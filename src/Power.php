@@ -14,8 +14,6 @@ class Power
         $computers_table = Computer::getTable();
         $computermodels_table = ComputerModel::getTable();
 
-        // select sum(glpi_computermodels.power_consumption),glpi_computers.name,glpi_computers.id from glpi_computermodels inner join glpi_computers on glpi_computermodels.id = glpi_computers.computermodels_id; 
-        // "SELECT SUM(`power_consumption`) AS `total_power_consumption` FROM `glpi_computermodels` INNER JOIN `glpi_computers` ON (`glpi_computermodels`.`id` = `glpi_computers`.`computermodels_id`)"
         $result = $DB->request([
             'SELECT'    => [
                 'SUM' => 'power_consumption AS total_power_consumption'
@@ -53,26 +51,11 @@ class Power
         $computers_table = Computer::getTable();
         $computermodels_table = ComputerModel::getTable();
 
-        /*  SQL:
-            SELECT
-                glpi_computermodels.name,
-                SUM(
-                    glpi_computermodels.power_consumption
-                ),
-                COUNT(glpi_computers.id)
-            FROM
-                glpi_computermodels
-            LEFT JOIN glpi_computers ON glpi_computermodels.id = glpi_computers.computermodels_id
-            WHERE
-                glpi_computermodels.power_consumption <> 0
-            GROUP BY
-                glpi_computermodels.id;
-        */
         $result = $DB->request([
             'SELECT'    => [
-                $computermodels_table . '.name',
+                ComputerModel::getTableField('name'),
                 'SUM' => 'power_consumption AS power_consumption_per_model',
-                'COUNT' => $computers_table . '.id',
+                'COUNT' => Computer::getTableField('id'),
             ],
             'FROM'      => $computermodels_table,
             'INNER JOIN' => [
@@ -84,9 +67,9 @@ class Power
                 ]
             ],
             'WHERE' => [
-                'power_consumption' => ['<>', '0'],
+                'power_consumption' => ['>', '0'],
             ],
-            'GROUPBY' => $computermodels_table . '.id',
+            'GROUPBY' => ComputerModel::getTableField('id'),
         ]);
 
         $data = [];
