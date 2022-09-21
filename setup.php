@@ -29,6 +29,8 @@
  * --------------------------------------------------------------------------
  */
 
+use GlpiPlugin\Carbon\Dashboard;
+
 define('PLUGIN_CARBON_VERSION', '0.0.1');
 
 // Minimal GLPI version, inclusive
@@ -47,6 +49,10 @@ function plugin_init_carbon()
     global $PLUGIN_HOOKS;
 
     $PLUGIN_HOOKS['csrf_compliant']['carbon'] = true;
+
+    // add new cards to the dashboard
+    $PLUGIN_HOOKS['dashboard_cards']['carbon'] = [Dashboard::class, 'dashboardCards'];
+
 }
 
 
