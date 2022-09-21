@@ -18,6 +18,11 @@ class Dashboard
                 'label'        => "GLPI Carbon - Global power consumption",
                 'provider'     => Dashboard::class . "::cardGlobalPowerProvider",
             ],
+            'plugin_carbon_card_power_per_model' => [
+                'widgettype'   => ["pie"],
+                'label'        => "GLPI Carbon - Power consumption per model",
+                'provider'     => Dashboard::class . "::cardPowerPerModelProvider",
+            ],
         ];
 
         return array_merge($cards, $new_cards);
@@ -25,17 +30,32 @@ class Dashboard
 
     static function cardGlobalPowerProvider(array $params = []) {
         $default_params = [
-           'label' => null,
-           'icon'  => null,
+           'label' => "plugin carbon - total power",
+           'icon'  => "fab fa-linux",
         ];
         $params = array_merge($default_params, $params);
   
         return [
            'number' => Power::getTotalPower(),
            'url'    => "https://www.linux.org/",
-           'label'  => "plugin carbon - global power",
-           'icon'   => "fab fa-linux", // font awesome icon
+           'label'  => $params['label'],
+           'icon'  => $params['icon'],
         ];
      }
   
+     static function cardPowerPerModelProvider(array $params = []) {
+        $default_params = [
+           'label' => "plugin carbon - power per model",
+           'icon'  => "fab fa-linux",
+           'color' => '#ea9999',
+        ];
+        $params = array_merge($default_params, $params);
+  
+        return [
+           'data' => Power::getPowerPerModel(),
+           'label'  => $params['label'],
+           'icon'  => $params['icon'],
+           'color' => $params['color'],
+        ];
+     }
 }
