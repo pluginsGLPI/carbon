@@ -19,7 +19,7 @@ class Dashboard
                 'provider'     => Dashboard::class . "::cardGlobalPowerProvider",
             ],
             'plugin_carbon_card_power_per_model' => [
-                'widgettype'   => ['pie', 'donut', 'halfpie', 'halfdonut', 'bars', 'hBars'],
+                'widgettype'   => ['pie', 'donut', 'halfpie', 'halfdonut', 'bar', 'hbar'],
                 'label'        => "GLPI Carbon - Power consumption per model",
                 'provider'     => Dashboard::class . "::cardPowerPerModelProvider",
             ],
