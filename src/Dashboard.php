@@ -2,6 +2,8 @@
 
 namespace GlpiPlugin\Carbon;
 
+use GlpiPlugin\Carbon\Power;
+
 class Dashboard
 {
     static function dashboardCards($cards = [])
@@ -29,7 +31,7 @@ class Dashboard
         $params = array_merge($default_params, $params);
   
         return [
-           'number' => 42,
+           'number' => Power::getTotalPower(),
            'url'    => "https://www.linux.org/",
            'label'  => "plugin carbon - global power",
            'icon'   => "fab fa-linux", // font awesome icon
