@@ -78,7 +78,7 @@ class Power
         ]);
 
         $data = [];
-        foreach ($result as $id => $row) {
+        foreach ($result as $row) {
             $data[] = [
                 'number' => $row['power_consumption_per_model'],
                 'url' => '/front/computermodel.form.php?id=' . $row['id'],
