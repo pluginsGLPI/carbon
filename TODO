@@ -1,6 +1,0 @@
-
-- ajouter une classe dérivant de CommonDBChild pour ajouter l'info d'impact pour chaque item_type:
-- ajouter une classe Impact pour définir l'impact??? pour l'instant impact = consommation électrique
-- ajouter une classe avec des méthodes static
-  - computeImpact($item_id)
-  - loadImpactData()
