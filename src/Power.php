@@ -7,6 +7,11 @@ use ComputerModel;
 
 class Power
 {
+    /**
+     * Returns total power of all computers.
+     * 
+     * @return int: total power of all computers
+     */
     static function getTotalPower()
     {
         global $DB;
@@ -55,7 +60,7 @@ class Power
             'SELECT'    => [
                 ComputerModel::getTableField('name'),
                 'SUM' => 'power_consumption AS power_consumption_per_model',
-                'COUNT' => Computer::getTableField('id'),
+                ComputerModel::getTableField('id'),
             ],
             'FROM'      => $computermodels_table,
             'INNER JOIN' => [
@@ -76,7 +81,7 @@ class Power
         foreach ($result as $id => $row) {
             $data[] = [
                 'number' => $row['power_consumption_per_model'],
-                'url' => '',
+                'url' => '/front/computermodel.form.php?id=' . $row['id'],
                 'label' => $row['name'],
             ];
         }

@@ -12,7 +12,7 @@ class Dashboard
             $cards = [];
         }
 
-        $new_cards =  [
+        $new_cards = [
             'plugin_carbon_card_global_power' => [
                 'widgettype'   => ["bigNumber"],
                 'label'        => "GLPI Carbon - Global power consumption",
@@ -28,34 +28,35 @@ class Dashboard
         return array_merge($cards, $new_cards);
     }
 
-    static function cardGlobalPowerProvider(array $params = []) {
+    static function cardGlobalPowerProvider(array $params = [])
+    {
         $default_params = [
-           'label' => "plugin carbon - total power",
-           'icon'  => "fab fa-linux",
+            'label' => "plugin carbon - total power",
+            'icon'  => "fas fa-computer",
         ];
         $params = array_merge($default_params, $params);
-  
+
         return [
-           'number' => Power::getTotalPower(),
-           'url'    => "https://www.linux.org/",
-           'label'  => $params['label'],
-           'icon'  => $params['icon'],
+            'number' => Power::getTotalPower(),
+            'label'  => $params['label'],
+            'icon'  => $params['icon'],
         ];
-     }
-  
-     static function cardPowerPerModelProvider(array $params = []) {
+    }
+
+    static function cardPowerPerModelProvider(array $params = [])
+    {
         $default_params = [
-           'label' => "plugin carbon - power per model",
-           'icon'  => "fab fa-linux",
-           'color' => '#ea9999',
+            'label' => "plugin carbon - power per model",
+            'icon'  => "fas fa-computer",
+            'color' => '#ea9999',
         ];
         $params = array_merge($default_params, $params);
-  
+
         return [
-           'data' => Power::getPowerPerModel(),
-           'label'  => $params['label'],
-           'icon'  => $params['icon'],
-           'color' => $params['color'],
+            'data' => Power::getPowerPerModel(),
+            'label'  => $params['label'],
+            'icon'  => $params['icon'],
+            'color' => $params['color'],
         ];
-     }
+    }
 }
