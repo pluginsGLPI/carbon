@@ -28,6 +28,7 @@
  *
  * --------------------------------------------------------------------------
  */
+use GlpiPlugin\Carbon\Power;
 
 /**
  * Plugin install process
@@ -36,6 +37,10 @@
  */
 function plugin_carbon_install()
 {
+    $migration = new Migration(PLUGIN_CARBON_VERSION);
+
+    Power::install($migration);
+
     return true;
 }
 

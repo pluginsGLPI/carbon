@@ -2,11 +2,21 @@
 
 namespace GlpiPlugin\Carbon;
 
+use CommonDBChild;
 use Computer;
 use ComputerModel;
+use Migration;
 
-class Power
+class Power extends CommonDBChild
 {
+    public static $itemtype = 'Computer';
+    public static $items_id = 'computers_id';
+
+    static function getTypeName($nb = 0)
+    {
+        return \_n("Power", "Powers", $nb, 'power');
+    }
+
     /**
      * Returns total power of all computers.
      * 
@@ -87,5 +97,33 @@ class Power
         }
 
         return $data;
+    }
+
+    static function install(Migration $migration)
+    {
+        global $DB;
+
+        $table = self::getTable();
+        if (!$DB->tableExists($table)) {
+            $migration->displayMessage(sprintf(\__("Installing %s"), $table));
+
+            $query = "CREATE TABLE `$table` (
+                       `id` INT(11) NOT NULL auto_increment,
+                       `computers_id` INT(11) NOT NULL DEFAULT '0',
+                       `power` FLOAT(24) DEFAULT '0.0',
+                       PRIMARY KEY (`id`)
+                    ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8_unicode_ci;";
+            $DB->query($query) or die($DB->error());
+        }
+    }
+
+
+    static function uninstall()
+    {
+        global $DB;
+
+        $DB->query("DROP TABLE IF EXISTS `" . self::getTable() . "`");
+
+        return true;
     }
 }
