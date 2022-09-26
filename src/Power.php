@@ -112,11 +112,10 @@ class Power extends CommonDBChild
                        `computers_id` INT(11) NOT NULL DEFAULT '0',
                        `power` FLOAT(24) DEFAULT '0.0',
                        PRIMARY KEY (`id`)
-                    ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8_unicode_ci;";
+                    ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
             $DB->query($query) or die($DB->error());
         }
     }
-
 
     static function uninstall()
     {
