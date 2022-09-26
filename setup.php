@@ -30,6 +30,7 @@
  */
 
 use GlpiPlugin\Carbon\Dashboard;
+use GlpiPlugin\Carbon\PowerModelCategory;
 
 define('PLUGIN_CARBON_VERSION', '0.0.1');
 
@@ -53,6 +54,7 @@ function plugin_init_carbon()
     // add new cards to the dashboard
     $PLUGIN_HOOKS['dashboard_cards']['carbon'] = [Dashboard::class, 'dashboardCards'];
 
+    Plugin::registerClass(PowerModelCategory::class);
 }
 
 
