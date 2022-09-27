@@ -11,7 +11,7 @@ class PowerModelCategory extends CommonDropdown
     static function getTypeName($nb = 0)
     {
 
-        return __('Carbon Plugin - Power model category', 'carbon');
+        return __('Carbon Plugin - Power model categories', 'carbon');
     }
 
     static function install(Migration $migration)

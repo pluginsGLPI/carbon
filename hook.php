@@ -70,5 +70,5 @@ function plugin_carbon_uninstall()
 
 function plugin_carbon_getDropdown()
 {
-    return [PowerModelCategory::class => __('Carbon Plugin - Power model category', 'carbon')];
+    return [PowerModelCategory::class => __('Carbon Plugin - Power model categories', 'carbon')];
 }
