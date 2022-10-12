@@ -7,10 +7,10 @@ use Computer;
 use ComputerModel;
 use Migration;
 
-class PowerModel_Computer extends CommonDBRelation
+class PowerModel_ComputerModel extends CommonDBRelation
 {
-    public static $itemtype_1 = 'Computer';
-    public static $items_id_1 = 'computers_id';
+    public static $itemtype_1 = 'ComputerModel';
+    public static $items_id_1 = 'computermodels_id';
     static public $checkItem_1_Rights  = self::DONT_CHECK_ITEM_RIGHTS;
 
     public static $itemtype_2 = 'GlpiPlugin\Carbon\PowerModel';
@@ -33,9 +33,9 @@ class PowerModel_Computer extends CommonDBRelation
             $query = "CREATE TABLE `$table` (
                        `id` INT(11) NOT NULL auto_increment,
                        `plugin_carbon_powermodels_id` INT(11) NOT NULL DEFAULT '0',
-                       `computers_id` INT(11) NOT NULL DEFAULT '0',
+                       `computermodels_id` INT(11) NOT NULL DEFAULT '0',
                        PRIMARY KEY (`id`),
-                       UNIQUE INDEX `unicity` (`plugin_carbon_powermodels_id`, `computers_id`)
+                       UNIQUE INDEX `unicity` (`plugin_carbon_powermodels_id`, `computermodels_id`)
                     ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
             $DB->query($query) or die($DB->error());
         }

@@ -31,7 +31,7 @@
 
 use GlpiPlugin\Carbon\Power;
 use GlpiPlugin\Carbon\PowerModel;
-use GlpiPlugin\Carbon\PowerModel_Computer;
+use GlpiPlugin\Carbon\PowerModel_ComputerModel;
 use GlpiPlugin\Carbon\PowerModelCategory;
 
 /**
@@ -45,7 +45,7 @@ function plugin_carbon_install()
 
     Power::install($migration);
     PowerModel::install($migration);
-    PowerModel_Computer::install($migration);
+    PowerModel_ComputerModel::install($migration);
     PowerModelCategory::install($migration);
 
     return true;
@@ -62,7 +62,7 @@ function plugin_carbon_uninstall()
 
     Power::uninstall($migration);
     PowerModel::uninstall($migration);
-    PowerModel_Computer::uninstall($migration);
+    PowerModel_ComputerModel::uninstall($migration);
     PowerModelCategory::uninstall($migration);
 
     return true;

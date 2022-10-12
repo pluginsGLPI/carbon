@@ -2,12 +2,15 @@
 
 namespace GlpiPlugin\Carbon;
 
-use CommonDBTM;
+use CommonDBChild;
 use Computer;
 use ComputerModel;
 use Migration;
 
-class PowerModel extends CommonDBTM {
+class PowerModel extends CommonDBChild {
+
+    public static $itemtype = 'GlpiPlugin\Carbon\PowerModelCategory';
+    public static $items_id = 'plugin_carbon_powermodelcategories_id';
 
     static function getTypeName($nb = 0)
     {
@@ -26,7 +29,8 @@ class PowerModel extends CommonDBTM {
                        `id` INT(11) NOT NULL auto_increment,
                        `name` VARCHAR(255),
                        `power` FLOAT(24) DEFAULT '0.0',
-                       PRIMARY KEY (`id`)
+                       `plugin_carbon_powermodelcategories_id` INT(11) DEFAULT '0',
+                        PRIMARY KEY (`id`)
                     ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
             $DB->query($query) or die($DB->error());
         }
