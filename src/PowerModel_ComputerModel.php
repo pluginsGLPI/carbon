@@ -41,7 +41,7 @@ class PowerModel_ComputerModel extends CommonDBRelation
         }
     }
 
-    static function uninstall()
+    static function uninstall(Migration $migration)
     {
         global $DB;
         $DB->query("DROP TABLE IF EXISTS `" . self::getTable() . "`");

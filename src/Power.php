@@ -117,7 +117,7 @@ class Power extends CommonDBChild
         }
     }
 
-    static function uninstall()
+    static function uninstall(Migration $migration)
     {
         global $DB;
 
