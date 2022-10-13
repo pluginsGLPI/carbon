@@ -18,9 +18,9 @@ class PowerData {
             return $data;
         }
 
-        $header = fgetcsv($file);
+        $header = array_slice(fgetcsv($file), 1);
         while (($line = fgetcsv($file)) !== FALSE) {
-            $data[] = array_combine($header, $line);
+            $data[$line[0]] = array_combine($header, array_slice($line, 1));
         }
 
         fclose($file);
