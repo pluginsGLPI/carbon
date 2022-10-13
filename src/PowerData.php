@@ -18,9 +18,9 @@ class PowerData {
             return $data;
         }
 
-        $header = array_slice(fgetcsv($file), 1);
+        $header = fgetcsv($file);
         while (($line = fgetcsv($file)) !== FALSE) {
-            $data[$line[0]] = array_combine($header, array_slice($line, 1));
+            $data[] = array_combine($header, $line);
         }
 
         fclose($file);
@@ -28,10 +28,22 @@ class PowerData {
         return $data;
     }
 
+    static function loadPowerModels()
+    {
+        $data = self::readCSVData(__DIR__ . '/../data/teclib-editions/powermodels.csv');
+        foreach ($data as $values) {
+            $name = $values['Power model'];
+            $power = floatval($values['Power']);
+            $category = $values['Category'];
+
+            PowerModel::updateOrInsert($name, $power, $category);
+        }
+    }
+
     static function install(Migration $migration)
     {
-        self::$powerModels = self::readCSVData(__DIR__ . '/../data/teclib-editions/powermodels.csv');
-        self::$computerModels2powerModels = self::readCSVData(__DIR__ . '/../data/teclib-editions/computermodels2powermodels.csv');
+        self::loadPowerModels();
+        //self::$computerModels2powerModels = self::readCSVData(__DIR__ . '/../data/teclib-editions/computermodels2powermodels.csv');
     }
 
     static function uninstall(Migration $migration)

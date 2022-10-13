@@ -23,19 +23,15 @@ class PowerModelCategory extends CommonDropdown
             $query = "CREATE TABLE `$table` (
                        `id` INT(11) NOT NULL auto_increment,
                        `name` VARCHAR(255) default NULL,
-                       `comment` TEXT,
                        PRIMARY KEY  (`id`),
                        KEY `name` (`name`)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
 
             $DB->query($query) or die($DB->error());
 
-            $query = "INSERT INTO `$table` (`id`, `name`, `comment`)
-                        VALUES  (1, 'Infrastructure', 'Servers...'),
-                                (2, 'Users', 'Desktops, laptops...')";
-
-            $DB->query($query) or die($DB->error());
-        }
+/*             $DB->insertOrDie($table, ['name' => 'Infrastructure']);
+            $DB->insertOrDie($table, ['name' => 'User']);
+ */        }
     }
 
     static function uninstall(Migration $migration)
@@ -47,4 +43,26 @@ class PowerModelCategory extends CommonDropdown
         return true;
     }
 
+    static function getByNameOrInsert(string $name)
+    {
+        global $DB;
+
+        $table = self::getTable();
+        $result = $DB->request([
+                'FROM' => $table,
+                'WHERE' => [
+                    'name' => $name,
+                ],
+            ],
+            '',
+            true
+        );
+
+        if ($result->numrows() == 1) {
+            return $result->current()['id'];
+        } else {
+            $DB->insertOrDie($table, ['name' => $name]);
+            return $DB->insertId();
+        }
+    }
 }

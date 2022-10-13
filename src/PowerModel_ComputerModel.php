@@ -9,12 +9,12 @@ use Migration;
 
 class PowerModel_ComputerModel extends CommonDBRelation
 {
-    public static $itemtype_1 = 'ComputerModel';
-    public static $items_id_1 = 'computermodels_id';
+    public static $itemtype_1 = 'GlpiPlugin\Carbon\PowerModel';
+    public static $items_id_1 = 'plugin_carbon_powermodels_id';
     static public $checkItem_1_Rights  = self::DONT_CHECK_ITEM_RIGHTS;
 
-    public static $itemtype_2 = 'GlpiPlugin\Carbon\PowerModel';
-    public static $items_id_2 = 'plugin_carbon_powermodels_id';
+    public static $itemtype_2 = 'ComputerModel';
+    public static $items_id_2 = 'computermodels_id';
     static public $checkItem_2_Rights  = self::DONT_CHECK_ITEM_RIGHTS;
 
     static function getTypeName($nb = 0)

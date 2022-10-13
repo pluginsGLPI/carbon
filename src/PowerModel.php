@@ -45,4 +45,20 @@ class PowerModel extends CommonDBChild {
         return true;
     }
 
+    static function updateOrInsert(string $name, float $power, string $category)
+    {
+        global $DB;
+
+        $category_id = PowerModelCategory::getByNameOrInsert($category);
+        $params = [
+            'name' => $name,
+            'power' => $power,
+            'plugin_carbon_powermodelcategories_id' => $category_id,
+        ];
+        $where = [
+            'name' => $name,
+        ];
+        $DB->updateOrInsert(self::getTable(), $params, $where);
+    }
+
 }
