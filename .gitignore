@@ -5,6 +5,7 @@ vendor/
 composer.lock
 *.min.*
 *.code-workspace
-data/
 *~
 docs/GLPI carbon.sql
+data/teclib-editions/computermodels.csv
+data/teclib-editions/computertypes.csv
