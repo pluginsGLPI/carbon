@@ -4,10 +4,8 @@ namespace GlpiPlugin\Carbon;
 
 use Migration;
 
-class PowerData {
-
-    public static $powerModels;
-    public static $computerModels2powerModels;
+class PowerData
+{
 
     static function readCSVData(string $filename)
     {
@@ -40,14 +38,24 @@ class PowerData {
         }
     }
 
+    static function loadPowerModels_ComputerModels()
+    {
+        $data = self::readCSVData(__DIR__ . '/../data/teclib-editions/computermodels2powermodels.csv');
+        foreach ($data as $values) {
+            $powerModel = $values['Power model'];
+            $computerModel = $values['Computer model'];
+
+            PowerModel_ComputerModel::updateOrInsert($powerModel, $computerModel);
+        }
+    }
+
     static function install(Migration $migration)
     {
         self::loadPowerModels();
-        //self::$computerModels2powerModels = self::readCSVData(__DIR__ . '/../data/teclib-editions/computermodels2powermodels.csv');
+        self::loadPowerModels_ComputerModels();
     }
 
     static function uninstall(Migration $migration)
     {
     }
-
 }

@@ -49,11 +49,10 @@ class PowerModel extends CommonDBChild {
     {
         global $DB;
 
-        $category_id = PowerModelCategory::getByNameOrInsert($category);
         $params = [
             'name' => $name,
             'power' => $power,
-            'plugin_carbon_powermodelcategories_id' => $category_id,
+            'plugin_carbon_powermodelcategories_id' => PowerModelCategory::getIdByNameOrInsert($category),
         ];
         $where = [
             'name' => $name,

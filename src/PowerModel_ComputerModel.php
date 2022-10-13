@@ -48,4 +48,21 @@ class PowerModel_ComputerModel extends CommonDBRelation
 
         return true;
     }
+
+    static function updateOrInsert(string $powerModel, string $computerModel)
+    {
+        global $DB;
+
+        $powerModel_id = DBUtils::getIdByName(PowerModel::getTable(), $powerModel);
+        $computerModel_id = DBUtils::getIdByName(ComputerModel::getTable(), $computerModel);
+        $params = [
+            'plugin_carbon_powermodels_id' => $powerModel_id,
+            'computermodels_id' => $computerModel_id,
+        ];
+        $where = [
+            'plugin_carbon_powermodels_id' => $powerModel_id,
+            'computermodels_id' => $computerModel_id,
+        ];
+        $DB->updateOrInsert(self::getTable(), $params, $where);
+    }
 }

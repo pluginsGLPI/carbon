@@ -28,10 +28,7 @@ class PowerModelCategory extends CommonDropdown
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
 
             $DB->query($query) or die($DB->error());
-
-/*             $DB->insertOrDie($table, ['name' => 'Infrastructure']);
-            $DB->insertOrDie($table, ['name' => 'User']);
- */        }
+        }
     }
 
     static function uninstall(Migration $migration)
@@ -43,26 +40,17 @@ class PowerModelCategory extends CommonDropdown
         return true;
     }
 
-    static function getByNameOrInsert(string $name)
+    static function getIdByNameOrInsert(string $name)
     {
         global $DB;
 
         $table = self::getTable();
-        $result = $DB->request([
-                'FROM' => $table,
-                'WHERE' => [
-                    'name' => $name,
-                ],
-            ],
-            '',
-            true
-        );
-
-        if ($result->numrows() == 1) {
-            return $result->current()['id'];
-        } else {
-            $DB->insertOrDie($table, ['name' => $name]);
-            return $DB->insertId();
+        if ($id = DBUtils::getIdByName($table, $name)) {
+            return $id;
         }
+
+        $DB->insertOrDie($table, ['name' => $name]);
+
+        return $DB->insertId();
     }
 }
