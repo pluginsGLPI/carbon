@@ -55,7 +55,7 @@ class Power extends CommonDBChild
                 ]
             ],
             'WHERE' => [
-                'computer_id' => $computer_id,
+                Computer::getTableField('id') => $computer_id,
             ],
         ];
         $result = $DB->request($request);
@@ -74,6 +74,27 @@ class Power extends CommonDBChild
         return false;
     }
 
+    static function computerPowerForAllComputers() 
+    {
+        global $DB;
+
+        $computers_table = Computer::getTable();
+
+        $request = [
+            'SELECT'    => [
+                Computer::getTableField('id') . ' AS computer_id',
+            ],
+            'FROM'      => $computers_table,
+        ];
+        $result = $DB->request($request);
+
+        foreach ($result as $computer) {
+            self::computerPowerForComputer($computer['computer_id']);
+        }
+
+        return false;
+    }
+
     static function install(Migration $migration)
     {
         global $DB;
@@ -83,9 +104,9 @@ class Power extends CommonDBChild
             $migration->displayMessage(sprintf(\__("Installing %s"), $table));
 
             $query = "CREATE TABLE `$table` (
-                       `id` INT(11) NOT NULL auto_increment,
+                       `id` INT(11) UNSIGNED NOT NULL auto_increment,
                        `computers_id` INT(11) NOT NULL DEFAULT '0',
-                       `power` FLOAT(24) DEFAULT '0.0',
+                       `power` INT(11) DEFAULT '0',
                        PRIMARY KEY (`id`)
                     ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
             $DB->query($query) or die($DB->error());

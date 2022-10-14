@@ -75,3 +75,31 @@ function plugin_carbon_getDropdown()
 {
     return [PowerModelCategory::class => __('Carbon Plugin - Power model categories', 'carbon')];
 }
+
+function plugin_carbon_getAddSearchOptions($itemtype)
+{
+    $sopt = [];
+
+    if (in_array($itemtype, PLUGIN_CARBON_TYPES)) {
+        $sopt[] = [
+            'id' => 2222,
+            'table'        => Power::getTable(),
+            'field'        => 'power',
+            'name'         => __('Power', 'power'),
+            'datatype'     => 'number',
+            'linkfield'    => 'computers_id',
+            'joinparams' => [
+                'jointype' => 'child'
+            ]
+        ];
+    }
+
+    return $sopt;
+}
+
+function plugin_carbon_post_plugin_enable($plugin)
+{
+    if ($plugin == 'carbon') {
+        Power::computerPowerForAllComputers();
+    }
+}

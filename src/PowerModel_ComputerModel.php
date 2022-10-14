@@ -31,7 +31,7 @@ class PowerModel_ComputerModel extends CommonDBRelation
             $migration->displayMessage(sprintf(__("Installing %s"), $table));
 
             $query = "CREATE TABLE `$table` (
-                       `id` INT(11) NOT NULL auto_increment,
+                       `id` INT(11) UNSIGNED NOT NULL auto_increment,
                        `plugin_carbon_powermodels_id` INT(11) NOT NULL DEFAULT '0',
                        `computermodels_id` INT(11) NOT NULL DEFAULT '0',
                        PRIMARY KEY (`id`),

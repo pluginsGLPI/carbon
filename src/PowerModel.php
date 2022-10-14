@@ -26,7 +26,7 @@ class PowerModel extends CommonDBChild {
             $migration->displayMessage(sprintf(\__("Installing %s"), $table));
 
             $query = "CREATE TABLE `$table` (
-                       `id` INT(11) NOT NULL auto_increment,
+                       `id` INT(11) UNSIGNED NOT NULL auto_increment,
                        `name` VARCHAR(255),
                        `power` FLOAT(24) DEFAULT '0.0',
                        `plugin_carbon_powermodelcategories_id` INT(11) DEFAULT '0',

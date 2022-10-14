@@ -31,6 +31,7 @@
 
 use GlpiPlugin\Carbon\Dashboard;
 use GlpiPlugin\Carbon\PowerModelCategory;
+use Glpi\Plugin\Hooks;
 
 define('PLUGIN_CARBON_VERSION', '0.0.1');
 
@@ -39,6 +40,15 @@ define("PLUGIN_CARBON_MIN_GLPI_VERSION", "10.0.0");
 // Maximum GLPI version, exclusive
 define("PLUGIN_CARBON_MAX_GLPI_VERSION", "10.0.99");
 
+// Plugin compatible itemtypes
+define('PLUGIN_CARBON_TYPES', [
+    'Computer',
+//    'Monitor',
+//    'NetworkEquipment',
+//    'Phone',
+//    'Printer',
+]);
+ 
 /**
  * Init hooks of the plugin.
  * REQUIRED
@@ -49,10 +59,13 @@ function plugin_init_carbon()
 {
     global $PLUGIN_HOOKS;
 
-    $PLUGIN_HOOKS['csrf_compliant']['carbon'] = true;
+    $PLUGIN_HOOKS[Hooks::CSRF_COMPLIANT]['carbon'] = true;
 
     // add new cards to the dashboard
     $PLUGIN_HOOKS['dashboard_cards']['carbon'] = [Dashboard::class, 'dashboardCards'];
+
+    // [HACK] add hook to compute power when enabling plugin
+    $PLUGIN_HOOKS[Hooks::POST_PLUGIN_ENABLE]['carbon'] = 'plugin_carbon_post_plugin_enable';
 
     Plugin::registerClass(PowerModelCategory::class);
 }

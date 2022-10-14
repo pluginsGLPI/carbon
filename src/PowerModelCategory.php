@@ -21,7 +21,7 @@ class PowerModelCategory extends CommonDropdown
         $table = self::getTable();
         if (!$DB->tableExists("$table")) {
             $query = "CREATE TABLE `$table` (
-                       `id` INT(11) NOT NULL auto_increment,
+                       `id` INT(11) UNSIGNED NOT NULL auto_increment,
                        `name` VARCHAR(255) default NULL,
                        PRIMARY KEY  (`id`),
                        KEY `name` (`name`)
