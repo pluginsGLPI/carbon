@@ -17,86 +17,61 @@ class Power extends CommonDBChild
         return \_n("Power", "Powers", $nb, 'power');
     }
 
-    /**
-     * Returns total power of all computers.
-     * 
-     * @return int: total power of all computers
-     */
-    static function getTotalPower()
+    static function computerPowerForComputer(int $computer_id)
     {
         global $DB;
 
         $computers_table = Computer::getTable();
         $computermodels_table = ComputerModel::getTable();
+        $powermodels_computermodels_table = PowerModel_ComputerModel::getTable();
+        $powermodels_table = PowerModel::getTable();
 
-        $result = $DB->request([
+        $request = [
             'SELECT'    => [
-                'SUM' => 'power_consumption AS total_power_consumption'
+                Computer::getTableField('id') . ' AS computer_id',
+                PowerModel::getTableField('power'),
+//                ComputerModel::getTableField('name') . ' AS computermodel_name',
+//                PowerModel::getTableField('name') . 'AS powermodel_name',
             ],
-            'FROM'      => $computermodels_table,
+            'FROM'      => $computers_table,
             'INNER JOIN' => [
-                $computers_table => [
+                $computermodels_table => [
                     'FKEY'   => [
                         $computermodels_table  => 'id',
                         $computers_table => 'computermodels_id',
                     ]
-                ]
-            ]
-        ]);
-        if ($row = $result->current()) {
-            $total_power_consumption = $row['total_power_consumption'];
-            return $total_power_consumption;
-        }
-
-        return 42;
-    }
-
-    /**
-     * Returns total power per computer model.
-     * 
-     * @return array of:
-     *   - int  'number': total power of the model
-     *   - string 'url': url to redirect when clicking on the slice
-     *   - string 'label': name of the computer model
-     */
-    static function getPowerPerModel()
-    {
-        global $DB;
-
-        $computers_table = Computer::getTable();
-        $computermodels_table = ComputerModel::getTable();
-
-        $result = $DB->request([
-            'SELECT'    => [
-                ComputerModel::getTableField('name'),
-                'SUM' => 'power_consumption AS power_consumption_per_model',
-                ComputerModel::getTableField('id'),
-            ],
-            'FROM'      => $computermodels_table,
-            'INNER JOIN' => [
-                $computers_table => [
+                ],
+                $powermodels_computermodels_table => [
                     'FKEY'   => [
                         $computermodels_table  => 'id',
-                        $computers_table => 'computermodels_id',
+                        $powermodels_computermodels_table => 'computermodels_id',
+                    ]
+                ],
+                $powermodels_table => [
+                    'FKEY'   => [
+                        $powermodels_computermodels_table  => 'plugin_carbon_powermodels_id',
+                        $powermodels_table => 'id',
                     ]
                 ]
             ],
             'WHERE' => [
-                'power_consumption' => ['>', '0'],
+                'computer_id' => $computer_id,
             ],
-            'GROUPBY' => ComputerModel::getTableField('id'),
-        ]);
+        ];
+        $result = $DB->request($request);
 
-        $data = [];
-        foreach ($result as $row) {
-            $data[] = [
-                'number' => $row['power_consumption_per_model'],
-                'url' => '/front/computermodel.form.php?id=' . $row['id'],
-                'label' => $row['name'],
+        if ($result->numrows() == 1) {
+            $params = [
+                'computers_id' => $computer_id,
+                'power' => $result->current()['power'],
             ];
+            $where = [
+                'computers_id' => $computer_id,
+            ];
+            return $DB->updateOrInsert(self::getTable(), $params, $where);
         }
 
-        return $data;
+        return false;
     }
 
     static function install(Migration $migration)
