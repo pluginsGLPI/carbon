@@ -15,10 +15,15 @@ class Dashboard
         }
 
         $new_cards = [
-            'plugin_carbon_card_global_power' => [
+            'plugin_carbon_card_total_power' => [
                 'widgettype'   => ["bigNumber"],
-                'label'        => "GLPI Carbon - Global power consumption",
-                'provider'     => Dashboard::class . "::cardGlobalPowerProvider",
+                'label'        => "GLPI Carbon - Total power consumption",
+                'provider'     => Dashboard::class . "::cardTotalPowerProvider",
+            ],
+            'plugin_carbon_card_total_power_per_model' => [
+                'widgettype'   => ['pie', 'donut', 'halfpie', 'halfdonut', 'bar', 'hbar'],
+                'label'        => "GLPI Carbon - Total power consumption per model",
+                'provider'     => Dashboard::class . "::cardTotalPowerPerModelProvider",
             ],
             'plugin_carbon_card_power_per_model' => [
                 'widgettype'   => ['pie', 'donut', 'halfpie', 'halfdonut', 'bar', 'hbar'],
@@ -30,7 +35,7 @@ class Dashboard
         return array_merge($cards, $new_cards);
     }
 
-    static function cardGlobalPowerProvider(array $params = [])
+    static function cardTotalPowerProvider(array $params = [])
     {
         $default_params = [
             'label' => "plugin carbon - total power",
@@ -42,6 +47,23 @@ class Dashboard
             'number' => self::getTotalPower(),
             'label'  => $params['label'],
             'icon'  => $params['icon'],
+        ];
+    }
+
+    static function cardTotalPowerPerModelProvider(array $params = [])
+    {
+        $default_params = [
+            'label' => "plugin carbon - total power per model",
+            'icon'  => "fas fa-computer",
+            'color' => '#ea9999',
+        ];
+        $params = array_merge($default_params, $params);
+
+        return [
+            'data' => self::getTotalPowerPerModel(),
+            'label'  => $params['label'],
+            'icon'  => $params['icon'],
+            'color' => $params['color'],
         ];
     }
 
@@ -61,6 +83,7 @@ class Dashboard
             'color' => $params['color'],
         ];
     }
+
     /**
      * Returns total power of all computers.
      * 
@@ -94,7 +117,7 @@ class Dashboard
      *   - string 'url': url to redirect when clicking on the slice
      *   - string 'label': name of the computer model
      */
-    static function getPowerPerModel()
+    static function getTotalPowerPerModel()
     {
         global $DB;
 
@@ -141,4 +164,59 @@ class Dashboard
 
         return $data;
     }
+
+    /**
+     * Returns power per computer model.
+     * 
+     * @return array of:
+     *   - int  'number': power of the model
+     *   - string 'url': url to redirect when clicking on the slice
+     *   - string 'label': name of the computer model
+     */
+    static function getPowerPerModel()
+    {
+        global $DB;
+
+        $computermodels_table = ComputerModel::getTable();
+        $powermodels_table = PowerModel::getTable();
+        $powermodels_computermodels_table = PowerModel_ComputerModel::getTable();
+
+        $result = $DB->request([
+            'SELECT'    => [
+                ComputerModel::getTableField('id'),
+                ComputerModel::getTableField('name'),
+                PowerModel::getTableField('power'),
+            ],
+            'FROM'      => $computermodels_table,
+            'INNER JOIN' => [
+                $powermodels_computermodels_table => [
+                    'FKEY'   => [
+                        $computermodels_table  => 'id',
+                        $powermodels_computermodels_table => 'computermodels_id',
+                    ]
+                ],
+                $powermodels_table => [
+                    'FKEY'   => [
+                        $powermodels_computermodels_table  => 'plugin_carbon_powermodels_id',
+                        $powermodels_table => 'id',
+                    ]
+                ],
+            ],
+            'WHERE' => [
+                PowerModel::getTableField('power') => ['>', '0'],
+            ],
+        ]);
+
+        $data = [];
+        foreach ($result as $row) {
+            $data[] = [
+                'number' => $row['power'],
+                'url' => '/front/computermodel.form.php?id=' . $row['id'],
+                'label' => $row['name'],
+            ];
+        }
+
+        return $data;
+    }
+
 }
