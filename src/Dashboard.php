@@ -102,8 +102,7 @@ class Dashboard
             'FROM'      => $powers_table,
         ]);
         if ($row = $result->current()) {
-            $total_power_consumption = $row['total_power_consumption'];
-            return $total_power_consumption;
+            return $row['total_power_consumption'];
         }
 
         return 42;
