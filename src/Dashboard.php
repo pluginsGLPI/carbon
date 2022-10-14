@@ -104,9 +104,10 @@ class Dashboard
 
         $result = $DB->request([
             'SELECT'    => [
+                ComputerModel::getTableField('id'),
                 ComputerModel::getTableField('name'),
                 'SUM' => Power::getTableField('power') . ' AS power_consumption_per_model',
-                ComputerModel::getTableField('id'),
+                'COUNT' => Computer::getTableField('id') . ' AS nb_computers_per_model',
             ],
             'FROM'      => $computermodels_table,
             'INNER JOIN' => [
@@ -134,7 +135,7 @@ class Dashboard
             $data[] = [
                 'number' => $row['power_consumption_per_model'],
                 'url' => '/front/computermodel.form.php?id=' . $row['id'],
-                'label' => $row['name'],
+                'label' => $row['name'] . " (" . $row['nb_computers_per_model'] . " computers)",
             ];
         }
 
