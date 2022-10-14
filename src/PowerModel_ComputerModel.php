@@ -53,8 +53,13 @@ class PowerModel_ComputerModel extends CommonDBRelation
     {
         global $DB;
 
-        $powerModel_id = DBUtils::getIdByName(PowerModel::getTable(), $powerModel);
-        $computerModel_id = DBUtils::getIdByName(ComputerModel::getTable(), $computerModel);
+        if (!($powerModel_id = DBUtils::getIdByName(PowerModel::getTable(), $powerModel))) {
+            return false;
+        }
+        if (!($computerModel_id = DBUtils::getIdByName(ComputerModel::getTable(), $computerModel))) {
+            return false;
+        }
+
         $params = [
             'plugin_carbon_powermodels_id' => $powerModel_id,
             'computermodels_id' => $computerModel_id,
@@ -63,6 +68,6 @@ class PowerModel_ComputerModel extends CommonDBRelation
             'plugin_carbon_powermodels_id' => $powerModel_id,
             'computermodels_id' => $computerModel_id,
         ];
-        $DB->updateOrInsert(self::getTable(), $params, $where);
+        return $DB->updateOrInsert(self::getTable(), $params, $where);
     }
 }
