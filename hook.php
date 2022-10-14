@@ -85,7 +85,7 @@ function plugin_carbon_getAddSearchOptions($itemtype)
             'id' => 2222,
             'table'        => Power::getTable(),
             'field'        => 'power',
-            'name'         => __('Power', 'power'),
+            'name'         => __('Power (W)', 'power (W)'),
             'datatype'     => 'number',
             'linkfield'    => 'computers_id',
             'joinparams' => [

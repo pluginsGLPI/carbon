@@ -65,28 +65,18 @@ class Dashboard
      * Returns total power of all computers.
      * 
      * @return int: total power of all computers
-     * @deprecated
      */
     static function getTotalPower()
     {
         global $DB;
 
-        $computers_table = Computer::getTable();
-        $computermodels_table = ComputerModel::getTable();
+        $powers_table = Power::getTable();
 
         $result = $DB->request([
             'SELECT'    => [
-                'SUM' => 'power_consumption AS total_power_consumption'
+                'SUM' => 'power AS total_power_consumption'
             ],
-            'FROM'      => $computermodels_table,
-            'INNER JOIN' => [
-                $computers_table => [
-                    'FKEY'   => [
-                        $computermodels_table  => 'id',
-                        $computers_table => 'computermodels_id',
-                    ]
-                ]
-            ]
+            'FROM'      => $powers_table,
         ]);
         if ($row = $result->current()) {
             $total_power_consumption = $row['total_power_consumption'];
@@ -103,7 +93,6 @@ class Dashboard
      *   - int  'number': total power of the model
      *   - string 'url': url to redirect when clicking on the slice
      *   - string 'label': name of the computer model
-     * @deprecated
      */
     static function getPowerPerModel()
     {
@@ -111,11 +100,12 @@ class Dashboard
 
         $computers_table = Computer::getTable();
         $computermodels_table = ComputerModel::getTable();
+        $powers_table = Power::getTable();
 
         $result = $DB->request([
             'SELECT'    => [
                 ComputerModel::getTableField('name'),
-                'SUM' => 'power_consumption AS power_consumption_per_model',
+                'SUM' => Power::getTableField('power') . ' AS power_consumption_per_model',
                 ComputerModel::getTableField('id'),
             ],
             'FROM'      => $computermodels_table,
@@ -125,10 +115,16 @@ class Dashboard
                         $computermodels_table  => 'id',
                         $computers_table => 'computermodels_id',
                     ]
-                ]
+                ],
+                $powers_table => [
+                    'FKEY'   => [
+                        $computers_table  => 'id',
+                        $powers_table => 'computers_id',
+                    ]
+                ],
             ],
             'WHERE' => [
-                'power_consumption' => ['>', '0'],
+                Power::getTableField('power') => ['>', '0'],
             ],
             'GROUPBY' => ComputerModel::getTableField('id'),
         ]);
