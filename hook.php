@@ -34,6 +34,7 @@ use GlpiPlugin\Carbon\PowerModel;
 use GlpiPlugin\Carbon\PowerModel_ComputerModel;
 use GlpiPlugin\Carbon\PowerModelCategory;
 use GlpiPlugin\Carbon\PowerData;
+use GlpiPlugin\Carbon\CarbonEmission;
 
 /**
  * Plugin install process
@@ -49,6 +50,7 @@ function plugin_carbon_install()
     PowerModel_ComputerModel::install($migration);
     PowerModelCategory::install($migration);
     PowerData::install($migration);
+    CarbonEmission::install($migration);
 
     return true;
 }
@@ -67,6 +69,7 @@ function plugin_carbon_uninstall()
     PowerModel_ComputerModel::uninstall($migration);
     PowerModelCategory::uninstall($migration);
     PowerData::uninstall($migration);
+    CarbonEmission::uninstall($migration);
 
     return true;
 }
@@ -92,6 +95,17 @@ function plugin_carbon_getAddSearchOptions($itemtype)
                 'jointype' => 'child'
             ]
         ];
+        $sopt[] = [
+            'id' => 2223,
+            'table'        => CarbonEmission::getTable(),
+            'field'        => 'emission_per_day',
+            'name'         => __('Carbon emission (kgCO2)', 'carbon emission (kgC02)'),
+            'datatype'     => 'number',
+            'linkfield'    => 'computers_id',
+            'joinparams' => [
+                'jointype' => 'child'
+            ]
+        ];
     }
 
     return $sopt;
@@ -101,5 +115,6 @@ function plugin_carbon_post_plugin_enable($plugin)
 {
     if ($plugin == 'carbon') {
         Power::computerPowerForAllComputers();
+        CarbonEmission::computerCarbonEmissionPerDayForAllComputers();
     }
 }

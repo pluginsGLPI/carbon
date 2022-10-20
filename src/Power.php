@@ -17,6 +17,41 @@ class Power extends CommonDBChild
         return \_n("Power", "Powers", $nb, 'power');
     }
 
+    static function getPower(int $computer_id): int
+    {
+        global $DB;
+
+        $powers_table = Power::getTable();
+        $computers_table = Computer::getTable();
+
+        $request = [
+            'SELECT'    => [
+                Computer::getTableField('id') . ' AS computer_id',
+                Power::getTableField('power') . ' AS power',
+            ],
+            'FROM'      => $powers_table,
+            'INNER JOIN' => [
+                $computers_table => [
+                    'FKEY'   => [
+                        $powers_table  => 'computers_id',
+                        $computers_table => 'id',
+                    ]
+                ],
+            ],
+            'WHERE' => [
+                Computer::getTableField('id') => $computer_id,
+            ],
+        ];
+        $result = $DB->request($request);
+
+        if ($result->numrows() == 1) {
+            $power = $result->current()['power'];
+            return $power;
+        }
+        
+        return 0;
+    }
+
     static function computerPowerForComputer(int $computer_id)
     {
         global $DB;
@@ -91,8 +126,6 @@ class Power extends CommonDBChild
         foreach ($result as $computer) {
             self::computerPowerForComputer($computer['computer_id']);
         }
-
-        return false;
     }
 
     static function install(Migration $migration)
@@ -105,7 +138,7 @@ class Power extends CommonDBChild
 
             $query = "CREATE TABLE `$table` (
                        `id` INT(11) UNSIGNED NOT NULL auto_increment,
-                       `computers_id` INT(11) NOT NULL DEFAULT '0',
+                       `computers_id` INT(11) UNSIGNED NOT NULL DEFAULT '0',
                        `power` INT(11) DEFAULT '0',
                        PRIMARY KEY (`id`)
                     ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";

@@ -32,8 +32,8 @@ class PowerModel_ComputerModel extends CommonDBRelation
 
             $query = "CREATE TABLE `$table` (
                        `id` INT(11) UNSIGNED NOT NULL auto_increment,
-                       `plugin_carbon_powermodels_id` INT(11) NOT NULL DEFAULT '0',
-                       `computermodels_id` INT(11) NOT NULL DEFAULT '0',
+                       `plugin_carbon_powermodels_id` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+                       `computermodels_id` INT(11) UNSIGNED NOT NULL DEFAULT '0',
                        PRIMARY KEY (`id`),
                        UNIQUE INDEX `unicity` (`plugin_carbon_powermodels_id`, `computermodels_id`)
                     ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";

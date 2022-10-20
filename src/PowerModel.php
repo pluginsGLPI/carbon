@@ -29,7 +29,7 @@ class PowerModel extends CommonDBChild {
                        `id` INT(11) UNSIGNED NOT NULL auto_increment,
                        `name` VARCHAR(255),
                        `power` FLOAT(24) DEFAULT '0.0',
-                       `plugin_carbon_powermodelcategories_id` INT(11) DEFAULT '0',
+                       `plugin_carbon_powermodelcategories_id` INT(11) UNSIGNED DEFAULT '0',
                         PRIMARY KEY (`id`)
                     ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
             $DB->query($query) or die($DB->error());
