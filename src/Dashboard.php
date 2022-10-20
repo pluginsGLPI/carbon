@@ -102,7 +102,7 @@ class Dashboard
             'FROM'      => $powers_table,
         ]);
         if ($row = $result->current()) {
-            return $row['total_power_consumption'];
+            return strval($row['total_power_consumption']) . "W";
         }
 
         return 42;
