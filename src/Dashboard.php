@@ -20,10 +20,20 @@ class Dashboard
                 'label'        => "GLPI Carbon - Total power consumption",
                 'provider'     => Dashboard::class . "::cardTotalPowerProvider",
             ],
+            'plugin_carbon_card_total_carbon_emission' => [
+                'widgettype'   => ["bigNumber"],
+                'label'        => "GLPI Carbon - Total carbon emission",
+                'provider'     => Dashboard::class . "::cardTotalCarbonEmissionProvider",
+            ],
             'plugin_carbon_card_total_power_per_model' => [
                 'widgettype'   => ['pie', 'donut', 'halfpie', 'halfdonut', 'bar', 'hbar'],
                 'label'        => "GLPI Carbon - Total power consumption per model",
                 'provider'     => Dashboard::class . "::cardTotalPowerPerModelProvider",
+            ],
+            'plugin_carbon_card_total_carbon_emission_per_model' => [
+                'widgettype'   => ['pie', 'donut', 'halfpie', 'halfdonut', 'bar', 'hbar'],
+                'label'        => "GLPI Carbon - Total carbon emission per model",
+                'provider'     => Dashboard::class . "::cardTotalCarbonEmissionPerModelProvider",
             ],
             'plugin_carbon_card_power_per_model' => [
                 'widgettype'   => ['pie', 'donut', 'halfpie', 'halfdonut', 'bar', 'hbar'],
@@ -35,53 +45,61 @@ class Dashboard
         return array_merge($cards, $new_cards);
     }
 
-    static function cardTotalPowerProvider(array $params = [])
+    static function cardNumberProvider(array $params = [], string $label, string $number)
     {
         $default_params = [
-            'label' => "plugin carbon - total power",
+            'label' => "plugin carbon - $label",
             'icon'  => "fas fa-computer",
         ];
         $params = array_merge($default_params, $params);
 
         return [
-            'number' => self::getTotalPower(),
+            'number' => $number,
             'label'  => $params['label'],
             'icon'  => $params['icon'],
+        ];
+    }
+
+    static function cardTotalPowerProvider(array $params = [])
+    {
+        return self::cardNumberProvider($params, "total power", self::getTotalPower());
+    }
+
+    static function cardTotalCarbonEmissionProvider(array $params = [])
+    {
+        return self::cardNumberProvider($params, "total carbon emission", self::getTotalCarbonEmission());
+    }
+
+    static function cardDataProvider(array $params = [], string $label, array $data)
+    {
+        $default_params = [
+            'label' => "plugin carbon - $label",
+            'icon'  => "fas fa-computer",
+            'color' => '#ea9999',
+        ];
+        $params = array_merge($default_params, $params);
+
+        return [
+            'data' => $data,
+            'label'  => $params['label'],
+            'icon'  => $params['icon'],
+            'color' => $params['color'],
         ];
     }
 
     static function cardTotalPowerPerModelProvider(array $params = [])
     {
-        $default_params = [
-            'label' => "plugin carbon - total power per model",
-            'icon'  => "fas fa-computer",
-            'color' => '#ea9999',
-        ];
-        $params = array_merge($default_params, $params);
+        return self::cardDataProvider($params, "total power per model", self::getTotalPowerPerModel());
+    }
 
-        return [
-            'data' => self::getTotalPowerPerModel(),
-            'label'  => $params['label'],
-            'icon'  => $params['icon'],
-            'color' => $params['color'],
-        ];
+    static function cardTotalCarbonEmissionPerModelProvider(array $params = [])
+    {
+        return self::cardDataProvider($params, "total carbon emission per model", self::getTotalCarbonEmissionPerModel());
     }
 
     static function cardPowerPerModelProvider(array $params = [])
     {
-        $default_params = [
-            'label' => "plugin carbon - power per model",
-            'icon'  => "fas fa-computer",
-            'color' => '#ea9999',
-        ];
-        $params = array_merge($default_params, $params);
-
-        return [
-            'data' => self::getPowerPerModel(),
-            'label'  => $params['label'],
-            'icon'  => $params['icon'],
-            'color' => $params['color'],
-        ];
+        return self::cardDataProvider($params, "power per model", self::getPowerPerModel());
     }
 
     /**
@@ -102,10 +120,87 @@ class Dashboard
             'FROM'      => $powers_table,
         ]);
         if ($row = $result->current()) {
-            return strval($row['total_power_consumption']) . "W";
+            return strval($row['total_power_consumption']) . " W";
         }
 
-        return 42;
+        return 0;
+    }
+
+    /**
+     * Returns total carbon emission of all computers.
+     * 
+     * @return int: total carbon emission of all computers
+     */
+    static function getTotalCarbonEmission()
+    {
+        global $DB;
+
+        $carbonemissions_table = CarbonEmission::getTable();
+
+        $result = $DB->request([
+            'SELECT'    => [
+                'SUM' => 'emission_per_day AS total_carbon_emission'
+            ],
+            'FROM'      => $carbonemissions_table,
+        ]);
+        if ($row = $result->current()) {
+            return number_format($row['total_carbon_emission'], 2) . " kg CO2";
+        }
+
+        return 0;
+    }
+
+    /**
+     * Returns total power per computer model.
+     * 
+     * @return array of:
+     *   - int  'number': total power of the model
+     *   - string 'url': url to redirect when clicking on the slice
+     *   - string 'label': name of the computer model
+     */
+    static function getTotalCarbonEmissionPerModel()
+    {
+        global $DB;
+
+        $computers_table = Computer::getTable();
+        $computermodels_table = ComputerModel::getTable();
+        $carbonemissions_table = CarbonEmission::getTable();
+
+        $result = $DB->request([
+            'SELECT'    => [
+                ComputerModel::getTableField('id'),
+                ComputerModel::getTableField('name'),
+                'SUM' => CarbonEmission::getTableField('emission_per_day') . ' AS emission_per_day_per_model',
+                'COUNT' => Computer::getTableField('id') . ' AS nb_computers_per_model',
+            ],
+            'FROM'      => $computermodels_table,
+            'INNER JOIN' => [
+                $computers_table => [
+                    'FKEY'   => [
+                        $computermodels_table  => 'id',
+                        $computers_table => 'computermodels_id',
+                    ]
+                ],
+                $carbonemissions_table => [
+                    'FKEY'   => [
+                        $computers_table  => 'id',
+                        $carbonemissions_table => 'computers_id',
+                    ]
+                ],
+            ],
+            'GROUPBY' => ComputerModel::getTableField('id'),
+        ]);
+
+        $data = [];
+        foreach ($result as $row) {
+            $data[] = [
+                'number' => $row['emission_per_day_per_model'],
+                'url' => '/front/computermodel.form.php?id=' . $row['id'],
+                'label' => $row['name'] . " (" . $row['nb_computers_per_model'] . " computers)",
+            ];
+        }
+
+        return $data;
     }
 
     /**
