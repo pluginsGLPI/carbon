@@ -4,8 +4,8 @@ namespace GlpiPlugin\Carbon;
 
 use CommonDBChild;
 use Computer;
-use ComputerModel;
 use Migration;
+use GlpiPlugin\Carbon\CarbonDataProviderStub;
 
 class CarbonEmission extends CommonDBChild
 {
@@ -22,9 +22,8 @@ class CarbonEmission extends CommonDBChild
         global $DB;
 
         $power = Power::getPower($computer_id);
-        $provider = CarbonDataProvider::PROVIDER;
 
-        $carbon_intensity = $provider::getCarbonIntensity('FR');
+        $carbon_intensity = CarbonDataProviderStub::getCarbonIntensity('FR');
 
         // units: power is in Watt, emission is in gCO2/kWh
         $carbon_emission = ((24.0 * (float)$power) / 1000.0) * ((float)$carbon_intensity / 1000.0);
@@ -40,7 +39,7 @@ class CarbonEmission extends CommonDBChild
         return $DB->updateOrInsert(self::getTable(), $params, $where);
     }
 
-    static function computerCarbonEmissionPerDayForAllComputers() 
+    static function computerCarbonEmissionPerDayForAllComputers()
     {
         global $DB;
 
@@ -87,5 +86,27 @@ class CarbonEmission extends CommonDBChild
         $DB->query("DROP TABLE IF EXISTS `" . self::getTable() . "`");
 
         return true;
+    }
+
+    static function cronInfo($name)
+    {
+        switch ($name) {
+            case 'ComputeCarbonEmissionsTask':
+                return [
+                    'description' => __('Compute carbon emissions for all computers', 'example')
+                ];
+        }
+        return [];
+    }
+
+    static function cronComputeCarbonEmissionsTask($task)
+    {
+        $task->log("Computing carbon emissions for all computers");
+
+        $computers_count = self::computerCarbonEmissionPerDayForAllComputers();
+
+        $task->setVolume($computers_count);
+
+        return 1;
     }
 }

@@ -4,7 +4,7 @@ namespace GlpiPlugin\Carbon;
 
 interface CarbonDataProvider
 {
-    const PROVIDER = 'CarbonDataProviderStub';
+    const PROVIDER = 'GlpiPlugin\Carbon\CarbonDataProviderStub';
 
     /**
      * Returns current electricity carbon intensity for the specified zone.

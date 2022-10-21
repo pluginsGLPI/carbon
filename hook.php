@@ -64,6 +64,18 @@ function plugin_carbon_install()
         ]
     );
 
+    CronTask::Register(
+        CarbonEmission::class,
+        'ComputeCarbonEmissionsTask',
+        MINUTE_TIMESTAMP,
+        [
+            'mode' => CronTask::MODE_INTERNAL,
+            'allowmode' => CronTask::MODE_INTERNAL+CronTask::MODE_EXTERNAL,
+            'logs_lifetime' => 30,
+            'comment' => __('Computes carbon emissions of computers', 'carbon'),
+        ]
+    );
+
     return true;
 }
 
@@ -122,12 +134,3 @@ function plugin_carbon_getAddSearchOptions($itemtype)
 
     return $sopt;
 }
-
-// no longer needed
-// function plugin_carbon_post_plugin_enable($plugin)
-// {
-//     if ($plugin == 'carbon') {
-//         Power::computerPowerForAllComputers();
-//         CarbonEmission::computerCarbonEmissionPerDayForAllComputers();
-//     }
-// }

@@ -32,6 +32,8 @@
 use GlpiPlugin\Carbon\Dashboard;
 use GlpiPlugin\Carbon\PowerModelCategory;
 use Glpi\Plugin\Hooks;
+use GlpiPlugin\Carbon\CarbonDataProviderStub;
+use GlpiPlugin\Carbon\CarbonEmission;
 
 define('PLUGIN_CARBON_VERSION', '0.0.1');
 
@@ -64,9 +66,8 @@ function plugin_init_carbon()
     // add new cards to the dashboard
     $PLUGIN_HOOKS[Hooks::DASHBOARD_CARDS]['carbon'] = [Dashboard::class, 'dashboardCards'];
 
-    // [HACK] add hook to compute power when enabling plugin... does not work any longer
-    //$PLUGIN_HOOKS[Hooks::POST_PLUGIN_ENABLE]['carbon'] = 'plugin_carbon_post_plugin_enable';
-
+    Plugin::registerClass(CarbonEmission::class);
+    Plugin::registerClass(CarbonDataProviderStub::class);
     Plugin::registerClass(Power::class);
     Plugin::registerClass(PowerModelCategory::class);
 }
