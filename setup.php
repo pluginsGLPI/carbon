@@ -62,11 +62,12 @@ function plugin_init_carbon()
     $PLUGIN_HOOKS[Hooks::CSRF_COMPLIANT]['carbon'] = true;
 
     // add new cards to the dashboard
-    $PLUGIN_HOOKS['dashboard_cards']['carbon'] = [Dashboard::class, 'dashboardCards'];
+    $PLUGIN_HOOKS[Hooks::DASHBOARD_CARDS]['carbon'] = [Dashboard::class, 'dashboardCards'];
 
-    // [HACK] add hook to compute power when enabling plugin
-    $PLUGIN_HOOKS[Hooks::POST_PLUGIN_ENABLE]['carbon'] = 'plugin_carbon_post_plugin_enable';
+    // [HACK] add hook to compute power when enabling plugin... does not work any longer
+    //$PLUGIN_HOOKS[Hooks::POST_PLUGIN_ENABLE]['carbon'] = 'plugin_carbon_post_plugin_enable';
 
+    Plugin::registerClass(Power::class);
     Plugin::registerClass(PowerModelCategory::class);
 }
 

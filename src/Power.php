@@ -48,11 +48,11 @@ class Power extends CommonDBChild
             $power = $result->current()['power'];
             return $power;
         }
-        
+
         return 0;
     }
 
-    static function computerPowerForComputer(int $computer_id)
+    static function computePowerForComputer(int $computer_id)
     {
         global $DB;
 
@@ -65,8 +65,8 @@ class Power extends CommonDBChild
             'SELECT'    => [
                 Computer::getTableField('id') . ' AS computer_id',
                 PowerModel::getTableField('power'),
-//                ComputerModel::getTableField('name') . ' AS computermodel_name',
-//                PowerModel::getTableField('name') . 'AS powermodel_name',
+                //                ComputerModel::getTableField('name') . ' AS computermodel_name',
+                //                PowerModel::getTableField('name') . 'AS powermodel_name',
             ],
             'FROM'      => $computers_table,
             'INNER JOIN' => [
@@ -109,7 +109,7 @@ class Power extends CommonDBChild
         return false;
     }
 
-    static function computerPowerForAllComputers() 
+    static function computePowerForAllComputers()
     {
         global $DB;
 
@@ -123,9 +123,12 @@ class Power extends CommonDBChild
         ];
         $result = $DB->request($request);
 
+        $computers_count = $result->numrows();
         foreach ($result as $computer) {
-            self::computerPowerForComputer($computer['computer_id']);
+            self::computePowerForComputer($computer['computer_id']);
         }
+
+        return $computers_count;
     }
 
     static function install(Migration $migration)
@@ -153,5 +156,27 @@ class Power extends CommonDBChild
         $DB->query("DROP TABLE IF EXISTS `" . self::getTable() . "`");
 
         return true;
+    }
+
+    static function cronInfo($name)
+    {
+        switch ($name) {
+            case 'ComputePowersTask':
+                return [
+                    'description' => __('Compute powers for all computers', 'example')
+                ];
+        }
+        return [];
+    }
+
+    static function cronComputePowersTask($task)
+    {
+        $task->log("Computing powers for all computers");
+
+        $computers_count = self::computePowerForAllComputers();
+
+        $task->setVolume($computers_count);
+
+        return 1;
     }
 }
