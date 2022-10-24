@@ -129,49 +129,7 @@ class Dashboard
     static function getTotalCarbonEmissionPerModel()
     {
         return DBUtils::getSumPerModel(CarbonEmission::getTable(), CarbonEmission::getTableField('emission_per_day'));
-/* 
-        global $DB;
-
-        $computers_table = Computer::getTable();
-        $computermodels_table = ComputerModel::getTable();
-        $carbonemissions_table = CarbonEmission::getTable();
-
-        $result = $DB->request([
-            'SELECT'    => [
-                ComputerModel::getTableField('id'),
-                ComputerModel::getTableField('name'),
-                'SUM' => CarbonEmission::getTableField('emission_per_day') . ' AS emission_per_day_per_model',
-                'COUNT' => Computer::getTableField('id') . ' AS nb_computers_per_model',
-            ],
-            'FROM'      => $computermodels_table,
-            'INNER JOIN' => [
-                $computers_table => [
-                    'FKEY'   => [
-                        $computermodels_table  => 'id',
-                        $computers_table => 'computermodels_id',
-                    ]
-                ],
-                $carbonemissions_table => [
-                    'FKEY'   => [
-                        $computers_table  => 'id',
-                        $carbonemissions_table => 'computers_id',
-                    ]
-                ],
-            ],
-            'GROUPBY' => ComputerModel::getTableField('id'),
-        ]);
-
-        $data = [];
-        foreach ($result as $row) {
-            $data[] = [
-                'number' => $row['emission_per_day_per_model'],
-                'url' => '/front/computermodel.form.php?id=' . $row['id'],
-                'label' => $row['name'] . " (" . $row['nb_computers_per_model'] . " computers)",
-            ];
-        }
-
-        return $data;
- */    }
+    }
 
     /**
      * Returns total power per computer model.
@@ -184,52 +142,7 @@ class Dashboard
     static function getTotalPowerPerModel()
     {
         return DBUtils::getSumPerModel(Power::getTable(), Power::getTableField('power'), [Power::getTableField('power') => ['>', '0']]);
-
-/*         global $DB;
-
-        $computers_table = Computer::getTable();
-        $computermodels_table = ComputerModel::getTable();
-        $powers_table = Power::getTable();
-
-        $result = $DB->request([
-            'SELECT'    => [
-                ComputerModel::getTableField('id'),
-                ComputerModel::getTableField('name'),
-                'SUM' => Power::getTableField('power') . ' AS power_consumption_per_model',
-                'COUNT' => Computer::getTableField('id') . ' AS nb_computers_per_model',
-            ],
-            'FROM'      => $computermodels_table,
-            'INNER JOIN' => [
-                $computers_table => [
-                    'FKEY'   => [
-                        $computermodels_table  => 'id',
-                        $computers_table => 'computermodels_id',
-                    ]
-                ],
-                $powers_table => [
-                    'FKEY'   => [
-                        $computers_table  => 'id',
-                        $powers_table => 'computers_id',
-                    ]
-                ],
-            ],
-            'WHERE' => [
-                Power::getTableField('power') => ['>', '0'],
-            ],
-            'GROUPBY' => ComputerModel::getTableField('id'),
-        ]);
-
-        $data = [];
-        foreach ($result as $row) {
-            $data[] = [
-                'number' => $row['power_consumption_per_model'],
-                'url' => '/front/computermodel.form.php?id=' . $row['id'],
-                'label' => $row['name'] . " (" . $row['nb_computers_per_model'] . " computers)",
-            ];
-        }
-
-        return $data;
- */    }
+    }
 
     /**
      * Returns power per computer model.
