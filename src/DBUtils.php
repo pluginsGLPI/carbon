@@ -48,7 +48,7 @@ class DBUtils
     }
 
     /**
-     * Returns sum of a table grouped by computer model.
+     * Returns sum of a table field grouped by computer model.
      * 
      * @return array of:
      *   - mixed  'number': sum for the model

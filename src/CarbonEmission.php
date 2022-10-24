@@ -5,7 +5,7 @@ namespace GlpiPlugin\Carbon;
 use CommonDBChild;
 use Computer;
 use Migration;
-use GlpiPlugin\Carbon\CarbonDataProviderStub;
+//use GlpiPlugin\Carbon\CarbonDataProviderStub;
 
 class CarbonEmission extends CommonDBChild
 {
@@ -17,19 +17,15 @@ class CarbonEmission extends CommonDBChild
         return \_n("CarbonEmission", "CarbonEmissions", $nb, 'carbon emission');
     }
 
-    // temporary function to compute carbon intensity (class not found in crontask problem)
-    static function getCarbonIntensity(string $zone): int
-    {
-        return mt_rand(53, 116);
-    }
-
     static function computeCarbonEmissionPerDay(int $computer_id)
     {
         global $DB;
 
         $power = Power::getPower($computer_id);
 
-        $carbon_intensity = self::getCarbonIntensity('FR');
+        $provider = CarbonDataProvider::PROVIDER;
+
+        $carbon_intensity = $provider::getCarbonIntensity('FR');
 
         // units: power is in Watt, emission is in gCO2/kWh
         $carbon_emission = ((24.0 * (float)$power) / 1000.0) * ((float)$carbon_intensity / 1000.0);
