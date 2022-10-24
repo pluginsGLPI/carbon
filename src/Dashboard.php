@@ -35,11 +35,6 @@ class Dashboard
                 'label'        => "GLPI Carbon - Total carbon emission per model",
                 'provider'     => Dashboard::class . "::cardTotalCarbonEmissionPerModelProvider",
             ],
-            'plugin_carbon_card_power_per_model' => [
-                'widgettype'   => ['pie', 'donut', 'halfpie', 'halfdonut', 'bar', 'hbar'],
-                'label'        => "GLPI Carbon - Power consumption per model",
-                'provider'     => Dashboard::class . "::cardPowerPerModelProvider",
-            ],
         ];
 
         return array_merge($cards, $new_cards);
@@ -97,25 +92,24 @@ class Dashboard
         return self::cardDataProvider($params, "total carbon emission per model", self::getTotalCarbonEmissionPerModel());
     }
 
-    static function cardPowerPerModelProvider(array $params = [])
-    {
-        return self::cardDataProvider($params, "power per model", self::getPowerPerModel());
-    }
-
     static function getTotalPower()
     {
-        if ($total = DBUtils::getSum(Power::getTable(), 'power'))
-            return strval($total) . " W";
+        $unit = 'W';
 
-        return "0 W";
+        if ($total = DBUtils::getSum(Power::getTable(), 'power'))
+            return strval($total) . " $unit";
+
+        return "0 $unit";
     }
 
     static function getTotalCarbonEmission()
     {
+        $unit = 'kg CO2';
+
         if ($total = DBUtils::getSum(CarbonEmission::getTable(), 'emission_per_day'))
-            return number_format($total, 2) . " kg CO2";
-        
-        return "0.00 kg CO2";
+            return number_format($total, 2) . " $unit";
+
+        return "0.00 $unit";
     }
 
     /**
@@ -143,59 +137,4 @@ class Dashboard
     {
         return DBUtils::getSumPerModel(Power::getTable(), Power::getTableField('power'), [Power::getTableField('power') => ['>', '0']]);
     }
-
-    /**
-     * Returns power per computer model.
-     * 
-     * @return array of:
-     *   - int  'number': power of the model
-     *   - string 'url': url to redirect when clicking on the slice
-     *   - string 'label': name of the computer model
-     */
-    static function getPowerPerModel()
-    {
-        global $DB;
-
-        $computermodels_table = ComputerModel::getTable();
-        $powermodels_table = PowerModel::getTable();
-        $powermodels_computermodels_table = PowerModel_ComputerModel::getTable();
-
-        $result = $DB->request([
-            'SELECT'    => [
-                ComputerModel::getTableField('id'),
-                ComputerModel::getTableField('name'),
-                PowerModel::getTableField('power'),
-            ],
-            'FROM'      => $computermodels_table,
-            'INNER JOIN' => [
-                $powermodels_computermodels_table => [
-                    'FKEY'   => [
-                        $computermodels_table  => 'id',
-                        $powermodels_computermodels_table => 'computermodels_id',
-                    ]
-                ],
-                $powermodels_table => [
-                    'FKEY'   => [
-                        $powermodels_computermodels_table  => 'plugin_carbon_powermodels_id',
-                        $powermodels_table => 'id',
-                    ]
-                ],
-            ],
-            'WHERE' => [
-                PowerModel::getTableField('power') => ['>', '0'],
-            ],
-        ]);
-
-        $data = [];
-        foreach ($result as $row) {
-            $data[] = [
-                'number' => $row['power'],
-                'url' => '/front/computermodel.form.php?id=' . $row['id'],
-                'label' => $row['name'],
-            ];
-        }
-
-        return $data;
-    }
-
 }
