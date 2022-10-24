@@ -102,11 +102,6 @@ class Dashboard
         return self::cardDataProvider($params, "power per model", self::getPowerPerModel());
     }
 
-    /**
-     * Returns total power of all computers.
-     * 
-     * @return int: total power of all computers
-     */
     static function getTotalPower()
     {
         if ($total = DBUtils::getSum(Power::getTable(), 'power'))
@@ -115,11 +110,6 @@ class Dashboard
         return "0 W";
     }
 
-    /**
-     * Returns total carbon emission of all computers.
-     * 
-     * @return float: total carbon emission of all computers
-     */
     static function getTotalCarbonEmission()
     {
         if ($total = DBUtils::getSum(CarbonEmission::getTable(), 'emission_per_day'))
@@ -129,15 +119,17 @@ class Dashboard
     }
 
     /**
-     * Returns total power per computer model.
+     * Returns total carbon emission per computer model.
      * 
      * @return array of:
-     *   - int  'number': total power of the model
+     *   - float  'number': total carbon emission of the model
      *   - string 'url': url to redirect when clicking on the slice
      *   - string 'label': name of the computer model
      */
     static function getTotalCarbonEmissionPerModel()
     {
+        return DBUtils::getSumPerModel(CarbonEmission::getTable(), CarbonEmission::getTableField('emission_per_day'));
+/* 
         global $DB;
 
         $computers_table = Computer::getTable();
@@ -179,7 +171,7 @@ class Dashboard
         }
 
         return $data;
-    }
+ */    }
 
     /**
      * Returns total power per computer model.
@@ -191,7 +183,9 @@ class Dashboard
      */
     static function getTotalPowerPerModel()
     {
-        global $DB;
+        return DBUtils::getSumPerModel(Power::getTable(), Power::getTableField('power'), [Power::getTableField('power') => ['>', '0']]);
+
+/*         global $DB;
 
         $computers_table = Computer::getTable();
         $computermodels_table = ComputerModel::getTable();
@@ -235,7 +229,7 @@ class Dashboard
         }
 
         return $data;
-    }
+ */    }
 
     /**
      * Returns power per computer model.

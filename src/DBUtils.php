@@ -2,6 +2,9 @@
 
 namespace GlpiPlugin\Carbon;
 
+use ComputerModel;
+use Computer;
+
 class DBUtils
 {
     static function getIdByName(string $table, string $name)
@@ -42,5 +45,61 @@ class DBUtils
         }
 
         return false;
+    }
+
+    /**
+     * Returns sum of a table grouped by computer model.
+     * 
+     * @return array of:
+     *   - mixed  'number': sum for the model
+     *   - string 'url': url to redirect when clicking on the slice
+     *   - string 'label': name of the computer model
+     */
+    static function getSumPerModel(string $table, string $field, array $where = [])
+    {
+        global $DB;
+
+        $computers_table = Computer::getTable();
+        $computermodels_table = ComputerModel::getTable();
+
+        $request = [
+            'SELECT'    => [
+                ComputerModel::getTableField('id'),
+                ComputerModel::getTableField('name'),
+                'SUM' => $field . ' AS total_per_model',
+                'COUNT' => Computer::getTableField('id') . ' AS nb_computers_per_model',
+            ],
+            'FROM'      => $computermodels_table,
+            'INNER JOIN' => [
+                $computers_table => [
+                    'FKEY'   => [
+                        $computermodels_table  => 'id',
+                        $computers_table => 'computermodels_id',
+                    ]
+                ],
+                $table => [
+                    'FKEY'   => [
+                        $computers_table  => 'id',
+                        $table => 'computers_id',
+                    ]
+                ],
+            ],
+            'GROUPBY' => ComputerModel::getTableField('id'),
+        ];
+        if (!empty($where)) {
+            $request['WHERE'] = $where;
+        }
+        $result = $DB->request($request);
+
+        $data = [];
+        foreach ($result as $row) {
+            $data[] = [
+                'number' => $row['total_per_model'],
+                'url' => '/front/computermodel.form.php?id=' . $row['id'],
+                'label' => $row['name'] . " (" . $row['nb_computers_per_model'] . " computers)",
+            ];
+        }
+
+        return $data;
     }
 }
