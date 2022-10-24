@@ -109,45 +109,23 @@ class Dashboard
      */
     static function getTotalPower()
     {
-        global $DB;
+        if ($total = DBUtils::getSum(Power::getTable(), 'power'))
+            return strval($total) . " W";
 
-        $powers_table = Power::getTable();
-
-        $result = $DB->request([
-            'SELECT'    => [
-                'SUM' => 'power AS total_power_consumption'
-            ],
-            'FROM'      => $powers_table,
-        ]);
-        if ($row = $result->current()) {
-            return strval($row['total_power_consumption']) . " W";
-        }
-
-        return 0;
+        return "0 W";
     }
 
     /**
      * Returns total carbon emission of all computers.
      * 
-     * @return int: total carbon emission of all computers
+     * @return float: total carbon emission of all computers
      */
     static function getTotalCarbonEmission()
     {
-        global $DB;
-
-        $carbonemissions_table = CarbonEmission::getTable();
-
-        $result = $DB->request([
-            'SELECT'    => [
-                'SUM' => 'emission_per_day AS total_carbon_emission'
-            ],
-            'FROM'      => $carbonemissions_table,
-        ]);
-        if ($row = $result->current()) {
-            return number_format($row['total_carbon_emission'], 2) . " kg CO2";
-        }
-
-        return 0;
+        if ($total = DBUtils::getSum(CarbonEmission::getTable(), 'emission_per_day'))
+            return number_format($total, 2) . " kg CO2";
+        
+        return "0.00 kg CO2";
     }
 
     /**
