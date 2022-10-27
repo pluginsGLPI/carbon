@@ -9,3 +9,4 @@ composer.lock
 docs/GLPI carbon.sql
 data/teclib-editions/computermodels.csv
 data/teclib-editions/computertypes.csv
+data/tests
