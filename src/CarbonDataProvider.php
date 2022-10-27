@@ -4,8 +4,6 @@ namespace GlpiPlugin\Carbon;
 
 interface CarbonDataProvider
 {
-    const PROVIDER = 'GlpiPlugin\Carbon\CarbonDataProviderFake';
-
     /**
      * Returns current electricity carbon intensity for the specified zone.
      * 
@@ -13,4 +11,3 @@ interface CarbonDataProvider
      */
     public static function getCarbonIntensity(string $zone): int;
 }
-
