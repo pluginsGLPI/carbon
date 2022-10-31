@@ -65,19 +65,34 @@ class CarbonDataProviderFrance implements CarbonDataProvider
         return $array_response;
     }
 
-    // curl -X 'GET' -H 'accept: application/json; charset=utf-8' 'https://odre.opendatasoft.com/api/v2/catalog/datasets/eco2mix-national-tr/records?select=taux_co2%2Cdate_heure&where=date_heure%20IN%20%5Bdate%272022-10-24T14%3A00%3A00%2B00%3A00%27%20TO%20date%272022-10-24T15%3A00%3A00%2B00%3A00%27%5D&order_by=date_heure%20desc&limit=20&offset=0&timezone=UTC'
-
-    public static function getCarbonIntensity(string $zone): int
+    public function getCarbonIntensity(string $zone): int
     {
-        $query_params = [
+        $format = "Y-m-d\TH:i:sP";
+        $now = new \DateTimeImmutable();
+
+        // "Données éCO2mix nationales temps réel" has a depth from M-1 to H-2
+        $from = $now->sub(new \DateInterval('PT3H'))->format($format);
+        $to = $now->sub(new \DateInterval('PT2H'))->format($format);
+
+        $params = [
             'select'    => 'taux_co2,date_heure',
-            'where'     => 'date_heure IN [date\'2021-10-24T14:00:00+00:00\' TO date\'2021-10-24T15:00:00+00:00\']',
+            'where'     => "date_heure IN [date'$from' TO date'$to']",
             'order_by'  => 'date_heure desc',
             'limit'     => 20,
             'offset'    => 0,
-            'timezone'  => 'UTC'
+            'timezone'  => 'UTC',
         ];
 
-        return 53;
+        $carbon_intensity = 0.0;
+
+        if ($response = $this->request('GET', '', $params)) {
+            print_r($response);
+            foreach ($response['records'] as $record) {
+                $carbon_intensity += $record['record']['fields']['taux_co2'];
+            }
+            $carbon_intensity /= count($response['records']);
+        }
+
+        return intval(round($carbon_intensity));
     }
 }
