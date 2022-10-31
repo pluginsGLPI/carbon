@@ -8,8 +8,9 @@ $format = "Y-m-d\TH:i:sP";
 $now = new DateTimeImmutable();
 print_r($now->format($format));
 echo  "\n";
-$from = $now->sub(new DateInterval('PT2H'))->format($format);
-$to = $now->sub(new DateInterval('PT1H'))->format($format);
+// "Données éCO2mix nationales temps réel" has a depth from M-1 to H-2
+$from = $now->sub(new DateInterval('PT3H'))->format($format);
+$to = $now->sub(new DateInterval('PT2H'))->format($format);
 print_r($from);
 echo "\n";
 print_r($to);
