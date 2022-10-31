@@ -27,8 +27,8 @@ class CarbonDataProviderFrance implements CarbonDataProvider
             'connect_timeout' => self::API_TIMEOUT,
             'headers'         => self::API_HEADERS,
             // This is insecure and not recommanded, but...
-            'verify'          => false
-            //'debug'           => true
+            'verify'          => false,
+            'debug'           => true,
         ];
 
         $this->api_client = new \GuzzleHttp\Client($api_params);
