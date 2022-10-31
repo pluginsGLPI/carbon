@@ -15,6 +15,7 @@ class CarbonDataProviderFrance implements CarbonDataProvider
     const API_HEADERS = [
         'Accept' => 'application/json; charset=utf-8',
     ];
+    const API_HTTP_VERSION = '2.0';
 
     protected $api_client = null;
     protected $last_error = '';
@@ -26,6 +27,7 @@ class CarbonDataProviderFrance implements CarbonDataProvider
             'timeout'         => self::API_TIMEOUT,
             'connect_timeout' => self::API_TIMEOUT,
             'headers'         => self::API_HEADERS,
+            'version'         => self::API_HTTP_VERSION,
             // This is insecure and not recommanded, but...
             'verify'          => false,
             'debug'           => true,
