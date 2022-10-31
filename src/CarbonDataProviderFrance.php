@@ -35,10 +35,12 @@ class CarbonDataProviderFrance implements CarbonDataProvider
     }
 
 
-    function httpQuery(string $endpoint = '', array $params = [], string $method = 'GET')
+    function request(string $method = 'GET', string $uri = '', array $params = [], array $options = [])
     {
+        $options['query'] = $params;
+
         try {
-            $response = $this->api_client->request($method, $endpoint, $params);
+            $response = $this->api_client->request($method, $uri, $options);
         } catch (RequestException $e) {
             $this->last_error = [
                 'title'     => "Plugins API error",
@@ -49,12 +51,10 @@ class CarbonDataProviderFrance implements CarbonDataProvider
                 $this->last_error['response'] = Psr7\Message::toString($e->getResponse());
             }
 
-            if (
-                $_SESSION['glpi_use_mode'] == \Session::DEBUG_MODE
-                || isCommandLine()
-            ) {
+            if ($_SESSION['glpi_use_mode'] == \Session::DEBUG_MODE || isCommandLine()) {
                 \Toolbox::logDebug($this->last_error);
             }
+
             return false;
         }
 
@@ -63,10 +63,8 @@ class CarbonDataProviderFrance implements CarbonDataProvider
         return $array_response;
     }
 
-    // curl -X 'GET' \
-    // 'https://odre.opendatasoft.com/api/v2/catalog/datasets/eco2mix-national-tr/records?select=taux_co2%2Cdate_heure&where=date_heure%20IN%20%5Bdate%272022-10-24T14%3A00%3A00%2B00%3A00%27%20TO%20date%272022-10-24T15%3A00%3A00%2B00%3A00%27%5D&order_by=date_heure%20desc&limit=20&offset=0&timezone=UTC' \
-    // -H 'accept: application/json; charset=utf-8'
-  
+    // curl -X 'GET' -H 'accept: application/json; charset=utf-8' 'https://odre.opendatasoft.com/api/v2/catalog/datasets/eco2mix-national-tr/records?select=taux_co2%2Cdate_heure&where=date_heure%20IN%20%5Bdate%272022-10-24T14%3A00%3A00%2B00%3A00%27%20TO%20date%272022-10-24T15%3A00%3A00%2B00%3A00%27%5D&order_by=date_heure%20desc&limit=20&offset=0&timezone=UTC'
+
     public static function getCarbonIntensity(string $zone): int
     {
         $query_params = [
