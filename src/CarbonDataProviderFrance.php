@@ -38,7 +38,6 @@ class CarbonDataProviderFrance extends CarbonDataProviderRestApi
         $carbon_intensity = 0.0;
 
         if ($response = $this->request('GET', '', ['query' => $params])) {
-            print_r($response);
             foreach ($response['records'] as $record) {
                 $carbon_intensity += $record['record']['fields']['taux_co2'];
             }
