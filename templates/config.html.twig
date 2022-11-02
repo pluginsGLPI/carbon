@@ -1,0 +1,15 @@
+{% import "components/form/fields_macros.html.twig" as fields %}
+
+{% if can_edit %}
+    <form name="form" action="{{ "Config"|itemtype_form_path }}" method="POST">
+        <input type="hidden" name="config_class" value="GlpiPlugin\\Carbon\\Config">
+        <input type="hidden" name="config_context" value="plugin:carbon">
+        <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token() }}">
+
+        <button type="submit" class="btn btn-primary mx-1" name="update" value="1">
+            <i class="ti ti-device-floppy"></i>
+            <span>{{ _x('button', 'Save') }}</span>
+        </button>
+    </form>
+{% endif %}
+
