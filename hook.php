@@ -35,6 +35,7 @@ use GlpiPlugin\Carbon\PowerModel_ComputerModel;
 use GlpiPlugin\Carbon\PowerModelCategory;
 use GlpiPlugin\Carbon\PowerData;
 use GlpiPlugin\Carbon\CarbonEmission;
+use GlpiPlugin\Carbon\Config;
 
 /**
  * Plugin install process
@@ -51,6 +52,7 @@ function plugin_carbon_install()
     PowerModelCategory::install($migration);
     PowerData::install($migration);
     CarbonEmission::install($migration);
+    Config::install($migration);
 
     CronTask::Register(
         Power::class,
@@ -94,6 +96,7 @@ function plugin_carbon_uninstall()
     PowerModelCategory::uninstall($migration);
     PowerData::uninstall($migration);
     CarbonEmission::uninstall($migration);
+    Config::uninstall($migration);
 
     return true;
 }

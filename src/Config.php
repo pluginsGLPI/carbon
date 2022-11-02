@@ -56,25 +56,26 @@ class Config extends \Config
         ]);
     }
 
-    private static $config_values = [
-        'electricitymap_api_token'              => '',
+    private static $config_entries = [
+        'electricitymap_api_token'              => 'XXX',
     ];
 
-    static function install(Migration $migration) {
+    static function install(Migration $migration)
+    {
         $current_config = self::getConfig();
 
-        foreach (self::$config_values as $key => $value) {
+        foreach (self::$config_entries as $key => $value) {
             if (!isset($current_config[$key])) {
                 Config::setConfigurationValues('plugin:carbon', [$key => $value]);
             }
         }
     }
 
-    static function uninstall() {
+    static function uninstall(Migration $migration)
+    {
         $config = new Config();
         $config->deleteByCriteria(['context' => 'plugin:carbon']);
 
         return true;
     }
-
 }
