@@ -68,7 +68,7 @@ function plugin_init_carbon()
     $PLUGIN_HOOKS[Hooks::DASHBOARD_CARDS]['carbon'] = [Dashboard::class, 'dashboardCards'];
 
     if (Session::haveRight('config', UPDATE)) {
-        $PLUGIN_HOOKS['config_page']['carbon'] = 'front/config.php';
+        $PLUGIN_HOOKS['config_page']['carbon'] = 'front/config.form.php';
     }
 
     Plugin::registerClass(CarbonEmission::class);
