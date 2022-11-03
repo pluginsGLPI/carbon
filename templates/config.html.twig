@@ -6,6 +6,12 @@
         <input type="hidden" name="config_context" value="plugin:carbon">
         <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token() }}">
 
+        {{ fields.textField(
+            'carbon_electricitymap_api_token',
+            current_config['electricitymap_api_token'],
+            __('API token for electricitymap.org', 'carbon')
+        ) }}
+
         <button type="submit" class="btn btn-primary mx-1" name="update" value="1">
             <i class="ti ti-device-floppy"></i>
             <span>{{ _x('button', 'Save') }}</span>

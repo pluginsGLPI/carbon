@@ -44,6 +44,9 @@ use GlpiPlugin\Carbon\Config;
  */
 function plugin_carbon_install()
 {
+    $config = new Config();
+    $config->setConfigurationValues('plugin:carbon', ['configuration' => false]);
+
     $migration = new Migration(PLUGIN_CARBON_VERSION);
 
     Power::install($migration);
@@ -60,7 +63,7 @@ function plugin_carbon_install()
         MINUTE_TIMESTAMP,
         [
             'mode' => CronTask::MODE_INTERNAL,
-            'allowmode' => CronTask::MODE_INTERNAL+CronTask::MODE_EXTERNAL,
+            'allowmode' => CronTask::MODE_INTERNAL + CronTask::MODE_EXTERNAL,
             'logs_lifetime' => 30,
             'comment' => __('Computes power consumption of computers', 'carbon'),
         ]
@@ -72,7 +75,7 @@ function plugin_carbon_install()
         MINUTE_TIMESTAMP,
         [
             'mode' => CronTask::MODE_INTERNAL,
-            'allowmode' => CronTask::MODE_INTERNAL+CronTask::MODE_EXTERNAL,
+            'allowmode' => CronTask::MODE_INTERNAL + CronTask::MODE_EXTERNAL,
             'logs_lifetime' => 30,
             'comment' => __('Computes carbon emissions of computers', 'carbon'),
         ]

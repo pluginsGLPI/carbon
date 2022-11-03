@@ -34,6 +34,7 @@ use GlpiPlugin\Carbon\PowerModelCategory;
 use Glpi\Plugin\Hooks;
 use GlpiPlugin\Carbon\CarbonDataProviderStub;
 use GlpiPlugin\Carbon\CarbonEmission;
+use GlpiPlugin\Carbon\Config;
 
 define('PLUGIN_CARBON_VERSION', '0.0.1');
 
@@ -66,10 +67,13 @@ function plugin_init_carbon()
     // add new cards to the dashboard
     $PLUGIN_HOOKS[Hooks::DASHBOARD_CARDS]['carbon'] = [Dashboard::class, 'dashboardCards'];
 
+//    $PLUGIN_HOOKS[Hooks::CONFIG_PAGE]['carbon'] = 'front/config.form.php';
+
     Plugin::registerClass(CarbonEmission::class);
     Plugin::registerClass(CarbonDataProviderStub::class);
     Plugin::registerClass(Power::class);
     Plugin::registerClass(PowerModelCategory::class);
+    Plugin::registerClass(Config::class, ['addtabon' => 'Config']);
 }
 
 

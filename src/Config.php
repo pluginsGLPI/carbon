@@ -51,8 +51,8 @@ class Config extends \Config
         $canedit        = Session::haveRight(self::$rightname, UPDATE);
 
         TemplateRenderer::getInstance()->display('@carbon/config.html.twig', [
-            'can_edit'       => $current_config,
-            'current_config' => $canedit
+            'can_edit'       => $canedit,
+            'current_config' => $current_config
         ]);
     }
 
