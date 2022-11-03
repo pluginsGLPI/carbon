@@ -20,41 +20,41 @@ class Config extends \Config
         return \Config::getConfigurationValues('plugin:carbon');
     }
 
-    function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
-    {
-        switch ($item->getType()) {
-            case \Config::class:
-                return self::createTabEntry(self::getTypeName());
-        }
-        return '';
-    }
+    // function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    // {
+    //     switch ($item->getType()) {
+    //         case \Config::class:
+    //             return self::createTabEntry(self::getTypeName());
+    //     }
+    //     return '';
+    // }
 
-    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
-    {
-        switch ($item->getType()) {
-            case \Config::class:
-                return self::showForConfig($item, $withtemplate);
-        }
+    // static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
+    // {
+    //     switch ($item->getType()) {
+    //         case \Config::class:
+    //             return self::showForConfig($item, $withtemplate);
+    //     }
 
-        return true;
-    }
+    //     return true;
+    // }
 
-    static function showForConfig(\Config $config, $withtemplate = 0)
-    {
-        global $CFG_GLPI;
+    // static function showForConfig(\Config $config, $withtemplate = 0)
+    // {
+    //     global $CFG_GLPI;
 
-        if (!self::canView()) {
-            return false;
-        }
+    //     if (!self::canView()) {
+    //         return false;
+    //     }
 
-        $current_config = self::getConfig();
-        $canedit        = Session::haveRight(self::$rightname, UPDATE);
+    //     $current_config = self::getConfig();
+    //     $canedit        = Session::haveRight(self::$rightname, UPDATE);
 
-        TemplateRenderer::getInstance()->display('@carbon/config.html.twig', [
-            'can_edit'       => $canedit,
-            'current_config' => $current_config
-        ]);
-    }
+    //     TemplateRenderer::getInstance()->display('@carbon/config.html.twig', [
+    //         'can_edit'       => $canedit,
+    //         'current_config' => $current_config
+    //     ]);
+    // }
 
     private static $config_entries = [
         'electricitymap_api_token'              => 'XXX',

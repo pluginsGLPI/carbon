@@ -46,12 +46,12 @@ define("PLUGIN_CARBON_MAX_GLPI_VERSION", "10.0.99");
 // Plugin compatible itemtypes
 define('PLUGIN_CARBON_TYPES', [
     'Computer',
-//    'Monitor',
-//    'NetworkEquipment',
-//    'Phone',
-//    'Printer',
+    //    'Monitor',
+    //    'NetworkEquipment',
+    //    'Phone',
+    //    'Printer',
 ]);
- 
+
 /**
  * Init hooks of the plugin.
  * REQUIRED
@@ -67,13 +67,16 @@ function plugin_init_carbon()
     // add new cards to the dashboard
     $PLUGIN_HOOKS[Hooks::DASHBOARD_CARDS]['carbon'] = [Dashboard::class, 'dashboardCards'];
 
-//    $PLUGIN_HOOKS[Hooks::CONFIG_PAGE]['carbon'] = 'front/config.form.php';
+    if (Session::haveRight('config', UPDATE)) {
+        $PLUGIN_HOOKS['config_page']['carbon'] = 'front/config.php';
+    }
 
     Plugin::registerClass(CarbonEmission::class);
     Plugin::registerClass(CarbonDataProviderStub::class);
     Plugin::registerClass(Power::class);
     Plugin::registerClass(PowerModelCategory::class);
-    Plugin::registerClass(Config::class, ['addtabon' => 'Config']);
+//    Plugin::registerClass(Config::class, ['addtabon' => 'Config']);
+    Plugin::registerClass(Config::class);
 }
 
 
