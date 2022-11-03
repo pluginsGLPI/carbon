@@ -75,7 +75,6 @@ function plugin_init_carbon()
     Plugin::registerClass(CarbonDataProviderStub::class);
     Plugin::registerClass(Power::class);
     Plugin::registerClass(PowerModelCategory::class);
-//    Plugin::registerClass(Config::class, ['addtabon' => 'Config']);
     Plugin::registerClass(Config::class);
 }
 

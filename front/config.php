@@ -1,19 +1,20 @@
 <?php
 
-include ("../../../inc/includes.php");
+include("../../../inc/includes.php");
 
 use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\Config;
 
-Session::checkRight("config", UPDATE);
+if (!(new Plugin())->isActivated('carbon')) {
+    Html::displayNotFoundError();
+}
 
-// To be available when plugin in not activated
-Plugin::load('carbon');
+Session::checkRight("config", UPDATE);
 
 Html::header("TITRE", $_SERVER['PHP_SELF'], "config", "plugins");
 echo __("This is the GLPI Carbon plugin config page", 'carbon');
 
-$current_config = \GlpiPlugin\Carbon\Config::getConfig();
+$current_config = Config::getConfig();
 $canedit        = Session::haveRight(Config::$rightname, UPDATE);
 
 TemplateRenderer::getInstance()->display('@carbon/config.html.twig', [
