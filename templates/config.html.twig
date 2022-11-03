@@ -7,7 +7,7 @@
         <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token() }}">
 
         {{ fields.textField(
-            'carbon_electricitymap_api_token',
+            'electricitymap_api_token',
             current_config['electricitymap_api_token'],
             __('API token for electricitymap.org', 'carbon')
         ) }}
