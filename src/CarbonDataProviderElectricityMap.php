@@ -2,48 +2,40 @@
 
 namespace GlpiPlugin\Carbon;
 
+use GlpiPlugin\Carbon\Config;
+
 class CarbonDataProviderElectricityMap extends CarbonDataProviderRestApi
 {
-    const BASE_URL = 'https://api.electricitymap.org/v3';
-
     function __construct()
     {
+        $base_url = Config::getconfig()['electricitymap_base_url'];
+        if (substr($base_url, -1) != '/') {
+            $base_url .= '/';
+        }
+
         parent::__construct(
             [
-                'base_uri'        => self::BASE_URL,
-                'debug'           => true,
+                'base_uri'        => $base_url,
+                'headers'      => [
+                    'X-BLOBR-KEY' => Config::getConfig()['electricitymap_api_key'],
+                ],
+                // 'debug'           => true,
             ]
         );
     }
 
     public function getCarbonIntensity(string $zone): int
     {
-        $now = new \DateTimeImmutable();
-
-        $format = "Y-m-d\TH:i:sP";
-
-        // "Données éCO2mix nationales temps réel" has a depth from M-1 to H-2
-        $from = $now->sub(new \DateInterval('PT3H'))->format($format);
-        $to = $now->sub(new \DateInterval('PT2H'))->format($format);
-
         $params = [
-            'select'    => 'taux_co2,date_heure',
-            'where'     => "date_heure IN [date'$from' TO date'$to']",
-            'order_by'  => 'date_heure desc',
-            'limit'     => 20,
-            'offset'    => 0,
-            'timezone'  => 'UTC',
+            'zone'  => $zone,
         ];
 
-        $carbon_intensity = 0.0;
+        $carbon_intensity = 0;
 
-        if ($response = $this->request('GET', '', ['query' => $params])) {
-            foreach ($response['records'] as $record) {
-                $carbon_intensity += $record['record']['fields']['taux_co2'];
-            }
-            $carbon_intensity /= count($response['records']);
+        if ($response = $this->request('GET', 'carbon-intensity/latest', ['query' => $params])) {
+            $carbon_intensity = $response['carbonIntensity'];
         }
 
-        return intval(round($carbon_intensity));
+        return $carbon_intensity;
     }
 }

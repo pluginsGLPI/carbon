@@ -7,9 +7,14 @@
         <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token() }}">
 
         {{ fields.textField(
-            'electricitymap_api_token',
-            current_config['electricitymap_api_token'],
-            __('API token for electricitymap.org', 'carbon')
+            'electricitymap_base_url',
+            current_config['electricitymap_base_url'],
+            __('Base URL for electricitymap.org API', 'carbon')
+        ) }}
+        {{ fields.textField(
+            'electricitymap_api_key',
+            current_config['electricitymap_api_key'],
+            __('Key for electricitymap.org API', 'carbon')
         ) }}
 
         <button type="submit" class="btn btn-primary mx-1" name="update" value="1">

@@ -21,7 +21,8 @@ class Config extends \Config
     }
 
     private static $config_entries = [
-        'electricitymap_api_token'              => 'XXX',
+        'electricitymap_api_key'              => 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+        'electricitymap_base_url'             => 'https://api.electricitymap.org/ZZZZZZZZZZZZZZv4/',
     ];
 
     static function install(Migration $migration)

@@ -31,7 +31,8 @@ abstract class CarbonDataProviderRestApi implements CarbonDataProvider
             // 'verify'          => false,
         ];
 
-        $this->api_client = new \GuzzleHttp\Client(array_merge($local_params, $params));
+        // array_merge_recursive() is used because it merges headers
+        $this->api_client = new \GuzzleHttp\Client(array_merge_recursive($local_params, $params));
     }
 
     protected function request(string $method = 'GET', string $uri = '', array $options = [])
