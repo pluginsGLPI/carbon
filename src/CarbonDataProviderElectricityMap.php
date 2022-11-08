@@ -12,12 +12,13 @@ class CarbonDataProviderElectricityMap extends CarbonDataProviderRestApi
         if (substr($base_url, -1) != '/') {
             $base_url .= '/';
         }
+        $api_key = Config::getconfig()['electricitymap_api_key'];
 
         parent::__construct(
             [
                 'base_uri'        => $base_url,
                 'headers'      => [
-                    'X-BLOBR-KEY' => Config::getConfig()['electricitymap_api_key'],
+                    'X-BLOBR-KEY' => $api_key,
                 ],
                 // 'debug'           => true,
             ]
