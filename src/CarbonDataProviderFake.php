@@ -2,11 +2,11 @@
 
 namespace GlpiPlugin\Carbon;
 
-use DateTimeInterface;
+use DateTime;
 
 class CarbonDataProviderFake implements CarbonDataProvider
 {
-    public function getCarbonIntensity(string $zone, DateTimeInterface $date): int
+    public function getCarbonIntensity(string $zone, DateTime $date): int
     {
         return mt_rand(53, 116);
     }

@@ -2,9 +2,10 @@
 
 namespace GlpiPlugin\Carbon;
 
-use DateTimeInterface;
+use DateTimeImmutable;
+use DateTime;
 
-class CarbonDataProviderFrance extends CarbonDataProviderRestApi
+class CarbonDataProviderFrance extends \GlpiPlugin\Carbon\CarbonDataProviderRestApi
 {
     const BASE_URL = 'https://odre.opendatasoft.com/api/v2/catalog/datasets/eco2mix-national-tr/records';
 
@@ -18,15 +19,15 @@ class CarbonDataProviderFrance extends CarbonDataProviderRestApi
         );
     }
 
-    public function getCarbonIntensity(string $zone, DateTimeInterface $date): int
+    public function getCarbonIntensity(string $zone, DateTime $date): int
     {
-        $now = new \DateTimeImmutable();
+        $d = \DateTimeImmutable::createFromMutable($date);
 
         $format = "Y-m-d\TH:i:sP";
 
         // "Données éCO2mix nationales temps réel" has a depth from M-1 to H-2
-        $from = $now->sub(new \DateInterval('PT3H'))->format($format);
-        $to = $now->sub(new \DateInterval('PT2H'))->format($format);
+        $from = $d->sub(new \DateInterval('PT3H'))->format($format);
+        $to = $d->sub(new \DateInterval('PT2H'))->format($format);
 
         $params = [
             'select'    => 'taux_co2,date_heure',

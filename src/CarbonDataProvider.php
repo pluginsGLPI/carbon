@@ -2,7 +2,7 @@
 
 namespace GlpiPlugin\Carbon;
 
-use DateTimeInterface;
+use DateTime;
 
 interface CarbonDataProvider
 {
@@ -11,5 +11,5 @@ interface CarbonDataProvider
      * 
      * @return int the carbon intensity in gCO2/kWh
      */
-    public function getCarbonIntensity(string $zone, DateTimeInterface $date): int;
+    public function getCarbonIntensity(string $zone, DateTime $date): int;
 }
