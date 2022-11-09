@@ -4,8 +4,8 @@ namespace GlpiPlugin\Carbon;
 
 use CommonDBChild;
 use Computer;
+use Location;
 use Migration;
-//use GlpiPlugin\Carbon\CarbonDataProviderStub;
 
 class CarbonEmission extends CommonDBChild
 {
@@ -17,15 +17,15 @@ class CarbonEmission extends CommonDBChild
         return \_n("CarbonEmission", "CarbonEmissions", $nb, 'carbon emission');
     }
 
-    static function computeCarbonEmissionPerDay(int $computer_id)
+    static function computeCarbonEmissionPerDay(int $computer_id, string $country)
     {
         global $DB;
 
         $power = Power::getPower($computer_id);
 
-        $provider = CarbonDataProvider::PROVIDER;
+        $provider = CarbonData::getCarbonDataProvider($country);
 
-        $carbon_intensity = $provider::getCarbonIntensity('FR');
+        $carbon_intensity = $provider::getCarbonIntensity($country);
 
         // units: power is in Watt, emission is in gCO2/kWh
         $carbon_emission = ((24.0 * (float)$power) / 1000.0) * ((float)$carbon_intensity / 1000.0);
@@ -46,17 +46,27 @@ class CarbonEmission extends CommonDBChild
         global $DB;
 
         $computers_table = Computer::getTable();
+        $locations_table = Location::getTable();
 
         $request = [
             'SELECT'    => [
                 Computer::getTableField('id') . ' AS computer_id',
+                Location::getTableField('country') . ' AS country',
             ],
             'FROM'      => $computers_table,
+            'INNER JOIN' => [
+                $locations_table => [
+                    'FKEY'   => [
+                        $computers_table  => 'locations_id',
+                        $locations_table => 'id',
+                    ]
+                ],
+            ],
         ];
         $result = $DB->request($request);
 
-        foreach ($result as $computer) {
-            self::computeCarbonEmissionPerDay($computer['computer_id']);
+        foreach ($result as $r) {
+            self::computeCarbonEmissionPerDay($r['computer_id'], $r['country']);
         }
 
         return false;
