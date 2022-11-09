@@ -8,6 +8,6 @@ include_once('../src/CarbonDataProviderElectricityMap.php');
 
 $provider = new GlpiPlugin\Carbon\CarbonDataProviderElectricityMap();
 
-print_r($provider->getCarbonIntensity('FR'));
+print_r($provider->getCarbonIntensity('FR', new DateTimeImmutable()));
 echo "\n";
-print_r($provider->getCarbonIntensity('DE'));
+print_r($provider->getCarbonIntensity('DE', new DateTimeImmutable()));

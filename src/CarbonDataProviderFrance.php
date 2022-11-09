@@ -2,6 +2,8 @@
 
 namespace GlpiPlugin\Carbon;
 
+use DateTimeInterface;
+
 class CarbonDataProviderFrance extends CarbonDataProviderRestApi
 {
     const BASE_URL = 'https://odre.opendatasoft.com/api/v2/catalog/datasets/eco2mix-national-tr/records';
@@ -16,7 +18,7 @@ class CarbonDataProviderFrance extends CarbonDataProviderRestApi
         );
     }
 
-    public function getCarbonIntensity(string $zone): int
+    public function getCarbonIntensity(string $zone, DateTimeInterface $date): int
     {
         $now = new \DateTimeImmutable();
 

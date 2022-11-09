@@ -2,6 +2,7 @@
 
 namespace GlpiPlugin\Carbon;
 
+use DateTimeInterface;
 use GlpiPlugin\Carbon\Config;
 
 class CarbonDataProviderElectricityMap extends CarbonDataProviderRestApi
@@ -25,7 +26,7 @@ class CarbonDataProviderElectricityMap extends CarbonDataProviderRestApi
         );
     }
 
-    public function getCarbonIntensity(string $zone): int
+    public function getCarbonIntensity(string $zone, DateTimeInterface $date): int
     {
         $params = [
             'zone'  => $zone,

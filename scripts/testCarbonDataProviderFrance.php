@@ -6,4 +6,4 @@ include_once('../src/CarbonDataProviderFrance.php');
 
 $provider = new GlpiPlugin\Carbon\CarbonDataProviderFrance();
 
-print_r($provider->getCarbonIntensity('FR'));
+print_r($provider->getCarbonIntensity('FR', new DateTimeImmutable()));
