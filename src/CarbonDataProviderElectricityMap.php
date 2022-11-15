@@ -3,6 +3,7 @@
 namespace GlpiPlugin\Carbon;
 
 use DateTime;
+use DateTimeInterface;
 use GlpiPlugin\Carbon\Config;
 
 class CarbonDataProviderElectricityMap extends CarbonDataProviderRestApi
@@ -21,21 +22,27 @@ class CarbonDataProviderElectricityMap extends CarbonDataProviderRestApi
                 'headers'      => [
                     'X-BLOBR-KEY' => $api_key,
                 ],
-                // 'debug'           => true,
+                'debug'           => true,
             ]
         );
     }
 
     public function getCarbonIntensity(string $zone, DateTime $date): int
     {
+        $format = DateTimeInterface:: ISO8601;
+        
         $params = [
+            'datetime' => $date->format($format),
             'zone'  => $zone,
         ];
 
         $carbon_intensity = 0;
 
-        if ($response = $this->request('GET', 'carbon-intensity/latest', ['query' => $params])) {
-            $carbon_intensity = $response['carbonIntensity'];
+        if ($response = $this->request('GET', 'carbon-intensity/history', ['query' => $params])) {
+            $history = $response['history'];
+            if (is_array($history) && count($history) > 0) {
+                $carbon_intensity = $history[0]['carbonIntensity'];
+            }
         }
 
         return $carbon_intensity;
