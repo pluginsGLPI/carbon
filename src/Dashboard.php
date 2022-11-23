@@ -17,22 +17,22 @@ class Dashboard
         $new_cards = [
             'plugin_carbon_card_total_power' => [
                 'widgettype'   => ["bigNumber"],
-                'label'        => "GLPI Carbon - Total power consumption",
+                'label'        => __("GLPI Carbon - Total power consumption", "carbon"),
                 'provider'     => Dashboard::class . "::cardTotalPowerProvider",
             ],
             'plugin_carbon_card_total_carbon_emission' => [
                 'widgettype'   => ["bigNumber"],
-                'label'        => "GLPI Carbon - Total carbon emission",
+                'label'        => __("GLPI Carbon - Total carbon emission", "carbon"),
                 'provider'     => Dashboard::class . "::cardTotalCarbonEmissionProvider",
             ],
             'plugin_carbon_card_total_power_per_model' => [
                 'widgettype'   => ['pie', 'donut', 'halfpie', 'halfdonut', 'bar', 'hbar'],
-                'label'        => "GLPI Carbon - Total power consumption per model",
+                'label'        => __("GLPI Carbon - Total power consumption per model", "carbon"),
                 'provider'     => Dashboard::class . "::cardTotalPowerPerModelProvider",
             ],
             'plugin_carbon_card_total_carbon_emission_per_model' => [
                 'widgettype'   => ['pie', 'donut', 'halfpie', 'halfdonut', 'bar', 'hbar'],
-                'label'        => "GLPI Carbon - Total carbon emission per model",
+                'label'        => __("GLPI Carbon - Total carbon emission per model", 'carbon'),
                 'provider'     => Dashboard::class . "::cardTotalCarbonEmissionPerModelProvider",
             ],
         ];
