@@ -8,9 +8,37 @@ use atoum;
 
 class PowerAbacus extends atoum
 {
-    public function testEvaluate()
+    public function test1()
     {
-        $abacus = new \GlpiPlugin\Carbon\PowerAbacus('$power * 1.5');
-        $this->string($abacus->evaluate(['power' => 100]))->isEqualTo('150');
+        $this->function->error_log = true;
+
+        $this->given(
+            $formula = '$a * $b + $c',
+            $variables = [
+                'a' => 2,
+                'b' => 3,
+                'c' => 4,
+            ],
+            $this->newTestedInstance($formula)
+        )
+            ->then
+            ->variable($this->testedInstance->evaluate($variables))
+            ->isEqualTo(10);
+    }
+
+    public function test2()
+    {
+        $this->function->error_log = true;
+
+        $this->given(
+            $formula = '$ram * 27',
+            $variables = [
+                'ram' => 2,
+            ],
+            $this->newTestedInstance($formula)
+        )
+            ->then
+            ->variable($this->testedInstance->evaluate($variables))
+            ->isEqualTo(54);
     }
 }
