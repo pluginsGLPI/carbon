@@ -35,6 +35,11 @@ class Dashboard
                 'label'        => __("GLPI Carbon - Total carbon emission per model", 'carbon'),
                 'provider'     => Dashboard::class . "::cardTotalCarbonEmissionPerModelProvider",
             ],
+            'plugin_carbon_card_carbon_emission_per_month' => [
+                'widgettype'   => ['lines', 'areas', 'bars', 'stackedbars'],
+                'label'        => __("GLPI Carbon - Carbon emission per month", 'carbon'),
+                'provider'     => Dashboard::class . "::cardCarbonEmissionPerMonthProvider",
+            ],
         ];
 
         return array_merge($cards, $new_cards);
@@ -136,5 +141,22 @@ class Dashboard
     static function getTotalPowerPerModel()
     {
         return DBUtils::getSumPerModel(Power::getTable(), Power::getTableField('power'), [Power::getTableField('power') => ['>', '0']]);
+    }
+
+    static function cardCarbonEmissionPerMonthProvider(array $params = [], string $label, array $data)
+    {
+        $default_params = [
+            'label' => "plugin carbon - $label",
+            'icon'  => "fas fa-computer",
+            'color' => '#ea9999',
+        ];
+        $params = array_merge($default_params, $params);
+
+        return [
+            'data' => $data,
+            'label'  => $params['label'],
+            'icon'  => $params['icon'],
+            'color' => $params['color'],
+        ];
     }
 }
