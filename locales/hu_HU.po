@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-23 15:21+0100\n"
+"POT-Creation-Date: 2022-11-24 11:58+0100\n"
 "PO-Revision-Date: 2022-11-23 14:34+0000\n"
 "Language-Team: Hungarian (Hungary) (https://www.transifex.com/teclib/teams/28042/hu_HU/)\n"
 "MIME-Version: 1.0\n"
@@ -42,6 +42,22 @@ msgid "PowerModel"
 msgid_plural "PowerModels"
 msgstr[0] ""
 msgstr[1] ""
+
+#: src/Dashboard.php:20
+msgid "GLPI Carbon - Total power consumption"
+msgstr ""
+
+#: src/Dashboard.php:25
+msgid "GLPI Carbon - Total carbon emission"
+msgstr ""
+
+#: src/Dashboard.php:30
+msgid "GLPI Carbon - Total power consumption per model"
+msgstr ""
+
+#: src/Dashboard.php:35
+msgid "GLPI Carbon - Total carbon emission per model"
+msgstr ""
 
 #: src/Power.php:17
 msgid "Power"

@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-23 15:21+0100\n"
+"POT-Creation-Date: 2022-11-24 11:58+0100\n"
 "PO-Revision-Date: 2022-11-23 14:34+0000\n"
 "Last-Translator: François Déchelle, 2022\n"
 "Language-Team: French (France) (https://www.transifex.com/teclib/teams/28042/fr_FR/)\n"
@@ -48,6 +48,22 @@ msgid_plural "PowerModels"
 msgstr[0] "Modèle de puissance"
 msgstr[1] "Modèles de puissance"
 msgstr[2] "Modèles de puissance"
+
+#: src/Dashboard.php:20
+msgid "GLPI Carbon - Total power consumption"
+msgstr "GLPI Carbon - Consommation électrique totale"
+
+#: src/Dashboard.php:25
+msgid "GLPI Carbon - Total carbon emission"
+msgstr "GLPI Carbon - Emission de CO2 totale"
+
+#: src/Dashboard.php:30
+msgid "GLPI Carbon - Total power consumption per model"
+msgstr "GLPI Carbon - Consommation électrique par modèle"
+
+#: src/Dashboard.php:35
+msgid "GLPI Carbon - Total carbon emission per model"
+msgstr "GLPI Carbon - Emission de CO2 par modèle"
 
 #: src/Power.php:17
 msgid "Power"
