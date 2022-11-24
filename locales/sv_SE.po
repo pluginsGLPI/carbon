@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-24 11:58+0100\n"
+"POT-Creation-Date: 2022-11-24 17:33+0100\n"
 "PO-Revision-Date: 2022-11-23 14:34+0000\n"
 "Language-Team: Swedish (Sweden) (https://www.transifex.com/teclib/teams/28042/sv_SE/)\n"
 "MIME-Version: 1.0\n"
@@ -21,8 +21,20 @@ msgstr ""
 msgid "This is the GLPI Carbon plugin config page"
 msgstr ""
 
-#: src/Config.php:15
-msgid "Carbon"
+#: src/Power.php:17
+msgid "Power"
+msgid_plural "Powers"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Power.php:140 src/PowerModel_ComputerModel.php:31
+#: src/CarbonEmission.php:81 src/PowerModel.php:26
+#, php-format
+msgid "Installing %s"
+msgstr ""
+
+#: src/Power.php:166
+msgid "Compute powers for all computers"
 msgstr ""
 
 #: src/PowerModel_ComputerModel.php:22
@@ -31,17 +43,9 @@ msgid_plural "Associated elements"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/PowerModel_ComputerModel.php:31 src/PowerModel.php:26 src/Power.php:140
-#: src/CarbonEmission.php:81
-#, php-format
-msgid "Installing %s"
+#: src/PowerModelCategory.php:14 hook.php:109
+msgid "Carbon Plugin - Power model categories"
 msgstr ""
-
-#: src/PowerModel.php:17
-msgid "PowerModel"
-msgid_plural "PowerModels"
-msgstr[0] ""
-msgstr[1] ""
 
 #: src/Dashboard.php:20
 msgid "GLPI Carbon - Total power consumption"
@@ -59,14 +63,8 @@ msgstr ""
 msgid "GLPI Carbon - Total carbon emission per model"
 msgstr ""
 
-#: src/Power.php:17
-msgid "Power"
-msgid_plural "Powers"
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/Power.php:166
-msgid "Compute powers for all computers"
+#: src/Dashboard.php:40
+msgid "GLPI Carbon - Carbon emission per month"
 msgstr ""
 
 #: src/CarbonEmission.php:17
@@ -79,8 +77,14 @@ msgstr[1] ""
 msgid "Compute carbon emissions for all computers"
 msgstr ""
 
-#: src/PowerModelCategory.php:14 hook.php:109
-msgid "Carbon Plugin - Power model categories"
+#: src/PowerModel.php:17
+msgid "PowerModel"
+msgid_plural "PowerModels"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Config.php:15
+msgid "Carbon"
 msgstr ""
 
 #: hook.php:68

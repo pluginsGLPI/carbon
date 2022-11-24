@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-24 11:58+0100\n"
+"POT-Creation-Date: 2022-11-24 17:33+0100\n"
 "PO-Revision-Date: 2022-11-23 14:34+0000\n"
 "Last-Translator: SeongHyeon Cho <jaymz9634@gmail.com>, 2022\n"
 "Language-Team: Korean (Korea) (https://www.transifex.com/teclib/teams/28042/ko_KR/)\n"
@@ -25,25 +25,29 @@ msgstr ""
 msgid "This is the GLPI Carbon plugin config page"
 msgstr "이것은 GLPI 탄소 플러그인 구성 페이지 입니다"
 
-#: src/Config.php:15
-msgid "Carbon"
-msgstr "탄소"
+#: src/Power.php:17
+msgid "Power"
+msgid_plural "Powers"
+msgstr[0] "전력"
+
+#: src/Power.php:140 src/PowerModel_ComputerModel.php:31
+#: src/CarbonEmission.php:81 src/PowerModel.php:26
+#, php-format
+msgid "Installing %s"
+msgstr "%s설치 중"
+
+#: src/Power.php:166
+msgid "Compute powers for all computers"
+msgstr "모든 컴퓨터들에 대한 전력 계산"
 
 #: src/PowerModel_ComputerModel.php:22
 msgid "Associated element"
 msgid_plural "Associated elements"
 msgstr[0] "관련 요소"
 
-#: src/PowerModel_ComputerModel.php:31 src/PowerModel.php:26 src/Power.php:140
-#: src/CarbonEmission.php:81
-#, php-format
-msgid "Installing %s"
-msgstr "%s설치 중"
-
-#: src/PowerModel.php:17
-msgid "PowerModel"
-msgid_plural "PowerModels"
-msgstr[0] "전력모델"
+#: src/PowerModelCategory.php:14 hook.php:109
+msgid "Carbon Plugin - Power model categories"
+msgstr "탄소 플러그인 - 전원 모델 분류"
 
 #: src/Dashboard.php:20
 msgid "GLPI Carbon - Total power consumption"
@@ -61,14 +65,9 @@ msgstr ""
 msgid "GLPI Carbon - Total carbon emission per model"
 msgstr ""
 
-#: src/Power.php:17
-msgid "Power"
-msgid_plural "Powers"
-msgstr[0] "전력"
-
-#: src/Power.php:166
-msgid "Compute powers for all computers"
-msgstr "모든 컴퓨터들에 대한 전력 계산"
+#: src/Dashboard.php:40
+msgid "GLPI Carbon - Carbon emission per month"
+msgstr ""
 
 #: src/CarbonEmission.php:17
 msgid "CarbonEmission"
@@ -79,9 +78,14 @@ msgstr[0] "탄소배출"
 msgid "Compute carbon emissions for all computers"
 msgstr "모든 컴퓨터들에 대한 탄소 배출 계산"
 
-#: src/PowerModelCategory.php:14 hook.php:109
-msgid "Carbon Plugin - Power model categories"
-msgstr "탄소 플러그인 - 전원 모델 분류"
+#: src/PowerModel.php:17
+msgid "PowerModel"
+msgid_plural "PowerModels"
+msgstr[0] "전력모델"
+
+#: src/Config.php:15
+msgid "Carbon"
+msgstr "탄소"
 
 #: hook.php:68
 msgid "Computes power consumption of computers"
