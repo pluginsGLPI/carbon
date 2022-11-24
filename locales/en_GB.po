@@ -1,14 +1,14 @@
-# English translations for glpi package.
-# Copyright (C) 2022 THE glpi'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the glpi package.
+# English translations for PACKAGE package.
+# Copyright (C) 2022 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
 # Automatically generated, 2022.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: glpi 100a\n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-23 15:21+0100\n"
-"PO-Revision-Date: 2022-11-23 15:21+0100\n"
+"POT-Creation-Date: 2022-11-24 09:31+0100\n"
+"PO-Revision-Date: 2022-11-24 09:31+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: en_GB\n"
@@ -21,9 +21,21 @@ msgstr ""
 msgid "This is the GLPI Carbon plugin config page"
 msgstr "This is the GLPI Carbon plugin config page"
 
-#: src/Config.php:15
-msgid "Carbon"
-msgstr "Carbon"
+#: src/Power.php:17
+msgid "Power"
+msgid_plural "Powers"
+msgstr[0] "Power"
+msgstr[1] "Powers"
+
+#: src/Power.php:140 src/PowerModel_ComputerModel.php:31
+#: src/CarbonEmission.php:81 src/PowerModel.php:26
+#, php-format
+msgid "Installing %s"
+msgstr "Installing %s"
+
+#: src/Power.php:166
+msgid "Compute powers for all computers"
+msgstr "Compute powers for all computers"
 
 #: src/PowerModel_ComputerModel.php:22
 msgid "Associated element"
@@ -31,27 +43,25 @@ msgid_plural "Associated elements"
 msgstr[0] "Associated element"
 msgstr[1] "Associated elements"
 
-#: src/PowerModel_ComputerModel.php:31 src/PowerModel.php:26 src/Power.php:140
-#: src/CarbonEmission.php:81
-#, php-format
-msgid "Installing %s"
-msgstr "Installing %s"
+#: src/PowerModelCategory.php:14 hook.php:109
+msgid "Carbon Plugin - Power model categories"
+msgstr "Carbon Plugin - Power model categories"
 
-#: src/PowerModel.php:17
-msgid "PowerModel"
-msgid_plural "PowerModels"
-msgstr[0] "PowerModel"
-msgstr[1] "PowerModels"
+#: src/Dashboard.php:20
+msgid "GLPI Carbon - Total power consumption"
+msgstr "GLPI Carbon - Total power consumption"
 
-#: src/Power.php:17
-msgid "Power"
-msgid_plural "Powers"
-msgstr[0] "Power"
-msgstr[1] "Powers"
+#: src/Dashboard.php:25
+msgid "GLPI Carbon - Total carbon emission"
+msgstr "GLPI Carbon - Total carbon emission"
 
-#: src/Power.php:166
-msgid "Compute powers for all computers"
-msgstr "Compute powers for all computers"
+#: src/Dashboard.php:30
+msgid "GLPI Carbon - Total power consumption per model"
+msgstr "GLPI Carbon - Total power consumption per model"
+
+#: src/Dashboard.php:35
+msgid "GLPI Carbon - Total carbon emission per model"
+msgstr "GLPI Carbon - Total carbon emission per model"
 
 #: src/CarbonEmission.php:17
 msgid "CarbonEmission"
@@ -63,9 +73,15 @@ msgstr[1] "CarbonEmissions"
 msgid "Compute carbon emissions for all computers"
 msgstr "Compute carbon emissions for all computers"
 
-#: src/PowerModelCategory.php:14 hook.php:109
-msgid "Carbon Plugin - Power model categories"
-msgstr "Carbon Plugin - Power model categories"
+#: src/PowerModel.php:17
+msgid "PowerModel"
+msgid_plural "PowerModels"
+msgstr[0] "PowerModel"
+msgstr[1] "PowerModels"
+
+#: src/Config.php:15
+msgid "Carbon"
+msgstr "Carbon"
 
 #: hook.php:68
 msgid "Computes power consumption of computers"
