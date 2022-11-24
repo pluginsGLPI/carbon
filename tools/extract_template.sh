@@ -54,7 +54,7 @@ do
 done
 
 #Update main language
-LANG=C msginit --no-translator -i locales/carbon.pot -l en_GB -o locales/en_GB.po
+#LANG=C msginit --no-translator -i locales/carbon.pot -l en_GB -o locales/en_GB.po
 
 ### for using tx :
 ##tx set --execute --auto-local -r GLPI.glpipot 'locales/<lang>.po' --source-lang en_GB --source-file locales/carbon.pot
