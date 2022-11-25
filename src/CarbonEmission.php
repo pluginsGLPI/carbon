@@ -105,7 +105,7 @@ class CarbonEmission extends CommonDBChild
         switch ($name) {
             case 'ComputeCarbonEmissionsTask':
                 return [
-                    'description' => __('Compute carbon emissions for all computers', 'example')
+                    'description' => __('Compute carbon emissions for all computers', 'carbon')
                 ];
         }
         return [];

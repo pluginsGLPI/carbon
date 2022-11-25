@@ -1,0 +1,117 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-11-24 17:33+0100\n"
+"PO-Revision-Date: 2022-11-23 14:34+0000\n"
+"Language-Team: Chinese (Taiwan) (https://www.transifex.com/teclib/teams/28042/zh_TW/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_TW\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: front/config.form.php:15
+msgid "This is the GLPI Carbon plugin config page"
+msgstr ""
+
+#: src/Power.php:17
+msgid "Power"
+msgid_plural "Powers"
+msgstr[0] ""
+
+#: src/Power.php:140 src/PowerModel_ComputerModel.php:31
+#: src/CarbonEmission.php:81 src/PowerModel.php:26
+#, php-format
+msgid "Installing %s"
+msgstr ""
+
+#: src/Power.php:166
+msgid "Compute powers for all computers"
+msgstr ""
+
+#: src/PowerModel_ComputerModel.php:22
+msgid "Associated element"
+msgid_plural "Associated elements"
+msgstr[0] ""
+
+#: src/PowerModelCategory.php:14 hook.php:109
+msgid "Carbon Plugin - Power model categories"
+msgstr ""
+
+#: src/Dashboard.php:20
+msgid "GLPI Carbon - Total power consumption"
+msgstr ""
+
+#: src/Dashboard.php:25
+msgid "GLPI Carbon - Total carbon emission"
+msgstr ""
+
+#: src/Dashboard.php:30
+msgid "GLPI Carbon - Total power consumption per model"
+msgstr ""
+
+#: src/Dashboard.php:35
+msgid "GLPI Carbon - Total carbon emission per model"
+msgstr ""
+
+#: src/Dashboard.php:40
+msgid "GLPI Carbon - Carbon emission per month"
+msgstr ""
+
+#: src/CarbonEmission.php:17
+msgid "CarbonEmission"
+msgid_plural "CarbonEmissions"
+msgstr[0] ""
+
+#: src/CarbonEmission.php:108
+msgid "Compute carbon emissions for all computers"
+msgstr ""
+
+#: src/PowerModel.php:17
+msgid "PowerModel"
+msgid_plural "PowerModels"
+msgstr[0] ""
+
+#: src/Config.php:15
+msgid "Carbon"
+msgstr ""
+
+#: hook.php:68
+msgid "Computes power consumption of computers"
+msgstr ""
+
+#: hook.php:80
+msgid "Computes carbon emissions of computers"
+msgstr ""
+
+#: hook.php:121
+msgid "Power (W)"
+msgstr ""
+
+#: hook.php:132
+msgid "Carbon emission (kgCO2)"
+msgstr ""
+
+#: setup.php:130
+msgid "Installed / not configured"
+msgstr ""
+
+#: entrée standard:12
+msgid "Base URL for electricitymap.org API"
+msgstr ""
+
+#: entrée standard:17
+msgid "Key for electricitymap.org API"
+msgstr ""
+
+#: entrée standard:22
+msgctxt "button"
+msgid "Save"
+msgstr ""

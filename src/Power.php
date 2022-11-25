@@ -163,7 +163,7 @@ class Power extends CommonDBChild
         switch ($name) {
             case 'ComputePowersTask':
                 return [
-                    'description' => __('Compute powers for all computers', 'example')
+                    'description' => __('Compute powers for all computers', 'carbon')
                 ];
         }
         return [];
