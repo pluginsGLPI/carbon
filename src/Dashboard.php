@@ -5,6 +5,9 @@ namespace GlpiPlugin\Carbon;
 use GlpiPlugin\Carbon\Power;
 use ComputerModel;
 use Computer;
+use DateTime;
+use DateInterval;
+use DateTimeInterface;
 
 class Dashboard
 {
@@ -17,27 +20,32 @@ class Dashboard
         $new_cards = [
             'plugin_carbon_card_total_power' => [
                 'widgettype'   => ["bigNumber"],
-                'label'        => __("GLPI Carbon - Total power consumption", "carbon"),
+                'group'        => __("Carbon", "carbon"),
+                'label'        => __("Total power consumption", "carbon"),
                 'provider'     => Dashboard::class . "::cardTotalPowerProvider",
             ],
             'plugin_carbon_card_total_carbon_emission' => [
                 'widgettype'   => ["bigNumber"],
-                'label'        => __("GLPI Carbon - Total carbon emission", "carbon"),
+                'group'        => __("Carbon", "carbon"),
+                'label'        => __("Total carbon emission", "carbon"),
                 'provider'     => Dashboard::class . "::cardTotalCarbonEmissionProvider",
             ],
             'plugin_carbon_card_total_power_per_model' => [
                 'widgettype'   => ['pie', 'donut', 'halfpie', 'halfdonut', 'bar', 'hbar'],
-                'label'        => __("GLPI Carbon - Total power consumption per model", "carbon"),
+                'group'        => __("Carbon", "carbon"),
+                'label'        => __("Total power consumption per model", "carbon"),
                 'provider'     => Dashboard::class . "::cardTotalPowerPerModelProvider",
             ],
             'plugin_carbon_card_total_carbon_emission_per_model' => [
                 'widgettype'   => ['pie', 'donut', 'halfpie', 'halfdonut', 'bar', 'hbar'],
-                'label'        => __("GLPI Carbon - Total carbon emission per model", 'carbon'),
+                'group'        => __("Carbon", "carbon"),
+                'label'        => __("Total carbon emission per model", 'carbon'),
                 'provider'     => Dashboard::class . "::cardTotalCarbonEmissionPerModelProvider",
             ],
             'plugin_carbon_card_carbon_emission_per_month' => [
                 'widgettype'   => ['lines', 'areas', 'bars', 'stackedbars'],
-                'label'        => __("GLPI Carbon - Carbon emission per month", 'carbon'),
+                'group'        => __("Carbon", "carbon"),
+                'label'        => __("Carbon emission per month", 'carbon'),
                 'provider'     => Dashboard::class . "::cardCarbonEmissionPerMonthProvider",
             ],
         ];
@@ -143,20 +151,42 @@ class Dashboard
         return DBUtils::getSumPerModel(Power::getTable(), Power::getTableField('power'), [Power::getTableField('power') => ['>', '0']]);
     }
 
-    static function cardCarbonEmissionPerMonthProvider(array $params = [], string $label, array $data)
+    static function cardCarbonEmissionPerMonthProvider(array $params = [])
     {
         $default_params = [
-            'label' => "plugin carbon - $label",
+            'label' => "plugin carbon - carbon emission per month",
             'icon'  => "fas fa-computer",
             'color' => '#ea9999',
         ];
         $params = array_merge($default_params, $params);
 
+        $data = [
+            'labels' => [],
+            'series' => [
+                [
+                    'name' => __("Carbon emission", "carbon"),
+                    'data' => []
+                ],
+            ]
+        ];
+
+        $date = new \DateTime();
+        $_31days = new DateInterval('P31D');
+        $_1day = new DateInterval('P1D');
+        $date->sub($_31days);
+
+        for ($day = 0; $day < 31; $day++) {
+            $data['labels'][] = $date->format('Y-m-d');
+
+            $data['series'][0]['data'][] = mt_rand(55, 100);
+            
+            $date->add($_1day);
+        }
+
         return [
-            'data' => $data,
-            'label'  => $params['label'],
+            'data'  => $data,
+            'label' => $params['label'],
             'icon'  => $params['icon'],
-            'color' => $params['color'],
         ];
     }
 }
