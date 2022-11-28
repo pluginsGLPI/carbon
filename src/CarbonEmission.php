@@ -40,11 +40,11 @@ class CarbonEmission extends CommonDBChild
             'emission_per_day' => $carbon_emission,
             'emission_date' => $date->format('Y-m-d H:i:s')
         ];
-        $where = [
-            'computers_id' => $computer_id,
-        ];
+        // $where = [
+        //     'computers_id' => $computer_id,
+        // ];
 
-        return $DB->updateOrInsert(self::getTable(), $params, $where);
+        return $DB->updateOrInsert(self::getTable(), $params);
     }
 
     static function computerCarbonEmissionPerDayForAllComputers(DateTime &$date)
