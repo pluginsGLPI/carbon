@@ -160,6 +160,26 @@ class Dashboard
         ];
         $params = array_merge($default_params, $params);
 
+        global $DB;
+
+        $emissions_table = CarbonEmission::getTable();
+
+        $date = new \DateTime();
+        $_31days = new DateInterval('P31D');
+        $date->sub($_31days);
+
+        $request = [
+            'SELECT'    => [
+                'SUM' => CarbonEmission::getTableField('emission_per_day') . ' AS total_emission_per_day',
+                CarbonEmission::getTableField('emission_date') . ' AS emission_date',
+            ],
+            'FROM'      => $emissions_table,
+            'GROUPBY' => CarbonEmission::getTableField('emission_date'),
+            'WHERE' => [
+                CarbonEmission::getTableField('emission_date') => ['>', $date->format('Y-m-d')],
+            ],
+        ];
+
         $data = [
             'labels' => [],
             'series' => [
@@ -170,17 +190,10 @@ class Dashboard
             ]
         ];
 
-        $date = new \DateTime();
-        $_31days = new DateInterval('P31D');
-        $_1day = new DateInterval('P1D');
-        $date->sub($_31days);
-
-        for ($day = 0; $day < 31; $day++) {
-            $data['labels'][] = $date->format('Y-m-d');
-
-            $data['series'][0]['data'][] = mt_rand(55, 100);
-            
-            $date->add($_1day);
+        $result = $DB->request($request);
+        foreach ($result as $row) {
+            $data['labels'][] = $row['emission_date'];
+            $data['series'][0]['data'][] = $row['total_emission_per_day'];
         }
 
         return [
@@ -189,4 +202,24 @@ class Dashboard
             'icon'  => $params['icon'],
         ];
     }
+
+    // $date = new \DateTime();
+    // $_31days = new DateInterval('P31D');
+    // $_1day = new DateInterval('P1D');
+    // $date->sub($_31days);
+
+    // for ($day = 0; $day < 31; $day++) {
+    //     $data['labels'][] = $date->format('Y-m-d');
+
+    //     $data['series'][0]['data'][] = mt_rand(55, 100);
+
+    //     $date->add($_1day);
+    // }
+
+    // return [
+    //     'data'  => $data,
+    //     'label' => $params['label'],
+    //     'icon'  => $params['icon'],
+    // ];
+
 }
