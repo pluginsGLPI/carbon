@@ -26,7 +26,7 @@ class CarbonEmission extends CommonDBChild
 
         $provider = CarbonData::getCarbonDataProvider($country, $latitude, $longitude);
 
-        $carbon_intensity = $provider::getCarbonIntensity($country, $latitude, $longitude, $date);
+        $carbon_intensity = $provider->getCarbonIntensity($country, $latitude, $longitude, $date);
 
         // units: power is in Watt, emission is in gCO2/kWh
         $carbon_emission = ((24.0 * (float)$power) / 1000.0) * ((float)$carbon_intensity / 1000.0);
@@ -118,7 +118,8 @@ class CarbonEmission extends CommonDBChild
     {
         $task->log("Computing carbon emissions for all computers");
 
-        $computers_count = self::computerCarbonEmissionPerDayForAllComputers(new DateTime());
+        $date = new DateTime();
+        $computers_count = self::computerCarbonEmissionPerDayForAllComputers($date);
 
         $task->setVolume($computers_count);
 

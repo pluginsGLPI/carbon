@@ -17,8 +17,8 @@ class CarbonData {
     public static function getCarbonDataProvider(string $country, string $latitude, string $longitude): CarbonDataProvider
     {
         if (array_key_exists($country, self::$providers)) {
-            $provider = self::$providers[$country];
-            return new $provider();
+            $provider_name = self::$providers[$country];
+            return new $provider_name;
         }
 
         // if (is_numeric($latitude) && is_numeric($longitude)) {

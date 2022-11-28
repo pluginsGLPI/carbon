@@ -2,7 +2,7 @@
 
 namespace GlpiPlugin\Carbon;
 
-include('../../../vendor/autoload.php');
+include_once(__DIR__ . '/../../../vendor/autoload.php');
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;

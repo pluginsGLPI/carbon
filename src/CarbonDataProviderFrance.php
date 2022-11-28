@@ -6,7 +6,7 @@ use DateInterval;
 use DateTimeImmutable;
 use DateTime;
 
-class CarbonDataProviderFrance extends \GlpiPlugin\Carbon\CarbonDataProviderRestApi
+class CarbonDataProviderFrance extends CarbonDataProviderRestApi
 {
     const BASE_URL = 'https://odre.opendatasoft.com/api/v2/catalog/datasets/eco2mix-national-tr/records';
 
