@@ -6,6 +6,7 @@ use CommonDBChild;
 use Computer;
 use Location;
 use Migration;
+use DateTime;
 
 class CarbonEmission extends CommonDBChild
 {
@@ -17,15 +18,15 @@ class CarbonEmission extends CommonDBChild
         return \_n("CarbonEmission", "CarbonEmissions", $nb, 'carbon emission');
     }
 
-    static function computeCarbonEmissionPerDay(int $computer_id, string $country)
+    static function computeCarbonEmissionPerDay(int $computer_id, string $country, string $latitude, string $longitude, DateTime &$date)
     {
         global $DB;
 
         $power = Power::getPower($computer_id);
 
-        $provider = CarbonData::getCarbonDataProvider($country);
+        $provider = CarbonData::getCarbonDataProvider($country, $latitude, $longitude);
 
-        $carbon_intensity = $provider::getCarbonIntensity($country);
+        $carbon_intensity = $provider::getCarbonIntensity($country, $latitude, $longitude, $date);
 
         // units: power is in Watt, emission is in gCO2/kWh
         $carbon_emission = ((24.0 * (float)$power) / 1000.0) * ((float)$carbon_intensity / 1000.0);
@@ -33,7 +34,7 @@ class CarbonEmission extends CommonDBChild
         $params = [
             'computers_id' => $computer_id,
             'emission_per_day' => $carbon_emission,
-            'emission_date' => date('Y-m-d H:i:s')
+            'emission_date' => $date->format('Y-m-d H:i:s')
         ];
         $where = [
             'computers_id' => $computer_id,
@@ -41,7 +42,7 @@ class CarbonEmission extends CommonDBChild
         return $DB->updateOrInsert(self::getTable(), $params, $where);
     }
 
-    static function computerCarbonEmissionPerDayForAllComputers()
+    static function computerCarbonEmissionPerDayForAllComputers(DateTime &$date)
     {
         global $DB;
 
@@ -52,6 +53,8 @@ class CarbonEmission extends CommonDBChild
             'SELECT'    => [
                 Computer::getTableField('id') . ' AS computer_id',
                 Location::getTableField('country') . ' AS country',
+                Location::getTableField('latitude') . ' AS latitude',
+                Location::getTableField('longitude') . ' AS longitude',
             ],
             'FROM'      => $computers_table,
             'INNER JOIN' => [
@@ -66,7 +69,7 @@ class CarbonEmission extends CommonDBChild
         $result = $DB->request($request);
 
         foreach ($result as $r) {
-            self::computeCarbonEmissionPerDay($r['computer_id'], $r['country']);
+            self::computeCarbonEmissionPerDay($r['computer_id'], $r['country'], $r['latitude'], $r['longitude'], $date);
         }
 
         return false;
@@ -115,7 +118,7 @@ class CarbonEmission extends CommonDBChild
     {
         $task->log("Computing carbon emissions for all computers");
 
-        $computers_count = self::computerCarbonEmissionPerDayForAllComputers();
+        $computers_count = self::computerCarbonEmissionPerDayForAllComputers(new DateTime());
 
         $task->setVolume($computers_count);
 

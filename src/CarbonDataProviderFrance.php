@@ -2,6 +2,7 @@
 
 namespace GlpiPlugin\Carbon;
 
+use DateInterval;
 use DateTimeImmutable;
 use DateTime;
 
@@ -19,15 +20,15 @@ class CarbonDataProviderFrance extends \GlpiPlugin\Carbon\CarbonDataProviderRest
         );
     }
 
-    public function getCarbonIntensity(string $zone, DateTime $date): int
+    public function getCarbonIntensity(string $country, string $latitude, string $longitude, DateTime &$date): int
     {
-        $d = \DateTimeImmutable::createFromMutable($date);
+        $d = DateTimeImmutable::createFromMutable($date);
 
         $format = "Y-m-d\TH:i:sP";
 
         // "Données éCO2mix nationales temps réel" has a depth from M-1 to H-2
-        $from = $d->sub(new \DateInterval('PT3H'))->format($format);
-        $to = $d->sub(new \DateInterval('PT2H'))->format($format);
+        $from = $d->sub(new DateInterval('PT3H'))->format($format);
+        $to = $d->sub(new DateInterval('PT2H'))->format($format);
 
         $params = [
             'select'    => 'taux_co2,date_heure',

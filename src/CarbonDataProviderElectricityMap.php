@@ -27,13 +27,13 @@ class CarbonDataProviderElectricityMap extends CarbonDataProviderRestApi
         );
     }
 
-    public function getCarbonIntensity(string $zone, DateTime $date): int
+    public function getCarbonIntensity(string $country, string $latitude, string $longitude, DateTime &$date): int
     {
         $format = DateTimeInterface::ISO8601;
         
         $params = [
             'datetime' => $date->format($format),
-            'zone'  => $zone,
+            'zone'  => $country,
         ];
 
         $carbon_intensity = 0;
