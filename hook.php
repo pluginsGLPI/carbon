@@ -60,7 +60,7 @@ function plugin_carbon_install()
     CronTask::Register(
         Power::class,
         'ComputePowersTask',
-        MINUTE_TIMESTAMP,
+        DAY_TIMESTAMP,
         [
             'mode' => CronTask::MODE_INTERNAL,
             'allowmode' => CronTask::MODE_INTERNAL + CronTask::MODE_EXTERNAL,
@@ -72,7 +72,7 @@ function plugin_carbon_install()
     CronTask::Register(
         CarbonEmission::class,
         'ComputeCarbonEmissionsTask',
-        MINUTE_TIMESTAMP,
+        DAY_TIMESTAMP,
         [
             'mode' => CronTask::MODE_INTERNAL,
             'allowmode' => CronTask::MODE_INTERNAL + CronTask::MODE_EXTERNAL,
