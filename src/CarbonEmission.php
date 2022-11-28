@@ -28,6 +28,10 @@ class CarbonEmission extends CommonDBChild
 
         $carbon_intensity = $provider->getCarbonIntensity($country, $latitude, $longitude, $date);
 
+        if (!$carbon_intensity) {
+            return 0;
+        }
+
         // units: power is in Watt, emission is in gCO2/kWh
         $carbon_emission = ((24.0 * (float)$power) / 1000.0) * ((float)$carbon_intensity / 1000.0);
 
@@ -39,6 +43,7 @@ class CarbonEmission extends CommonDBChild
         $where = [
             'computers_id' => $computer_id,
         ];
+
         return $DB->updateOrInsert(self::getTable(), $params, $where);
     }
 
@@ -66,13 +71,15 @@ class CarbonEmission extends CommonDBChild
                 ],
             ],
         ];
-        $result = $DB->request($request);
 
+        $result = $DB->request($request);
+        $count = 0;
         foreach ($result as $r) {
-            self::computeCarbonEmissionPerDay($r['computer_id'], $r['country'], $r['latitude'], $r['longitude'], $date);
+            if (self::computeCarbonEmissionPerDay($r['computer_id'], $r['country'], $r['latitude'], $r['longitude'], $date))
+                $count++;
         }
 
-        return false;
+        return $count;
     }
 
     static function install(Migration $migration)
