@@ -20,28 +20,22 @@ class CarbonDataProviderCO2signal extends CarbonDataProviderRestApi
                 'headers'      => [
                     'auth-token' => $api_key,
                 ],
-                // 'debug'           => true,
+                'debug'           => true,
             ]
         );
     }
 
     public function getCarbonIntensity(string $country, string $latitude, string $longitude, DateTime &$date): int
     {
-        $format = DateTimeInterface::ISO8601;
-        
         $params = [
-            'datetime' => $date->format($format),
-            'zone'  => $country,
+            'countryCode'  => $country,
         ];
 
         $carbon_intensity = 0;
 
-        if ($response = $this->request('GET', 'carbon-intensity/history', ['query' => $params])) {
+        if ($response = $this->request('GET', 'latest', ['query' => $params])) {
             print_r($response);
-            $history = $response['history'];
-            if (is_array($history) && count($history) > 0) {
-                $carbon_intensity = $history[0]['carbonIntensity'];
-            }
+            $carbon_intensity = $response['data']['carbonIntensity'];
         }
 
         return $carbon_intensity;

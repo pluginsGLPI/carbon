@@ -7,7 +7,7 @@ include_once('../src/Config.php');
 include_once('../src/CarbonDataProviderCO2signal.php');
 
 $provider = new GlpiPlugin\Carbon\CarbonDataProviderCO2signal();
-
-print_r($provider->getCarbonIntensity('FR', '0', '0', new DateTime()));
+$now = new DateTime();
+print_r($provider->getCarbonIntensity('FR', '0', '0', $now));
 echo "\n";
-print_r($provider->getCarbonIntensity('DE', '0', '0', new DateTime()));
+print_r($provider->getCarbonIntensity('DE', '0', '0', $now));
