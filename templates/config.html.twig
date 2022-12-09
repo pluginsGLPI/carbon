@@ -17,6 +17,12 @@
             __('Key for electricitymap.org API', 'carbon')
         ) }}
 
+        {{ fields.textField(
+            'co2signal_api_key',
+            current_config['co2signal_api_key'],
+            __('Key for co2signal.com API', 'carbon')
+        ) }}
+
         <button type="submit" class="btn btn-primary mx-1" name="update" value="1">
             <i class="ti ti-device-floppy"></i>
             <span>{{ _x('button', 'Save') }}</span>
