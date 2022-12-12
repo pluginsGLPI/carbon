@@ -27,6 +27,7 @@ abstract class CarbonDataProviderRestApi implements CarbonDataProvider
             'headers'         => self::DEFAULT_HEADERS,
             'version'         => self::DEFAULT_HTTP_VERSION,
             'http_errors'     => false,
+            'debug'           => ($_SESSION['glpi_use_mode'] == \Session::DEBUG_MODE),
             // This is insecure and not recommanded, but...
             // 'verify'          => false,
         ];

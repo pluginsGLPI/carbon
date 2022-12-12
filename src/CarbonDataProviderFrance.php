@@ -15,7 +15,6 @@ class CarbonDataProviderFrance extends CarbonDataProviderRestApi
         parent::__construct(
             [
                 'base_uri'        => self::BASE_URL,
-                'debug'           => true,
             ]
         );
     }

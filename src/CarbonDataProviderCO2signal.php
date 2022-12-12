@@ -20,7 +20,6 @@ class CarbonDataProviderCO2signal extends CarbonDataProviderRestApi
                 'headers'      => [
                     'auth-token' => $api_key,
                 ],
-                // 'debug'           => true,
             ]
         );
     }
@@ -34,7 +33,6 @@ class CarbonDataProviderCO2signal extends CarbonDataProviderRestApi
         $carbon_intensity = 0;
 
         if ($response = $this->request('GET', 'latest', ['query' => $params])) {
-            // print_r($response);
             $carbon_intensity = $response['data']['carbonIntensity'];
         }
 

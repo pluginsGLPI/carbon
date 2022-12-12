@@ -22,7 +22,6 @@ class CarbonDataProviderElectricityMap extends CarbonDataProviderRestApi
                 'headers'      => [
                     'X-BLOBR-KEY' => $api_key,
                 ],
-                // 'debug'           => true,
             ]
         );
     }
@@ -39,7 +38,6 @@ class CarbonDataProviderElectricityMap extends CarbonDataProviderRestApi
         $carbon_intensity = 0;
 
         if ($response = $this->request('GET', 'carbon-intensity/history', ['query' => $params])) {
-            print_r($response);
             $history = $response['history'];
             if (is_array($history) && count($history) > 0) {
                 $carbon_intensity = $history[0]['carbonIntensity'];
