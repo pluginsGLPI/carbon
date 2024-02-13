@@ -7,14 +7,13 @@ use Migration;
 
 class PowerModelCategory extends CommonDropdown
 {
-
-    static function getTypeName($nb = 0)
+    public static function getTypeName($nb = 0)
     {
 
         return __('Carbon Plugin - Power model categories', 'carbon');
     }
 
-    static function install(Migration $migration)
+    public static function install(Migration $migration)
     {
         global $DB;
 
@@ -31,7 +30,7 @@ class PowerModelCategory extends CommonDropdown
         }
     }
 
-    static function uninstall(Migration $migration)
+    public static function uninstall(Migration $migration)
     {
         global $DB;
 
@@ -40,7 +39,7 @@ class PowerModelCategory extends CommonDropdown
         return true;
     }
 
-    static function getIdByNameOrInsert(string $name)
+    public static function getIdByNameOrInsert(string $name)
     {
         global $DB;
 

@@ -3,21 +3,19 @@
 namespace GlpiPlugin\Carbon;
 
 use CommonDBChild;
-use Computer;
-use ComputerModel;
 use Migration;
 
-class PowerModel extends CommonDBChild {
-
+class PowerModel extends CommonDBChild
+{
     public static $itemtype = 'GlpiPlugin\Carbon\PowerModelCategory';
     public static $items_id = 'plugin_carbon_powermodelcategories_id';
 
-    static function getTypeName($nb = 0)
+    public static function getTypeName($nb = 0)
     {
         return \_n("PowerModel", "PowerModels", $nb, 'powermodel');
     }
 
-    static function install(Migration $migration)
+    public static function install(Migration $migration)
     {
         global $DB;
 
@@ -36,7 +34,7 @@ class PowerModel extends CommonDBChild {
         }
     }
 
-    static function uninstall(Migration $migration)
+    public static function uninstall(Migration $migration)
     {
         global $DB;
 
@@ -45,7 +43,7 @@ class PowerModel extends CommonDBChild {
         return true;
     }
 
-    static function updateOrInsert(string $name, float $power, string $category)
+    public static function updateOrInsert(string $name, float $power, string $category)
     {
         global $DB;
 
@@ -59,5 +57,4 @@ class PowerModel extends CommonDBChild {
         ];
         $DB->updateOrInsert(self::getTable(), $params, $where);
     }
-
 }

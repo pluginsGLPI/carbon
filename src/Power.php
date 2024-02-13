@@ -12,12 +12,12 @@ class Power extends CommonDBChild
     public static $itemtype = 'Computer';
     public static $items_id = 'computers_id';
 
-    static function getTypeName($nb = 0)
+    public static function getTypeName($nb = 0)
     {
         return \_n("Power", "Powers", $nb, 'power');
     }
 
-    static function getPower(int $computer_id): int
+    public static function getPower(int $computer_id): int
     {
         global $DB;
 
@@ -52,7 +52,7 @@ class Power extends CommonDBChild
         return 0;
     }
 
-    static function computePowerForComputer(int $computer_id)
+    public static function computePowerForComputer(int $computer_id)
     {
         global $DB;
 
@@ -109,7 +109,7 @@ class Power extends CommonDBChild
         return false;
     }
 
-    static function computePowerForAllComputers()
+    public static function computePowerForAllComputers()
     {
         global $DB;
 
@@ -131,7 +131,7 @@ class Power extends CommonDBChild
         return $computers_count;
     }
 
-    static function install(Migration $migration)
+    public static function install(Migration $migration)
     {
         global $DB;
 
@@ -149,7 +149,7 @@ class Power extends CommonDBChild
         }
     }
 
-    static function uninstall(Migration $migration)
+    public static function uninstall(Migration $migration)
     {
         global $DB;
 
@@ -158,7 +158,7 @@ class Power extends CommonDBChild
         return true;
     }
 
-    static function cronInfo($name)
+    public static function cronInfo($name)
     {
         switch ($name) {
             case 'ComputePowersTask':
@@ -169,7 +169,7 @@ class Power extends CommonDBChild
         return [];
     }
 
-    static function cronComputePowersTask($task)
+    public static function cronComputePowersTask($task)
     {
         $task->log("Computing powers for all computers");
 

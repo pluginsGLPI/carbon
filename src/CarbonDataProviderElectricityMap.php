@@ -8,7 +8,7 @@ use GlpiPlugin\Carbon\Config;
 
 class CarbonDataProviderElectricityMap extends CarbonDataProviderRestApi
 {
-    function __construct()
+    public function __construct()
     {
         $base_url = Config::getconfig()['electricitymap_base_url'];
         if (substr($base_url, -1) != '/') {
@@ -29,7 +29,7 @@ class CarbonDataProviderElectricityMap extends CarbonDataProviderRestApi
     public function getCarbonIntensity(string $country, string $latitude, string $longitude, DateTime &$date): int
     {
         $format = DateTimeInterface::ISO8601;
-        
+
         $params = [
             'datetime' => $date->format($format),
             'zone'  => $country,

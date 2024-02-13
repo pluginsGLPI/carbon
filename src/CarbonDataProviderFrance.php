@@ -10,7 +10,7 @@ class CarbonDataProviderFrance extends CarbonDataProviderRestApi
 {
     const BASE_URL = 'https://odre.opendatasoft.com/api/v2/catalog/datasets/eco2mix-national-tr/records';
 
-    function __construct()
+    public function __construct()
     {
         parent::__construct(
             [

@@ -17,7 +17,7 @@ class PowerAbacus
 {
     protected $tokens = null;
 
-    function __construct(string $formula)
+    public function __construct(string $formula)
     {
         $math = new BcMath();
         $factory = new ExpressionFactory($math);
@@ -35,7 +35,7 @@ class PowerAbacus
         $this->tokens = $parser->parse($formula);
     }
 
-    function evaluate(array $variables)
+    public function evaluate(array $variables)
     {
         $context = new Context($variables);
         $evaluator = new Evaluator();

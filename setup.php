@@ -30,11 +30,7 @@
  */
 
 use GlpiPlugin\Carbon\Dashboard;
-use GlpiPlugin\Carbon\PowerModelCategory;
 use Glpi\Plugin\Hooks;
-use GlpiPlugin\Carbon\CarbonDataProviderStub;
-use GlpiPlugin\Carbon\CarbonEmission;
-use GlpiPlugin\Carbon\Config;
 
 define('PLUGIN_CARBON_VERSION', '0.0.1');
 
@@ -70,12 +66,6 @@ function plugin_init_carbon()
     if (Session::haveRight('config', UPDATE)) {
         $PLUGIN_HOOKS['config_page']['carbon'] = 'front/config.form.php';
     }
-
-    Plugin::registerClass(CarbonEmission::class);
-    Plugin::registerClass(CarbonDataProviderStub::class);
-    Plugin::registerClass(Power::class);
-    Plugin::registerClass(PowerModelCategory::class);
-    Plugin::registerClass(Config::class);
 }
 
 
@@ -100,34 +90,4 @@ function plugin_version_carbon()
             ]
         ]
     ];
-}
-
-/**
- * Check pre-requisites before install
- * OPTIONNAL, but recommanded
- *
- * @return boolean
- */
-function plugin_carbon_check_prerequisites()
-{
-    return true;
-}
-
-/**
- * Check configuration process
- *
- * @param boolean $verbose Whether to display message on failure. Defaults to false
- *
- * @return boolean
- */
-function plugin_carbon_check_config($verbose = false)
-{
-    if (true) { // Your configuration check
-        return true;
-    }
-
-    if ($verbose) {
-        echo __('Installed / not configured', 'carbon');
-    }
-    return false;
 }

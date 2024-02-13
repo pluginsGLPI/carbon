@@ -7,7 +7,7 @@ use Computer;
 
 class DBUtils
 {
-    static function getIdByName(string $table, string $name)
+    public static function getIdByName(string $table, string $name)
     {
         global $DB;
 
@@ -29,7 +29,7 @@ class DBUtils
         return false;
     }
 
-    static function getSum(string $table, string $field)
+    public static function getSum(string $table, string $field)
     {
         global $DB;
 
@@ -49,13 +49,13 @@ class DBUtils
 
     /**
      * Returns sum of a table field grouped by computer model.
-     * 
+     *
      * @return array of:
      *   - mixed  'number': sum for the model
      *   - string 'url': url to redirect when clicking on the slice
      *   - string 'label': name of the computer model
      */
-    static function getSumPerModel(string $table, string $field, array $where = [])
+    public static function getSumPerModel(string $table, string $field, array $where = [])
     {
         global $DB;
 

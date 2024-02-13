@@ -6,8 +6,7 @@ use Migration;
 
 class PowerData
 {
-
-    static function readCSVData(string $filename)
+    public static function readCSVData(string $filename)
     {
         $data = [];
 
@@ -17,7 +16,7 @@ class PowerData
         }
 
         $header = fgetcsv($file);
-        while (($line = fgetcsv($file)) !== FALSE) {
+        while (($line = fgetcsv($file)) !== false) {
             $data[] = array_combine($header, $line);
         }
 
@@ -26,7 +25,7 @@ class PowerData
         return $data;
     }
 
-    static function loadPowerModels()
+    public static function loadPowerModels()
     {
         $data = self::readCSVData(__DIR__ . '/../data/teclib-editions/powermodels.csv');
         foreach ($data as $values) {
@@ -38,7 +37,7 @@ class PowerData
         }
     }
 
-    static function loadPowerModels_ComputerModels()
+    public static function loadPowerModels_ComputerModels()
     {
         $data = self::readCSVData(__DIR__ . '/../data/teclib-editions/computermodels2powermodels.csv');
         foreach ($data as $values) {
@@ -49,13 +48,13 @@ class PowerData
         }
     }
 
-    static function install(Migration $migration)
+    public static function install(Migration $migration)
     {
         self::loadPowerModels();
         self::loadPowerModels_ComputerModels();
     }
 
-    static function uninstall(Migration $migration)
+    public static function uninstall(Migration $migration)
     {
     }
 }

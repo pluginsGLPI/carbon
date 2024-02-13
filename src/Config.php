@@ -2,20 +2,16 @@
 
 namespace GlpiPlugin\Carbon;
 
-use CommonGLPI;
-use Session;
-use Glpi\Application\View\TemplateRenderer;
 use Migration;
 
 class Config extends \Config
 {
-
-    static function getTypeName($nb = 0)
+    public static function getTypeName($nb = 0)
     {
         return __('Carbon', 'carbon');
     }
 
-    static function getConfig()
+    public static function getConfig()
     {
         return \Config::getConfigurationValues('plugin:carbon');
     }
@@ -26,7 +22,7 @@ class Config extends \Config
         'co2signal_api_key'                   => 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
     ];
 
-    static function install(Migration $migration)
+    public static function install(Migration $migration)
     {
         $current_config = self::getConfig();
 
@@ -37,7 +33,7 @@ class Config extends \Config
         }
     }
 
-    static function uninstall(Migration $migration)
+    public static function uninstall(Migration $migration)
     {
         $config = new Config();
         $config->deleteByCriteria(['context' => 'plugin:carbon']);

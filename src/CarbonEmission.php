@@ -13,12 +13,12 @@ class CarbonEmission extends CommonDBChild
     public static $itemtype = 'Computer';
     public static $items_id = 'computers_id';
 
-    static function getTypeName($nb = 0)
+    public static function getTypeName($nb = 0)
     {
         return \_n("CarbonEmission", "CarbonEmissions", $nb, 'carbon emission');
     }
 
-    static function computeCarbonEmissionPerDay(int $computer_id, string $country, string $latitude, string $longitude, DateTime &$date)
+    public static function computeCarbonEmissionPerDay(int $computer_id, string $country, string $latitude, string $longitude, DateTime &$date)
     {
         global $DB;
 
@@ -47,7 +47,7 @@ class CarbonEmission extends CommonDBChild
         return $DB->updateOrInsert(self::getTable(), $params);
     }
 
-    static function computerCarbonEmissionPerDayForAllComputers(DateTime &$date)
+    public static function computerCarbonEmissionPerDayForAllComputers(DateTime &$date)
     {
         global $DB;
 
@@ -75,14 +75,15 @@ class CarbonEmission extends CommonDBChild
         $result = $DB->request($request);
         $count = 0;
         foreach ($result as $r) {
-            if (self::computeCarbonEmissionPerDay($r['computer_id'], $r['country'], $r['latitude'], $r['longitude'], $date))
+            if (self::computeCarbonEmissionPerDay($r['computer_id'], $r['country'], $r['latitude'], $r['longitude'], $date)) {
                 $count++;
+            }
         }
 
         return $count;
     }
 
-    static function install(Migration $migration)
+    public static function install(Migration $migration)
     {
         global $DB;
 
@@ -101,7 +102,7 @@ class CarbonEmission extends CommonDBChild
         }
     }
 
-    static function uninstall(Migration $migration)
+    public static function uninstall(Migration $migration)
     {
         global $DB;
 
@@ -110,7 +111,7 @@ class CarbonEmission extends CommonDBChild
         return true;
     }
 
-    static function cronInfo($name)
+    public static function cronInfo($name)
     {
         switch ($name) {
             case 'ComputeCarbonEmissionsTask':
@@ -121,7 +122,7 @@ class CarbonEmission extends CommonDBChild
         return [];
     }
 
-    static function cronComputeCarbonEmissionsTask($task)
+    public static function cronComputeCarbonEmissionsTask($task)
     {
         $task->log("Computing carbon emissions for all computers");
 

@@ -3,7 +3,6 @@
 namespace GlpiPlugin\Carbon;
 
 use CommonDBRelation;
-use Computer;
 use ComputerModel;
 use Migration;
 
@@ -11,18 +10,18 @@ class PowerModel_ComputerModel extends CommonDBRelation
 {
     public static $itemtype_1 = 'GlpiPlugin\Carbon\PowerModel';
     public static $items_id_1 = 'plugin_carbon_powermodels_id';
-    static public $checkItem_1_Rights  = self::DONT_CHECK_ITEM_RIGHTS;
+    public static $checkItem_1_Rights  = self::DONT_CHECK_ITEM_RIGHTS;
 
     public static $itemtype_2 = 'ComputerModel';
     public static $items_id_2 = 'computermodels_id';
-    static public $checkItem_2_Rights  = self::DONT_CHECK_ITEM_RIGHTS;
+    public static $checkItem_2_Rights  = self::DONT_CHECK_ITEM_RIGHTS;
 
-    static function getTypeName($nb = 0)
+    public static function getTypeName($nb = 0)
     {
         return _n('Associated element', 'Associated elements', $nb);
     }
 
-    static function install(Migration $migration)
+    public static function install(Migration $migration)
     {
         global $DB;
 
@@ -41,7 +40,7 @@ class PowerModel_ComputerModel extends CommonDBRelation
         }
     }
 
-    static function uninstall(Migration $migration)
+    public static function uninstall(Migration $migration)
     {
         global $DB;
         $DB->query("DROP TABLE IF EXISTS `" . self::getTable() . "`");
@@ -49,7 +48,7 @@ class PowerModel_ComputerModel extends CommonDBRelation
         return true;
     }
 
-    static function updateOrInsert(string $powerModel, string $computerModel)
+    public static function updateOrInsert(string $powerModel, string $computerModel)
     {
         global $DB;
 

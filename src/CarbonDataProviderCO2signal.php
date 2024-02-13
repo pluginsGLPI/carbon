@@ -3,14 +3,13 @@
 namespace GlpiPlugin\Carbon;
 
 use DateTime;
-use DateTimeInterface;
 use GlpiPlugin\Carbon\Config;
 
 class CarbonDataProviderCO2signal extends CarbonDataProviderRestApi
 {
     const BASE_URL = 'https://api.co2signal.com/v1/';
 
-    function __construct()
+    public function __construct()
     {
         $api_key = Config::getconfig()['co2signal_api_key'];
 
