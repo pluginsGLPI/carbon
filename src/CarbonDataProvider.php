@@ -11,5 +11,5 @@ interface CarbonDataProvider
      *
      * @return int the carbon intensity in gCO2/kWh
      */
-    public function getCarbonIntensity(string $country, string $latitude, string $longitude, DateTime &$date): int;
+    public function getCarbonIntensity(string $country = "", string $latitude = "", string $longitude = "", DateTime &$date = null): int;
 }

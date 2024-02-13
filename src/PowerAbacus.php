@@ -2,8 +2,6 @@
 
 namespace GlpiPlugin\Carbon;
 
-require_once __DIR__ . '/../vendor/autoload.php';
-
 use Xylemical\Expressions\Math\BcMath;
 use Xylemical\Expressions\Context;
 use Xylemical\Expressions\ExpressionFactory;

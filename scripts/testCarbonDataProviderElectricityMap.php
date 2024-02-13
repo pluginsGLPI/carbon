@@ -1,13 +1,9 @@
 <?php
 
 include("../../../inc/includes.php");
-include_once('../src/CarbonDataProvider.php');
-include_once('../src/CarbonDataProviderRestApi.php');
-include_once('../src/Config.php');
-include_once('../src/CarbonDataProviderElectricityMap.php');
 
 $provider = new GlpiPlugin\Carbon\CarbonDataProviderElectricityMap();
 
-print_r($provider->getCarbonIntensity('FR', new DateTime()));
+print_r($provider->getCarbonIntensity('FR', '', '', new DateTime()));
 echo "\n";
-print_r($provider->getCarbonIntensity('DE', new DateTime()));
+print_r($provider->getCarbonIntensity('DE', '', '', new DateTime()));

@@ -19,7 +19,7 @@ class CarbonDataProviderFrance extends CarbonDataProviderRestApi
         );
     }
 
-    public function getCarbonIntensity(string $country, string $latitude, string $longitude, DateTime &$date): int
+    public function getCarbonIntensity(string $country = "", string $latitude = "", string $longitude = "", DateTime &$date = null): int
     {
         $d = DateTimeImmutable::createFromMutable($date);
 

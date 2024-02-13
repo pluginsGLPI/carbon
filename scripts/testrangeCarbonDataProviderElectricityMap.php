@@ -1,10 +1,6 @@
 <?php
 
 include("../../../inc/includes.php");
-include_once('../src/CarbonDataProvider.php');
-include_once('../src/CarbonDataProviderRestApi.php');
-include_once('../src/Config.php');
-include_once('../src/CarbonDataProviderElectricityMap.php');
 
 $provider = new GlpiPlugin\Carbon\CarbonDataProviderElectricityMap();
 
@@ -37,7 +33,7 @@ $step = new DateInterval('P1D');
 
 while ($date < $end_date) {
     foreach ($zones as $zone) {
-        $carbon_intensity = $provider->getCarbonIntensity($zone, $date);
+        $carbon_intensity = $provider->getCarbonIntensity($zone, '', '', $date);
         fputcsv($f, [$zone, $date->format('Y-m-d H:i:s'), $carbon_intensity]);
     }
     $date->add($step);
