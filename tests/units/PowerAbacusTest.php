@@ -1,5 +1,5 @@
 <?php
-namespace GlpiPlugin\Carbon;
+namespace GlpiPlugin\Carbon\Tests;
 
 use PHPUnit\Framework\TestCase;
 

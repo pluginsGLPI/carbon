@@ -13,5 +13,10 @@
             "php": "7.4.0"
         },
         "sort-packages": true
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "GlpiPlugin\\Carbon\\Tests\\": "tests/src/"
+        }
     }
 }

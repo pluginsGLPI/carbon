@@ -37,6 +37,8 @@ use GlpiPlugin\Carbon\PowerData;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\Config;
 
+use DBUtils;
+
 /**
  * Plugin install process
  *
@@ -94,14 +96,22 @@ function plugin_carbon_install()
  */
 function plugin_carbon_uninstall()
 {
-    $migration = new Migration(PLUGIN_CARBON_VERSION);
+    global $DB;
 
-    Power::uninstall($migration);
-    PowerModel::uninstall($migration);
-    PowerModel_ComputerModel::uninstall($migration);
-    PowerModelCategory::uninstall($migration);
+    $migration = new Migration(PLUGIN_CARBON_VERSION);
+    $itemtypesWihTable = [
+        CarbonEmission::class,
+        PowerModelCategory::class,
+        PowerModel::class,
+        PowerModel_ComputerModel::class,
+        Power::class,
+    ];
+    $DbUtils = new DBUtils();
+    foreach ($itemtypesWihTable as $itemtype) {
+        $DB->dropTable($DbUtils->getTableForItemType($itemtype));
+    }
+
     PowerData::uninstall($migration);
-    CarbonEmission::uninstall($migration);
     Config::uninstall($migration);
 
     return true;

@@ -83,34 +83,6 @@ class CarbonEmission extends CommonDBChild
         return $count;
     }
 
-    public static function install(Migration $migration)
-    {
-        global $DB;
-
-        $table = self::getTable();
-        if (!$DB->tableExists($table)) {
-            $migration->displayMessage(sprintf(\__("Installing %s"), $table));
-
-            $query = "CREATE TABLE `$table` (
-                       `id` INT(11) UNSIGNED NOT NULL auto_increment,
-                       `computers_id` INT(11) UNSIGNED NOT NULL DEFAULT '0',
-                       `emission_per_day` FLOAT DEFAULT '0.0',
-                       `emission_date` DATETIME DEFAULT NULL,
-                       PRIMARY KEY (`id`)
-                    ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
-            $DB->query($query) or die($DB->error());
-        }
-    }
-
-    public static function uninstall(Migration $migration)
-    {
-        global $DB;
-
-        $DB->query("DROP TABLE IF EXISTS `" . self::getTable() . "`");
-
-        return true;
-    }
-
     public static function cronInfo($name)
     {
         switch ($name) {
