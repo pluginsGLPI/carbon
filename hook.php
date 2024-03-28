@@ -44,17 +44,20 @@ use GlpiPlugin\Carbon\Config;
  */
 function plugin_carbon_install()
 {
+    global $DB;
+
     $config = new Config();
     $config->setConfigurationValues('plugin:carbon', ['configuration' => false]);
 
     $migration = new Migration(PLUGIN_CARBON_VERSION);
 
-    Power::install($migration);
-    PowerModel::install($migration);
-    PowerModel_ComputerModel::install($migration);
-    PowerModelCategory::install($migration);
+    $dbFile = plugin_carbon_getSchemaPath();
+    if ($dbFile === null || !$DB->runFile($dbFile)) {
+        $migration->displayWarning("Error creating tables : " . $DB->error(), true);
+        die('Giving up');
+     }
+
     PowerData::install($migration);
-    CarbonEmission::install($migration);
     Config::install($migration);
 
     CronTask::Register(
