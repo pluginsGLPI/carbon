@@ -37,8 +37,6 @@ use GlpiPlugin\Carbon\PowerData;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\Config;
 
-use DBUtils;
-
 /**
  * Plugin install process
  *
