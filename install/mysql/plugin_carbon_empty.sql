@@ -2,7 +2,7 @@ CREATE TABLE `glpi_plugin_carbon_carbonemissions` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `computers_id` int unsigned NOT NULL DEFAULT '0',
   `emission_per_day` float DEFAULT '0',
-  `emission_date` datetime DEFAULT NULL,
+  `emission_date` timestamp DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
