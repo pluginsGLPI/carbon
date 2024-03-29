@@ -11,6 +11,7 @@ use Html;
 use User;
 use Profile;
 use Plugin;
+use Glpi\System\Diagnostic\DatabaseSchemaIntegrityChecker;
 
 class PluginInstallTest extends CommonTestCase
 {
@@ -37,7 +38,7 @@ class PluginInstallTest extends CommonTestCase
 
         // Drop tables of the plugin if they exist
         $result = $DB->listTables('glpi_plugin_' . $pluginName . '_%');
-        foreach($result as $data) {
+        foreach ($result as $data) {
             $DB->dropTable($data['TABLE_NAME']);
         }
 
@@ -66,9 +67,10 @@ class PluginInstallTest extends CommonTestCase
         $messages = implode(PHP_EOL, $messages);
         $this->assertTrue($plugin->isActivated($pluginName), 'Cannot enable the plugin: ' . $messages);
 
+        $this->checkSchema(PLUGIN_CARBON_VERSION);
+
         // $this->checkConfig();
         // $this->checkRequestType();
-        // $this->checkPluginName();
         // $this->checkAutomaticAction();
         // $this->checkDashboard();
     }
@@ -81,5 +83,63 @@ class PluginInstallTest extends CommonTestCase
         $this->assertEquals(0, count($diff));
 
         return $config;
+    }
+
+    private function checkSchema(
+        string $version,
+        bool $strict = true,
+        bool $ignore_innodb_migration = false,
+        bool $ignore_timestamps_migration = false,
+        bool $ignore_utf8mb4_migration = false,
+        bool $ignore_dynamic_row_format_migration = false,
+        bool $ignore_unsigned_keys_migration = false
+    ): bool {
+        global $DB;
+
+        $schemaFile = plugin_carbon_getSchemaPath($version);
+
+        $checker = new DatabaseSchemaIntegrityChecker(
+            $DB,
+            $strict,
+            $ignore_innodb_migration,
+            $ignore_timestamps_migration,
+            $ignore_utf8mb4_migration,
+            $ignore_dynamic_row_format_migration,
+            $ignore_unsigned_keys_migration
+        );
+
+        try {
+            $differences = $checker->checkCompleteSchema($schemaFile, true, 'plugin:formcreator');
+        } catch (\Throwable $e) {
+            $message = __('Failed to check the sanity of the tables!', 'formcreator');
+            if (isCommandLine()) {
+                echo $message . PHP_EOL;
+            } else {
+                Session::addMessageAfterRedirect($message, false, ERROR);
+            }
+            return false;
+        }
+
+        if (count($differences) > 0) {
+            foreach ($differences as $table_name => $difference) {
+                $message = null;
+                switch ($difference['type']) {
+                    case DatabaseSchemaIntegrityChecker::RESULT_TYPE_ALTERED_TABLE:
+                        $message = sprintf(__('Table schema differs for table "%s".'), $table_name);
+                        break;
+                    case DatabaseSchemaIntegrityChecker::RESULT_TYPE_MISSING_TABLE:
+                        $message = sprintf(__('Table "%s" is missing.'), $table_name);
+                        break;
+                    case DatabaseSchemaIntegrityChecker::RESULT_TYPE_UNKNOWN_TABLE:
+                        $message = sprintf(__('Unknown table "%s" has been found in database.'), $table_name);
+                        break;
+                }
+                echo $message . PHP_EOL;
+                echo $difference['diff'] . PHP_EOL;
+            }
+            return false;
+        }
+
+        return true;
     }
 }
