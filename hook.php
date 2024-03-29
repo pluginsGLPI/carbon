@@ -120,34 +120,42 @@ function plugin_carbon_getDropdown()
     return [PowerModelCategory::class => __('Carbon Plugin - Power model categories', 'carbon')];
 }
 
-function plugin_carbon_getAddSearchOptions($itemtype)
+/**
+ * Undocumented function
+ *
+ * @param [type] $itemtype
+ * @return array
+ */
+function plugin_carbon_getAddSearchOptionsNew($itemtype): array
 {
     $sopt = [];
 
-    if (in_array($itemtype, PLUGIN_CARBON_TYPES)) {
-        $sopt[] = [
-            'id' => 2222,
-            'table'        => Power::getTable(),
-            'field'        => 'power',
-            'name'         => __('Power (W)', 'power (W)'),
-            'datatype'     => 'number',
-            'linkfield'    => 'computers_id',
-            'joinparams' => [
-                'jointype' => 'child'
-            ]
-        ];
-        $sopt[] = [
-            'id' => 2223,
-            'table'        => CarbonEmission::getTable(),
-            'field'        => 'emission_per_day',
-            'name'         => __('Carbon emission (kgCO2)', 'carbon emission (kgC02)'),
-            'datatype'     => 'number',
-            'linkfield'    => 'computers_id',
-            'joinparams' => [
-                'jointype' => 'child'
-            ]
-        ];
+    if (!in_array($itemtype, PLUGIN_CARBON_TYPES)) {
+        return $sopt;
     }
+
+    $sopt[] = [
+        'id' => 2222,
+        'table'        => Power::getTable(),
+        'field'        => 'power',
+        'name'         => __('Power (W)', 'power (W)'),
+        'datatype'     => 'number',
+        'linkfield'    => 'computers_id',
+        'joinparams' => [
+            'jointype' => 'child'
+        ]
+    ];
+    $sopt[] = [
+        'id' => 2223,
+        'table'        => CarbonEmission::getTable(),
+        'field'        => 'emission_per_day',
+        'name'         => __('Carbon emission (kgCO2)', 'carbon emission (kgC02)'),
+        'datatype'     => 'number',
+        'linkfield'    => 'computers_id',
+        'joinparams' => [
+            'jointype' => 'child'
+        ]
+    ];
 
     return $sopt;
 }
