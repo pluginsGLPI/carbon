@@ -15,34 +15,6 @@ class PowerModel extends CommonDBChild
         return \_n("PowerModel", "PowerModels", $nb, 'powermodel');
     }
 
-    public static function install(Migration $migration)
-    {
-        global $DB;
-
-        $table = self::getTable();
-        if (!$DB->tableExists($table)) {
-            $migration->displayMessage(sprintf(\__("Installing %s"), $table));
-
-            $query = "CREATE TABLE `$table` (
-                       `id` INT(11) UNSIGNED NOT NULL auto_increment,
-                       `name` VARCHAR(255),
-                       `power` FLOAT(24) DEFAULT '0.0',
-                       `plugin_carbon_powermodelcategories_id` INT(11) UNSIGNED DEFAULT '0',
-                        PRIMARY KEY (`id`)
-                    ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
-            $DB->query($query) or die($DB->error());
-        }
-    }
-
-    public static function uninstall(Migration $migration)
-    {
-        global $DB;
-
-        $DB->query("DROP TABLE IF EXISTS `" . self::getTable() . "`");
-
-        return true;
-    }
-
     public static function updateOrInsert(string $name, float $power, string $category)
     {
         global $DB;

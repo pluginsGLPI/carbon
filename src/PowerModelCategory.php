@@ -13,32 +13,6 @@ class PowerModelCategory extends CommonDropdown
         return __('Carbon Plugin - Power model categories', 'carbon');
     }
 
-    public static function install(Migration $migration)
-    {
-        global $DB;
-
-        $table = self::getTable();
-        if (!$DB->tableExists("$table")) {
-            $query = "CREATE TABLE `$table` (
-                       `id` INT(11) UNSIGNED NOT NULL auto_increment,
-                       `name` VARCHAR(255) default NULL,
-                       PRIMARY KEY  (`id`),
-                       KEY `name` (`name`)
-                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
-
-            $DB->query($query) or die($DB->error());
-        }
-    }
-
-    public static function uninstall(Migration $migration)
-    {
-        global $DB;
-
-        $DB->query("DROP TABLE IF EXISTS `" . self::getTable() . "`");
-
-        return true;
-    }
-
     public static function getIdByNameOrInsert(string $name)
     {
         global $DB;

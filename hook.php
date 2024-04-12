@@ -44,17 +44,20 @@ use GlpiPlugin\Carbon\Config;
  */
 function plugin_carbon_install()
 {
+    global $DB;
+
     $config = new Config();
     $config->setConfigurationValues('plugin:carbon', ['configuration' => false]);
 
     $migration = new Migration(PLUGIN_CARBON_VERSION);
 
-    Power::install($migration);
-    PowerModel::install($migration);
-    PowerModel_ComputerModel::install($migration);
-    PowerModelCategory::install($migration);
+    $dbFile = plugin_carbon_getSchemaPath();
+    if ($dbFile === null || !$DB->runFile($dbFile)) {
+        $migration->displayWarning("Error creating tables : " . $DB->error(), true);
+        die('Giving up');
+     }
+
     PowerData::install($migration);
-    CarbonEmission::install($migration);
     Config::install($migration);
 
     CronTask::Register(
@@ -91,14 +94,22 @@ function plugin_carbon_install()
  */
 function plugin_carbon_uninstall()
 {
-    $migration = new Migration(PLUGIN_CARBON_VERSION);
+    global $DB;
 
-    Power::uninstall($migration);
-    PowerModel::uninstall($migration);
-    PowerModel_ComputerModel::uninstall($migration);
-    PowerModelCategory::uninstall($migration);
+    $migration = new Migration(PLUGIN_CARBON_VERSION);
+    $itemtypesWihTable = [
+        CarbonEmission::class,
+        PowerModelCategory::class,
+        PowerModel::class,
+        PowerModel_ComputerModel::class,
+        Power::class,
+    ];
+    $DbUtils = new DBUtils();
+    foreach ($itemtypesWihTable as $itemtype) {
+        $DB->dropTable($DbUtils->getTableForItemType($itemtype));
+    }
+
     PowerData::uninstall($migration);
-    CarbonEmission::uninstall($migration);
     Config::uninstall($migration);
 
     return true;
@@ -109,34 +120,42 @@ function plugin_carbon_getDropdown()
     return [PowerModelCategory::class => __('Carbon Plugin - Power model categories', 'carbon')];
 }
 
-function plugin_carbon_getAddSearchOptions($itemtype)
+/**
+ * Undocumented function
+ *
+ * @param [type] $itemtype
+ * @return array
+ */
+function plugin_carbon_getAddSearchOptionsNew($itemtype): array
 {
     $sopt = [];
 
-    if (in_array($itemtype, PLUGIN_CARBON_TYPES)) {
-        $sopt[] = [
-            'id' => 2222,
-            'table'        => Power::getTable(),
-            'field'        => 'power',
-            'name'         => __('Power (W)', 'power (W)'),
-            'datatype'     => 'number',
-            'linkfield'    => 'computers_id',
-            'joinparams' => [
-                'jointype' => 'child'
-            ]
-        ];
-        $sopt[] = [
-            'id' => 2223,
-            'table'        => CarbonEmission::getTable(),
-            'field'        => 'emission_per_day',
-            'name'         => __('Carbon emission (kgCO2)', 'carbon emission (kgC02)'),
-            'datatype'     => 'number',
-            'linkfield'    => 'computers_id',
-            'joinparams' => [
-                'jointype' => 'child'
-            ]
-        ];
+    if (!in_array($itemtype, PLUGIN_CARBON_TYPES)) {
+        return $sopt;
     }
+
+    $sopt[] = [
+        'id' => 2222,
+        'table'        => Power::getTable(),
+        'field'        => 'power',
+        'name'         => __('Power (W)', 'power (W)'),
+        'datatype'     => 'number',
+        'linkfield'    => 'computers_id',
+        'joinparams' => [
+            'jointype' => 'child'
+        ]
+    ];
+    $sopt[] = [
+        'id' => 2223,
+        'table'        => CarbonEmission::getTable(),
+        'field'        => 'emission_per_day',
+        'name'         => __('Carbon emission (kgCO2)', 'carbon emission (kgC02)'),
+        'datatype'     => 'number',
+        'linkfield'    => 'computers_id',
+        'joinparams' => [
+            'jointype' => 'child'
+        ]
+    ];
 
     return $sopt;
 }
