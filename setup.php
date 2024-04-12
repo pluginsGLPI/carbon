@@ -31,6 +31,7 @@
 
 use GlpiPlugin\Carbon\Dashboard;
 use Glpi\Plugin\Hooks;
+use GlpiPlugin\Carbon\Menu;
 
 define('PLUGIN_CARBON_VERSION', '0.0.1');
 
@@ -66,6 +67,8 @@ function plugin_init_carbon()
     if (Session::haveRight('config', UPDATE)) {
         $PLUGIN_HOOKS['config_page']['carbon'] = 'front/config.form.php';
     }
+
+    $PLUGIN_HOOKS[Hooks::REDEFINE_MENUS]['carbon'] = [Menu::class, 'hookRedefineMenu'];
 }
 
 
