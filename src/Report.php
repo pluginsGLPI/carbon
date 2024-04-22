@@ -1,4 +1,5 @@
 <?php
+
 namespace GlpiPlugin\Carbon;
 
 use CommonDBTM;
