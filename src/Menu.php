@@ -14,7 +14,7 @@ class Menu
         $menu['tools']['content'][Report::getType()] = [
             'title' => Report::getTypeName(0),
             'shortcut' => Report::getMenuShorcut(),
-            'page' => Report::getSearchURL(),
+            'page' => Report::getSearchURL(false),
             'icon' => Report::getIcon(),
             'lists_itemtype' => Report::getType(),
             'links' => [

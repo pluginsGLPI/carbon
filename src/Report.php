@@ -13,12 +13,17 @@ class Report extends CommonDBTM
         return _n("Carbon report", "Carbon reports", $nb, 'carbon');
     }
 
+    public static function canView(): bool
+    {
+        return true;
+    }
+
     public static function getIcon(): string
     {
         return 'fa-solid fa-solar-panel';
     }
     public static function showInstantReport(): void
     {
-        TemplateRenderer::getInstance()->display('@carbon/templates/interface.html.twig');
+        TemplateRenderer::getInstance()->display('@carbon/interface.html.twig');
     }
 }
