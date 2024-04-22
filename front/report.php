@@ -21,6 +21,6 @@ Html::header(
     Report::getType()
 );
 
-Search::show(Report::getType());
+Report::showInstantReport();
 
 Html::footer();

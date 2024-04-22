@@ -3,6 +3,8 @@
 namespace GlpiPlugin\Carbon;
 
 use CommonDBTM;
+use Glpi\Application\View\TemplateRenderer;
+use SebastianBergmann\Type\VoidType;
 
 class Report extends CommonDBTM
 {
@@ -14,5 +16,9 @@ class Report extends CommonDBTM
     public static function getIcon(): string
     {
         return 'fa-solid fa-solar-panel';
+    }
+    public static function showInstantReport(): void
+    {
+        TemplateRenderer::getInstance()->display('@carbon/templates/interface.html.twig');
     }
 }
