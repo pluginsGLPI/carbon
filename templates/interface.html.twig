@@ -1,5 +1,107 @@
-{% block body %}
-<header>
-    <h1>GLPI Carbon UI</h1>
-</header>
+{% block header %}
+	<header>
+		<h1>GLPI Carbon UI</h1>
+	</header>
 {% endblock %}
+
+{% block body %}
+	<div class="page-body">
+		<div class="container-xl">
+			<div class="row row-deck row-cards">
+
+				<div class="col-sm-6 col-lg-3">
+					<div class="card">
+						<div class="card-body">
+							<div class="subheader">Total Carbon Emission</div>
+							<div class="h1 mb-3" id="carbonEmission"></div>
+						</div>
+					</div>
+				</div>
+
+                <div class="col-sm-6 col-lg-3">
+					<div class="card">
+						<div class="card-body">
+							<div class="subheader">Total Power Consumption</div>
+							<div class="h1 mb-3" id="powerConsumption"></div>
+						</div>
+					</div>
+				</div>
+
+                <div class="col-12">
+                    <div class="row row-cards">
+                        <div class="col-sm-6 col-lg-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="subheader">Carbon Emission per Type</div>
+                                    <div class="h1 mb-3" id="carbonEmissionPerModel"></div>
+                                    <div id="carbonEmissionPerModelChart" class="chart-lg"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
+
+{% block scripts %}
+	<script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
+	<script>
+	document.addEventListener('DOMContentLoaded', function () {
+        var donutOptions = {
+          series: [44, 55, 41, 17, 15],
+          labels: ['Desktops', 'Tablets', 'Mobiles', 'Laptops', 'Others'],
+          chart: {
+          type: 'donut',
+          width: '100%',
+        },
+        responsive: [{
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200
+            },
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }]
+        };
+
+        var chart = new ApexCharts(document.querySelector("#carbonEmissionPerModelChart"), donutOptions);
+        chart.render();
+
+        fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/totalCarbonEmission.php").then(response => {
+            console.log(response);
+            return response.json();
+        }).then(data => {
+            let totalCarbonEmission = data;
+            document.getElementById('carbonEmission').textContent = totalCarbonEmission;
+        });
+
+        fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/totalPowerConsumption.php").then(response => {
+            console.log(response);
+            return response.json();
+        }).then(data => {
+            let totalPowerConsumption = data;
+            document.getElementById('powerConsumption').textContent = totalPowerConsumption;
+        });
+
+        fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/totalCarbonEmissionPerModel.php").then(response => {
+            console.log(response);
+            return response.json();
+        }).then(data => {
+            let carbonEmissionPerModel = data;
+            console.log(carbonEmissionPerModel);
+        });
+    });
+</script>
+{% endblock %}
+
+{% block styles %}{% endblock %}
+
+
