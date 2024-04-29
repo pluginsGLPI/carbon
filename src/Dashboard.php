@@ -149,15 +149,8 @@ class Dashboard
         return DBUtils::getSumPerModel(Power::getTable(), Power::getTableField('power'), [Power::getTableField('power') => ['>', '0']]);
     }
 
-    public static function cardCarbonEmissionPerMonthProvider(array $params = [])
+    public static function getCarbonEmissionPerMonth()
     {
-        $default_params = [
-            'label' => "plugin carbon - carbon emission per month",
-            'icon'  => "fas fa-computer",
-            'color' => '#ea9999',
-        ];
-        $params = array_merge($default_params, $params);
-
         global $DB;
 
         $emissions_table = CarbonEmission::getTable();
@@ -193,6 +186,20 @@ class Dashboard
             $data['labels'][] = $row['emission_date'];
             $data['series'][0]['data'][] = $row['total_emission_per_day'];
         }
+
+        return $data;
+    }
+
+    public static function cardCarbonEmissionPerMonthProvider(array $params = [])
+    {
+        $default_params = [
+            'label' => "plugin carbon - carbon emission per month",
+            'icon'  => "fas fa-computer",
+            'color' => '#ea9999',
+        ];
+        $params = array_merge($default_params, $params);
+
+        $data = self::getCarbonEmissionPerMonth();
 
         return [
             'data'  => $data,
