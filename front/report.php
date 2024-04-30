@@ -15,7 +15,7 @@ if (!Report::canView()) {
 }
 
 Html::header(
-    __('Form Creator', 'carbon'),
+    __('GLPI Carbon', 'carbon'),
     '',
     'tools',
     Report::getType()
