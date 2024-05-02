@@ -69,6 +69,9 @@ function plugin_init_carbon()
     }
 
     $PLUGIN_HOOKS[Hooks::REDEFINE_MENUS]['carbon'] = [Menu::class, 'hookRedefineMenu'];
+
+    // Add ApexCharts.js library
+    $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'] = 'lib/apexcharts/dist/apexcharts.min.js';
 }
 
 
