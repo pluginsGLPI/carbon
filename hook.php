@@ -29,6 +29,7 @@
  * --------------------------------------------------------------------------
  */
 
+use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\Power;
 use GlpiPlugin\Carbon\PowerModel;
 use GlpiPlugin\Carbon\PowerModel_ComputerModel;
@@ -136,7 +137,7 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
 
     $sopt[] = [
         'id' => 2222,
-        'table'        => Power::getTable(),
+        'table'        => ComputerType::getTable(),
         'field'        => 'power',
         'name'         => __('Power (W)', 'power (W)'),
         'datatype'     => 'number',

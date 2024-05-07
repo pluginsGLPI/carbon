@@ -3,6 +3,7 @@
 namespace GlpiPlugin\Carbon;
 
 use ComputerModel;
+use ComputerType as GlpiComputerType;
 use Computer;
 
 class DBUtils
