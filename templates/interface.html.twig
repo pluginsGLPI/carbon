@@ -12,7 +12,7 @@
 				<div class="col-sm-6 col-lg-3">
 					<div class="card">
 						<div class="card-body">
-							<div class="subheader">{{__('Total Carbon Emission', 'carbon')}}</div>
+							<div class="subheader">{{ __('Total Carbon Emission', 'carbon') }}</div>
 							<div class="h1 mb-3" id="carbonEmission"></div>
 						</div>
 					</div>
@@ -21,7 +21,7 @@
                 <div class="col-sm-6 col-lg-3">
 					<div class="card">
 						<div class="card-body">
-							<div class="subheader">{{__('Total Power Consumption', 'carbon')}}</div>
+							<div class="subheader">{{ __('Total Power Consumption', 'carbon') }}</div>
 							<div class="h1 mb-3" id="powerConsumption"></div>
 						</div>
 					</div>
@@ -32,7 +32,7 @@
                         <div class="col-sm-6 col-lg-6">
                             <div class="card">
                                 <div class="card-body">
-                                    <div class="subheader">{{__('Carbon Emission per Type (g CO²)', 'carbon')}}</div>
+                                    <div class="subheader">{{ __('Carbon Emission per Type (g CO²)', 'carbon') }}</div>
                                     <div class="h1 mb-3" id="carbonEmissionPerModel"></div>
                                     <div id="carbonEmissionPerModelChart" class="chart-lg"></div>
                                 </div>
@@ -42,7 +42,7 @@
                         <div class="col-sm-6 col-lg-6">
                             <div class="card">
                                 <div class="card-body">
-                                    <div class="subheader">{{__('Power Consumption per Type (W)', 'carbon')}}</div>
+                                    <div class="subheader">{{ __('Power Consumption per Type (W)', 'carbon') }}</div>
                                     <div class="h1 mb-3" id="powerConsumptionPerModel"></div>
                                     <div id="powerConsumptionPerModelChart" class="chart-lg"></div>
                                 </div>
@@ -57,7 +57,7 @@
                     <div class="col-sm-6 col-lg-12">
                         <div class="card">
                             <div class="card-body">
-                                <div class="subheader">{{__('Carbon Emission per Month (g CO²)', 'carbon')}}</div>
+                                <div class="subheader">{{ __('Carbon Emission per Month (g CO²)', 'carbon') }}</div>
                                 <div class="h1 mb-3" id="carbonEmissionPerMonth"></div>
                                 <div id="carbonEmissionPerMonthChart" class="chart-lg"></div>
                             </div>
@@ -152,6 +152,7 @@
         carbonEmissionPerMonthChart.render();
         carbonConsumptionPerTypeChart.render();
 
+        // Fetch data with Ajax
         fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/totalCarbonEmission.php").then(response => {
             console.log(response);
             return response.json();

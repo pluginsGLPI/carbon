@@ -71,10 +71,8 @@ function plugin_init_carbon()
     $PLUGIN_HOOKS[Hooks::REDEFINE_MENUS]['carbon'] = [Menu::class, 'hookRedefineMenu'];
 
     // Add ApexCharts.js library
-    $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'] = 'lib/apexcharts/dist/apexcharts.min.js';
+    $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][ ] = 'dist/bundle.js';
 }
-
-
 /**
  * Get the name and the version of the plugin
  * REQUIRED
@@ -103,7 +101,8 @@ function plugin_version_carbon()
  *
  * @return string|null
  */
-function plugin_carbon_getSchemaPath(string $version = null): ?string {
+function plugin_carbon_getSchemaPath(string $version = null): ?string
+{
     $version = $version ?? PLUGIN_CARBON_VERSION;
 
     // Drop suffixes for alpha, beta, rc versions
@@ -116,7 +115,7 @@ function plugin_carbon_getSchemaPath(string $version = null): ?string {
     $current_version = $matches[1];
 
     if ($version === $current_version) {
-       $schemaPath = Plugin::getPhpDir('carbon') . '/install/mysql/plugin_carbon_empty.sql';
+        $schemaPath = Plugin::getPhpDir('carbon') . '/install/mysql/plugin_carbon_empty.sql';
     } else {
         $schemaPath = Plugin::getPhpDir('carbon') . "/install/mysql/plugin_carbon_{$version}_empty.sql";
     }
