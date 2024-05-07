@@ -95,7 +95,7 @@ class DBUtils
         foreach ($result as $row) {
             $data[] = [
                 'number' => $row['total_per_model'],
-                'url' => '/front/computermodel.form.php?id=' . $row['id'],
+                'url' => ComputerModel::getFormURLWithID($row['id']),
                 'label' => $row['name'] . " (" . $row['nb_computers_per_model'] . " computers)",
             ];
         }
