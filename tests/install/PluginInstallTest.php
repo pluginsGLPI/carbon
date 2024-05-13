@@ -3,15 +3,11 @@
 namespace GlpiPlugin\Carbon\Tests;
 
 use Session;
-use Auth;
-use Toolbox;
-use DB;
 use Config;
-use Html;
-use User;
-use Profile;
+use CronTask;
 use Plugin;
 use Glpi\System\Diagnostic\DatabaseSchemaIntegrityChecker;
+use GlpiPlugin\Carbon\ComputerPower;
 
 class PluginInstallTest extends CommonTestCase
 {

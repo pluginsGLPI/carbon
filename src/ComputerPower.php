@@ -2,32 +2,27 @@
 
 namespace GlpiPlugin\Carbon;
 
-use CommonDBChild;
 use Computer;
 use ComputerModel;
-use Migration;
 
-class Power extends CommonDBChild
+class ComputerPower
 {
-    public static $itemtype = 'Computer';
-    public static $items_id = 'computers_id';
-
     public static function getTypeName($nb = 0)
     {
-        return \_n("Power", "Powers", $nb, 'power');
+        return _n("Computer power", "Computers power", $nb, 'power');
     }
 
     public static function getPower(int $computer_id): int
     {
         global $DB;
 
-        $powers_table = Power::getTable();
+        $powers_table = self::getTable();
         $computers_table = Computer::getTable();
 
         $request = [
             'SELECT'    => [
                 Computer::getTableField('id') . ' AS computer_id',
-                Power::getTableField('power') . ' AS power',
+                self::getTableField('power') . ' AS power',
             ],
             'FROM'      => $powers_table,
             'INNER JOIN' => [

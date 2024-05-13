@@ -42,15 +42,15 @@ define('PLUGIN_CARBON_VERSION', '0.0.1');
 // Minimal GLPI version, inclusive
 define("PLUGIN_CARBON_MIN_GLPI_VERSION", "10.0.0");
 // Maximum GLPI version, exclusive
-define("PLUGIN_CARBON_MAX_GLPI_VERSION", "10.0.99");
+define("PLUGIN_CARBON_MAX_GLPI_VERSION", "10.1.0");
 
 // Plugin compatible itemtypes
 define('PLUGIN_CARBON_TYPES', [
-    'Computer',
-    //    'Monitor',
-    //    'NetworkEquipment',
-    //    'Phone',
-    //    'Printer',
+    Computer::class,
+    //    Monitor::class,
+    //    NetworkEquipment::class,
+    //    Phone::class,
+    //    Printer::class,
 ]);
 
 /**

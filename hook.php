@@ -30,12 +30,12 @@
  */
 
 use GlpiPlugin\Carbon\ComputerType;
-use GlpiPlugin\Carbon\Power;
 use GlpiPlugin\Carbon\PowerModel;
 use GlpiPlugin\Carbon\PowerModel_ComputerModel;
 use GlpiPlugin\Carbon\PowerModelCategory;
 use GlpiPlugin\Carbon\PowerData;
 use GlpiPlugin\Carbon\CarbonEmission;
+use GlpiPlugin\Carbon\ComputerPower;
 use GlpiPlugin\Carbon\Config;
 
 /**
@@ -62,7 +62,7 @@ function plugin_carbon_install()
     Config::install($migration);
 
     CronTask::Register(
-        Power::class,
+        ComputerPower::class,
         'ComputePowersTask',
         DAY_TIMESTAMP,
         [
@@ -103,7 +103,8 @@ function plugin_carbon_uninstall()
         PowerModelCategory::class,
         PowerModel::class,
         PowerModel_ComputerModel::class,
-        Power::class,
+        ComputerPower::class,
+        ComputerType::class,
     ];
     $DbUtils = new DBUtils();
     foreach ($itemtypesWihTable as $itemtype) {
