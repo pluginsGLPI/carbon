@@ -2,8 +2,10 @@
 
 namespace GlpiPlugin\Carbon;
 
+use ComputerModel;
 use GlpiPlugin\Carbon\Power;
 use DateInterval;
+use DateTime;
 
 class Dashboard
 {
@@ -133,7 +135,7 @@ class Dashboard
      */
     public static function getTotalCarbonEmissionPerModel()
     {
-        return DBUtils::getSumPerModel(CarbonEmission::getTable(), CarbonEmission::getTableField('emission_per_day'));
+        return DBUtils::getSumEmissionsPerModel();
     }
 
     /**
@@ -146,7 +148,7 @@ class Dashboard
      */
     public static function getTotalPowerPerModel()
     {
-        return DBUtils::getSumPerModel(Power::getTable(), Power::getTableField('power'), [Power::getTableField('power') => ['>', '0']]);
+        return DBUtils::getSumPowerPerModel([ComputerModel::getTableField('power_consumption') => ['>', '0']]);
     }
 
     public static function cardCarbonEmissionPerMonthProvider(array $params = [])
@@ -162,7 +164,7 @@ class Dashboard
 
         $emissions_table = CarbonEmission::getTable();
 
-        $date = new \DateTime();
+        $date = new DateTime();
         $_31days = new DateInterval('P31D');
         $date->sub($_31days);
 
@@ -201,7 +203,7 @@ class Dashboard
         ];
     }
 
-    // $date = new \DateTime();
+    // $date = new DateTime();
     // $_31days = new DateInterval('P31D');
     // $_1day = new DateInterval('P1D');
     // $date->sub($_31days);

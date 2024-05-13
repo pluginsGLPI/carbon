@@ -4,13 +4,13 @@ namespace GlpiPlugin\Carbon;
 
 use CommonDBChild;
 use Computer;
+use ComputerModel;
 use Location;
-use Migration;
 use DateTime;
 
 class CarbonEmission extends CommonDBChild
 {
-    public static $itemtype = 'Computer';
+    public static $itemtype = Computer::class;
     public static $items_id = 'computers_id';
 
     public static function getTypeName($nb = 0)
@@ -18,14 +18,14 @@ class CarbonEmission extends CommonDBChild
         return \_n("CarbonEmission", "CarbonEmissions", $nb, 'carbon emission');
     }
 
-    public static function computeCarbonEmissionPerDay(int $computer_id, string $country, string $latitude, string $longitude, DateTime &$date)
+    public static function computeCarbonEmissionPerDay(int $computer_id, string $country, string $latitude, string $longitude, DateTime &$date): bool
     {
-        global $DB;
-
-        $power = Power::getPower($computer_id);
-
+        $power = ComputerType::getPower($computer_id);
+        $model = new ComputerModel();
+        if ($model->getFromDbByCrit(['computers_id' => $computer_id])) {
+            $power = $model->fields['power_consumption'];
+        }
         $provider = CarbonData::getCarbonDataProvider($country, $latitude, $longitude);
-
         $carbon_intensity = $provider->getCarbonIntensity($country, $latitude, $longitude, $date);
 
         if (!$carbon_intensity) {
@@ -40,14 +40,28 @@ class CarbonEmission extends CommonDBChild
             'emission_per_day' => $carbon_emission,
             'emission_date' => $date->format('Y-m-d H:i:s')
         ];
-        // $where = [
-        //     'computers_id' => $computer_id,
-        // ];
 
-        return $DB->updateOrInsert(self::getTable(), $params);
+        $carbonEmission = new self();
+        $success = false;
+        if ($carbonEmission->getFromDBByCrit(['computers_id' => $computer_id])) {
+            $success = $carbonEmission->update([
+                'emission_per_day' => $carbon_emission,
+                'emission_date' => $date->format('Y-m-d H:i:s')
+            ]);
+        } else {
+            $carbonEmission->add([
+                'computers_id' => $computer_id,
+                'emission_per_day' => $carbon_emission,
+                'emission_date' => $date->format('Y-m-d H:i:s')
+            ]);
+            $success = (!$carbonEmission->isNewItem());
+        }
+
+        return $success;
     }
 
-    public static function computerCarbonEmissionPerDayForAllComputers(DateTime &$date)
+
+    public static function computerCarbonEmissionPerDayForAllComputers(DateTime &$date): int
     {
         global $DB;
 

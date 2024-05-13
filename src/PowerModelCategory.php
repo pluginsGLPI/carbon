@@ -3,7 +3,6 @@
 namespace GlpiPlugin\Carbon;
 
 use CommonDropdown;
-use Migration;
 
 class PowerModelCategory extends CommonDropdown
 {

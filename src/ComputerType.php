@@ -4,7 +4,7 @@ namespace GlpiPlugin\Carbon;
 
 use CommonDBChild;
 use CommonGLPI;
-use CommonDBTM;
+use Computer;
 use ComputerType as GlpiComputerType;
 use Session;
 use Glpi\Application\View\TemplateRenderer;
@@ -64,5 +64,40 @@ class ComputerType extends CommonDBChild
             'params'   => $options,
             'item'     => $this,
         ]);
+    }
+
+    public static function getPower(int $computer_id): int
+    {
+        global $DB;
+
+        $powers_table = self::getTable();
+        $computers_table = Computer::getTable();
+
+        $request = [
+            'SELECT'    => [
+                Computer::getTableField('id') . ' AS computers_id',
+                self::getTableField('power_consumption') . ' AS power_consumption',
+            ],
+            'FROM'      => $powers_table,
+            'INNER JOIN' => [
+                $computers_table => [
+                    'FKEY'   => [
+                        $powers_table  => 'computertypes_id',
+                        $computers_table => 'computertypes_id',
+                    ]
+                ],
+            ],
+            'WHERE' => [
+                Computer::getTableField('id') => $computer_id,
+            ],
+        ];
+        $result = $DB->request($request);
+
+        if ($result->numrows() == 1) {
+            $power = $result->current()['power_consumption'];
+            return $power;
+        }
+
+        return 0;
     }
 }

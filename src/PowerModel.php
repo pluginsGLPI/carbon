@@ -3,7 +3,6 @@
 namespace GlpiPlugin\Carbon;
 
 use CommonDBChild;
-use Migration;
 
 class PowerModel extends CommonDBChild
 {
