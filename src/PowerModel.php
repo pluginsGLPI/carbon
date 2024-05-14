@@ -6,7 +6,7 @@ use CommonDBChild;
 
 class PowerModel extends CommonDBChild
 {
-    public static $itemtype = 'GlpiPlugin\Carbon\PowerModelCategory';
+    public static $itemtype = PowerModelCategory::class;
     public static $items_id = 'plugin_carbon_powermodelcategories_id';
 
     public static function getTypeName($nb = 0)
