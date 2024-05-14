@@ -3,7 +3,7 @@
 namespace GlpiPlugin\Carbon;
 
 use ComputerModel;
-use GlpiPlugin\Carbon\Power;
+use GlpiPlugin\Carbon\ComputerType;
 use DateInterval;
 use DateTime;
 
@@ -107,7 +107,7 @@ class Dashboard
     {
         $unit = 'W';
 
-        if ($total = DBUtils::getSum(Power::getTable(), 'power')) {
+        if ($total = DBUtils::getSum(ComputerType::getTable(), 'power')) {
             return strval($total) . " $unit";
         }
 
