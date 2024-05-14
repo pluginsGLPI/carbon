@@ -4,6 +4,8 @@ namespace GlpiPlugin\Carbon;
 
 use Computer;
 use ComputerModel;
+use ComputerType as GlpiComputerType;
+use QueryExpression;
 
 class ComputerPower
 {
@@ -16,22 +18,30 @@ class ComputerPower
     {
         global $DB;
 
-        $powers_table = self::getTable();
+        $computertypes_table = ComputerType::getTable();
+        $computermodels_table = ComputerModel::getTable();
         $computers_table = Computer::getTable();
 
         $request = [
             'SELECT'    => [
                 Computer::getTableField('id') . ' AS computer_id',
-                self::getTableField('power') . ' AS power',
+                new QueryExpression('COALESCE('
+                    . ComputerModel::getTableField('power_consumption') . ', ' . ComputerType::getTableField('power_consumption') . ', 0) AS power_consumption'),
             ],
-            'FROM'      => $powers_table,
-            'INNER JOIN' => [
+            'FROM'      => $computertypes_table,
+            'LEFT JOIN' => [
                 $computers_table => [
                     'FKEY'   => [
-                        $powers_table  => 'computers_id',
-                        $computers_table => 'id',
+                        $computertypes_table  => 'computertypes_id',
+                        $computers_table => 'computertypes_id',
                     ]
                 ],
+                $computermodels_table => [
+                    'FKEY'   => [
+                        $computers_table => 'computermodels_id',
+                        $computermodels_table  => 'id',
+                    ]
+                ]
             ],
             'WHERE' => [
                 Computer::getTableField('id') => $computer_id,
@@ -40,7 +50,7 @@ class ComputerPower
         $result = $DB->request($request);
 
         if ($result->numrows() == 1) {
-            $power = $result->current()['power'];
+            $power = $result->current()['power_consumption'];
             return $power;
         }
 
