@@ -8,6 +8,7 @@ use CronTask;
 use Plugin;
 use Glpi\System\Diagnostic\DatabaseSchemaIntegrityChecker;
 use GlpiPlugin\Carbon\ComputerPower;
+use GlpiPlugin\Carbon\CarbonEmission;
 
 class PluginInstallTest extends CommonTestCase
 {
@@ -67,7 +68,7 @@ class PluginInstallTest extends CommonTestCase
 
         // $this->checkConfig();
         // $this->checkRequestType();
-        // $this->checkAutomaticAction();
+        $this->checkAutomaticAction();
         // $this->checkDashboard();
     }
 
@@ -105,9 +106,9 @@ class PluginInstallTest extends CommonTestCase
         );
 
         try {
-            $differences = $checker->checkCompleteSchema($schemaFile, true, 'plugin:formcreator');
+            $differences = $checker->checkCompleteSchema($schemaFile, true, 'plugin:carbon');
         } catch (\Throwable $e) {
-            $message = __('Failed to check the sanity of the tables!', 'formcreator');
+            $message = __('Failed to check the sanity of the tables!', 'carbon');
             if (isCommandLine()) {
                 echo $message . PHP_EOL;
             } else {
@@ -137,5 +138,22 @@ class PluginInstallTest extends CommonTestCase
         }
 
         return true;
+    }
+
+    private function checkAutomaticAction()
+    {
+        $cronTask = new CronTask();
+        $cronTask->getFromDBByCrit([
+            'itemtype' => ComputerPower::class,
+            'name'     => 'ComputePowersTask',
+        ]);
+        $this->assertFalse($cronTask->isNewItem());
+
+        $cronTask = new CronTask();
+        $cronTask->getFromDBByCrit([
+            'itemtype' => CarbonEmission::class,
+            'name'     => 'ComputeCarbonEmissionsTask',
+        ]);
+        $this->assertFalse($cronTask->isNewItem());
     }
 }

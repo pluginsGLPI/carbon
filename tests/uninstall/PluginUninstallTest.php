@@ -2,6 +2,9 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
+use CronTask;
+use GlpiPlugin\Carbon\ComputerPower;
+use GlpiPlugin\Carbon\CarbonEmission;
 use Plugin;
 
 class PluginUninstallTest extends CommonTestCase
@@ -30,9 +33,26 @@ class PluginUninstallTest extends CommonTestCase
         // Check all plugin's tables are dropped
         $tables = [];
         $result = $DB->listTables('glpi_plugin_' . $pluginName . '_%');
-        foreach($result as $data) {
+        foreach($result as $row) {
            $tables[] = array_pop($row);
         }
         $this->AssertEquals(0, count($tables), "not deleted tables \n" . json_encode($tables, JSON_PRETTY_PRINT));
+    }
+
+    public function checkAutomaticAction()
+    {
+        $cronTask = new CronTask();
+        $cronTask->getFromDBByCrit([
+            'itemtype' => ComputerPower::class,
+            'name'     => 'ComputePowersTask',
+        ]);
+        $this->assertTrue($cronTask->isNewItem());
+
+        $cronTask = new CronTask();
+        $cronTask->getFromDBByCrit([
+            'itemtype' => CarbonEmission::class,
+            'name'     => 'ComputeCarbonEmissionsTask',
+        ]);
+        $this->assertTrue($cronTask->isNewItem());
     }
 }
