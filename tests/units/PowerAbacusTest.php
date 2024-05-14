@@ -2,6 +2,7 @@
 namespace GlpiPlugin\Carbon\Tests;
 
 use PHPUnit\Framework\TestCase;
+use GlpiPlugin\Carbon\PowerAbacus;
 
 class PowerAbacusTest extends TestCase
 {
