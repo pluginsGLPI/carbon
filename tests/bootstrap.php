@@ -8,7 +8,7 @@ class UnitTestAutoload
 {
 
    public static function register() {
-      spl_autoload_register(array('UnitTestAutoload', 'autoload'));
+      spl_autoload_register(['UnitTestAutoload', 'autoload']);
    }
 
    public static function autoload($className) {

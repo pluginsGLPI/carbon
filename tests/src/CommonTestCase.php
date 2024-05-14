@@ -4,8 +4,8 @@ namespace GlpiPlugin\Carbon\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Auth;
-use Config;
 use CommonDBTM;
+use Config;
 use DB;
 use Entity;
 use Html;
@@ -16,7 +16,6 @@ use User;
 
 class CommonTestCase extends TestCase
 {
-
     /** @var integer $debugMode save state of GLPI debug mode */
     private $debugMode = null;
 
@@ -128,7 +127,7 @@ class CommonTestCase extends TestCase
 
         $this->handleDeprecations($itemtype, $input);
 
-        // assign entity
+        // assign entity if not already set
         if ($item->isEntityAssign()) {
             $entity = 0;
             if (Session::getLoginUserID(true)) {
@@ -139,7 +138,7 @@ class CommonTestCase extends TestCase
             }
         }
 
-        // assign recursiviy
+        // assign recursiviy if not already set
         if ($item->maybeRecursive()) {
             $recursive = 0;
             if (Session::getLoginUserID(true)) {
@@ -150,7 +149,7 @@ class CommonTestCase extends TestCase
             }
         }
 
-        // set name
+        // set random name if not already set
         if (!isset($item->fields['name'])) {
             if (!isset($input['name'])) {
                 $input['name'] = $this->getUniqueString();
@@ -159,6 +158,9 @@ class CommonTestCase extends TestCase
 
         $item->add($input);
         $this->assertFalse($item->isNewItem(), $this->getSessionMessage());
+
+        // Reload the item to ensure that all fields are set
+        $this->assertTrue($item->getFromDB($item->getID()));
 
         return $item;
     }

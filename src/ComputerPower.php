@@ -21,6 +21,7 @@ class ComputerPower
         $computertypes_table = ComputerType::getTable();
         $computermodels_table = ComputerModel::getTable();
         $computers_table = Computer::getTable();
+        $computermodels_table = ComputerModel::getTable();
 
         $request = [
             'SELECT'    => [
