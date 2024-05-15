@@ -71,7 +71,10 @@ function plugin_init_carbon()
     $PLUGIN_HOOKS[Hooks::REDEFINE_MENUS]['carbon'] = [Menu::class, 'hookRedefineMenu'];
 
     // Add ApexCharts.js library
-    $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][ ] = 'dist/bundle.js';
+    $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][] = 'dist/bundle.js';
+
+    // Import CSS
+    $PLUGIN_HOOKS[Hooks::ADD_CSS]['carbon'][] = 'dist/main.css';
 }
 /**
  * Get the name and the version of the plugin
