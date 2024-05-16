@@ -1,0 +1,82 @@
+{% extends "generic_show_form.html.twig" %}
+{% import "components/form/fields_macros.html.twig" as fields %}
+{% import '@carbon/components/form/fields_macros.html.twig' as carbonFields %}
+
+{% block form_fields %}
+    {{ fields.textField(
+        'name',
+        item.fields['name'],
+        __('Name'),
+        { required: true }
+    ) }}
+
+    {{ fields.dropdownNumberField(
+        'average_load',
+        item.fields['average_load'],
+        __('Average load', 'carbon'),
+        {
+            'min': 0,
+            'max': 100,
+            'step': 5,
+        }
+    ) }}
+
+    {{ carbonFields.timeField(
+        'time_start',
+        item.fields['time_start'],
+        __('Start time', 'carbon')
+    ) }}
+
+    {{ carbonFields.timeField(
+        'time_stop',
+        item.fields['time_stop'],
+        __('Stop time', 'carbon')
+    ) }}
+
+    {{ fields.smallTitle(__('Days of week where the computer usually runs', 'carbon')) }}
+
+      {{ fields.checkboxField(
+         'day_1',
+         item.fields['day_1'],
+         __('Monday')
+      ) }}
+
+      {{ fields.checkboxField(
+         'day_2',
+         item.fields['day_2'],
+         __('Tuesday')
+      ) }}
+
+      {{ fields.checkboxField(
+         'day_3',
+         item.fields['day_3'],
+         __('Wednesday')
+      ) }}
+
+      {{ fields.checkboxField(
+         'day_4',
+         item.fields['day_4'],
+         __('Thursday')
+      ) }}
+
+      {{ fields.checkboxField(
+         'day_5',
+         item.fields['day_5'],
+         __('Friday')
+      ) }}
+
+      {{ fields.checkboxField(
+         'day_6',
+         item.fields['day_6'],
+         __('Saturday'),
+         field_options
+      ) }}
+
+      {{ fields.checkboxField(
+         'day_7',
+         item.fields['day_7'],
+         __('Sunday'),
+         field_options
+      ) }}
+
+{% endblock %}

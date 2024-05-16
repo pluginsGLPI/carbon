@@ -1,0 +1,12 @@
+{% extends "generic_show_form.html.twig" %}
+{% import "components/form/fields_macros.html.twig" as fields %}
+
+{% block form_fields %}
+    {{ fields.smallTitle(__('Usage information', 'carbon')) }}
+    {{ fields.dropdownField(
+        '\\GlpiPlugin\\Carbon\\ComputerUsageProfile',
+        'plugin_carbon_computerusageprofiles_id',
+        item.fields['plugin_carbon_computerusageprofiles_id'],
+        _n('Usage profile', 'Usage profiles', 1, 'carbon'))
+    }}
+{% endblock %}
