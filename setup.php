@@ -29,7 +29,7 @@
  * --------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Carbon\Dashboard;
+use GlpiPlugin\Carbon\Dashboard\Dashboard;
 use Glpi\Plugin\Hooks;
 use GlpiPlugin\Carbon\Menu;
 use Computer;

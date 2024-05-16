@@ -29,15 +29,12 @@
  * --------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Carbon\ComputerType;
-use GlpiPlugin\Carbon\PowerModel;
-use GlpiPlugin\Carbon\PowerModel_ComputerModel;
-use GlpiPlugin\Carbon\PowerModelCategory;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerPower;
+use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
-
 use GlpiPlugin\Carbon\Config;
+use GlpiPlugin\Carbon\EnvironnementalImpact;
 
 /**
  * Plugin install process
@@ -100,11 +97,10 @@ function plugin_carbon_uninstall()
     $migration = new Migration(PLUGIN_CARBON_VERSION);
     $itemtypesWihTable = [
         CarbonEmission::class,
-        PowerModelCategory::class,
-        PowerModel::class,
-        PowerModel_ComputerModel::class,
         ComputerPower::class,
         ComputerType::class,
+        ComputerUsageProfile::class,
+        EnvironnementalImpact::class,
     ];
     $DbUtils = new DBUtils();
     foreach ($itemtypesWihTable as $itemtype) {
@@ -119,7 +115,6 @@ function plugin_carbon_uninstall()
 function plugin_carbon_getDropdown()
 {
     return [
-        PowerModelCategory::class => __('Carbon Plugin - Power model categories', 'carbon'),
         ComputerUsageProfile::class => __('Carbon Plugin - Computer usage profiles', 'carbon'),
     ];
 }

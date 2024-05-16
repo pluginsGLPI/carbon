@@ -1,9 +1,11 @@
 <?php
 
-namespace GlpiPlugin\Carbon;
+namespace GlpiPlugin\Carbon\Dashboard;
 
 use ComputerModel;
+use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerType;
+use GlpiPlugin\Carbon\DBUtils;
 use DateInterval;
 use DateTime;
 
@@ -118,7 +120,7 @@ class Dashboard
     {
         $unit = ''; // This is a count, no unit
 
-        if ($total = DBUtils::getIncompleteComputers()) {
+        if ($total = Provider::getIncompleteComputers()) {
             return strval($total) . " $unit";
         }
 
@@ -130,7 +132,7 @@ class Dashboard
     {
         $unit = 'W';
 
-        if ($total = DBUtils::getSum(ComputerType::getTable(), 'power')) {
+        if ($total = Provider::getSum(ComputerType::getTable(), 'power')) {
             return strval($total) . " $unit";
         }
 
@@ -141,7 +143,7 @@ class Dashboard
     {
         $unit = 'kg CO2';
 
-        if ($total = DBUtils::getSum(CarbonEmission::getTable(), 'emission_per_day')) {
+        if ($total = Provider::getSum(CarbonEmission::getTable(), 'emission_per_day')) {
             return number_format($total, 2) . " $unit";
         }
 
@@ -158,7 +160,7 @@ class Dashboard
      */
     public static function getTotalCarbonEmissionPerModel()
     {
-        return DBUtils::getSumEmissionsPerModel();
+        return Provider::getSumEmissionsPerModel();
     }
 
     /**
@@ -171,7 +173,7 @@ class Dashboard
      */
     public static function getTotalPowerPerModel()
     {
-        return DBUtils::getSumPowerPerModel([ComputerModel::getTableField('power_consumption') => ['>', '0']]);
+        return Provider::getSumPowerPerModel([ComputerModel::getTableField('power_consumption') => ['>', '0']]);
     }
 
     public static function getCarbonEmissionPerMonth()
