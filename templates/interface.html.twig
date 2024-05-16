@@ -1,8 +1,10 @@
-{% block header %}
-	<header>
-		<h1>GLPI Carbon UI</h1>
-	</header>
-{% endblock %}
+<div class="page">
+
+<!-- Header with background image -->
+  <header class="page-header illustrationBackground">
+      <h1 class="page-title">{{ __('GLPI Carbon', 'carbon') }}</h1>
+  </header>
+
 
 {% block body %}
 	<div class="page-body">
@@ -18,7 +20,7 @@
 					</div>
 				</div>
 
-                <div class="col-sm-6 col-lg-3">
+        <div class="col-sm-6 col-lg-3">
 					<div class="card">
 						<div class="card-body">
 							<div class="subheader">{{ __('Total Power Consumption', 'carbon') }}</div>
@@ -68,6 +70,7 @@
 			</div>
 		</div>
 	</div>
+</div>
 {% endblock %}
 
 {% block footer %}

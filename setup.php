@@ -82,7 +82,10 @@ function plugin_init_carbon()
     // Plugin::registerClass(MonitorType::class, ['addtabon' => GlpiMonitorType::class]);
 
     // Add ApexCharts.js library
-    $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][ ] = 'dist/bundle.js';
+    $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][] = 'dist/bundle.js';
+
+    // Import CSS
+    $PLUGIN_HOOKS[Hooks::ADD_CSS]['carbon'][] = 'dist/main.css';
 }
 
 /**
