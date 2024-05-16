@@ -7,6 +7,9 @@ use CommonDBChild;
 use CommonGLPI;
 use Glpi\Application\View\TemplateRenderer;
 
+/**
+ * Relation between a computer and a usage profile
+ */
 class EnvironnementalImpact extends CommonDBChild
 {
     public static $itemtype = Computer::class;
@@ -66,17 +69,6 @@ class EnvironnementalImpact extends CommonDBChild
         if (!$history) {
             return;
         }
-
-        // foreach ($this->updates as $field) {
-        //     Event::log(
-        //         $_POST['id'],
-        //         'computers',
-        //         4,
-        //         $field,
-        //         //TRANS: %s is the user login
-        //         sprintf(__('%s updates an item'), $_SESSION['glpiname'])
-        //     );
-        // }
     }
 
     public function showForComputer($ID, $withtemplate = '') {

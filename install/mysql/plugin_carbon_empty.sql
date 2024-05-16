@@ -6,20 +6,20 @@ CREATE TABLE `glpi_plugin_carbon_carbonemissions` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE `glpi_plugin_carbon_powermodelcategories` (
-  `id`   int unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+-- CREATE TABLE `glpi_plugin_carbon_powermodelcategories` (
+--   `id`   int unsigned NOT NULL AUTO_INCREMENT,
+--   `name` varchar(255) DEFAULT NULL,
+--   PRIMARY KEY (`id`),
+--   KEY `name` (`name`)
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE `glpi_plugin_carbon_powermodels` (
-  `id`    int unsigned NOT NULL AUTO_INCREMENT,
-  `name`  varchar(255) DEFAULT NULL,
-  `power` float        DEFAULT '0',
-  `plugin_carbon_powermodelcategories_id` int unsigned DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+-- CREATE TABLE `glpi_plugin_carbon_powermodels` (
+--   `id`    int unsigned NOT NULL AUTO_INCREMENT,
+--   `name`  varchar(255) DEFAULT NULL,
+--   `power` float        DEFAULT '0',
+--   `plugin_carbon_powermodelcategories_id` int unsigned DEFAULT '0',
+--   PRIMARY KEY (`id`)
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `glpi_plugin_carbon_powermodels_computermodels` (
   `id`                           int unsigned NOT NULL AUTO_INCREMENT,

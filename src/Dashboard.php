@@ -16,6 +16,12 @@ class Dashboard
         }
 
         $new_cards = [
+            'plugin_carbon_card_incomplete_computers' => [
+                'widgettype'   => ["bigNumber"],
+                'group'        => __("Carbon", "carbon"),
+                'label'        => __("Unhandled computers", "carbon"),
+                'provider'     => Dashboard::class . "::cardUnhandledComputersCountProvider",
+            ],
             'plugin_carbon_card_total_power' => [
                 'widgettype'   => ["bigNumber"],
                 'group'        => __("Carbon", "carbon"),
@@ -66,6 +72,11 @@ class Dashboard
         ];
     }
 
+    public static function cardUnhandledComputersCountProvider(array $params = [])
+    {
+        return self::cardNumberProvider($params, "unhandled computers", self::getUnhandledComputersCount());
+    }
+
     public static function cardTotalPowerProvider(array $params = [])
     {
         return self::cardNumberProvider($params, "total power", self::getTotalPower());
@@ -101,6 +112,18 @@ class Dashboard
     public static function cardTotalCarbonEmissionPerModelProvider(array $params = [])
     {
         return self::cardDataProvider($params, "total carbon emission per model", self::getTotalCarbonEmissionPerModel());
+    }
+
+    public static function getUnhandledComputersCount()
+    {
+        $unit = ''; // This is a count, no unit
+
+        if ($total = DBUtils::getIncompleteComputers()) {
+            return strval($total) . " $unit";
+        }
+
+        return "0 $unit";
+
     }
 
     public static function getTotalPower()
