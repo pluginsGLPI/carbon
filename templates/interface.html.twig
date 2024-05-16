@@ -1,20 +1,24 @@
 <div class="page">
 
 <!-- Header with background image -->
-  <header class="page-header illustrationBackground">
-      <h1 class="page-title">{{ __('GLPI Carbon', 'carbon') }}</h1>
+  <header class="page-header header-height justify-content-end illustration">
+    <div class="container-xl">
+        <h1 class="page-title title-color pb-4">{{ __('GLPI Carbon', 'carbon') }}</h1>
+    </div>
   </header>
 
 
 {% block body %}
 	<div class="page-body">
 		<div class="container-xl">
-			<div class="row row-deck row-cards">
+			<div class="row row-cards">
 
+        <!-- Row for score cards & information block -->
 				<div class="col-sm-6 col-lg-3">
-					<div class="card">
-						<div class="card-body">
-							<div class="subheader">{{ __('Total Carbon Emission', 'carbon') }}</div>
+					<div class="card ">
+						<div class="card-body carbon-emission-card text-white">
+              <span><img class="carbon-emission pb-2" src="../dist/images/carbonemissionicon.png" /></span>
+							<div class="subheader text-white">{{ __('Total Carbon Emission', 'carbon') }}</div>
 							<div class="h1 mb-3" id="carbonEmission"></div>
 						</div>
 					</div>
@@ -22,50 +26,73 @@
 
         <div class="col-sm-6 col-lg-3">
 					<div class="card">
-						<div class="card-body">
+						<div class="card-body power-emission-card">
+              <span><img class="carbon-emission pb-2" src="../dist/images/powerconsumptionicon.png" /></span>
 							<div class="subheader">{{ __('Total Power Consumption', 'carbon') }}</div>
 							<div class="h1 mb-3" id="powerConsumption"></div>
 						</div>
 					</div>
 				</div>
 
-                <div class="col-12">
-                    <div class="row row-cards">
-                        <div class="col-sm-6 col-lg-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="subheader">{{ __('Carbon Emission per Type (g CO²)', 'carbon') }}</div>
-                                    <div class="h1 mb-3" id="carbonEmissionPerModel"></div>
-                                    <div id="carbonEmissionPerModelChart" class="chart-lg"></div>
-                                </div>
-                            </div>
-                        </div>
+        <div class="col-sm-6 col-lg-6">
+          <div class="card">
+            <div class="card-header">
+              <div class="row align-items-center">
+                <div class="col-auto">
+                  <span><svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-exclamation-circle"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 9v4" /><path d="M12 16v.01" /></svg></span>
+                </div>
+                <div class="col">
+                  <h3 class="card-title">{{ __('Information', 'carbon') }}</h3>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer sit amet ante ac ex fringilla volutpat non vel elit. Suspendisse tempor vehicula consectetur. Aenean scelerisque facilisis venenatis. Vivamus eleifend egestas blandit. Nullam dignissim blandit felis vitae tempus. Suspendisse potenti.
+                </p>
+            </div>
+          </div>
+        </div>
 
-                        <div class="col-sm-6 col-lg-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="subheader">{{ __('Power Consumption per Type (W)', 'carbon') }}</div>
-                                    <div class="h1 mb-3" id="powerConsumptionPerModel"></div>
-                                    <div id="powerConsumptionPerModelChart" class="chart-lg"></div>
-                                </div>
-                            </div>
-                        </div>
+        <!-- Row for score cards -->
 
+        <!-- Row for pie charts
+        <div class="col-12">
+            <div class="row row-cards">
+                <div class="col-sm-6 col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="subheader">{{ __('Carbon Emission per Type (g CO²)', 'carbon') }}</div>
+                            <div class="h1 mb-3" id="carbonEmissionPerModel"></div>
+                            <div id="carbonEmissionPerModelChart" class="chart-lg"></div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="col-12">
-                    <div class="row row-cards">
-                    <div class="col-sm-6 col-lg-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="subheader">{{ __('Carbon Emission per Month (g CO²)', 'carbon') }}</div>
-                                <div class="h1 mb-3" id="carbonEmissionPerMonth"></div>
-                                <div id="carbonEmissionPerMonthChart" class="chart-lg"></div>
-                            </div>
+                <div class="col-sm-6 col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="subheader">{{ __('Power Consumption per Type (W)', 'carbon') }}</div>
+                            <div class="h1 mb-3" id="powerConsumptionPerModel"></div>
+                            <div id="powerConsumptionPerModelChart" class="chart-lg"></div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+        Row for pie charts -->
+
+        <div class="col-12">
+            <div class="row row-cards">
+            <div class="col-sm-6 col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="subheader">{{ __('Carbon Emission per Month (g CO²)', 'carbon') }}</div>
+                        <div class="h1 mb-3" id="carbonEmissionPerMonth"></div>
+                        <div id="carbonEmissionPerMonthChart" class="chart-lg"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
 			</div>
 		</div>

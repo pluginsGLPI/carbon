@@ -1,4 +1,23 @@
-.illustrationBackground {
-    background-image: url(../dist/images/illustration_bridge.png);
+.illustration {
+    background-image: url(../pics/illustration_bridge.png);
     background-size: 100% 100%;
 }
+
+.header-height {
+    height: 135px;
+}
+
+.title-color {
+    color: #005B52 !important;
+}
+
+.carbon-emission-card {
+    background-color: #005C53;
+}
+
+.power-emission-card {
+    background-color: #D6D58E;
+}
+
+
+
