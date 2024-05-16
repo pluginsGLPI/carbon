@@ -3,7 +3,7 @@
 include("../../../inc/includes.php");
 
 use GlpiPlugin\Carbon\MonitorType;
-if (!(new Plugin())->isActivated('carbon')) {
+if (!Plugin::isPluginActive('carbon')) {
     Html::displayNotFoundError();
 }
 

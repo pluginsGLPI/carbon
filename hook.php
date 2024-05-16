@@ -36,6 +36,8 @@ use GlpiPlugin\Carbon\PowerModelCategory;
 use GlpiPlugin\Carbon\PowerData;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerPower;
+use GlpiPlugin\Carbon\ComputerUsageProfile;
+
 use GlpiPlugin\Carbon\Config;
 
 /**
@@ -119,7 +121,10 @@ function plugin_carbon_uninstall()
 
 function plugin_carbon_getDropdown()
 {
-    return [PowerModelCategory::class => __('Carbon Plugin - Power model categories', 'carbon')];
+    return [
+        PowerModelCategory::class => __('Carbon Plugin - Power model categories', 'carbon'),
+        ComputerUsageProfile::class => __('Carbon Plugin - Computer usage profiles', 'carbon'),
+    ];
 }
 
 /**

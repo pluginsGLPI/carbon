@@ -1,10 +1,12 @@
 <?php
 
-include("../../../inc/includes.php");
 
+use Glpi\Event;
 use GlpiPlugin\Carbon\ComputerType;
 
-if (!(new Plugin())->isActivated('carbon')) {
+include("../../../inc/includes.php");
+
+if (!Plugin::isPluginActive('carbon')) {
     Html::displayNotFoundError();
 }
 
