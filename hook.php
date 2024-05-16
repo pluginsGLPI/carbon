@@ -33,7 +33,6 @@ use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\PowerModel;
 use GlpiPlugin\Carbon\PowerModel_ComputerModel;
 use GlpiPlugin\Carbon\PowerModelCategory;
-use GlpiPlugin\Carbon\PowerData;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerPower;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
@@ -60,7 +59,6 @@ function plugin_carbon_install()
         die('Giving up');
      }
 
-    PowerData::install($migration);
     Config::install($migration);
 
     CronTask::Register(
@@ -113,7 +111,6 @@ function plugin_carbon_uninstall()
         $DB->dropTable($DbUtils->getTableForItemType($itemtype));
     }
 
-    PowerData::uninstall($migration);
     Config::uninstall($migration);
 
     return true;

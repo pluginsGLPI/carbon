@@ -1,8 +1,0 @@
-"Power model","Power","Category","Note"
-"Server(S)","400","Infrastructure",""
-"Server(M)","600","Infrastructure",""
-"Server(L)","800","Infrastructure",""
-"Laptop(S)","80","User",""
-"Laptop(L)","140","User",""
-"Desktop(S)","150","User",""
-"Desktop(L)","300","User",""
