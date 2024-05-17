@@ -1,24 +1,25 @@
 <div class="page">
 
 <!-- Header with background image -->
-  <header class="page-header header-height justify-content-end illustration">
-    <div class="container-xl">
-        <h1 class="page-title title-color pb-4">{{ __('GLPI Carbon', 'carbon') }}</h1>
+  <header class="page-header header-height illustration container-fluid">
+
+    <div class="container-fluid">
+        <h1 class="page-title title-color title-position">{{ __('GLPI Carbon', 'carbon') }}</h1>
     </div>
   </header>
 
 
 {% block body %}
 	<div class="page-body">
-		<div class="container-xl">
+		<div class="container-fluid">
 			<div class="row row-cards">
 
         <!-- Row for score cards & information block -->
 				<div class="col-sm-6 col-lg-3">
 					<div class="card ">
-						<div class="card-body carbon-emission-card text-white">
-              <span><img class="carbon-emission pb-2" src="../dist/images/carbonemissionicon.png" /></span>
-							<div class="subheader text-white">{{ __('Total Carbon Emission', 'carbon') }}</div>
+						<div class="card-body carbon-emission-card">
+              <span><img class="carbon-emission pb-2" src="../dist/images/carbon_emission_icon_darkgreen.png" /></span>
+							<div class="subheader">{{ __('Total Carbon Emission', 'carbon') }}</div>
 							<div class="h1 mb-3" id="carbonEmission"></div>
 						</div>
 					</div>
@@ -26,10 +27,12 @@
 
         <div class="col-sm-6 col-lg-3">
 					<div class="card">
-						<div class="card-body power-emission-card">
-              <span><img class="carbon-emission pb-2" src="../dist/images/powerconsumptionicon.png" /></span>
-							<div class="subheader">{{ __('Total Power Consumption', 'carbon') }}</div>
-							<div class="h1 mb-3" id="powerConsumption"></div>
+						<div class="card-body monthly-emission-card">
+							<div class="subheader text-white">{{ __('Monthly carbon emission', 'carbon') }}</div>
+              <div class="subheader text-white">{{ __('April, 2024', 'carbon') }}</div>
+							<div class="h1 my-3 text-white text-center" id="powerConsumption"></div>
+                  <p class="m-0 percent-color">{{ __(' - 10%', 'carbon') }}</p>
+                  <div class="subheader text-white">{{ __('Compared to last month', 'carbon') }}</div>
 						</div>
 					</div>
 				</div>
@@ -38,8 +41,8 @@
           <div class="card">
             <div class="card-header">
               <div class="row align-items-center">
-                <div class="col-auto">
-                  <span><svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-exclamation-circle"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 9v4" /><path d="M12 16v.01" /></svg></span>
+                <div class="col-auto fw-bold">
+                  <span><svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9" /><line x1="12" y1="8" x2="12.01" y2="8" /><polyline points="11 12 12 12 12 16 13 16" /></svg></span>
                 </div>
                 <div class="col">
                   <h3 class="card-title">{{ __('Information', 'carbon') }}</h3>
@@ -47,15 +50,23 @@
               </div>
             </div>
             <div class="card-body">
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer sit amet ante ac ex fringilla volutpat non vel elit. Suspendisse tempor vehicula consectetur. Aenean scelerisque facilisis venenatis. Vivamus eleifend egestas blandit. Nullam dignissim blandit felis vitae tempus. Suspendisse potenti.
-                </p>
+              <div class="row align-items-center">
+                <div class="col-auto">
+                  <span><img src="../dist/images/ecology_icon_orange.png" /></span>
+                </div>
+                <div class="col">
+                  <p class="m-0">{{ __('Our data is sourced from reliable sources and is meticulously calculated using industry-standard methodologies. We utilize accurate measurement tools and algorithms to ensure the precision and reliability of our environmental metrics.','carbon') }}
+                  </p>
+                </div>
+                <p class="m-0">{{ __('As we move towards a greener future, businesses will soon be required to report energy usage and carbon emissions. By 2025, many areas will enforce these regulations. Adopting these practices now ensures compliance and helps combat climate change.','carbon') }}
+                  </p>
+              </div>
             </div>
           </div>
         </div>
 
         <!-- Row for score cards -->
 
-        <!-- Row for pie charts
         <div class="col-12">
             <div class="row row-cards">
                 <div class="col-sm-6 col-lg-6">
@@ -79,7 +90,7 @@
                 </div>
             </div>
         </div>
-        Row for pie charts -->
+        <!--Row for pie charts -->
 
         <div class="col-12">
             <div class="row row-cards">
@@ -107,7 +118,7 @@
 	<script>
 	document.addEventListener('DOMContentLoaded', function () {
 
-        var carbonColorPalette = ['#1D2A62', '#00A3FF', '#3A3A3A', '#6D7783', '#317399' ];
+        var carbonColorPalette = ['#FEEC5C', '#F78343', '#D1E883', '#BBDA50', '#146151' ];
         var powerColorPalette  = ['#EAB640', '#EB9C43', '#D1330B', '#AD5B34', '#B33C2F' ];
 
         // Define options for each chart
@@ -134,22 +145,75 @@
 
         var carbonEmissionPerMonthOptions = {
           series: [{
-            name: 'carbon emission',
-            data: [400, 1100, 960, 785, 805, 1056, 1502, 805, 905, 995, 1000, 1200, 1400]
+            name: 'Desktops',
+            data: [0.55,0.26,0.67,0.91,0.45,0.77,0.91,0.45,0.77,0.91,0.45,0.77]
+          }, {
+            name: 'Tablets',
+            data: [0.45,0.74,0.33,0.09,0.55,0.23,0.09,0.55,0.23,0.09,0.55,0.23]
+          }, {
+            name: 'Mobiles',
+            data: [0.67,0.33,0.45,0.77,0.91,0.45,0.77,0.91,0.45,0.77,0.91,0.45]
+          }, {
+            name: 'Laptops',
+            data: [0.91,0.45,0.77,0.91,0.45,0.77,0.91,0.45,0.77,0.91,0.45,0.77]
+          },
+          {
+            name: 'Others',
+            data: [0.45,0.77,0.91,0.45,0.77,0.91,0.45,0.77,0.91,0.45,0.77,0.91]
           }],
           chart: {
+            type: 'bar',
             height: 350,
-            type: 'area',
+            stacked: true,
+            toolbar: {
+              show: true
+            },
+            zoom: {
+              enabled: true
+            }
           },
-          dataLabels: {
-            enabled: false
-          },
-          stroke: {
-            curve: 'smooth'
+          colors: carbonColorPalette,
+          responsive: [{
+            breakpoint: 480,
+              options: {
+                legend: {
+                  position: 'bottom',
+                  offsetX: -10,
+                  offsetY: 0
+                }
+              }
+          }],
+          plotOptions: {
+            bar: {
+              horizontal: false,
+              borderRadius: 10,
+              borderRadiusApplication: 'end', // 'around', 'end'
+              borderRadiusWhenStacked: 'last', // 'all', 'last'
+              dataLabels: {
+                total: {
+                  enabled: true,
+                  formatter: function (val) {
+                    return val.toFixed(2);
+                  },
+                  style: {
+                    fontSize: '13px',
+                    fontWeight: 900
+                  }
+                }
+              }
+            },
           },
           xaxis: {
-            categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            type: 'datetime',
+            categories: ['01/01/2024', '01/02/2024', '01/03/2024', '01/04/2024', '01/05/2024', '01/06/2024', '01/07/2024', '01/08/2024', '01/09/2024', '01/10/2024', '01/11/2024', '01/12/2024'],
           },
+          legend: {
+            position: 'right',
+            offsetY: 40
+          },
+          fill: {
+            opacity: 1
+          }
         };
 
         var powerConsumptionPerTypeOptions = {

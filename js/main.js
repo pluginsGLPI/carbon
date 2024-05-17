@@ -5,8 +5,9 @@ window.ApexCharts = ApexCharts;
 
 // Import images paths :
 require('../pics/illustration_bridge.png');
-require('../pics/carbonemissionicon.png');
-require('../pics/powerconsumptionicon.png');
+require('../pics/carbon_emission_icon_darkgreen.png');
+require('../pics/carbon_emission_icon_white.png');
+require('../pics/ecology_icon_orange.png');
 
 // Import css :
 require('../css/main.css');
