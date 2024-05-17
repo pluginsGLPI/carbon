@@ -14,7 +14,7 @@ class ComputerUsageProfile extends CommonDropdown
 {
     public static function getTypeName($nb = 0)
     {
-        return _n("Computer usage profile", "Computer usage profiles", $nb, 'power');
+        return _n("Computer usage profile", "Computer usage profiles", $nb, 'carbon');
     }
 
     public static function canView()
