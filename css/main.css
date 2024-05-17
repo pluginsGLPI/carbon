@@ -1,22 +1,47 @@
 .illustration {
-    background-image: url(../pics/illustration_bridge.png);
+    background-color: #FCF8A1;
+    background-image: url('../pics/illustration_bridge.png');
     background-size: 100% 100%;
+    background-repeat: no-repeat;
 }
 
 .header-height {
-    height: 135px;
+    height: 165px;
+    margin-top: 0 !important;
+    position: relative;
+}
+
+@media (min-width: 1200px) {
+    .header-height {
+        height: 210px;
+    }
+    .illustration {
+        background-size: 100% 210px;
+    }
 }
 
 .title-color {
     color: #005B52 !important;
 }
 
-.carbon-emission-card {
-    background-color: #005C53;
+.title-position {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
 }
 
-.power-emission-card {
-    background-color: #D6D58E;
+.carbon-emission-card {
+    background-color: #BBDA50;
+}
+
+.monthly-emission-card {
+    background-color: #145161;
+}
+
+.percent-color {
+    color: #BBDA50;
 }
 
 
