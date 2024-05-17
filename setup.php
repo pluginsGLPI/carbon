@@ -32,7 +32,6 @@
 use GlpiPlugin\Carbon\Dashboard\Dashboard;
 use Glpi\Plugin\Hooks;
 use GlpiPlugin\Carbon\Menu;
-use Computer;
 use GlpiPlugin\Carbon\EnvironnementalImpact;
 use ComputerType as GlpiComputerType;
 use MonitorType as GlpiMonitorType;
