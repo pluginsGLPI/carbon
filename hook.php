@@ -34,6 +34,9 @@ use GlpiPlugin\Carbon\ComputerPower;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Config;
+use GlpiPlugin\Carbon\Install;
+use GlpiPlugin\Carbon\Uninstall;
+use GlpiPlugin\Carbon\Report;
 use GlpiPlugin\Carbon\EnvironnementalImpact;
 
 /**
@@ -43,44 +46,18 @@ use GlpiPlugin\Carbon\EnvironnementalImpact;
  */
 function plugin_carbon_install()
 {
-    global $DB;
-
-    $config = new Config();
-    $config->setConfigurationValues('plugin:carbon', ['configuration' => false]);
-
-    $migration = new Migration(PLUGIN_CARBON_VERSION);
-
-    $dbFile = plugin_carbon_getSchemaPath();
-    if ($dbFile === null || !$DB->runFile($dbFile)) {
-        $migration->displayWarning("Error creating tables : " . $DB->error(), true);
-        die('Giving up');
-     }
-
-    Config::install($migration);
-
-    CronTask::Register(
-        ComputerPower::class,
-        'ComputePowersTask',
-        DAY_TIMESTAMP,
-        [
-            'mode' => CronTask::MODE_INTERNAL,
-            'allowmode' => CronTask::MODE_INTERNAL + CronTask::MODE_EXTERNAL,
-            'logs_lifetime' => 30,
-            'comment' => __('Computes power consumption of computers', 'carbon'),
-        ]
-    );
-
-    CronTask::Register(
-        CarbonEmission::class,
-        'ComputeCarbonEmissionsTask',
-        DAY_TIMESTAMP,
-        [
-            'mode' => CronTask::MODE_INTERNAL,
-            'allowmode' => CronTask::MODE_INTERNAL + CronTask::MODE_EXTERNAL,
-            'logs_lifetime' => 30,
-            'comment' => __('Computes carbon emissions of computers', 'carbon'),
-        ]
-    );
+    if (!is_readable(__DIR__ . '/install/Install.php')) {
+        return false;
+    }
+    require_once(__DIR__ . '/install/Install.php');
+    $install = new Install();
+    try {
+        $install->install();
+    } catch (\Exception $e) {
+        $backtrace = Toolbox::backtrace(false);
+        trigger_error($e->getMessage() . PHP_EOL . $backtrace, E_USER_WARNING);
+        return false;
+    }
 
     return true;
 }
@@ -92,22 +69,18 @@ function plugin_carbon_install()
  */
 function plugin_carbon_uninstall()
 {
-    global $DB;
-
-    $migration = new Migration(PLUGIN_CARBON_VERSION);
-    $itemtypesWihTable = [
-        CarbonEmission::class,
-        ComputerPower::class,
-        ComputerType::class,
-        ComputerUsageProfile::class,
-        EnvironnementalImpact::class,
-    ];
-    $DbUtils = new DBUtils();
-    foreach ($itemtypesWihTable as $itemtype) {
-        $DB->dropTable($DbUtils->getTableForItemType($itemtype));
+    if (!is_readable(__DIR__ . '/install/Uninstall.php')) {
+        return false;
     }
-
-    Config::uninstall($migration);
+    require_once(__DIR__ . '/install/Uninstall.php');
+    $uninstall = new Uninstall();
+    try {
+        $uninstall->uninstall();
+    } catch (\Exception $e) {
+        $backtrace = Toolbox::backtrace(false);
+        trigger_error($e->getMessage() . PHP_EOL . $backtrace, E_USER_WARNING);
+        return false;
+    }
 
     return true;
 }
