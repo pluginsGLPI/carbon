@@ -31,9 +31,11 @@ class Profile extends GlpiProfile
 
         $canedit = Session::haveRightsOr(self::$rightname, [CREATE, UPDATE, PURGE]);
 
+        $profile = new GlpiProfile();
+        $profile->getFromDB($ID);
         echo "<div class='spaced'>";
         if ($canedit) {
-            echo "<form method='post' action='". GlpiProfile::getFormURL()."' data-track-changes='true'>";
+            echo "<form method='post' action='".GlpiProfile::getFormURL()."' data-track-changes='true'>";
         }
         $rights = [
             [
@@ -46,13 +48,12 @@ class Profile extends GlpiProfile
             'title'   => Report::getTypeName(Session::getPluralNumber()),
             'canedit' => $canedit,
         ];
-        $profile = new GlpiProfile();
         $profile->displayRightsChoiceMatrix($rights, $matrix_options);
 
         if ($canedit) {
             echo "<div class='center'>";
             echo Html::hidden('id', ['value' => $ID]);
-            echo Html::submit(_sx('button', 'Save'), ['name' => 'update']);
+            echo Html::submit(_sx('button', 'Save'), ['name' => 'update', 'class' => 'btn btn-primary mt-2']);
             echo "</div>";
             Html::closeForm();
         }
