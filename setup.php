@@ -36,6 +36,7 @@ use GlpiPlugin\Carbon\Menu;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\EnvironnementalImpact;
 use GlpiPlugin\Carbon\Profile;
+use GlpiPlugin\Carbon\Report;
 use ComputerType as GlpiComputerType;
 use MonitorType as GlpiMonitorType;
 use Profile as GlpiProfile;
@@ -77,7 +78,7 @@ function plugin_init_carbon()
         $PLUGIN_HOOKS['config_page']['carbon'] = 'front/config.form.php';
     }
 
-    $PLUGIN_HOOKS[Hooks::REDEFINE_MENUS]['carbon'] = [Menu::class, 'hookRedefineMenu'];
+    $PLUGIN_HOOKS['menu_toadd']['carbon']['tools'] = [Report::class];
 
     Plugin::registerClass(Config::class, ['addtabon' => GlpiConfig::class]);
     Plugin::registerClass(Profile::class, ['addtabon' => GlpiProfile::class]);

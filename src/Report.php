@@ -15,14 +15,30 @@ class Report extends CommonDBTM
         return _n("Carbon report", "Carbon reports", $nb, 'carbon');
     }
 
-    public static function canView(): bool
-    {
-        return true;
-    }
-
     public static function getIcon(): string
     {
         return 'fa-solid fa-solar-panel';
+    }
+
+    public static function getMenuContent()
+    {
+        $menu = [];
+
+        if (self::canView()) {
+            $menu = [
+                'title' => Report::getTypeName(0),
+                'shortcut' => Report::getMenuShorcut(),
+                'page' => Report::getSearchURL(false),
+                'icon' => Report::getIcon(),
+                'lists_itemtype' => Report::getType(),
+                'links' => [
+                    'search' => Report::getSearchURL(),
+                    'lists' => '',
+                ]
+            ];
+        }
+
+        return $menu;
     }
 
     public function getRights($interface = 'central')
