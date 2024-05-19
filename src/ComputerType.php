@@ -14,6 +14,8 @@ class ComputerType extends CommonDBChild
     public static $itemtype = GlpiComputerType::class;
     public static $items_id = 'computertypes_id';
 
+    public static $rightname = 'dropdown';
+
     public static function getTypeName($nb = 0)
     {
         return _n("Power", "Powers", $nb, 'carbon');
@@ -38,7 +40,7 @@ class ComputerType extends CommonDBChild
      * @return void
      */
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
-        /** @var GlpiComputerType $item */
+        /** @var CommonDBTM $item */
         if ($item->getType() == GlpiComputerType::class) {
             $typePower = new self();
             $typePower->getFromDBByCrit([$item->getForeignKeyField() => $item->getID()]);
