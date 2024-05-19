@@ -29,9 +29,11 @@
  * --------------------------------------------------------------------------
  */
 
+use Config as GlpiConfig;
 use GlpiPlugin\Carbon\Dashboard\Dashboard;
 use Glpi\Plugin\Hooks;
 use GlpiPlugin\Carbon\Menu;
+use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\EnvironnementalImpact;
 use ComputerType as GlpiComputerType;
 use MonitorType as GlpiMonitorType;
@@ -75,6 +77,7 @@ function plugin_init_carbon()
 
     $PLUGIN_HOOKS[Hooks::REDEFINE_MENUS]['carbon'] = [Menu::class, 'hookRedefineMenu'];
 
+    Plugin::registerClass(Config::class, ['addtabon' => GlpiConfig::class]);
     Plugin::registerClass(ComputerType::class, ['addtabon' => GlpiComputerType::class]);
     Plugin::registerClass(EnvironnementalImpact::class, ['addtabon' => Computer::class]);
     // TODO: enable monitor power consumption before enabling UI
@@ -139,4 +142,14 @@ function plugin_carbon_getSchemaPath(string $version = null): ?string
     }
 
     return $schemaPath;
+}
+
+/**
+ * Get friendly name of the plugin, may be used in various places
+ *
+ * @return string
+ */
+function plugin_carbon_getFriendlyName(): string
+{
+    return __('Environmental Impact', 'carbon');
 }
