@@ -8,6 +8,8 @@ use SebastianBergmann\Type\VoidType;
 
 class Report extends CommonDBTM
 {
+    public static $rightname = 'carbon:report';
+
     public static function getTypeName($nb = 0)
     {
         return _n("Carbon report", "Carbon reports", $nb, 'carbon');
@@ -21,6 +23,13 @@ class Report extends CommonDBTM
     public static function getIcon(): string
     {
         return 'fa-solid fa-solar-panel';
+    }
+
+    public function getRights($interface = 'central')
+    {
+        $values = parent::getRights();
+
+        return array_intersect_key($values, [READ => true]);
     }
 
     public static function showInstantReport(): void

@@ -2,10 +2,12 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
+use Config;
 use CronTask;
 use GlpiPlugin\Carbon\ComputerPower;
 use GlpiPlugin\Carbon\CarbonEmission;
 use Plugin;
+use ProfileRight;
 
 class PluginUninstallTest extends CommonTestCase
 {
@@ -37,6 +39,12 @@ class PluginUninstallTest extends CommonTestCase
            $tables[] = array_pop($row);
         }
         $this->AssertEquals(0, count($tables), "not deleted tables \n" . json_encode($tables, JSON_PRETTY_PRINT));
+
+        $this->checkConfig();
+        // $this->checkRequestType();
+        $this->checkAutomaticAction();
+        // $this->checkDashboard();
+        $this->checkRights();
     }
 
     public function checkAutomaticAction()
@@ -54,5 +62,18 @@ class PluginUninstallTest extends CommonTestCase
             'name'     => 'ComputeCarbonEmissionsTask',
         ]);
         $this->assertTrue($cronTask->isNewItem());
+    }
+
+    private function checkConfig()
+    {
+        $config = Config::getConfigurationValues(TEST_PLUGIN_NAME);
+        $this->assertArrayNotHasKey('plugin:carbon', $config);
+    }
+
+    private function checkRights() {
+        $profile_right = new ProfileRight();
+        $rights = $profile_right->find(['name' => ['LIKE', 'carbon:%']]);
+
+        $this->assertEquals(0, count($rights));
     }
 }

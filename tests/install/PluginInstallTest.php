@@ -5,10 +5,14 @@ namespace GlpiPlugin\Carbon\Tests;
 use Session;
 use Config;
 use CronTask;
+use DBUtils;
 use Plugin;
+use Profile;
+use ProfileRight;
 use Glpi\System\Diagnostic\DatabaseSchemaIntegrityChecker;
 use GlpiPlugin\Carbon\ComputerPower;
 use GlpiPlugin\Carbon\CarbonEmission;
+use GlpiPlugin\Carbon\Report;
 
 class PluginInstallTest extends CommonTestCase
 {
@@ -66,10 +70,11 @@ class PluginInstallTest extends CommonTestCase
 
         $this->checkSchema(PLUGIN_CARBON_VERSION);
 
-        // $this->checkConfig();
+        $this->checkConfig();
         // $this->checkRequestType();
         $this->checkAutomaticAction();
         // $this->checkDashboard();
+        $this->checkRights();
     }
 
     public function testConfigurationExists()
@@ -155,5 +160,61 @@ class PluginInstallTest extends CommonTestCase
             'name'     => 'ComputeCarbonEmissionsTask',
         ]);
         $this->assertFalse($cronTask->isNewItem());
+    }
+
+    private function checkConfig()
+    {
+        $config = Config::getConfigurationValues('plugin:' . TEST_PLUGIN_NAME);
+        $this->assertCount(4, $config);
+
+        $expected = [
+            'configuration'           => false,
+            'electricitymap_api_key'  => 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+            'electricitymap_base_url' => 'https://api.electricitymap.org/ZZZZZZZZZZZZZZv4/',
+            'co2signal_api_key'       => 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+        ];
+        $this->assertEqualsCanonicalizing($expected, $config);
+    }
+
+    private function checkRights() {
+        // Key is ID of the profile, value is the name of the profile
+        $expected_profiles = [
+            4 =>  READ, // 'Super-Admin'
+        ];
+        $this->checkRight(Report::$rightname, $expected_profiles);
+    }
+
+    private function checkRight(string $rightname, array $profiles) {
+        global $DB;
+
+        $profile_table = Profile::getTable();
+        $profile_fk = Profile::getForeignKeyField();
+        $profileright_table = ProfileRight::getTable();
+        $request = [
+            'SELECT' => [
+                ProfileRight::getTableField('id'),
+                Profile::getTableField('id'),
+            ],
+            'FROM' => $profile_table,
+            'LEFT JOIN' => [
+                $profileright_table => [
+                    'FKEY' => [
+                        $profile_table => 'id',
+                        $profileright_table => $profile_fk,
+                    ],
+                ],
+            ],
+            'WHERE' => [
+                ProfileRight::getTableField('name') => $rightname,
+            ]
+        ];
+
+        foreach ($DB->request($request) as $profile_right) {
+            if (!isset($profiles[$profile_right['id']])) {
+                $this->assertEquals(0, $profiles[$profile_right['id']]);
+            } else {
+                $this->assertEquals(0, $profile_right['rights']);
+            }
+        }
     }
 }
