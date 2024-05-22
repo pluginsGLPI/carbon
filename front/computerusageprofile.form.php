@@ -9,7 +9,5 @@ if (!Plugin::isPluginActive('carbon')) {
     Html::displayNotFoundError();
 }
 
-Session::checkRight('entity', UPDATE);
-
 $dropdown = new ComputerUsageProfile();
 include (GLPI_ROOT . "/front/dropdown.common.form.php");
