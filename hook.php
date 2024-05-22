@@ -50,7 +50,7 @@ function plugin_carbon_install()
         return false;
     }
     require_once(__DIR__ . '/install/Install.php');
-    $install = new Install();
+    $install = new Install(new Migration(PLUGIN_CARBON_VERSION));
     try {
         $install->install();
     } catch (\Exception $e) {
@@ -73,7 +73,7 @@ function plugin_carbon_uninstall()
         return false;
     }
     require_once(__DIR__ . '/install/Uninstall.php');
-    $uninstall = new Uninstall();
+    $uninstall = new Uninstall(new Migration(PLUGIN_CARBON_VERSION));
     try {
         $uninstall->uninstall();
     } catch (\Exception $e) {

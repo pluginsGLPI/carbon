@@ -10,6 +10,13 @@ use Profile;
 
 class Install
 {
+    private Migration $migration;
+
+    public function __construct(Migration $migration)
+    {
+        $this->migration = $migration;
+    }
+
     /**
      * Determine if the plugin is already installed then run a fresh install
      * or an upgrade
@@ -29,11 +36,11 @@ class Install
         $config = new Config();
         $config->setConfigurationValues('plugin:carbon', ['configuration' => false]);
 
-        $migration = new Migration(PLUGIN_CARBON_VERSION);
+        $this->migration = new Migration(PLUGIN_CARBON_VERSION);
 
         $dbFile = plugin_carbon_getSchemaPath();
         if ($dbFile === null || !$DB->runFile($dbFile)) {
-            $migration->displayWarning("Error creating tables : " . $DB->error(), true);
+            $this->migration->displayWarning("Error creating tables : " . $DB->error(), true);
             die('Giving up');
          }
 
@@ -46,7 +53,7 @@ class Install
 
     private function createConfig()
     {
-        $current_config = Config::getConfigurationValues('plugin:carbon');;
+        $current_config = Config::getConfigurationValues('plugin:carbon');
         $config_entries = [
             'electricitymap_api_key'              => 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
             'electricitymap_base_url'             => 'https://api.electricitymap.org/ZZZZZZZZZZZZZZv4/',

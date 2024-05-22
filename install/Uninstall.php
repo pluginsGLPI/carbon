@@ -4,17 +4,23 @@ namespace GlpiPlugin\Carbon;
 
 use Config;
 use DBUtils;
+use DisplayPreference;
 use Migration;
 use ProfileRight;
-use RuntimeException;
 
 class Uninstall
 {
+    private Migration $migration;
+
+    public function __construct(Migration $migration)
+    {
+        $this->migration = $migration;
+    }
+
     public function uninstall()
     {
         global $DB;
 
-        $migration = new Migration(PLUGIN_CARBON_VERSION);
         $itemtypesWihTable = [
             CarbonEmission::class,
             ComputerPower::class,
