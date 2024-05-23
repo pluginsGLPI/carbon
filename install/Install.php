@@ -47,6 +47,7 @@ class Install
         $this->createConfig();
         $this->createAutomaticActions();
         $this->createRights();
+        $this->createDisplayPrefs();
 
         return true;
     }
@@ -131,5 +132,17 @@ class Install
         if (!$success) {
             throw new \RuntimeException('Error while creating automatic action: ' . $name);
         }
+    }
+
+    private function createDisplayPrefs()
+    {
+        $this->migration->updateDisplayPrefs([
+            CarbonIntensity::class => [
+                2, 3, 4, 5, 6
+            ]
+            ],
+            [],
+            true
+        );
     }
 }

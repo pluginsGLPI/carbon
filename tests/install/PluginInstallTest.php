@@ -5,13 +5,14 @@ namespace GlpiPlugin\Carbon\Tests;
 use Session;
 use Config;
 use CronTask;
-use DBUtils;
+use DisplayPreference;
 use Plugin;
 use Profile;
 use ProfileRight;
 use Glpi\System\Diagnostic\DatabaseSchemaIntegrityChecker;
 use GlpiPlugin\Carbon\ComputerPower;
 use GlpiPlugin\Carbon\CarbonEmission;
+use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\Report;
 
 class PluginInstallTest extends CommonTestCase
@@ -75,6 +76,8 @@ class PluginInstallTest extends CommonTestCase
         $this->checkAutomaticAction();
         // $this->checkDashboard();
         $this->checkRights();
+
+        $this->checkDisplayPrefs();
     }
 
     public function testConfigurationExists()
@@ -216,5 +219,13 @@ class PluginInstallTest extends CommonTestCase
                 $this->assertEquals(0, $profile_right['rights']);
             }
         }
+    }
+
+    private function checkDisplayPrefs()
+    {
+        $displayPreference = new DisplayPreference();
+        $preferences = $displayPreference->find(['itemtype' => CarbonIntensity::class, 'users_id' => 0]);
+
+        $this->assertEquals(5, count($preferences));
     }
 }

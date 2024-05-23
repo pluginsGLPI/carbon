@@ -23,6 +23,9 @@ class Uninstall
 
         $itemtypesWihTable = [
             CarbonEmission::class,
+            CarbonIntensity::class,
+            CarbonIntensitySource::class,
+            CarbonIntensityZone::class,
             ComputerPower::class,
             ComputerType::class,
             ComputerUsageProfile::class,
@@ -35,6 +38,7 @@ class Uninstall
 
         $this->deleteConfig();
         $this->deleteRights();
+        $this->deleteDisplayPrefs();
 
         return true;
     }
@@ -54,6 +58,14 @@ class Uninstall
             'name' => ['LIKE', 'carbon:%'],
         ])) {
             throw new \RuntimeException('Error while deleting rights');
+        }
+    }
+
+    private function deleteDisplayPrefs()
+    {
+        $displayPreference = new DisplayPreference();
+        if (!$displayPreference->deleteByCriteria(['itemtype' => CarbonIntensity::class])) {
+            throw new \RuntimeException('Error while deleting display preferences');
         }
     }
 }

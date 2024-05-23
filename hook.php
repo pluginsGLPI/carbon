@@ -38,6 +38,8 @@ use GlpiPlugin\Carbon\Install;
 use GlpiPlugin\Carbon\Uninstall;
 use GlpiPlugin\Carbon\Report;
 use GlpiPlugin\Carbon\EnvironnementalImpact;
+use GlpiPlugin\Carbon\CarbonIntensitySource;
+use GlpiPlugin\Carbon\CarbonIntensityZone;
 
 /**
  * Plugin install process
@@ -88,7 +90,9 @@ function plugin_carbon_uninstall()
 function plugin_carbon_getDropdown()
 {
     return [
-        ComputerUsageProfile::class => __('Carbon Plugin - Computer usage profiles', 'carbon'),
+        ComputerUsageProfile::class  => ComputerUsageProfile::getTypeName(),
+        CarbonIntensitySource::class => CarbonIntensitySource::getTypeName(),
+        CarbonIntensityZone::class   => CarbonIntensityZone::getTypeName(),
     ];
 }
 
