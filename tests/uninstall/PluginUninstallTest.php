@@ -4,8 +4,10 @@ namespace GlpiPlugin\Carbon\Tests;
 
 use Config;
 use CronTask;
+use DisplayPreference;
 use GlpiPlugin\Carbon\ComputerPower;
 use GlpiPlugin\Carbon\CarbonEmission;
+use GlpiPlugin\Carbon\CarbonIntensity;
 use Plugin;
 use ProfileRight;
 
@@ -45,6 +47,7 @@ class PluginUninstallTest extends CommonTestCase
         $this->checkAutomaticAction();
         // $this->checkDashboard();
         $this->checkRights();
+        $this->checkDisplayPrefs();
     }
 
     public function checkAutomaticAction()
@@ -75,5 +78,13 @@ class PluginUninstallTest extends CommonTestCase
         $rights = $profile_right->find(['name' => ['LIKE', 'carbon:%']]);
 
         $this->assertEquals(0, count($rights));
+    }
+
+    private function checkDisplayPrefs()
+    {
+        $displayPreference = new DisplayPreference();
+        $preferences = $displayPreference->find(['itemtype' => CarbonIntensity::class, 'users_id' => 0]);
+
+        $this->assertEquals(0, count($preferences));
     }
 }

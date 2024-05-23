@@ -6,6 +6,28 @@ CREATE TABLE `glpi_plugin_carbon_carbonemissions` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE `glpi_plugin_carbon_carbonintensities` (
+  `id`                                      int unsigned NOT NULL AUTO_INCREMENT,
+  `emission_date`                           timestamp    DEFAULT NULL,
+  `plugin_carbon_carbonintensitysources_id` int unsigned NOT NULL DEFAULT '0',
+  `plugin_carbon_carbonintensityzones_id`   int unsigned NOT NULL DEFAULT '0',
+  `intensity`                               float        DEFAULT '0'   COMMENT 'CO2eq/KWh',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unicity` (`emission_date`, `plugin_carbon_carbonintensitysources_id`, `plugin_carbon_carbonintensityzones_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `glpi_plugin_carbon_carbonintensityzones` (
+  `id`               int unsigned NOT NULL AUTO_INCREMENT,
+  `name`             varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `glpi_plugin_carbon_carbonintensitysources` (
+  `id`               int unsigned NOT NULL AUTO_INCREMENT,
+  `name`             varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE `glpi_plugin_carbon_computertypes` (
   `id`                int unsigned NOT NULL AUTO_INCREMENT,
   `computertypes_id`  int unsigned NOT NULL DEFAULT '0',

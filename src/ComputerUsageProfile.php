@@ -81,7 +81,7 @@ class ComputerUsageProfile extends CommonDropdown
         ];
 
         $tab[] = [
-            'id'                 => '6',
+            'id'                 => '7',
             'table'              => $my_table,
             'field'              => 'time_stop',
             'name'               => __('Stop time', 'carbon'),

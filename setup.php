@@ -32,7 +32,7 @@
 use Config as GlpiConfig;
 use GlpiPlugin\Carbon\Dashboard\Dashboard;
 use Glpi\Plugin\Hooks;
-use GlpiPlugin\Carbon\Menu;
+use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\EnvironnementalImpact;
 use GlpiPlugin\Carbon\Profile;
@@ -79,6 +79,7 @@ function plugin_init_carbon()
     }
 
     $PLUGIN_HOOKS['menu_toadd']['carbon']['tools'] = [Report::class];
+    $PLUGIN_HOOKS['menu_toadd']['carbon']['admin'] = [CarbonIntensity::class];
 
     Plugin::registerClass(Config::class, ['addtabon' => GlpiConfig::class]);
     Plugin::registerClass(Profile::class, ['addtabon' => GlpiProfile::class]);
