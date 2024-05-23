@@ -5,8 +5,20 @@
     background-repeat: no-repeat;
 }
 
+.illustration-footer {
+    background-image: url('../pics/illustration-footer.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+.footer-height {
+    height: 170px;
+    margin-top: 0 !important;
+    position: relative;
+}
+
 .header-height {
-    height: 165px;
+    height: 170px;
     margin-top: 0 !important;
     position: relative;
 }

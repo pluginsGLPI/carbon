@@ -1,124 +1,119 @@
 <div class="page">
+    <!-- Header with background image -->
+    <header class="page-header header-height illustration container-fluid">
+        <div class="container-fluid">
+            <h1 class="page-title title-color title-position">{{ __('GLPI Carbon', 'carbon') }}</h1>
+        </div>
+    </header>
 
-<!-- Header with background image -->
-  <header class="page-header header-height illustration container-fluid">
+    {% block body %}
+    <div class="page-body">
+        <div class="container-fluid px-0">
+            <div class="row row-cards">
+                <!-- Row for score cards & information block -->
+                <div class="col-sm-6 col-lg-3">
+                    <div class="card">
+                        <div class="card-body carbon-emission-card">
+                            <span><img class="carbon-emission pb-2" src="../dist/images/carbon_emission_icon_darkgreen.png" /></span>
+                            <div class="subheader">{{ __('Total Carbon Emission', 'carbon') }}</div>
+                            <div class="h1 mb-3" id="carbonEmission"></div>
+                        </div>
+                    </div>
+                </div>
 
-    <div class="container-fluid">
-        <h1 class="page-title title-color title-position">{{ __('GLPI Carbon', 'carbon') }}</h1>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="card">
+                        <div class="card-body monthly-emission-card">
+                            <div class="subheader text-white">{{ __('Monthly carbon emission', 'carbon') }}</div>
+                            <div class="subheader text-white">{{ __('April, 2024', 'carbon') }}</div>
+                            <div class="h1 my-3 text-white text-center" id="powerConsumption"></div>
+                            <p class="m-0 percent-color">{{ __(' - 10%', 'carbon') }}</p>
+                            <div class="subheader text-white">{{ __('Compared to last month', 'carbon') }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Information block -->
+                <div class="col-sm-6 col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="row align-items-center">
+                                <div class="col-auto fw-bold">
+                                    <span><svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9" /><line x1="12" y1="8" x2="12.01" y2="8" /><polyline points="11 12 12 12 12 16 13 16" /></svg></span>
+                                </div>
+                                <div class="col">
+                                    <h3 class="card-title">{{ __('Information', 'carbon') }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-auto">
+                                    <span><img src="../dist/images/ecology_icon_orange.png" /></span>
+                                </div>
+                                <div class="col">
+                                    <p class="m-0">{{ __('Our data is sourced from reliable sources and is meticulously calculated using industry-standard methodologies. We utilize accurate measurement tools and algorithms to ensure the precision and reliability of our environmental metrics.','carbon') }}</p>
+                                    <p class="m-0">{{ __('As we move towards a greener future, businesses will soon be required to report energy usage and carbon emissions. By 2025, many areas will enforce these regulations. Adopting these practices now ensures compliance and helps combat climate change.','carbon') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row for score cards -->
+                <div class="col-12">
+                    <div class="row row-cards">
+                        <div class="col-sm-6 col-lg-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="subheader">{{ __('Carbon Emission per Type (g CO²)', 'carbon') }}</div>
+                                    <div class="h1 mb-3" id="carbonEmissionPerModel"></div>
+                                    <div id="carbonEmissionPerModelChart" class="chart-lg"></div>
+                                </div>
+                            </div>
+                        </div>
+                        {# Uncomment the block below if needed #}
+                        {# <div class="col-sm-6 col-lg-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="subheader">{{ __('Power Consumption per Type (W)', 'carbon') }}</div>
+                                    <div class="h1 mb-3" id="powerConsumptionPerModel"></div>
+                                    <div id="powerConsumptionPerModelChart" class="chart-lg"></div>
+                                </div>
+                            </div>
+                        </div> #}
+                    </div>
+                </div>
+
+                <!-- Row for pie charts -->
+                <div class="col-12">
+                    <div class="row row-cards">
+                        <div class="col-sm-6 col-lg-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="subheader">{{ __('Carbon Emission per Month (g CO²)', 'carbon') }}</div>
+                                    <div class="h1 mb-3" id="carbonEmissionPerMonth"></div>
+                                    <div id="carbonEmissionPerMonthChart" class="chart-lg"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </header>
+    {% endblock %}
 
-
-{% block body %}
-	<div class="page-body">
-		<div class="container-fluid">
-			<div class="row row-cards">
-
-        <!-- Row for score cards & information block -->
-				<div class="col-sm-6 col-lg-3">
-					<div class="card ">
-						<div class="card-body carbon-emission-card">
-              <span><img class="carbon-emission pb-2" src="../dist/images/carbon_emission_icon_darkgreen.png" /></span>
-							<div class="subheader">{{ __('Total Carbon Emission', 'carbon') }}</div>
-							<div class="h1 mb-3" id="carbonEmission"></div>
-						</div>
-					</div>
-				</div>
-
-        <div class="col-sm-6 col-lg-3">
-					<div class="card">
-						<div class="card-body monthly-emission-card">
-							<div class="subheader text-white">{{ __('Monthly carbon emission', 'carbon') }}</div>
-              <div class="subheader text-white">{{ __('April, 2024', 'carbon') }}</div>
-							<div class="h1 my-3 text-white text-center" id="powerConsumption"></div>
-                  <p class="m-0 percent-color">{{ __(' - 10%', 'carbon') }}</p>
-                  <div class="subheader text-white">{{ __('Compared to last month', 'carbon') }}</div>
-						</div>
-					</div>
-				</div>
-
-        <div class="col-sm-6 col-lg-6">
-          <div class="card">
-            <div class="card-header">
-              <div class="row align-items-center">
-                <div class="col-auto fw-bold">
-                  <span><svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9" /><line x1="12" y1="8" x2="12.01" y2="8" /><polyline points="11 12 12 12 12 16 13 16" /></svg></span>
-                </div>
-                <div class="col">
-                  <h3 class="card-title">{{ __('Information', 'carbon') }}</h3>
-                </div>
-              </div>
-            </div>
-            <div class="card-body">
-              <div class="row align-items-center">
-                <div class="col-auto">
-                  <span><img src="../dist/images/ecology_icon_orange.png" /></span>
-                </div>
-                <div class="col">
-                  <p class="m-0">{{ __('Our data is sourced from reliable sources and is meticulously calculated using industry-standard methodologies. We utilize accurate measurement tools and algorithms to ensure the precision and reliability of our environmental metrics.','carbon') }}
-                  </p>
-                </div>
-                <p class="m-0">{{ __('As we move towards a greener future, businesses will soon be required to report energy usage and carbon emissions. By 2025, many areas will enforce these regulations. Adopting these practices now ensures compliance and helps combat climate change.','carbon') }}
-                  </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Row for score cards -->
-
-        <div class="col-12">
-            <div class="row row-cards">
-                <div class="col-sm-6 col-lg-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="subheader">{{ __('Carbon Emission per Type (g CO²)', 'carbon') }}</div>
-                            <div class="h1 mb-3" id="carbonEmissionPerModel"></div>
-                            <div id="carbonEmissionPerModelChart" class="chart-lg"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-sm-6 col-lg-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="subheader">{{ __('Power Consumption per Type (W)', 'carbon') }}</div>
-                            <div class="h1 mb-3" id="powerConsumptionPerModel"></div>
-                            <div id="powerConsumptionPerModelChart" class="chart-lg"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!--Row for pie charts -->
-
-        <div class="col-12">
-            <div class="row row-cards">
-            <div class="col-sm-6 col-lg-12">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="subheader">{{ __('Carbon Emission per Month (g CO²)', 'carbon') }}</div>
-                        <div class="h1 mb-3" id="carbonEmissionPerMonth"></div>
-                        <div id="carbonEmissionPerMonthChart" class="chart-lg"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-			</div>
-		</div>
-	</div>
+    <!-- Footer -->
+    <footer class="footer-height illustration-footer footer mt-3">
+    </footer>
 </div>
-{% endblock %}
-
-{% block footer %}
-{% endblock %}
 
 {% block scripts %}
 	<script>
 	document.addEventListener('DOMContentLoaded', function () {
 
-        var carbonColorPalette = ['#FEEC5C', '#F78343', '#D1E883', '#BBDA50', '#146151' ];
+        var carbonColorPalette = ['#1D2A61', '#FCF8A1', '#1989E0', '#146151', '#E6BA52' ];
         var powerColorPalette  = ['#EAB640', '#EB9C43', '#D1330B', '#AD5B34', '#B33C2F' ];
 
         // Define options for each chart
