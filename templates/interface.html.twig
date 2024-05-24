@@ -16,6 +16,7 @@
                         <div class="card-body carbon-emission-card">
                             <span><img class="carbon-emission pb-2" src="../dist/images/carbon_emission_icon_darkgreen.png" /></span>
                             <div class="subheader">{{ __('Total Carbon Emission', 'carbon') }}</div>
+                            <div class="subheader">{{ __('May 2023 - April 2024', 'carbon') }}</div>
                             <div class="h1 mb-3" id="carbonEmission"></div>
                         </div>
                     </div>
@@ -32,6 +33,30 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="col-sm-6 col-lg-3">
+                    <div class="card">
+                        <div class="card-body carbon-emission-card">
+                            <span><img class="carbon-emission pb-2" src="../dist/images/carbon_emission_icon_darkgreen.png" /></span>
+                            <div class="subheader">{{ __('Total Carbon Emission', 'carbon') }}</div>
+                            <div class="subheader">{{ __('May 2023 - April 2024', 'carbon') }}</div>
+                            <div class="h1 mb-3" id="carbonEmission"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row for score cards -->
+                <div class="col-12">
+                    <div class="row row-cards">
+                        <div class="col-sm-6 col-lg-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="subheader">{{ __('Carbon Emission per Type', 'carbon') }}</div>
+                                    <div class="h1 mb-3" id="carbonEmissionPerModel"></div>
+                                    <div id="carbonEmissionPerModelChart" class="chart-lg"></div>
+                                </div>
+                            </div>
+                        </div>
 
                 <!-- Information block -->
                 <div class="col-sm-6 col-lg-6">
@@ -59,19 +84,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Row for score cards -->
-                <div class="col-12">
-                    <div class="row row-cards">
-                        <div class="col-sm-6 col-lg-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="subheader">{{ __('Carbon Emission per Type (g CO²)', 'carbon') }}</div>
-                                    <div class="h1 mb-3" id="carbonEmissionPerModel"></div>
-                                    <div id="carbonEmissionPerModelChart" class="chart-lg"></div>
-                                </div>
-                            </div>
-                        </div>
                         {# Uncomment the block below if needed #}
                         {# <div class="col-sm-6 col-lg-6">
                             <div class="card">
@@ -138,7 +150,7 @@
         }]
         };
 
-        var carbonEmissionPerMonthOptions = {
+        {# var carbonEmissionPerMonthOptions = {
           series: [{
             name: 'Desktops',
             data: [0.55,0.26,0.67,0.91,0.45,0.77,0.91,0.45,0.77,0.91,0.45,0.77]
@@ -167,7 +179,7 @@
               enabled: true
             }
           },
-          colors: carbonColorPalette,
+          colors: ['#146151'],
           responsive: [{
             breakpoint: 480,
               options: {
@@ -209,6 +221,28 @@
           fill: {
             opacity: 1
           }
+        }; #}
+
+        var carbonEmissionPerMonthOptions = {
+          chart: {
+            type: 'bar',
+            height: 350,
+          },
+          colors: ['#146151'],
+          series : [{
+            name: 'Carbon Emission',
+            data: [0.55,0.26,0.67,0.91,0.45,0.77,0.91,0.45,0.77,0.91,0.45,0.77]
+          }],
+          plotOptions: {
+            bar: {
+              horizontal: false,
+              columnWidth: '55%',
+              endingShape: 'rounded'
+            },
+          },
+          xaxis: {
+          categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+          },
         };
 
         var powerConsumptionPerTypeOptions = {
@@ -247,7 +281,7 @@
             return response.json();
         }).then(data => {
             let totalCarbonEmission = data;
-            document.getElementById('carbonEmission').textContent = totalCarbonEmission;
+            document.getElementById('carbonEmission').innerHTML = totalCarbonEmission + " g CO" + "<sub>2</sub>";
         });
 
         fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/totalPowerConsumption.php").then(response => {
