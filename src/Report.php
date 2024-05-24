@@ -4,7 +4,6 @@ namespace GlpiPlugin\Carbon;
 
 use CommonDBTM;
 use Glpi\Application\View\TemplateRenderer;
-use SebastianBergmann\Type\VoidType;
 
 class Report extends CommonDBTM
 {
