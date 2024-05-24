@@ -2,13 +2,13 @@ CREATE TABLE `glpi_plugin_carbon_carbonemissions` (
   `id`               int unsigned NOT NULL AUTO_INCREMENT,
   `computers_id`     int unsigned NOT NULL DEFAULT '0',
   `emission_per_day` float        DEFAULT '0',
-  `emission_date`    timestamp    DEFAULT NULL,
+  `emission_date`    timestamp    NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `glpi_plugin_carbon_carbonintensities` (
   `id`                                      int unsigned NOT NULL AUTO_INCREMENT,
-  `emission_date`                           timestamp    DEFAULT NULL,
+  `emission_date`                           timestamp    NULL DEFAULT NULL,
   `plugin_carbon_carbonintensitysources_id` int unsigned NOT NULL DEFAULT '0',
   `plugin_carbon_carbonintensityzones_id`   int unsigned NOT NULL DEFAULT '0',
   `intensity`                               float        DEFAULT '0'   COMMENT 'CO2eq/KWh',
