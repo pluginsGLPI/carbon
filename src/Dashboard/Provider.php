@@ -4,7 +4,8 @@ namespace GlpiPlugin\Carbon\Dashboard;
 
 use Computer;
 use ComputerModel;
-use ComputerType;
+use ComputerType as GlpiComputerType;
+use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\EnvironnementalImpact;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
@@ -93,7 +94,7 @@ class Provider
 
         $computers_table = Computer::getTable();
         $computermodels_table = ComputerModel::getTable();
-        $computertypes_table = ComputerType::getTable();
+        $glpiComputertypes_table = GlpiComputerType::getTable();
 
         $request = [
             'SELECT'    => [
@@ -110,10 +111,10 @@ class Provider
                         $computers_table => 'computermodels_id',
                     ]
                 ],
-                $computertypes_table => [
+                $glpiComputertypes_table => [
                     'FKEY'   => [
                         $computers_table  => 'computertypes_id',
-                        $computertypes_table => 'computertypes_id',
+                        $glpiComputertypes_table => 'computertypes_id',
                     ]
                 ],
             ],
@@ -149,6 +150,7 @@ class Provider
 
         $computers_table = Computer::getTable();
         $computermodels_table = ComputerModel::getTable();
+        $glpiComputertypes_table = GlpiComputerType::getTable();
         $computertypes_table = ComputerType::getTable();
         $location_table = Location::getTable();
         $environnementalimpact_table = EnvironnementalImpact::getTable();
@@ -166,10 +168,16 @@ class Provider
                         $computermodels_table => 'id',
                     ]
                 ],
-                $computertypes_table => [
+                $glpiComputertypes_table => [
                     'FKEY'   => [
                         $computers_table  => 'computertypes_id',
-                        $computertypes_table => 'id',
+                        $glpiComputertypes_table => 'id',
+                    ]
+                ],
+                $computertypes_table => [
+                    'FKEY'   => [
+                        $computertypes_table  => 'computertypes_id',
+                        $glpiComputertypes_table => 'id',
                     ]
                 ],
                 $location_table = [
@@ -196,8 +204,14 @@ class Provider
                     'is_deleted' => 0,
                     'OR' => [[
                         ComputerModel::getTableField('id') => null,
-                        ComputerType::getTableField('id')  => null,
+                        GlpiComputerType::getTableField('id')  => null,
                         Location::getTableField('id')      => null,
+                        [
+                            'AND' => [
+                                ComputerType::getTableField('power_consumption') => 0,
+                                ComputerModel::getTableField('power_consumption') => 0,
+                            ]
+                        ]
                     ],
                     [
                         EnvironnementalImpact::getTableField(ComputerUsageProfile::getForeignKeyField()) => null,
