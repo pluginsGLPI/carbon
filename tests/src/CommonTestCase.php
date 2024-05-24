@@ -128,6 +128,13 @@ class CommonTestCase extends TestCase
 
         $this->handleDeprecations($itemtype, $input);
 
+        // set random name if not already set
+        if (!isset($item->fields['name'])) {
+            if (!isset($input['name'])) {
+                $input['name'] = $this->getUniqueString();
+            }
+        }
+
         // assign entity if not already set
         if ($item->isEntityAssign()) {
             $entity = 0;
@@ -141,19 +148,11 @@ class CommonTestCase extends TestCase
 
         // assign recursiviy if not already set
         if ($item->maybeRecursive()) {
-            $recursive = 0;
-            if (Session::getLoginUserID(true)) {
-                $recursive = Session::getActiveEntity();
-            }
             if (!isset($input['is_recursive'])) {
-                $input['is_recursive'] = $recursive;
-            }
-        }
-
-        // set random name if not already set
-        if (!isset($item->fields['name'])) {
-            if (!isset($input['name'])) {
-                $input['name'] = $this->getUniqueString();
+                $input['is_recursive'] = 0;
+                // if (Session::getLoginUserID(true)) {
+                //     $input['is_recursive'] = Session::haveRecursiveAccessToEntity($entity) ? 1 : 0;
+                // }
             }
         }
 
