@@ -40,6 +40,7 @@ use GlpiPlugin\Carbon\Report;
 use GlpiPlugin\Carbon\EnvironnementalImpact;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
+use ComputerType as GlpiComputerType;
 
 /**
  * Plugin install process
@@ -113,12 +114,19 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
     $sopt[] = [
         'id' => 2222,
         'table'        => ComputerType::getTable(),
-        'field'        => 'power',
-        'name'         => __('Power (W)', 'power (W)'),
+        'field'        => 'power_consumption',
+        'name'         => __('Power consumption (W)', 'power consumption (W)'),
         'datatype'     => 'number',
         'linkfield'    => 'computers_id',
         'joinparams' => [
-            'jointype' => 'child'
+            'jointype' => 'child',
+            'beforejoin' => [
+                'table' => GlpiComputerType::getTable(),
+                'joinparams' => [
+                    'jointype' => 'child',
+
+                ]
+            ]
         ]
     ];
     $sopt[] = [
