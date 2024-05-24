@@ -8,6 +8,7 @@ use ComputerType;
 use GlpiPlugin\Carbon\EnvironnementalImpact;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
+use Location;
 
 class Provider
 {
@@ -136,7 +137,7 @@ class Provider
     }
 
     /**
-     * Counts the computers which where data are missing to compute their
+     * Counts the computers which are missing data to compute their
      * environnemental impact
      *
      * @param array $where
@@ -149,6 +150,7 @@ class Provider
         $computers_table = Computer::getTable();
         $computermodels_table = ComputerModel::getTable();
         $computertypes_table = ComputerType::getTable();
+        $location_table = Location::getTable();
         $environnementalimpact_table = EnvironnementalImpact::getTable();
         $computerUsageProfile_table = ComputerUsageProfile::getTable();
 
@@ -170,6 +172,12 @@ class Provider
                         $computertypes_table => 'id',
                     ]
                 ],
+                $location_table = [
+                    'FKEY'   => [
+                        $computers_table  => 'locations_id',
+                        $location_table => 'id',
+                    ]
+                ],
                 $environnementalimpact_table => [
                     'FKEY'   => [
                         $computers_table  => 'id',
@@ -188,7 +196,8 @@ class Provider
                     'is_deleted' => 0,
                     'OR' => [[
                         ComputerModel::getTableField('id') => null,
-                        ComputerType::getTableField('id') => null,
+                        ComputerType::getTableField('id')  => null,
+                        Location::getTableField('id')      => null,
                     ],
                     [
                         EnvironnementalImpact::getTableField(ComputerUsageProfile::getForeignKeyField()) => null,
