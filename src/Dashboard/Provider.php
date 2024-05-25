@@ -5,11 +5,13 @@ namespace GlpiPlugin\Carbon\Dashboard;
 use Computer;
 use ComputerModel;
 use ComputerType as GlpiComputerType;
+use DbUtils;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\EnvironnementalImpact;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use Location;
+use Session;
 
 class Provider
 {
@@ -142,9 +144,26 @@ class Provider
      * environnemental impact
      *
      * @param array $where
-     * @return void
+     * @return integer|null : count of computers or null if an error occurred
      */
-    public static function getIncompleteComputers(array $where = [])
+    public static function getUnhandledComputersCount(array $where = []): ?int
+    {
+        $total = (new DbUtils())->countElementsInTableForMyEntities(Computer::getTable(), $where);
+        $complete_computers_count = self::getHandledComputersCount($where);
+
+        if ($complete_computers_count === null || $complete_computers_count > $total) {
+            return null;
+        }
+
+        return $total - $complete_computers_count;
+    }
+
+    /**
+     * Count the computers having all required data to computer carbon intensity
+     *
+     * @return integer|null
+     */
+    public static function getHandledComputersCount(array $where = []): ?int
     {
         global $DB;
 
@@ -161,7 +180,7 @@ class Provider
                 'COUNT' => Computer::getTableField('id') . ' AS nb_computers',
             ],
             'FROM' => $computers_table,
-            'LEFT JOIN' => [
+            'INNER JOIN' => [
                 $computermodels_table => [
                     'FKEY'   => [
                         $computers_table  => 'computermodels_id',
@@ -178,9 +197,12 @@ class Provider
                     'FKEY'   => [
                         $computertypes_table  => 'computertypes_id',
                         $glpiComputertypes_table => 'id',
+                        ['AND' => [
+                            'NOT' => [GlpiComputerType::getTableField('id') => null]],
+                        ]
                     ]
                 ],
-                $location_table = [
+                $location_table => [
                     'FKEY'   => [
                         $computers_table  => 'locations_id',
                         $location_table => 'id',
@@ -202,27 +224,22 @@ class Provider
             'WHERE' => [
                 'AND' => [
                     'is_deleted' => 0,
-                    'OR' => [[
-                        ComputerModel::getTableField('id') => null,
-                        GlpiComputerType::getTableField('id')  => null,
-                        Location::getTableField('id')      => null,
-                        [
-                            'AND' => [
-                                ComputerType::getTableField('power_consumption') => 0,
-                                ComputerModel::getTableField('power_consumption') => 0,
-                            ]
-                        ]
-                    ],
+                    ['NOT' => [Location::getTableField('latitude') => '']],
+                    ['NOT' => [Location::getTableField('longitude') => '']],
+                    ['NOT' => [Location::getTableField('latitude') => null]],
+                    ['NOT' => [Location::getTableField('longitude') => null]],
+                    ComputerUsageProfile::getTableField('average_load') => ['>', 0],
                     [
-                        EnvironnementalImpact::getTableField(ComputerUsageProfile::getForeignKeyField()) => null,
-                    ]],
+                        'OR' => [
+                            ComputerType::getTableField('power_consumption') => ['>', 0],
+                            ComputerModel::getTableField('power_consumption') => ['>', 0],
+                        ],
+                    ],
                 ],
             ]
         ];
 
-        if (!empty($where)) {
-            $request['WHERE'] += $where;
-        }
+        $request['WHERE'] += $where + (new DbUtils())->getEntitiesRestrictCriteria($computers_table, '', '', true);
 
         $result = $DB->request($request);
 
@@ -230,6 +247,6 @@ class Provider
             return $result->current()['nb_computers'];
         }
 
-        return false;
+        return null;
     }
 }
