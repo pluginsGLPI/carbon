@@ -7,7 +7,7 @@ use GlpiPlugin\Carbon\ComputerType;
 use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
 
-class ComputerPowerTest extends CommonTestCase
+class ComputerPowerTest extends DbTestCase
 {
     public function testGetPower()
     {

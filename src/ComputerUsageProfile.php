@@ -89,7 +89,7 @@ class ComputerUsageProfile extends CommonDropdown
         ];
 
         $tab[] = [
-            'id'                 => '11',
+            'id'                 => '201',
             'table'              => $my_table,
             'field'              => 'day_1',
             'name'               => __('Monday'),
@@ -97,7 +97,7 @@ class ComputerUsageProfile extends CommonDropdown
         ];
 
         $tab[] = [
-            'id'                 => '12',
+            'id'                 => '202',
             'table'              => $my_table,
             'field'              => 'day_2',
             'name'               => __('Tuesday'),
@@ -105,7 +105,7 @@ class ComputerUsageProfile extends CommonDropdown
         ];
 
         $tab[] = [
-            'id'                 => '13',
+            'id'                 => '203',
             'table'              => $my_table,
             'field'              => 'day_3',
             'name'               => __('Wednesday'),
@@ -113,7 +113,7 @@ class ComputerUsageProfile extends CommonDropdown
         ];
 
         $tab[] = [
-            'id'                 => '14',
+            'id'                 => '204',
             'table'              => $my_table,
             'field'              => 'day_4',
             'name'               => __('Thursday'),
@@ -121,7 +121,7 @@ class ComputerUsageProfile extends CommonDropdown
         ];
 
         $tab[] = [
-            'id'                 => '15',
+            'id'                 => '205',
             'table'              => $my_table,
             'field'              => 'day_5',
             'name'               => __('Friday'),
@@ -129,7 +129,7 @@ class ComputerUsageProfile extends CommonDropdown
         ];
 
         $tab[] = [
-            'id'                 => '16',
+            'id'                 => '206',
             'table'              => $my_table,
             'field'              => 'day_6',
             'name'               => __('Saturday'),
@@ -137,7 +137,7 @@ class ComputerUsageProfile extends CommonDropdown
         ];
 
         $tab[] = [
-            'id'                 => '17',
+            'id'                 => '207',
             'table'              => $my_table,
             'field'              => 'day_7',
             'name'               => __('Sunday'),

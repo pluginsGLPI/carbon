@@ -4,10 +4,14 @@ namespace GlpiPlugin\Carbon\Dashboard;
 
 use Computer;
 use ComputerModel;
-use ComputerType;
+use ComputerType as GlpiComputerType;
+use DbUtils;
+use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\EnvironnementalImpact;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
+use Location;
+use Session;
 
 class Provider
 {
@@ -92,7 +96,7 @@ class Provider
 
         $computers_table = Computer::getTable();
         $computermodels_table = ComputerModel::getTable();
-        $computertypes_table = ComputerType::getTable();
+        $glpiComputertypes_table = GlpiComputerType::getTable();
 
         $request = [
             'SELECT'    => [
@@ -109,10 +113,10 @@ class Provider
                         $computers_table => 'computermodels_id',
                     ]
                 ],
-                $computertypes_table => [
+                $glpiComputertypes_table => [
                     'FKEY'   => [
                         $computers_table  => 'computertypes_id',
-                        $computertypes_table => 'computertypes_id',
+                        $glpiComputertypes_table => 'computertypes_id',
                     ]
                 ],
             ],
@@ -136,19 +140,38 @@ class Provider
     }
 
     /**
-     * Counts the computers which where data are missing to compute their
+     * Counts the computers which are missing data to compute their
      * environnemental impact
      *
      * @param array $where
-     * @return void
+     * @return integer|null : count of computers or null if an error occurred
      */
-    public static function getIncompleteComputers(array $where = [])
+    public static function getUnhandledComputersCount(array $where = []): ?int
+    {
+        $total = (new DbUtils())->countElementsInTableForMyEntities(Computer::getTable(), $where);
+        $complete_computers_count = self::getHandledComputersCount($where);
+
+        if ($complete_computers_count === null || $complete_computers_count > $total) {
+            return null;
+        }
+
+        return $total - $complete_computers_count;
+    }
+
+    /**
+     * Count the computers having all required data to computer carbon intensity
+     *
+     * @return integer|null
+     */
+    public static function getHandledComputersCount(array $where = []): ?int
     {
         global $DB;
 
         $computers_table = Computer::getTable();
         $computermodels_table = ComputerModel::getTable();
+        $glpiComputertypes_table = GlpiComputerType::getTable();
         $computertypes_table = ComputerType::getTable();
+        $location_table = Location::getTable();
         $environnementalimpact_table = EnvironnementalImpact::getTable();
         $computerUsageProfile_table = ComputerUsageProfile::getTable();
 
@@ -157,17 +180,32 @@ class Provider
                 'COUNT' => Computer::getTableField('id') . ' AS nb_computers',
             ],
             'FROM' => $computers_table,
-            'LEFT JOIN' => [
+            'INNER JOIN' => [
                 $computermodels_table => [
                     'FKEY'   => [
                         $computers_table  => 'computermodels_id',
                         $computermodels_table => 'id',
                     ]
                 ],
-                $computertypes_table => [
+                $glpiComputertypes_table => [
                     'FKEY'   => [
                         $computers_table  => 'computertypes_id',
-                        $computertypes_table => 'id',
+                        $glpiComputertypes_table => 'id',
+                    ]
+                ],
+                $computertypes_table => [
+                    'FKEY'   => [
+                        $computertypes_table  => 'computertypes_id',
+                        $glpiComputertypes_table => 'id',
+                        ['AND' => [
+                            'NOT' => [GlpiComputerType::getTableField('id') => null]],
+                        ]
+                    ]
+                ],
+                $location_table => [
+                    'FKEY'   => [
+                        $computers_table  => 'locations_id',
+                        $location_table => 'id',
                     ]
                 ],
                 $environnementalimpact_table => [
@@ -186,20 +224,22 @@ class Provider
             'WHERE' => [
                 'AND' => [
                     'is_deleted' => 0,
-                    'OR' => [[
-                        ComputerModel::getTableField('id') => null,
-                        ComputerType::getTableField('id') => null,
-                    ],
+                    ['NOT' => [Location::getTableField('latitude') => '']],
+                    ['NOT' => [Location::getTableField('longitude') => '']],
+                    ['NOT' => [Location::getTableField('latitude') => null]],
+                    ['NOT' => [Location::getTableField('longitude') => null]],
+                    ComputerUsageProfile::getTableField('average_load') => ['>', 0],
                     [
-                        EnvironnementalImpact::getTableField(ComputerUsageProfile::getForeignKeyField()) => null,
-                    ]],
+                        'OR' => [
+                            ComputerType::getTableField('power_consumption') => ['>', 0],
+                            ComputerModel::getTableField('power_consumption') => ['>', 0],
+                        ],
+                    ],
                 ],
             ]
         ];
 
-        if (!empty($where)) {
-            $request['WHERE'] += $where;
-        }
+        $request['WHERE'] += $where + (new DbUtils())->getEntitiesRestrictCriteria($computers_table, '', '', true);
 
         $result = $DB->request($request);
 
@@ -207,6 +247,6 @@ class Provider
             return $result->current()['nb_computers'];
         }
 
-        return false;
+        return null;
     }
 }

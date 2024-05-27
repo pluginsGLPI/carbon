@@ -7,6 +7,7 @@ use Auth;
 use CommonDBTM;
 use Config;
 use DB;
+use Glpi\Inventory\Conf;
 use Entity;
 use Html;
 use Session;
@@ -127,6 +128,13 @@ class CommonTestCase extends TestCase
 
         $this->handleDeprecations($itemtype, $input);
 
+        // set random name if not already set
+        if (!isset($item->fields['name'])) {
+            if (!isset($input['name'])) {
+                $input['name'] = $this->getUniqueString();
+            }
+        }
+
         // assign entity if not already set
         if ($item->isEntityAssign()) {
             $entity = 0;
@@ -140,19 +148,11 @@ class CommonTestCase extends TestCase
 
         // assign recursiviy if not already set
         if ($item->maybeRecursive()) {
-            $recursive = 0;
-            if (Session::getLoginUserID(true)) {
-                $recursive = Session::getActiveEntity();
-            }
             if (!isset($input['is_recursive'])) {
-                $input['is_recursive'] = $recursive;
-            }
-        }
-
-        // set random name if not already set
-        if (!isset($item->fields['name'])) {
-            if (!isset($input['name'])) {
-                $input['name'] = $this->getUniqueString();
+                $input['is_recursive'] = 0;
+                // if (Session::getLoginUserID(true)) {
+                //     $input['is_recursive'] = Session::haveRecursiveAccessToEntity($entity) ? 1 : 0;
+                // }
             }
         }
 
@@ -163,6 +163,19 @@ class CommonTestCase extends TestCase
         $this->assertTrue($item->getFromDB($item->getID()));
 
         return $item;
+    }
+
+    public function getItems(array $batch) {
+        $output = [];
+
+        foreach($batch as $itemtype => $items) {
+            foreach ($items as $data) {
+                $item = $this->getItem($itemtype, $data);
+                $output[$itemtype][$item->getID()] = $item;
+            }
+        }
+
+        return $output;
     }
 
     protected function getSessionMessage() {
@@ -216,5 +229,31 @@ class CommonTestCase extends TestCase
                 }
                 break;
         }
+    }
+
+    protected function importInventory(array $files)
+    {
+        $inventory = new Conf();
+        return $inventory->importFiles($files);
+    }
+
+    /**
+     * Create an entity and switch to it
+     *
+     * @return int
+     */
+    protected function isolateInEntity($login, $password): int {
+        $entity      = new Entity();
+        $rand        = mt_rand();
+        $entities_id = $entity->add([
+        'name'        => "test formcreator sub entity $rand",
+        'entities_id' => 0
+        ]);
+
+        $this->login($login, $password);
+        $success = Session::changeActiveEntities($entities_id);
+        $this->assertTrue($success, 'Failed to change active entity');
+
+        return $entities_id;
     }
 }
