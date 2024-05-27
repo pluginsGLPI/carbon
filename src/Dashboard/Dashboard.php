@@ -24,6 +24,12 @@ class Dashboard
                 'label'        => __("Unhandled computers", "carbon"),
                 'provider'     => Dashboard::class . "::cardUnhandledComputersCountProvider",
             ],
+            'plugin_carbon_card_cmplete_computers' => [
+                'widgettype'   => ["bigNumber"],
+                'group'        => __("Carbon", "carbon"),
+                'label'        => __("Handled computers", "carbon"),
+                'provider'     => Dashboard::class . "::cardHandledComputersCountProvider",
+            ],
             'plugin_carbon_card_total_power' => [
                 'widgettype'   => ["bigNumber"],
                 'group'        => __("Carbon", "carbon"),
@@ -79,6 +85,11 @@ class Dashboard
         return self::cardNumberProvider($params, "unhandled computers", self::getUnhandledComputersCount());
     }
 
+    public static function cardHandledComputersCountProvider(array $params = [])
+    {
+        return self::cardNumberProvider($params, "unhandled computers", self::getHandledComputersCount());
+    }
+
     public static function cardTotalPowerProvider(array $params = [])
     {
         return self::cardNumberProvider($params, "total power", self::getTotalPower());
@@ -120,12 +131,24 @@ class Dashboard
     {
         $unit = ''; // This is a count, no unit
 
-        if ($total = Provider::getIncompleteComputers()) {
-            return strval($total) . " $unit";
+        $total = Provider::getUnhandledComputersCount();
+        if ($total === null) {
+            return 'N/A';
         }
 
-        return "0 $unit";
+        return strval($total) . " $unit";
+    }
 
+    public static function getHandledComputersCount()
+    {
+        $unit = ''; // This is a count, no unit
+
+        $total = Provider::getHandledComputersCount();
+        if ($total === null) {
+            return 'N/A';
+        }
+
+        return strval($total) . " $unit";
     }
 
     public static function getTotalPower()
