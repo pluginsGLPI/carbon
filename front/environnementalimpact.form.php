@@ -12,11 +12,11 @@ if (!Plugin::isPluginActive('carbon')) {
 
 Session::checkRight(EnvironnementalImpact::$rightname, READ);
 
-$computer = new EnvironnementalImpact();
+$environemental_impact = new EnvironnementalImpact();
 
 if (isset($_POST['update'])) {
-    $computer->check($_POST['id'], UPDATE);
-    $computer->update($_POST);
+    $environemental_impact->check($_POST['id'], UPDATE);
+    $environemental_impact->update($_POST);
     Event::log(
         $_POST['id'],
         'computers',
@@ -27,3 +27,5 @@ if (isset($_POST['update'])) {
     );
     Html::back();
 }
+
+Html::back();
