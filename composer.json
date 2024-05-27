@@ -28,6 +28,7 @@
         "php-lint": "vendor/bin/parallel-lint --colors --exclude vendor .",
         "css-lint": "node_modules/.bin/stylelint --color --formatter verbose '**/*.css' '**/*.scss'",
         "js-lint": "node_modules/.bin/eslint --color .",
-        "license-headers": "vendor/bin/licence-headers-check --ansi --no-interaction"
+        "license-headers": "vendor/bin/licence-headers-check --ansi --no-interaction",
+        "build-schema": "tools/build-db-schema.php carbon | plantuml -p -tpng > tools/carbon.png"
     }
 }
