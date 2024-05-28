@@ -18,11 +18,6 @@ class Report extends CommonDBTM
     {
         return 'fa-solid fa-solar-panel';
     }
-
-    public static function canView()
-    {
-        return true;
-    }
     public static function getMenuContent()
     {
         $menu = [];

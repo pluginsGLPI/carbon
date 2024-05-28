@@ -1,7 +1,6 @@
 <?php
 
 use GlpiPlugin\Carbon\Dashboard\Dashboard;
-use SebastianBergmann\Environment\Console;
 
 include('../../../inc/includes.php');
 
