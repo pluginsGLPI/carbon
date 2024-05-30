@@ -23,10 +23,11 @@
     position: relative;
 }
 
-@media (min-width: 1200px) {
+@media screen and (min-width >= 1200px) {
     .header-height {
         height: 210px;
     }
+
     .illustration {
         background-size: 100% 210px;
     }
