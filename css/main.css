@@ -56,6 +56,10 @@
     background-color: #FCF8A1;
 }
 
+.card {
+    min-height: 185px !important;
+}
+
 .percent-color {
     color: #BBDA50;
 }
