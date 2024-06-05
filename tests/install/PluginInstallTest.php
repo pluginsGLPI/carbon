@@ -195,8 +195,8 @@ class PluginInstallTest extends CommonTestCase
         $profileright_table = ProfileRight::getTable();
         $request = [
             'SELECT' => [
-                ProfileRight::getTableField('id'),
                 Profile::getTableField('id'),
+                ProfileRight::getTableField('rights'),
             ],
             'FROM' => $profile_table,
             'LEFT JOIN' => [
@@ -214,9 +214,9 @@ class PluginInstallTest extends CommonTestCase
 
         foreach ($DB->request($request) as $profile_right) {
             if (!isset($profiles[$profile_right['id']])) {
-                $this->assertEquals(0, $profiles[$profile_right['id']]);
-            } else {
                 $this->assertEquals(0, $profile_right['rights']);
+            } else {
+                $this->assertEquals($profiles[$profile_right['id']], $profile_right['rights']);
             }
         }
     }
