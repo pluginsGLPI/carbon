@@ -24,7 +24,7 @@ class Dashboard
                 'label'        => __("Unhandled computers", "carbon"),
                 'provider'     => Dashboard::class . "::cardUnhandledComputersCountProvider",
             ],
-            'plugin_carbon_card_cmplete_computers' => [
+            'plugin_carbon_card_complete_computers' => [
                 'widgettype'   => ["bigNumber"],
                 'group'        => __("Carbon", "carbon"),
                 'label'        => __("Handled computers", "carbon"),
