@@ -14,6 +14,9 @@ class ComputerPower
         return _n("Computer power", "Computers power", $nb, 'power');
     }
 
+    /**
+     * Returns the declared power for a computer
+     */
     public static function getPower(int $computer_id): int
     {
         global $DB;
@@ -58,6 +61,9 @@ class ComputerPower
         return 0;
     }
 
+    /**
+     * @deprecated uses the old data model for powers
+     */
     public static function computePowerForComputer(int $computer_id)
     {
         global $DB;
@@ -115,6 +121,9 @@ class ComputerPower
         return false;
     }
 
+    /**
+     * @deprecated uses the old data model for powers
+     */
     public static function computePowerForAllComputers()
     {
         global $DB;
@@ -135,27 +144,5 @@ class ComputerPower
         }
 
         return $computers_count;
-    }
-
-    public static function cronInfo($name)
-    {
-        switch ($name) {
-            case 'ComputePowersTask':
-                return [
-                    'description' => __('Compute powers for all computers', 'carbon')
-                ];
-        }
-        return [];
-    }
-
-    public static function cronComputePowersTask($task)
-    {
-        $task->log("Computing powers for all computers");
-
-        $computers_count = self::computePowerForAllComputers();
-
-        $task->setVolume($computers_count);
-
-        return 1;
     }
 }

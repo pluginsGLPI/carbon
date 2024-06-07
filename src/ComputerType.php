@@ -16,6 +16,9 @@ class ComputerType extends CommonDBChild
 
     public static $rightname = 'dropdown';
 
+    /**
+     * @todo fix type name
+     */
     public static function getTypeName($nb = 0)
     {
         return _n("Power", "Powers", $nb, 'carbon');
@@ -68,6 +71,9 @@ class ComputerType extends CommonDBChild
         ]);
     }
 
+    /**
+     * @deprecated power lookup is incomplete
+     */
     public static function getPower(int $computer_id): int
     {
         global $DB;

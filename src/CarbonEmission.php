@@ -18,6 +18,9 @@ class CarbonEmission extends CommonDBChild
         return \_n("CarbonEmission", "CarbonEmissions", $nb, 'carbon emission');
     }
 
+    /**
+     * @deprecated uses old data model
+     */
     public static function computeCarbonEmissionPerDay(int $computer_id, string $country, string $latitude, string $longitude, DateTime &$date): bool
     {
         $power = ComputerType::getPower($computer_id);
@@ -60,7 +63,9 @@ class CarbonEmission extends CommonDBChild
         return $success;
     }
 
-
+    /**
+     * @deprecated uses deprecated method computeCarbonEmissionPerDay
+     */
     public static function computerCarbonEmissionPerDayForAllComputers(DateTime &$date): int
     {
         global $DB;
@@ -97,6 +102,9 @@ class CarbonEmission extends CommonDBChild
         return $count;
     }
 
+    /**
+     * @deprecated uses deprecated methods
+     */
     public static function cronInfo($name)
     {
         switch ($name) {
@@ -108,6 +116,9 @@ class CarbonEmission extends CommonDBChild
         return [];
     }
 
+    /**
+     * @deprecated uses deprecated methods
+     */
     public static function cronComputeCarbonEmissionsTask($task)
     {
         $task->log("Computing carbon emissions for all computers");
