@@ -37,7 +37,7 @@ use DateTime;
 use DateInterval;
 use DateTimeZone;
 use GlpiPlugin\Carbon\CarbonIntensity;
-use GlpiPlugin\Carbon\Collector\CarbonIntensitySource;
+use GlpiPlugin\Carbon\CarbonIntensitySource;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
