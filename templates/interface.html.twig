@@ -2,6 +2,7 @@
     <!-- Header with background image -->
     <header class="page-header header-height illustration container-fluid">
         <div class="container-fluid">
+        <img src="../dist/images/illustration_bridge.png" class="illustration-header" alt="GLPI Carbon header" />
             <h1 class="page-title title-color title-position">{{ __('GLPI Carbon', 'carbon') }}</h1>
         </div>
     </header>
@@ -19,13 +20,13 @@
                             <div class="col-auto">
                               <span><img src="../dist/images/carbon_emission_icon_darkgreen.png" /></span>
                             </div>
-                          <div class="col">
-                            <div class="subheader">{{ __('Total Carbon Emission', 'carbon') }}</div>
-                            <div class="subheader">{{ __('May 2023 - April 2024', 'carbon') }}</div>
-                            <div class="h1 my-3" id="carbonEmission"></div>
+                            <div class="col">
+                              <div class="subheader">{{ __('Total Carbon Emission', 'carbon') }}</div>
+                              <div class="subheader">{{ __('May 2023 - April 2024', 'carbon') }}</div>
+                            </div>
+                            <div class="my-3 nb-carbon-emission-size text-center" id="carbonEmission"></div>
+                            </div>
                           </div>
-                          </div>
-                        </div>
                     </div>
                 </div>
 
@@ -39,7 +40,7 @@
                             <div class="col">
                               <div class="subheader text-white">{{ __('Monthly carbon emission', 'carbon') }}</div>
                               <div class="subheader text-white">{{ __('April, 2024', 'carbon') }}</div>
-                              <div class="h1 my-3 text-white" id="monthlyEmission"></div>
+                              <div class="my-3 text-white nb-monthly-carbon-emission" id="monthlyEmission"></div>
                                 <p class="m-0 percent-color" id="monthlyComparison"></p>
                               <div class="subheader text-white">{{ __('Compared to last month', 'carbon') }}</div>
                             </div>
@@ -72,11 +73,11 @@
                   <div class="card card-height">
                     <div class="card-body ">
                       <h3 class="card-title">{{__('Want to know more ?','carbon')}}</h3>
-                      <p class="text-secondary">{{ __('Here is a video to find some explanation','carbon')}}</p>
+                      <p class="text-secondary">{{ __('Here is a video about the impact of numeric on the enviromnent.','carbon')}}</p>
                     </div>
                     <!-- Card footer -->
                     <div class="card-footer d-flex justify-content-center">
-                      <a href="#" class="btn">Go see the video</a>
+                      <a href="https://www.youtube.com/watch?v=o4_DLOuGToQ" target="_blank" class="btn">Go see the video</a>
                     </div>
                   </div>
                 </div>
@@ -85,43 +86,48 @@
                 <!-- Row for score cards -->
 
                 <div class="col-12">
-                    <div class="row row-cards pb-3">
+                    <div class="row row-cards pb-3 align-items-center">
                         <div class="col-sm-6 col-lg-6">
                             <div class="card">
-                                <div class="card-body">
+                                <div class="card-body card-max-height">
                                     <div class="subheader">{{ __('Carbon Emission per Type', 'carbon') }}</div>
                                     <div class="h1 mb-3" id="carbonEmissionPerModel"></div>
-                                    <div id="carbonEmissionPerModelChart" class="chart-lg"></div>
+                                    <div id="carbonEmissionPerModelChart" class="chart-lg "></div>
                                 </div>
                             </div>
                         </div>
 
-                <!-- Information block -->
-                <div class="col-sm-6 col-lg-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="row">
-                                <div class="col-auto fw-bold">
-                                    <span><svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9" /><line x1="12" y1="8" x2="12.01" y2="8" /><polyline points="11 12 12 12 12 16 13 16" /></svg></span>
+                  <!-- Information block -->
+                  <div class="col-sm-6 col-lg-6">
+                      <div class="card">
+                          <div class="card-header">
+                              <div class="row">
+                                  <div class="col-auto fw-bold">
+                                      <span><svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9" /><line x1="12" y1="8" x2="12.01" y2="8" /><polyline points="11 12 12 12 12 16 13 16" /></svg></span>
+                                  </div>
+                                  <div class="col">
+                                      <h3 class="card-title">{{ __('Information', 'carbon') }}</h3>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="card-body">
+                              <div class="row align-items-center">
+                                  <div class="col-auto">
+                                      <span><img src="../dist/images/ecology-icon-light.png" /></span>
+                                  </div>
+                                  <div class="col">
+                                      <p class="m-0">{{ __('Our data is sourced from reliable sources and is meticulously calculated using industry-standard methodologies. We utilize accurate measurement tools and algorithms to ensure the precision and reliability of our environmental metrics.','carbon') }}</p>
+                                      <p class="m-0 pb-4 pt-2">{{ __('As we move towards a greener future, businesses will soon be required to report energy usage and carbon emissions. By 2025, many areas will enforce these regulations. Adopting these practices now ensures compliance and helps combat climate change.','carbon') }}</p>
+                                  </div>
+                              </div>
+                                <div class="row">
+                                    <h4 class="pt-3">{{ __('Did you know ?','carbon') }}</h4>
+                                    <p class="m-0 pb-2">{{ __('1 gram of CO₂ is equivalent to the CO₂ emitted when you drive a car for about 20 meters.','carbon') }}</p>
                                 </div>
-                                <div class="col">
-                                    <h3 class="card-title">{{ __('Information', 'carbon') }}</h3>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="row align-items-center">
-                                <div class="col-auto">
-                                    <span><img src="../dist/images/ecology_icon_orange.png" /></span>
-                                </div>
-                                <div class="col">
-                                    <p class="m-0">{{ __('Our data is sourced from reliable sources and is meticulously calculated using industry-standard methodologies. We utilize accurate measurement tools and algorithms to ensure the precision and reliability of our environmental metrics.','carbon') }}</p>
-                                    <p class="m-0">{{ __('As we move towards a greener future, businesses will soon be required to report energy usage and carbon emissions. By 2025, many areas will enforce these regulations. Adopting these practices now ensures compliance and helps combat climate change.','carbon') }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
                         {# Uncomment the block below if needed #}
                         {# <div class="col-sm-6 col-lg-6">
                             <div class="card">
@@ -154,12 +160,12 @@
 
             </div>
         </div>
+        <!-- Footer -->
+          <div class="container-fluid mt-3 footer-height d-flex justify-content-center">
+              <img src="../dist/images/illustration-footer.png" class="py-1 illustration-footer" alt="GLPI Carbon footer" />
+          </div>
     </div>
     {% endblock %}
-
-    <!-- Footer -->
-    <footer class="footer-height illustration-footer footer mt-3">
-    </footer>
 </div>
 
 {% block scripts %}
@@ -382,6 +388,7 @@
             console.log(response);
             return response.json();
         }).then(data => {
+          console.log(data);
             carbonEmissionPerMonthChart.updateOptions({
               xaxis: {
                 categories: data.labels,
