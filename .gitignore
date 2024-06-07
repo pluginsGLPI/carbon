@@ -7,8 +7,8 @@ vendor/
 *.code-workspace
 *~
 docs/GLPI carbon.sql
-data/teclib-editions/computermodels.csv
-data/teclib-editions/computertypes.csv
 data/tests
 scripts/out.csv
 locales/??.po
+tests/logs/*
+.phpunit.result.cache

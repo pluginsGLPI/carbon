@@ -11,6 +11,9 @@ use Xylemical\Expressions\Parser;
 use Xylemical\Expressions\Token;
 use Xylemical\Expressions\Value;
 
+/** 
+ * @deprecated was a tentative to express emission computation as formulas
+ */
 class PowerAbacus
 {
     protected $tokens = null;
