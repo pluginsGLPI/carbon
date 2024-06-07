@@ -60,7 +60,7 @@ class Computer implements CommonInterface
     {
         $usage_profile = $this->getUsageProfile();
 
-        if (!self::isUsageDay($usage_profile, $begin_date))
+        if ($usage_profile === null || !self::isUsageDay($usage_profile, $begin_date))
             return 0;
 
         return 0;
@@ -68,14 +68,14 @@ class Computer implements CommonInterface
 
     /**
      * Returns the carbon emission for the specified day.
-     * 
+     *
      * {@inheritDoc}
      */
     public function getCarbonEmissionPerDay(DateTime $day) : ?float
     {
         $usage_profile = $this->getUsageProfile();
 
-        if (!self::isUsageDay($usage_profile, $day)) {
+        if ($usage_profile === null || !self::isUsageDay($usage_profile, $day)) {
             return 0.0;
         }
 
@@ -86,15 +86,15 @@ class Computer implements CommonInterface
 
     /**
      * Returns the consumed energy for the specified day.
-     * 
+     *
      * {@inheritDoc}
      */
     public function getEnergyPerDay(DateTime $day) : float
     {
         $usage_profile = $this->getUsageProfile();
 
-        if (!self::isUsageDay($usage_profile, $day)) {
-            return 0.0;
+        if ($usage_profile === null || !self::isUsageDay($usage_profile, $day)) {
+            return 0;
         }
 
         $power = ComputerPower::getPower($this->items_id);
@@ -207,7 +207,7 @@ class Computer implements CommonInterface
                     GlpiComputer::getTableField('id') => $this->items_id,
                     CarbonIntensity::getTableField('emission_date') => ['>=', $start_date_s],
                     'NOT' => [ CarbonIntensity::getTableField('emission_date') => ['>', $stop_date_s]],
-                ],  
+                ],
             ],
             'ORDER' => CarbonIntensity::getTableField('emission_date') . ' ASC',
         ];
@@ -222,7 +222,7 @@ class Computer implements CommonInterface
         if ($query_result->numrows() == 0) {
             return null;
         }
-        
+
         $total_emission = 0;
         $previous_timestamp = 0;
         foreach ($query_result as $row) {
@@ -242,7 +242,6 @@ class Computer implements CommonInterface
             $emission = $row['intensity'] * $energy_in_kwh;
             $total_emission += $emission;
         }
-
 
         return $total_emission;
     }
