@@ -22,17 +22,18 @@ class UnitTestAutoload
 }
 
 if (!$glpiConfigDir = getenv('TEST_GLPI_CONFIG_DIR')) {
-   echo "Environment var TEST_GLPI_CONFIG_DIR is not set" . PHP_EOL;
-   exit(1);
+   fwrite(STDOUT, "Environment var TEST_GLPI_CONFIG_DIR is not set" . PHP_EOL);
+   $glpiConfigDir = 'tests/config';
 }
-
 
 UnitTestAutoload::register();
 
 define('GLPI_ROOT', realpath(__DIR__ . '/../../../'));
 define("GLPI_CONFIG_DIR", GLPI_ROOT . "/$glpiConfigDir");
+fwrite(STDOUT, "GLPI config path: " . GLPI_CONFIG_DIR . PHP_EOL);
+fwrite(STDOUT, "checking config file " . GLPI_CONFIG_DIR . '/config_db.php' . PHP_EOL);
 if (!file_exists(GLPI_CONFIG_DIR . '/config_db.php')) {
-   echo GLPI_ROOT . "/$glpiConfigDir/config_db.php missing. Did GLPI successfully initialized ?\n";
+   echo GLPI_ROOT . "/$glpiConfigDir/config_db.php missing. Was GLPI successfully initialized ?" . PHP_EOL;
    exit(1);
 }
 unset($glpiConfigDir);
@@ -40,7 +41,8 @@ unset($glpiConfigDir);
 define('GLPI_LOG_DIR', __DIR__ . '/logs');
 @mkdir(GLPI_LOG_DIR);
 
-include (GLPI_ROOT . "/inc/includes.php");
+ini_set('session.use_cookies', 0); //disable session cookies
+require_once GLPI_ROOT . "/inc/includes.php";
 
 loadDataset();
 

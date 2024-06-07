@@ -119,6 +119,27 @@ function plugin_version_carbon()
 }
 
 /**
+ * Check plugin's prerequisites before installation
+ *
+ * @return boolean
+ */
+function plugin_carbon_check_prerequisites() {
+    $prerequisitesSuccess = true;
+
+    if (version_compare(GLPI_VERSION, PLUGIN_CARBON_MIN_GLPI_VERSION, 'lt')) {
+       echo "This plugin requires GLPI >= " . PLUGIN_CARBON_MIN_GLPI_VERSION . " and GLPI < " . PLUGIN_CARBON_MAX_GLPI_VERSION . "<br>";
+       $prerequisitesSuccess = false;
+    }
+
+    if (!is_readable(__DIR__ . '/vendor/autoload.php') || !is_file(__DIR__ . '/vendor/autoload.php')) {
+       echo "Run composer install --no-dev in the plugin directory<br>";
+       $prerequisitesSuccess = false;
+    }
+
+    return $prerequisitesSuccess;
+}
+
+/**
  * Get the path to the empty SQL schema file
  *
  * @return string|null

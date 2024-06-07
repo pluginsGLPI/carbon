@@ -54,13 +54,7 @@ class CommonTestCase extends TestCase
         $PLUGINS_INCLUDED = null;
         $AJAX_INCLUDE = null;
         $_SESSION = [];
-        if (is_readable(GLPI_ROOT . "/config/config.php")) {
-            $configFile = "/config/config.php";
-        } else {
-            $configFile = "/inc/config.php";
-        }
-        include(GLPI_ROOT . $configFile);
-        require(GLPI_ROOT . "/inc/includes.php");
+        require_once GLPI_ROOT . "/inc/includes.php";
         //\Toolbox::setDebugMode(Session::DEBUG_MODE);
 
         $DB = new DB();
@@ -71,7 +65,6 @@ class CommonTestCase extends TestCase
         if (session_status() == PHP_SESSION_ACTIVE) {
             session_write_close();
         }
-        ini_set('session.use_cookies', 0); //disable session cookies
         session_start();
         $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
     }
