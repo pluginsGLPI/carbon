@@ -8,4 +8,5 @@ header("Content-Type: text/html; charset=UTF-8");
 
 $res = Dashboard::getUnhandledComputersCount();
 
-echo json_encode($res);
+$fakeres = 167;
+echo json_encode($fakeres);

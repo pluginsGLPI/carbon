@@ -1,5 +1,5 @@
 .nb-carbon-emission-size {
-    font-size: 2.5rem;
+    font-size: 2rem;
 }
 
 .nb-monthly-carbon-emission {
@@ -32,6 +32,11 @@
 .carbon-emission-card {
     background-color: #BBDA50;
 
+}
+
+.icon-size {
+    width: 63px;
+    height: 63px;
 }
 
 .monthly-emission-card {

@@ -11,6 +11,8 @@ require('../pics/ecology_icon_orange.png');
 require('../pics/ecology-icon-light.png');
 require('../pics/illustration-footer.png');
 require('../pics/device_icon_black.png');
+require('../pics/icon-co2-calendar-green.png');
+require('../pics/icon-co2-calendar-yellow.png');
 
 // Import css :
 require('../css/main.css');
