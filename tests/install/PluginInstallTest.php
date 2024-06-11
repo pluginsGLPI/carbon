@@ -25,8 +25,13 @@ class PluginInstallTest extends CommonTestCase
         self::login('glpi', 'glpi', true);
     }
 
-    public function testInstallPlugin()
-    {
+
+    /**
+     * Execute plugin installation in the context if tests
+     *
+     * @return void
+     */
+    protected function executeInstallation() {
         global $DB;
 
         $pluginName = TEST_PLUGIN_NAME;
@@ -67,8 +72,16 @@ class PluginInstallTest extends CommonTestCase
         $plugin->init();
         $messages = $_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR] ?? [];
         $messages = implode(PHP_EOL, $messages);
-        $this->assertTrue($plugin->isActivated($pluginName), 'Cannot enable the plugin: ' . $messages);
+        $this->assertTrue(Plugin::isPluginActive($pluginName), 'Cannot enable the plugin: ' . $messages);
+    }
 
+    public function testInstallPlugin()
+    {
+        if (!Plugin::isPluginActive(TEST_PLUGIN_NAME)) {
+            // For unit test script which expects that installation runs in the tests context
+            $this->executeInstallation();
+        }
+        $this->assertTrue(Plugin::isPluginActive(TEST_PLUGIN_NAME), 'Plugin not activated');
         $this->checkSchema(PLUGIN_CARBON_VERSION);
 
         $this->checkConfig();

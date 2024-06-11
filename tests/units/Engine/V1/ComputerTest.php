@@ -75,7 +75,7 @@ class ComputerTest extends CommonTestCase
                 self::TEST_LAPTOP_USAGE_PROFILE,
             ],
             'Computer with server usage profile' => [
-                new Computer($server_glpi_computer->getID()), 
+                new Computer($server_glpi_computer->getID()),
                 self::TEST_SERVER_PROFILE,
             ],
         ];
@@ -197,7 +197,7 @@ class ComputerTest extends CommonTestCase
 
         $source = $this->createObjectIfNotExist(CarbonIntensitySource::class, [ 'name' => $source_name ]);
 
-        $end_date = DateTime::createFromInterface($begin_date);
+        $end_date = clone $begin_date;
         $end_date->add(new DateInterval('P2D'));
         $one_hour = new DateInterval('PT1H');
         while ($begin_date < $end_date) {
