@@ -75,7 +75,7 @@ class ComputerTest extends CommonTestCase
                 self::TEST_LAPTOP_USAGE_PROFILE,
             ],
             'Computer with server usage profile' => [
-                new Computer($server_glpi_computer->getID()), 
+                new Computer($server_glpi_computer->getID()),
                 self::TEST_SERVER_PROFILE,
             ],
         ];
