@@ -197,7 +197,7 @@ class ComputerTest extends CommonTestCase
 
         $source = $this->createObjectIfNotExist(CarbonIntensitySource::class, [ 'name' => $source_name ]);
 
-        $end_date = DateTime::createFromInterface($begin_date);
+        $end_date = clone $begin_date;
         $end_date->add(new DateInterval('P2D'));
         $one_hour = new DateInterval('PT1H');
         while ($begin_date < $end_date) {
