@@ -18,10 +18,11 @@ class ComputerPowerTest extends DbTestCase
         $glpi_computer_model = $this->getItem(GlpiComputerModel::class, [
             'power_consumption' => $power,
         ]);
-        $computer->update([
+        $success = $computer->update([
             'id'                                    => $computer->getID(),
             GlpiComputerModel::getForeignKeyField() => $glpi_computer_model->getID(),
         ]);
+        $this->assertTrue($success);
     }
 
     private function computerSetTypeWithPower(Computer $computer, int $power)
@@ -31,10 +32,11 @@ class ComputerPowerTest extends DbTestCase
             GlpiComputerType::getForeignKeyField() => $glpi_computer_type->getID(),
             'power_consumption'                    => $power,
         ]);
-        $computer->update([
+        $success = $computer->update([
             'id'                                   => $computer->getID(),
             GlpiComputerType::getForeignKeyField() => $glpi_computer_type->getID(),
         ]);
+        $this->assertTrue($success);
     }
 
     public function computerPowerProvider() : \Generator
