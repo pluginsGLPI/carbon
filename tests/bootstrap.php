@@ -4,29 +4,10 @@ global $CFG_GLPI, $PLUGIN_HOOKS, $_CFG_GLPI;
 
 define('TEST_PLUGIN_NAME', 'carbon');
 
-class UnitTestAutoload
-{
-
-   public static function register() {
-      spl_autoload_register(['UnitTestAutoload', 'autoload']);
-   }
-
-   public static function autoload($className) {
-      $file = __DIR__ . "/src/$className.php";
-      if (is_readable($file) && is_file($file)) {
-         include_once(__DIR__ . "/src/$className.php");
-         return true;
-      }
-      return false;
-   }
-}
-
 if (!$glpiConfigDir = getenv('TEST_GLPI_CONFIG_DIR')) {
    fwrite(STDOUT, "Environment var TEST_GLPI_CONFIG_DIR is not set" . PHP_EOL);
    $glpiConfigDir = 'tests/config';
 }
-
-UnitTestAutoload::register();
 
 define('GLPI_ROOT', realpath(__DIR__ . '/../../../'));
 define("GLPI_CONFIG_DIR", GLPI_ROOT . "/$glpiConfigDir");
