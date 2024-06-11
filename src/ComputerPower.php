@@ -32,9 +32,9 @@ class ComputerPower
                 new QueryExpression('COALESCE('
                     . ComputerModel::getTableField('power_consumption') . ', ' . ComputerType::getTableField('power_consumption') . ', 0) AS power_consumption'),
             ],
-            'FROM'      => $computertypes_table,
+            'FROM'      => $computers_table,
             'LEFT JOIN' => [
-                $computers_table => [
+                $computertypes_table => [
                     'FKEY'   => [
                         $computertypes_table  => 'computertypes_id',
                         $computers_table => 'computertypes_id',
