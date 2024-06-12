@@ -1,6 +1,6 @@
 <?php
 
-use GlpiPlugin\Carbon\Dashboard;
+use GlpiPlugin\Carbon\Dashboard\Dashboard;
 
 include('../../../inc/includes.php');
 

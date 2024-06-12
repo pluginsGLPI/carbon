@@ -1,23 +1,20 @@
-.illustration {
-    background-color: #FCF8A1;
-    background-image: url('../pics/illustration_bridge.png');
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
+.nb-carbon-emission-size {
+    font-size: 2rem;
 }
 
-.header-height {
-    height: 165px;
+.nb-monthly-carbon-emission {
+    font-size: 2rem;
+}
+
+.footer-height, .header-height{
+    height: auto;
     margin-top: 0 !important;
     position: relative;
 }
 
-@media (min-width: 1200px) {
-    .header-height {
-        height: 210px;
-    }
-    .illustration {
-        background-size: 100% 210px;
-    }
+.illustration-footer, .illustration-header {
+    width: 100%;
+    height: auto;
 }
 
 .title-color {
@@ -34,12 +31,31 @@
 
 .carbon-emission-card {
     background-color: #BBDA50;
+
+}
+
+.icon-size {
+    width: 63px;
+    height: 63px;
 }
 
 .monthly-emission-card {
     background-color: #145161;
 }
 
+.unhandled-computers-card {
+    background-color: #FCF8A1;
+}
+
+.card-max-height {
+    max-height: 380px !important;
+}
+
+.card {
+    min-height: 185px !important;
+}
+
 .percent-color {
     color: #BBDA50;
 }
+
