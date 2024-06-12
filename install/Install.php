@@ -34,7 +34,6 @@ class Install
         global $DB;
 
         $config = new Config();
-        $config->setConfigurationValues('plugin:carbon', ['configuration' => false]);
 
         $this->migration = new Migration(PLUGIN_CARBON_VERSION);
 

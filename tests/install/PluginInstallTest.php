@@ -180,15 +180,15 @@ class PluginInstallTest extends CommonTestCase
 
     private function checkConfig()
     {
-        $config = Config::getConfigurationValues('plugin:' . TEST_PLUGIN_NAME);
-        $this->assertCount(4, $config);
-
         $expected = [
-            'configuration'           => false,
             'electricitymap_api_key'  => 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
             'electricitymap_base_url' => 'https://api.electricitymap.org/ZZZZZZZZZZZZZZv4/',
             'co2signal_api_key'       => 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
         ];
+
+        $config = Config::getConfigurationValues('plugin:' . TEST_PLUGIN_NAME);
+        $this->assertCount(count($expected), $config);
+
         $this->assertEqualsCanonicalizing($expected, $config);
     }
 
