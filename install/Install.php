@@ -35,7 +35,9 @@ namespace GlpiPlugin\Carbon;
 
 use Config;
 use CronTask;
+use DirectoryIterator;
 use Migration;
+use Plugin;
 use ProfileRight;
 use Profile;
 use GlpiPlugin\Carbon\History\Computer;
@@ -45,138 +47,98 @@ class Install
 {
     private Migration $migration;
 
+    private bool $force_upgrade = false;
+
     public function __construct(Migration $migration)
     {
         $this->migration = $migration;
     }
 
     /**
-     * Determine if the plugin is already installed then run a fresh install
-     * or an upgrade
-     *
-     * @return void
+     * Get installed version of the plugin, from database information
      */
-    public function install(): bool
+    public static function detectVersion(): string
     {
-        // TODO: check if plugin is installed
-        return $this->freshInstall();
-    }
-
-    public function freshInstall(): bool
-    {
-        global $DB;
-
-        $config = new Config();
-
-        $this->migration = new Migration(PLUGIN_CARBON_VERSION);
-
-        $dbFile = plugin_carbon_getSchemaPath();
-        if ($dbFile === null || !$DB->runFile($dbFile)) {
-            $this->migration->displayWarning("Error creating tables : " . $DB->error(), true);
-            die('Giving up');
+        $version = Config::getConfigurationValue('plugin:carbon', 'dbversion');
+        if ($version === null) {
+            return '0.0.0';
         }
 
-        $this->createConfig();
-        $this->createAutomaticActions();
-        $this->createRights();
-        $this->createDisplayPrefs();
+        return $version;
+    }
+
+    /**
+     * Run an upgrade of the plugin
+     *
+     * @param  string $version rpevious version of the plugin
+     * @param  array  $args    arguments given in command line
+     * @return bool
+     */
+    public function upgrade(string $from_version, array $args = []): bool
+    {
+        $oldest_upgradable_version = '0.0.0';
+        if (version_compare($from_version, '0.0.0', 'lt')) {
+            $this->migration->displayError("Upgrade is not supported before $oldest_upgradable_version!");
+            return false;
+        }
+
+        $this->force_upgrade = is_array($args) && in_array('force-upgrade', $args);
+
+        ini_set("max_execution_time", "0");
+        $migrations = $this->getMigrationsToDo($from_version);
+        foreach ($migrations as $file => $data) {
+            $function = $data['function'];
+            $target_version = $data['target_version'];
+            include_once($file);
+            if ($function($this->migration)) {
+                Config::setConfigurationValues('plugin:carbon', ['dbversion' => $target_version]);
+            } else {
+                return false;
+            }
+        }
 
         return true;
     }
 
-    private function createConfig()
-    {
-        global $PLUGIN_HOOKS;
-
-        $PLUGIN_HOOKS[Hooks::SECURED_CONFIGS]['carbon'] = [
-            'electricitymap_api_key',
-            'co2signal_api_key'
-        ];
-
-        $current_config = Config::getConfigurationValues('plugin:carbon');
-        $config_entries = [
-            'electricitymap_api_key'              => 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-            'electricitymap_base_url'             => 'https://api.electricitymap.org/ZZZZZZZZZZZZZZv4/',
-            'co2signal_api_key'                   => 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-        ];
-        foreach ($config_entries as $key => $value) {
-            if (!isset($current_config[$key])) {
-                Config::setConfigurationValues('plugin:carbon', [$key => $value]);
-            }
-        }
-    }
-
     /**
-     * Create and grant new rights for the plugin
+     * Get migrations that have to be ran.
      *
-     * @return void
+     * @param string $current_version
+     * @param bool $force_latest
+     *
+     * @return array
      */
-    private function createRights()
+    private function getMigrationsToDo(string $current_version): array
     {
-        global $DB;
-
-        $profiles = $DB->request([
-            'SELECT' => ['id'],
-            'FROM'   => Profile::getTable(),
-        ]);
-        foreach ($profiles as $profile) {
-            $rights = ProfileRight::getProfileRights(
-                $profile['id'],
-                [
-                    Config::$rightname,
-                    Report::$rightname,
-                ]
-            );
-            if (($rights[Config::$rightname] & (READ + UPDATE)) != READ + UPDATE) {
+        $pattern = '/^update_(?<source_version>\d+\.\d+\.(?:\d+|x))_to_(?<target_version>\d+\.\d+\.(?:\d+|x))\.php$/';
+        $plugin_directory = Plugin::getPhpDir('carbon') . '/install/migration';
+        $migration_iterator = new DirectoryIterator($plugin_directory);
+        $migrations = [];
+        foreach ($migration_iterator as $file) {
+            $versions_matches = [];
+            if ($file->isDir() || $file->isDot() || preg_match($pattern, $file->getFilename(), $versions_matches) !== 1) {
                 continue;
             }
-            $right = READ;
-            ProfileRight::updateProfileRights($profile['id'], [
-                Report::$rightname => $right,
-            ]);
-        }
-    }
 
-    private function createAutomaticActions()
-    {
-        $automatic_actions = [
-            [
-                'itemtype'  => CarbonEmission::class,
-                'name'      => 'Historize',
-                'frequency' => DAY_TIMESTAMP,
-                'options'   => [
-                    'mode' => CronTask::MODE_EXTERNAL,
-                    'allowmode' => CronTask::MODE_INTERNAL + CronTask::MODE_EXTERNAL,
-                    'logs_lifetime' => 30,
-                    'comment' => __('Computes carbon emissions of computers', 'carbon'),
-                    'param'   => 10000, // Maximum rows to generate per execution
-                ]
-            ],
-        ];
-
-        foreach ($automatic_actions as $action) {
-            $success = CronTask::Register(
-                $action['itemtype'],
-                $action['name'],
-                $action['frequency'],
-                $action['options']
-            );
-            if (!$success) {
-                throw new \RuntimeException('Error while creating automatic action: ' . $action['name']);
+            $operator = '>';
+            if ($this->force_upgrade) {
+                $operator .= '=';
+            }
+            if (version_compare($versions_matches['target_version'], $current_version, $operator)) {
+                $function = preg_replace(
+                    '/^update_(\d+)\.(\d+)\.(\d+|x)_to_(\d+)\.(\d+)\.(\d+|x)\.php$/',
+                    'update$1$2$3to$4$5$6',
+                    $file->getBasename()
+                );
+                $migrations[$file->getPathname()] = [
+                    'function' => $function,
+                    'target_version' => $versions_matches['target_version'],
+                ];
             }
         }
-    }
 
-    private function createDisplayPrefs()
-    {
-        $this->migration->updateDisplayPrefs(
-            [
-                CarbonIntensity::class => [
-                    2, 3, 4, 5, 6
-                ]
-            ],
-            [],
-            true
-        );
+        ksort($migrations, SORT_NATURAL);
+
+        return $migrations;
     }
 }

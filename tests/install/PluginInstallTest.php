@@ -206,14 +206,16 @@ class PluginInstallTest extends CommonTestCase
 
     private function checkConfig()
     {
+        $plugin_path = Plugin::getPhpDir(TEST_PLUGIN_NAME, true);
+        require_once($plugin_path . '/setup.php');
+
         $expected = [
             'electricitymap_api_key'  => 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-            'electricitymap_base_url' => 'https://api.electricitymap.org/ZZZZZZZZZZZZZZv4/',
-            'co2signal_api_key'       => 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+            'dbversion'               => PLUGIN_CARBON_SCHEMA_VERSION,
         ];
 
         $config = Config::getConfigurationValues('plugin:' . TEST_PLUGIN_NAME);
-        $this->assertCount(count($expected), $config);
+        $this->assertCount(count($expected), $config); // 1 more key : dbversion
 
         $glpi_key = new GLPIKey();
         foreach ($expected as $key => $expected_value) {
