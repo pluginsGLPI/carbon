@@ -33,7 +33,7 @@
 
 {% if can_edit %}
     <form name="form" action="{{ "Config"|itemtype_form_path }}" method="POST">
-        <input type="hidden" name="config_class" value="GlpiPlugin\\Carbon\\Config">
+        <input type="hidden" name="config_class" value="GlpiPlugin\Carbon\Config">
         <input type="hidden" name="config_context" value="plugin:carbon">
         <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token() }}">
 
@@ -42,13 +42,13 @@
             current_config['electricitymap_base_url'],
             __('Base URL for electricitymap.org API', 'carbon')
         ) }}
-        {{ fields.textField(
+        {{ fields.passwordField(
             'electricitymap_api_key',
             current_config['electricitymap_api_key'],
             __('Key for electricitymap.org API', 'carbon')
         ) }}
 
-        {{ fields.textField(
+        {{ fields.passwordField(
             'co2signal_api_key',
             current_config['co2signal_api_key'],
             __('Key for co2signal.com API', 'carbon')

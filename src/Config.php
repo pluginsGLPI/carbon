@@ -82,4 +82,26 @@ class Config extends GlpiConfig
             'action'         => (isset($options['plugin_config']) ? Config::getFormURL() : GlpiConfig::getFormURL()),
         ]);
     }
+
+    /**
+     * Prepare input for configuration update
+     *
+     * @param array $input
+     * @return array
+     */
+    public static function configUpdate(array $input): array
+    {
+        $protected_fields = [
+            'electricitymap_api_key',
+            'co2signal_api_key'
+        ];
+        foreach ($protected_fields as $field) {
+            if (isset($input[$field]) && empty($input[$field])) {
+                unset($input[$field]);
+            }
+        }
+
+        return $input;
+    }
+
 }

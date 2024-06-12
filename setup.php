@@ -73,6 +73,12 @@ function plugin_init_carbon()
 
     $PLUGIN_HOOKS[Hooks::CSRF_COMPLIANT]['carbon'] = true;
 
+    // Secured config
+    $PLUGIN_HOOKS[Hooks::SECURED_CONFIGS]['carbon'] = [
+        'electricitymap_api_key',
+        'co2signal_api_key'
+    ];
+
     // add new cards to the dashboard
     $PLUGIN_HOOKS[Hooks::DASHBOARD_CARDS]['carbon'] = [Dashboard::class, 'dashboardCards'];
 
