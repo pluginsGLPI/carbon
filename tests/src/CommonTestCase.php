@@ -1,5 +1,36 @@
 <?php
 
+/**
+ * -------------------------------------------------------------------------
+ * carbon plugin for GLPI
+ * -------------------------------------------------------------------------
+ *
+ * MIT License
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ * -------------------------------------------------------------------------
+ * @copyright Copyright (C) 2024 Teclib' and contributors.
+ * @license   MIT https://opensource.org/licenses/mit-license.php
+ * @link      https://github.com/pluginsGLPI/carbon
+ * -------------------------------------------------------------------------
+ */
+
 namespace GlpiPlugin\Carbon\Tests;
 
 use PHPUnit\Framework\TestCase;
@@ -54,13 +85,7 @@ class CommonTestCase extends TestCase
         $PLUGINS_INCLUDED = null;
         $AJAX_INCLUDE = null;
         $_SESSION = [];
-        if (is_readable(GLPI_ROOT . "/config/config.php")) {
-            $configFile = "/config/config.php";
-        } else {
-            $configFile = "/inc/config.php";
-        }
-        include(GLPI_ROOT . $configFile);
-        require(GLPI_ROOT . "/inc/includes.php");
+        require_once GLPI_ROOT . "/inc/includes.php";
         //\Toolbox::setDebugMode(Session::DEBUG_MODE);
 
         $DB = new DB();
@@ -71,7 +96,6 @@ class CommonTestCase extends TestCase
         if (session_status() == PHP_SESSION_ACTIVE) {
             session_write_close();
         }
-        ini_set('session.use_cookies', 0); //disable session cookies
         session_start();
         $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
     }

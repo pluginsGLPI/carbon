@@ -31,14 +31,13 @@
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\Dashboard\Dashboard;
 
-include ('../../../inc/includes.php');
+include('../../../inc/includes.php');
 
-// Check if plugin is activated...
-if (!Plugin::isPluginActive('carbon')) {
-    Html::displayNotFoundError();
-}
+header("Content-Type: text/html; charset=UTF-8");
 
-$dropdown = new CarbonIntensityZone();
-include (GLPI_ROOT . "/front/dropdown.common.form.php");
+$res = Dashboard::getUnhandledComputersCount();
+
+$fakeres = 167;
+echo json_encode($fakeres);

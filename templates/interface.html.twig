@@ -1,128 +1,213 @@
+{#
+ # -------------------------------------------------------------------------
+ # carbon plugin for GLPI
+ # -------------------------------------------------------------------------
+ #
+ # MIT License
+ #
+ # Permission is hereby granted, free of charge, to any person obtaining a copy
+ # of this software and associated documentation files (the "Software"), to deal
+ # in the Software without restriction, including without limitation the rights
+ # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ # copies of the Software, and to permit persons to whom the Software is
+ # furnished to do so, subject to the following conditions:
+ #
+ # The above copyright notice and this permission notice shall be included in all
+ # copies or substantial portions of the Software.
+ #
+ # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ # SOFTWARE.
+ # -------------------------------------------------------------------------
+ # @copyright Copyright (C) 2024 Teclib' and contributors.
+ # @license   MIT https://opensource.org/licenses/mit-license.php
+ # @link      https://github.com/pluginsGLPI/carbon
+ # -------------------------------------------------------------------------
+ #}
+
 <div class="page">
-
-<!-- Header with background image -->
-  <header class="page-header header-height illustration container-fluid">
-
-    <div class="container-fluid">
-        <h1 class="page-title title-color title-position">{{ __('GLPI Carbon', 'carbon') }}</h1>
-    </div>
-  </header>
-
-
-{% block body %}
-	<div class="page-body">
-		<div class="container-fluid">
-			<div class="row row-cards">
-
-        <!-- Row for score cards & information block -->
-				<div class="col-sm-6 col-lg-3">
-					<div class="card ">
-						<div class="card-body carbon-emission-card">
-              <span><img class="carbon-emission pb-2" src="../dist/images/carbon_emission_icon_darkgreen.png" /></span>
-							<div class="subheader">{{ __('Total Carbon Emission', 'carbon') }}</div>
-							<div class="h1 mb-3" id="carbonEmission"></div>
-						</div>
-					</div>
-				</div>
-
-        <div class="col-sm-6 col-lg-3">
-					<div class="card">
-						<div class="card-body monthly-emission-card">
-							<div class="subheader text-white">{{ __('Monthly carbon emission', 'carbon') }}</div>
-              <div class="subheader text-white">{{ __('April, 2024', 'carbon') }}</div>
-							<div class="h1 my-3 text-white text-center" id="powerConsumption"></div>
-                  <p class="m-0 percent-color">{{ __(' - 10%', 'carbon') }}</p>
-                  <div class="subheader text-white">{{ __('Compared to last month', 'carbon') }}</div>
-						</div>
-					</div>
-				</div>
-
-        <div class="col-sm-6 col-lg-6">
-          <div class="card">
-            <div class="card-header">
-              <div class="row align-items-center">
-                <div class="col-auto fw-bold">
-                  <span><svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9" /><line x1="12" y1="8" x2="12.01" y2="8" /><polyline points="11 12 12 12 12 16 13 16" /></svg></span>
-                </div>
-                <div class="col">
-                  <h3 class="card-title">{{ __('Information', 'carbon') }}</h3>
-                </div>
-              </div>
-            </div>
-            <div class="card-body">
-              <div class="row align-items-center">
-                <div class="col-auto">
-                  <span><img src="../dist/images/ecology_icon_orange.png" /></span>
-                </div>
-                <div class="col">
-                  <p class="m-0">{{ __('Our data is sourced from reliable sources and is meticulously calculated using industry-standard methodologies. We utilize accurate measurement tools and algorithms to ensure the precision and reliability of our environmental metrics.','carbon') }}
-                  </p>
-                </div>
-                <p class="m-0">{{ __('As we move towards a greener future, businesses will soon be required to report energy usage and carbon emissions. By 2025, many areas will enforce these regulations. Adopting these practices now ensures compliance and helps combat climate change.','carbon') }}
-                  </p>
-              </div>
-            </div>
-          </div>
+    <!-- Header with background image -->
+    <header class="page-header header-height illustration container-fluid">
+        <div class="container-fluid">
+        <img src="../dist/images/illustration_bridge.png" class="illustration-header" alt="GLPI Carbon header" />
+            <h1 class="page-title title-color title-position">{{ __('GLPI Carbon', 'carbon') }}</h1>
         </div>
+    </header>
 
-        <!-- Row for score cards -->
+    {% block body %}
+    <div class="page-body">
+        <div class="container-fluid px-0">
+            <div class="row row-cards pb-3">
 
-        <div class="col-12">
-            <div class="row row-cards">
-                <div class="col-sm-6 col-lg-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="subheader">{{ __('Carbon Emission per Type (g CO²)', 'carbon') }}</div>
-                            <div class="h1 mb-3" id="carbonEmissionPerModel"></div>
-                            <div id="carbonEmissionPerModelChart" class="chart-lg"></div>
+                <!-- Row for score cards -->
+                <div class="col-sm-6 col-lg-3">
+                    <div class="card card-height">
+                        <div class="card-body carbon-emission-card">
+                          <div class="row align-items-center">
+                            <div class="col-auto">
+                              <span><img src="../dist/images/carbon_emission_icon_darkgreen.png" /></span>
+                            </div>
+                            <div class="col">
+                              <div class="subheader">{{ __('Total Carbon Emission', 'carbon') }}</div>
+                              <div class="subheader">{{ __('May 2023 - April 2024', 'carbon') }}</div>
+                            </div>
+                            <div class="my-3 nb-carbon-emission-size text-center" id="carbonEmission"></div>
+                            </div>
+                          </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-lg-3">
+                    <div class="card card-height">
+                        <div class="card-body monthly-emission-card">
+                          <div class="row align-items-center">
+                            <div class="col-auto">
+                              <span><img src="../dist/images/icon-co2-calendar-green.png" class="icon-size" /></span>
+                            </div>
+                            <div class="col">
+                              <div class="subheader text-white">{{ __('Monthly carbon emission', 'carbon') }}</div>
+                              <div class="subheader text-white">{{ __('April, 2024', 'carbon') }}</div>
+                              <div class="my-3 text-white nb-monthly-carbon-emission" id="monthlyEmission"></div>
+                                <p class="m-0 percent-color" id="monthlyComparison"></p>
+                              <div class="subheader text-white">{{ __('Compared to last month', 'carbon') }}</div>
+                            </div>
+                          </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-sm-6 col-lg-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="subheader">{{ __('Power Consumption per Type (W)', 'carbon') }}</div>
-                            <div class="h1 mb-3" id="powerConsumptionPerModel"></div>
-                            <div id="powerConsumptionPerModelChart" class="chart-lg"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!--Row for pie charts -->
-
-        <div class="col-12">
-            <div class="row row-cards">
-            <div class="col-sm-6 col-lg-12">
-                <div class="card">
+                <div class="col-sm-6 col-lg-3">
+                  <div class="card card-sm card-height">
                     <div class="card-body">
-                        <div class="subheader">{{ __('Carbon Emission per Month (g CO²)', 'carbon') }}</div>
-                        <div class="h1 mb-3" id="carbonEmissionPerMonth"></div>
-                        <div id="carbonEmissionPerMonthChart" class="chart-lg"></div>
+                      <div class="row align-items-center">
+                        <div class="col-auto">
+                          <span><img src="../dist/images/device_icon_black.png" /></span>
+                        </div>
+                        <div class="col">
+                          <div class="font-weight-medium">{{ __('Warning', 'carbon') }}</div>
+                          <div class="text-secondary" id="unhandledComputers"></div>
+                          {# <div class="text-secondary" id="handledComputers"></div> #}
+                        </div>
+                      </div>
+                      </div class="row">
+                        <div class="col align-items-center">
+                          <div class="text-secondary px-3 pb-3" id="unhandledComputersPercentage"></div>
+                        </div>
+                      </div>
+                    </div>
+
+                <div class="col-sm-6 col-lg-3">
+                  <div class="card card-height">
+                    <div class="card-body ">
+                      <h3 class="card-title">{{__('Want to know more ?','carbon')}}</h3>
+                      <p class="text-secondary">{{ __('Here is a video about the impact of numeric on the enviromnent.','carbon')}}</p>
+                    </div>
+                    <!-- Card footer -->
+                    <div class="card-footer d-flex justify-content-center">
+                      <a href="https://www.youtube.com/watch?v=o4_DLOuGToQ" target="_blank" class="btn">Go see the video</a>
+                    </div>
+                  </div>
+                </div>
+                  </div>
+                </div>
+                <!-- Row for score cards -->
+
+                <div class="col-12">
+                    <div class="row row-cards pb-3 align-items-center">
+                        <div class="col-sm-6 col-lg-6">
+                            <div class="card">
+                                <div class="card-body card-max-height">
+                                    <div class="subheader">{{ __('Carbon Emission per Type', 'carbon') }}</div>
+                                    <div class="h1 mb-3" id="carbonEmissionPerModel"></div>
+                                    <div id="carbonEmissionPerModelChart" class="chart-lg "></div>
+                                </div>
+                            </div>
+                        </div>
+
+                  <!-- Information block -->
+                  <div class="col-sm-6 col-lg-6">
+                      <div class="card">
+                          <div class="card-header">
+                              <div class="row">
+                                  <div class="col-auto fw-bold">
+                                      <span><svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9" /><line x1="12" y1="8" x2="12.01" y2="8" /><polyline points="11 12 12 12 12 16 13 16" /></svg></span>
+                                  </div>
+                                  <div class="col">
+                                      <h3 class="card-title">{{ __('Information', 'carbon') }}</h3>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="card-body">
+                              <div class="row align-items-center">
+                                  <div class="col-auto">
+                                      <span><img src="../dist/images/ecology-icon-light.png" /></span>
+                                  </div>
+                                  <div class="col">
+                                      <p class="m-0 pt-3 pb-3">{{ __('Our data is sourced from reliable sources and is meticulously calculated using industry-standard methodologies. We utilize accurate measurement tools and algorithms to ensure the precision and reliability of our environmental metrics.','carbon') }}</p>
+                                      <p class="m-0 pb-4 pt-3">{{ __('As we move towards a greener future, businesses will soon be required to report energy usage and carbon emissions. By 2025, many areas will enforce these regulations. Adopting these practices now ensures compliance and helps combat climate change.','carbon') }}</p>
+                                  </div>
+                              </div>
+                                <div class="row">
+                                    <h4 class="pt-3">{{ __('Did you know ?','carbon') }}</h4>
+                                    <p class="m-0 pb-2">{{ __('1 gram of CO₂ is equivalent to the CO₂ emitted when you drive a car for about 20 meters.','carbon') }}</p>
+                                </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                        {# Uncomment the block below if needed #}
+                        {# <div class="col-sm-6 col-lg-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="subheader">{{ __('Power Consumption per Type (W)', 'carbon') }}</div>
+                                    <div class="h1 mb-3" id="powerConsumptionPerModel"></div>
+                                    <div id="powerConsumptionPerModelChart" class="chart-lg"></div>
+                                </div>
+                            </div>
+                        </div> #}
                     </div>
                 </div>
+                <!-- Information block -->
+
+                <!-- Bar graph -->
+                <div class="col-12">
+                    <div class="row row-cards">
+                        <div class="col-sm-6 col-lg-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="subheader">{{ __('Carbon Emission per Month', 'carbon') }}</div>
+                                    <div class="h1 mb-3" id="carbonEmissionPerMonth"></div>
+                                    <div id="carbonEmissionPerMonthChart" class="chart-lg"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Bar graph -->
+
             </div>
         </div>
-
-			</div>
-		</div>
-	</div>
+        <!-- Footer -->
+          <div class="container-fluid mt-3 footer-height d-flex justify-content-center">
+              <img src="../dist/images/illustration-footer.png" class="py-1 illustration-footer" alt="GLPI Carbon footer" />
+          </div>
+    </div>
+    {% endblock %}
 </div>
-{% endblock %}
-
-{% block footer %}
-{% endblock %}
 
 {% block scripts %}
 	<script>
 	document.addEventListener('DOMContentLoaded', function () {
 
-        var carbonColorPalette = ['#FEEC5C', '#F78343', '#D1E883', '#BBDA50', '#146151' ];
-        var powerColorPalette  = ['#EAB640', '#EB9C43', '#D1330B', '#AD5B34', '#B33C2F' ];
+        var carbonColorPalette = ['#146151', '#FEEC5C', '#BBDA50', '#F78343', '#97989C' ];
+        //var powerColorPalette  = ['#EAB640', '#EB9C43', '#D1330B', '#AD5B34', '#B33C2F' ];
 
         // Define options for each chart
-        var carbonEmissionPerTypeOptions = {
+        {# var carbonEmissionPerTypeOptions = {
           series: [0.6543, 0.4255, 1.0041, 1.6217, 0.8615],
           labels: ['Desktops', 'Tablets', 'Mobiles', 'Laptops', 'Others'],
           chart: {
@@ -141,9 +226,9 @@
             }
           }
         }]
-        };
+        }; #}
 
-        var carbonEmissionPerMonthOptions = {
+        {# var carbonEmissionPerMonthOptions = {
           series: [{
             name: 'Desktops',
             data: [0.55,0.26,0.67,0.91,0.45,0.77,0.91,0.45,0.77,0.91,0.45,0.77]
@@ -172,7 +257,7 @@
               enabled: true
             }
           },
-          colors: carbonColorPalette,
+          colors: ['#146151'],
           responsive: [{
             breakpoint: 480,
               options: {
@@ -214,9 +299,65 @@
           fill: {
             opacity: 1
           }
+        }; #}
+
+        var carbonEmissionPerTypeOptions = {
+          series: [0.6543, 0.4255, 1.0041, 1.6217, 0.8615],
+          labels: ['Desktops', 'Tablets', 'Mobiles', 'Laptops', 'Others'],
+          colors: carbonColorPalette,
+          chart: {
+            type: 'donut',
+          },
+          plotOptions: {
+            pie: {
+              startAngle: -90,
+              endAngle: 90,
+              offsetY: 10
+            }
+          },
+          grid: {
+            padding: {
+              bottom: -80
+            }
+          },
+          responsive: [{
+            breakpoint: 480,
+            options: {
+              chart: {
+                width: 200
+              },
+              legend: {
+                position: 'bottom'
+              }
+            }
+          }]
         };
 
-        var powerConsumptionPerTypeOptions = {
+        var carbonEmissionPerMonthOptions = {
+          chart: {
+            type: 'bar',
+            height: 350,
+          },
+          colors: ['#BBDA50'],
+          series : [],
+          plotOptions: {
+            bar: {
+              horizontal: false,
+              columnWidth: '55%',
+              endingShape: 'rounded'
+            },
+          },
+          dataLabels: {
+              style: {
+                colors: ['#145161'],
+              },
+          },
+          xaxis: {
+          categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+          },
+        };
+
+        {# var powerConsumptionPerTypeOptions = {
           series: [1200, 1100, 960, 785, 805],
           labels: ['Desktops', 'Tablets', 'Mobiles', 'Laptops', 'Others'],
           chart: {
@@ -235,34 +376,37 @@
               }
             }
           }]
-        };
+        }; #}
 
         // Initialize charts
         var carbonEmissionPerTypeChart = new ApexCharts(document.querySelector("#carbonEmissionPerModelChart"), carbonEmissionPerTypeOptions);
         var carbonEmissionPerMonthChart = new ApexCharts(document.querySelector("#carbonEmissionPerMonthChart"), carbonEmissionPerMonthOptions);
-        var carbonConsumptionPerTypeChart = new ApexCharts(document.querySelector("#powerConsumptionPerModelChart"), powerConsumptionPerTypeOptions);
+        //var carbonConsumptionPerTypeChart = new ApexCharts(document.querySelector("#powerConsumptionPerModelChart"), powerConsumptionPerTypeOptions);
         // Render charts
         carbonEmissionPerTypeChart.render();
         carbonEmissionPerMonthChart.render();
-        carbonConsumptionPerTypeChart.render();
+        //carbonConsumptionPerTypeChart.render();
 
         // Fetch data with Ajax
+
+        // Total carbon emission
         fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/totalCarbonEmission.php").then(response => {
             console.log(response);
             return response.json();
         }).then(data => {
             let totalCarbonEmission = data;
-            document.getElementById('carbonEmission').textContent = totalCarbonEmission;
+            document.getElementById('carbonEmission').innerHTML = totalCarbonEmission + " g CO" + "<sub>2</sub>";
         });
 
-        fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/totalPowerConsumption.php").then(response => {
+        {# fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/totalPowerConsumption.php").then(response => {
             console.log(response);
             return response.json();
         }).then(data => {
             let totalPowerConsumption = data;
             document.getElementById('powerConsumption').textContent = totalPowerConsumption;
-        });
+        }); #}
 
+        // Carbon emission per model
         fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/totalCarbonEmissionPerModel.php").then(response => {
             console.log(response);
             return response.json();
@@ -271,13 +415,47 @@
             console.log(carbonEmissionPerModel);
         });
 
+        // Carbon emission per month
         fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/carbonEmissionPerMonth.php").then(response => {
             console.log(response);
             return response.json();
         }).then(data => {
-            let carbonEmissionPerMonth = data;
-            console.log(carbonEmissionPerMonth);
+          console.log(data);
+            carbonEmissionPerMonthChart.updateOptions({
+              xaxis: {
+                categories: data.labels,
+              },
+              series: data.series
+            });
+
+            // update total carbon emission for month
+            let currentMonthEmission = data.series[0].data[data.series[0].data.length - 1];
+            document.getElementById('monthlyEmission').textContent = currentMonthEmission + " g CO₂";
+
+             // Calculate and display the percentage comparison with the previous month
+            let previousMonthEmission = data.series[0].data[data.series[0].data.length - 2];
+            let percentageChange = ((currentMonthEmission - previousMonthEmission) / previousMonthEmission) * 100;
+            let comparisonText = (percentageChange >= 0 ? "↑ " : "↓ ") + Math.abs(percentageChange).toFixed(2) + "%";
+            document.getElementById('monthlyComparison').textContent = comparisonText;
         });
+
+        Promise.all([
+                fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/unhandledComputers.php").then(response => response.json()),
+                fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/handledComputers.php").then(response => response.json())
+            ]).then(([unhandledComputersCount, handledComputersCount]) => {
+
+                unhandledComputersCount = Number(unhandledComputersCount);
+                handledComputersCount = Number(handledComputersCount)
+
+                document.getElementById('unhandledComputers').innerHTML = unhandledComputersCount + " unhandled computers";
+                {# document.getElementById('handledComputers').innerHTML = handledComputersCount + " handled computers"; #}
+
+                let totalComputers = unhandledComputersCount + handledComputersCount;
+                console.log(totalComputers);
+                let unhandledComputersPercentage = totalComputers > 0 ? (unhandledComputersCount / totalComputers) * 100 : 0;
+                document.getElementById('unhandledComputersPercentage').textContent = "It represents " + unhandledComputersPercentage.toFixed(2) + "%" + " of your parc that contains " + totalComputers + " computers.";
+            });
+
     });
 </script>
 {% endblock %}

@@ -25,7 +25,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  * -------------------------------------------------------------------------
- * @copyright Copyright (C) 2024 by the carbon plugin team.
+ * @copyright Copyright (C) 2024 Teclib' and contributors.
  * @license   MIT https://opensource.org/licenses/mit-license.php
  * @link      https://github.com/pluginsGLPI/carbon
  * -------------------------------------------------------------------------
@@ -178,7 +178,7 @@ class CreateTestInventoryCommand extends Command
     private function getComputer(string $computer_name, Location $location, GlpiComputerType $computer_type, ComputerUsageProfile $usage_profile) : CommonDBTM
     {
         $glpi_computer = $this->createItemIfNotExist(
-            GlpiComputer::class, 
+            GlpiComputer::class,
             [
                 'name' => $computer_name,
                 Location::getForeignKeyField() => $location->getID(),
@@ -187,7 +187,7 @@ class CreateTestInventoryCommand extends Command
             ]
         );
         $impact = $this->createItemIfNotExist(
-            EnvironnementalImpact::class, 
+            EnvironnementalImpact::class,
             [
                 GlpiComputer::getForeignKeyField() => $glpi_computer->getId(),
                 ComputerUsageProfile::getForeignKeyField() => $usage_profile->getID(),
@@ -200,7 +200,7 @@ class CreateTestInventoryCommand extends Command
     private function createTestInventory(array $inventory_data)
     {
         $location = $this->createItemIfNotExist(
-            Location::class, 
+            Location::class,
             [
                 'name' => self::TEST_LOCATION_NAME,
                 'country' => self::TEST_LOCATION_COUNTRY

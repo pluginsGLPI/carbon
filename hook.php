@@ -3,7 +3,6 @@
 /**
  * -------------------------------------------------------------------------
  * carbon plugin for GLPI
- * Copyright (C) 2022 by the carbon Development Team.
  * -------------------------------------------------------------------------
  *
  * MIT License
@@ -25,8 +24,11 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
- * --------------------------------------------------------------------------
+ * -------------------------------------------------------------------------
+ * @copyright Copyright (C) 2024 Teclib' and contributors.
+ * @license   MIT https://opensource.org/licenses/mit-license.php
+ * @link      https://github.com/pluginsGLPI/carbon
+ * -------------------------------------------------------------------------
  */
 
 use GlpiPlugin\Carbon\CarbonEmission;

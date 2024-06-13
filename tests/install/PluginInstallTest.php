@@ -1,5 +1,36 @@
 <?php
 
+/**
+ * -------------------------------------------------------------------------
+ * carbon plugin for GLPI
+ * -------------------------------------------------------------------------
+ *
+ * MIT License
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ * -------------------------------------------------------------------------
+ * @copyright Copyright (C) 2024 Teclib' and contributors.
+ * @license   MIT https://opensource.org/licenses/mit-license.php
+ * @link      https://github.com/pluginsGLPI/carbon
+ * -------------------------------------------------------------------------
+ */
+
 namespace GlpiPlugin\Carbon\Tests;
 
 use Session;
@@ -25,8 +56,13 @@ class PluginInstallTest extends CommonTestCase
         self::login('glpi', 'glpi', true);
     }
 
-    public function testInstallPlugin()
-    {
+
+    /**
+     * Execute plugin installation in the context if tests
+     *
+     * @return void
+     */
+    protected function executeInstallation() {
         global $DB;
 
         $pluginName = TEST_PLUGIN_NAME;
@@ -67,8 +103,16 @@ class PluginInstallTest extends CommonTestCase
         $plugin->init();
         $messages = $_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR] ?? [];
         $messages = implode(PHP_EOL, $messages);
-        $this->assertTrue($plugin->isActivated($pluginName), 'Cannot enable the plugin: ' . $messages);
+        $this->assertTrue(Plugin::isPluginActive($pluginName), 'Cannot enable the plugin: ' . $messages);
+    }
 
+    public function testInstallPlugin()
+    {
+        if (!Plugin::isPluginActive(TEST_PLUGIN_NAME)) {
+            // For unit test script which expects that installation runs in the tests context
+            $this->executeInstallation();
+        }
+        $this->assertTrue(Plugin::isPluginActive(TEST_PLUGIN_NAME), 'Plugin not activated');
         $this->checkSchema(PLUGIN_CARBON_VERSION);
 
         $this->checkConfig();
@@ -167,15 +211,15 @@ class PluginInstallTest extends CommonTestCase
 
     private function checkConfig()
     {
-        $config = Config::getConfigurationValues('plugin:' . TEST_PLUGIN_NAME);
-        $this->assertCount(4, $config);
-
         $expected = [
-            'configuration'           => false,
             'electricitymap_api_key'  => 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
             'electricitymap_base_url' => 'https://api.electricitymap.org/ZZZZZZZZZZZZZZv4/',
             'co2signal_api_key'       => 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
         ];
+
+        $config = Config::getConfigurationValues('plugin:' . TEST_PLUGIN_NAME);
+        $this->assertCount(count($expected), $config);
+
         $this->assertEqualsCanonicalizing($expected, $config);
     }
 
