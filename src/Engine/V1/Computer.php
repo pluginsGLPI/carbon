@@ -223,7 +223,7 @@ class Computer implements CommonInterface
             return null;
         }
 
-        $total_emission = 0;
+        $total_emission = 0.0;
         $previous_timestamp = 0;
         foreach ($query_result as $row) {
             $emission_date = DateTime::createFromFormat('Y-m-d H:i:s', $row['emission_date']);
