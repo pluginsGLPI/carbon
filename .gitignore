@@ -12,3 +12,4 @@ scripts/out.csv
 locales/??.po
 tests/logs/*
 .phpunit.result.cache
+.vscode/launch.json
