@@ -25,7 +25,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  * -------------------------------------------------------------------------
- * @copyright Copyright (C) 2024 by the carbon plugin team.
+ * @copyright Copyright (C) 2024 Teclib' and contributors.
  * @license   MIT https://opensource.org/licenses/mit-license.php
  * @link      https://github.com/pluginsGLPI/carbon
  * -------------------------------------------------------------------------
@@ -51,27 +51,27 @@ interface CommonInterface
 
     /**
      * Returns the carbon emission for the specified day.
-     * 
+     *
      * @param DateTime $day the day
-     * 
+     *
      * @return float or null
-     * 
+     *
      * If no carbon intensity data are available for the specified day, returns null
-     * Otherwise, returns the CO2 emission of the day, which can be 0 
-     * 
+     * Otherwise, returns the CO2 emission of the day, which can be 0
+     *
      * Unit of returned value, if float, is grams of CO2
      */
     public function getCarbonEmissionPerDay(DateTime $day) : ?float;
 
     /**
      * Returns the consumed energy for the specified day.
-     * 
+     *
      * @param DateTime $day the day
-     * 
+     *
      * @return float
-     * 
-     * Returns the consumed energy 
-     * 
+     *
+     * Returns the consumed energy
+     *
      * Unit of returned value is kWh (kiloWattHour)
      */
     public function getEnergyPerDay(DateTime $day) : float;
