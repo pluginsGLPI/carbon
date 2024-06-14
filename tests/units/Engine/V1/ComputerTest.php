@@ -125,7 +125,7 @@ class ComputerTest extends CommonTestCase
 
     private function createComputerUsageProfilePowerLocation(array $usage_profile_params, int $type_power, string $country) : GlpiComputer
     {
-        $glpi_computer = $this->createComputerUsageProfilePower(self::TEST_LAPTOP_USAGE_PROFILE, self::TEST_LAPTOP_POWER);
+        $glpi_computer = $this->createComputerUsageProfilePower($usage_profile_params, $type_power);
 
         $location = $this->getItem(
             Location::class,
@@ -215,8 +215,9 @@ class ComputerTest extends CommonTestCase
 
         $source = $this->getItem(CarbonIntensitySource::class, [ 'name' => $source_name ]);
 
-        $current_date = DateTime::createFromInterface($begin_date);
-        $end_date = DateTime::createFromInterface($begin_date);
+        $current_date = clone $begin_date;
+        $current_date->sub(new DateInterval('P1D'));
+        $end_date = clone $current_date;
         $end_date->add(new DateInterval('P2D'));
         $one_hour = new DateInterval('PT1H');
         while ($current_date < $end_date) {

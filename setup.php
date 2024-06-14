@@ -61,6 +61,9 @@ define('PLUGIN_CARBON_TYPES', [
     //    Printer::class,
 ]);
 
+// round() precision for emission computation
+define('PLUGIN_CARBON_FLOAT_PRECISION', 3);
+
 /**
  * Init hooks of the plugin.
  * REQUIRED
