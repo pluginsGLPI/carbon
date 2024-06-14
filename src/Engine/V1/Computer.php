@@ -243,6 +243,7 @@ class Computer implements CommonInterface
             $total_emission += $emission;
         }
 
+        $total_emission = round($total_emission, PLUGIN_CARBON_FLOAT_PRECISION);
         return $total_emission;
     }
 }
