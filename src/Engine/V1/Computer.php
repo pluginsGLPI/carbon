@@ -205,8 +205,8 @@ class Computer implements CommonInterface
             'WHERE' => [
                 'AND' => [
                     GlpiComputer::getTableField('id') => $this->items_id,
-                    CarbonIntensity::getTableField('emission_date') => ['>=', $start_date_s],
-                    'NOT' => [ CarbonIntensity::getTableField('emission_date') => ['>', $stop_date_s]],
+                    [CarbonIntensity::getTableField('emission_date') => ['>=', $start_date_s]],
+                    [CarbonIntensity::getTableField('emission_date') => ['<=', $stop_date_s]],
                 ],
             ],
             'ORDER' => CarbonIntensity::getTableField('emission_date') . ' ASC',
