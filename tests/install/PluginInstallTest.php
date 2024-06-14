@@ -37,6 +37,7 @@ use Session;
 use Config;
 use CronTask;
 use DisplayPreference;
+use GLPIKey;
 use Plugin;
 use Profile;
 use ProfileRight;
@@ -220,7 +221,14 @@ class PluginInstallTest extends CommonTestCase
         $config = Config::getConfigurationValues('plugin:' . TEST_PLUGIN_NAME);
         $this->assertCount(count($expected), $config);
 
-        $this->assertEqualsCanonicalizing($expected, $config);
+        $glpi_key = new GLPIKey();
+        foreach ($expected as $key => $expected_value) {
+            $value = $config[$key];
+            if (!empty($value) && $glpi_key->isConfigSecured('plugin:carbon', $key)) {
+                $value = $glpi_key->decrypt($config[$key]);
+            }
+            $this->assertEquals($expected_value, $value, "configuration key $key mismatch");
+        }
     }
 
     private function checkRights() {

@@ -38,6 +38,7 @@ use CronTask;
 use Migration;
 use ProfileRight;
 use Profile;
+use Glpi\Plugin\Hooks;
 
 class Install
 {
@@ -84,6 +85,13 @@ class Install
 
     private function createConfig()
     {
+        global $PLUGIN_HOOKS;
+
+        $PLUGIN_HOOKS[Hooks::SECURED_CONFIGS]['carbon'] = [
+            'electricitymap_api_key',
+            'co2signal_api_key'
+        ];
+
         $current_config = Config::getConfigurationValues('plugin:carbon');
         $config_entries = [
             'electricitymap_api_key'              => 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
@@ -95,7 +103,6 @@ class Install
                 Config::setConfigurationValues('plugin:carbon', [$key => $value]);
             }
         }
-
     }
 
     /**
