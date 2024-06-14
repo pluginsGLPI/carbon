@@ -215,9 +215,9 @@ class ComputerTest extends CommonTestCase
 
         $source = $this->getItem(CarbonIntensitySource::class, [ 'name' => $source_name ]);
 
-        $current_date = DateTime::createFromInterface($begin_date);
+        $current_date = clone $begin_date;
         $current_date->sub(new DateInterval('P1D'));
-        $end_date = DateTime::createFromInterface($current_date);
+        $end_date = clone $current_date;
         $end_date->add(new DateInterval('P2D'));
         $one_hour = new DateInterval('PT1H');
         while ($current_date < $end_date) {
