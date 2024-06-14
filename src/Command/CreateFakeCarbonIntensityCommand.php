@@ -56,13 +56,15 @@ class CreateFakeCarbonIntensityCommand extends Command
     private InputInterface $input;
     private OutputInterface $output;
 
-    protected function configure() {
+    protected function configure()
+    {
         $this
            ->setName('plugin:carbon:create_carbon_intensity')
            ->setDescription("Create fake carbon intenssity data");
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
         $this->input = $input;
         $this->output = $output;
 
@@ -98,7 +100,8 @@ class CreateFakeCarbonIntensityCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function generateFakeData(DateTime $start_date, DateTime $end_date) {
+    protected function generateFakeData(DateTime $start_date, DateTime $end_date)
+    {
         // Initialize progress bar
         $days = (int) $start_date->diff($end_date)->format('%a');
         $progress_bar = new ProgressBar($this->output, $days);

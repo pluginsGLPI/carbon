@@ -49,7 +49,6 @@ use GlpiPlugin\Carbon\Report;
 
 class PluginInstallTest extends CommonTestCase
 {
-
     public function setUp(): void
     {
         //   parent::setUp();
@@ -63,7 +62,8 @@ class PluginInstallTest extends CommonTestCase
      *
      * @return void
      */
-    protected function executeInstallation() {
+    protected function executeInstallation()
+    {
         global $DB;
 
         $pluginName = TEST_PLUGIN_NAME;
@@ -72,7 +72,7 @@ class PluginInstallTest extends CommonTestCase
         $this->assertTrue($DB->connected);
 
         //Drop plugin configuration if exists
-        $config = new Config;
+        $config = new Config();
         $config->deleteByCriteria(['context' => $pluginName]);
 
         // Drop tables of the plugin if they exist
@@ -231,7 +231,8 @@ class PluginInstallTest extends CommonTestCase
         }
     }
 
-    private function checkRights() {
+    private function checkRights()
+    {
         // Key is ID of the profile, value is the name of the profile
         $expected_profiles = [
             4 =>  READ, // 'Super-Admin'
@@ -239,7 +240,8 @@ class PluginInstallTest extends CommonTestCase
         $this->checkRight(Report::$rightname, $expected_profiles);
     }
 
-    private function checkRight(string $rightname, array $profiles) {
+    private function checkRight(string $rightname, array $profiles)
+    {
         global $DB;
 
         $profile_table = Profile::getTable();

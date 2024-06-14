@@ -229,7 +229,8 @@ class Provider
                         $computertypes_table  => 'computertypes_id',
                         $glpiComputertypes_table => 'id',
                         ['AND' => [
-                            'NOT' => [GlpiComputerType::getTableField('id') => null]],
+                            'NOT' => [GlpiComputerType::getTableField('id') => null]
+                        ],
                         ]
                     ]
                 ],

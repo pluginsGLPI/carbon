@@ -55,12 +55,13 @@ class ComputerType extends CommonDBChild
         return _n("Power", "Powers", $nb, 'carbon');
     }
 
-    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
+    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    {
         $tabNames = [];
         if (!$withtemplate) {
-           if ($item->getType() == GlpiComputerType::class) {
-              $tabNames[1] = __('Carbon');
-           }
+            if ($item->getType() == GlpiComputerType::class) {
+                $tabNames[1] = __('Carbon');
+            }
         }
         return $tabNames;
     }
@@ -73,7 +74,8 @@ class ComputerType extends CommonDBChild
      * @param integer $withtemplate
      * @return void
      */
-    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
+    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
+    {
         /** @var CommonDBTM $item */
         if ($item->getType() == GlpiComputerType::class) {
             $typePower = new self();
@@ -87,7 +89,8 @@ class ComputerType extends CommonDBChild
         }
     }
 
-    public function showForComputerType($ID, $withtemplate = '') {
+    public function showForComputerType($ID, $withtemplate = '')
+    {
         // TODO: Design a rights system for the whole plugin
         $canedit = Session::haveRight(Config::$rightname, UPDATE);
 

@@ -49,17 +49,19 @@ class MonitorType extends CommonDBChild
         return _n("Power", "Powers", $nb, 'carbon');
     }
 
-    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
+    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    {
         $tabNames = [];
         if (!$withtemplate) {
-           if ($item->getType() == GlpiMonitorType::class) {
-              $tabNames[1] = __('Carbon');
-           }
+            if ($item->getType() == GlpiMonitorType::class) {
+                $tabNames[1] = __('Carbon');
+            }
         }
         return $tabNames;
     }
 
-    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
+    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
+    {
         /** @var GlpiComputerType $item */
         if ($item->getType() == GlpiMonitorType::class) {
             $typePower = new self();
@@ -73,7 +75,8 @@ class MonitorType extends CommonDBChild
         }
     }
 
-    public function showForComputerType() {
+    public function showForComputerType()
+    {
         // TODO: Design a rights system for the whole plugin
         $canedit = Session::haveRight(Config::$rightname, UPDATE);
 

@@ -66,7 +66,7 @@ class Profile extends GlpiProfile
         $profile->getFromDB($ID);
         echo "<div class='spaced'>";
         if ($canedit) {
-            echo "<form method='post' action='".GlpiProfile::getFormURL()."' data-track-changes='true'>";
+            echo "<form method='post' action='" . GlpiProfile::getFormURL() . "' data-track-changes='true'>";
         }
         $rights = [
             [

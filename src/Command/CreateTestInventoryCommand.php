@@ -124,13 +124,15 @@ class CreateTestInventoryCommand extends Command
     private InputInterface $input;
     private OutputInterface $output;
 
-    protected function configure() {
+    protected function configure()
+    {
         $this
            ->setName('plugin:carbon:create_test_inventory')
            ->setDescription("Create a test inventory");
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
         $this->input = $input;
         $this->output = $output;
 
@@ -142,7 +144,7 @@ class CreateTestInventoryCommand extends Command
         return Command::SUCCESS;
     }
 
-    private function createItemIfNotExist(string $item_type, array $crit, array $input = null) : CommonDBTM
+    private function createItemIfNotExist(string $item_type, array $crit, array $input = null): CommonDBTM
     {
         $item = new $item_type();
 
@@ -161,7 +163,7 @@ class CreateTestInventoryCommand extends Command
         return $item;
     }
 
-    private function getComputerType(string $type_name, int $power) : CommonDBTM
+    private function getComputerType(string $type_name, int $power): CommonDBTM
     {
         $glpi_computer_type = $this->createItemIfNotExist(GlpiComputerType::class, [ 'name' => $type_name]);
         $computer_type = $this->createItemIfNotExist(
@@ -175,7 +177,7 @@ class CreateTestInventoryCommand extends Command
         return $glpi_computer_type;
     }
 
-    private function getComputer(string $computer_name, Location $location, GlpiComputerType $computer_type, ComputerUsageProfile $usage_profile) : CommonDBTM
+    private function getComputer(string $computer_name, Location $location, GlpiComputerType $computer_type, ComputerUsageProfile $usage_profile): CommonDBTM
     {
         $glpi_computer = $this->createItemIfNotExist(
             GlpiComputer::class,
@@ -207,11 +209,11 @@ class CreateTestInventoryCommand extends Command
             ]
         );
 
-        foreach($inventory_data as $type_name => $type_data) {
+        foreach ($inventory_data as $type_name => $type_data) {
             $computer_type = $this->getComputerType($type_name, $type_data['power']);
             $usage_profile = $this->createItemIfNotExist(ComputerUsageProfile::class, $type_data['usage_profile']);
-            for($computer_count = 0; $computer_count < $type_data['count']; $computer_count++) {
-                $computer_name = $type_name . '-' .strval($computer_count);
+            for ($computer_count = 0; $computer_count < $type_data['count']; $computer_count++) {
+                $computer_name = $type_name . '-' . strval($computer_count);
                 $this->getComputer($computer_name, $location, $computer_type, $usage_profile);
             }
         }

@@ -61,7 +61,7 @@ interface CommonInterface
      *
      * Unit of returned value, if float, is grams of CO2
      */
-    public function getCarbonEmissionPerDay(DateTime $day) : ?float;
+    public function getCarbonEmissionPerDay(DateTime $day): ?float;
 
     /**
      * Returns the consumed energy for the specified day.
@@ -74,5 +74,5 @@ interface CommonInterface
      *
      * Unit of returned value is kWh (kiloWattHour)
      */
-    public function getEnergyPerDay(DateTime $day) : float;
+    public function getEnergyPerDay(DateTime $day): float;
 }

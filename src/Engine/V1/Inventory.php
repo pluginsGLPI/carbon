@@ -47,7 +47,6 @@ use DbUtils;
  */
 class Inventory implements CommonInterface
 {
-
     private array $items = [];
 
     /**
@@ -57,7 +56,8 @@ class Inventory implements CommonInterface
      * @param integer $items_id
      * @return boolean
      */
-    public function hasItem(string $itemtype, int $items_id) {
+    public function hasItem(string $itemtype, int $items_id)
+    {
 
         return isset($this->items[$itemtype][$items_id]);
     }

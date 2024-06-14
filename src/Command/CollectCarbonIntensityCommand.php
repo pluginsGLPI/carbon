@@ -56,13 +56,15 @@ class CollectCarbonIntensityCommand extends Command
     private InputInterface $input;
     private OutputInterface $output;
 
-    protected function configure() {
+    protected function configure()
+    {
         $this
            ->setName('plugin:carbon:collect_carbon_intensity')
            ->setDescription("Read carbon dioxyde intensity from external sources");
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
         $this->input = $input;
         $this->output = $output;
 
@@ -94,7 +96,8 @@ class CollectCarbonIntensityCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function getFromEco2mix(DateTime $start_date) {
+    protected function getFromEco2mix(DateTime $start_date)
+    {
         $end_date = new DateTime('now', new DateTimeZone('UTC'));
         $end_date->setTime(0, 0, 0);
 

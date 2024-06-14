@@ -53,12 +53,13 @@ class ComputerUsageProfile extends CommonDropdown
         return Entity::canView();
     }
 
-    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
-        $env       = new self;
+    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    {
+        $env       = new self();
         $found_env = $env->find([static::getForeignKeyField() => $item->getID()]);
         $nb        = $_SESSION['glpishow_count_on_tabs'] ? count($found_env) : 0;
         return self::createTabEntry(self::getTypeName($nb), $nb);
-     }
+    }
 
     public function showForm($ID, array $options = [])
     {
@@ -73,20 +74,21 @@ class ComputerUsageProfile extends CommonDropdown
         return true;
     }
 
-    public function getAdditionalFields() {
+    public function getAdditionalFields()
+    {
         return [
-           [
-              'name'      => 'time_start',
-              'type'      => 'dropdownValue',
-              'label'     => __('Knowbase category', 'formcreator'),
-              'list'      => false
-           ],
-           [
-              'name'      => 'time_stop',
-              'type'      => 'parent',
-              'label'     => __('As child of'),
-              'list'      => false
-           ]
+            [
+                'name'      => 'time_start',
+                'type'      => 'dropdownValue',
+                'label'     => __('Knowbase category', 'formcreator'),
+                'list'      => false
+            ],
+            [
+                'name'      => 'time_stop',
+                'type'      => 'parent',
+                'label'     => __('As child of'),
+                'list'      => false
+            ]
         ];
     }
 

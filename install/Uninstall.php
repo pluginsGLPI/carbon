@@ -85,9 +85,11 @@ class Uninstall
     private function deleteRights()
     {
         $profile_right = new ProfileRight();
-        if (!$profile_right->deleteByCriteria([
-            'name' => ['LIKE', 'carbon:%'],
-        ])) {
+        if (
+            !$profile_right->deleteByCriteria([
+                'name' => ['LIKE', 'carbon:%'],
+            ])
+        ) {
             throw new \RuntimeException('Error while deleting rights');
         }
     }

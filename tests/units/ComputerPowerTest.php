@@ -71,7 +71,7 @@ class ComputerPowerTest extends DbTestCase
         $this->assertTrue($success);
     }
 
-    public function computerPowerProvider() : \Generator
+    public function computerPowerProvider(): \Generator
     {
         // computer with no model and no type
         $computer_no_model_no_type = $this->getItem(Computer::class);
@@ -92,7 +92,7 @@ class ComputerPowerTest extends DbTestCase
         $this->computerSetModelWithPower($computer_model_type, self::MODEL_TYPE_POWER);
         $this->computerSetTypeWithPower($computer_model_type, 0);
         yield 'Computer with a model and a type' => [$computer_model_type, self::MODEL_TYPE_POWER];
-   }
+    }
 
    /**
     * @dataProvider computerPowerProvider

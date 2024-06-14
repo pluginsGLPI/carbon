@@ -61,7 +61,8 @@ showEntityRelations($schema_tables);
  * @param string $plugin
  * @return array
  */
-function findTables(string $plugin = ''): array {
+function findTables(string $plugin = ''): array
+{
     global $DB;
 
     if ($plugin == '') {
@@ -90,7 +91,8 @@ function findTables(string $plugin = ''): array {
     return $tables;
 }
 
-function findRelations(&$schema_tables) {
+function findRelations(&$schema_tables)
+{
     global $DB;
 
     foreach ($schema_tables as &$table_data) {
@@ -108,7 +110,8 @@ function findRelations(&$schema_tables) {
     }
 }
 
-function completeMissingData(&$schema_tables) {
+function completeMissingData(&$schema_tables)
+{
     foreach ($schema_tables as $table_data) {
         foreach ($table_data['links'] as $link) {
             if (hasTable($schema_tables, $link['table'])) {
@@ -120,13 +123,15 @@ function completeMissingData(&$schema_tables) {
                 'fields' => [[
                     'int',
                     'id',
-                ]],
+                ]
+                ],
             ];
         }
     }
 }
 
-function hasTable($schema_tables, $search): bool {
+function hasTable($schema_tables, $search): bool
+{
     foreach ($schema_tables as $table_data) {
         if ($table_data['name'] == $search) {
             return true;
@@ -136,7 +141,8 @@ function hasTable($schema_tables, $search): bool {
     return false;
 }
 
-function convertType($type): string {
+function convertType($type): string
+{
     $type = strtolower($type);
     $type = explode(' ', $type)[0];
     if (strpos($type, '(') !== false) {
@@ -178,7 +184,8 @@ function convertType($type): string {
     return 'unknown';
 }
 
-function getRelationType(&$schema_tables, $table, $field_name): ?array {
+function getRelationType(&$schema_tables, $table, $field_name): ?array
+{
     $db_utils = new DbUtils();
 
     $itemtype = $db_utils->getItemTypeForTable($table);
@@ -260,7 +267,8 @@ function getRelationType(&$schema_tables, $table, $field_name): ?array {
  * @param string $table
  * @return boolean
  */
-function isRelationTableWithProperties($table): bool {
+function isRelationTableWithProperties($table): bool
+{
     global $DB;
 
     $itemtype = getItemTypeForTable($table);
@@ -287,7 +295,8 @@ function isRelationTableWithProperties($table): bool {
     return false;
 }
 
-function showEntityRelations($schema_tables) {
+function showEntityRelations($schema_tables)
+{
 
     $generator = new PlantUml();
     $generator->generate($schema_tables);
@@ -302,7 +311,8 @@ class Mermaid
         '1,n' => ['|o', 'o|'],
     ];
 
-    public function generate(array $schema_tables) {
+    public function generate(array $schema_tables)
+    {
         echo "---" . PHP_EOL;
         echo "title: GLPI Database Schema" . PHP_EOL;
         echo "---" . PHP_EOL;
@@ -313,7 +323,7 @@ class Mermaid
             $table_name = $table_data['name'];
             // $itemtype = $db_utils->getItemTypeForTable($table_name);
             // $itemtype_name = $itemtype::getTypeName(1);
-            echo "    $table_name {".PHP_EOL;
+            echo "    $table_name {" . PHP_EOL;
             foreach ($table_data['fields'] as $field) {
                 $field_type = $field[0];
                 $field_name = $field[1];
@@ -349,8 +359,9 @@ class GraphViz
     const ODD_FIELD_BACK_COLOR = '#E3E3E3';
     const EVEN_FIELD_BACK_COLOR = 'white';
 
-    public function generate(array $schema_tables) {
-        $db_utils = new DbUtils;
+    public function generate(array $schema_tables)
+    {
+        $db_utils = new DbUtils();
 
         echo "digraph G {" . PHP_EOL;
         echo "    node [shape=plaintext]" . PHP_EOL;
@@ -401,7 +412,6 @@ class GraphViz
                 // echo "    $table_name:$foreign_key -> $foreign_table:id [arrowhead=vee, arrowtail=dot, dir=both];" . PHP_EOL;
                 echo implode(' ', $arrow) . PHP_EOL;
             }
-
         }
 
         echo "}";
@@ -417,7 +427,8 @@ class PlantUml
         '1,n' => ['|o', 'o|'],
     ];
 
-    public function generate(array $schema_tables) {
+    public function generate(array $schema_tables)
+    {
         echo "@startuml" . PHP_EOL;
         echo "' avoid problems with angled crows feet";
         echo "skinparam linetype ortho";
@@ -427,7 +438,7 @@ class PlantUml
             $table_name = $table_data['name'];
             // $itemtype = $db_utils->getItemTypeForTable($table_name);
             // $itemtype_name = $itemtype::getTypeName(1);
-            echo "entity \"$table_name\" as $table_name {".PHP_EOL;
+            echo "entity \"$table_name\" as $table_name {" . PHP_EOL;
             foreach ($table_data['fields'] as $field) {
                 $field_type = $field[0];
                 $field_name = $field[1];

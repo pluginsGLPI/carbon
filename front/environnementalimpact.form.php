@@ -34,7 +34,7 @@
 use Glpi\Event;
 use GlpiPlugin\Carbon\EnvironnementalImpact;
 
-include ('../../../inc/includes.php');
+include('../../../inc/includes.php');
 
 // Check if plugin is activated...
 if (!Plugin::isPluginActive('carbon')) {
