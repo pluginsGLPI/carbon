@@ -51,7 +51,8 @@ define('DATE_MIN', 'P6M');
 class CreateFakeCarbonIntensityCommand extends Command
 {
     /** @var int ID of the data source being processed */
-    private int $source_id, $zone_id;
+    private int $source_id;
+    private int $zone_id;
 
     private InputInterface $input;
     private OutputInterface $output;
