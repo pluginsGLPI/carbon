@@ -192,7 +192,7 @@ class ProviderTest extends DbTestCase
         // Computers with a empty usage profile
         $computers = $this->getItems($computers_definition);
         $total_count += count($computers[Computer::class]);
-        foreach($computers[Computer::class] as $computers_id => $computer) {
+        foreach ($computers[Computer::class] as $computers_id => $computer) {
             $impact = $this->getItem(EnvironnementalImpact::class, [
                 'computers_id' => $computers_id,
                 'plugin_carbon_computerusageprofiles_id' => $usage_profile_empty->getID(),
@@ -202,7 +202,7 @@ class ProviderTest extends DbTestCase
         // computers with a usage profile; 3 of them are complete
         $computers = $this->getItems($computers_definition);
         $total_count += count($computers[Computer::class]);
-        foreach($computers[Computer::class] as $computers_id => $computer) {
+        foreach ($computers[Computer::class] as $computers_id => $computer) {
             $impact = $this->getItem(EnvironnementalImpact::class, [
                 'computers_id' => $computers_id,
                 'plugin_carbon_computerusageprofiles_id' => $usage_profile->getID(),

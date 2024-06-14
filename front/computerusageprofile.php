@@ -33,7 +33,7 @@
 
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 
-include ('../../../inc/includes.php');
+include('../../../inc/includes.php');
 
 // Check if plugin is activated
 if (!Plugin::isPluginActive('carbon')) {
@@ -41,4 +41,4 @@ if (!Plugin::isPluginActive('carbon')) {
 }
 
 $dropdown = new ComputerUsageProfile();
-include (GLPI_ROOT . "/front/dropdown.common.php");
+include(GLPI_ROOT . "/front/dropdown.common.php");

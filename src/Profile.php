@@ -41,12 +41,12 @@ use Session;
 
 class Profile extends GlpiProfile
 {
-    function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         return self::createTabEntry(__('Environnemental impact', 'carbon'), 0);
     }
 
-    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
+    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
         /** @var CommonDBTM $item */
         $profile = new self();
@@ -54,7 +54,7 @@ class Profile extends GlpiProfile
         return true;
     }
 
-    function showForm($ID, $options = [])
+    public function showForm($ID, $options = [])
     {
         if (!self::canView()) {
             return false;
@@ -66,7 +66,7 @@ class Profile extends GlpiProfile
         $profile->getFromDB($ID);
         echo "<div class='spaced'>";
         if ($canedit) {
-            echo "<form method='post' action='".GlpiProfile::getFormURL()."' data-track-changes='true'>";
+            echo "<form method='post' action='" . GlpiProfile::getFormURL() . "' data-track-changes='true'>";
         }
         $rights = [
             [

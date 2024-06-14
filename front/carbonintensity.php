@@ -33,7 +33,7 @@
 
 use GlpiPlugin\Carbon\CarbonIntensity;
 
-include ('../../../inc/includes.php');
+include('../../../inc/includes.php');
 
 // Check if plugin is activated...
 if (!Plugin::isPluginActive('carbon')) {

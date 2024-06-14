@@ -48,20 +48,21 @@ use DateTime;
  */
 class Computer implements CommonInterface
 {
-
     private string $itemtype = '\Computer';
-    private int    $items_id;
+    private int $items_id;
 
-    public function __construct(int $items_id) {
+    public function __construct(int $items_id)
+    {
         $this->items_id = $items_id;
     }
 
-    public function getCarbonEmission(DateTime $begin_date, DateTime $end_date) : int
+    public function getCarbonEmission(DateTime $begin_date, DateTime $end_date): int
     {
         $usage_profile = $this->getUsageProfile();
 
-        if ($usage_profile === null || !self::isUsageDay($usage_profile, $begin_date))
+        if ($usage_profile === null || !self::isUsageDay($usage_profile, $begin_date)) {
             return 0;
+        }
 
         return 0;
     }
@@ -71,7 +72,7 @@ class Computer implements CommonInterface
      *
      * {@inheritDoc}
      */
-    public function getCarbonEmissionPerDay(DateTime $day) : ?float
+    public function getCarbonEmissionPerDay(DateTime $day): ?float
     {
         $usage_profile = $this->getUsageProfile();
 
@@ -89,7 +90,7 @@ class Computer implements CommonInterface
      *
      * {@inheritDoc}
      */
-    public function getEnergyPerDay(DateTime $day) : float
+    public function getEnergyPerDay(DateTime $day): float
     {
         $usage_profile = $this->getUsageProfile();
 
@@ -112,7 +113,7 @@ class Computer implements CommonInterface
         return $energy_in_kwh;
     }
 
-    public function getUsageProfile() : ?array
+    public function getUsageProfile(): ?array
     {
         global $DB;
 
@@ -153,7 +154,7 @@ class Computer implements CommonInterface
         return null;
     }
 
-    private static function isUsageDay(array $usage_profile, DateTime $dateTime) : bool
+    private static function isUsageDay(array $usage_profile, DateTime $dateTime): bool
     {
         $day_of_week = $dateTime->format('N');
         $key = 'day_' . strval($day_of_week);
@@ -161,7 +162,7 @@ class Computer implements CommonInterface
         return $usage_profile[$key] != 0;
     }
 
-    private function requestCarbonIntensitiesPerDay(DateTime $day, string $start_time, string $stop_time) : DBmysqlIterator
+    private function requestCarbonIntensitiesPerDay(DateTime $day, string $start_time, string $stop_time): DBmysqlIterator
     {
         global $DB;
 
@@ -215,7 +216,7 @@ class Computer implements CommonInterface
         return $DB->request($request);
     }
 
-    private function computeEmissionPerDay(DateTime $day, int $power, string $start_time, string $stop_time) : ?float
+    private function computeEmissionPerDay(DateTime $day, int $power, string $start_time, string $stop_time): ?float
     {
         $query_result = $this->requestCarbonIntensitiesPerDay($day, $start_time, $stop_time);
 

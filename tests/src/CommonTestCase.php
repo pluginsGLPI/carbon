@@ -189,10 +189,11 @@ class CommonTestCase extends TestCase
         return $item;
     }
 
-    public function getItems(array $batch) {
+    public function getItems(array $batch)
+    {
         $output = [];
 
-        foreach($batch as $itemtype => $items) {
+        foreach ($batch as $itemtype => $items) {
             foreach ($items as $data) {
                 $item = $this->getItem($itemtype, $data);
                 $output[$itemtype][$item->getID()] = $item;
@@ -202,25 +203,28 @@ class CommonTestCase extends TestCase
         return $output;
     }
 
-    protected function getSessionMessage() {
-        if (isset($_SESSION['MESSAGE_AFTER_REDIRECT'][INFO])
-           || isset($_SESSION['MESSAGE_AFTER_REDIRECT'][WARNING])
-           || isset($_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR])) {
-           return null;
+    protected function getSessionMessage()
+    {
+        if (
+            isset($_SESSION['MESSAGE_AFTER_REDIRECT'][INFO])
+            || isset($_SESSION['MESSAGE_AFTER_REDIRECT'][WARNING])
+            || isset($_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR])
+        ) {
+            return null;
         }
 
         $messages = '';
         if (isset($_SESSION['MESSAGE_AFTER_REDIRECT'][INFO])) {
-           $messages .= implode(' ', $_SESSION['MESSAGE_AFTER_REDIRECT'][INFO]);
+            $messages .= implode(' ', $_SESSION['MESSAGE_AFTER_REDIRECT'][INFO]);
         }
         if (isset($_SESSION['MESSAGE_AFTER_REDIRECT'][WARNING])) {
-           $messages .= ' ' . implode(' ', $_SESSION['MESSAGE_AFTER_REDIRECT'][WARNING]);
+            $messages .= ' ' . implode(' ', $_SESSION['MESSAGE_AFTER_REDIRECT'][WARNING]);
         }
         if (isset($_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR])) {
-           $messages .= ' ' . implode(' ', $_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR]);
+            $messages .= ' ' . implode(' ', $_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR]);
         }
         return $messages;
-     }
+    }
 
     /**
      * Handle deprecations in GLPI
@@ -266,12 +270,13 @@ class CommonTestCase extends TestCase
      *
      * @return int
      */
-    protected function isolateInEntity($login, $password): int {
+    protected function isolateInEntity($login, $password): int
+    {
         $entity      = new Entity();
         $rand        = mt_rand();
         $entities_id = $entity->add([
-        'name'        => "test formcreator sub entity $rand",
-        'entities_id' => 0
+            'name'        => "test formcreator sub entity $rand",
+            'entities_id' => 0
         ]);
 
         $this->login($login, $password);

@@ -73,7 +73,7 @@ class Install
         if ($dbFile === null || !$DB->runFile($dbFile)) {
             $this->migration->displayWarning("Error creating tables : " . $DB->error(), true);
             die('Giving up');
-         }
+        }
 
         $this->createConfig();
         $this->createAutomaticActions();
@@ -117,8 +117,8 @@ class Install
         $profiles = $DB->request([
             'SELECT' => ['id'],
             'FROM'   => Profile::getTable(),
-         ]);
-         foreach ($profiles as $profile) {
+        ]);
+        foreach ($profiles as $profile) {
             $rights = ProfileRight::getProfileRights(
                 $profile['id'],
                 [
@@ -127,11 +127,11 @@ class Install
                 ]
             );
             if (($rights[Config::$rightname] & (READ + UPDATE)) != READ + UPDATE) {
-               continue;
+                continue;
             }
             $right = READ;
             ProfileRight::updateProfileRights($profile['id'], [
-               Report::$rightname => $right,
+                Report::$rightname => $right,
             ]);
         }
     }
@@ -173,10 +173,11 @@ class Install
 
     private function createDisplayPrefs()
     {
-        $this->migration->updateDisplayPrefs([
-            CarbonIntensity::class => [
-                2, 3, 4, 5, 6
-            ]
+        $this->migration->updateDisplayPrefs(
+            [
+                CarbonIntensity::class => [
+                    2, 3, 4, 5, 6
+                ]
             ],
             [],
             true

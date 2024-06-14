@@ -59,12 +59,13 @@ class EnvironnementalImpact extends CommonDBChild
         return 'fa-solid fa-solar-panel';
     }
 
-    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
+    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    {
         $tabNames = [];
         if (!$withtemplate) {
-           if ($item->getType() == Computer::class) {
-              $tabNames[1] = self::getTypeName();
-           }
+            if ($item->getType() == Computer::class) {
+                $tabNames[1] = self::getTypeName();
+            }
         }
         return $tabNames;
     }
@@ -77,17 +78,20 @@ class EnvironnementalImpact extends CommonDBChild
      * @param integer $withtemplate
      * @return void
      */
-    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
+    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
+    {
         /** @var Computer $item */
         if ($item->getType() == Computer::class) {
             $environnementalImpact = new self();
             $environnementalImpact->getFromDBByCrit([$item->getForeignKeyField() => $item->getID()]);
             if ($environnementalImpact->isNewItem()) {
-                $environnementalImpact->add([
-                    $item->getForeignKeyField() => $item->getID()
-                ],
-                [],
-                false);
+                $environnementalImpact->add(
+                    [
+                        $item->getForeignKeyField() => $item->getID()
+                    ],
+                    [],
+                    false
+                );
             }
             $environnementalImpact->showForComputer($environnementalImpact->getID());
         }
@@ -102,7 +106,8 @@ class EnvironnementalImpact extends CommonDBChild
         }
     }
 
-    public function showForComputer($ID, $withtemplate = '') {
+    public function showForComputer($ID, $withtemplate = '')
+    {
         // TODO: Design a rights system for the whole plugin
         $canedit = self::canUpdate();
 

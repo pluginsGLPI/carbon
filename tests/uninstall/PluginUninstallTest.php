@@ -44,7 +44,8 @@ use ProfileRight;
 
 class PluginUninstallTest extends CommonTestCase
 {
-    public function testUninstallPlugin() {
+    public function testUninstallPlugin()
+    {
         global $DB;
 
         $pluginName = TEST_PLUGIN_NAME;
@@ -54,9 +55,9 @@ class PluginUninstallTest extends CommonTestCase
 
         // Uninstall the plugin
         $log = '';
-        ob_start(function($in) use (&$log) {
-           $log .= $in;
-           return '';
+        ob_start(function ($in) use (&$log) {
+            $log .= $in;
+            return '';
         });
         $plugin->uninstall($plugin->getID());
         ob_end_clean();
@@ -68,8 +69,8 @@ class PluginUninstallTest extends CommonTestCase
         // Check all plugin's tables are dropped
         $tables = [];
         $result = $DB->listTables('glpi_plugin_' . $pluginName . '_%');
-        foreach($result as $row) {
-           $tables[] = array_pop($row);
+        foreach ($result as $row) {
+            $tables[] = array_pop($row);
         }
         $this->AssertEquals(0, count($tables), "not deleted tables \n" . json_encode($tables, JSON_PRETTY_PRINT));
 
@@ -104,7 +105,8 @@ class PluginUninstallTest extends CommonTestCase
         $this->assertArrayNotHasKey('plugin:carbon', $config);
     }
 
-    private function checkRights() {
+    private function checkRights()
+    {
         $profile_right = new ProfileRight();
         $rights = $profile_right->find(['name' => ['LIKE', 'carbon:%']]);
 

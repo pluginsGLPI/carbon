@@ -45,7 +45,8 @@ class Config extends GlpiConfig
         return plugin_carbon_getFriendlyName();
     }
 
-    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
+    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    {
         $tabNames = [];
         if (!$withtemplate) {
             if ($item->getType() == GlpiConfig::class) {
@@ -63,7 +64,8 @@ class Config extends GlpiConfig
      * @param integer $withtemplate
      * @return void
      */
-    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
+    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
+    {
         /** @var CommonDBTM $item */
         if ($item->getType() == GlpiConfig::class) {
             $config = new self();
@@ -103,5 +105,4 @@ class Config extends GlpiConfig
 
         return $input;
     }
-
 }

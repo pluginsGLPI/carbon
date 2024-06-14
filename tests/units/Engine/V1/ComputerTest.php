@@ -95,7 +95,7 @@ class ComputerTest extends CommonTestCase
 
     const TEST_DATE_1 = '1999-12-02 12:00:00';
 
-    private function createComputerUsageProfile(array $usage_profile_params) : GlpiComputer
+    private function createComputerUsageProfile(array $usage_profile_params): GlpiComputer
     {
         $usage_profile = $this->getItem(ComputerUsageProfile::class, $usage_profile_params);
         $glpi_computer = $this->getItem(GlpiComputer::class);
@@ -107,7 +107,7 @@ class ComputerTest extends CommonTestCase
         return $glpi_computer;
     }
 
-    private function createComputerUsageProfilePower(array $usage_profile_params, int $type_power) : GlpiComputer
+    private function createComputerUsageProfilePower(array $usage_profile_params, int $type_power): GlpiComputer
     {
         $glpi_computer = $this->createComputerUsageProfile($usage_profile_params);
         $glpiComputerType = $this->getItem(GlpiComputerType::class);
@@ -123,7 +123,7 @@ class ComputerTest extends CommonTestCase
         return $glpi_computer;
     }
 
-    private function createComputerUsageProfilePowerLocation(array $usage_profile_params, int $type_power, string $country) : GlpiComputer
+    private function createComputerUsageProfilePowerLocation(array $usage_profile_params, int $type_power, string $country): GlpiComputer
     {
         $glpi_computer = $this->createComputerUsageProfilePower($usage_profile_params, $type_power);
 
@@ -141,18 +141,18 @@ class ComputerTest extends CommonTestCase
         return $glpi_computer;
     }
 
-    public function computerUsageProfileProvider() : \Generator
+    public function computerUsageProfileProvider(): \Generator
     {
         $laptop_glpi_computer = $this->createComputerUsageProfile(self::TEST_LAPTOP_USAGE_PROFILE);
         yield 'Computer with laptop usage profile' => [
-                new Computer($laptop_glpi_computer->getID()),
-                self::TEST_LAPTOP_USAGE_PROFILE,
+            new Computer($laptop_glpi_computer->getID()),
+            self::TEST_LAPTOP_USAGE_PROFILE,
         ];
 
         $server_glpi_computer = $this->createComputerUsageProfile(self::TEST_SERVER_USAGE_PROFILE);
         yield 'Computer with server usage profile' => [
-                new Computer($server_glpi_computer->getID()),
-                self::TEST_SERVER_USAGE_PROFILE,
+            new Computer($server_glpi_computer->getID()),
+            self::TEST_SERVER_USAGE_PROFILE,
         ];
     }
 
@@ -185,7 +185,7 @@ class ComputerTest extends CommonTestCase
         }
     }
 
-    public function computerUsageProfilePowerProvider() : \Generator
+    public function computerUsageProfilePowerProvider(): \Generator
     {
         $laptop_glpi_computer = $this->createComputerUsageProfilePower(self::TEST_LAPTOP_USAGE_PROFILE, self::TEST_LAPTOP_POWER);
         yield 'Computer with laptop usage profile and type' => [
@@ -232,7 +232,7 @@ class ComputerTest extends CommonTestCase
         }
     }
 
-    public function computerCarbonIntensityProvider() : \Generator
+    public function computerCarbonIntensityProvider(): \Generator
     {
         $country = $this->getUniqueString();
         $day_1 = DateTime::createFromFormat('Y-m-d H:i:s', self::TEST_DATE_1, new DateTimeZone('UTC'));

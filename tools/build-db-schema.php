@@ -40,6 +40,9 @@ if (PHP_SAPI != 'cli') {
     exit();
 }
 
+require_once(__DIR__ . '/Graphviz.php');
+require_once(__DIR__ . '/PlantUML.php');
+require_once(__DIR__ . '/Mermaid.php');
 require realpath(__DIR__ . '/../../../inc/includes.php');
 
 $CFG_GLPI['root_doc']            = '/glpi';
@@ -61,7 +64,8 @@ showEntityRelations($schema_tables);
  * @param string $plugin
  * @return array
  */
-function findTables(string $plugin = ''): array {
+function findTables(string $plugin = ''): array
+{
     global $DB;
 
     if ($plugin == '') {
@@ -90,7 +94,8 @@ function findTables(string $plugin = ''): array {
     return $tables;
 }
 
-function findRelations(&$schema_tables) {
+function findRelations(&$schema_tables)
+{
     global $DB;
 
     foreach ($schema_tables as &$table_data) {
@@ -108,7 +113,8 @@ function findRelations(&$schema_tables) {
     }
 }
 
-function completeMissingData(&$schema_tables) {
+function completeMissingData(&$schema_tables)
+{
     foreach ($schema_tables as $table_data) {
         foreach ($table_data['links'] as $link) {
             if (hasTable($schema_tables, $link['table'])) {
@@ -120,13 +126,15 @@ function completeMissingData(&$schema_tables) {
                 'fields' => [[
                     'int',
                     'id',
-                ]],
+                ]
+                ],
             ];
         }
     }
 }
 
-function hasTable($schema_tables, $search): bool {
+function hasTable($schema_tables, $search): bool
+{
     foreach ($schema_tables as $table_data) {
         if ($table_data['name'] == $search) {
             return true;
@@ -136,7 +144,8 @@ function hasTable($schema_tables, $search): bool {
     return false;
 }
 
-function convertType($type): string {
+function convertType($type): string
+{
     $type = strtolower($type);
     $type = explode(' ', $type)[0];
     if (strpos($type, '(') !== false) {
@@ -178,7 +187,8 @@ function convertType($type): string {
     return 'unknown';
 }
 
-function getRelationType(&$schema_tables, $table, $field_name): ?array {
+function getRelationType(&$schema_tables, $table, $field_name): ?array
+{
     $db_utils = new DbUtils();
 
     $itemtype = $db_utils->getItemTypeForTable($table);
@@ -260,7 +270,8 @@ function getRelationType(&$schema_tables, $table, $field_name): ?array {
  * @param string $table
  * @return boolean
  */
-function isRelationTableWithProperties($table): bool {
+function isRelationTableWithProperties($table): bool
+{
     global $DB;
 
     $itemtype = getItemTypeForTable($table);
@@ -287,170 +298,9 @@ function isRelationTableWithProperties($table): bool {
     return false;
 }
 
-function showEntityRelations($schema_tables) {
+function showEntityRelations($schema_tables)
+{
 
     $generator = new PlantUml();
     $generator->generate($schema_tables);
-}
-
-class Mermaid
-{
-    const CARDINALITY = [
-        '0,1' => ['|o', 'o|'],
-        '1'   => ['||', '||'],
-        '0,n' => ['}o', 'o{'],
-        '1,n' => ['|o', 'o|'],
-    ];
-
-    public function generate(array $schema_tables) {
-        echo "---" . PHP_EOL;
-        echo "title: GLPI Database Schema" . PHP_EOL;
-        echo "---" . PHP_EOL;
-        echo "erDiagram" . PHP_EOL;
-
-        foreach ($schema_tables as $table_data) {
-            echo PHP_EOL;
-            $table_name = $table_data['name'];
-            // $itemtype = $db_utils->getItemTypeForTable($table_name);
-            // $itemtype_name = $itemtype::getTypeName(1);
-            echo "    $table_name {".PHP_EOL;
-            foreach ($table_data['fields'] as $field) {
-                $field_type = $field[0];
-                $field_name = $field[1];
-                echo "        $field_type $field_name" . PHP_EOL;
-            }
-            echo "    }" . PHP_EOL;
-            if (count($table_data['links']) === 0) {
-                continue;
-            }
-            echo PHP_EOL;
-            foreach ($table_data['links'] as $link) {
-                $local_cardinality = self::CARDINALITY[$link['local']][0];
-                $foreign_cardinality = self::CARDINALITY[$link['foreign']][1];
-                $foreign_table = $link['table'];
-                $relation_label = $link['label'];
-                echo "    $table_name $local_cardinality--$foreign_cardinality $foreign_table : $relation_label" . PHP_EOL;
-            }
-        }
-    }
-}
-
-class GraphViz
-{
-    const CARDINALITY = [
-        '0,1' => 'otee',
-        '1'   => 'teetee',
-        '0,n' => 'ocrow',
-        '1,n' => 'teecrow',
-    ];
-
-    const NAME_BACK_COLOR = '#ECECFF';
-    const COLOR = 'black';
-    const ODD_FIELD_BACK_COLOR = '#E3E3E3';
-    const EVEN_FIELD_BACK_COLOR = 'white';
-
-    public function generate(array $schema_tables) {
-        $db_utils = new DbUtils;
-
-        echo "digraph G {" . PHP_EOL;
-        echo "    node [shape=plaintext]" . PHP_EOL;
-
-        foreach ($schema_tables as $table_data) {
-            echo PHP_EOL;
-            $table_name = $table_data['name'];
-            echo "    $table_name [label=<" . PHP_EOL;
-            echo '        <table border="1" cellborder="1" cellspacing="0">' . PHP_EOL;
-            echo '            <tr><td bgcolor="' . self::NAME_BACK_COLOR . '" colspan="2">' . $table_name . '</td></tr>' . PHP_EOL;
-            $even = true;
-            foreach ($table_data['fields'] as $field) {
-                $even = !$even;
-                $bgcolor = $even ? self::EVEN_FIELD_BACK_COLOR : self::ODD_FIELD_BACK_COLOR;
-                $field_type = $field[0];
-                $field_name = $field[1];
-                $port = '';
-                if ($field_name == 'id') {
-                    $port = 'port="id"';
-                } else if (($foreign_table = $db_utils->getTableNameForForeignKeyField($field_name)) !== '') {
-                    $port = 'port="' . $field_name . '"';
-                }
-                echo "            <tr>" . PHP_EOL;
-                echo "                <td bgcolor=\"$bgcolor\" $port>" . PHP_EOL;
-                echo "                    $field_type" . PHP_EOL;
-                echo "                </td>" . PHP_EOL;
-                echo "                <td bgcolor=\"$bgcolor\">" . PHP_EOL;
-                echo "                    $field_name" . PHP_EOL;
-                echo "                </td>" . PHP_EOL;
-                echo "            </tr>" . PHP_EOL;
-            }
-            echo "     </table>>];" . PHP_EOL;
-
-            echo PHP_EOL;
-            foreach ($table_data['links'] as $link) {
-                $local_cardinality = self::CARDINALITY[$link['local']];
-                $foreign_table = $link['table'];
-                $foreign_key = $db_utils->getForeignKeyFieldForTable($foreign_table);
-                $local_field = $link['local_field'] ?? $foreign_key;
-                $foreign_cardinality = self::CARDINALITY[$link['foreign']];
-                $relation_label = $link['label'];
-                $arrow = [
-                    "$table_name:$local_field",
-                    "->",
-                    "$foreign_table:id",
-                    "[arrowhead=$local_cardinality, arrowtail=$foreign_cardinality, dir=both]",
-                ];
-                // echo "    $table_name:$foreign_key -> $foreign_table:id [arrowhead=vee, arrowtail=dot, dir=both];" . PHP_EOL;
-                echo implode(' ', $arrow) . PHP_EOL;
-            }
-
-        }
-
-        echo "}";
-    }
-}
-
-class PlantUml
-{
-    const CARDINALITY = [
-        '0,1' => ['|o', 'o|'],
-        '1'   => ['||', '||'],
-        '0,n' => ['}o', 'o{'],
-        '1,n' => ['|o', 'o|'],
-    ];
-
-    public function generate(array $schema_tables) {
-        echo "@startuml" . PHP_EOL;
-        echo "' avoid problems with angled crows feet";
-        echo "skinparam linetype ortho";
-
-        foreach ($schema_tables as $table_data) {
-            echo PHP_EOL;
-            $table_name = $table_data['name'];
-            // $itemtype = $db_utils->getItemTypeForTable($table_name);
-            // $itemtype_name = $itemtype::getTypeName(1);
-            echo "entity \"$table_name\" as $table_name {".PHP_EOL;
-            foreach ($table_data['fields'] as $field) {
-                $field_type = $field[0];
-                $field_name = $field[1];
-                echo "    $field_name : $field_type" . PHP_EOL;
-            }
-            echo "}" . PHP_EOL;
-            if (count($table_data['links']) === 0) {
-                continue;
-            }
-            echo PHP_EOL;
-        }
-
-        foreach ($schema_tables as $table_data) {
-            $table_name = $table_data['name'];
-            foreach ($table_data['links'] as $link) {
-                $local_cardinality = self::CARDINALITY[$link['local']][0];
-                $foreign_cardinality = self::CARDINALITY[$link['foreign']][1];
-                $foreign_table = $link['table'];
-                $relation_label = $link['label'];
-                echo "$table_name $local_cardinality--$foreign_cardinality $foreign_table" . PHP_EOL;
-            }
-        }
-
-        echo "@enduml" . PHP_EOL;
-    }
 }
