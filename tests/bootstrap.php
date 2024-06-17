@@ -32,7 +32,7 @@
  */
 
 // fix empty CFG_GLPI on boostrap; see https://github.com/sebastianbergmann/phpunit/issues/325
-global $CFG_GLPI, $PLUGIN_HOOKS, $_CFG_GLPI;
+global $CFG_GLPI, $PLUGIN_HOOKS;
 
 define('TEST_PLUGIN_NAME', 'carbon');
 
@@ -86,6 +86,10 @@ function loadDataset()
 
     fwrite(STDOUT, sprintf(PHP_EOL . "Loading GLPI dataset version %s" . PHP_EOL, $version));
 
+    // The following dataset contains data for France, then timezone must be Europe/Paris
+    $DB->setTimezone('Europe/Paris');
+    //Set GLPI timezone as well
+    Config::setConfigurationValues('core', ['timezone' => 'Europe/Paris']);
     $DB->beginTransaction();
 
     if (!$DB->runFile(__DIR__ . '/fixtures/carbon_intensity.sql')) {

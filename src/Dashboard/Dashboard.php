@@ -33,12 +33,13 @@
 
 namespace GlpiPlugin\Carbon\Dashboard;
 
+use Computer as GlpiComputer;
 use ComputerModel;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerType;
-use GlpiPlugin\Carbon\DBUtils;
-use DateInterval;
 use DateTime;
+use DbUtils;
+use QueryExpression;
 
 class Dashboard
 {
@@ -90,6 +91,12 @@ class Dashboard
                 'group'        => __("Carbon", "carbon"),
                 'label'        => __("Carbon emission per month", 'carbon'),
                 'provider'     => Dashboard::class . "::cardCarbonEmissionPerMonthProvider",
+            ],
+            'plugin_carbon_card_carbon_intensity' => [
+                'widgettype'   => ['lines', 'bars'],
+                'group'        => __("Carbon", "carbon"),
+                'label'        => __("Carbon intensity", 'carbon'),
+                'provider'     => Dashboard::class . "::cardCarbonintensityProvider",
             ],
         ];
 
@@ -186,22 +193,21 @@ class Dashboard
     {
         $unit = 'W';
 
-        if ($total = Provider::getSum(ComputerType::getTable(), 'power')) {
-            return strval($total) . " $unit";
+        $power = Provider::getTotalPower();
+        if ($power === null) {
+            return 'N/A';
         }
 
-        return "0 $unit";
+        return "$power $unit";
     }
 
     public static function getTotalCarbonEmission()
     {
-        $unit = 'kg CO2';
-
         if ($total = Provider::getSum(CarbonEmission::getTable(), 'emission_per_day')) {
-            return number_format($total, 2) . " $unit";
+            return CarbonEmission::getWeight($total);
         }
 
-        return "0.00 $unit";
+        return "0.00 g";
     }
 
     /**
@@ -230,47 +236,6 @@ class Dashboard
         return Provider::getSumPowerPerModel([ComputerModel::getTableField('power_consumption') => ['>', '0']]);
     }
 
-    public static function getCarbonEmissionPerMonth()
-    {
-        global $DB;
-
-        $emissions_table = CarbonEmission::getTable();
-
-        $date = new DateTime();
-        $_31days = new DateInterval('P31D');
-        $date->sub($_31days);
-
-        $request = [
-            'SELECT'    => [
-                'SUM' => CarbonEmission::getTableField('emission_per_day') . ' AS total_emission_per_day',
-                CarbonEmission::getTableField('emission_date') . ' AS emission_date',
-            ],
-            'FROM'      => $emissions_table,
-            'GROUPBY' => CarbonEmission::getTableField('emission_date'),
-            'WHERE' => [
-                CarbonEmission::getTableField('emission_date') => ['>', $date->format('Y-m-d')],
-            ],
-        ];
-
-        $data = [
-            'labels' => [],
-            'series' => [
-                [
-                    'name' => __("Carbon emission", "carbon"),
-                    'data' => []
-                ],
-            ]
-        ];
-
-        $result = $DB->request($request);
-        foreach ($result as $row) {
-            $data['labels'][] = $row['emission_date'];
-            $data['series'][0]['data'][] = $row['total_emission_per_day'];
-        }
-
-        return $data;
-    }
-
     public static function cardCarbonEmissionPerMonthProvider(array $params = [])
     {
         $default_params = [
@@ -280,7 +245,25 @@ class Dashboard
         ];
         $params = array_merge($default_params, $params);
 
-        $data = self::getCarbonEmissionPerMonth();
+        $data = Provider::getCarbonEmissionPerMonth();
+
+        return [
+            'data'  => $data,
+            'label' => $params['label'],
+            'icon'  => $params['icon'],
+        ];
+    }
+
+    public static function cardCarbonintensityProvider(array $params = [])
+    {
+        $default_params = [
+            'label' => "plugin carbon - carbon dioxyde intensity",
+            'icon'  => "fas fa-computer",
+            'color' => '#ea9999',
+        ];
+        $params = array_merge($default_params, $params);
+
+        $data = Provider::getCarbonIntensity();
 
         return [
             'data'  => $data,
