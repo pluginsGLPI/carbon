@@ -218,6 +218,10 @@ class Computer implements CommonInterface
 
     private function computeEmissionPerDay(DateTime $day, int $power, string $start_time, string $stop_time): ?float
     {
+        if ($power === 0) {
+            return 0;
+        }
+
         $query_result = $this->requestCarbonIntensitiesPerDay($day, $start_time, $stop_time);
 
         if ($query_result->numrows() == 0) {

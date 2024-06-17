@@ -36,13 +36,18 @@ namespace GlpiPlugin\Carbon\Dashboard;
 use Computer;
 use ComputerModel;
 use ComputerType as GlpiComputerType;
+use DateTime;
+use DateInterval;
 use DbUtils;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\EnvironnementalImpact;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
+use GlpiPlugin\Carbon\CarbonIntensity;
+use GlpiPlugin\Carbon\CarbonIntensitySource;
+use GlpiPlugin\Carbon\CarbonIntensityZone;
 use Location;
-use Session;
+use QueryExpression;
 
 class Provider
 {
@@ -192,12 +197,11 @@ class Provider
     /**
      * Count the computers having all required data to computer carbon intensity
      *
-     * @return integer|null
+     * @param array $where
+     * @return array
      */
-    public static function getHandledComputersCount(array $where = []): ?int
+    public static function getHandledComputersQuery(array $where = []): array
     {
-        global $DB;
-
         $computers_table = Computer::getTable();
         $computermodels_table = ComputerModel::getTable();
         $glpiComputertypes_table = GlpiComputerType::getTable();
@@ -208,7 +212,7 @@ class Provider
 
         $request = [
             'SELECT' => [
-                'COUNT' => Computer::getTableField('id') . ' AS nb_computers',
+               Computer::getTableField('*'),
             ],
             'FROM' => $computers_table,
             'INNER JOIN' => [
@@ -271,7 +275,26 @@ class Provider
             ]
         ];
 
-        $request['WHERE'] += $where + (new DbUtils())->getEntitiesRestrictCriteria($computers_table, '', '', true);
+        $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($computers_table, '', '', 'auto');
+        $request['WHERE'] += $where + $entity_restrict;
+
+        return $request;
+    }
+
+    /**
+     * Count the computers having all required data to computer carbon intensity
+     *
+     * @param array $where
+     * @return integer|null
+     */
+    public static function getHandledComputersCount(array $where = []): ?int
+    {
+        global $DB;
+
+        $request = self::getHandledComputersQuery($where);
+        $request['SELECT'] = [
+            'COUNT' => Computer::getTableField('id') . ' AS nb_computers',
+        ];
 
         $result = $DB->request($request);
 
@@ -280,5 +303,152 @@ class Provider
         }
 
         return null;
+    }
+
+    /**
+     * Get total power of assets having all required data to compute carbon intensity
+     *
+     * @return integer|null
+     */
+    public static function getTotalPower(): ?int
+    {
+        global $DB;
+
+        $request = Provider::getHandledComputersQuery();
+        $request['SELECT'] = [
+            'SUM' => ComputerType::getTableField('power') . ' AS total',
+        ];
+
+        $result = $DB->request($request);
+
+        if ($result->numrows() == 1) {
+            return $result->current()['total'];
+        }
+
+        return null;
+    }
+
+    /**
+     * Get total CO2 emissions for last month (all assets)
+     *
+     * @return float|null
+     */
+    public static function getTotalCarbonEmission(): ?float
+    {
+        global $DB;
+
+        $end_date = new DateTime('now');
+        $end_date->setDate($end_date->format('Y'), $end_date->format('m'), 1);
+
+        $start_date = clone $end_date;
+        $start_date = $start_date->sub(new DateInterval('P2D'));
+        $end_date->setDate($end_date->format('Y'), $end_date->format('m'), 1);
+
+        $end_date = $end_date->format('Y-m-d');
+        $start_date = $start_date->format('Y-m-d');
+        $emission_table = CarbonEmission::getTable();
+        $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($emission_table, '', '', 'auto');
+        $request = [
+            'SELECT' => [
+                'SUM' => 'emission_per_day AS total',
+            ],
+            'FROM'  => CarbonEmission::getTable(),
+            'WHERE' => [
+                ['emission_date' => ['>=', $start_date]],
+                ['emission_date' => ['<', $end_date]],
+            ] + $entity_restrict
+        ];
+        $result = $DB->request($request);
+
+        if ($result->numrows() == 1) {
+            return $result->current()['total'];
+        }
+
+        return null;
+    }
+
+
+    public static function getCarbonIntensity() : array
+    {
+        global $DB;
+
+        $request = [
+            'SELECT' => [
+                CarbonIntensity::getTable() => [
+                    'intensity',
+                    'emission_date',
+                ]
+            ],
+            'FROM'  => CarbonIntensity::getTable(),
+            'WHERE' => [
+                [CarbonIntensity::getTableField('emission_date') => ['>=', date('2024-03-01')]],
+                [CarbonIntensity::getTableField('emission_date') => ['<', date('2024-03-03')]],
+                CarbonIntensitySource::getForeignKeyField('sources_id') => 1,
+                CarbonIntensityZone::getForeignKeyField('zones_id') => 1,
+            ]
+        ];
+        $data = [
+            'labels' => [],
+            'series' => [
+                [
+                    'name' => __("gCO2eq / KWh", "carbon"),
+                    'data' => []
+                ]
+            ],
+        ];
+        $rows = $DB->request($request);
+        foreach ($rows as $row) {
+            $data['labels'][]            = $row['emission_date'];
+            $data['series'][0]['data'][] = $row['intensity'];
+        }
+
+        return $data;
+    }
+
+    /**
+     * Get carbon emission per month for all assets in the current entity
+     *
+     * @return void
+     */
+    public static function getCarbonEmissionPerMonth()
+    {
+        global $DB;
+
+        $emissions_table = CarbonEmission::getTable();
+
+        $start_date = new DateTime('now');
+        $start_date->modify('-1 year');
+
+        $dbUtils = new DbUtils();
+        $entityRestrict = $dbUtils->getEntitiesRestrictCriteria($emissions_table, '', '', 'auto');
+        $request = [
+            'SELECT'    => [
+                'SUM' => CarbonEmission::getTableField('emission_per_day') . ' AS total_emission_per_day',
+            ],
+            'FROM'    => $emissions_table,
+            'GROUPBY' => new QueryExpression('MONTH(`date`)'),
+            'WHERE'   => [
+                'date' => ['>=', $start_date->format('Y-m-d')],
+            ] + $entityRestrict,
+        ];
+
+        $data = [
+            'labels' => [],
+            'series' => [
+                [
+                    'name' => __("Carbon emission", "carbon"),
+                    'data' => []
+                ],
+            ]
+        ];
+
+        $result = $DB->request($request);
+        foreach ($result as $row) {
+            $date = new DateTime($row['date']);
+            $data['labels'][] = $date->format('Y-m');
+            $data['series'][0]['data'][] = $row['total_emission_per_day'];
+        }
+
+        return $data;
     }
 }

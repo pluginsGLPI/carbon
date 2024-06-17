@@ -38,15 +38,28 @@ use Computer;
 use ComputerModel;
 use Location;
 use DateTime;
+use CronTask;
+use GlpiPlugin\Carbon\History\Computer as ComputerHistory;
 
 class CarbonEmission extends CommonDBChild
 {
-    public static $itemtype = Computer::class;
-    public static $items_id = 'computers_id';
+    public static $itemtype = 'itemtype';
+    public static $items_id = 'items_id';
 
     public static function getTypeName($nb = 0)
     {
-        return \_n("CarbonEmission", "CarbonEmissions", $nb, 'carbon emission');
+        return _n("Carbon Emission", "Carbon Emissions", $nb, 'carbon emission');
+    }
+
+    public static function cronHistorize(CronTask $task): int
+    {
+        $task->setVolume(0); // start with zero
+        $history = new ComputerHistory();
+        $history->setLimit(0);
+        $count = $history->historizeItems();
+        $task->setVolume($count);
+
+        return ($count > 0 ? 1 : 0);
     }
 
     /**
@@ -59,7 +72,47 @@ class CarbonEmission extends CommonDBChild
                 return [
                     'description' => __('Compute carbon emissions for all computers', 'carbon')
                 ];
+
+            case 'Historize':
+                return ['description' => __('Compute daily environnemental impact for all assets', 'carbon'),
+                    'parameter' => __('Maximum number of entries to calculate', 'carbon'),
+                ];
         }
         return [];
+    }
+
+    /** Format a weight passing a weight in grams
+     *
+     * @param integer $weight  Weight in grams
+     *
+     * @return string  formatted weight
+     **/
+    public static function getWeight(int $weight): string
+    {
+       //TRANS: list of unit (o for octet)
+        $units = [
+            __('g',  'carbon'),
+            __('Kg', 'carbon'),
+            __('t',  'carbon'),
+            __('Kt', 'carbon'),
+            __('Mt', 'carbon'),
+            __('Gt', 'carbon'),
+            __('Tt', 'carbon'),
+            __('Pt', 'carbon'),
+            __('Et', 'carbon'),
+            __('Zt', 'carbon'),
+            __('Yt', 'carbon'),
+        ];
+        $multiple = 1000;
+        foreach ($units as $val) {
+            if ($weight < $multiple) {
+                break;
+            }
+            $weight = $weight / $multiple;
+        }
+
+        $val .= "CO2eq";
+       //TRANS: %1$s is a number maybe float or string and %2$s the unit
+        return sprintf(__('%1$s %2$s'), round($weight, 2), $val);
     }
 }

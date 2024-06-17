@@ -34,11 +34,15 @@
 namespace GlpiPlugin\Carbon;
 
 use Config;
+use CronTask;
 use DBUtils;
 use DisplayPreference;
 use Migration;
 use ProfileRight;
 use CronTask;
+use GlpiPlugin\Carbon\ComputerPower;
+use GlpiPlugin\Carbon\CarbonEmission;
+use GlpiPlugin\Carbon\History\Computer;
 
 class Uninstall
 {

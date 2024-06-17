@@ -80,6 +80,8 @@ class PluginUninstallTest extends CommonTestCase
         // $this->checkDashboard();
         $this->checkRights();
         $this->checkDisplayPrefs();
+
+        Config::deleteConfigurationValues('carbon:test_dataset', ['version']);
     }
 
     public function checkAutomaticAction()
