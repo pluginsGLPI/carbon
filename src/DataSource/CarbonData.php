@@ -31,14 +31,25 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon;
+namespace GlpiPlugin\Carbon\DataSource;
 
-use DateTime;
-
-class CarbonDataProviderFake implements CarbonDataProvider
+class CarbonData
 {
-    public function getCarbonIntensity(string $country = "", string $latitude = "", string $longitude = "", DateTime &$date = null): int
+    private static $sources = [
+        'France' => 'GlpiPlugin\Carbon\DataSource\CarbonDataSourceFrance',
+        'Germany' => 'GlpiPlugin\Carbon\DataSource\CarbonDataSourceElectricityMap',
+    ];
+
+    /**
+     * Returns carbon data source instance for the specified zone.
+     */
+    public static function getCarbonDataSource(string $country, string $latitude, string $longitude): CarbonDataSource
     {
-        return mt_rand(53, 116);
+        if (array_key_exists($country, self::$sources)) {
+            $provider_name = self::$sources[$country];
+            return new $provider_name();
+        }
+
+        return new CarbonDataSourceElectricityMap();
     }
 }

@@ -31,20 +31,22 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon;
+namespace GlpiPlugin\Carbon\DataSource;
 
 use DateTime;
 use GlpiPlugin\Carbon\Config;
 
-class CarbonDataProviderCO2signal extends CarbonDataProviderRestApi
+class CarbonDataSourceCO2signal implements CarbonDataSource
 {
     const BASE_URL = 'https://api.co2signal.com/v1/';
+
+    private RestApiClient $client;
 
     public function __construct()
     {
         $api_key = Config::getconfig()['co2signal_api_key'];
 
-        parent::__construct(
+        $this->client = new RestApiClient(
             [
                 'base_uri'        => self::BASE_URL,
                 'headers'      => [
@@ -62,7 +64,7 @@ class CarbonDataProviderCO2signal extends CarbonDataProviderRestApi
 
         $carbon_intensity = 0;
 
-        if ($response = $this->request('GET', 'latest', ['query' => $params])) {
+        if ($response = $this->client->request('GET', 'latest', ['query' => $params])) {
             $carbon_intensity = $response['data']['carbonIntensity'];
         }
 

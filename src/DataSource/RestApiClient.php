@@ -31,13 +31,13 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon;
+namespace GlpiPlugin\Carbon\DataSource;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7;
 
-abstract class CarbonDataProviderRestApi implements CarbonDataProvider
+class RestApiClient
 {
     const DEFAULT_TIMEOUT = 5;
     const DEFAULT_HEADERS = [

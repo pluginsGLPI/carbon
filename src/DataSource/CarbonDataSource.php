@@ -31,11 +31,11 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon;
+namespace GlpiPlugin\Carbon\DataSource;
 
 use DateTime;
 
-interface CarbonDataProvider
+interface CarbonDataSource
 {
     /**
      * Returns current electricity carbon intensity for the specified location and date.
