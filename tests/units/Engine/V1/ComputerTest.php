@@ -95,6 +95,12 @@ class ComputerTest extends CommonTestCase
 
     const TEST_DATE_1 = '1999-12-02 12:00:00';
 
+    /**
+     * The delta for comparison of computed emission with expected value,
+     * as == for float must not be used because of float representation.
+     */
+    const EPSILON = 0.001;
+
     private function createComputerUsageProfile(array $usage_profile_params): GlpiComputer
     {
         $usage_profile = $this->getItem(ComputerUsageProfile::class, $usage_profile_params);
@@ -262,6 +268,6 @@ class ComputerTest extends CommonTestCase
     public function testEmission(Computer $computer, DateTime $day, float $expected_emission)
     {
         $emission = $computer->getCarbonEmissionPerDay($day);
-        $this->assertEquals($expected_emission, $emission);
+        $this->assertEqualsWithDelta($expected_emission, $emission, self::EPSILON);
     }
 }
