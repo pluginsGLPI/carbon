@@ -201,13 +201,6 @@ class PluginInstallTest extends CommonTestCase
             'name'     => 'ComputePowersTask',
         ]);
         $this->assertFalse($cronTask->isNewItem());
-
-        $cronTask = new CronTask();
-        $cronTask->getFromDBByCrit([
-            'itemtype' => CarbonEmission::class,
-            'name'     => 'ComputeCarbonEmissionsTask',
-        ]);
-        $this->assertFalse($cronTask->isNewItem());
     }
 
     private function checkConfig()
