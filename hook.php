@@ -51,6 +51,13 @@ use ComputerType as GlpiComputerType;
  */
 function plugin_carbon_install()
 {
+    global $argv;
+
+    // Handle -p force-fresh-install argument. If found, let's do an uninstall first
+    if (in_array('force-fresh-install', $argv)) {
+        plugin_carbon_uninstall();
+    }
+
     if (!is_readable(__DIR__ . '/install/Install.php')) {
         return false;
     }

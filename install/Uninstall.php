@@ -38,6 +38,7 @@ use DBUtils;
 use DisplayPreference;
 use Migration;
 use ProfileRight;
+use CronTask;
 
 class Uninstall
 {
@@ -62,12 +63,18 @@ class Uninstall
             ComputerUsageProfile::class,
             EnvironnementalImpact::class,
         ];
+
         $DbUtils = new DBUtils();
         foreach ($itemtypesWihTable as $itemtype) {
-            $DB->dropTable($DbUtils->getTableForItemType($itemtype));
+            // Check if table exists, needed for forced install use case
+            $table = $DbUtils->getTableForItemType($itemtype);
+            if ($DB->tableExists($table)) {
+                $DB->dropTable($table);
+            }
         }
 
         $this->deleteConfig();
+        $this->deleteAutomaticActions();
         $this->deleteRights();
         $this->deleteDisplayPrefs();
 
@@ -91,6 +98,21 @@ class Uninstall
             ])
         ) {
             throw new \RuntimeException('Error while deleting rights');
+        }
+    }
+
+    public function deleteAutomaticActions()
+    {
+        $actions = [
+            ComputerPower::class,
+            CarbonEmission::class,
+        ];
+
+        foreach ($actions as $itemtype) {
+            $cron_task = new CronTask();
+            $cron_task->deleteByCriteria([
+                'itemtype' => $itemtype,
+            ]);
         }
     }
 
