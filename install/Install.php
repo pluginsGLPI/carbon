@@ -160,7 +160,7 @@ class Install
                 $action['options']
             );
             if (!$success) {
-                throw new \RuntimeException('Error while creating automatic action: ' . $name);
+                throw new \RuntimeException('Error while creating automatic action: ' . $action['name']);
             }
         }
     }
