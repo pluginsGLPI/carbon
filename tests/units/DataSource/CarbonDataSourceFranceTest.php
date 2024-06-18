@@ -31,55 +31,26 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\DataSource;
+namespace GlpiPlugin\Carbon\DataSource\Tests;
 
-use DateInterval;
-use DateTimeImmutable;
 use DateTime;
+use GlpiPlugin\Carbon\DataSource\CarbonDataSourceFrance;
+use GlpiPlugin\Carbon\Tests\CommonTestCase;
 
-class CarbonDataSourceFrance implements CarbonDataSource
+// curl -X 'GET' \
+//   'https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/eco2mix-national-tr/records?select=taux_co2%2Cdate_heure&where=date_heure%20IN%20%5Bdate%272024-06-16T14%3A00%3A00%27%20TO%20date%272024-06-16T20%3A00%3A00%27%5D&order_by=date_heure%20desc&limit=50&offset=0&timezone=UTC&include_links=false&include_app_metas=false' \
+//   -H 'accept: application/json; charset=utf-8'
+
+class CarbonDataSourceFranceTest extends CommonTestCase
 {
-    const BASE_URL = 'https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/eco2mix-national-tr/records';
-
-    private RestApiClient $client;
-
-    public function __construct()
+    public function testGetCarbonIntensity()
     {
-        $this->client = new RestApiClient(
-            [
-                'base_uri'        => self::BASE_URL,
-            ]
-        );
-    }
+        $source = new CarbonDataSourceFrance();
 
-    public function getCarbonIntensity(string $country = "", string $latitude = "", string $longitude = "", DateTime &$date = null): int
-    {
-        $d = DateTimeImmutable::createFromMutable($date);
+        $date = new DateTime();
+        $intensity = $source->getCarbonIntensity('France', '', '', $date);
 
-        $format = "Y-m-d\TH:i:sP";
-
-        // "Données éCO2mix nationales temps réel" has a depth from M-1 to H-2
-        $from = $d->sub(new DateInterval('PT3H'))->format($format);
-        $to = $d->sub(new DateInterval('PT2H'))->format($format);
-
-        $params = [
-            'select'    => 'taux_co2,date_heure',
-            'where'     => "date_heure IN [date'$from' TO date'$to']",
-            'order_by'  => 'date_heure desc',
-            'limit'     => 20,
-            'offset'    => 0,
-            'timezone'  => 'UTC',
-        ];
-
-        $carbon_intensity = 0.0;
-
-        if ($response = $this->client->request('GET', '', ['query' => $params])) {
-            foreach ($response['records'] as $record) {
-                $carbon_intensity += $record['record']['fields']['taux_co2'];
-            }
-            $carbon_intensity /= count($response['records']);
-        }
-
-        return intval(round($carbon_intensity));
+        $this->assertIsInt($intensity);
+        $this->assertTrue(0 < $intensity && $intensity < 100);
     }
 }

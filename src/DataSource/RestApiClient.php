@@ -48,7 +48,7 @@ class RestApiClient
     protected $api_client = null;
     protected $last_error = '';
 
-    protected function __construct(array $params)
+    function __construct(array $params)
     {
         $local_params = [
             'timeout'         => self::DEFAULT_TIMEOUT,
@@ -65,7 +65,7 @@ class RestApiClient
         $this->api_client = new Client(array_merge_recursive($local_params, $params));
     }
 
-    protected function request(string $method = 'GET', string $uri = '', array $options = [])
+    function request(string $method = 'GET', string $uri = '', array $options = [])
     {
         try {
             $response = $this->api_client->request($method, $uri, $options);
