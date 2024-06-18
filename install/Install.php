@@ -138,36 +138,30 @@ class Install
 
     private function createAutomaticActions()
     {
-        $name = 'ComputePowersTask';
-        $success = CronTask::Register(
-            ComputerPower::class,
-            $name,
-            DAY_TIMESTAMP,
+        $automatic_actions = [
             [
-                'mode' => CronTask::MODE_INTERNAL,
-                'allowmode' => CronTask::MODE_INTERNAL + CronTask::MODE_EXTERNAL,
-                'logs_lifetime' => 30,
-                'comment' => __('Computes power consumption of computers', 'carbon'),
-            ]
-        );
-        if (!$success) {
-            throw new \RuntimeException('Error while creating automatic action: ' . $name);
-        }
+                'itemtype'  => ComputerPower::class,
+                'name'      => 'ComputePowersTask',
+                'frequency' => DAY_TIMESTAMP,
+                'options'   => [
+                    'mode' => CronTask::MODE_INTERNAL,
+                    'allowmode' => CronTask::MODE_INTERNAL + CronTask::MODE_EXTERNAL,
+                    'logs_lifetime' => 30,
+                    'comment' => __('Computes power consumption of computers', 'carbon'),
+                ]
+            ],
+        ];
 
-        $name = 'ComputeCarbonEmissionsTask';
-        CronTask::Register(
-            CarbonEmission::class,
-            $name,
-            DAY_TIMESTAMP,
-            [
-                'mode' => CronTask::MODE_INTERNAL,
-                'allowmode' => CronTask::MODE_INTERNAL + CronTask::MODE_EXTERNAL,
-                'logs_lifetime' => 30,
-                'comment' => __('Computes carbon emissions of computers', 'carbon'),
-            ]
-        );
-        if (!$success) {
-            throw new \RuntimeException('Error while creating automatic action: ' . $name);
+        foreach ($automatic_actions as $action) {
+            $success = CronTask::Register(
+                $action['itemtype'],
+                $action['name'],
+                $action['frequency'],
+                $action['options']
+            );
+            if (!$success) {
+                throw new \RuntimeException('Error while creating automatic action: ' . $name);
+            }
         }
     }
 
