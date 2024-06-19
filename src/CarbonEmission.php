@@ -81,6 +81,14 @@ class CarbonEmission extends CommonDBChild
         return [];
     }
 
+    public function prepareInpurForAdd($input)
+    {
+        $date = new DateTime($input['date']);
+        $date->setTime(0, 0, 0);
+        $input['date'] = $date->format('Y-m-d');
+        return $input;
+    }
+
     /** Format a weight passing a weight in grams
      *
      * @param integer $weight  Weight in grams
@@ -91,9 +99,9 @@ class CarbonEmission extends CommonDBChild
     {
        //TRANS: list of unit (o for octet)
         $units = [
-            __('g',  'carbon'),
+            __('g', 'carbon'),
             __('Kg', 'carbon'),
-            __('t',  'carbon'),
+            __('t', 'carbon'),
             __('Kt', 'carbon'),
             __('Mt', 'carbon'),
             __('Gt', 'carbon'),

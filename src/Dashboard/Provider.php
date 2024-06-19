@@ -70,7 +70,7 @@ class Provider
     }
 
     /**
-     * Returns sum of a table field grouped by computer model.
+     * Returns sum of of carbon emission grouped by computer model without time limitation.
      *
      * @return array of:
      *   - mixed  'number': sum for the model
@@ -81,51 +81,57 @@ class Provider
     {
         global $DB;
 
-        $computers_table = Computer::getTable();
         $computermodels_table = ComputerModel::getTable();
         $carbonemissions_table = CarbonEmission::getTable();
 
+        $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($carbonemissions_table, '', '', 'auto');
         $request = [
             'SELECT'    => [
                 ComputerModel::getTableField('id'),
                 ComputerModel::getTableField('name'),
                 'SUM' => 'emission_per_day AS total_per_model',
-                'COUNT' => Computer::getTableField('id') . ' AS nb_computers_per_model',
+                new QueryExpression('COUNT(DISTINCT ' . CarbonEmission::getTableField('items_id') . ') AS nb_computers_per_model'),
             ],
             'FROM'      => $computermodels_table,
             'INNER JOIN' => [
-                $computers_table => [
-                    'FKEY'   => [
-                        $computermodels_table  => 'id',
-                        $computers_table => 'computermodels_id',
-                    ]
-                ],
                 $carbonemissions_table => [
                     'FKEY'   => [
-                        $computers_table  => 'id',
-                        $carbonemissions_table => 'computers_id',
+                        $carbonemissions_table => 'models_id',
+                        $computermodels_table  => 'id'
                     ]
                 ],
             ],
+            'WHERE' => [
+                CarbonEmission::getTableField('itemtype') => Computer::class
+            ] + $entity_restrict,
             'GROUPBY' => ComputerModel::getTableField('id'),
+            'ORDER'   => ComputerModel::getTableField('name'),
         ];
+
         if (!empty($where)) {
-            $request['WHERE'] = $where;
+            $request['WHERE'] = $request['WHERE'] + $where;
         }
         $result = $DB->request($request);
 
         $data = [];
         foreach ($result as $row) {
+            $count = $row['nb_computers_per_model'];
             $data[] = [
-                'number' => $row['total_per_model'],
+                'number' => number_format($row['total_per_model'], PLUGIN_CARBON_DECIMALS),
                 'url' => ComputerModel::getFormURLWithID($row['id']),
-                'label' => $row['name'] . " (" . $row['nb_computers_per_model'] . " computers)",
+                'label' => $row['name'] . " (" . $row['nb_computers_per_model'] . " " . Computer::getTypeName($count) . ")",
             ];
         }
 
         return $data;
     }
 
+    /**
+     * Get the sum of power of all computers per model
+     *
+     * @param array $where
+     * @return void
+     */
     public static function getSumPowerPerModel(array $where = [])
     {
         global $DB;
@@ -133,7 +139,9 @@ class Provider
         $computers_table = Computer::getTable();
         $computermodels_table = ComputerModel::getTable();
         $glpiComputertypes_table = GlpiComputerType::getTable();
+        $computertype_table = ComputerType::getTable();
 
+        $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($computers_table, '', '', 'auto');
         $request = [
             'SELECT'    => [
                 ComputerModel::getTableField('id'),
@@ -152,21 +160,29 @@ class Provider
                 $glpiComputertypes_table => [
                     'FKEY'   => [
                         $computers_table  => 'computertypes_id',
-                        $glpiComputertypes_table => 'computertypes_id',
+                        $glpiComputertypes_table => 'id',
                     ]
                 ],
+                $computertype_table => [
+                    'FKEY' => [
+                        $glpiComputertypes_table => 'id',
+                        $computertype_table => 'computertypes_id',
+                    ]
+                ]
             ],
+            'WHERE' => $entity_restrict,
             'GROUPBY' => ComputerModel::getTableField('id'),
+            'ORDER'   => ComputerModel::getTableField('name'),
         ];
         if (!empty($where)) {
-            $request['WHERE'] = $where;
+            $request['WHERE'] = $request['WHERE'] + $where;
         }
         $result = $DB->request($request);
 
         $data = [];
         foreach ($result as $row) {
             $data[] = [
-                'number' => $row['total_per_model'],
+                'number' => number_format($row['total_per_model'], PLUGIN_CARBON_DECIMALS),
                 'url' => ComputerModel::getFormURLWithID($row['id']),
                 'label' => $row['name'] . " (" . $row['nb_computers_per_model'] . " computers)",
             ];
@@ -212,7 +228,7 @@ class Provider
 
         $request = [
             'SELECT' => [
-               Computer::getTableField('*'),
+                Computer::getTableField('*'),
             ],
             'FROM' => $computers_table,
             'INNER JOIN' => [
@@ -316,13 +332,13 @@ class Provider
 
         $request = Provider::getHandledComputersQuery();
         $request['SELECT'] = [
-            'SUM' => ComputerType::getTableField('power') . ' AS total',
+            'SUM' => ComputerType::getTableField('power_consumption') . ' AS total',
         ];
 
         $result = $DB->request($request);
 
         if ($result->numrows() == 1) {
-            return $result->current()['total'];
+            return $result->current()['total'] ?? 0;
         }
 
         return null;
@@ -361,14 +377,14 @@ class Provider
         $result = $DB->request($request);
 
         if ($result->numrows() == 1) {
-            return $result->current()['total'];
+            return number_format($result->current()['total'] ?? 0, PLUGIN_CARBON_DECIMALS);
         }
 
         return null;
     }
 
 
-    public static function getCarbonIntensity() : array
+    public static function getCarbonIntensity(): array
     {
         global $DB;
 
@@ -399,7 +415,7 @@ class Provider
         $rows = $DB->request($request);
         foreach ($rows as $row) {
             $data['labels'][]            = $row['emission_date'];
-            $data['series'][0]['data'][] = $row['intensity'];
+            $data['series'][0]['data'][] = number_format($row['intensity'], PLUGIN_CARBON_DECIMALS);
         }
 
         return $data;
@@ -408,9 +424,9 @@ class Provider
     /**
      * Get carbon emission per month for all assets in the current entity
      *
-     * @return void
+     * @return array
      */
-    public static function getCarbonEmissionPerMonth()
+    public static function getCarbonEmissionPerMonth(): array
     {
         global $DB;
 
@@ -421,12 +437,15 @@ class Provider
 
         $dbUtils = new DbUtils();
         $entityRestrict = $dbUtils->getEntitiesRestrictCriteria($emissions_table, '', '', 'auto');
+        $year_month = new QueryExpression("DATE_FORMAT(`date`, '%Y-%m')");
         $request = [
             'SELECT'    => [
-                'SUM' => CarbonEmission::getTableField('emission_per_day') . ' AS total_emission_per_day',
+                'SUM' => CarbonEmission::getTableField('emission_per_day') . ' AS total_emission_per_month',
+                new QueryExpression("DATE_FORMAT(`date`, '%Y-%m') as `date`")
             ],
             'FROM'    => $emissions_table,
-            'GROUPBY' => new QueryExpression('MONTH(`date`)'),
+            'GROUPBY' => $year_month,
+            'ORDER'   => $year_month,
             'WHERE'   => [
                 'date' => ['>=', $start_date->format('Y-m-d')],
             ] + $entityRestrict,
@@ -436,7 +455,7 @@ class Provider
             'labels' => [],
             'series' => [
                 [
-                    'name' => __("Carbon emission", "carbon"),
+                    'name' => __("gCO2eq / KWh", "carbon"),
                     'data' => []
                 ],
             ]
@@ -446,7 +465,7 @@ class Provider
         foreach ($result as $row) {
             $date = new DateTime($row['date']);
             $data['labels'][] = $date->format('Y-m');
-            $data['series'][0]['data'][] = $row['total_emission_per_day'];
+            $data['series'][0]['data'][] = number_format($row['total_emission_per_month'], PLUGIN_CARBON_DECIMALS);
         }
 
         return $data;

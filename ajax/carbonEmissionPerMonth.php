@@ -31,13 +31,13 @@
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Carbon\Dashboard\Dashboard;
+use GlpiPlugin\Carbon\Dashboard\Provider;
 
 include('../../../inc/includes.php');
 
 header("Content-Type: text/html; charset=UTF-8");
 
-$res = Dashboard::getCarbonEmissionPerMonth();
+$res = Provider::getCarbonEmissionPerMonth();
 
 // Generate fake data
 
