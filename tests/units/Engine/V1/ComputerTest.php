@@ -52,9 +52,8 @@ use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
-use GlpiPlugin\Carbon\Tests\CommonTestCase;
 
-class ComputerTest extends CommonTestCase
+class ComputerTest extends DbTestCase
 {
     const TEST_LAPTOP_USAGE_PROFILE = [
         'name' => 'Test laptop usage profile',
