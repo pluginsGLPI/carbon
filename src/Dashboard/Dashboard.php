@@ -239,7 +239,7 @@ class Dashboard
     public static function cardCarbonEmissionPerMonthProvider(array $params = [])
     {
         $default_params = [
-            'label' => "plugin carbon - carbon emission per month",
+            'label' => __('Carbon emission per month', 'carbon'),
             'icon'  => "fas fa-computer",
             'color' => '#ea9999',
         ];
@@ -257,7 +257,7 @@ class Dashboard
     public static function cardCarbonintensityProvider(array $params = [])
     {
         $default_params = [
-            'label' => "plugin carbon - carbon dioxyde intensity",
+            'label' => __('Carbon dioxyde intensity', 'carbon'),
             'icon'  => "fas fa-computer",
             'color' => '#ea9999',
         ];
@@ -271,23 +271,4 @@ class Dashboard
             'icon'  => $params['icon'],
         ];
     }
-
-    // $date = new DateTime();
-    // $_31days = new DateInterval('P31D');
-    // $_1day = new DateInterval('P1D');
-    // $date->sub($_31days);
-
-    // for ($day = 0; $day < 31; $day++) {
-    //     $data['labels'][] = $date->format('Y-m-d');
-
-    //     $data['series'][0]['data'][] = mt_rand(55, 100);
-
-    //     $date->add($_1day);
-    // }
-
-    // return [
-    //     'data'  => $data,
-    //     'label' => $params['label'],
-    //     'icon'  => $params['icon'],
-    // ];
 }
