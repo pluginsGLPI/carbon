@@ -261,7 +261,7 @@ class CommonTestCase extends TestCase
         $entity      = new Entity();
         $rand        = mt_rand();
         $entities_id = $entity->add([
-            'name'        => "test formcreator sub entity $rand",
+            'name'        => "test sub entity $rand",
             'entities_id' => 0
         ]);
 
