@@ -36,7 +36,6 @@ namespace GlpiPlugin\Carbon\Dashboard\Tests;
 use Computer;
 use ComputerModel;
 use ComputerType as GlpiComputerType;
-use DbUtils;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Dashboard\Provider;
@@ -103,85 +102,85 @@ class ProviderTest extends DbTestCase
             Computer::class => [
                 [
                     'computermodels_id' => $computer_model_empty->getID(),
-                    'computertypes_id'  => $computer_type_empty->getID(),
+                    'computertypes_id'  => $glpi_computer_type_empty->getID(),
                     'locations_id'      => $location_empty->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model->getID(),
-                    'computertypes_id'  => $computer_type_empty->getID(),
+                    'computertypes_id'  => $glpi_computer_type_empty->getID(),
                     'locations_id'      => $location_empty->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model_empty->getID(),
-                    'computertypes_id'  => $computer_type->getID(),
+                    'computertypes_id'  => $glpi_computer_type->getID(),
                     'locations_id'      => $location_empty->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model->getID(),
-                    'computertypes_id'  => $computer_type->getID(),
+                    'computertypes_id'  => $glpi_computer_type->getID(),
                     'locations_id'      => $location_empty->getID(),
                 ],
 
                 [
                     'computermodels_id' => $computer_model_empty->getID(),
-                    'computertypes_id'  => $computer_type_empty->getID(),
+                    'computertypes_id'  => $glpi_computer_type_empty->getID(),
                     'locations_id'      => $location_empty_2->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model->getID(),
-                    'computertypes_id'  => $computer_type_empty->getID(),
+                    'computertypes_id'  => $glpi_computer_type_empty->getID(),
                     'locations_id'      => $location_empty_2->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model_empty->getID(),
-                    'computertypes_id'  => $computer_type->getID(),
+                    'computertypes_id'  => $glpi_computer_type->getID(),
                     'locations_id'      => $location_empty_2->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model->getID(),
-                    'computertypes_id'  => $computer_type->getID(),
+                    'computertypes_id'  => $glpi_computer_type->getID(),
                     'locations_id'      => $location_empty_2->getID(),
                 ],
 
                 [
                     'computermodels_id' => $computer_model_empty->getID(),
-                    'computertypes_id'  => $computer_type_empty->getID(),
+                    'computertypes_id'  => $glpi_computer_type_empty->getID(),
                     'locations_id'      => $location_empty_3->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model->getID(),
-                    'computertypes_id'  => $computer_type_empty->getID(),
+                    'computertypes_id'  => $glpi_computer_type_empty->getID(),
                     'locations_id'      => $location_empty_3->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model_empty->getID(),
-                    'computertypes_id'  => $computer_type->getID(),
+                    'computertypes_id'  => $glpi_computer_type->getID(),
                     'locations_id'      => $location_empty_3->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model->getID(),
-                    'computertypes_id'  => $computer_type->getID(),
+                    'computertypes_id'  => $glpi_computer_type->getID(),
                     'locations_id'      => $location_empty_3->getID(),
                 ],
 
                 [
                     'computermodels_id' => $computer_model_empty->getID(),
-                    'computertypes_id'  => $computer_type_empty->getID(),
+                    'computertypes_id'  => $glpi_computer_type_empty->getID(),
                     'locations_id'      => $location->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model->getID(),
-                    'computertypes_id'  => $computer_type_empty->getID(),
+                    'computertypes_id'  => $glpi_computer_type_empty->getID(),
                     'locations_id'      => $location->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model_empty->getID(),
-                    'computertypes_id'  => $computer_type->getID(),
+                    'computertypes_id'  => $glpi_computer_type->getID(),
                     'locations_id'      => $location->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model->getID(),
-                    'computertypes_id'  => $computer_type->getID(),
+                    'computertypes_id'  => $glpi_computer_type->getID(),
                     'locations_id'      => $location->getID(),
                 ],
             ]
