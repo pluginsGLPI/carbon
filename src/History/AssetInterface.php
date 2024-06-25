@@ -26,16 +26,18 @@
  * SOFTWARE.
  * -------------------------------------------------------------------------
  * @copyright Copyright (C) 2024 Teclib' and contributors.
+ * @copyright Copyright (C) 2024 by the carbon plugin team.
  * @license   MIT https://opensource.org/licenses/mit-license.php
  * @link      https://github.com/pluginsGLPI/carbon
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Carbon\Dashboard\Provider;
+namespace GlpiPlugin\Carbon\History;
 
-include('../../../inc/includes.php');
+use CommonDBTM;
+use GlpiPlugin\Carbon\Engine\V1\CommonInterface as EngineInterface;
 
-header("Content-Type: text/html; charset=UTF-8");
-
-$res = Provider::getHandledComputersCount();
-echo json_encode($res);
+interface AssetInterface
+{
+    public static function getEngine(CommonDBTM $item): EngineInterface;
+}

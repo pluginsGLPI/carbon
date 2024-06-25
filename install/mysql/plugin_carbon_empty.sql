@@ -31,9 +31,15 @@
 
 CREATE TABLE `glpi_plugin_carbon_carbonemissions` (
   `id`               int unsigned NOT NULL AUTO_INCREMENT,
-  `computers_id`     int unsigned NOT NULL DEFAULT '0',
+  `itemtype`         varchar(255) DEFAULT NULL,
+  `items_id`         int unsigned NOT NULL DEFAULT '0',
+  `entities_id`      int unsigned NOT NULL DEFAULT '0',
+  `types_id`         int unsigned NOT NULL DEFAULT '0',
+  `models_id`        int unsigned NOT NULL DEFAULT '0',
+  `locations_id`     int unsigned NOT NULL DEFAULT '0',
+  `energy_per_day`   float        DEFAULT '0',
   `emission_per_day` float        DEFAULT '0',
-  `emission_date`    timestamp    NULL DEFAULT NULL,
+  `date`             timestamp    NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

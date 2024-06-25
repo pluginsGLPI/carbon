@@ -39,6 +39,8 @@ use DisplayPreference;
 use Migration;
 use ProfileRight;
 use CronTask;
+use GlpiPlugin\Carbon\ComputerPower;
+use GlpiPlugin\Carbon\CarbonEmission;
 
 class Uninstall
 {

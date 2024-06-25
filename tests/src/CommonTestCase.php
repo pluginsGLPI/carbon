@@ -36,11 +36,23 @@ namespace GlpiPlugin\Carbon\Tests;
 use PHPUnit\Framework\TestCase;
 use Auth;
 use CommonDBTM;
-use Config;
+use Computer;
+use ComputerType as GlpiComputerType;
+use DateTime;
+use DateInterval;
+use DateTimeInterface;
 use DB;
 use Glpi\Inventory\Conf;
+use GlpiPlugin\Carbon\EnvironnementalImpact;
+use GlpiPlugin\Carbon\ComputerUsageProfile;
+use GlpiPlugin\Carbon\ComputerType;
+use GlpiPlugin\Carbon\CarbonIntensitySource;
+use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\CarbonIntensity;
 use Entity;
+use GlpiPlugin\Carbon\CarbonEmission;
 use Html;
+use Location;
 use Session;
 use Ticket;
 use Toolbox;
@@ -113,20 +125,6 @@ class CommonTestCase extends TestCase
         return $result;
     }
 
-    protected function setupGLPI()
-    {
-        global $CFG_GLPI;
-        $settings = [
-            'use_mailing' => '1',
-            'enable_api'  => '1',
-            'enable_api_login_credentials'  => '1',
-            'enable_api_login_external_token'  => '1',
-        ];
-        Config::setConfigurationValues('core', $settings);
-
-        $CFG_GLPI = $settings + $CFG_GLPI;
-    }
-
     /**
      * Get a unique random string
      */
@@ -147,13 +145,15 @@ class CommonTestCase extends TestCase
      */
     protected function getItem(string $itemtype, array $input = []): CommonDBTM
     {
+        global $DB;
+
         /** @var CommonDBTM */
         $item = new $itemtype();
 
         $this->handleDeprecations($itemtype, $input);
 
         // set random name if not already set
-        if (!isset($item->fields['name'])) {
+        if (!isset($item->fields['name']) && $DB->fieldExists($item->getTable(), 'name')) {
             if (!isset($input['name'])) {
                 $input['name'] = $this->getUniqueString();
             }
@@ -201,6 +201,97 @@ class CommonTestCase extends TestCase
         }
 
         return $output;
+    }
+
+    protected function createComputerUsageProfile(array $usage_profile_params): Computer
+    {
+        $usage_profile = $this->getItem(ComputerUsageProfile::class, $usage_profile_params);
+        $glpi_computer = $this->getItem(Computer::class);
+        $impact = $this->getItem(EnvironnementalImpact::class, [
+            Computer::getForeignKeyField() => $glpi_computer->getId(),
+            ComputerUsageProfile::getForeignKeyField() => $usage_profile->getID(),
+        ]);
+
+        return $glpi_computer;
+    }
+
+    protected function createComputerUsageProfilePower(array $usage_profile_params, int $type_power): Computer
+    {
+        $glpi_computer = $this->createComputerUsageProfile($usage_profile_params);
+        $glpiComputerType = $this->getItem(GlpiComputerType::class);
+        $carbonComputerType = $this->getItem(ComputerType::class, [
+            GlpiComputerType::getForeignKeyField() => $glpiComputerType->getID(),
+            'power_consumption'                    => $type_power,
+        ]);
+        $glpi_computer->update([
+            'id'                                   => $glpi_computer->getID(),
+            GlpiComputerType::getForeignKeyField() => $glpiComputerType->getID(),
+        ]);
+
+        return $glpi_computer;
+    }
+
+    protected function createComputerUsageProfilePowerLocation(array $usage_profile_params, int $type_power, string $country): Computer
+    {
+        $glpi_computer = $this->createComputerUsageProfilePower($usage_profile_params, $type_power);
+
+        $location = $this->getItem(
+            Location::class,
+            [
+                'country' => $country,
+            ]
+        );
+        $glpi_computer->update([
+            'id'                                => $glpi_computer->getID(),
+            Location::getForeignKeyField()      => $location->getID(),
+        ]);
+
+        return $glpi_computer;
+    }
+
+    protected function createCarbonIntensityData(string $country, string $source_name, DateTimeInterface $begin_date, float $intensity, string $length = 'P2D')
+    {
+        $zone = $this->getItem(CarbonIntensityZone::class, [ 'name' => $country ]);
+
+        $source = $this->getItem(CarbonIntensitySource::class, [ 'name' => $source_name ]);
+
+        $current_date = clone $begin_date;
+        $current_date->sub(new DateInterval('P1D'));
+        $end_date = clone $current_date;
+        $end_date->add(new DateInterval($length));
+        $one_hour = new DateInterval('PT1H');
+        while ($current_date < $end_date) {
+            $crit = [
+                CarbonIntensitySource::getForeignKeyField()  => $source->getID(),
+                CarbonIntensityZone::getForeignKeyField() => $zone->getID(),
+                'emission_date' => $current_date->format('Y-m-d H:i:s'),
+                'intensity' => $intensity,
+            ];
+            $emission = $this->getItem(CarbonIntensity::class, $crit);
+            $current_date->add($one_hour);
+        }
+    }
+
+    protected function createCarbonEmissionData(CommonDBTM $item, DateTime $start, DateInterval $length, float $energy, float $emission)
+    {
+        $date_current = clone $start;
+        $date_stop = $start->add($length);
+        while ($date_current < $date_stop) {
+            $itemtype = $item->getType();
+            $items_id = $item->getID();
+            $this->getItem(CarbonEmission::class, [
+                'itemtype'         => $itemtype,
+                'items_id'         => $items_id,
+                'entities_id'      => Session::getActiveEntity(),
+                'types_id'         => $item->fields['computertypes_id'],
+                'models_id'        => $item->fields['computermodels_id'],
+                'locations_id'     => $item->fields['locations_id'],
+                'energy_per_day'   => $energy,
+                'emission_per_day' => $emission,
+                'date'             => $date_current->format('Y-m-d'),
+            ]);
+            $date_current = $date_current->add(new DateInterval('P1D'));
+        }
     }
 
     protected function getSessionMessage()
@@ -275,7 +366,7 @@ class CommonTestCase extends TestCase
         $entity      = new Entity();
         $rand        = mt_rand();
         $entities_id = $entity->add([
-            'name'        => "test formcreator sub entity $rand",
+            'name'        => "test sub entity $rand",
             'entities_id' => 0
         ]);
 

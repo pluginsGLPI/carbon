@@ -36,7 +36,9 @@ namespace GlpiPlugin\Carbon\Dashboard\Tests;
 use Computer;
 use ComputerModel;
 use ComputerType as GlpiComputerType;
-use DbUtils;
+use DateInterval;
+use DateTime;
+use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Dashboard\Provider;
@@ -103,85 +105,85 @@ class ProviderTest extends DbTestCase
             Computer::class => [
                 [
                     'computermodels_id' => $computer_model_empty->getID(),
-                    'computertypes_id'  => $computer_type_empty->getID(),
+                    'computertypes_id'  => $glpi_computer_type_empty->getID(),
                     'locations_id'      => $location_empty->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model->getID(),
-                    'computertypes_id'  => $computer_type_empty->getID(),
+                    'computertypes_id'  => $glpi_computer_type_empty->getID(),
                     'locations_id'      => $location_empty->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model_empty->getID(),
-                    'computertypes_id'  => $computer_type->getID(),
+                    'computertypes_id'  => $glpi_computer_type->getID(),
                     'locations_id'      => $location_empty->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model->getID(),
-                    'computertypes_id'  => $computer_type->getID(),
+                    'computertypes_id'  => $glpi_computer_type->getID(),
                     'locations_id'      => $location_empty->getID(),
                 ],
 
                 [
                     'computermodels_id' => $computer_model_empty->getID(),
-                    'computertypes_id'  => $computer_type_empty->getID(),
+                    'computertypes_id'  => $glpi_computer_type_empty->getID(),
                     'locations_id'      => $location_empty_2->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model->getID(),
-                    'computertypes_id'  => $computer_type_empty->getID(),
+                    'computertypes_id'  => $glpi_computer_type_empty->getID(),
                     'locations_id'      => $location_empty_2->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model_empty->getID(),
-                    'computertypes_id'  => $computer_type->getID(),
+                    'computertypes_id'  => $glpi_computer_type->getID(),
                     'locations_id'      => $location_empty_2->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model->getID(),
-                    'computertypes_id'  => $computer_type->getID(),
+                    'computertypes_id'  => $glpi_computer_type->getID(),
                     'locations_id'      => $location_empty_2->getID(),
                 ],
 
                 [
                     'computermodels_id' => $computer_model_empty->getID(),
-                    'computertypes_id'  => $computer_type_empty->getID(),
+                    'computertypes_id'  => $glpi_computer_type_empty->getID(),
                     'locations_id'      => $location_empty_3->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model->getID(),
-                    'computertypes_id'  => $computer_type_empty->getID(),
+                    'computertypes_id'  => $glpi_computer_type_empty->getID(),
                     'locations_id'      => $location_empty_3->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model_empty->getID(),
-                    'computertypes_id'  => $computer_type->getID(),
+                    'computertypes_id'  => $glpi_computer_type->getID(),
                     'locations_id'      => $location_empty_3->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model->getID(),
-                    'computertypes_id'  => $computer_type->getID(),
+                    'computertypes_id'  => $glpi_computer_type->getID(),
                     'locations_id'      => $location_empty_3->getID(),
                 ],
 
                 [
                     'computermodels_id' => $computer_model_empty->getID(),
-                    'computertypes_id'  => $computer_type_empty->getID(),
+                    'computertypes_id'  => $glpi_computer_type_empty->getID(),
                     'locations_id'      => $location->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model->getID(),
-                    'computertypes_id'  => $computer_type_empty->getID(),
+                    'computertypes_id'  => $glpi_computer_type_empty->getID(),
                     'locations_id'      => $location->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model_empty->getID(),
-                    'computertypes_id'  => $computer_type->getID(),
+                    'computertypes_id'  => $glpi_computer_type->getID(),
                     'locations_id'      => $location->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model->getID(),
-                    'computertypes_id'  => $computer_type->getID(),
+                    'computertypes_id'  => $glpi_computer_type->getID(),
                     'locations_id'      => $location->getID(),
                 ],
             ]
@@ -230,5 +232,156 @@ class ProviderTest extends DbTestCase
 
         $unhandled_count = Provider::getUnhandledComputersCount([Computer::getTableField('entities_id') => Session::getActiveEntity()]);
         $this->assertEquals($total_count - 3, $unhandled_count);
+    }
+
+    public function testGetSumEmissionsPerModel()
+    {
+        $entities_id = $this->isolateInEntity('glpi', 'glpi');
+
+        $computer_type    = $this->getItem(GlpiComputerType::class);
+        $computer_model_1 = $this->getItem(ComputerModel::class);
+        $computer_model_2 = $this->getItem(ComputerModel::class);
+        $location = $this->getItem(Location::class, [
+            'latitude'  => '48.864716',
+            'longitude' => '2.349014',
+            'country'   => 'France'
+        ]);
+
+        $date = new DateTime('now');
+        $date->setTime(0, 0, 0);
+        for ($shift = 1; $shift < 5; $shift++) {
+            $date = $date->sub(new DateInterval('P1D'));
+            $rows = [
+                CarbonEmission::class => [
+                    [
+                        'itemtype'         => Computer::class,
+                        'items_id'         => 1,
+                        'entities_id'      => $entities_id,
+                        'types_id'         => $computer_type->getID(),
+                        'models_id'        => $computer_model_1->getID(),
+                        'locations_id'     => $location->getID(),
+                        'energy_per_day'   => 0.5,
+                        'emission_per_day' => 1,
+                        'date'             => $date->format('Y-m-d'),
+                    ], [
+                        'itemtype'         => Computer::class,
+                        'items_id'         => 2,
+                        'entities_id'      => $entities_id,
+                        'types_id'         => $computer_type->getID(),
+                        'models_id'        => $computer_model_2->getID(),
+                        'locations_id'     => $location->getID(),
+                        'energy_per_day'   => 1,
+                        'emission_per_day' => 2,
+                        'date'             => $date->format('Y-m-d'),
+                    ],
+                ]
+            ];
+
+            $items = $this->getItems($rows);
+        }
+
+        $output = Provider::getSumEmissionsPerModel();
+        $expected = [
+            [
+                'number' => 4.0,
+                'url' => ComputerModel::getFormURLWithID($computer_model_1->getID()),
+                'label' => $computer_model_1->fields['name'] . " (1 Computer)",
+            ], [
+                'number' => 8.0,
+                'url' => ComputerModel::getFormURLWithID($computer_model_2->getID()),
+                'label' => $computer_model_2->fields['name'] . " (1 Computer)",
+            ]
+        ];
+        $this->assertEquals($expected, $output);
+    }
+
+    public function testGetSumPowerPerModel()
+    {
+        $entities_id = $this->isolateInEntity('glpi', 'glpi');
+
+        $country = $this->getUniqueString();
+        $usage_profile = [
+            'name' => 'Test laptop usage profile',
+            'average_load' => 30,
+            'time_start' => "09:00:00",
+            'time_stop' => "17:00:00",
+            'day_1' => 1,
+            'day_2' => 1,
+            'day_3' => 1,
+            'day_4' => 1,
+            'day_5' => 1,
+            'day_6' => 0,
+            'day_7' => 0,
+        ];
+        $computer_1 = $this->createComputerUsageProfilePowerLocation($usage_profile, 60, $country);
+        $computer_2 = $this->createComputerUsageProfilePowerLocation($usage_profile, 60, $country);
+        $computer_3 = $this->createComputerUsageProfilePowerLocation($usage_profile, 60, $country);
+        $computer_4 = $this->createComputerUsageProfilePowerLocation($usage_profile, 60, $country);
+
+        $computer_model_1 = $this->getItem(ComputerModel::class, [
+            'power_consumption' => 10
+        ]);
+        $computer_model_2 = $this->getItem(ComputerModel::class, [
+            'power_consumption' => 40
+        ]);
+
+        $computer_1->update([
+            'id' => $computer_1->getID(),
+            ComputerModel::getForeignKeyField() => $computer_model_1->getID(),
+        ]);
+        $computer_2->update([
+            'id' => $computer_2->getID(),
+            ComputerModel::getForeignKeyField() => $computer_model_1->getID(),
+        ]);
+        $computer_3->update([
+            'id' => $computer_3->getID(),
+            ComputerModel::getForeignKeyField() => $computer_model_2->getID(),
+        ]);
+        $computer_4->update([
+            'id' => $computer_4->getID(),
+            ComputerModel::getForeignKeyField() => $computer_model_2->getID(),
+        ]);
+
+        $output = Provider::getSumPowerPerModel();
+        $expected = [
+            [
+                'number' => 20.0,
+                'url' => ComputerModel::getFormURLWithID($computer_model_1->getID()),
+                'label' => $computer_model_1->fields['name'] . " (2 computers)",
+            ], [
+                'number' => 80.0,
+                'url' => ComputerModel::getFormURLWithID($computer_model_2->getID()),
+                'label' => $computer_model_2->fields['name'] . " (2 computers)",
+            ]
+        ];
+        $this->assertEquals($expected, $output);
+    }
+
+    public function testGetCarbonEmissionPerMonth()
+    {
+        $country = $this->getUniqueString();
+        $source  = $this->getUniqueString();
+        $usage_profile = [
+            'name' => 'Test laptop usage profile',
+            'average_load' => 30,
+            'time_start' => "09:00:00",
+            'time_stop' => "17:00:00",
+            'day_1' => 1,
+            'day_2' => 1,
+            'day_3' => 1,
+            'day_4' => 1,
+            'day_5' => 1,
+            'day_6' => 1,
+            'day_7' => 1,
+        ];
+        $computer_1 = $this->createComputerUsageProfilePowerLocation($usage_profile, 60, $country);
+        $start_date = new DateTime('now');
+        $start_date->modify('-5 month');
+        $duration = 'P4M';
+        $this->createCarbonIntensityData($country, $source, $start_date, 1, $duration);
+        $this->createCarbonEmissionData($computer_1, $start_date, new DateInterval($duration), 1, 2);
+        $output = Provider::getCarbonEmissionPerMonth();
+
+        // TODO: check all values
     }
 }

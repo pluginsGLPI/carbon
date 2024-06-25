@@ -38,6 +38,7 @@ use CronTask;
 use Migration;
 use ProfileRight;
 use Profile;
+use GlpiPlugin\Carbon\History\Computer;
 use Glpi\Plugin\Hooks;
 
 class Install
@@ -150,6 +151,18 @@ class Install
                     'comment' => __('Computes power consumption of computers', 'carbon'),
                 ]
             ],
+            [
+                'itemtype'  => CarbonEmission::class,
+                'name'      => 'Historize',
+                'frequency' => DAY_TIMESTAMP,
+                'options'   => [
+                    'mode' => CronTask::MODE_EXTERNAL,
+                    'allowmode' => CronTask::MODE_INTERNAL + CronTask::MODE_EXTERNAL,
+                    'logs_lifetime' => 30,
+                    'comment' => __('Computes carbon emissions of computers', 'carbon'),
+                    'param'   => 10000, // Maximum rows to generate per execution
+                ]
+            ],
         ];
 
         foreach ($automatic_actions as $action) {
@@ -160,7 +173,7 @@ class Install
                 $action['options']
             );
             if (!$success) {
-                throw new \RuntimeException('Error while creating automatic action: ' . $name);
+                throw new \RuntimeException('Error while creating automatic action: ' . $action['name']);
             }
         }
     }

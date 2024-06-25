@@ -52,9 +52,8 @@ use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
-use GlpiPlugin\Carbon\Tests\CommonTestCase;
 
-class ComputerTest extends CommonTestCase
+class ComputerTest extends DbTestCase
 {
     const TEST_LAPTOP_USAGE_PROFILE = [
         'name' => 'Test laptop usage profile',
@@ -101,52 +100,6 @@ class ComputerTest extends CommonTestCase
      */
     const EPSILON = 0.001;
 
-    private function createComputerUsageProfile(array $usage_profile_params): GlpiComputer
-    {
-        $usage_profile = $this->getItem(ComputerUsageProfile::class, $usage_profile_params);
-        $glpi_computer = $this->getItem(GlpiComputer::class);
-        $impact = $this->getItem(EnvironnementalImpact::class, [
-            GlpiComputer::getForeignKeyField() => $glpi_computer->getId(),
-            ComputerUsageProfile::getForeignKeyField() => $usage_profile->getID(),
-        ]);
-
-        return $glpi_computer;
-    }
-
-    private function createComputerUsageProfilePower(array $usage_profile_params, int $type_power): GlpiComputer
-    {
-        $glpi_computer = $this->createComputerUsageProfile($usage_profile_params);
-        $glpiComputerType = $this->getItem(GlpiComputerType::class);
-        $carbonComputerType = $this->getItem(ComputerType::class, [
-            GlpiComputerType::getForeignKeyField() => $glpiComputerType->getID(),
-            'power_consumption'                    => $type_power,
-        ]);
-        $glpi_computer->update([
-            'id'                                   => $glpi_computer->getID(),
-            GlpiComputerType::getForeignKeyField() => $glpiComputerType->getID(),
-        ]);
-
-        return $glpi_computer;
-    }
-
-    private function createComputerUsageProfilePowerLocation(array $usage_profile_params, int $type_power, string $country): GlpiComputer
-    {
-        $glpi_computer = $this->createComputerUsageProfilePower($usage_profile_params, $type_power);
-
-        $location = $this->getItem(
-            Location::class,
-            [
-                'country' => $country,
-            ]
-        );
-        $glpi_computer->update([
-            'id'                                => $glpi_computer->getID(),
-            Location::getForeignKeyField()      => $location->getID(),
-        ]);
-
-        return $glpi_computer;
-    }
-
     public function computerUsageProfileProvider(): \Generator
     {
         $laptop_glpi_computer = $this->createComputerUsageProfile(self::TEST_LAPTOP_USAGE_PROFILE);
@@ -155,7 +108,8 @@ class ComputerTest extends CommonTestCase
             self::TEST_LAPTOP_USAGE_PROFILE,
         ];
 
-        $server_glpi_computer = $this->createComputerUsageProfile(self::TEST_SERVER_USAGE_PROFILE);
+        $country = $this->getUniqueString();
+        $server_glpi_computer = $this->createComputerUsageProfilePowerLocation(self::TEST_SERVER_USAGE_PROFILE, 150, $country);
         yield 'Computer with server usage profile' => [
             new Computer($server_glpi_computer->getID()),
             self::TEST_SERVER_USAGE_PROFILE,
@@ -213,29 +167,6 @@ class ComputerTest extends CommonTestCase
     {
         $monday = new DateTime('2024-01-01 00:00:00', new DateTimeZone('UTC'));
         $this->assertEquals($computer->getEnergyPerDay($monday), $expected_energy);
-    }
-
-    private function createCarbonIntensityData(string $country, string $source_name, DateTimeInterface $begin_date, float $intensity)
-    {
-        $zone = $this->getItem(CarbonIntensityZone::class, [ 'name' => $country ]);
-
-        $source = $this->getItem(CarbonIntensitySource::class, [ 'name' => $source_name ]);
-
-        $current_date = clone $begin_date;
-        $current_date->sub(new DateInterval('P1D'));
-        $end_date = clone $current_date;
-        $end_date->add(new DateInterval('P2D'));
-        $one_hour = new DateInterval('PT1H');
-        while ($current_date < $end_date) {
-            $crit = [
-                CarbonIntensitySource::getForeignKeyField()  => $source->getID(),
-                CarbonIntensityZone::getForeignKeyField() => $zone->getID(),
-                'emission_date' => $current_date->format('Y-m-d H:i:s'),
-                'intensity' => $intensity,
-            ];
-            $emission = $this->getItem(CarbonIntensity::class, $crit);
-            $current_date->add($one_hour);
-        }
     }
 
     public function computerCarbonIntensityProvider(): \Generator
