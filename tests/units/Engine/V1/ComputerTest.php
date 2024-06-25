@@ -108,7 +108,8 @@ class ComputerTest extends DbTestCase
             self::TEST_LAPTOP_USAGE_PROFILE,
         ];
 
-        $server_glpi_computer = $this->createComputerUsageProfile(self::TEST_SERVER_USAGE_PROFILE);
+        $country = $this->getUniqueString();
+        $server_glpi_computer = $this->createComputerUsageProfilePowerLocation(self::TEST_SERVER_USAGE_PROFILE, 150, $country);
         yield 'Computer with server usage profile' => [
             new Computer($server_glpi_computer->getID()),
             self::TEST_SERVER_USAGE_PROFILE,
