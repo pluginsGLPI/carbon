@@ -126,6 +126,55 @@ class Provider
         return $data;
     }
 
+    public static function getSumEmissionsPerType(array $where = [])
+    {
+        global $DB;
+
+        $glpicomputertypes_table = GlpiComputerType::getTable();
+        $carbonemissions_table = CarbonEmission::getTable();
+
+        $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($carbonemissions_table, '', '', 'auto');
+        $request = [
+            'SELECT'    => [
+                GlpiComputerType::getTableField('id'),
+                GlpiComputerType::getTableField('name'),
+                'SUM' => 'emission_per_day AS total_per_type',
+                new QueryExpression('COUNT(DISTINCT ' . CarbonEmission::getTableField('items_id') . ') AS nb_computers_per_type'),
+            ],
+            'FROM'      => $glpicomputertypes_table,
+            'INNER JOIN' => [
+                $carbonemissions_table => [
+                    'FKEY'   => [
+                        $carbonemissions_table => 'types_id',
+                        $glpicomputertypes_table  => 'id'
+                    ]
+                ],
+            ],
+            'WHERE' => [
+                CarbonEmission::getTableField('itemtype') => Computer::class
+            ] + $entity_restrict,
+            'GROUPBY' => GlpiComputerType::getTableField('id'),
+            'ORDER'   => GlpiComputerType::getTableField('name'),
+        ];
+
+        if (!empty($where)) {
+            $request['WHERE'] = $request['WHERE'] + $where;
+        }
+        $result = $DB->request($request);
+
+        $data = [];
+        foreach ($result as $row) {
+            $count = $row['nb_computers_per_type'];
+            $data[] = [
+                'number' => number_format($row['total_per_type'], PLUGIN_CARBON_DECIMALS),
+                'url' => GlpiComputerType::getFormURLWithID($row['id']),
+                'label' => $row['name'] . " (" . $row['nb_computers_per_type'] . " " . Computer::getTypeName($count) . ")",
+            ];
+        }
+
+        return $data;
+    }
+
     /**
      * Get the sum of power of all computers per model
      *
