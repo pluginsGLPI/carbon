@@ -40,8 +40,8 @@ if (PHP_SAPI != 'cli') {
     exit();
 }
 
-require_once(__DIR__ . '/Graphviz.php');
-require_once(__DIR__ . '/PlantUML.php');
+require_once(__DIR__ . '/GraphViz.php');
+require_once(__DIR__ . '/PlantUml.php');
 require_once(__DIR__ . '/Mermaid.php');
 require realpath(__DIR__ . '/../../../inc/includes.php');
 
