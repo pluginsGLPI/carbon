@@ -54,7 +54,7 @@ function plugin_carbon_install()
     global $argv;
 
     // Handle -p force-fresh-install argument. If found, let's do an uninstall first
-    if (in_array('force-fresh-install', $argv)) {
+    if (is_array($argv) && in_array('force-fresh-install', $argv)) {
         plugin_carbon_uninstall();
     }
 
