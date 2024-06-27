@@ -69,7 +69,8 @@ class ComputerTest extends DbTestCase
         'day_7' => 0,
     ];
     const TEST_LAPTOP_POWER = 40 /* Watt */;
-    const TEST_LAPTOP_ENERGY_PER_DAY = 0.320 /* kWh */;
+    // This computer is up 8 hours per day, from 09:00 to 17:00
+    const TEST_LAPTOP_ENERGY_PER_DAY = (self::TEST_LAPTOP_POWER * 8 /* hours */) / 1000.0  /* kWh */;
 
     const TEST_SERVER_USAGE_PROFILE = [
         'name' => 'Test server usage profile',
@@ -85,14 +86,18 @@ class ComputerTest extends DbTestCase
         'day_7' => 1,
     ];
     const TEST_SERVER_POWER = 150 /* Watt */;
-    const TEST_SERVER_ENERGY_PER_DAY = 3.450 /* kWh */;
+    // This computer is up 23 hours per day, from 00:00 to 23:00
+    const TEST_SERVER_ENERGY_PER_DAY = (self::TEST_SERVER_POWER * 23 /* hours */) / 1000.0  /* kWh */;
 
-    const TEST_CARBON_INTENSITY_1 = 1.0 /* gCO2/kWh */;
-    const TEST_CARBON_INTENSITY_2 = 2.0 /* gCO2/kWh */;
+    const TEST_CARBON_INTENSITY_THURSDAY = 1.0 /* gCO2/kWh */;
+    const TEST_CARBON_INTENSITY_SATURDAY = 2.0 /* gCO2/kWh */;
 
     const TEST_CARBON_INTENSITY_SOURCE = 'Test source';
 
-    const TEST_DATE_1 = '1999-12-02 12:00:00';
+    // Thursday, December 2, 1999
+    const TEST_DATE_THURSDAY = '1999-12-02 12:00:00';
+    // Saturday, December 4, 1999
+    const TEST_DATE_SATURDAY = '1999-12-04 12:00:00';
 
     /**
      * The delta for comparison of computed emission with expected value,
@@ -129,22 +134,6 @@ class ComputerTest extends DbTestCase
         }
     }
 
-    /**
-     * @dataProvider computerUsageProfileProvider
-     */
-    public function testUsageDay(Computer $computer, array $usage_profile_params)
-    {
-        $sunday = new DateTime('2023-12-31 00:00:00', new DateTimeZone('UTC'));
-        $emission = $computer->getCarbonEmissionPerDay($sunday);
-
-        $day_7 = $usage_profile_params['day_7'];
-        if ($day_7 == 0) {
-            $this->assertTrue($emission == 0.0);
-        } else {
-            $this->assertTrue(is_null($emission) || $emission != 0.0);
-        }
-    }
-
     public function computerUsageProfilePowerProvider(): \Generator
     {
         $laptop_glpi_computer = $this->createComputerUsageProfilePower(self::TEST_LAPTOP_USAGE_PROFILE, self::TEST_LAPTOP_POWER);
@@ -163,7 +152,7 @@ class ComputerTest extends DbTestCase
     /**
      * @dataProvider computerUsageProfilePowerProvider
      */
-    public function testEnergy(Computer $computer, float $expected_energy)
+    public function testEnergyPerDay(Computer $computer, float $expected_energy)
     {
         $monday = new DateTime('2024-01-01 00:00:00', new DateTimeZone('UTC'));
         $this->assertEquals($computer->getEnergyPerDay($monday), $expected_energy);
@@ -172,23 +161,39 @@ class ComputerTest extends DbTestCase
     public function computerCarbonIntensityProvider(): \Generator
     {
         $country = $this->getUniqueString();
-        $day_1 = DateTime::createFromFormat('Y-m-d H:i:s', self::TEST_DATE_1, new DateTimeZone('UTC'));
-        $this->createCarbonIntensityData($country, self::TEST_CARBON_INTENSITY_SOURCE, $day_1, self::TEST_CARBON_INTENSITY_1);
+        $thursday = DateTime::createFromFormat('Y-m-d H:i:s', self::TEST_DATE_THURSDAY, new DateTimeZone('UTC'));
+        $this->createCarbonIntensityData($country, self::TEST_CARBON_INTENSITY_SOURCE, $thursday, self::TEST_CARBON_INTENSITY_THURSDAY);
+        $saturday = DateTime::createFromFormat('Y-m-d H:i:s', self::TEST_DATE_SATURDAY, new DateTimeZone('UTC'));
+        $this->createCarbonIntensityData($country, self::TEST_CARBON_INTENSITY_SOURCE, $saturday, self::TEST_CARBON_INTENSITY_SATURDAY);
 
         $laptop_glpi_computer = $this->createComputerUsageProfilePowerLocation(self::TEST_LAPTOP_USAGE_PROFILE, self::TEST_LAPTOP_POWER, $country);
+        $laptop_computer = new Computer($laptop_glpi_computer->getID());
 
-        yield 'Computer with laptop usage profile and type' => [
-            new Computer($laptop_glpi_computer->getID()),
-            $day_1,
-            self::TEST_LAPTOP_ENERGY_PER_DAY * self::TEST_CARBON_INTENSITY_1,
+        yield 'Computer with laptop usage profile and type on a Thursday' => [
+            $laptop_computer,
+            $thursday,
+            self::TEST_LAPTOP_ENERGY_PER_DAY * self::TEST_CARBON_INTENSITY_THURSDAY,
         ];
 
         $server_glpi_computer = $this->createComputerUsageProfilePowerLocation(self::TEST_SERVER_USAGE_PROFILE, self::TEST_SERVER_POWER, $country);
+        $server_computer = new Computer($server_glpi_computer->getID());
 
-        yield 'Computer with server usage profile and type' => [
-            new Computer($server_glpi_computer->getID()),
-            $day_1,
-            self::TEST_SERVER_ENERGY_PER_DAY * self::TEST_CARBON_INTENSITY_1,
+        yield 'Computer with server usage profile and type on a Thursday' => [
+            $server_computer,
+            $thursday,
+            self::TEST_SERVER_ENERGY_PER_DAY * self::TEST_CARBON_INTENSITY_THURSDAY,
+        ];
+
+        yield 'Computer with laptop usage profile and type on a Saturday' => [
+            $laptop_computer,
+            $saturday,
+            0.0,
+        ];
+
+        yield 'Computer with server usage profile and type on a Saturday' => [
+            $server_computer,
+            $saturday,
+            self::TEST_SERVER_ENERGY_PER_DAY * self::TEST_CARBON_INTENSITY_SATURDAY,
         ];
     }
 
@@ -196,7 +201,7 @@ class ComputerTest extends DbTestCase
      *
      * @dataProvider computerCarbonIntensityProvider
      */
-    public function testEmission(Computer $computer, DateTime $day, float $expected_emission)
+    public function testCarbonEmissionPerDay(Computer $computer, DateTime $day, float $expected_emission)
     {
         $emission = $computer->getCarbonEmissionPerDay($day);
         $this->assertEqualsWithDelta($expected_emission, $emission, self::EPSILON);
