@@ -46,6 +46,8 @@ use Location;
 abstract class AbstractAsset extends CommonDBTM implements AssetInterface
 {
     protected static string $itemtype = '';
+    protected static string $type_itemtype  = '';
+    protected static string $model_itemtype = '';
 
     /** @var string Date interval to shift the end date relatively to the now */
     protected static string $date_end_shift = 'P1D';
@@ -104,7 +106,8 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     public function historizeItem(int $id, ?DateTime $start_date = null, ?DateTime $end_date = null): int
     {
         /** @var CommonDBTM $item */
-        $item = Computer::getById($id);
+        $itemtype = static::$itemtype;
+        $item = $itemtype::getById($id);
         if ($item === false) {
             return 0;
         }
@@ -164,12 +167,14 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         }
 
         $entry = new CarbonEmission();
+        $type_fk = static::$type_itemtype::getForeignKeyField();
+        $model_fk = static::$model_itemtype::getForeignKeyField();
         $id = $entry->add([
             'itemtype'          => $item->getType(),
             'items_id'          => $item->getID(),
             'entities_id'       => $item->fields['entities_id'],
-            'types_id'          => $item->fields['computertypes_id'],
-            'models_id'         => $item->fields['computermodels_id'],
+            'types_id'          => $item->fields[$type_fk],
+            'models_id'         => $item->fields[$model_fk],
             'locations_id'      => $item->fields['locations_id'],
             'energy_per_day'    => $energy,
             'emission_per_day'  => $emission,

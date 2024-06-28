@@ -41,15 +41,6 @@ use DateTime;
 interface CommonInterface
 {
     /**
-     * Compute the carbon emissions between two dates
-     *
-     * @param DateTime $begin_date
-     * @param DateTime $end_date
-     * @return void
-     */
-    public function getCarbonEmission(DateTime $begin_date, DateTime $end_date);
-
-    /**
      * Returns the carbon emission for the specified day.
      *
      * @param DateTime $day the day

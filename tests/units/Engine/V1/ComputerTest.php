@@ -34,23 +34,12 @@
 namespace GlpiPlugin\Carbon\Engine\V1\Tests;
 
 use DateTime;
-use DateTimeImmutable;
-use DateTimeInterface;
 use DateTimeZone;
-use DateInterval;
-use CommonDBTM;
 use Computer as GlpiComputer;
 use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
-use Location;
-use Plugin;
 use GlpiPlugin\Carbon\Engine\V1\Computer;
 use GlpiPlugin\Carbon\ComputerType;
-use GlpiPlugin\Carbon\ComputerUsageProfile;
-use GlpiPlugin\Carbon\EnvironnementalImpact;
-use GlpiPlugin\Carbon\CarbonIntensity;
-use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 
 class ComputerTest extends DbTestCase
@@ -99,6 +88,10 @@ class ComputerTest extends DbTestCase
     // Saturday, December 4, 1999
     const TEST_DATE_SATURDAY = '1999-12-04 12:00:00';
 
+    const MODEL_NO_TYPE_POWER = 1;
+    const NO_MODEL_TYPE_POWER = 2;
+    const MODEL_TYPE_POWER = 3;
+
     /**
      * The delta for comparison of computed emission with expected value,
      * as == for float must not be used because of float representation.
@@ -124,13 +117,13 @@ class ComputerTest extends DbTestCase
     /**
      * @dataProvider computerUsageProfileProvider
      */
-    public function testUsageProfile(Computer $computer, array $usage_profile_params)
+    public function testGetUsageProfile(Computer $computer, array $usage_profile_params)
     {
         $usage_profile = $computer->getUsageProfile();
         $this->assertNotNull($usage_profile);
 
         foreach ($usage_profile_params as $k => $v) {
-            $this->assertEquals($usage_profile[$k], $v);
+            $this->assertEquals($usage_profile->fields[$k], $v);
         }
     }
 
@@ -201,9 +194,68 @@ class ComputerTest extends DbTestCase
      *
      * @dataProvider computerCarbonIntensityProvider
      */
-    public function testCarbonEmissionPerDay(Computer $computer, DateTime $day, float $expected_emission)
+    public function testGetCarbonEmissionPerDay(Computer $computer, DateTime $day, float $expected_emission)
     {
         $emission = $computer->getCarbonEmissionPerDay($day);
         $this->assertEqualsWithDelta($expected_emission, $emission, self::EPSILON);
+    }
+
+    private function computerSetModelWithPower(GlpiComputer $computer, int $power)
+    {
+        $glpi_computer_model = $this->getItem(GlpiComputerModel::class, [
+            'power_consumption' => $power,
+        ]);
+        $success = $computer->update([
+            'id'                                    => $computer->getID(),
+            GlpiComputerModel::getForeignKeyField() => $glpi_computer_model->getID(),
+        ]);
+        $this->assertTrue($success);
+    }
+
+    private function computerSetTypeWithPower(GlpiComputer $computer, int $power)
+    {
+        $glpi_computer_type = $this->getItem(GlpiComputerType::class);
+        $carbonComputerType = $this->getItem(ComputerType::class, [
+            GlpiComputerType::getForeignKeyField() => $glpi_computer_type->getID(),
+            'power_consumption'                    => $power,
+        ]);
+        $success = $computer->update([
+            'id'                                   => $computer->getID(),
+            GlpiComputerType::getForeignKeyField() => $glpi_computer_type->getID(),
+        ]);
+        $this->assertTrue($success);
+    }
+
+    public function getPowerProvider(): \Generator
+    {
+        // computer with no model and no type
+        $computer_no_model_no_type = $this->getItem(GlpiComputer::class);
+        yield 'Computer with no model and no type' => [$computer_no_model_no_type, 0];
+
+        // computer with a model and no type
+        $computer_model_no_type = $this->getItem(GlpiComputer::class);
+        $this->computerSetModelWithPower($computer_model_no_type, self::MODEL_NO_TYPE_POWER);
+        yield 'Computer with a model and no type' => [$computer_model_no_type, self::MODEL_NO_TYPE_POWER];
+
+        // computer with no model and a type
+        $computer_no_model_type = $this->getItem(GlpiComputer::class);
+        $this->computerSetTypeWithPower($computer_no_model_type, self::NO_MODEL_TYPE_POWER);
+        yield 'Computer with no model and a type' => [$computer_no_model_type, self::NO_MODEL_TYPE_POWER];
+
+        // computer with a model and a type: model have priority
+        $computer_model_type = $this->getItem(GlpiComputer::class);
+        $this->computerSetModelWithPower($computer_model_type, self::MODEL_TYPE_POWER);
+        $this->computerSetTypeWithPower($computer_model_type, 0);
+        yield 'Computer with a model and a type' => [$computer_model_type, self::MODEL_TYPE_POWER];
+    }
+
+    /**
+     * @dataProvider getPowerProvider
+     */
+    public function testGetPower(GlpiComputer $computer, int $expected_power)
+    {
+        $engine = new Computer($computer->getID());
+        $actual_power = $engine->getPower();
+        $this->assertEquals($expected_power, $actual_power);
     }
 }

@@ -40,6 +40,7 @@ use Location;
 use DateTime;
 use CronTask;
 use GlpiPlugin\Carbon\History\Computer as ComputerHistory;
+use GlpiPlugin\Carbon\History\Monitor as MonitorHistory;
 
 class CarbonEmission extends CommonDBChild
 {
@@ -53,11 +54,18 @@ class CarbonEmission extends CommonDBChild
 
     public static function cronHistorize(CronTask $task): int
     {
+        $histories = [
+            ComputerHistory::class,
+            MonitorHistory::class,
+        ];
         $task->setVolume(0); // start with zero
-        $history = new ComputerHistory();
-        $history->setLimit(0);
-        $count = $history->historizeItems();
-        $task->setVolume($count);
+        foreach ($histories as $history_type) {
+            /** @var AbstractAsset $history */
+            $history = new $history_type();
+            $history->setLimit(0);
+            $count = $history->historizeItems();
+            $task->addVolume($count);
+        }
 
         return ($count > 0 ? 1 : 0);
     }
