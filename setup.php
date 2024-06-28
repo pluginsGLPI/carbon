@@ -98,7 +98,7 @@ function plugin_init_carbon()
     Plugin::registerClass(ComputerType::class, ['addtabon' => GlpiComputerType::class]);
     Plugin::registerClass(EnvironnementalImpact::class, ['addtabon' => Computer::class]);
     // TODO: enable monitor power consumption before enabling UI
-    // Plugin::registerClass(MonitorType::class, ['addtabon' => GlpiMonitorType::class]);
+    Plugin::registerClass(MonitorType::class, ['addtabon' => GlpiMonitorType::class]);
 
     // Add ApexCharts.js library
     $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][] = 'dist/bundle.js';

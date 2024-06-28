@@ -60,8 +60,8 @@ class Uninstall
             CarbonIntensity::class,
             CarbonIntensitySource::class,
             CarbonIntensityZone::class,
-            ComputerPower::class,
             ComputerType::class,
+            MonitorType::class,
             ComputerUsageProfile::class,
             EnvironnementalImpact::class,
         ];

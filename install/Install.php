@@ -141,17 +141,6 @@ class Install
     {
         $automatic_actions = [
             [
-                'itemtype'  => ComputerPower::class,
-                'name'      => 'ComputePowersTask',
-                'frequency' => DAY_TIMESTAMP,
-                'options'   => [
-                    'mode' => CronTask::MODE_INTERNAL,
-                    'allowmode' => CronTask::MODE_INTERNAL + CronTask::MODE_EXTERNAL,
-                    'logs_lifetime' => 30,
-                    'comment' => __('Computes power consumption of computers', 'carbon'),
-                ]
-            ],
-            [
                 'itemtype'  => CarbonEmission::class,
                 'name'      => 'Historize',
                 'frequency' => DAY_TIMESTAMP,

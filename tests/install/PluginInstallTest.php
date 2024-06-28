@@ -197,13 +197,6 @@ class PluginInstallTest extends CommonTestCase
     {
         $cronTask = new CronTask();
         $cronTask->getFromDBByCrit([
-            'itemtype' => ComputerPower::class,
-            'name'     => 'ComputePowersTask',
-        ]);
-        $this->assertFalse($cronTask->isNewItem());
-
-        $cronTask = new CronTask();
-        $cronTask->getFromDBByCrit([
             'itemtype' => CarbonEmission::class,
             'name'     => 'Historize',
         ]);
