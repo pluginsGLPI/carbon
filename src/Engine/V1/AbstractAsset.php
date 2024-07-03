@@ -35,6 +35,7 @@ namespace GlpiPlugin\Carbon\Engine\V1;
 
 use Computer as GlpiComputer;
 use CommonDBTM;
+use DateInterval;
 use DateTime;
 use DBmysqlIterator;
 use DbUtils;
@@ -132,19 +133,21 @@ abstract class AbstractAsset
     /**
      * get all carbon intensities diring the day, between 2 hours boundaries
      *
-     * @param DateTime $day
-     * @param string $start_time
-     * @param string $stop_time
+     * @param DateTime $start_time
+     * @param DateInterval $length
      * @return DBmysqlIterator
      */
-    protected function requestCarbonIntensitiesPerDay(DateTime $day, string $start_time, string $stop_time): DBmysqlIterator
+    protected function requestCarbonIntensitiesPerDay(DateTime $start_time, DateInterval $length): DBmysqlIterator
     {
         global $DB;
 
-        $day_s = $day->format('Y-m-d');
-        $start_date = DateTime::createFromFormat('Y-m-d H:i:s', $day_s . $start_time);
-        $start_date_s = $start_date->format('Y-m-d H:i:s'); // may be can use directly concatenation
-        $stop_date = DateTime::createFromFormat('Y-m-d H:i:s', $day_s . $stop_time);
+        // Find start tine and end time taking into account that
+        // start time may contain a non-zero minute and second, resolution of carbon emission is 1h
+        // stop time  may contain a non-zero minute and second, resolution of carbon emission is 1h
+        $start_date_s = $start_time->format('Y-m-d H:00:00'); // may be can use directly concatenation
+        $stop_date = clone $start_time;
+        $stop_date = $stop_date->add($length);
+        $stop_date = $stop_date->add(new DateInterval('PT1H')); // Add 1h again to include ending time with minutes or seconds
         $stop_date_s = $stop_date->format('Y-m-d H:i:s'); // idem, may be can use directly concatenation
 
         $itemtype = static::$itemtype;
@@ -183,7 +186,7 @@ abstract class AbstractAsset
                 'AND' => [
                     $itemtype::getTableField('id') => $this->items_id,
                     [CarbonIntensity::getTableField('emission_date') => ['>=', $start_date_s]],
-                    [CarbonIntensity::getTableField('emission_date') => ['<=', $stop_date_s]],
+                    [CarbonIntensity::getTableField('emission_date') => ['<', $stop_date_s]],
                 ],
             ],
             'ORDER' => CarbonIntensity::getTableField('emission_date') . ' ASC',
@@ -288,16 +291,25 @@ abstract class AbstractAsset
 
         $power = $this->getPower();
 
-        return $this->computeEmissionPerDay($day, $power, $usage_profile->fields['time_start'], $usage_profile->fields['time_stop']);
+        // Assume that start and stop times are HH:ii:ss
+        $seconds_start = explode(':', $usage_profile->fields['time_start']);
+        $seconds_stop  = explode(':', $usage_profile->fields['time_stop']);
+
+        $start_time = clone $day;
+        $start_time->setTime($seconds_start[0], $seconds_start[1], $seconds_start[2]);
+        $seconds_start = $seconds_start[0] * 3600 + $seconds_start[1] * 60 + $seconds_start[2];
+        $seconds_stop = $seconds_stop[0] * 3600 + $seconds_stop[1] * 60 + $seconds_stop[2];
+        $length = new DateInterval('PT' . ($seconds_stop - $seconds_start) . 'S');
+        return $this->computeEmissionPerDay($start_time, $power, $length);
     }
 
-    protected function computeEmissionPerDay(DateTime $day, int $power, string $start_time, string $stop_time): ?float
+    protected function computeEmissionPerDay(DateTime $start_time, int $power, DateInterval $length): ?float
     {
         if ($power === 0) {
             return 0;
         }
 
-        $query_result = $this->requestCarbonIntensitiesPerDay($day, $start_time, $stop_time);
+        $query_result = $this->requestCarbonIntensitiesPerDay($start_time, $length);
 
         if ($query_result->numrows() == 0) {
             return null;
@@ -305,22 +317,33 @@ abstract class AbstractAsset
 
         $total_emission = 0.0;
         $previous_timestamp = 0;
+        $length_seconds = $length->format('%S');
         foreach ($query_result as $row) {
             $emission_date = DateTime::createFromFormat('Y-m-d H:i:s', $row['emission_date']);
             if ($previous_timestamp == 0) {
                 $previous_timestamp = $emission_date->getTimestamp();
                 continue;
             }
-            $timestamp = $emission_date->getTimestamp();
-            $delta_time = $timestamp - $previous_timestamp;
-            $previous_timestamp = $timestamp;
+
+            // calculate seconds where the asset is on within the hour
+            $current_timestamp = $emission_date->format('U');
+            $next_hour = $current_timestamp;
+            $hour_fraction = ($next_hour - $start_time->format('U'));
+            $hour_fraction = min($hour_fraction, $length_seconds);
+
             // units:
             // power is in Watt
             // delta_time is in seconds
             // intensity is in gCO2/kWh
-            $energy_in_kwh = ($power * $delta_time) / (1000.0 * 60 * 60);
+            $energy_in_kwh = ($power * $hour_fraction) / (1000.0 * 60 * 60);
             $emission = $row['intensity'] * $energy_in_kwh;
             $total_emission += $emission;
+
+            // Increment start_time using $emission_date
+            // (because this lop assumes that carbon intensity is recorded for last hour)
+            // TODO: to define if it should be for the next hour instead
+            $start_time = clone $emission_date;
+            $length_seconds -= $hour_fraction;
         }
 
         return $total_emission;
