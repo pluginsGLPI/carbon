@@ -26,29 +26,59 @@
  * SOFTWARE.
  * -------------------------------------------------------------------------
  * @copyright Copyright (C) 2024 Teclib' and contributors.
- * @copyright Copyright (C) 2024 by the carbon plugin team.
  * @license   MIT https://opensource.org/licenses/mit-license.php
  * @link      https://github.com/pluginsGLPI/carbon
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\History;
+namespace GlpiPlugin\Carbon\Tests;
 
-use CommonDBTM;
-use GlpiPlugin\Carbon\Engine\V1\CommonInterface as EngineInterface;
-use GlpiPlugin\Carbon\Engine\V1\Computer as EngineComputer;
-use Computer as GlpiComputer;
-use ComputerType;
-use ComputerModel;
+use Plugin;
+use Config;
 
-class Computer extends AbstractAsset
+class GlobalFixture
 {
-    protected static string $itemtype       = GlpiComputer::class;
-    protected static string $type_itemtype  = ComputerType::class;
-    protected static string $model_itemtype = ComputerModel::class;
-
-    public static function getEngine(CommonDBTM $item): EngineInterface
+    /**
+     * Load fixtures shared among all test cases of all test suites
+     *
+     * STDOUt is used to output messages to prevent header already sent errors
+     * when GLPI initializes a session
+     *
+     * @return void
+     */
+    public static function loadDataset()
     {
-        return new EngineComputer($item->getID());
+        global $DB, $GLPI_CACHE;
+
+        $version = '1.0.0';
+
+        if (!Plugin::isPluginActive(TEST_PLUGIN_NAME)) {
+        // Plugin not activated yet
+            return;
+        }
+
+        $conf = Config::getConfigurationValue('carbon:test_dataset', 'version');
+        if ($conf !== null && $conf == $version) {
+            fwrite(STDOUT, sprintf(PHP_EOL . "Plugin dataset version %s already loaded" . PHP_EOL, $conf));
+            return;
+        }
+
+        fwrite(STDOUT, sprintf(PHP_EOL . "Loading GLPI dataset version %s" . PHP_EOL, $version));
+
+        // The following dataset contains data for France, then timezone must be Europe/Paris
+        $DB->setTimezone('Europe/Paris');
+        //Set GLPI timezone as well
+        Config::setConfigurationValues('core', ['timezone' => 'Europe/Paris']);
+        $DB->beginTransaction();
+
+        if (!$DB->runFile(__DIR__ . '/../fixtures/carbon_intensity.sql')) {
+            fwrite(STDOUT, sprintf('Failed to load carbon intensity dataset' . PHP_EOL));
+            exit(1);
+        }
+
+        $DB->commit();
+        $GLPI_CACHE->clear();
+
+        Config::setConfigurationValues('carbon:test_dataset', ['version' => $version]);
     }
 }

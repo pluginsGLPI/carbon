@@ -36,19 +36,19 @@ namespace GlpiPlugin\Carbon\History;
 
 use CommonDBTM;
 use GlpiPlugin\Carbon\Engine\V1\CommonInterface as EngineInterface;
-use GlpiPlugin\Carbon\Engine\V1\Computer as EngineComputer;
+use GlpiPlugin\Carbon\Engine\V1\Monitor as EngineMonitor;
 use Computer as GlpiComputer;
-use ComputerType;
-use ComputerModel;
+use MonitorType;
+use MonitorModel;
 
-class Computer extends AbstractAsset
+class Monitor extends AbstractAsset
 {
-    protected static string $itemtype       = GlpiComputer::class;
-    protected static string $type_itemtype  = ComputerType::class;
-    protected static string $model_itemtype = ComputerModel::class;
+    protected static string $itemtype = GlpiComputer::class;
+    protected static string $type_itemtype  = MonitorType::class;
+    protected static string $model_itemtype = MonitorModel::class;
 
     public static function getEngine(CommonDBTM $item): EngineInterface
     {
-        return new EngineComputer($item->getID());
+        return new EngineMonitor($item->getID());
     }
 }

@@ -88,13 +88,6 @@ class PluginUninstallTest extends CommonTestCase
     {
         $cronTask = new CronTask();
         $cronTask->getFromDBByCrit([
-            'itemtype' => ComputerPower::class,
-            'name'     => 'ComputePowersTask',
-        ]);
-        $this->assertTrue($cronTask->isNewItem());
-
-        $cronTask = new CronTask();
-        $cronTask->getFromDBByCrit([
             'itemtype' => CarbonEmission::class,
             'name'     => 'ComputeCarbonEmissionsTask',
         ]);

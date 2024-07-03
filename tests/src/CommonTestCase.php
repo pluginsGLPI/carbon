@@ -295,14 +295,14 @@ class CommonTestCase extends TestCase
         }
     }
 
-    protected function getSessionMessage()
+    protected function getSessionMessage(): string
     {
         if (
             isset($_SESSION['MESSAGE_AFTER_REDIRECT'][INFO])
             || isset($_SESSION['MESSAGE_AFTER_REDIRECT'][WARNING])
             || isset($_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR])
         ) {
-            return null;
+            return '';
         }
 
         $messages = '';

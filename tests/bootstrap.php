@@ -31,6 +31,8 @@
  * -------------------------------------------------------------------------
  */
 
+use GlpiPlugin\Carbon\Tests\GlobalFixture;
+
 // fix empty CFG_GLPI on boostrap; see https://github.com/sebastianbergmann/phpunit/issues/325
 global $CFG_GLPI, $PLUGIN_HOOKS;
 
@@ -57,48 +59,4 @@ define('GLPI_LOG_DIR', __DIR__ . '/logs');
 ini_set('session.use_cookies', 0); //disable session cookies
 require_once GLPI_ROOT . "/inc/includes.php";
 
-loadDataset();
-
-/**
- * Load fixtures shared among all test cases of all test suites
- *
- * STDOUt is used to output messages to prevent header already sent errors
- * when GLPI initializes a session
- *
- * @return void
- */
-function loadDataset()
-{
-    global $DB, $GLPI_CACHE;
-
-    $version = '1.0.0';
-
-    if (!Plugin::isPluginActive(TEST_PLUGIN_NAME)) {
-       // Plugin not activated yet
-        return;
-    }
-
-    $conf = Config::getConfigurationValue('carbon:test_dataset', 'version');
-    if ($conf !== null && $conf == $version) {
-        fwrite(STDOUT, sprintf(PHP_EOL . "Plugin dataset version %s already loaded" . PHP_EOL, $conf));
-        return;
-    }
-
-    fwrite(STDOUT, sprintf(PHP_EOL . "Loading GLPI dataset version %s" . PHP_EOL, $version));
-
-    // The following dataset contains data for France, then timezone must be Europe/Paris
-    $DB->setTimezone('Europe/Paris');
-    //Set GLPI timezone as well
-    Config::setConfigurationValues('core', ['timezone' => 'Europe/Paris']);
-    $DB->beginTransaction();
-
-    if (!$DB->runFile(__DIR__ . '/fixtures/carbon_intensity.sql')) {
-        fwrite(STDOUT, sprintf('Failed to load carbon intensity dataset' . PHP_EOL));
-        exit(1);
-    }
-
-    $DB->commit();
-    $GLPI_CACHE->clear();
-
-    Config::setConfigurationValues('carbon:test_dataset', ['version' => $version]);
-}
+GlobalFixture::loadDataset();

@@ -44,6 +44,8 @@ class MonitorType extends CommonDBChild
     public static $itemtype = GlpiMonitorType::class;
     public static $items_id = 'monitortypes_id';
 
+    public static $rightname = 'dropdown';
+
     public static function getTypeName($nb = 0)
     {
         return _n("Power", "Powers", $nb, 'carbon');
@@ -60,9 +62,17 @@ class MonitorType extends CommonDBChild
         return $tabNames;
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param CommonGLPI $item
+     * @param integer $tabnum
+     * @param integer $withtemplate
+     * @return void
+     */
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
-        /** @var GlpiComputerType $item */
+        /** @var CommonDBTM $item */
         if ($item->getType() == GlpiMonitorType::class) {
             $typePower = new self();
             $typePower->getFromDBByCrit([$item->getForeignKeyField() => $item->getID()]);
@@ -71,11 +81,11 @@ class MonitorType extends CommonDBChild
                     $item->getForeignKeyField() => $item->getID()
                 ]);
             }
-            $typePower->showForComputerType($item);
+            $typePower->showForMonitorType($item);
         }
     }
 
-    public function showForComputerType()
+    public function showForMonitorType()
     {
         // TODO: Design a rights system for the whole plugin
         $canedit = Session::haveRight(Config::$rightname, UPDATE);
