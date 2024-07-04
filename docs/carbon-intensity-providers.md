@@ -50,3 +50,9 @@ API console: https://odre.opendatasoft.com/api/explore/v2.1/console
 Full documentation on ODSQL (Opendatasoft Query Language): https://help.opendatasoft.com/apis/ods-explore-v2/explore_v2.1.html
 
 Base URL for API: https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/eco2mix-national-tr/records
+
+## ENTSOE
+
+European Network of Transmission System Operators for Electricity: https://www.entsoe.eu/
+
+Dashboard: https://transparency.entsoe.eu/dashboard/show
