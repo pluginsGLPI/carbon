@@ -75,7 +75,7 @@ class ComputerTest extends DbTestCase
         'day_7' => 1,
     ];
     const TEST_SERVER_POWER = 150 /* Watt */;
-    // This computer is up 23 hours per day, from 00:00 to 23:00
+    // This computer is up 24 hours per day, from 00:00 to 00:00 (next day)
     const TEST_SERVER_ENERGY_PER_DAY = (self::TEST_SERVER_POWER * 23 /* hours */) / 1000.0  /* kWh */;
 
     const TEST_CARBON_INTENSITY_THURSDAY = 1.0 /* gCO2/kWh */;
@@ -154,9 +154,9 @@ class ComputerTest extends DbTestCase
     public function computerCarbonIntensityProvider(): \Generator
     {
         $country = $this->getUniqueString();
-        $thursday = DateTime::createFromFormat('Y-m-d H:i:s', self::TEST_DATE_THURSDAY, new DateTimeZone('UTC'));
+        $thursday = DateTime::createFromFormat('Y-m-d H:i:s', self::TEST_DATE_THURSDAY);
         $this->createCarbonIntensityData($country, self::TEST_CARBON_INTENSITY_SOURCE, $thursday, self::TEST_CARBON_INTENSITY_THURSDAY);
-        $saturday = DateTime::createFromFormat('Y-m-d H:i:s', self::TEST_DATE_SATURDAY, new DateTimeZone('UTC'));
+        $saturday = DateTime::createFromFormat('Y-m-d H:i:s', self::TEST_DATE_SATURDAY);
         $this->createCarbonIntensityData($country, self::TEST_CARBON_INTENSITY_SOURCE, $saturday, self::TEST_CARBON_INTENSITY_SATURDAY);
 
         $laptop_glpi_computer = $this->createComputerUsageProfilePowerLocation(self::TEST_LAPTOP_USAGE_PROFILE, self::TEST_LAPTOP_POWER, $country);
@@ -168,9 +168,68 @@ class ComputerTest extends DbTestCase
             self::TEST_LAPTOP_ENERGY_PER_DAY * self::TEST_CARBON_INTENSITY_THURSDAY,
         ];
 
+        $profile = [
+            'name' => 'Test laptop usage profile',
+            'average_load' => 30,
+            'time_start' => "09:30:00",
+            'time_stop' => "17:00:00",
+            'day_1' => 1,
+            'day_2' => 1,
+            'day_3' => 1,
+            'day_4' => 1,
+            'day_5' => 1,
+            'day_6' => 0,
+            'day_7' => 0,
+        ];
+        $laptop_glpi_computer_2 = $this->createComputerUsageProfilePowerLocation($profile, self::TEST_LAPTOP_POWER, $country);
+        yield 'Computer with laptop usage profile starting at half hour' => [
+            new Computer($laptop_glpi_computer_2->getID()),
+            $thursday,
+            self::TEST_LAPTOP_POWER * 7.5 / 1000,
+        ];
+
+        $profile = [
+            'name' => 'Test laptop usage profile',
+            'average_load' => 30,
+            'time_start' => "09:00:00",
+            'time_stop' => "17:15:00",
+            'day_1' => 1,
+            'day_2' => 1,
+            'day_3' => 1,
+            'day_4' => 1,
+            'day_5' => 1,
+            'day_6' => 0,
+            'day_7' => 0,
+        ];
+        $laptop_glpi_computer_2 = $this->createComputerUsageProfilePowerLocation($profile, self::TEST_LAPTOP_POWER, $country);
+        yield 'Computer with laptop usage profile ending at quarter hour' => [
+            new Computer($laptop_glpi_computer_2->getID()),
+            $thursday,
+            self::TEST_LAPTOP_POWER * 8.25 / 1000,
+        ];
+
+        $profile = [
+            'name' => 'Test laptop usage profile',
+            'average_load' => 30,
+            'time_start' => "09:15:00",
+            'time_stop' => "09:45:00",
+            'day_1' => 1,
+            'day_2' => 1,
+            'day_3' => 1,
+            'day_4' => 1,
+            'day_5' => 1,
+            'day_6' => 0,
+            'day_7' => 0,
+        ];
+        $laptop_glpi_computer_3 = $this->createComputerUsageProfilePowerLocation($profile, self::TEST_LAPTOP_POWER, $country);
+        yield 'Computer with laptop usage profile a few minutes in a single hour' => [
+            new Computer($laptop_glpi_computer_3->getID()),
+            $thursday,
+            self::TEST_LAPTOP_POWER * 0.5 / 1000,
+        ];
+
         $server_glpi_computer = $this->createComputerUsageProfilePowerLocation(self::TEST_SERVER_USAGE_PROFILE, self::TEST_SERVER_POWER, $country);
         $server_computer = new Computer($server_glpi_computer->getID());
-
         yield 'Computer with server usage profile and type on a Thursday' => [
             $server_computer,
             $thursday,
