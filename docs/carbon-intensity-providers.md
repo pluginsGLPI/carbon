@@ -37,17 +37,16 @@ Base URL for API: https://api.electricitymap.org
 
 This data provider, namely _Données éCO2mix nationales temps réel_, provides real-time data on electricity mix for France only.
 
-Data are available from month M-1 to hour H-2. Timestep is 1/4 hour.
+Data are available from month M-1 to recent hours, the delay in hours is not specified. Timestep is 1/4 hour. Data are refreshed every hour.
 
 This API does not require authentication.
 
 Provider: https://www.rte-france.com/eco2mix
 
-API documentation: https://odre.opendatasoft.com/explore/dataset/eco2mix-national-tr/information/?disjunctive.nature
+API documentation: https://odre.opendatasoft.com/explore/dataset/eco2mix-national-tr/api/?disjunctive.nature
 
-API console: https://odre.opendatasoft.com/api/v2/console
+API console: https://odre.opendatasoft.com/api/explore/v2.1/console
 
-Full documentation on ODSQL (Opendatasoft Query Language): https://help.opendatasoft.com/apis/ods-explore-v2/
+Full documentation on ODSQL (Opendatasoft Query Language): https://help.opendatasoft.com/apis/ods-explore-v2/explore_v2.1.html
 
-Base URL for API: https://odre.opendatasoft.com/api/v2/catalog/datasets/eco2mix-national-tr/records
-
+Base URL for API: https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/eco2mix-national-tr/records
