@@ -34,18 +34,20 @@
 namespace GlpiPlugin\Carbon\DataSource\Tests;
 
 use DateTime;
-use GlpiPlugin\Carbon\DataSource\CarbonDataSourceFrance;
+use GlpiPlugin\Carbon\DataSource\CarbonDataSourceRTE;
+use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
 use GlpiPlugin\Carbon\Tests\CommonTestCase;
 
-// curl -X 'GET' \
-//   'https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/eco2mix-national-tr/records?select=taux_co2%2Cdate_heure&where=date_heure%20IN%20%5Bdate%272024-06-16T14%3A00%3A00%27%20TO%20date%272024-06-16T20%3A00%3A00%27%5D&order_by=date_heure%20desc&limit=50&offset=0&timezone=UTC&include_links=false&include_app_metas=false' \
-//   -H 'accept: application/json; charset=utf-8'
-
-class CarbonDataSourceFranceTest extends CommonTestCase
+class CarbonDataSourceRTETest extends CommonTestCase
 {
+    const RESPONSE_1 = '{"total_count": 25, "results": [{"taux_co2": 13, "date_heure": "2024-06-16T20:00:00+00:00"}, {"taux_co2": 13, "date_heure": "2024-06-16T19:45:00+00:00"}, {"taux_co2": 13, "date_heure": "2024-06-16T19:30:00+00:00"}, {"taux_co2": 13, "date_heure": "2024-06-16T19:15:00+00:00"}, {"taux_co2": 13, "date_heure": "2024-06-16T19:00:00+00:00"}, {"taux_co2": 13, "date_heure": "2024-06-16T18:45:00+00:00"}, {"taux_co2": 13, "date_heure": "2024-06-16T18:30:00+00:00"}, {"taux_co2": 13, "date_heure": "2024-06-16T18:15:00+00:00"}, {"taux_co2": 13, "date_heure": "2024-06-16T18:00:00+00:00"}, {"taux_co2": 13, "date_heure": "2024-06-16T17:45:00+00:00"}, {"taux_co2": 13, "date_heure": "2024-06-16T17:30:00+00:00"}, {"taux_co2": 13, "date_heure": "2024-06-16T17:15:00+00:00"}, {"taux_co2": 14, "date_heure": "2024-06-16T17:00:00+00:00"}, {"taux_co2": 14, "date_heure": "2024-06-16T16:45:00+00:00"}, {"taux_co2": 13, "date_heure": "2024-06-16T16:30:00+00:00"}, {"taux_co2": 14, "date_heure": "2024-06-16T16:15:00+00:00"}, {"taux_co2": 15, "date_heure": "2024-06-16T16:00:00+00:00"}, {"taux_co2": 15, "date_heure": "2024-06-16T15:45:00+00:00"}, {"taux_co2": 15, "date_heure": "2024-06-16T15:30:00+00:00"}, {"taux_co2": 15, "date_heure": "2024-06-16T15:15:00+00:00"}, {"taux_co2": 15, "date_heure": "2024-06-16T15:00:00+00:00"}, {"taux_co2": 15, "date_heure": "2024-06-16T14:45:00+00:00"}, {"taux_co2": 15, "date_heure": "2024-06-16T14:30:00+00:00"}, {"taux_co2": 15, "date_heure": "2024-06-16T14:15:00+00:00"}, {"taux_co2": 15, "date_heure": "2024-06-16T14:00:00+00:00"}]}';
+
     public function testGetCarbonIntensity()
     {
-        $source = new CarbonDataSourceFrance();
+        $client = $this->createStub(RestApiClientInterface::class);
+        $client->method('request')->willReturn(json_decode(self::RESPONSE_1, true));
+
+        $source = new CarbonDataSourceRTE($client);
 
         $date = new DateTime();
         $intensity = $source->getCarbonIntensity('France', '', '', $date);
