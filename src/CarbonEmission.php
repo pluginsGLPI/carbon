@@ -38,6 +38,7 @@ use DateTime;
 use CronTask;
 use GlpiPlugin\Carbon\History\Computer as ComputerHistory;
 use GlpiPlugin\Carbon\History\Monitor as MonitorHistory;
+use GlpiPlugin\Carbon\History\NetworkEquipment as NetworkEquipmentHistory;
 
 class CarbonEmission extends CommonDBChild
 {
@@ -54,6 +55,7 @@ class CarbonEmission extends CommonDBChild
         $histories = [
             ComputerHistory::class,
             MonitorHistory::class,
+            NetworkEquipmentHistory::class,
         ];
         $task->setVolume(0); // start with zero
         foreach ($histories as $history_type) {

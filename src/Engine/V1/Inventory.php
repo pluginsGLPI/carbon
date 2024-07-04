@@ -45,7 +45,7 @@ use DbUtils;
  *
  * Next we call the method getCarbonEmission()
  */
-class Inventory implements CommonInterface
+class Inventory implements EngineInterface
 {
     private array $items = [];
 
@@ -97,7 +97,7 @@ class Inventory implements CommonInterface
                 // Callback function for plugins
                 // It gets the  following arguments
                 // - string $itemtype
-                // the callback returns the name of a class which implements CommonInterface
+                // the callback returns the name of a class which implements EngineInterface
                 $callback_function = 'plugin_' . $plugin_info['plug'] . '_carbon_engine';
                 if (!is_callable($callback_function)) {
                     return false;

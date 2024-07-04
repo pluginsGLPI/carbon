@@ -35,17 +35,58 @@ namespace GlpiPlugin\Carbon\Engine\V1;
 
 use Computer as GlpiComputer;
 use ComputerType as GlpiComputerType;
+use GlpiPlugin\Carbon\ComputerUsageProfile;
+use GlpiPlugin\Carbon\EnvironnementalImpact;
 use ComputerModel;
 use GlpiPlugin\Carbon\ComputerType;
-use DateTime;
 
 /**
  * Compute CO2 emission of a computer
  */
-class Computer extends AbstractAsset implements CommonInterface
+class Computer extends AbstractSwitchable
 {
     protected static string $itemtype = GlpiComputer::class;
     protected static string $type_itemtype  = GlpiComputerType::class;
     protected static string $model_itemtype = ComputerModel::class;
     protected static string $plugin_type_itemtype = ComputerType::class;
+
+
+    public function getUsageProfile(): ?ComputerUsageProfile
+    {
+        global $DB;
+
+        $computers_table = GlpiComputer::getTable();
+        $environnementalimpact_table = EnvironnementalImpact::getTable();
+        $computerUsageProfile_table = ComputerUsageProfile::getTable();
+
+        $request = [
+            'SELECT' => ComputerUsageProfile::getTableField('id'),
+            'FROM' => $computers_table,
+            'INNER JOIN' => [
+                $environnementalimpact_table => [
+                    'FKEY'   => [
+                        $computers_table  => 'id',
+                        $environnementalimpact_table => 'computers_id',
+                    ]
+                ],
+                $computerUsageProfile_table => [
+                    'FKEY'   => [
+                        $environnementalimpact_table  => 'plugin_carbon_computerusageprofiles_id',
+                        $computerUsageProfile_table => 'id',
+                    ]
+                ]
+            ],
+            'WHERE' => [
+                GlpiComputer::getTableField('id') => $this->items_id,
+            ],
+        ];
+
+        $result = $DB->request($request);
+
+        if ($result->numrows() == 1) {
+            return ComputerUsageProfile::getById($result->current()['id']);
+        }
+
+        return null;
+    }
 }

@@ -35,23 +35,18 @@ namespace GlpiPlugin\Carbon\Engine\V1;
 
 use Computer as GlpiComputer;
 use Computer_Item;
+use DateTime;
 use Monitor as GlpiMonitor;
-use DBmysqlIterator;
 use MonitorType as GlpiMonitorType;
 use MonitorModel;
-use Location;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
-use GlpiPlugin\Carbon\ComputerPower;
 use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\EnvironnementalImpact;
-use GlpiPlugin\Carbon\CarbonIntensity;
-use DateTime;
 
 /**
  * Compute CO2 emission of a computer
  */
-class Monitor extends AbstractAsset implements CommonInterface
+class Monitor extends AbstractSwitchable
 {
     protected static string $itemtype = GlpiMonitor::class;
     protected static string $type_itemtype  = GlpiMonitorType::class;

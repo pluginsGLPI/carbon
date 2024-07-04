@@ -33,21 +33,18 @@
 
 namespace GlpiPlugin\Carbon\Engine\V1;
 
-use Computer as GlpiComputer;
 use CommonDBTM;
 use DateInterval;
 use DateTime;
 use DBmysqlIterator;
 use DbUtils;
 use DbMysql;
-use GlpiPlugin\Carbon\ComputerUsageProfile;
-use GlpiPlugin\Carbon\EnvironnementalImpact;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use Location;
 use QueryExpression;
 
-abstract class AbstractAsset
+abstract class AbstractAsset implements EngineInterface
 {
     protected static string $itemtype;
     protected static string $type_itemtype;
@@ -74,60 +71,6 @@ abstract class AbstractAsset
         }
 
         $this->items_id = $items_id;
-    }
-
-    public function getUsageProfile(): ?ComputerUsageProfile
-    {
-        global $DB;
-
-        $computers_table = GlpiComputer::getTable();
-        $environnementalimpact_table = EnvironnementalImpact::getTable();
-        $computerUsageProfile_table = ComputerUsageProfile::getTable();
-
-        $request = [
-            'SELECT' => ComputerUsageProfile::getTableField('id'),
-            'FROM' => $computers_table,
-            'INNER JOIN' => [
-                $environnementalimpact_table => [
-                    'FKEY'   => [
-                        $computers_table  => 'id',
-                        $environnementalimpact_table => 'computers_id',
-                    ]
-                ],
-                $computerUsageProfile_table => [
-                    'FKEY'   => [
-                        $environnementalimpact_table  => 'plugin_carbon_computerusageprofiles_id',
-                        $computerUsageProfile_table => 'id',
-                    ]
-                ]
-            ],
-            'WHERE' => [
-                GlpiComputer::getTableField('id') => $this->items_id,
-            ],
-        ];
-
-        $result = $DB->request($request);
-
-        if ($result->numrows() == 1) {
-            return ComputerUsageProfile::getById($result->current()['id']);
-        }
-
-        return null;
-    }
-
-    /**
-     * Tells if the asset is expected to run in the specified date and usage profile
-     *
-     * @param ComputerUsageProfile $usage_profile
-     * @param DateTime $dateTime
-     * @return boolean true if the asset is powered on
-     */
-    protected static function isUsageDay(ComputerUsageProfile $usage_profile, DateTime $dateTime): bool
-    {
-        $day_of_week = $dateTime->format('N');
-        $key = 'day_' . strval($day_of_week);
-
-        return $usage_profile->fields[$key] != 0;
     }
 
     /**
@@ -254,18 +197,9 @@ abstract class AbstractAsset
      */
     public function getEnergyPerDay(DateTime $day): float
     {
-        $usage_profile = $this->getUsageProfile();
-
-        if ($usage_profile === null || !self::isUsageDay($usage_profile, $day)) {
-            return 0;
-        }
-
         $power = $this->getPower();
 
-        $day_s = $day->format('Y-m-d');
-        $start_date = DateTime::createFromFormat('Y-m-d H:i:s', $day_s . $usage_profile->fields['time_start']);
-        $stop_date = DateTime::createFromFormat('Y-m-d H:i:s', $day_s . $usage_profile->fields['time_stop']);
-        $delta_time = $stop_date->getTimestamp() - $start_date->getTimestamp();
+        $delta_time = 24;
 
         // units:
         // power is in Watt
@@ -275,7 +209,6 @@ abstract class AbstractAsset
         return $energy_in_kwh;
     }
 
-
     /**
      * Returns the carbon emission for the specified day.
      *
@@ -283,69 +216,11 @@ abstract class AbstractAsset
      */
     public function getCarbonEmissionPerDay(DateTime $day): ?float
     {
-        $usage_profile = $this->getUsageProfile();
-
-        if ($usage_profile === null || !self::isUsageDay($usage_profile, $day)) {
-            return 0.0;
-        }
-
         $power = $this->getPower();
 
-        // Assume that start and stop times are HH:ii:ss
-        $seconds_start = explode(':', $usage_profile->fields['time_start']);
-        $seconds_stop  = explode(':', $usage_profile->fields['time_stop']);
-
-        $start_time = clone $day;
-        $start_time->setTime($seconds_start[0], $seconds_start[1], $seconds_start[2]);
-        $seconds_start = $seconds_start[0] * 3600 + $seconds_start[1] * 60 + $seconds_start[2];
-        $seconds_stop = $seconds_stop[0] * 3600 + $seconds_stop[1] * 60 + $seconds_stop[2];
-        $length = new DateInterval('PT' . ($seconds_stop - $seconds_start) . 'S');
-        return $this->computeEmissionPerDay($start_time, $power, $length);
-    }
-
-    protected function computeEmissionPerDay(DateTime $start_time, int $power, DateInterval $length): ?float
-    {
-        if ($power === 0) {
-            return 0;
-        }
-
-        $query_result = $this->requestCarbonIntensitiesPerDay($start_time, $length);
-
-        if ($query_result->numrows() == 0) {
-            return null;
-        }
-
-        $total_emission = 0.0;
-        $previous_timestamp = 0;
-        $length_seconds = $length->format('%S');
-        foreach ($query_result as $row) {
-            $emission_date = DateTime::createFromFormat('Y-m-d H:i:s', $row['emission_date']);
-            if ($previous_timestamp == 0) {
-                $previous_timestamp = $emission_date->getTimestamp();
-                continue;
-            }
-
-            // calculate seconds where the asset is on within the hour
-            $current_timestamp = $emission_date->format('U');
-            $next_hour = $current_timestamp;
-            $hour_fraction = ($next_hour - $start_time->format('U'));
-            $hour_fraction = min($hour_fraction, $length_seconds);
-
-            // units:
-            // power is in Watt
-            // delta_time is in seconds
-            // intensity is in gCO2/kWh
-            $energy_in_kwh = ($power * $hour_fraction) / (1000.0 * 60 * 60);
-            $emission = $row['intensity'] * $energy_in_kwh;
-            $total_emission += $emission;
-
-            // Increment start_time using $emission_date
-            // (because this lop assumes that carbon intensity is recorded for last hour)
-            // TODO: to define if it should be for the next hour instead
-            $start_time = clone $emission_date;
-            $length_seconds -= $hour_fraction;
-        }
-
-        return $total_emission;
+        // units:
+        // power is in Watt
+        // intensity is in gCO2eq/kWh
+        return $power * 24 / 1000;
     }
 }

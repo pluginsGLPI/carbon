@@ -34,13 +34,12 @@
 
 namespace GlpiPlugin\Carbon\History;
 
-use Computer;
 use CommonDBTM;
 use DateInterval;
 use DateTime;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonEmission;
-use GlpiPlugin\Carbon\Engine\V1\CommonInterface as EngineInterface;
+use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use Location;
 
 abstract class AbstractAsset extends CommonDBTM implements AssetInterface

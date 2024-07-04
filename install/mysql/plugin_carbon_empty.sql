@@ -104,3 +104,11 @@ CREATE TABLE `glpi_plugin_carbon_monitortypes` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `unicity` (`monitortypes_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `glpi_plugin_carbon_networkequipmenttypes` (
+  `id`                       int unsigned NOT NULL AUTO_INCREMENT,
+  `networkequipmenttypes_id` int unsigned NOT NULL DEFAULT '0',
+  `power_consumption`        int          DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unicity` (`networkequipmenttypes_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

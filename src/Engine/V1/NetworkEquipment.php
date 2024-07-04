@@ -31,12 +31,18 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon;
+namespace GlpiPlugin\Carbon\Engine\V1;
 
-use ComputerType as GlpiComputerType;
+use NetworkEquipment as GlpiNetworkEquipment;
+use NetworkEquipmentType as GlpiNetworkEquipmentType;
+use NetworkEquipmentModel;
+use GlpiPlugin\Carbon\NetworkEquipmentType;
+use DateTime;
 
-class ComputerType extends AbstractType
+class NetworkEquipment extends AbstractAsset
 {
-    public static $itemtype = GlpiComputerType::class;
-    public static $items_id = 'computertypes_id';
+    protected static string $itemtype = GlpiNetworkEquipment::class;
+    protected static string $type_itemtype  = GlpiNetworkEquipmentType::class;
+    protected static string $model_itemtype = NetworkEquipmentModel::class;
+    protected static string $plugin_type_itemtype = NetworkEquipmentType::class;
 }

@@ -38,7 +38,7 @@ use DateTime;
 /**
  * Compute environnemental impact of a computer
  */
-interface CommonInterface
+interface EngineInterface
 {
     /**
      * Returns the carbon emission for the specified day.

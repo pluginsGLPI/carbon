@@ -42,9 +42,11 @@ use GlpiPlugin\Carbon\Profile;
 use GlpiPlugin\Carbon\Report;
 use ComputerType as GlpiComputerType;
 use MonitorType as GlpiMonitorType;
+use NetworkEquipmentType as GlpiNetworkEquipmentType;
 use Profile as GlpiProfile;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\MonitorType;
+use GlpiPlugin\Carbon\NetworkEquipmentType;
 
 define('PLUGIN_CARBON_VERSION', '0.0.1');
 
@@ -97,8 +99,8 @@ function plugin_init_carbon()
     Plugin::registerClass(Profile::class, ['addtabon' => GlpiProfile::class]);
     Plugin::registerClass(ComputerType::class, ['addtabon' => GlpiComputerType::class]);
     Plugin::registerClass(EnvironnementalImpact::class, ['addtabon' => Computer::class]);
-    // TODO: enable monitor power consumption before enabling UI
     Plugin::registerClass(MonitorType::class, ['addtabon' => GlpiMonitorType::class]);
+    Plugin::registerClass(NetworkEquipmentType::class, ['addtabon' => GlpiNetworkEquipmentType::class]);
 
     // Add ApexCharts.js library
     $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][] = 'dist/bundle.js';

@@ -31,12 +31,11 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon;
+namespace GlpiPlugin\Carbon\Engine\V1;
 
-use ComputerType as GlpiComputerType;
+use GlpiPlugin\Carbon\ComputerUsageProfile;
 
-class ComputerType extends AbstractType
+interface SwitchableInterface
 {
-    public static $itemtype = GlpiComputerType::class;
-    public static $items_id = 'computertypes_id';
+    public function getUsageProfile(): ?ComputerUsageProfile;
 }

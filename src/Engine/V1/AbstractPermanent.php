@@ -31,12 +31,8 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon;
+namespace GlpiPlugin\Carbon\Engine\V1;
 
-use ComputerType as GlpiComputerType;
-
-class ComputerType extends AbstractType
+abstract class AbstractPermanent extends AbstractAsset
 {
-    public static $itemtype = GlpiComputerType::class;
-    public static $items_id = 'computertypes_id';
 }
