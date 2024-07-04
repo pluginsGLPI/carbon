@@ -37,19 +37,15 @@ use DateInterval;
 use DateTimeImmutable;
 use DateTime;
 
-class CarbonDataSourceFrance implements CarbonDataSource
+class CarbonDataSourceRTE implements CarbonDataSource
 {
-    const BASE_URL = 'https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/eco2mix-national-tr/records';
+    const RECORDS_URL = 'https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/eco2mix-national-tr/records';
 
-    private RestApiClient $client;
+    private RestApiClientInterface $client;
 
-    public function __construct()
+    public function __construct(RestApiClientInterface $client)
     {
-        $this->client = new RestApiClient(
-            [
-                'base_uri'        => self::BASE_URL,
-            ]
-        );
+        $this->client = $client;
     }
 
     public function getCarbonIntensity(string $country = "", string $latitude = "", string $longitude = "", DateTime &$date = null): int
@@ -73,11 +69,11 @@ class CarbonDataSourceFrance implements CarbonDataSource
 
         $carbon_intensity = 0.0;
 
-        if ($response = $this->client->request('GET', '', ['query' => $params])) {
-            foreach ($response['records'] as $record) {
-                $carbon_intensity += $record['record']['fields']['taux_co2'];
+        if ($response = $this->client->request('GET', self::RECORDS_URL, ['query' => $params])) {
+            foreach ($response['results'] as $record) {
+                $carbon_intensity += $record['taux_co2'];
             }
-            $carbon_intensity /= count($response['records']);
+            $carbon_intensity /= count($response['results']);
         }
 
         return intval(round($carbon_intensity));
