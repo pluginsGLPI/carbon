@@ -37,7 +37,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7;
 
-class RestApiClient
+class RestApiClient implements RestApiClientInterface
 {
     const DEFAULT_TIMEOUT = 5;
     const DEFAULT_HEADERS = [
