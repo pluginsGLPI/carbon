@@ -34,7 +34,8 @@
 namespace GlpiPlugin\Carbon\DataSource;
 
 use DateInterval;
-use DateTimeImmutable;
+use DateTimeInterface;
+use DateTimeZone;
 use DateTime;
 
 class CarbonDataSourceRTE implements CarbonDataSource
@@ -48,34 +49,66 @@ class CarbonDataSourceRTE implements CarbonDataSource
         $this->client = $client;
     }
 
-    public function getCarbonIntensity(string $country = "", string $latitude = "", string $longitude = "", DateTime &$date = null): int
+    /**
+     * Fetch carbon intensities from Opendata Réseaux-Énergies using real-time dataset.
+     *
+     * See https://odre.opendatasoft.com/explore/dataset/eco2mix-national-tr/api/?disjunctive.nature
+     *
+     * Dataset has a depth from MONTH-1 to HOUR-2.
+     * Note that the HOUR-2 seems to be not fully guaranted.
+     *
+     * The method fetches the intensities for the day before the current day.
+     */
+    public function fetchCarbonIntensity(): array
     {
-        $d = DateTimeImmutable::createFromMutable($date);
+        $today = new DateTime('now', new DateTimeZone('UTC'));
+        $today->setTime(0, 0, 0);
+        $yesterday = (clone $today)->sub(new DateInterval('P1D'));
 
         $format = "Y-m-d\TH:i:sP";
-
-        // "Données éCO2mix nationales temps réel" has a depth from M-1 to H-2
-        $from = $d->sub(new DateInterval('PT3H'))->format($format);
-        $to = $d->sub(new DateInterval('PT2H'))->format($format);
+        $from = $yesterday->format($format);
+        $to = $today->format($format);
 
         $params = [
-            'select'    => 'taux_co2,date_heure',
-            'where'     => "date_heure IN [date'$from' TO date'$to']",
-            'order_by'  => 'date_heure desc',
-            'limit'     => 20,
-            'offset'    => 0,
-            'timezone'  => 'UTC',
+            'select' => 'taux_co2,date_heure',
+            'where' => "date_heure IN [date'$from' TO date'$to']",
+            'order_by' => 'date_heure desc',
+            'limit' => 100,
+            'offset' => 0,
+            'timezone' => 'UTC',
         ];
 
-        $carbon_intensity = 0.0;
+        $response = $this->client->request('GET', self::RECORDS_URL, ['query' => $params]);
+        if (!$response)
+            return [];
 
-        if ($response = $this->client->request('GET', self::RECORDS_URL, ['query' => $params])) {
-            foreach ($response['results'] as $record) {
-                $carbon_intensity += $record['taux_co2'];
+        $intensities = [];
+        $intensity = 0.0;
+        $count = 0;
+        $first = true;
+
+        // compute mean value over each hour
+        foreach ($response['results'] as $record) {
+            $matches = [];
+            preg_match("/:([0-9][0-9]):/", $record['date_heure'], $matches);
+            if ($matches[1] == '00') {
+                if (!$first) {
+                    $intensities[] = [
+                        'datetime' => $record['date_heure'],
+                        'intensity' => intval(round($intensity / $count)),
+                    ];
+                    $intensity = 0.0;
+                    $count = 0;
+                }
+                $first = false;
             }
-            $carbon_intensity /= count($response['results']);
+            $intensity += $record['taux_co2'];
+            $count++;
         }
 
-        return intval(round($carbon_intensity));
+        return [
+            'source' => 'RTE',
+            'France' => $intensities,
+        ];
     }
 }
