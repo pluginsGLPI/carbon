@@ -35,48 +35,60 @@ namespace GlpiPlugin\Carbon\DataSource;
 
 use DateTime;
 use DateTimeInterface;
+use DateTimeZone;
 use GlpiPlugin\Carbon\Config;
 
 class CarbonDataSourceElectricityMap implements CarbonDataSource
 {
-    private RestApiClient $client;
+    const HISTORY_URL = 'https://api.electricitymap.org/v3/carbon-intensity/history';
 
-    public function __construct()
+    private RestApiClientInterface $client;
+
+    public function __construct(RestApiClientInterface $client)
     {
-        $base_url = Config::getconfig()['electricitymap_base_url'];
-        if (substr($base_url, -1) != '/') {
-            $base_url .= '/';
-        }
+        $this->client = $client;
+    }
+    private function createRestApiClient(): RestApiClientInterface
+    {
         $api_key = Config::getconfig()['electricitymap_api_key'];
 
-        $this->client = new RestApiClient(
+        return new RestApiClient(
             [
-                'base_uri'        => $base_url,
-                'headers'      => [
-                    'X-BLOBR-KEY' => $api_key,
+                'headers' => [
+                    'auth-token' => $api_key,
                 ],
             ]
         );
     }
 
-    public function getCarbonIntensity(string $country = "", string $latitude = "", string $longitude = "", DateTime &$date = null): int
+    public function fetchCarbonIntensity(): array
     {
-        $format = DateTimeInterface::ISO8601;
-
+        // TODO: get zones from GLPI locations
         $params = [
-            'datetime' => $date->format($format),
-            'zone'  => $country,
+            'zone' => 'FR',
         ];
 
-        $carbon_intensity = 0;
+        $response = $this->client->request('GET', self::HISTORY_URL, ['query' => $params]);
+        if (!$response)
+            return [];
 
-        if ($response = $this->client->request('GET', 'carbon-intensity/history', ['query' => $params])) {
-            $history = $response['history'];
-            if (is_array($history) && count($history) > 0) {
-                $carbon_intensity = $history[0]['carbonIntensity'];
+        $intensities = [];
+        foreach ($response['history'] as $record) {
+            $datetime = DateTime::createFromFormat('Y-m-d\TH:i:s+', $record['datetime'], new DateTimeZone('UTC'));
+            if (!$datetime instanceof DateTimeInterface) {
+                var_dump(DateTime::getLastErrors());
+                continue;
             }
+            $intensities[] = [
+                'datetime' => $datetime->format('Y-m-d\TH:i:sP'),
+                'intensity' => $record['carbonIntensity'],
+            ];
         }
 
-        return $carbon_intensity;
+        return [
+            'source' => 'ElectricityMap',
+            $response['zone'] => $intensities,
+        ];
+        ;
     }
 }
