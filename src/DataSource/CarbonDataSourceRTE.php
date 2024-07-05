@@ -79,8 +79,9 @@ class CarbonDataSourceRTE implements CarbonDataSource
         ];
 
         $response = $this->client->request('GET', self::RECORDS_URL, ['query' => $params]);
-        if (!$response)
+        if (!$response) {
             return [];
+        }
 
         $intensities = [];
         $intensity = 0.0;

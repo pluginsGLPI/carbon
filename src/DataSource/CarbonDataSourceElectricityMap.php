@@ -69,8 +69,9 @@ class CarbonDataSourceElectricityMap implements CarbonDataSource
         ];
 
         $response = $this->client->request('GET', self::HISTORY_URL, ['query' => $params]);
-        if (!$response)
+        if (!$response) {
             return [];
+        }
 
         $intensities = [];
         foreach ($response['history'] as $record) {
