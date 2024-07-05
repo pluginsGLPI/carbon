@@ -65,7 +65,7 @@ class RestApiClient implements RestApiClientInterface
         $this->api_client = new Client(array_merge_recursive($local_params, $params));
     }
 
-    function request(string $method = 'GET', string $uri = '', array $options = [])
+    public function request(string $method = 'GET', string $uri = '', array $options = [])
     {
         try {
             $response = $this->api_client->request($method, $uri, $options);
