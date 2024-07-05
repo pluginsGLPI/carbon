@@ -48,7 +48,7 @@ class RestApiClient implements RestApiClientInterface
     protected $api_client = null;
     protected $last_error = '';
 
-    function __construct(array $params)
+    public function __construct(array $params)
     {
         $local_params = [
             'timeout'         => self::DEFAULT_TIMEOUT,

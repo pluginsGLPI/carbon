@@ -35,5 +35,5 @@ namespace GlpiPlugin\Carbon\DataSource;
 
 interface RestApiClientInterface
 {
-    function request(string $method, string $uri, array $options);
+    public function request(string $method, string $uri, array $options);
 }
