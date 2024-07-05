@@ -34,61 +34,62 @@
 namespace GlpiPlugin\Carbon\DataSource;
 
 use DateTime;
+use DateTimeInterface;
+use DateTimeZone;
+use GlpiPlugin\Carbon\Config;
 
-/**
- * The common interface for all classes implementing carbon intensity fetching from various sources.
- * Sources are most of the time REST API, but this is not limitative.
- *
- * Depending on the source, the time range of the intensities may vary.
- *
- * The method returns an array constructed as this:
- * [
- *      'source' => the source name,
- *      'a zone name' => [
- *            [
- *                'datetime' => the date and time of the intensity,
- *                'intensity' => the intensity,
- *            ],
- *            ...
- *        ],
- *      ...
- * ]
- *
- * For example:
- * [
- *      'source' => 'FR_SOURCE',
- *      'France_west' => [
- *            [
- *                'datetime' => "2024-07-03T01:00:00+00:00",
- *                'intensity' => 12,
- *            ],
- *            [
- *                'datetime' => ""2024-07-03T02:00:00+00:00"",
- *                'intensity' => 13,
- *            ],
- *       ],
- *      'France_east' => [
- *            [
- *                'datetime' => "2024-07-03T01:00:00+00:00",
- *                'intensity' => 41,
- *            ],
- *            [
- *                'datetime' => ""2024-07-03T02:00:00+00:00"",
- *                'intensity' => 40,
- *            ],
- *       ],
- * ]
- *
- * The carbon intensity unit is gCO2/kWh
- *
- */
-
-interface CarbonDataSource
+class CarbonIntensityElectricityMap implements CarbonIntensity
 {
-    /**
-     * Fetch carbon intensities from the source.
-     *
-     * @return an array organized as described above
-     */
-    public function fetchCarbonIntensity(): array;
+    const HISTORY_URL = 'https://api.electricitymap.org/v3/carbon-intensity/history';
+
+    private RestApiClientInterface $client;
+
+    public function __construct(RestApiClientInterface $client)
+    {
+        $this->client = $client;
+    }
+    private function createRestApiClient(): RestApiClientInterface
+    {
+        $api_key = Config::getconfig()['electricitymap_api_key'];
+
+        return new RestApiClient(
+            [
+                'headers' => [
+                    'auth-token' => $api_key,
+                ],
+            ]
+        );
+    }
+
+    public function fetchCarbonIntensity(): array
+    {
+        // TODO: get zones from GLPI locations
+        $params = [
+            'zone' => 'FR',
+        ];
+
+        $response = $this->client->request('GET', self::HISTORY_URL, ['query' => $params]);
+        if (!$response) {
+            return [];
+        }
+
+        $intensities = [];
+        foreach ($response['history'] as $record) {
+            $datetime = DateTime::createFromFormat('Y-m-d\TH:i:s+', $record['datetime'], new DateTimeZone('UTC'));
+            if (!$datetime instanceof DateTimeInterface) {
+                var_dump(DateTime::getLastErrors());
+                continue;
+            }
+            $intensities[] = [
+                'datetime' => $datetime->format('Y-m-d\TH:i:sP'),
+                'intensity' => $record['carbonIntensity'],
+            ];
+        }
+
+        return [
+            'source' => 'ElectricityMap',
+            $response['zone'] => $intensities,
+        ];
+        ;
+    }
 }

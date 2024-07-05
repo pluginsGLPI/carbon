@@ -38,7 +38,7 @@ use DateTimeInterface;
 use DateTimeZone;
 use DateTime;
 
-class CarbonDataSourceRTE implements CarbonDataSource
+class CarbonIntensityRTE implements CarbonIntensity
 {
     const RECORDS_URL = 'https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/eco2mix-national-tr/records';
 
