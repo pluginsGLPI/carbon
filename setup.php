@@ -33,13 +33,13 @@
 
 use Config as GlpiConfig;
 use GlpiPlugin\Carbon\Dashboard\Dashboard;
+use GlpiPlugin\Carbon\Dashboard\Widget;
 use Glpi\Plugin\Hooks;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\EnvironnementalImpact;
 use GlpiPlugin\Carbon\Profile;
 use GlpiPlugin\Carbon\Report;
-use GlpiPlugin\Carbon\Widget;
 use ComputerType as GlpiComputerType;
 use MonitorType as GlpiMonitorType;
 use Profile as GlpiProfile;
@@ -84,7 +84,7 @@ function plugin_init_carbon()
 
     // add new cards to the dashboard
     $PLUGIN_HOOKS[Hooks::DASHBOARD_CARDS]['carbon'] = [Dashboard::class, 'dashboardCards'];
-    // $PLUGIN_HOOKS[Hooks::DASHBOARD_CARDS]['carbon'] = [Widget::class, 'getTypes'];
+    $PLUGIN_HOOKS[Hooks::DASHBOARD_TYPES]['carbon'] = [Widget::class, 'WidgetTypes'];
 
     if (Session::haveRight('config', UPDATE)) {
         $PLUGIN_HOOKS['config_page']['carbon'] = 'front/config.form.php';

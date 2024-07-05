@@ -98,6 +98,31 @@ class Dashboard
                 'label'        => __("Carbon intensity", 'carbon'),
                 'provider'     => Dashboard::class . "::cardCarbonintensityProvider",
             ],
+            'plugin_carbon_card_carbon_emission_per_type' => [
+                'widgettype'   => ['graphpertype'],
+                'group'        => __("Carbon", "carbon"),
+                'label'        => __("Carbon emission per type", 'carbon'),
+            ],
+            'plugin_carbon_card_total_carbon_emission' => [
+                'widgettype'   => ['totalcarbonemission'],
+                'group'        => __("Carbon", "carbon"),
+                'label'        => __("Total carbon emission", 'carbon'),
+            ],
+            'plugin_carbon_card_monthly_carbon_emission' => [
+                'widgettype'   => ['monthlycarbonemission'],
+                'group'        => __("Carbon", "carbon"),
+                'label'        => __("Monthly carbon emission", 'carbon'),
+            ],
+            'plugin_carbon_card_unhandled_computers' => [
+                'widgettype'   => ['unhandledcomputers'],
+                'group'        => __("Carbon", "carbon"),
+                'label'        => __("Unhandled computers", 'carbon'),
+            ],
+            'plugin_carbon_card_graph_carbon_emission_per_month' => [
+                'widgettype'   => ['graphpermonth'],
+                'group'        => __("Carbon", "carbon"),
+                'label'        => __("Carbon emission per month graph", 'carbon'),
+            ],
         ];
 
         return array_merge($cards, $new_cards);
