@@ -88,7 +88,7 @@ interface CarbonDataSource
     /**
      * Fetch carbon intensities from the source.
      *
-     * * @return an array organized as described above
+     * @return an array organized as described above
      */
     public function fetchCarbonIntensity(): array;
 }
