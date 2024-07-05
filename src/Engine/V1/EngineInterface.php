@@ -40,6 +40,8 @@ use DateTime;
  */
 interface EngineInterface
 {
+    public function getPower(): int;
+
     /**
      * Returns the carbon emission for the specified day.
      *

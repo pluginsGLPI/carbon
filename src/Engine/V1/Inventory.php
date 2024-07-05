@@ -143,6 +143,19 @@ class Inventory implements EngineInterface
         return true;
     }
 
+    public function getPower(): int
+    {
+        $power = 0;
+
+        foreach ($this->items as $itemtype => $items) {
+            foreach ($items as $tems_id => $item) {
+                $power += $item->getPower();
+            }
+        }
+
+        return $power;
+    }
+
     public function getEnergyPerDay(DateTime $day): float
     {
         $energy = 0;

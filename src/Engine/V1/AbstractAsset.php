@@ -204,7 +204,7 @@ abstract class AbstractAsset implements EngineInterface
         // units:
         // power is in Watt
         // delta_time is in seconds
-        $energy_in_kwh = ($power * $delta_time) / (1000.0 * 60 * 60);
+        $energy_in_kwh = ($power * $delta_time) / (1000.0);
 
         return $energy_in_kwh;
     }
