@@ -31,14 +31,64 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon;
+namespace GlpiPlugin\Carbon\DataSource;
 
 use DateTime;
 
-class CarbonDataProviderFake implements CarbonDataProvider
+/**
+ * The common interface for all classes implementing carbon intensity fetching from various sources.
+ * Sources are most of the time REST API, but this is not limitative.
+ *
+ * Depending on the source, the time range of the intensities may vary.
+ *
+ * The method returns an array constructed as this:
+ * [
+ *      'source' => the source name,
+ *      'a zone name' => [
+ *            [
+ *                'datetime' => the date and time of the intensity,
+ *                'intensity' => the intensity,
+ *            ],
+ *            ...
+ *        ],
+ *      ...
+ * ]
+ *
+ * For example:
+ * [
+ *      'source' => 'FR_SOURCE',
+ *      'France_west' => [
+ *            [
+ *                'datetime' => "2024-07-03T01:00:00+00:00",
+ *                'intensity' => 12,
+ *            ],
+ *            [
+ *                'datetime' => ""2024-07-03T02:00:00+00:00"",
+ *                'intensity' => 13,
+ *            ],
+ *       ],
+ *      'France_east' => [
+ *            [
+ *                'datetime' => "2024-07-03T01:00:00+00:00",
+ *                'intensity' => 41,
+ *            ],
+ *            [
+ *                'datetime' => ""2024-07-03T02:00:00+00:00"",
+ *                'intensity' => 40,
+ *            ],
+ *       ],
+ * ]
+ *
+ * The carbon intensity unit is gCO2/kWh
+ *
+ */
+
+interface CarbonIntensity
 {
-    public function getCarbonIntensity(string $country = "", string $latitude = "", string $longitude = "", DateTime &$date = null): int
-    {
-        return mt_rand(53, 116);
-    }
+    /**
+     * Fetch carbon intensities from the source.
+     *
+     * @return an array organized as described above
+     */
+    public function fetchCarbonIntensity(): array;
 }
