@@ -34,9 +34,6 @@
 namespace GlpiPlugin\Carbon;
 
 use CommonDBChild;
-use Computer;
-use ComputerModel;
-use Location;
 use DateTime;
 use CronTask;
 use GlpiPlugin\Carbon\History\Computer as ComputerHistory;
@@ -89,8 +86,12 @@ class CarbonEmission extends CommonDBChild
         return [];
     }
 
-    public function prepareInpurForAdd($input)
+    public function prepareInputForAdd($input)
     {
+        $input = parent::prepareInputForAdd($input);
+        if ($input === false || count($input) === 0) {
+            return false;
+        }
         $date = new DateTime($input['date']);
         $date->setTime(0, 0, 0);
         $input['date'] = $date->format('Y-m-d');
