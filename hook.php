@@ -38,6 +38,7 @@ use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\Install;
 use GlpiPlugin\Carbon\Uninstall;
+use GlpiPlugin\Carbon\Upgrade;
 use GlpiPlugin\Carbon\Report;
 use GlpiPlugin\Carbon\EnvironnementalImpact;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
@@ -49,22 +50,19 @@ use ComputerType as GlpiComputerType;
  *
  * @return boolean
  */
-function plugin_carbon_install()
+function plugin_carbon_install(array $args = []): bool
 {
     global $argv;
-
-    // Handle -p force-fresh-install argument. If found, let's do an uninstall first
-    if (is_array($argv) && in_array('force-fresh-install', $argv)) {
-        plugin_carbon_uninstall();
-    }
 
     if (!is_readable(__DIR__ . '/install/Install.php')) {
         return false;
     }
     require_once(__DIR__ . '/install/Install.php');
+    $version = Install::detectVersion();
     $install = new Install(new Migration(PLUGIN_CARBON_VERSION));
+
     try {
-        $install->install();
+        return $install->upgrade($version, $argv);
     } catch (\Exception $e) {
         $backtrace = Toolbox::backtrace(false);
         trigger_error($e->getMessage() . PHP_EOL . $backtrace, E_USER_WARNING);
@@ -79,7 +77,7 @@ function plugin_carbon_install()
  *
  * @return boolean
  */
-function plugin_carbon_uninstall()
+function plugin_carbon_uninstall(): bool
 {
     if (!is_readable(__DIR__ . '/install/Uninstall.php')) {
         return false;
