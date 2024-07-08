@@ -26,17 +26,29 @@
  * SOFTWARE.
  * -------------------------------------------------------------------------
  * @copyright Copyright (C) 2024 Teclib' and contributors.
+ * @copyright Copyright (C) 2024 by the carbon plugin team.
  * @license   MIT https://opensource.org/licenses/mit-license.php
  * @link      https://github.com/pluginsGLPI/carbon
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon;
+namespace GlpiPlugin\Carbon\History;
 
-use ComputerType as GlpiComputerType;
+use CommonDBTM;
+use NetworkEquipment as GlpiNetworkEquipment;
+use NetworkEquipmentType;
+use NetworkEquipmentModel;
+use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
+use GlpiPlugin\Carbon\Engine\V1\Monitor as EngineMonitor;
 
-class ComputerType extends AbstractType
+class NetworkEquipment extends AbstractAsset
 {
-    public static $itemtype = GlpiComputerType::class;
-    public static $items_id = 'computertypes_id';
+    protected static string $itemtype = GlpiNetworkEquipment::class;
+    protected static string $type_itemtype  = NetworkEquipmentType::class;
+    protected static string $model_itemtype = NetworkEquipmentModel::class;
+
+    public static function getEngine(CommonDBTM $item): EngineInterface
+    {
+        return new EngineMonitor($item->getID());
+    }
 }

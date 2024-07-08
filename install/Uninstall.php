@@ -62,6 +62,7 @@ class Uninstall
             CarbonIntensityZone::class,
             ComputerType::class,
             MonitorType::class,
+            NetworkEquipmentType::class,
             ComputerUsageProfile::class,
             EnvironnementalImpact::class,
         ];
@@ -106,7 +107,6 @@ class Uninstall
     public function deleteAutomaticActions()
     {
         $actions = [
-            ComputerPower::class,
             CarbonEmission::class,
         ];
 

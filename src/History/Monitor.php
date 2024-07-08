@@ -35,7 +35,7 @@
 namespace GlpiPlugin\Carbon\History;
 
 use CommonDBTM;
-use GlpiPlugin\Carbon\Engine\V1\CommonInterface as EngineInterface;
+use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Engine\V1\Monitor as EngineMonitor;
 use Computer as GlpiComputer;
 use MonitorType;

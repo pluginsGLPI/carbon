@@ -246,6 +246,8 @@ class ProviderTest extends DbTestCase
             'longitude' => '2.349014',
             'country'   => 'France'
         ]);
+        $computer_1 = $this->getItem(Computer::class);
+        $computer_2 = $this->getItem(Computer::class);
 
         $date = new DateTime('now');
         $date->setTime(0, 0, 0);
@@ -254,8 +256,8 @@ class ProviderTest extends DbTestCase
             $rows = [
                 CarbonEmission::class => [
                     [
-                        'itemtype'         => Computer::class,
-                        'items_id'         => 1,
+                        'itemtype'         => $computer_1::getType(),
+                        'items_id'         => $computer_1->getID(),
                         'entities_id'      => $entities_id,
                         'types_id'         => $computer_type->getID(),
                         'models_id'        => $computer_model_1->getID(),
@@ -264,8 +266,8 @@ class ProviderTest extends DbTestCase
                         'emission_per_day' => 1,
                         'date'             => $date->format('Y-m-d'),
                     ], [
-                        'itemtype'         => Computer::class,
-                        'items_id'         => 2,
+                        'itemtype'         => $computer_2::getType(),
+                        'items_id'         => $computer_2->getID(),
                         'entities_id'      => $entities_id,
                         'types_id'         => $computer_type->getID(),
                         'models_id'        => $computer_model_2->getID(),

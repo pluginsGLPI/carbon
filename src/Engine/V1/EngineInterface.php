@@ -31,12 +31,41 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon;
+namespace GlpiPlugin\Carbon\Engine\V1;
 
-use ComputerType as GlpiComputerType;
+use DateTime;
 
-class ComputerType extends AbstractType
+/**
+ * Compute environnemental impact of a computer
+ */
+interface EngineInterface
 {
-    public static $itemtype = GlpiComputerType::class;
-    public static $items_id = 'computertypes_id';
+    public function getPower(): int;
+
+    /**
+     * Returns the carbon emission for the specified day.
+     *
+     * @param DateTime $day the day
+     *
+     * @return float or null
+     *
+     * If no carbon intensity data are available for the specified day, returns null
+     * Otherwise, returns the CO2 emission of the day, which can be 0
+     *
+     * Unit of returned value, if float, is grams of CO2
+     */
+    public function getCarbonEmissionPerDay(DateTime $day): ?float;
+
+    /**
+     * Returns the consumed energy for the specified day.
+     *
+     * @param DateTime $day the day
+     *
+     * @return float
+     *
+     * Returns the consumed energy
+     *
+     * Unit of returned value is kWh (kiloWattHour)
+     */
+    public function getEnergyPerDay(DateTime $day): float;
 }

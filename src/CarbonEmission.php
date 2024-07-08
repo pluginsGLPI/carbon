@@ -34,13 +34,11 @@
 namespace GlpiPlugin\Carbon;
 
 use CommonDBChild;
-use Computer;
-use ComputerModel;
-use Location;
 use DateTime;
 use CronTask;
 use GlpiPlugin\Carbon\History\Computer as ComputerHistory;
 use GlpiPlugin\Carbon\History\Monitor as MonitorHistory;
+use GlpiPlugin\Carbon\History\NetworkEquipment as NetworkEquipmentHistory;
 
 class CarbonEmission extends CommonDBChild
 {
@@ -57,6 +55,7 @@ class CarbonEmission extends CommonDBChild
         $histories = [
             ComputerHistory::class,
             MonitorHistory::class,
+            NetworkEquipmentHistory::class,
         ];
         $task->setVolume(0); // start with zero
         foreach ($histories as $history_type) {
@@ -89,8 +88,12 @@ class CarbonEmission extends CommonDBChild
         return [];
     }
 
-    public function prepareInpurForAdd($input)
+    public function prepareInputForAdd($input)
     {
+        $input = parent::prepareInputForAdd($input);
+        if ($input === false || count($input) === 0) {
+            return false;
+        }
         $date = new DateTime($input['date']);
         $date->setTime(0, 0, 0);
         $input['date'] = $date->format('Y-m-d');

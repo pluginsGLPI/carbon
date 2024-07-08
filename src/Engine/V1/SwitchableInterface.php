@@ -33,37 +33,9 @@
 
 namespace GlpiPlugin\Carbon\Engine\V1;
 
-use DateTime;
+use GlpiPlugin\Carbon\ComputerUsageProfile;
 
-/**
- * Compute environnemental impact of a computer
- */
-interface CommonInterface
+interface SwitchableInterface
 {
-    /**
-     * Returns the carbon emission for the specified day.
-     *
-     * @param DateTime $day the day
-     *
-     * @return float or null
-     *
-     * If no carbon intensity data are available for the specified day, returns null
-     * Otherwise, returns the CO2 emission of the day, which can be 0
-     *
-     * Unit of returned value, if float, is grams of CO2
-     */
-    public function getCarbonEmissionPerDay(DateTime $day): ?float;
-
-    /**
-     * Returns the consumed energy for the specified day.
-     *
-     * @param DateTime $day the day
-     *
-     * @return float
-     *
-     * Returns the consumed energy
-     *
-     * Unit of returned value is kWh (kiloWattHour)
-     */
-    public function getEnergyPerDay(DateTime $day): float;
+    public function getUsageProfile(): ?ComputerUsageProfile;
 }
