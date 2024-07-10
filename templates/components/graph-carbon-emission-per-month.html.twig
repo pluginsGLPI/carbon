@@ -40,13 +40,13 @@
 <script>
 
     $(document).ready(function () {
-      
+
       var currentUrl = window.location.href;
 
       if (currentUrl.includes('dashboard')) {
         document.getElementById('cardBodyBorder1').classList.add('border', 'border-2');
       }
-      
+
       var carbonEmissionPerMonthOptions = {
         chart: {
           type: 'bar',
@@ -74,7 +74,7 @@
       var carbonEmissionPerMonthChart = new ApexCharts(document.querySelector("#carbonEmissionPerMonthChart"), carbonEmissionPerMonthOptions);
       carbonEmissionPerMonthChart.render();
 
-      fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/carbonEmissionPerMonth.php").then(response => {
+      fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/carbonEmissionPerMonth.php").then(response => {
           console.log(response);
           return response.json();
       }).then(data => {

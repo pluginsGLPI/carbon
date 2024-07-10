@@ -78,7 +78,7 @@
         carbonEmissionPerTypeChart.render();
 
         // Carbon emission per model
-        fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/totalCarbonEmissionPerModel.php").then(response => {
+        fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/totalCarbonEmissionPerModel.php").then(response => {
             console.log(response);
             return response.json();
         }).then(data => {
