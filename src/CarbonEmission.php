@@ -100,7 +100,8 @@ class CarbonEmission extends CommonDBChild
         return $input;
     }
 
-    /** Format a weight passing a weight in grams
+    /**
+     * Format a weight passing a weight in grams
      *
      * @param integer $weight  Weight in grams
      *

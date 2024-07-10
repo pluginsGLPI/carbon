@@ -46,8 +46,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 // 6 months
 
-define('DATE_MIN', 'P6M');
-
 class CreateFakeCarbonIntensityCommand extends Command
 {
     /** @var int ID of the data source being processed */

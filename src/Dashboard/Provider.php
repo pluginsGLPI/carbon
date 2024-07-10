@@ -117,7 +117,7 @@ class Provider
         foreach ($result as $row) {
             $count = $row['nb_computers_per_model'];
             $data[] = [
-                'number' => number_format($row['total_per_model'], PLUGIN_CARBON_DECIMALS),
+                'number' => CarbonEmission::getWeight($row['total_per_model'], PLUGIN_CARBON_DECIMALS),
                 'url' => ComputerModel::getFormURLWithID($row['id']),
                 'label' => $row['name'] . " (" . $row['nb_computers_per_model'] . " " . Computer::getTypeName($count) . ")",
             ];
