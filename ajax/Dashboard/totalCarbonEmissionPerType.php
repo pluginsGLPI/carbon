@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * -------------------------------------------------------------------------
  * carbon plugin for GLPI
  * -------------------------------------------------------------------------
@@ -31,12 +31,12 @@
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Carbon\Dashboard\Provider;
+ use GlpiPlugin\Carbon\Dashboard\Dashboard;
 
-include('../../../../inc/includes.php');
+ include('../../../../inc/includes.php');
 
-header("Content-Type: text/html; charset=UTF-8");
+ header("Content-Type: text/html; charset=UTF-8");
 
-$res = Provider::getCarbonEmissionPerMonth();
+ $res = Dashboard::getTotalCarbonEmissionPerModel();
 
-echo json_encode($res);
+ echo json_encode($res);

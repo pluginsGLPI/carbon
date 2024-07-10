@@ -249,6 +249,18 @@ class Dashboard
     }
 
     /**
+     * Returns total carbon emission per computer type.
+     *
+     * @return array of:
+     *  - float  'number': total carbon emission of the type
+     *  - string 'url': url to redirect when clicking on the slice
+     *  - string 'label': name of the computer type
+     */
+    public static function getTotalCarbonEmissionPerType() {
+        return Provider::getSumEmissionsPerType();
+    }
+
+    /**
      * Returns total power per computer model.
      *
      * @return array of:

@@ -78,12 +78,28 @@
         carbonEmissionPerTypeChart.render();
 
         // Carbon emission per model
-        fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/totalCarbonEmissionPerModel.php").then(response => {
+        fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/totalCarbonEmissionPerType.php").then(response => {
             console.log(response);
             return response.json();
         }).then(data => {
-            let carbonEmissionPerModel = data;
-            console.log(carbonEmissionPerModel);
+            var carbonEmissionPerType = data;
+            console.log(carbonEmissionPerType);
+
+            var series = [];
+            var labels = [];
+
+            carbonEmissionPerType.forEach(item => {
+
+                var number = parseFloat(item.number.replace(',', '.'));
+                series.push(number);
+                labels.push(item.label);
+            });
+
+            carbonEmissionPerTypeChart.updateOptions({
+                series: series,
+                labels: labels
+            });
+
         });
 
 
