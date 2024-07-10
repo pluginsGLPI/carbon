@@ -103,11 +103,11 @@ class CarbonEmission extends CommonDBChild
     /**
      * Format a weight passing a weight in grams
      *
-     * @param integer $weight  Weight in grams
+     * @param float $weight  Weight in grams
      *
      * @return string  formatted weight
      **/
-    public static function getWeight(int $weight): string
+    public static function getWeight(float $weight): string
     {
        //TRANS: list of unit (o for octet)
         $units = [
