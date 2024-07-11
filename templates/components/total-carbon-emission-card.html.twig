@@ -47,11 +47,11 @@
         $(document).ready(function() {
 
             fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/totalCarbonEmission.php").then(response => {
-                console.log(response);
+
                 return response.json();
             }).then(data => {
                 let totalCarbonEmission = data;
-                document.getElementById('carbonEmission').innerHTML = totalCarbonEmission + "<sub>2</sub>";
+                document.getElementById('carbonEmission').innerHTML = totalCarbonEmission;
             });
 
         });

@@ -77,13 +77,12 @@
         var carbonEmissionPerTypeChart = new ApexCharts(document.querySelector("#carbonEmissionPerModelChart"), carbonEmissionPerTypeOptions);
         carbonEmissionPerTypeChart.render();
 
-        // Carbon emission per model
+        // Carbon emission per type
         fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/totalCarbonEmissionPerType.php").then(response => {
-            console.log(response);
+
             return response.json();
         }).then(data => {
             var carbonEmissionPerType = data;
-            console.log(carbonEmissionPerType);
 
             var series = [];
             var labels = [];

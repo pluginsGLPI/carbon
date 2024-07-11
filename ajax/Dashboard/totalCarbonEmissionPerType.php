@@ -1,6 +1,6 @@
 <?php
 
-/*
+/**
  * -------------------------------------------------------------------------
  * carbon plugin for GLPI
  * -------------------------------------------------------------------------
@@ -31,12 +31,24 @@
  * -------------------------------------------------------------------------
  */
 
- use GlpiPlugin\Carbon\Dashboard\Dashboard;
+use GlpiPlugin\Carbon\Dashboard\Dashboard;
 
- include('../../../../inc/includes.php');
+include('../../../../inc/includes.php');
 
- header("Content-Type: text/html; charset=UTF-8");
+// Check if plugin is activated...
+if (!Plugin::isPluginActive('carbon')) {
+    http_response_code(404);
+    die();
+}
 
- $res = Dashboard::getTotalCarbonEmissionPerModel();
+if (!Report::canView()) {
+    // Will die
+    http_response_code(403);
+    die();
+}
 
- echo json_encode($res);
+header("Content-Type: text/html; charset=UTF-8");
+
+$res = Dashboard::getTotalCarbonEmissionPerModel();
+
+echo json_encode($res);

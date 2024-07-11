@@ -64,17 +64,10 @@
           unhandledComputersCount = Number(unhandledComputersCount);
           handledComputersCount   = Number(handledComputersCount);
 
-          //check responses values - remove after tests
-          console.log("unhandled : " + unhandledComputersCount);
-          console.log("handled : " + handledComputersCount);
-
           document.getElementById('unhandledComputers').innerHTML = unhandledComputersCount + " unhandled computers";
 
           let totalComputers      = unhandledComputersCount + handledComputersCount;
 
-          //check total computers - remove after tests
-          console.log("total computers: " + totalComputers);
-          
           let unhandledComputersPercentage = totalComputers > 0 ? (unhandledComputersCount / totalComputers) * 100 : 0;
           document.getElementById('unhandledComputersPercentage').textContent = "It represents " + unhandledComputersPercentage.toFixed(2) + "%" + " of your parc that contains " + totalComputers + " computers.";
     });
