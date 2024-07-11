@@ -256,7 +256,8 @@ class Dashboard
      *  - string 'url': url to redirect when clicking on the slice
      *  - string 'label': name of the computer type
      */
-    public static function getTotalCarbonEmissionPerType() {
+    public static function getTotalCarbonEmissionPerType()
+    {
         return Provider::getSumEmissionsPerType();
     }
 
