@@ -153,7 +153,7 @@ class CreateTestInventoryCommand extends Command
             if (is_null($input)) {
                 $input = $crit;
             }
-            $this->output->writeln("<info>creating " . $item_type . "(" . implode(",", array_values($input)) . ")</info>");
+            $this->output->writeln("<info>creating " . $item_type . "(" . implode(", ", array_values($input)) . ")</info>");
             $item->add($input);
 
             // Reload the item to ensure that all fields are set
@@ -205,7 +205,11 @@ class CreateTestInventoryCommand extends Command
             Location::class,
             [
                 'name' => self::TEST_LOCATION_NAME,
-                'country' => self::TEST_LOCATION_COUNTRY
+                'country' => self::TEST_LOCATION_COUNTRY,
+                // Eiffel Tower, Paris, France
+                'latitude' => '48.858093',
+                'longitude' => '2.294694',
+                'locations_id' => 0,
             ]
         );
 
