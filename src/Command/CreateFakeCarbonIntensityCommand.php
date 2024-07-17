@@ -44,7 +44,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-// 6 months
+//
 
 class CreateFakeCarbonIntensityCommand extends Command
 {
