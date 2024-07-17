@@ -55,19 +55,19 @@
     if (currentUrl.includes('dashboard')) {
       document.getElementById('cardBodyBorder').classList.add('border', 'border-2');
     }
-    
+
     Promise.all([
-      fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/unhandledComputers.php").then(response => response.json()),
-      fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/handledComputers.php").then(response => response.json())
+      fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/unhandledComputersCount.php").then(response => response.json()),
+      fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/handledComputersCount.php").then(response => response.json())
       ]).then(([unhandledComputersCount, handledComputersCount]) => {
 
           unhandledComputersCount = Number(unhandledComputersCount);
-          handledComputersCount   = Number(handledComputersCount)
+          handledComputersCount   = Number(handledComputersCount);
 
           document.getElementById('unhandledComputers').innerHTML = unhandledComputersCount + " unhandled computers";
 
           let totalComputers      = unhandledComputersCount + handledComputersCount;
-          console.log(totalComputers);
+
           let unhandledComputersPercentage = totalComputers > 0 ? (unhandledComputersCount / totalComputers) * 100 : 0;
           document.getElementById('unhandledComputersPercentage').textContent = "It represents " + unhandledComputersPercentage.toFixed(2) + "%" + " of your parc that contains " + totalComputers + " computers.";
     });

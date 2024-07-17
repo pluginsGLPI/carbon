@@ -33,11 +33,22 @@
 
 use GlpiPlugin\Carbon\Dashboard\Dashboard;
 
-include('../../../inc/includes.php');
+include('../../../../inc/includes.php');
+
+// Check if plugin is activated...
+if (!Plugin::isPluginActive('carbon')) {
+    http_response_code(404);
+    die();
+}
+
+if (!Report::canView()) {
+    // Will die
+    http_response_code(403);
+    die();
+}
 
 header("Content-Type: text/html; charset=UTF-8");
 
-$res = Dashboard::getUnhandledComputersCount();
+$res = Dashboard::getTotalCarbonEmissionPerModel();
 
-$fakeres = 167;
-echo json_encode($fakeres);
+echo json_encode($res);
