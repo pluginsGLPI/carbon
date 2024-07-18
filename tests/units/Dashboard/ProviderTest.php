@@ -285,11 +285,11 @@ class ProviderTest extends DbTestCase
         $output = Provider::getSumEmissionsPerModel();
         $expected = [
             [
-                'number' => 4.0,
+                'number' => '4 gCO2eq',
                 'url' => ComputerModel::getFormURLWithID($computer_model_1->getID()),
                 'label' => $computer_model_1->fields['name'] . " (1 Computer)",
             ], [
-                'number' => 8.0,
+                'number' => '8 gCO2eq',
                 'url' => ComputerModel::getFormURLWithID($computer_model_2->getID()),
                 'label' => $computer_model_2->fields['name'] . " (1 Computer)",
             ]
