@@ -59,7 +59,7 @@ class ComputerTest extends DbTestCase
 
         $model_power = 55;
         $location = $this->getItem(Location::class, [
-            'country' => 'France'
+            'country' => 'Fake zone'
         ]);
         $model = $this->getItem(ComputerModel::class, ['power_consumption' => $model_power]);
         $type = $this->getItem(ComputerType::class, []);

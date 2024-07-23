@@ -42,9 +42,9 @@ use Plugin;
 use Profile;
 use ProfileRight;
 use Glpi\System\Diagnostic\DatabaseSchemaIntegrityChecker;
-use GlpiPlugin\Carbon\ComputerPower;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\CarbonIntensity;
+use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\Report;
 
 class PluginInstallTest extends CommonTestCase
@@ -121,7 +121,7 @@ class PluginInstallTest extends CommonTestCase
         $this->checkAutomaticAction();
         // $this->checkDashboard();
         $this->checkRights();
-
+        $this->checkDataSources();
         $this->checkDisplayPrefs();
     }
 
@@ -277,5 +277,17 @@ class PluginInstallTest extends CommonTestCase
         $preferences = $displayPreference->find(['itemtype' => CarbonIntensity::class, 'users_id' => 0]);
 
         $this->assertEquals(5, count($preferences));
+    }
+
+    private function checkDataSources()
+    {
+        $sources = ['RTE', 'ElectricityMap'];
+        foreach ($sources as $source_name) {
+            $source = new CarbonIntensitySource();
+            $source->getFromDBByCrit([
+                'name' => $source_name
+            ]);
+            $this->assertFalse($source->isNewItem());
+        }
     }
 }

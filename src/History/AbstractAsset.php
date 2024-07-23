@@ -37,7 +37,9 @@ namespace GlpiPlugin\Carbon\History;
 use CommonDBTM;
 use DateInterval;
 use DateTime;
+use DbUtils;
 use GlpiPlugin\Carbon\CarbonIntensity;
+use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use Location;
@@ -235,19 +237,36 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      */
     protected function getZoneId(int $items_id): ?int
     {
+        global $DB;
 
-        $item = new static::$itemtype();
-        if (!$item->getFromDB($items_id)) {
+        $item_table = (new DbUtils())->getTableForItemType(static::$itemtype);
+        $location_table = Location::getTable();
+        $zone_table = CarbonIntensityZone::getTable();
+        $iterator = $DB->request([
+            'SELECT' => CarbonIntensityZone::getTableField('id'),
+            'FROM' => $zone_table,
+            'INNER JOIN' => [
+                $location_table => [
+                    'FKEY' => [
+                        $zone_table => 'name',
+                        $location_table => 'country',
+                    ],
+                ],
+                $item_table => [
+                    'FKEY' => [
+                        $item_table => Location::getForeignKeyField(),
+                        $location_table => 'id',
+                    ],
+                ]
+            ],
+            'WHERE' => [
+                $item_table . '.id' => $items_id
+            ]
+        ]);
+        if ($iterator->count() !== 1) {
             return null;
         }
 
-        $location = new Location();
-        if (!$location->getFromDB($item->fields['locations_id'])) {
-            return null;
-        }
-
-        // TODO: convert location to zone, based on GPS coordinates or address
-
-        return 1;
+        return $iterator->current()['id'];
     }
 }
