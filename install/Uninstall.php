@@ -55,25 +55,9 @@ class Uninstall
     {
         global $DB;
 
-        $itemtypesWihTable = [
-            CarbonEmission::class,
-            CarbonIntensity::class,
-            CarbonIntensitySource::class,
-            CarbonIntensityZone::class,
-            ComputerType::class,
-            MonitorType::class,
-            NetworkEquipmentType::class,
-            ComputerUsageProfile::class,
-            EnvironnementalImpact::class,
-        ];
-
-        $DbUtils = new DBUtils();
-        foreach ($itemtypesWihTable as $itemtype) {
-            // Check if table exists, needed for forced install use case
-            $table = $DbUtils->getTableForItemType($itemtype);
-            if ($DB->tableExists($table)) {
-                $DB->dropTable($table);
-            }
+        $iterator = $DB->listTables('glpi_plugin_carbon_%');
+        foreach ($iterator as $table) {
+            $DB->dropTable($table['TABLE_NAME']);
         }
 
         $this->deleteConfig();
