@@ -35,9 +35,11 @@ namespace GlpiPlugin\Carbon\DataSource\Tests;
 
 use GlpiPlugin\Carbon\DataSource\CarbonIntensityElectricityMap;
 use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
+use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use DateTimeImmutable;
+use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
 
 class CarbonIntensityElectricityMapTest extends DbTestCase
 {
@@ -47,14 +49,21 @@ class CarbonIntensityElectricityMapTest extends DbTestCase
         $response = file_get_contents(__DIR__ . '/../../fixtures/ElectricityMap/api-sample.json');
         $client->method('request')->willReturn(json_decode($response, true));
 
-        $source = new CarbonIntensityElectricityMap($client);
+        $data_source = new CarbonIntensityElectricityMap($client);
+        $source = new CarbonIntensitySource();
+        $source->getFromDBByCrit(['name' => $data_source->getSourceName()]);
+        $this->assertFalse($source->isNewItem());
         $zone = $this->getItem(CarbonIntensityZone::class, [
             'name' => 'France',
-            'electricitymap_code' => 'FR',
+        ]);
+        $source_zone = $this->getItem(CarbonIntensitySource_CarbonIntensityZone::class, [
+            CarbonIntensitySource::getForeignKeyField() => $source->getID(),
+            CarbonIntensityZone::getForeignKeyField() => $zone->getID(),
+            'code' => 'FR'
         ]);
 
         $date = new DateTimeImmutable('5 days ago');
-        $intensities = $source->fetchDay($date, 'France');
+        $intensities = $data_source->fetchDay($date, 'France');
 
         $this->assertIsArray($intensities);
         $this->assertArrayHasKey('source', $intensities);

@@ -1,0 +1,252 @@
+<?php
+
+/**
+ * -------------------------------------------------------------------------
+ * carbon plugin for GLPI
+ * -------------------------------------------------------------------------
+ *
+ * MIT License
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ * -------------------------------------------------------------------------
+ * @copyright Copyright (C) 2024 Teclib' and contributors.
+ * @license   MIT https://opensource.org/licenses/mit-license.php
+ * @link      https://github.com/pluginsGLPI/carbon
+ * -------------------------------------------------------------------------
+ */
+
+namespace GlpiPlugin\Carbon;
+
+use CommonDBRelation;
+use CommonGLPI;
+use CommonDBTM;
+use GlpiPlugin\Carbon\Application\View\Extension\DataHelpersExtension;
+use Glpi\Application\View\TemplateRenderer;
+
+class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
+{
+    public static $itemtype_1 = CarbonIntensitySource::class; // Type ref or field name (must start with itemtype)
+    public static $items_id_1 = 'plugin_carbon_carbonintensitysources_id'; // Field name
+    public static $checkItem_1_Rights = self::HAVE_SAME_RIGHT_ON_ITEM;
+
+    public static $itemtype_2 = CarbonIntensityZone::class; // Type ref or field name (must start with itemtype)
+    public static $items_id_2 = 'plugin_carbon_carbonintensityzones_id'; // Field name
+    public static $checkItem_2_Rights = self::HAVE_SAME_RIGHT_ON_ITEM;
+
+    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    {
+        if ($item->getType() === CarbonIntensitySource::class) {
+            return self::createTabEntry(CarbonIntensityZone::getTypeName(), 0);
+        }
+        return self::createTabEntry(CarbonIntensitySource::getTypeName(), 0);
+    }
+
+    public static function showForSource(CommonDBTM $item)
+    {
+        global $DB;
+
+        $item_id = $item->getID();
+
+        if (!$item->can($item_id, READ)) {
+            return;
+        }
+        $canedit = $item->canEdit($item_id);
+
+        $source_table = CarbonIntensitySource::getTable();
+        $zone_table = CarbonIntensityZone::getTable();
+        $source_zone_table = self::getTable();
+        $iterator = $DB->request([
+            'SELECT' => [
+                $zone_table => '*',
+            ],
+            'FROM' => $source_zone_table,
+            'INNER JOIN' => [
+                $source_table => [
+                    'FKEY' => [
+                        $source_zone_table => 'plugin_carbon_carbonintensitysources_id',
+                        $source_table => 'id',
+                    ],
+                ],
+                $zone_table => [
+                    'FKEY' => [
+                        $source_zone_table => 'plugin_carbon_carbonintensityzones_id',
+                        $zone_table => 'id',
+                    ],
+                ],
+            ],
+            'WHERE' => [
+                CarbonIntensitySource::getTableField('id') => $item_id,
+            ]
+        ]);
+
+        $tot = $iterator->count();
+        foreach ($iterator as $data) {
+            $entries[] = [
+                'itemtype'   => CarbonIntensitySource::class,
+                'id'         => $item->getID(),
+                'name'       => $data['name'],
+                'is_enabled' => '',
+            ];
+        }
+
+        $renderer = TemplateRenderer::getInstance();
+        $renderer->getEnvironment()->addExtension(new DataHelpersExtension());
+        $renderer->display('@carbon/components/datatable.html.twig', [
+            'is_tab' => true,
+            'nopager' => true,
+            'nofilter' => true,
+            'nosort' => true,
+            'columns' => [
+                'name' => __('Name')
+            ],
+            'formatters' => [
+            ],
+            'footers' => [
+                ['', '', '', __('Total'), $tot, '']
+            ],
+            'footer_class' => 'fw-bold',
+            'entries' => $entries,
+            'total_number' => count($entries),
+            'filtered_number' => count($entries),
+            'showmassiveactions' => $canedit,
+            'massiveactionparams' => [
+                'num_displayed' => count($entries),
+                'container'     => 'mass' . static::class . mt_rand(),
+            ]
+        ]);
+    }
+
+    public static function showForZone(CommonDBTM $item)
+    {
+        global $DB;
+
+        $item_id = $item->getID();
+
+        if (!$item->can($item_id, READ)) {
+            return;
+        }
+        $canedit = $item->canEdit($item_id);
+
+        $source_table = CarbonIntensitySource::getTable();
+        $zone_table = CarbonIntensityZone::getTable();
+        $source_zone_table = self::getTable();
+        $iterator = $DB->request([
+            'SELECT' => [
+                $source_table => '*',
+            ],
+            'FROM' => $source_zone_table,
+            'INNER JOIN' => [
+                $source_table => [
+                    'FKEY' => [
+                        $source_zone_table => 'plugin_carbon_carbonintensitysources_id',
+                        $source_table => 'id',
+                    ],
+                ],
+                $zone_table => [
+                    'FKEY' => [
+                        $source_zone_table => 'plugin_carbon_carbonintensityzones_id',
+                        $zone_table => 'id',
+                    ],
+                ],
+            ],
+            'WHERE' => [
+                CarbonIntensityZone::getTableField('id') => $item_id,
+            ]
+        ]);
+
+        $tot = $iterator->count();
+        foreach ($iterator as $data) {
+            $entries[] = [
+                'itemtype'   => CarbonIntensitySource::class,
+                'id'         => $item->getID(),
+                'name'       => $data['name'],
+                'is_enabled' => '',
+            ];
+        }
+
+        $renderer = TemplateRenderer::getInstance();
+        $renderer->getEnvironment()->addExtension(new DataHelpersExtension());
+        $renderer->display('@carbon/components/datatable.html.twig', [
+            'is_tab' => true,
+            'nopager' => true,
+            'nofilter' => true,
+            'nosort' => true,
+            'columns' => [
+                'name' => __('Name')
+            ],
+            'formatters' => [
+            ],
+            'footers' => [
+                ['', '', '', __('Total'), $tot, '']
+            ],
+            'footer_class' => 'fw-bold',
+            'entries' => $entries,
+            'total_number' => count($entries),
+            'filtered_number' => count($entries),
+            'showmassiveactions' => $canedit,
+            'massiveactionparams' => [
+                'num_displayed' => count($entries),
+                'container'     => 'mass' . static::class . mt_rand(),
+            ]
+        ]);
+    }
+
+    /**
+     * Get the zone code from a source name and a zone name
+     *
+     * @param string $source_name
+     * @param string $zone_name
+     * @return string
+     */
+    public function getFromDbBySourceAndZone(string $source_name, string $zone_name): ?string
+    {
+        global $DB;
+
+        $zone_table = CarbonIntensityZone::getTable();
+        $source_table = CarbonIntensitySource::getTable();
+        $source_zone_table = self::getTable();
+        $request = [
+            'SELECT' => CarbonIntensitySource_CarbonIntensityZone::getTableField('code'),
+            'FROM'   => $source_zone_table,
+            'INNER JOIN' => [
+                $source_table => [
+                    'ON' => [
+                        $source_table => 'id',
+                        $source_zone_table => CarbonIntensitySource::getForeignKeyField(),
+                    ]
+                ],
+                $zone_table => [
+                    'ON' => [
+                        $zone_table => 'id',
+                        $source_zone_table => CarbonIntensityZone::getForeignKeyField(),
+                    ]
+                ]
+            ],
+            'WHERE' => [
+                CarbonIntensitySource::getTableField('name') => $source_name,
+                CarbonIntensityZone::getTableField('name') => $zone_name,
+            ],
+            'LIMIT' => '1'
+        ];
+        $iterator = $DB->request($request);
+        $zone_code = $iterator->current()['code'] ?? null;
+
+        return $zone_code;
+    }
+}

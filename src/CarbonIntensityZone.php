@@ -35,8 +35,8 @@ namespace GlpiPlugin\Carbon;
 
 use CommonDropdown;
 use CommonGLPI;
-use Entity;
-use Glpi\Application\View\TemplateRenderer;
+use DBUtils;
+use Session;
 
 /**
  * Usage profile of a computer
@@ -45,7 +45,7 @@ class CarbonIntensityZone extends CommonDropdown
 {
     public static function getTypeName($nb = 0)
     {
-        return _n(" Carbon intensity zone", "Carbon intensity zones", $nb, 'carbon');
+        return _n("Carbon intensity zone", "Carbon intensity zones", $nb, 'carbon');
     }
 
     public static function canCreate()
@@ -66,5 +66,41 @@ class CarbonIntensityZone extends CommonDropdown
     public static function canPurge()
     {
         return false;
+    }
+
+    public function defineTabs($options = [])
+    {
+        $tabs = parent::defineTabs($options);
+        $this->addStandardTab(CarbonIntensitySource::class, $tabs, $options);
+        return $tabs;
+    }
+
+    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    {
+        if (!$withtemplate) {
+            $nb = 0;
+            switch ($item->getType()) {
+                case CarbonIntensitySource::class:
+                    if ($_SESSION['glpishow_count_on_tabs']) {
+                        $nb = (new DBUtils())->countElementsInTable(
+                            CarbonIntensitySource_CarbonIntensityZone::getTable(),
+                            [CarbonIntensitySource::getForeignKeyField() => $item->getID()]
+                        );
+                    }
+                    return self::createTabEntry(self::getTypeName(Session::getPluralNumber()), $nb);
+            }
+        }
+
+        return '';
+    }
+
+    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
+    {
+        switch ($item->getType()) {
+            case CarbonIntensitySource::class:
+                CarbonIntensitySource_CarbonIntensityZone::showForSource($item);
+        }
+
+        return true;
     }
 }
