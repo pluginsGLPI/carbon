@@ -38,7 +38,7 @@ use DateTimeInterface;
 use DateTimeZone;
 use DateTime;
 
-class CarbonIntensityRTE implements CarbonIntensity
+class CarbonIntensityRTE extends AbstractCarbonIntensity
 {
     const RECORDS_URL = 'https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/eco2mix-national-tr/records';
 
@@ -47,6 +47,22 @@ class CarbonIntensityRTE implements CarbonIntensity
     public function __construct(RestApiClientInterface $client)
     {
         $this->client = $client;
+    }
+
+    public function getSourceName(): string
+    {
+        return 'RTE';
+    }
+
+    public function getDataInterval(): string
+    {
+        return 'P15M';
+    }
+
+    public function getZones(): array {
+        return [
+            'France',
+        ];
     }
 
     /**

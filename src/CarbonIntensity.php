@@ -34,9 +34,13 @@
 namespace GlpiPlugin\Carbon;
 
 use CommonDBTM;
+use DateTime;
+use DateInterval;
+use DateTimeImmutable;
 use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\DataSource\CarbonIntensityInterface;
 
 class CarbonIntensity extends CommonDBTM
 {
@@ -127,4 +131,79 @@ class CarbonIntensity extends CommonDBTM
 
         return $tab;
     }
+
+
+    /**
+     * Get the last known date of carbon emissiosn
+     *
+     * @param string $zone Zone to examinate
+     * @return DateTimeImmutable
+     */
+    public function getLatestKnownDate(string $zone_name, string $source_name): ?DateTimeImmutable
+    {
+        global $DB;
+
+        $intensity_table = CarbonIntensity::getTable();
+        $source_table = CarbonIntensitySource::getTable();
+        $zone_table   = CarbonIntensityZone::getTable();
+
+        $result = $DB->request([
+            'SELECT' => CarbonIntensity::getTableField('emission_date'),
+            'FROM'   => $intensity_table,
+            'INNER JOIN' => [
+                $source_table => [
+                    'FKEY' => [
+                        $intensity_table => 'plugin_carbon_carbonintensitysources_id',
+                        $source_table => 'id',
+                    ]
+                ],
+                $zone_table => [
+                    'FKEY' => [
+                        $intensity_table => 'plugin_carbon_carbonintensityzones_id',
+                        $zone_table => 'id',
+                    ]
+                ]
+            ],
+            'WHERE' => [
+                CarbonIntensitySource::getTableField('name') => $source_name,
+                CarbonIntensityZone::getTableField('name') => $zone_name
+            ],
+            'LIMIT' => '1'
+        ])->current();
+        if ($result === null) {
+            return null;
+        }
+        return DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $result['emission_date']);
+    }
+
+    /**
+     * Download data for a single zone
+     *
+     * @param string $zone zone name
+     * @param integer $limit maximum count of items to process
+     * @return integer count of item downloaded
+     */
+    public function downloadOneZone(CarbonIntensityInterface $data_source, string $zone_name, int $limit = 0): int
+    {
+        $incremental = $data_source->isZoneDownloadComplete($zone_name);
+
+        // Find date where start the download
+        $toolbox = new Toolbox();
+        $last_known_intensity_date = $this->getLatestKnownDate($zone_name, $data_source->getSourceName());
+        $first_unknown_intensity_date = null;
+        if ($last_known_intensity_date !== null) {
+            $first_unknown_intensity_date = $last_known_intensity_date->add(new DateInterval($data_source->getDataInterval()));
+        }
+        $oldest_asset_date = $toolbox->getOldestAssetDate();
+        $start_date = max($oldest_asset_date, $first_unknown_intensity_date);
+
+        $recent_limit = new DateTime('15 days ago');
+        $recent_limit->setTime(0, 0, 0);
+        if ($incremental && $start_date >= $recent_limit) {
+            return $data_source->incrementalDownload($zone_name, $start_date, $this, $limit);
+        }
+
+        return $data_source->fullDownload($zone_name, $start_date, $this, $limit);
+    }
+
 }

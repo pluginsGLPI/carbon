@@ -38,7 +38,7 @@ use DateTimeInterface;
 use DateTimeZone;
 use GlpiPlugin\Carbon\Config;
 
-class CarbonIntensityElectricityMap implements CarbonIntensity
+class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
 {
     const HISTORY_URL = 'https://api.electricitymap.org/v3/carbon-intensity/history';
 
@@ -48,17 +48,21 @@ class CarbonIntensityElectricityMap implements CarbonIntensity
     {
         $this->client = $client;
     }
-    private function createRestApiClient(): RestApiClientInterface
-    {
-        $api_key = Config::getconfig()['electricitymap_api_key'];
 
-        return new RestApiClient(
-            [
-                'headers' => [
-                    'auth-token' => $api_key,
-                ],
-            ]
-        );
+    public function getSourceName(): string
+    {
+        return 'ElectricityMap';
+    }
+
+    public function getDataInterval(): string
+    {
+        return 'P60M';
+    }
+
+    public function getZones(): array {
+        return [
+            'France',
+        ];
     }
 
     public function fetchCarbonIntensity(): array
