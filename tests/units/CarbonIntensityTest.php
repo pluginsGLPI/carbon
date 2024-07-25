@@ -31,40 +31,19 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon;
+namespace GlpiPlugin\Carbon\Tests;
 
-use CommonDropdown;
-use CommonGLPI;
-use Entity;
-use Glpi\Application\View\TemplateRenderer;
+use Config;
+use DateTime;
+use GlpiPlugin\Carbon\Tests\DbTestCase;
+use GlpiPlugin\Carbon\DataSource\AbstractCarbonIntensity;
+use GlpiPlugin\Carbon\CarbonIntensity;
+use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\CarbonIntensitySource;
 
-/**
- * Usage profile of a computer
- */
-class CarbonIntensityZone extends CommonDropdown
+class CarbonIntensityTest extends DbTestCase
 {
-    public static function getTypeName($nb = 0)
+    public function testGetLastKnownDate()
     {
-        return _n(" Carbon intensity zone", "Carbon intensity zones", $nb, 'carbon');
-    }
-
-    public static function canCreate()
-    {
-        return false;
-    }
-
-    public static function canUpdate()
-    {
-        return false;
-    }
-
-    public static function canDelete()
-    {
-        return false;
-    }
-
-    public static function canPurge()
-    {
-        return false;
     }
 }

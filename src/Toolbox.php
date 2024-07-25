@@ -33,38 +33,47 @@
 
 namespace GlpiPlugin\Carbon;
 
-use CommonDropdown;
-use CommonGLPI;
-use Entity;
-use Glpi\Application\View\TemplateRenderer;
+use DateTime;
+use DateTimeImmutable;
 
-/**
- * Usage profile of a computer
- */
-class CarbonIntensityZone extends CommonDropdown
+class Toolbox
 {
-    public static function getTypeName($nb = 0)
+    /**
+     * Get the oldest asset date in the database
+     *
+     * @return DateTimeImmutable
+     */
+    public function getOldestAssetDate(): ?DateTimeImmutable
     {
-        return _n(" Carbon intensity zone", "Carbon intensity zones", $nb, 'carbon');
+        $itemtypes = Config::getSupportedAssets();
+        $oldest_date = null;
+        foreach ($itemtypes as $itemtype) {
+            /** @var CommonDBTM $item */
+            $item = new $itemtype();
+            $result = $item->find([], ['date_creation DESC'], 1);
+            if (count($result) === 1) {
+                $row = array_pop($result);
+                if ($oldest_date === null || $row['date_creation'] < $oldest_date) {
+                    $oldest_date = $row['date_creation'];
+                }
+            }
+        }
+
+        if ($oldest_date === null) {
+            return $this->getDefaultCarbonIntensityDownloadDate();
+        }
+        return DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $oldest_date);
     }
 
-    public static function canCreate()
+    /**
+     * Get default date where environnemental imapct shouw be known
+     * when no inventory data is available
+     */
+    public function getDefaultCarbonIntensityDownloadDate(): DateTimeImmutable
     {
-        return false;
-    }
-
-    public static function canUpdate()
-    {
-        return false;
-    }
-
-    public static function canDelete()
-    {
-        return false;
-    }
-
-    public static function canPurge()
-    {
-        return false;
+        $start_date = new DateTime('1 year ago');
+        $start_date->setDate($start_date->format('Y'), 1, 1);
+        $start_date->setTime(0, 0, 0);
+        return DateTimeImmutable::createFromMutable($start_date);
     }
 }

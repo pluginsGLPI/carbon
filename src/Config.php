@@ -35,6 +35,9 @@ namespace GlpiPlugin\Carbon;
 
 use Config as GlpiConfig;
 use CommonGLPI;
+use Computer as GlpiComputer;
+use Monitor as GlpiMonitor;
+use NetworkEquipment as GlpiNetworkEquipment;
 use Glpi\Application\View\TemplateRenderer;
 use Session;
 
@@ -104,5 +107,21 @@ class Config extends GlpiConfig
         }
 
         return $input;
+    }
+
+    /**
+     * Get an array of supported assets
+     *
+     * @return array
+     */
+    public static function getSupportedAssets(): array
+    {
+        return [
+            GlpiComputer::class,
+            GlpiMonitor::class,
+            GlpiNetworkEquipment::class,
+            // Printer::class,
+            // Phone::class
+        ];
     }
 }

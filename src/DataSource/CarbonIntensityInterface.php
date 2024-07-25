@@ -33,7 +33,8 @@
 
 namespace GlpiPlugin\Carbon\DataSource;
 
-use DateTime;
+use DateTimeImmutable;
+use GlpiPlugin\Carbon\CarbonIntensity;
 
 /**
  * The common interface for all classes implementing carbon intensity fetching from various sources.
@@ -83,12 +84,85 @@ use DateTime;
  *
  */
 
-interface CarbonIntensity
+interface CarbonIntensityInterface
 {
     /**
      * Fetch carbon intensities from the source.
      *
      * @return an array organized as described above
      */
-    public function fetchCarbonIntensity(): array;
+    // public function fetchCarbonIntensity(): array;
+
+    /**
+     * Is the setup of zones complete ?
+     *
+     * @return boolean
+     */
+    public function isZoneSetupComplete(): bool;
+
+    /**
+     * Is the download of the zone complete (except daily updates)
+     *
+     * @param string $zone_name
+     * @return boolean
+     */
+    public function isZoneDownloadComplete(string $zone_name): bool;
+
+    /**
+     * are all zones fully downloaded (except dayli updates)
+     *
+     * @return boolean
+     */
+    public function isDownloadComplete(): bool;
+
+    /**
+     * Get the source name of the data source
+     *
+     * @return string
+     */
+    public function getSourceName(): string;
+
+    /**
+     * Create zones handled by the data source
+     *
+     * @return integer count if item processed
+     */
+    public function createZones(): int;
+
+    /**
+     * Get zones handled by the data source
+     *
+     * @return array
+     */
+    public function getZones(): array;
+
+    public function getMaxIncrementalAge(): DateTimeImmutable;
+
+    /**
+     * Get the date interval between 2 intensity samples
+     *
+     * @return string
+     */
+    public function getDataInterval(): string;
+
+    /**
+     * Download all available data. Obeys limit of the autoamtic action.
+     * If the returned count is negative, then something went wrong
+     * and the absolute value of the count tells how many items were saved
+     *
+     * @param string $zone
+     * @param DateTimeImmutable $start_date date where the download must start
+     * @param CarbonIntensity $intensity Instance used to update the database
+     * @param integer $limit
+     * @return integer count of successfully saved items
+     */
+    public function fullDownload(string $zone, DateTimeImmutable $start_date, CarbonIntensity $intensity, int $limit = 0): int;
+
+    /**
+     * download latest carbon intensity history
+     * @param string $zone zone to download
+     *
+     * @return integer
+     */
+    public function incrementalDownload(string $zone, DateTimeImmutable $start_date, CarbonIntensity $intensity, int $limit = 0): int;
 }

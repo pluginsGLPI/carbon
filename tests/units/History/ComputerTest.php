@@ -37,9 +37,11 @@ use Computer as GlpiComputer;
 use GlpiPlugin\Carbon\History\Computer;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use Location;
+use DateInterval;
 use DateTime;
 use ComputerModel;
 use ComputerType;
+use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\EnvironnementalImpact;
 
@@ -59,7 +61,7 @@ class ComputerTest extends DbTestCase
 
         $model_power = 55;
         $location = $this->getItem(Location::class, [
-            'country' => 'Fake zone'
+            'country' => PLUGIN_CARBON_TEST_FAKE_ZONE_NAME,
         ]);
         $model = $this->getItem(ComputerModel::class, ['power_consumption' => $model_power]);
         $type = $this->getItem(ComputerType::class, []);

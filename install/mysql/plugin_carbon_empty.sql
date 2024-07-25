@@ -56,13 +56,25 @@ CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_carbonintensities` (
 CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_carbonintensityzones` (
   `id`               int unsigned NOT NULL AUTO_INCREMENT,
   `name`             varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unicity` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_carbonintensitysources` (
   `id`               int unsigned NOT NULL AUTO_INCREMENT,
   `name`             varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unicity` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_carbonintensitysources_carbonintensityzones` (
+  `id`               int unsigned NOT NULL AUTO_INCREMENT,
+  `plugin_carbon_carbonintensitysources_id` int unsigned NOT NULL DEFAULT '0',
+  `plugin_carbon_carbonintensityzones_id`   int unsigned NOT NULL DEFAULT '0',
+  `code`                                    varchar(255) DEFAULT NULL,
+  `is_enabled`                              tinyint(1)   NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unicity` (`plugin_carbon_carbonintensitysources_id`, `plugin_carbon_carbonintensityzones_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_computertypes` (
@@ -105,7 +117,7 @@ CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_monitortypes` (
   UNIQUE KEY `unicity` (`monitortypes_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE `glpi_plugin_carbon_networkequipmenttypes` (
+CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_networkequipmenttypes` (
   `id`                       int unsigned NOT NULL AUTO_INCREMENT,
   `networkequipmenttypes_id` int unsigned NOT NULL DEFAULT '0',
   `power_consumption`        int          DEFAULT '0',
