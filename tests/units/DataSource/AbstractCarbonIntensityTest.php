@@ -56,11 +56,11 @@ class AbstractCarbonIntensityTest extends DbTestCase
 
         yield [
             'start' => new DateTimeImmutable('2020-01-01'),
-            'stop'  => new DateTimeImmutable('2020-01-31'),
+            'stop'  => new DateTimeImmutable('2020-02-01'),
             'expected' => [
                 [
                     'start' => new DateTimeImmutable('2020-01-01'),
-                    'stop'  => new DateTimeImmutable('2020-01-31'),
+                    'stop'  => new DateTimeImmutable('2020-02-01'),
                 ],
             ]
         ];
@@ -98,11 +98,11 @@ class AbstractCarbonIntensityTest extends DbTestCase
                 ],
                 [
                     'start' => new DateTimeImmutable('2020-02-01'),
-                    'stop'  => new DateTimeImmutable('2020-02-29'),
+                    'stop'  => new DateTimeImmutable('2020-03-01'),
                 ],
                 [
                     'start' => new DateTimeImmutable('2020-01-14'),
-                    'stop'  => new DateTimeImmutable('2020-01-31'),
+                    'stop'  => new DateTimeImmutable('2020-02-01'),
                 ],
             ]
         ];
@@ -117,11 +117,11 @@ class AbstractCarbonIntensityTest extends DbTestCase
                 ],
                 [
                     'start' => new DateTimeImmutable('2021-02-01'),
-                    'stop'  => new DateTimeImmutable('2021-02-28'),
+                    'stop'  => new DateTimeImmutable('2021-03-01'),
                 ],
                 [
                     'start' => new DateTimeImmutable('2021-01-14'),
-                    'stop'  => new DateTimeImmutable('2021-01-31'),
+                    'stop'  => new DateTimeImmutable('2021-02-01'),
                 ],
             ]
         ];
@@ -258,7 +258,8 @@ class AbstractCarbonIntensityTest extends DbTestCase
         $start_date = new DateTime('3 months ago');
         $start_date->setTime(0, 0, 0);
         $start_date = DateTimeImmutable::createFromMutable($start_date);
-        $instance->fullDownload('FR', $start_date, $intensity);
+        $stop_date = new DateTimeImmutable('2 days ago');
+        $instance->fullDownload('FR', $start_date, $stop_date, $intensity);
     }
 
     public function testIncrementalDownload()

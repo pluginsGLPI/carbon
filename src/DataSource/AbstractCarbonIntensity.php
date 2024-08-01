@@ -97,21 +97,22 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
         return true;
     }
 
-    protected function setZoneSetupComplete() {
+    protected function setZoneSetupComplete()
+    {
         $config = $this->getConfigZoneSetupCompleteName();
         GlpiConfig::setConfigurationValues('plugin:carbon', [$config => 1]);
     }
 
-    public function isDownloadComplete(): bool
-    {
-        foreach ($this->getZones() as $zone) {
-            if ($this->isZoneDownloadComplete($zone) === false) {
-                return false;
-            }
-        }
+    // public function isDownloadComplete(): bool
+    // {
+    //     foreach ($this->getZones() as $zone) {
+    //         if ($this->isZoneDownloadComplete($zone) === false) {
+    //             return false;
+    //         }
+    //     }
 
-        return true;
-    }
+    //     return true;
+    // }
 
     public function isZoneDownloadComplete(string $zone_name): bool
     {
@@ -122,11 +123,6 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
         }
 
         return true;
-    }
-
-    protected function setZoneDownloadComplete() {
-        $config = $this->getConfigZoneSetupCompleteName();
-        GlpiConfig::setConfigurationValues('plugin:carbon', [$config => 1]);
     }
 
     /**
@@ -155,24 +151,18 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
         return ($failure ? -1 : 1);
     }
 
-    public function fullDownload(string $zone, DateTimeImmutable $start_date, CarbonIntensity $intensity, int $limit = 0): int
+    public function fullDownload(string $zone, DateTimeImmutable $start_date, DateTimeImmutable $stop_date, CarbonIntensity $intensity, int $limit = 0): int
     {
-        $end_date = new DateTimeImmutable('now');
-
         $count = 0;
         $saved = 0;
-        $max_date = $this->getMaxIncrementalAge();
-        foreach ($this->sliceDateRangeByMonth($start_date, $end_date) as $slice) {
-            $slice['stop'] = min($slice['stop'], $max_date);
-            if ($slice['stop'] <= $slice['start']) {
-                continue;
-            }
+        // $max_date = $this->getMaxIncrementalAge();
+        foreach ($this->sliceDateRangeByMonth($start_date, $stop_date) as $slice) {
             try {
                 $data = $this->fetchRange($slice['start'], $slice['stop'], $zone);
             } catch (AbortException $e) {
                 break;
             }
-            if (isset($data[$zone])) {
+            if (!isset($data[$zone])) {
                 break;
             }
             $saved = $intensity->save($zone, $this->getSourceName(), $data[$zone]);
@@ -182,7 +172,6 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
             }
         }
 
-        $this->setZoneDownloadComplete();
         return $saved > 0 ? $count : -$count;
     }
 
@@ -229,8 +218,10 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
             return;
         }
 
+        $current_date = clone $real_stop;
+
         // If stop date day is > 1 then return a slice to the begining of the same month
-        if ($real_stop->format('d') > 1) {
+        if ($real_stop->format('d') > 1 || $real_stop->format('H') > 0) {
             $slice['start'] = $real_stop->setDate($stop->format('Y'), $real_stop->format('m'), 1);
             if ($slice['start'] < $real_start) {
                 $slice['start'] = $real_start;
@@ -242,8 +233,8 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
 
         // Yield slices for each month ordered backwards
         while ($current_date > $real_start) {
-            $slice['stop']  = $current_date->modify('-1 day');
-            $slice['start'] = $current_date->setDate($slice['stop']->format('Y'), $slice['stop']->format('m'), 1);
+            $slice['stop']  = $current_date;
+            $slice['start'] = $current_date->setDate($slice['stop']->format('Y'), $slice['stop']->format('m') - 1, 1);
             if ($slice['start'] < $real_start) {
                 $slice['start'] = $real_start;
             }

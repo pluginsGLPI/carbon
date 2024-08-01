@@ -37,7 +37,6 @@ use CommonDBTM;
 use DateTime;
 use DateInterval;
 use DateTimeImmutable;
-use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensityInterface;
@@ -45,7 +44,6 @@ use QueryParam;
 
 class CarbonIntensity extends CommonDBTM
 {
-
     private const MIN_HISTORY_LENGTH = '13 months ago';
 
     public static $rightname = 'carbon:report';
@@ -143,7 +141,7 @@ class CarbonIntensity extends CommonDBTM
      * @param string $zone Zone to examinate
      * @return DateTimeImmutable
      */
-    public function getLatestKnownDate(string $zone_name, string $source_name): ?DateTimeImmutable
+    public function getLastKnownDate(string $zone_name, string $source_name): ?DateTimeImmutable
     {
         global $DB;
 
@@ -172,6 +170,51 @@ class CarbonIntensity extends CommonDBTM
                 CarbonIntensitySource::getTableField('name') => $source_name,
                 CarbonIntensityZone::getTableField('name') => $zone_name
             ],
+            'ORDER' => CarbonIntensity::getTableField('emission_date') . ' DESC',
+            'LIMIT' => '1'
+        ])->current();
+        if ($result === null) {
+            return null;
+        }
+        return DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $result['emission_date']);
+    }
+
+    /**
+     * Get the first known date of carbon emissiosn
+     *
+     * @param string $zone Zone to examinate
+     * @return DateTimeImmutable
+     */
+    public function getFirstKnownDate(string $zone_name, string $source_name): ?DateTimeImmutable
+    {
+        global $DB;
+
+        $intensity_table = CarbonIntensity::getTable();
+        $source_table = CarbonIntensitySource::getTable();
+        $zone_table   = CarbonIntensityZone::getTable();
+
+        $result = $DB->request([
+            'SELECT' => CarbonIntensity::getTableField('emission_date'),
+            'FROM'   => $intensity_table,
+            'INNER JOIN' => [
+                $source_table => [
+                    'FKEY' => [
+                        $intensity_table => 'plugin_carbon_carbonintensitysources_id',
+                        $source_table => 'id',
+                    ]
+                ],
+                $zone_table => [
+                    'FKEY' => [
+                        $intensity_table => 'plugin_carbon_carbonintensityzones_id',
+                        $zone_table => 'id',
+                    ]
+                ]
+            ],
+            'WHERE' => [
+                CarbonIntensitySource::getTableField('name') => $source_name,
+                CarbonIntensityZone::getTableField('name') => $zone_name
+            ],
+            'ORDER' => CarbonIntensity::getTableField('emission_date') . ' ASC',
             'LIMIT' => '1'
         ])->current();
         if ($result === null) {
@@ -189,16 +232,22 @@ class CarbonIntensity extends CommonDBTM
      */
     public function downloadOneZone(CarbonIntensityInterface $data_source, string $zone_name, int $limit = 0): int
     {
-        $incremental = $data_source->isZoneDownloadComplete($zone_name);
+        // $incremental = $data_source->isZoneDownloadComplete($zone_name);
 
         $start_date = $this->getDownloadStartDate($zone_name, $data_source);
+        $stop_date  = $this->getDownloadStopDate($zone_name, $data_source);
 
-        $recent_limit = $data_source->getMaxIncrementalAge();
-        if ($incremental && $start_date >= $recent_limit) {
+        $first_known_intensity_date = $this->getFirstKnownDate($zone_name, $data_source->getSourceName());
+        $incremental = false;
+        if ($first_known_intensity_date !== null) {
+            $incremental = ($start_date >= $first_known_intensity_date);
+        }
+        if ($incremental) {
+            $start_date = $data_source->getMaxIncrementalAge();
             return $data_source->incrementalDownload($zone_name, $start_date, $this, $limit);
         }
 
-        return $data_source->fullDownload($zone_name, $start_date, $this, $limit);
+        return $data_source->fullDownload($zone_name, $start_date, $stop_date, $this, $limit);
     }
 
     public function getDownloadStartDate(string $zone_name, CarbonIntensityInterface $data_source): ?DateTimeImmutable
@@ -208,15 +257,22 @@ class CarbonIntensity extends CommonDBTM
         $start_date = DateTimeImmutable::createFromMutable($start_date);
 
         $toolbox = new Toolbox();
-        $last_known_intensity_date = $this->getLatestKnownDate($zone_name, $data_source->getSourceName());
-        $first_unknown_intensity_date = null;
-        if ($last_known_intensity_date !== null) {
-            $first_unknown_intensity_date = $last_known_intensity_date->add(new DateInterval('PT1H'));
-            $oldest_asset_date = $toolbox->getOldestAssetDate();
-            $start_date = max($oldest_asset_date, $first_unknown_intensity_date);
-        }
+        // $last_known_intensity_date = $this->getLatestKnownDate($zone_name, $data_source->getSourceName());
+        $oldest_asset_date = $toolbox->getOldestAssetDate();
+        $start_date = min($start_date, $oldest_asset_date);
 
         return $start_date;
+    }
+    public function getDownloadStopDate(string $zone_name, CarbonIntensityInterface $data_source): DateTimeImmutable
+    {
+        $stop_date = $data_source->getMaxIncrementalAge();
+        $first_known_intensity_date = $this->getFirstKnownDate($zone_name, $data_source->getSourceName());
+        if ($first_known_intensity_date !== null) {
+            $first_known_intensity_date = $first_known_intensity_date->sub(new DateInterval('PT1H'));
+            $stop_date = min($stop_date, $first_known_intensity_date);
+        }
+
+        return $stop_date;
     }
 
     /**
@@ -279,6 +335,9 @@ class CarbonIntensity extends CommonDBTM
                 $count++;
             }
         } catch (\RuntimeException $e) {
+            if (!$in_transaction) {
+                $DB->commit();
+            }
             trigger_error($e->getMessage(), E_USER_ERROR);
             $count = -$count;
         } finally {

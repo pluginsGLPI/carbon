@@ -113,7 +113,7 @@ interface CarbonIntensityInterface
      *
      * @return boolean
      */
-    public function isDownloadComplete(): bool;
+    // public function isDownloadComplete(): bool;
 
     /**
      * Get the source name of the data source
@@ -152,11 +152,12 @@ interface CarbonIntensityInterface
      *
      * @param string $zone
      * @param DateTimeImmutable $start_date date where the download must start
+     * @param DateTimeImmutable $stop_date date where the download must start
      * @param CarbonIntensity $intensity Instance used to update the database
      * @param integer $limit
      * @return integer count of successfully saved items
      */
-    public function fullDownload(string $zone, DateTimeImmutable $start_date, CarbonIntensity $intensity, int $limit = 0): int;
+    public function fullDownload(string $zone, DateTimeImmutable $start_date, DateTimeImmutable $stop_date, CarbonIntensity $intensity, int $limit = 0): int;
 
     /**
      * download latest carbon intensity history

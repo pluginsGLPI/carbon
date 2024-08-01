@@ -72,6 +72,14 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
         return 'P60M';
     }
 
+    public function getMaxIncrementalAge(): DateTimeImmutable
+    {
+        $recent_limit = new DateTime('1 day ago');
+        $recent_limit->setTime(0, 0, 0);
+
+        return DateTimeImmutable::createFromMutable($recent_limit);
+    }
+
     public function createZones(): int
     {
         try {
@@ -229,7 +237,7 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
         ];
     }
 
-    public function fullDownload(string $zone, DateTimeImmutable $start_date, CarbonIntensity $intensity, int $limit = 0): int
+    public function fullDownload(string $zone, DateTimeImmutable $start_date, DateTimeImmutable $stop_date, CarbonIntensity $intensity, int $limit = 0): int
     {
         // Disable full download because we miss documentation for PAST_URL endpoint
         $start_date = new DateTime('24 hours ago');
