@@ -104,7 +104,7 @@ abstract class AbstractAsset implements EngineInterface
         $request = [
             'SELECT' => [
                 CarbonIntensity::getTableField('intensity') . ' AS intensity',
-                CarbonIntensity::getTableField('emission_date') . ' AS emission_date',
+                CarbonIntensity::getTableField('date') . ' AS date',
             ],
             'FROM' => $items_table,
             'INNER JOIN' => [
@@ -130,11 +130,11 @@ abstract class AbstractAsset implements EngineInterface
             'WHERE' => [
                 'AND' => [
                     $itemtype::getTableField('id') => $this->items_id,
-                    [CarbonIntensity::getTableField('emission_date') => ['>=', $start_date_s]],
-                    [CarbonIntensity::getTableField('emission_date') => ['<', $stop_date_s]],
+                    [CarbonIntensity::getTableField('date') => ['>=', $start_date_s]],
+                    [CarbonIntensity::getTableField('date') => ['<', $stop_date_s]],
                 ],
             ],
-            'ORDER' => CarbonIntensity::getTableField('emission_date') . ' ASC',
+            'ORDER' => CarbonIntensity::getTableField('date') . ' ASC',
         ];
 
         return $DB->request($request);

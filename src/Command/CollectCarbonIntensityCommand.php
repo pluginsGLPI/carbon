@@ -121,7 +121,7 @@ class CollectCarbonIntensityCommand extends Command
                 $carbon_intensity->add([
                     'plugin_carbon_colletors_carbonintensitysources_id' => $this->source_id,
                     'plugin_carbon_colletors_carbonintensityzones_id' => 1,
-                    'emission_date' => $date, // Eco2mix seems to provide datetime in
+                    'date'          => $date, // Eco2mix seems to provide datetime in
                     'intensity'     => $intensity,
                 ]);
             }
@@ -333,11 +333,11 @@ class CollectCarbonIntensityCommand extends Command
     protected function getLastRecordDate(): ?DateTime
     {
         $carbon_intensity = new CarbonIntensity();
-        $rows = $carbon_intensity->find(['plugin_carbon_colletors_carbonintensitysources_id' => $this->source_id], ['emission_date DESC'], 1);
+        $rows = $carbon_intensity->find(['plugin_carbon_colletors_carbonintensitysources_id' => $this->source_id], ['date DESC'], 1);
         if (count($rows) === 0) {
             return null;
         }
         $row = array_pop($rows);
-        return new DateTime($row['emission_date'], new DateTimeZone('UTC'));
+        return new DateTime($row['date'], new DateTimeZone('UTC'));
     }
 }

@@ -39,6 +39,7 @@ use ComputerType as GlpiComputerType;
 use DateTime;
 use DateInterval;
 use DbUtils;
+use Glpi\Dashboard\Filter;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\EnvironnementalImpact;
 use GlpiPlugin\Carbon\CarbonEmission;
@@ -419,8 +420,8 @@ class Provider
             ],
             'FROM'  => CarbonEmission::getTable(),
             'WHERE' => [
-                ['emission_date' => ['>=', $start_date]],
-                ['emission_date' => ['<', $end_date]],
+                ['date' => ['>=', $start_date]],
+                ['date' => ['<', $end_date]],
             ] + $entity_restrict
         ];
         $result = $DB->request($request);
@@ -432,38 +433,53 @@ class Provider
         return null;
     }
 
-
-    public static function getCarbonIntensity(): array
+    public static function getCarbonIntensity(array $params): array
     {
         global $DB;
+
+        $source = new CarbonIntensitySource();
+        $zone = new CarbonIntensityZone();
+        $source->getFromDBByCrit([
+            'name' => 'RTE'
+        ]);
+        $zone->getFromDBByCrit([
+            'name' => 'France'
+        ]);
 
         $request = [
             'SELECT' => [
                 CarbonIntensity::getTable() => [
                     'intensity',
-                    'emission_date',
+                    'date',
                 ]
             ],
             'FROM'  => CarbonIntensity::getTable(),
             'WHERE' => [
-                [CarbonIntensity::getTableField('emission_date') => ['>=', date('2024-03-01')]],
-                [CarbonIntensity::getTableField('emission_date') => ['<', date('2024-03-03')]],
-                CarbonIntensitySource::getForeignKeyField('sources_id') => 1,
-                CarbonIntensityZone::getForeignKeyField('zones_id') => 1,
+                // [CarbonIntensity::getTableField('date') => ['>=', date('2024-03-01')]],
+                // [CarbonIntensity::getTableField('date') => ['<', date('2024-03-03')]],
+                CarbonIntensitySource::getForeignKeyField('sources_id') => $source->getID(),
+                CarbonIntensityZone::getForeignKeyField('zones_id') => $zone->getID(),
             ]
         ];
+
+        $filters = self::getFiltersCriteria(CarbonIntensity::getTable(), $params['apply_filters']);
+        $request = array_merge_recursive(
+            $request,
+            $filters
+        );
+
         $data = [
             'labels' => [],
             'series' => [
                 [
-                    'name' => __("gCO2eq / KWh", "carbon"),
-                    'data' => []
+                    'name' => sprintf('%s %s', $source->fields['name'], $zone->fields['name']),
+                    'data' => [],
                 ]
             ],
         ];
         $rows = $DB->request($request);
         foreach ($rows as $row) {
-            $data['labels'][]            = $row['emission_date'];
+            $data['labels'][]            = $row['date'];
             $data['series'][0]['data'][] = number_format($row['intensity'], PLUGIN_CARBON_DECIMALS);
         }
 
@@ -518,5 +534,36 @@ class Provider
         }
 
         return $data;
+    }
+
+    public static function getFiltersCriteria(string $table = "", array $apply_filters = []): array
+    {
+        $where = [];
+        $join  = [];
+
+        $filters = Filter::getRegisteredFilterClasses();
+
+        foreach ($filters as $filter) {
+            if (!$filter::canBeApplied($table) || !array_key_exists($filter::getId(), $apply_filters)) {
+                continue;
+            }
+            $filter_criteria = $filter::getCriteria($table, $apply_filters[$filter::getId()]);
+            if (isset($filter_criteria['WHERE'])) {
+                $where = array_merge($where, $filter_criteria['WHERE']);
+            }
+            if (isset($filter_criteria['JOIN'])) {
+                $join = array_merge($join, $filter_criteria['JOIN']);
+            }
+        }
+
+        $criteria = [];
+        if (count($where)) {
+            $criteria['WHERE'] = $where;
+        }
+        if (count($join)) {
+            $criteria['LEFT JOIN'] = $join;
+        }
+
+        return $criteria;
     }
 }

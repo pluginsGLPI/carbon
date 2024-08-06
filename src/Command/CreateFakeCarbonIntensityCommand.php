@@ -122,7 +122,7 @@ class CreateFakeCarbonIntensityCommand extends Command
                 $carbon_intensity->add([
                     'plugin_carbon_carbonintensitysources_id' => $this->source_id,
                     'plugin_carbon_carbonintensityzones_id' => $this->zone_id,
-                    'emission_date' => $date, // Eco2mix seems to provide datetime in
+                    'date'          => $date, // Eco2mix seems to provide datetime in
                     'intensity'     => $intensity,
                 ]);
             }

@@ -273,7 +273,7 @@ class CommonTestCase extends TestCase
             $crit = [
                 CarbonIntensitySource::getForeignKeyField()  => $source->getID(),
                 CarbonIntensityZone::getForeignKeyField() => $zone->getID(),
-                'emission_date' => $current_date->format('Y-m-d H:i:s'),
+                'date' => $current_date->format('Y-m-d H:i:s'),
                 'intensity' => $intensity,
             ];
             $emission = $this->getItem(CarbonIntensity::class, $crit);

@@ -125,14 +125,14 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
         $previous_timestamp = 0;
         $length_seconds = $length->format('%S');
         foreach ($query_result as $row) {
-            $emission_date = DateTime::createFromFormat('Y-m-d H:i:s', $row['emission_date']);
+            $date = DateTime::createFromFormat('Y-m-d H:i:s', $row['date']);
             if ($previous_timestamp == 0) {
-                $previous_timestamp = $emission_date->getTimestamp();
+                $previous_timestamp = $date->getTimestamp();
                 continue;
             }
 
             // calculate seconds where the asset is on within the hour
-            $current_timestamp = $emission_date->format('U');
+            $current_timestamp = $date->format('U');
             $next_hour = $current_timestamp;
             $hour_fraction = ($next_hour - $start_time->format('U'));
             $hour_fraction = min($hour_fraction, $length_seconds);
@@ -145,10 +145,10 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
             $emission = $row['intensity'] * $energy_in_kwh;
             $total_emission += $emission;
 
-            // Increment start_time using $emission_date
-            // (because this lop assumes that carbon intensity is recorded for last hour)
+            // Increment start_time using $date
+            // (because this loop assumes that carbon intensity is recorded for last hour)
             // TODO: to define if it should be for the next hour instead
-            $start_time = clone $emission_date;
+            $start_time = clone $date;
             $length_seconds -= $hour_fraction;
         }
 

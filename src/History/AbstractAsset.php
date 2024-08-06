@@ -216,12 +216,12 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         $first_entry = $carbon_intensity->find([
             'plugin_carbon_carbonintensityzones_id' => $zones_id,
         ], [
-            'emission_date ASC'
+            'date ASC'
         ], 1);
 
         if (count($first_entry) === 1) {
             $first_entry = array_pop($first_entry);
-            $start_date = new DateTime($first_entry['emission_date']);
+            $start_date = new DateTime($first_entry['date']);
             return $start_date;
         }
 

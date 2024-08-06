@@ -43,7 +43,8 @@ use GlpiPlugin\Carbon\CarbonIntensityZone;
 class CarbonIntensityRTE extends AbstractCarbonIntensity
 {
     const RECORDS_URL = 'https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/eco2mix-national-tr/records';
-    const EXPORT_URL  = 'https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/eco2mix-national-tr/exports/json';
+    const EXPORT_URL_TO_2023  = 'https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/eco2mix-national-tr/exports/json';
+    const EXPORT_URL_TO_2012  = 'https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/eco2mix-national-cons-def/exports/json';
 
     private RestApiClientInterface $client;
 
@@ -67,6 +68,11 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         return [
             'France',
         ];
+    }
+
+    public function getHardStartDate(): DateTimeImmutable
+    {
+        return DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '2012-01-01T00:00:00+00:00');
     }
 
     public function getMaxIncrementalAge(): DateTimeImmutable
@@ -133,7 +139,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
             return [];
         }
 
-        return $this->formatOutput($response['results']);
+        return $this->formatOutput($response['results'], 15);
     }
 
     /**
@@ -155,19 +161,27 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
 
         $timezone = $start->getTimezone()->getName();
         $params = [
+            'select' => 'taux_co2,date_heure',
             'where' => "date_heure IN [date'$from' TO date'$to']",
             'order_by' => 'date_heure asc',
             'timezone' => $timezone,
         ];
-        $response = $this->client->request('GET', self::EXPORT_URL, ['timeout' => 8, 'query' => $params]);
+        if ($stop < DateTime::createFromFormat(DateTimeInterface::ATOM, '2023-02-01T00:00:00+00:00')) {
+            $step = 15;
+            $url = self::EXPORT_URL_TO_2012;
+        } else {
+            $step = 15;
+            $url = self::EXPORT_URL_TO_2023;
+        }
+        $response = $this->client->request('GET', $url, ['timeout' => 8, 'query' => $params]);
         if (!$response) {
             return [];
         }
 
-        return $this->formatOutput($response);
+        return $this->formatOutput($response, $step);
     }
 
-    private function formatOutput(array $response): array
+    private function formatOutput(array $response, int $step): array
     {
         // array sort records, just in case
         usort($response, function ($a, $b) {
@@ -179,7 +193,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         $filtered_response = $this->deduplicate($response);
 
         // Convert samples from 15 min to 1 hour
-        $intensities = $this->convertToHourly($filtered_response);
+        $intensities = $this->convertToHourly($filtered_response, $step);
 
         return [
             'source' => self::getSourceName(),
@@ -209,9 +223,10 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
      * Convert records to 1 hour
      *
      * @param array $records
+     * @param int   $step : interval in minutes between 2 samples
      * @return array
      */
-    protected function convertToHourly(array $records): array
+    protected function convertToHourly(array $records, int $step): array
     {
         $intensities = [];
         $intensity = 0.0;
@@ -227,7 +242,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
             if ($previous_record_date !== null) {
                 // Ensure that current date is 15 minutes ahead than previous record date
                 $diff = $date->getTimestamp() - $previous_record_date->getTimestamp();
-                if ($diff !== 15 * 60) {
+                if ($diff !== $step * 60) {
                     if ($diff == 4500 && $this->switchTowinterTime($date)) {
                         // 4500 = 1h + 15m
                         $filled_date = DateTime::createFromFormat(DateTimeInterface::ATOM, end($intensities)['datetime']);
@@ -245,10 +260,10 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
                 }
             }
 
-            if ($minute === 45) {
+            if ($minute === (60 - $step)) {
                 $intensities[] = [
                     'datetime' => $date->format('Y-m-d\TH:00:00P'),
-                    'intensity' => (int) round($intensity / $count),
+                    'intensity' => (float) $intensity / $count,
                 ];
                 $intensity = 0.0;
                 $count = 0;

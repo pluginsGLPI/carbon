@@ -120,7 +120,7 @@ class GlobalFixture
             $DB->insert($intensity_table, [
                 'plugin_carbon_carbonintensitysources_id' => $source_id,
                 'plugin_carbon_carbonintensityzones_id'   => $zone_id,
-                'emission_date' => $row[0],
+                'date' => $row[0],
                 'intensity' => $row[1],
             ]);
         }
