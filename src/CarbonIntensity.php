@@ -243,7 +243,8 @@ class CarbonIntensity extends CommonDBTM
             $incremental = ($start_date >= $first_known_intensity_date);
         }
         if ($incremental) {
-            $start_date = $data_source->getMaxIncrementalAge();
+            $start_date = max($data_source->getMaxIncrementalAge(), $this->getLastKnownDate($zone_name, $data_source->getSourceName()));
+            $start_date = $start_date->add(new DateInterval('PT1H'));
             return $data_source->incrementalDownload($zone_name, $start_date, $this, $limit);
         }
 
@@ -257,7 +258,6 @@ class CarbonIntensity extends CommonDBTM
         $start_date = DateTimeImmutable::createFromMutable($start_date);
 
         $toolbox = new Toolbox();
-        // $last_known_intensity_date = $this->getLatestKnownDate($zone_name, $data_source->getSourceName());
         $oldest_asset_date = $toolbox->getOldestAssetDate();
         $start_date = min($start_date, $oldest_asset_date);
 

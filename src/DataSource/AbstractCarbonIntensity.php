@@ -196,7 +196,6 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
         return $saved > 0 ? $count : -$count;
     }
 
-
     /**
      * Divide a time range into a group of 1 month time ranges (1 to last day of month)
      * Handles input ranges not matching a month boundary

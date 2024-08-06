@@ -36,6 +36,7 @@ namespace GlpiPlugin\Carbon\DataSource;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
+use DateTimeInterface;
 use DateTimeZone;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 
@@ -218,7 +219,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         $previous_record_date = null;
 
         foreach ($records as $record) {
-            $date = new DateTime($record['date_heure'], new DateTimeZone("UTC"));
+            $date = DateTime::createFromFormat(DateTimeInterface::ATOM, $record['date_heure']);
             $count++;
             $intensity += $record['taux_co2'];
             $minute = (int) $date->format('i');
@@ -229,16 +230,16 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
                 if ($diff !== 15 * 60) {
                     if ($diff == 4500 && $this->switchTowinterTime($date)) {
                         // 4500 = 1h + 15m
-                        $filled_date = DateTime::createFromFormat('Y-m-d H:i:sT', end($intensities)['datetime']);
+                        $filled_date = DateTime::createFromFormat(DateTimeInterface::ATOM, end($intensities)['datetime']);
                         $filled_date->add(new DateInterval('PT1H'));
                         $intensities[] = [
-                            'datetime'  => $filled_date->format('Y-m-d H:i:00+00:00'), // Force UTC timezone
+                            'datetime'  => $filled_date->format('Y-m-d\TH:00:00P'),
                             'intensity' => (end($intensities)['intensity'] + $record['taux_co2']) / 2,
                         ];
                     } else {
                         // Unexpected gap in the records. What to do with this ?
-                        $date_1 = $previous_record_date->format('Y-m-d H:i:00+00:00');
-                        $date_2 = $date->format('Y-m-d H:i:00+00:00');
+                        $date_1 = $previous_record_date->format(DateTimeInterface::ATOM);
+                        $date_2 = $date->format(DateTimeInterface::ATOM);
                         trigger_error("Inconsistent date time increment: $diff seconds between $date_1 and $date_2", E_USER_WARNING);
                     }
                 }
@@ -246,7 +247,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
 
             if ($minute === 45) {
                 $intensities[] = [
-                    'datetime' => $date->format('Y-m-d H:00:00+00:00'), // Force UTC timezone
+                    'datetime' => $date->format('Y-m-d\TH:00:00P'),
                     'intensity' => (int) round($intensity / $count),
                 ];
                 $intensity = 0.0;

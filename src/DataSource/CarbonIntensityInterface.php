@@ -160,10 +160,13 @@ interface CarbonIntensityInterface
     public function fullDownload(string $zone, DateTimeImmutable $start_date, DateTimeImmutable $stop_date, CarbonIntensity $intensity, int $limit = 0): int;
 
     /**
-     * download latest carbon intensity history
-     * @param string $zone zone to download
+     * Download recent carbon intensity data day by day
      *
-     * @return integer
+     * @param string $zone zone to process
+     * @param DateTimeImmutable $start_date DAte where the downlos must begin
+     * @param CarbonIntensity $intensity Instance of CarbonIntensity to use to save data
+     * @param integer $limit maximum count of items to process
+     * @return integer count of processed items. Negative count on failure
      */
     public function incrementalDownload(string $zone, DateTimeImmutable $start_date, CarbonIntensity $intensity, int $limit = 0): int;
 }
