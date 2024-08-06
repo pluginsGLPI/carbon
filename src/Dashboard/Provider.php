@@ -437,6 +437,15 @@ class Provider
     {
         global $DB;
 
+        $source = new CarbonIntensitySource();
+        $zone = new CarbonIntensityZone();
+        $source->getFromDBByCrit([
+            'name' => 'RTE'
+        ]);
+        $zone->getFromDBByCrit([
+            'name' => 'France'
+        ]);
+
         $request = [
             'SELECT' => [
                 CarbonIntensity::getTable() => [
@@ -448,16 +457,16 @@ class Provider
             'WHERE' => [
                 [CarbonIntensity::getTableField('emission_date') => ['>=', date('2024-03-01')]],
                 [CarbonIntensity::getTableField('emission_date') => ['<', date('2024-03-03')]],
-                CarbonIntensitySource::getForeignKeyField('sources_id') => 1,
-                CarbonIntensityZone::getForeignKeyField('zones_id') => 1,
+                CarbonIntensitySource::getForeignKeyField('sources_id') => $source->getID(),
+                CarbonIntensityZone::getForeignKeyField('zones_id') => $zone->getID(),
             ]
         ];
         $data = [
             'labels' => [],
             'series' => [
                 [
-                    'name' => __("gCO2eq / KWh", "carbon"),
-                    'data' => []
+                    'name' => sprintf('%s %s', $source->fields['name'], $zone->fields['name']),
+                    'data' => [],
                 ]
             ],
         ];
