@@ -80,6 +80,11 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
         return DateTimeImmutable::createFromMutable($recent_limit);
     }
 
+    public function getHardStartDate(): DateTimeImmutable
+    {
+        return DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '2021-01-01T00:00:00+00:00');
+    }
+
     public function createZones(): int
     {
         try {

@@ -70,6 +70,11 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         ];
     }
 
+    public function getHardStartDate(): DateTimeImmutable
+    {
+        return DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '2012-01-01T00:00:00+00:00');
+    }
+
     public function getMaxIncrementalAge(): DateTimeImmutable
     {
         $recent_limit = new DateTime('15 days ago');

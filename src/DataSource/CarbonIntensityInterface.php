@@ -130,6 +130,13 @@ interface CarbonIntensityInterface
     public function createZones(): int;
 
     /**
+     * Get the absolute starrt date of data from the source
+     *
+     * @return DateTimeImmutable
+     */
+    public function getHardStartDate(): DateTimeImmutable;
+
+    /**
      * Get zones handled by the data source
      *
      * @return array
