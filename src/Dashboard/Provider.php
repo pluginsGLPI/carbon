@@ -419,8 +419,8 @@ class Provider
             ],
             'FROM'  => CarbonEmission::getTable(),
             'WHERE' => [
-                ['emission_date' => ['>=', $start_date]],
-                ['emission_date' => ['<', $end_date]],
+                ['date' => ['>=', $start_date]],
+                ['date' => ['<', $end_date]],
             ] + $entity_restrict
         ];
         $result = $DB->request($request);
@@ -472,7 +472,7 @@ class Provider
         ];
         $rows = $DB->request($request);
         foreach ($rows as $row) {
-            $data['labels'][]            = $row['emission_date'];
+            $data['labels'][]            = $row['date'];
             $data['series'][0]['data'][] = number_format($row['intensity'], PLUGIN_CARBON_DECIMALS);
         }
 

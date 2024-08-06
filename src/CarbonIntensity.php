@@ -97,7 +97,7 @@ class CarbonIntensity extends CommonDBTM
         $tab[] = [
             'id'                 => '3',
             'table'              => $table,
-            'field'              => 'emission_date',
+            'field'              => 'date',
             'name'               => __('Emission date', 'carbon'),
             'massiveaction'      => false, // implicit field is id
             'datatype'           => 'datetime',
@@ -150,7 +150,7 @@ class CarbonIntensity extends CommonDBTM
         $zone_table   = CarbonIntensityZone::getTable();
 
         $result = $DB->request([
-            'SELECT' => CarbonIntensity::getTableField('emission_date'),
+            'SELECT' => CarbonIntensity::getTableField('date'),
             'FROM'   => $intensity_table,
             'INNER JOIN' => [
                 $source_table => [
@@ -170,13 +170,13 @@ class CarbonIntensity extends CommonDBTM
                 CarbonIntensitySource::getTableField('name') => $source_name,
                 CarbonIntensityZone::getTableField('name') => $zone_name
             ],
-            'ORDER' => CarbonIntensity::getTableField('emission_date') . ' DESC',
+            'ORDER' => CarbonIntensity::getTableField('date') . ' DESC',
             'LIMIT' => '1'
         ])->current();
         if ($result === null) {
             return null;
         }
-        return DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $result['emission_date']);
+        return DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $result['date']);
     }
 
     /**
@@ -194,7 +194,7 @@ class CarbonIntensity extends CommonDBTM
         $zone_table   = CarbonIntensityZone::getTable();
 
         $result = $DB->request([
-            'SELECT' => CarbonIntensity::getTableField('emission_date'),
+            'SELECT' => CarbonIntensity::getTableField('date'),
             'FROM'   => $intensity_table,
             'INNER JOIN' => [
                 $source_table => [
@@ -214,13 +214,13 @@ class CarbonIntensity extends CommonDBTM
                 CarbonIntensitySource::getTableField('name') => $source_name,
                 CarbonIntensityZone::getTableField('name') => $zone_name
             ],
-            'ORDER' => CarbonIntensity::getTableField('emission_date') . ' ASC',
+            'ORDER' => CarbonIntensity::getTableField('date') . ' ASC',
             'LIMIT' => '1'
         ])->current();
         if ($result === null) {
             return null;
         }
-        return DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $result['emission_date']);
+        return DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $result['date']);
     }
 
     /**
@@ -309,7 +309,7 @@ class CarbonIntensity extends CommonDBTM
         $query = $DB->buildInsert(
             CarbonIntensity::getTable(),
             [
-                'emission_date' => new QueryParam(),
+                'date' => new QueryParam(),
                 CarbonIntensitySource::getForeignKeyField() => new QueryParam(),
                 CarbonIntensityZone::getForeignKeyField() => new QueryParam(),
                 'intensity' => new QueryParam(),
