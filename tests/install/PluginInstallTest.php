@@ -35,7 +35,7 @@ namespace GlpiPlugin\Carbon\Tests;
 
 use Session;
 use Config;
-use CronTask;
+use CronTask as GLPICronTask;
 use DisplayPreference;
 use GLPIKey;
 use Plugin;
@@ -45,6 +45,7 @@ use Glpi\System\Diagnostic\DatabaseSchemaIntegrityChecker;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
+use GlpiPlugin\Carbon\CronTask;
 use GlpiPlugin\Carbon\Report;
 
 class PluginInstallTest extends CommonTestCase
@@ -195,13 +196,33 @@ class PluginInstallTest extends CommonTestCase
 
     private function checkAutomaticAction()
     {
-        $cronTask = new CronTask();
+        $cronTask = new GLPICronTask();
+        $rows = $cronTask->find([
+            'itemtype' => ['LIKE', '%' . 'Carbon' . '%'],
+        ]);
+        $this->assertEquals(3, count($rows));
+
+        $cronTask = new GLPICronTask();
         $cronTask->getFromDBByCrit([
-            'itemtype' => CarbonEmission::class,
+            'itemtype' => CronTask::class,
             'name'     => 'Historize',
         ]);
         $this->assertFalse($cronTask->isNewItem());
         $this->assertEquals(10000, $cronTask->fields['param']);
+
+        $cronTask = new GLPICronTask();
+        $cronTask->getFromDBByCrit([
+            'itemtype' => CronTask::class,
+            'name'     => 'DownloadRte',
+        ]);
+        $this->assertFalse($cronTask->isNewItem());
+
+        $cronTask = new GLPICronTask();
+        $cronTask->getFromDBByCrit([
+            'itemtype' => CronTask::class,
+            'name'     => 'DownloadElectricityMap',
+        ]);
+        $this->assertFalse($cronTask->isNewItem());
     }
 
     private function checkConfig()

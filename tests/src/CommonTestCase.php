@@ -252,9 +252,17 @@ class CommonTestCase extends TestCase
 
     protected function createCarbonIntensityData(string $country, string $source_name, DateTimeInterface $begin_date, float $intensity, string $length = 'P2D')
     {
-        $zone = $this->getItem(CarbonIntensityZone::class, [ 'name' => $country ]);
+        $zone = new CarbonIntensityZone();
+        $zone->getFromDBByCrit(['name' => $country]);
+        if ($zone->isNewItem()) {
+            $zone = $this->getItem(CarbonIntensityZone::class, [ 'name' => $country ]);
+        }
 
-        $source = $this->getItem(CarbonIntensitySource::class, [ 'name' => $source_name ]);
+        $source = new CarbonIntensitySource();
+        $source->getFromDBByCrit(['name' => $source_name]);
+        if ($source->isNewItem()) {
+            $source = $this->getItem(CarbonIntensitySource::class, [ 'name' => $source_name ]);
+        }
 
         $current_date = clone $begin_date;
         $current_date->sub(new DateInterval('P1D'));

@@ -31,29 +31,54 @@
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Carbon\CarbonEmission;
+use GlpiPlugin\Carbon\CronTask;
+use CronTask as GlpiCronTask;
 
 $automatic_actions = [
     [
-        'itemtype'  => CarbonEmission::class,
+        'itemtype'  => CronTask::class,
         'name'      => 'Historize',
         'frequency' => DAY_TIMESTAMP,
         'options'   => [
-            'mode' => CronTask::MODE_EXTERNAL,
-            'allowmode' => CronTask::MODE_INTERNAL + CronTask::MODE_EXTERNAL,
+            'mode' => GlpiCronTask::MODE_EXTERNAL,
+            'allowmode' => GlpiCronTask::MODE_INTERNAL + GlpiCronTask::MODE_EXTERNAL,
             'logs_lifetime' => 30,
-            'comment' => __('Computes carbon emissions of computers', 'carbon'),
+            'comment' => __('Compute carbon emissions of computers', 'carbon'),
+            'param'   => 10000, // Maximum rows to generate per execution
+        ]
+    ],
+    [
+        'itemtype'  => CronTask::class,
+        'name'      => 'DownloadRte',
+        'frequency' => DAY_TIMESTAMP,
+        'options'   => [
+            'mode' => GlpiCronTask::MODE_EXTERNAL,
+            'allowmode' => GlpiCronTask::MODE_INTERNAL + GlpiCronTask::MODE_EXTERNAL,
+            'logs_lifetime' => 30,
+            'comment' => __('Collect carbon intensities from RTE', 'carbon'),
+            'param'   => 10000, // Maximum rows to generate per execution
+        ]
+    ],
+    [
+        'itemtype'  => CronTask::class,
+        'name'      => 'DownloadElectricityMap',
+        'frequency' => DAY_TIMESTAMP / 2, // Twice a day
+        'options'   => [
+            'mode' => GlpiCronTask::MODE_EXTERNAL,
+            'allowmode' => GlpiCronTask::MODE_INTERNAL + GlpiCronTask::MODE_EXTERNAL,
+            'logs_lifetime' => 30,
+            'comment' => __('Collect carbon intensities from ElectricityMap', 'carbon'),
             'param'   => 10000, // Maximum rows to generate per execution
         ]
     ],
 ];
 
 foreach ($automatic_actions as $action) {
-    $task = new CronTask();
+    $task = new GlpiCronTask();
     if ($task->getFromDBByCrit(['name' => $action['name']]) !== false) {
         $task->delete(['id' => $task->getID()]);
     }
-    $success = CronTask::Register(
+    $success = GlpiCronTask::Register(
         $action['itemtype'],
         $action['name'],
         $action['frequency'],

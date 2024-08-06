@@ -61,8 +61,8 @@ define('PLUGIN_CARBON_DECIMALS', 3);
 // Plugin compatible itemtypes
 define('PLUGIN_CARBON_TYPES', [
     Computer::class,
-    //    Monitor::class,
-    //    NetworkEquipment::class,
+    Monitor::class,
+    NetworkEquipment::class,
     //    Phone::class,
     //    Printer::class,
 ]);

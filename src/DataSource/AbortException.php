@@ -31,40 +31,8 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon;
+namespace GlpiPlugin\Carbon\DataSource;
 
-use CommonDropdown;
-use CommonGLPI;
-use Entity;
-use Glpi\Application\View\TemplateRenderer;
-
-/**
- * Usage profile of a computer
- */
-class CarbonIntensityZone extends CommonDropdown
+class AbortException extends \RuntimeException
 {
-    public static function getTypeName($nb = 0)
-    {
-        return _n(" Carbon intensity zone", "Carbon intensity zones", $nb, 'carbon');
-    }
-
-    public static function canCreate()
-    {
-        return false;
-    }
-
-    public static function canUpdate()
-    {
-        return false;
-    }
-
-    public static function canDelete()
-    {
-        return false;
-    }
-
-    public static function canPurge()
-    {
-        return false;
-    }
 }

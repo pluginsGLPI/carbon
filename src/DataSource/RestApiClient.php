@@ -36,6 +36,8 @@ namespace GlpiPlugin\Carbon\DataSource;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7;
+use Session;
+use Toolbox;
 
 class RestApiClient implements RestApiClientInterface
 {
@@ -48,7 +50,7 @@ class RestApiClient implements RestApiClientInterface
     protected $api_client = null;
     protected $last_error = '';
 
-    public function __construct(array $params)
+    public function __construct(array $params = [])
     {
         $local_params = [
             'timeout'         => self::DEFAULT_TIMEOUT,
@@ -56,7 +58,7 @@ class RestApiClient implements RestApiClientInterface
             'headers'         => self::DEFAULT_HEADERS,
             'version'         => self::DEFAULT_HTTP_VERSION,
             'http_errors'     => false,
-            'debug'           => ($_SESSION['glpi_use_mode'] == \Session::DEBUG_MODE),
+            'debug'           => ($_SESSION['glpi_use_mode'] == Session::DEBUG_MODE),
             // This is insecure and not recommanded, but...
             // 'verify'          => false,
         ];
@@ -79,7 +81,7 @@ class RestApiClient implements RestApiClientInterface
                 $this->last_error['response'] = Psr7\Message::toString($e->getResponse());
             }
 
-            \Toolbox::logDebug($this->last_error);
+            Toolbox::logDebug($this->last_error);
 
             return false;
         }

@@ -41,6 +41,8 @@ use DbUtils;
 use DbMysql;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\CarbonIntensity;
+use GlpiPlugin\Carbon\CarbonIntensitySource;
+use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
 use Location;
 use QueryExpression;
 

@@ -31,64 +31,49 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\DataSource;
+namespace GlpiPlugin\Carbon;
 
 use DateTime;
+use DateTimeImmutable;
 
-/**
- * The common interface for all classes implementing carbon intensity fetching from various sources.
- * Sources are most of the time REST API, but this is not limitative.
- *
- * Depending on the source, the time range of the intensities may vary.
- *
- * The method returns an array constructed as this:
- * [
- *      'source' => the source name,
- *      'a zone name' => [
- *            [
- *                'datetime' => the date and time of the intensity,
- *                'intensity' => the intensity,
- *            ],
- *            ...
- *        ],
- *      ...
- * ]
- *
- * For example:
- * [
- *      'source' => 'FR_SOURCE',
- *      'France_west' => [
- *            [
- *                'datetime' => "2024-07-03T01:00:00+00:00",
- *                'intensity' => 12,
- *            ],
- *            [
- *                'datetime' => ""2024-07-03T02:00:00+00:00"",
- *                'intensity' => 13,
- *            ],
- *       ],
- *      'France_east' => [
- *            [
- *                'datetime' => "2024-07-03T01:00:00+00:00",
- *                'intensity' => 41,
- *            ],
- *            [
- *                'datetime' => ""2024-07-03T02:00:00+00:00"",
- *                'intensity' => 40,
- *            ],
- *       ],
- * ]
- *
- * The carbon intensity unit is gCO2/kWh
- *
- */
-
-interface CarbonIntensity
+class Toolbox
 {
     /**
-     * Fetch carbon intensities from the source.
+     * Get the oldest asset date in the database
      *
-     * @return an array organized as described above
+     * @return DateTimeImmutable
      */
-    public function fetchCarbonIntensity(): array;
+    public function getOldestAssetDate(): ?DateTimeImmutable
+    {
+        $itemtypes = Config::getSupportedAssets();
+        $oldest_date = null;
+        foreach ($itemtypes as $itemtype) {
+            /** @var CommonDBTM $item */
+            $item = new $itemtype();
+            $result = $item->find([], ['date_creation DESC'], 1);
+            if (count($result) === 1) {
+                $row = array_pop($result);
+                if ($oldest_date === null || $row['date_creation'] < $oldest_date) {
+                    $oldest_date = $row['date_creation'];
+                }
+            }
+        }
+
+        if ($oldest_date === null) {
+            return $this->getDefaultCarbonIntensityDownloadDate();
+        }
+        return DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $oldest_date);
+    }
+
+    /**
+     * Get default date where environnemental imapct shouw be known
+     * when no inventory data is available
+     */
+    public function getDefaultCarbonIntensityDownloadDate(): DateTimeImmutable
+    {
+        $start_date = new DateTime('1 year ago');
+        $start_date->setDate($start_date->format('Y'), 1, 1);
+        $start_date->setTime(0, 0, 0);
+        return DateTimeImmutable::createFromMutable($start_date);
+    }
 }

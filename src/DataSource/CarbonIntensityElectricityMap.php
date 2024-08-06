@@ -36,11 +36,17 @@ namespace GlpiPlugin\Carbon\DataSource;
 use DateTime;
 use DateTimeInterface;
 use DateTimeZone;
-use GlpiPlugin\Carbon\Config;
+use DateTimeImmutable;
+use GlpiPlugin\Carbon\CarbonIntensity;
+use GlpiPlugin\Carbon\CarbonIntensityZone;
+use Config as GlpiConfig;
+use GLPIKey;
 
 class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
 {
     const HISTORY_URL = 'https://api.electricitymap.org/v3/carbon-intensity/history';
+    const PAST_URL    = 'https://api.electricitymap.org/v3/carbon-intensity/past-range';
+    const ZONES_URL    = 'https://api.electricitymap.org/v3/zones'; // Do not send API token
 
     private RestApiClientInterface $client;
 
@@ -54,26 +60,161 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
         return 'ElectricityMap';
     }
 
+    public function getZones(): array
+    {
+        return [
+            'France'
+        ];
+    }
+
     public function getDataInterval(): string
     {
         return 'P60M';
     }
 
-    public function getZones(): array {
+    public function getMaxIncrementalAge(): DateTimeImmutable
+    {
+        $recent_limit = new DateTime('1 day ago');
+        $recent_limit->setTime(0, 0, 0);
+
+        return DateTimeImmutable::createFromMutable($recent_limit);
+    }
+
+    public function createZones(): int
+    {
+        try {
+            $zones = $this->downloadZones();
+        } catch (\RuntimeException $e) {
+            return 0;
+        }
+
+        $count = 0;
+        $failed = false;
+        foreach ($zones as $zone_key => $zone_spec) {
+            $input = [
+                'name' => $zone_spec['zoneName'],
+            ];
+            $zone = new CarbonIntensityZone();
+            if ($zone->getFromDbByCrit($input) === false) {
+                $zone_id = $zone->add($input);
+                if ($zone_id === false) {
+                    $failed = true;
+                    continue;
+                }
+            }
+            $count++;
+        }
+
+        if ($failed) {
+            $count = -$count;
+        } else {
+            $this->setZoneSetupComplete();
+        }
+
+        return $count;
+    }
+
+    private function getToken(): string
+    {
+        $glpi_key = new GLPIKey();
+        $value = GlpiConfig::getConfigurationValue('plugin:carbon', 'electricitymap_api_key');
+        return $glpi_key->decrypt($value);
+    }
+
+    protected function downloadZones(): array
+    {
+        $response = $this->client->request('GET', self::ZONES_URL, []);
+        if (!$response) {
+            return [];
+        }
+
+        if (isset($response['error'])) {
+            // An error ocured
+            trigger_error('' . $response['error'], E_USER_WARNING);
+            if ($response['error'] === 'Invalid auth-token') {
+                throw new AbortException('Invalid auth-token');
+            }
+            return [];
+        }
+
+        return $response;
+    }
+
+    /**
+     * Fetch carbon intensities from Opendata Réseaux-Énergies using export dataset.
+     *
+     * See https://odre.opendatasoft.com/explore/dataset/eco2mix-national-tr/api/?disjunctive.nature
+     *
+     * The method fetches the intensities for the date range specified in argument.
+     */
+    public function fetchDay(DateTimeImmutable $day, string $zone): array
+    {
+        // $day argument is ignored : this endpoint gives the 24 last hours
+
+        // TODO: get zones from GLPI locations
+        $params = [
+            'zone' => $zone,
+        ];
+
+        $options = [
+            'headers' => [
+                'auth-token' => $this->getToken(),
+            ],
+            'query' => $params
+        ];
+
+        $response = $this->client->request('GET', self::HISTORY_URL, $options);
+        if (!$response) {
+            return [];
+        }
+
+        if (isset($response['error'])) {
+            // An error ocured
+            trigger_error('' . $response['error'], E_USER_WARNING);
+            if ($response['error'] === 'Invalid auth-token') {
+                throw new AbortException('Invalid auth-token');
+            }
+            return [];
+        }
+
+        $intensities = [];
+        foreach ($response['history'] as $record) {
+            $datetime = DateTime::createFromFormat('Y-m-d\TH:i:s+', $record['datetime'], new DateTimeZone('UTC'));
+            if (!$datetime instanceof DateTimeInterface) {
+                // var_dump(DateTime::getLastErrors());
+                continue;
+            }
+            $intensities[] = [
+                'datetime' => $datetime->format(DateTime::ATOM),
+                'intensity' => $record['carbonIntensity'],
+            ];
+        }
+
         return [
-            'France',
+            'source' => $this->getSourceName(),
+            $response['zone'] => $intensities,
         ];
     }
 
-    public function fetchCarbonIntensity(): array
+    public function fetchRange(DateTimeImmutable $start, DateTimeImmutable $stop, string $zone): array
     {
+
         // TODO: get zones from GLPI locations
         $params = [
-            'zone' => 'FR',
+            'zone' => $zone,
         ];
 
-        $response = $this->client->request('GET', self::HISTORY_URL, ['query' => $params]);
+        $response = $this->client->request('GET', self::PAST_URL, ['query' => $params]);
         if (!$response) {
+            return [];
+        }
+
+        if (isset($response['error'])) {
+            // An error ocured
+            trigger_error('' . $response['error'], E_USER_WARNING);
+            if ($response['error'] === 'Invalid auth-token') {
+                throw new AbortException('Invalid auth-token');
+            }
             return [];
         }
 
@@ -85,15 +226,23 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
                 continue;
             }
             $intensities[] = [
-                'datetime' => $datetime->format('Y-m-d\TH:i:sP'),
+                'datetime' => $datetime->format(DateTime::ATOM),
                 'intensity' => $record['carbonIntensity'],
             ];
         }
 
         return [
-            'source' => 'ElectricityMap',
+            'source' => $this->getSourceName(),
             $response['zone'] => $intensities,
         ];
-        ;
+    }
+
+    public function fullDownload(string $zone, DateTimeImmutable $start_date, DateTimeImmutable $stop_date, CarbonIntensity $intensity, int $limit = 0): int
+    {
+        // Disable full download because we miss documentation for PAST_URL endpoint
+        $start_date = new DateTime('24 hours ago');
+        $start_date->setTime($start_date->format('H'), 0, 0);
+        $start_date = DateTimeImmutable::createFromMutable($start_date);
+        return $this->incrementalDownload($zone, $start_date, $intensity, $limit);
     }
 }

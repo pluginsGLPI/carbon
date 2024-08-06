@@ -38,7 +38,8 @@ use DBUtils;
 use DisplayPreference;
 use Migration;
 use ProfileRight;
-use CronTask;
+use CronTask as GlpiCronTask;
+use GlpiPlugin\Carbon\CronTask;
 use GlpiPlugin\Carbon\ComputerPower;
 use GlpiPlugin\Carbon\CarbonEmission;
 
@@ -91,11 +92,11 @@ class Uninstall
     public function deleteAutomaticActions()
     {
         $actions = [
-            CarbonEmission::class,
+            CronTask::class,
         ];
 
         foreach ($actions as $itemtype) {
-            $cron_task = new CronTask();
+            $cron_task = new GlpiCronTask();
             $cron_task->deleteByCriteria([
                 'itemtype' => $itemtype,
             ]);

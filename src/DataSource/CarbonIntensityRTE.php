@@ -34,13 +34,16 @@
 namespace GlpiPlugin\Carbon\DataSource;
 
 use DateInterval;
+use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
-use DateTime;
+use GlpiPlugin\Carbon\CarbonIntensityZone;
 
 class CarbonIntensityRTE extends AbstractCarbonIntensity
 {
     const RECORDS_URL = 'https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/eco2mix-national-tr/records';
+    const EXPORT_URL  = 'https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/eco2mix-national-tr/exports/json';
 
     private RestApiClientInterface $client;
 
@@ -59,10 +62,37 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         return 'P15M';
     }
 
-    public function getZones(): array {
+    public function getZones(): array
+    {
         return [
             'France',
         ];
+    }
+
+    public function getMaxIncrementalAge(): DateTimeImmutable
+    {
+        $recent_limit = new DateTime('15 days ago');
+        $recent_limit->setTime(0, 0, 0);
+
+        return DateTimeImmutable::createFromMutable($recent_limit);
+    }
+
+    public function createZones(): int
+    {
+        $zone = new CarbonIntensityZone();
+
+        $input = ['name' => 'France'];
+        if (!$zone->getFromDBByCrit($input)) {
+            if (!$zone->add($input)) {
+                $this->setZoneSetupComplete();
+                return 1;
+            } else {
+                // Failed to create item
+                return -1;
+            }
+        }
+
+        return 1;
     }
 
     /**
@@ -73,25 +103,29 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
      * Dataset has a depth from MONTH-1 to HOUR-2.
      * Note that the HOUR-2 seems to be not fully guaranted.
      *
-     * The method fetches the intensities for the day before the current day.
+     * @param DateTimeImmutable $day date to download from [00::00:00 to 24:00:00[
+     * @param string $zone
+     * @return array
      */
-    public function fetchCarbonIntensity(): array
+    public function fetchDay(DateTimeImmutable $day, string $zone): array
     {
-        $today = new DateTime('now', new DateTimeZone('UTC'));
-        $today->setTime(0, 0, 0);
-        $yesterday = (clone $today)->sub(new DateInterval('P1D'));
+        $start = DateTime::createFromImmutable($day);
+        $start->setTime(0, 0, 0);
+        $stop = clone $start;
+        $stop->setTime(23, 59, 59);
 
-        $format = "Y-m-d\TH:i:sP";
-        $from = $yesterday->format($format);
-        $to = $today->format($format);
+        $format = DateTime::ATOM;
+        $timezone = $start->getTimezone()->getName();
+        $from = $start->format($format);
+        $to = $stop->format($format);
 
         $params = [
             'select' => 'taux_co2,date_heure',
             'where' => "date_heure IN [date'$from' TO date'$to']",
-            'order_by' => 'date_heure desc',
-            'limit' => 100,
+            'order_by' => 'date_heure asc',
+            'limit' => 4 * 24, // 4 samples per hour = 4 * 24 hours
             'offset' => 0,
-            'timezone' => 'UTC',
+            'timezone' => $timezone,
         ];
 
         $response = $this->client->request('GET', self::RECORDS_URL, ['query' => $params]);
@@ -99,33 +133,149 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
             return [];
         }
 
+        return $this->formatOutput($response['results']);
+    }
+
+    /**
+     * Fetch carbon intensities from Opendata Réseaux-Énergies using export dataset.
+     *
+     * See https://odre.opendatasoft.com/explore/dataset/eco2mix-national-tr/api/?disjunctive.nature
+     *
+     * The method fetches the intensities for the date range specified in argument.
+     * @param DateTimeImmutable $start
+     * @param DateTimeImmutable $stop
+     * @param string $zone
+     * @return array
+     */
+    public function fetchRange(DateTimeImmutable $start, DateTimeImmutable $stop, string $zone): array
+    {
+        $format = DateTime::ATOM;
+        $from = $start->format($format);
+        $to = $stop->format($format);
+
+        $timezone = $start->getTimezone()->getName();
+        $params = [
+            'where' => "date_heure IN [date'$from' TO date'$to']",
+            'order_by' => 'date_heure asc',
+            'timezone' => $timezone,
+        ];
+        $response = $this->client->request('GET', self::EXPORT_URL, ['timeout' => 8, 'query' => $params]);
+        if (!$response) {
+            return [];
+        }
+
+        return $this->formatOutput($response);
+    }
+
+    private function formatOutput(array $response): array
+    {
+        // array sort records, just in case
+        usort($response, function ($a, $b) {
+            return $a['date_heure'] <=> $b['date_heure'];
+        });
+
+        // Deduplicate entries (solves switching from winter time to summer time)
+        // because there are 2 samples at same UTC date time
+        $filtered_response = $this->deduplicate($response);
+
+        // Convert samples from 15 min to 1 hour
+        $intensities = $this->convertToHourly($filtered_response);
+
+        return [
+            'source' => self::getSourceName(),
+            'France' => $intensities,
+        ];
+    }
+
+    protected function deduplicate(array $records): array
+    {
+        $filtered_response = [];
+        foreach ($records as $record) {
+            if (isset($filtered_response[$record['date_heure']])) {
+                if ($filtered_response[$record['date_heure']]['taux_co2'] != $record['taux_co2']) {
+                    // Inconsistency detected. What to do with this record?
+                    continue;
+                }
+                continue;
+            }
+
+            $filtered_response[$record['date_heure']] = $record;
+        }
+
+        return $filtered_response;
+    }
+
+    /**
+     * Convert records to 1 hour
+     *
+     * @param array $records
+     * @return array
+     */
+    protected function convertToHourly(array $records): array
+    {
         $intensities = [];
         $intensity = 0.0;
         $count = 0;
-        $first = true;
+        $previous_record_date = null;
 
-        // compute mean value over each hour
-        foreach ($response['results'] as $record) {
-            $matches = [];
-            preg_match("/:([0-9][0-9]):/", $record['date_heure'], $matches);
-            if ($matches[1] == '00') {
-                if (!$first) {
-                    $intensities[] = [
-                        'datetime' => $record['date_heure'],
-                        'intensity' => intval(round($intensity / $count)),
-                    ];
-                    $intensity = 0.0;
-                    $count = 0;
-                }
-                $first = false;
-            }
-            $intensity += $record['taux_co2'];
+        foreach ($records as $record) {
+            $date = DateTime::createFromFormat(DateTimeInterface::ATOM, $record['date_heure']);
             $count++;
+            $intensity += $record['taux_co2'];
+            $minute = (int) $date->format('i');
+
+            if ($previous_record_date !== null) {
+                // Ensure that current date is 15 minutes ahead than previous record date
+                $diff = $date->getTimestamp() - $previous_record_date->getTimestamp();
+                if ($diff !== 15 * 60) {
+                    if ($diff == 4500 && $this->switchTowinterTime($date)) {
+                        // 4500 = 1h + 15m
+                        $filled_date = DateTime::createFromFormat(DateTimeInterface::ATOM, end($intensities)['datetime']);
+                        $filled_date->add(new DateInterval('PT1H'));
+                        $intensities[] = [
+                            'datetime'  => $filled_date->format('Y-m-d\TH:00:00P'),
+                            'intensity' => (end($intensities)['intensity'] + $record['taux_co2']) / 2,
+                        ];
+                    } else {
+                        // Unexpected gap in the records. What to do with this ?
+                        $date_1 = $previous_record_date->format(DateTimeInterface::ATOM);
+                        $date_2 = $date->format(DateTimeInterface::ATOM);
+                        trigger_error("Inconsistent date time increment: $diff seconds between $date_1 and $date_2", E_USER_WARNING);
+                    }
+                }
+            }
+
+            if ($minute === 45) {
+                $intensities[] = [
+                    'datetime' => $date->format('Y-m-d\TH:00:00P'),
+                    'intensity' => (int) round($intensity / $count),
+                ];
+                $intensity = 0.0;
+                $count = 0;
+            }
+
+            $previous_record_date = $date;
         }
 
-        return [
-            'source' => 'RTE',
-            'France' => $intensities,
-        ];
+        return $intensities;
+    }
+
+    private function switchTowinterTime(DateTime $date): bool
+    {
+        // We assume that the datetime is already switched to winter time
+        // Therefore summer time is 03:00:00 and winter time is 02:00:00
+        $date = clone $date;
+        $date->setTimezone(new DateTimeZone('Europe/Paris'));
+        $month = (int) $date->format('m');
+        $day_of_month = (int) $date->format('d');
+        $day_of_week = (int) $date->format('w');
+        // Find if this is the day and time to switch to winter time
+        if ($month === 10 && $day_of_week === 0 && $day_of_month >= 25) {
+            if ($date->format('H:i:s') === '02:00:00') {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
