@@ -248,7 +248,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
             if ($minute === 45) {
                 $intensities[] = [
                     'datetime' => $date->format('Y-m-d\TH:00:00P'),
-                    'intensity' => (int) round($intensity / $count),
+                    'intensity' => (float) $intensity / $count,
                 ];
                 $intensity = 0.0;
                 $count = 0;

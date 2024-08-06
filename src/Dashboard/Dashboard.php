@@ -301,7 +301,7 @@ class Dashboard
         ];
         $params = array_merge($default_params, $params);
 
-        $data = Provider::getCarbonIntensity();
+        $data = Provider::getCarbonIntensity($params);
 
         return [
             'data'  => $data,
