@@ -116,7 +116,6 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
     public function fetchDay(DateTimeImmutable $day, string $zone): array
     {
         $start = DateTime::createFromImmutable($day);
-        $start->setTime(0, 0, 0);
         $stop = clone $start;
         $stop->setTime(23, 59, 59);
 
@@ -138,6 +137,10 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         if (!$response) {
             return [];
         }
+
+        $response['results'] = array_filter($response['results'], function ($item) {
+            return $item['taux_co2'] != 0;
+        });
 
         return $this->formatOutput($response['results'], 15);
     }
