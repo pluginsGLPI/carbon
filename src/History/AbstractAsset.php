@@ -230,7 +230,8 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     }
 
     /**
-     * Undocumented function
+     * Get the ID of the zone the asset belongs to
+     * Location's country must match a zone name
      *
      * @param integer $items_id
      * @return integer|null
