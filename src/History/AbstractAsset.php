@@ -241,13 +241,15 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
 
         $carbon_intensity = new CarBonIntensity();
         $zone_id = $this->getZoneId($id);
-        $last = $carbon_intensity->find([
-            CarbonIntensityZone::getForeignKeyField() => $zone_id,
+        $last = $carbon_intensity->find(
+            [
+                CarbonIntensityZone::getForeignKeyField() => $zone_id,
+            ],
             ['date DESC'],
-            'LIMIT 1'
-        ]);
+            '1'
+        );
 
-        $last_intensity_date = DateTime::createFromFormat('Y-m-d H:i:s', $last['date']);
+        $last_intensity_date = DateTime::createFromFormat('Y-m-d H:i:s', reset($last)['date']);
         $stop_date = min($today, $last_intensity_date);
 
         return $stop_date;
