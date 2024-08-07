@@ -34,14 +34,12 @@
 namespace GlpiPlugin\Carbon\Tests;
 
 use GlpiPlugin\Carbon\CronTask;
-use GlpiPlugin\Carbon\Tests\CommonTestCase;
-use GlpiPlugin\Carbon\DataSource\AbstractCarbonIntensity;
+use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use CronTask as GlpiCronTask;
-use DateTimeImmutable;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensityInterface;
 
-class CronTaskTest extends CommonTestCase
+class CronTaskTest extends DbTestCase
 {
     public function downloadSourceProvider()
     {

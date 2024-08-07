@@ -379,7 +379,7 @@ class CommonTestCase extends TestCase
             'entities_id' => 0
         ]);
 
-        $this->login($login, $password);
+        // $this->login($login, $password);
         $success = Session::changeActiveEntities($entities_id);
         $this->assertTrue($success, 'Failed to change active entity');
 
