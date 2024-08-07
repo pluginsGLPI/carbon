@@ -134,7 +134,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
             'timezone' => $timezone,
         ];
 
-        $response = $this->client->request('GET', self::RECORDS_URL, ['query' => $params]);
+        $response = $this->client->request('GET', self::RECORDS_URL, ['timeout' => 8, 'query' => $params]);
         if (!$response) {
             return [];
         }
