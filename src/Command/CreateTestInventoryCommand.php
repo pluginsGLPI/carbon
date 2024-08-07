@@ -43,6 +43,7 @@ use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\EnvironnementalImpact;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -65,7 +66,7 @@ class CreateTestInventoryCommand extends Command
                 'day_6' => 0,
                 'day_7' => 0,
             ],
-            'power' => 70 /* Watt */,
+            'power' => 70 /* Watt */ ,
             'count' => 2,
         ],
         'Laptop' => [
@@ -82,7 +83,7 @@ class CreateTestInventoryCommand extends Command
                 'day_6' => 0,
                 'day_7' => 0,
             ],
-            'power' => 40 /* Watt */,
+            'power' => 40 /* Watt */ ,
             'count' => 5,
         ],
         'Server' => [
@@ -99,7 +100,7 @@ class CreateTestInventoryCommand extends Command
                 'day_6' => 1,
                 'day_7' => 1,
             ],
-            'power' => 150 /* Watt */,
+            'power' => 150 /* Watt */ ,
             'count' => 2,
         ],
         'Tablet' => [
@@ -116,7 +117,7 @@ class CreateTestInventoryCommand extends Command
                 'day_6' => 0,
                 'day_7' => 0,
             ],
-            'power' => 15 /* Watt */,
+            'power' => 15 /* Watt */ ,
             'count' => 1,
         ],
     ];
@@ -127,8 +128,16 @@ class CreateTestInventoryCommand extends Command
     protected function configure()
     {
         $this
-           ->setName('plugin:carbon:create_test_inventory')
-           ->setDescription("Create a test inventory");
+            ->setName('plugin:carbon:create_test_inventory')
+            ->setDescription('Create a test inventory')
+            ->setHelp('This command creates an inventory for testing, using internal data.');
+
+        $this->addOption(
+            'entity-id',
+            'i',
+            InputOption::VALUE_REQUIRED,
+            'The ID of the entity in which the assets will be created (entity must have been created first)'
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -139,7 +148,13 @@ class CreateTestInventoryCommand extends Command
         $message = __("Creating test inventory", 'carbon');
         $output->writeln("<info>$message</info>");
 
-        $this->createTestInventory(self::TEST_INVENTORY_DATA);
+        $entity_id = 0;
+        $entity_id_option = $input->getOption('entity-id');
+        if ($entity_id_option) {
+            $entity_id = intval($entity_id_option);
+        }
+
+        $this->createTestInventory($entity_id, self::TEST_INVENTORY_DATA);
 
         return Command::SUCCESS;
     }
@@ -165,7 +180,7 @@ class CreateTestInventoryCommand extends Command
 
     private function getComputerType(string $type_name, int $power): CommonDBTM
     {
-        $glpi_computer_type = $this->createItemIfNotExist(GlpiComputerType::class, [ 'name' => $type_name]);
+        $glpi_computer_type = $this->createItemIfNotExist(GlpiComputerType::class, ['name' => $type_name]);
         $computer_type = $this->createItemIfNotExist(
             ComputerType::class,
             [
@@ -177,7 +192,7 @@ class CreateTestInventoryCommand extends Command
         return $glpi_computer_type;
     }
 
-    private function getComputer(string $computer_name, Location $location, GlpiComputerType $computer_type, ComputerUsageProfile $usage_profile): CommonDBTM
+    private function getComputer(string $computer_name, int $entity_id, Location $location, GlpiComputerType $computer_type, ComputerUsageProfile $usage_profile): CommonDBTM
     {
         $glpi_computer = $this->createItemIfNotExist(
             GlpiComputer::class,
@@ -185,7 +200,7 @@ class CreateTestInventoryCommand extends Command
                 'name' => $computer_name,
                 Location::getForeignKeyField() => $location->getID(),
                 GlpiComputerType::getForeignKeyField() => $computer_type->getID(),
-                Entity::getForeignKeyField() => 0,
+                Entity::getForeignKeyField() => $entity_id,
             ]
         );
         $impact = $this->createItemIfNotExist(
@@ -199,7 +214,7 @@ class CreateTestInventoryCommand extends Command
         return $glpi_computer;
     }
 
-    private function createTestInventory(array $inventory_data)
+    private function createTestInventory(int $entity_id, array $inventory_data)
     {
         $location = $this->createItemIfNotExist(
             Location::class,
@@ -218,7 +233,7 @@ class CreateTestInventoryCommand extends Command
             $usage_profile = $this->createItemIfNotExist(ComputerUsageProfile::class, $type_data['usage_profile']);
             for ($computer_count = 0; $computer_count < $type_data['count']; $computer_count++) {
                 $computer_name = $type_name . '-' . strval($computer_count);
-                $this->getComputer($computer_name, $location, $computer_type, $usage_profile);
+                $this->getComputer($computer_name, $entity_id, $location, $computer_type, $usage_profile);
             }
         }
     }
