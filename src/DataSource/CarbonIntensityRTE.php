@@ -138,9 +138,25 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
             return [];
         }
 
+        // Drop data with no carbon intensity (may be returned by the provider)
         $response['results'] = array_filter($response['results'], function ($item) {
             return $item['taux_co2'] != 0;
         });
+
+        // Drop last rows until we reach
+        $safety_count = 0;
+        while (($last_item = end($response['results'])) !== null) {
+            $time = DateTime::createFromFormat(DateTimeInterface::ATOM, $last_item['date_heure']);
+            if ($time->format('i') === '45') {
+                // We expect 15 minutes steps
+                break;
+            }
+            array_pop($response['results']);
+            $safety_count++;
+            if ($safety_count > 3) {
+                break;
+            }
+        }
 
         return $this->formatOutput($response['results'], 15);
     }
