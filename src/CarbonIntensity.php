@@ -242,7 +242,7 @@ class CarbonIntensity extends CommonDBTM
         if ($first_known_intensity_date !== null) {
             $incremental = ($start_date >= $first_known_intensity_date);
         }
-        if ($first_known_intensity_date <= $data_source->getHardStartDate()) {
+        if ($first_known_intensity_date !== null && $first_known_intensity_date <= $data_source->getHardStartDate()) {
             // Cannot download older data, then switch to incremetal mode
             $incremental = true;
         }
