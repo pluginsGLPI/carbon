@@ -150,7 +150,7 @@ class CarbonIntensity extends CommonDBTM
         $zone_table   = CarbonIntensityZone::getTable();
 
         $result = $DB->request([
-            'SELECT' => CarbonIntensity::getTableField('date'),
+            'SELECT' => [$intensity_table => ['id', 'date']],
             'FROM'   => $intensity_table,
             'INNER JOIN' => [
                 $source_table => [
@@ -235,7 +235,6 @@ class CarbonIntensity extends CommonDBTM
         // $incremental = $data_source->isZoneDownloadComplete($zone_name);
 
         $start_date = $this->getDownloadStartDate($zone_name, $data_source);
-        $stop_date  = $this->getDownloadStopDate($zone_name, $data_source);
 
         $first_known_intensity_date = $this->getFirstKnownDate($zone_name, $data_source->getSourceName());
         $incremental = false;
@@ -252,6 +251,7 @@ class CarbonIntensity extends CommonDBTM
             return $data_source->incrementalDownload($zone_name, $start_date, $this, $limit);
         }
 
+        $stop_date  = $this->getDownloadStopDate($zone_name, $data_source);
         return $data_source->fullDownload($zone_name, $start_date, $stop_date, $this, $limit);
     }
 

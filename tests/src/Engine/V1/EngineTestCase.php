@@ -35,11 +35,11 @@
 
 use Computer_Item;
 use DateTime;
-use GlpiPlugin\Carbon\Tests\CommonTestCase;
+use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 
-class EngineTestCase extends CommonTestCase
+class EngineTestCase extends DbTestCase
 {
     protected static string $engine_class = '';
     protected static string $itemtype_class = '';
