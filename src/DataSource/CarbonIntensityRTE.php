@@ -248,7 +248,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
                         $filled_date = DateTime::createFromFormat(DateTimeInterface::ATOM, end($intensities)['datetime']);
                         $filled_date->add(new DateInterval('PT1H'));
                         $intensities[] = [
-                            'datetime'  => $filled_date->format('Y-m-d\TH:00:00P'),
+                            'datetime'  => $filled_date->format('Y-m-d\TH:00:00'),
                             'intensity' => (end($intensities)['intensity'] + $record['taux_co2']) / 2,
                         ];
                     } else {
@@ -262,7 +262,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
 
             if ($minute === (60 - $step)) {
                 $intensities[] = [
-                    'datetime' => $date->format('Y-m-d\TH:00:00P'),
+                    'datetime' => $date->format('Y-m-d\TH:00:00'),
                     'intensity' => (float) $intensity / $count,
                 ];
                 $intensity = 0.0;
