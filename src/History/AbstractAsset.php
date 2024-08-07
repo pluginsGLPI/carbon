@@ -128,13 +128,11 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         }
 
         // Determine the last date to compute
-        $tmp_end_date = new DateTime('now');
-        $tmp_end_date->setTime(0, 0, 0);
-        $tmp_end_date = $tmp_end_date->sub(new DateInterval(static::$date_end_shift));
+        $last_available_date = $this->getStopDate($id);
         if ($end_date === null) {
-            $end_date = $tmp_end_date;
+            $end_date = $last_available_date;
         } else {
-            $end_date = min($tmp_end_date, $end_date);
+            $end_date = min($last_available_date, $end_date);
         }
 
         $engine = static::getEngine($item);
@@ -227,6 +225,32 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
 
         // No carbon intensity in DB, cannot find a date
         return null;
+    }
+
+    /**
+     * Find the date where daily computation must stop
+     *
+     * @param integer $id
+     * @return DateTime|null
+     */
+    protected function getStopDate(int $id): ?DateTime
+    {
+        $today = new DateTime('now');
+        $today->setTime(0, 0, 0);
+        $today = $today->sub(new DateInterval(static::$date_end_shift));
+
+        $carbon_intensity = new CarBonIntensity();
+        $zone_id = $this->getZoneId($id);
+        $last = $carbon_intensity->find([
+            CarbonIntensityZone::getForeignKeyField() => $zone_id,
+            ['date DESC'],
+            'LIMIT 1'
+        ]);
+
+        $last_intensity_date = DateTime::createFromFormat('Y-m-d H:i:s', $last['date']);
+        $stop_date = min($today, $last_intensity_date);
+
+        return $stop_date;
     }
 
     /**
