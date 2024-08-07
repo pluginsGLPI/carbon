@@ -193,7 +193,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      */
     protected function getStartDate(int $id): ?DateTime
     {
-        // Find the oldest carbon emissions date calculates for the item
+        // Find the oldest carbon emissions date calculated for the item
         $itemtype = static::$itemtype;
         $carbon_emission = new CarbonEmission();
         $last_entry = $carbon_emission->find([
