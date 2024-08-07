@@ -52,10 +52,12 @@ class CronTask
             NetworkEquipmentHistory::class,
         ];
         $task->setVolume(0); // start with zero
+        $remaining = $task->fields['param'];
+        $limit_per_type = floor(((int) $remaining) / count($histories));
         foreach ($histories as $history_type) {
             /** @var AbstractAsset $history */
             $history = new $history_type();
-            $history->setLimit(0);
+            $history->setLimit($limit_per_type);
             $count = $history->historizeItems();
             $task->addVolume($count);
         }
