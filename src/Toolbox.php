@@ -50,11 +50,11 @@ class Toolbox
         foreach ($itemtypes as $itemtype) {
             /** @var CommonDBTM $item */
             $item = new $itemtype();
-            $result = $item->find([], ['date DESC'], 1);
+            $result = $item->find([], ['date_creation DESC'], 1);
             if (count($result) === 1) {
                 $row = array_pop($result);
-                if ($oldest_date === null || $row['date'] < $oldest_date) {
-                    $oldest_date = $row['date'];
+                if ($oldest_date === null || $row['date_creation'] < $oldest_date) {
+                    $oldest_date = $row['date_creation'];
                 }
             }
         }
