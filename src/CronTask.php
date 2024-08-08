@@ -115,7 +115,12 @@ class CronTask
         $count = 0;
         $failure = false;
         foreach ($zones as $zone_name) {
-            $added = $intensity->downloadOneZone($data_source, $zone_name, $limit_per_zone);
+            try {
+                $added = $intensity->downloadOneZone($data_source, $zone_name, $limit_per_zone);
+            } catch (\RuntimeException $e) {
+                trigger_error($e->getMessage(), E_USER_WARNING);
+                continue;
+            }
             $count += abs($added);
             $failure |= $added < 0;
         }
