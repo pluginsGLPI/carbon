@@ -298,16 +298,18 @@ class CarbonIntensity extends CommonDBTM
             'name' => $source_name,
         ]);
         if ($source->isNewItem()) {
-            trigger_error('Attempt to save carbon intensity with a source which is not in the database', E_USER_ERROR);
-            return 0;
+            throw new \RuntimeException('Attempt to save carbon intensity with a source which is not in the database');
+            // trigger_error('Attempt to save carbon intensity with a source which is not in the database', E_USER_ERROR);
+            // return 0;
         }
         $zone = new CarbonIntensityZone();
         $zone->getFromDBByCrit([
             'name' => $zone_name,
         ]);
         if ($zone->isNewItem()) {
-            trigger_error('Attempt to save carbon intensity with a zone which is not in the database', E_USER_ERROR);
-            return 0;
+            throw new \RuntimeException('Attempt to save carbon intensity with a zone which is not in the database');
+            // trigger_error('Attempt to save carbon intensity with a zone which is not in the database', E_USER_ERROR);
+            // return 0;
         }
 
         $query = $DB->buildInsert(

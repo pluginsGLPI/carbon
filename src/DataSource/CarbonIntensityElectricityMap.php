@@ -101,11 +101,14 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
             ];
             $zone = new CarbonIntensityZone();
             if ($zone->getFromDbByCrit($input) === false) {
+                $input['electricitymap_code'] = $zone_key;
                 $zone_id = $zone->add($input);
                 if ($zone_id === false) {
                     $failed = true;
                     continue;
                 }
+            } else {
+                $zone->update(['electricitymap_code' => $zone_key] + $zone->fields);
             }
             $count++;
         }
@@ -155,10 +158,15 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
     public function fetchDay(DateTimeImmutable $day, string $zone): array
     {
         // $day argument is ignored : this endpoint gives the 24 last hours
-
-        // TODO: get zones from GLPI locations
+        $zone_object = new CarbonIntensityZone();
+        $zone_object->getFromDbByCrit(['name' => $zone]);
+        if (!$zone_object) {
+            return [];
+        }
+        $zone_code = $zone_object->fields['electricitymap_code'];
+        $zone_code = 'FR';
         $params = [
-            'zone' => $zone,
+            'zone' => $zone_code,
         ];
 
         $options = [
@@ -173,11 +181,13 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
             return [];
         }
 
-        if (isset($response['error'])) {
+        if (isset($response['status']) && $response['status'] === 'error') {
             // An error ocured
-            trigger_error('' . $response['error'], E_USER_WARNING);
-            if ($response['error'] === 'Invalid auth-token') {
+            if ($response['message'] === 'Invalid auth-token') {
                 throw new AbortException('Invalid auth-token');
+            }
+            if (preg_match("#^Zone '[^']*' does not exist.$#", $response['message']) !== false) {
+                throw new AbortException($response['message']);
             }
             return [];
         }
@@ -186,18 +196,25 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
         foreach ($response['history'] as $record) {
             $datetime = DateTime::createFromFormat('Y-m-d\TH:i:s+', $record['datetime'], new DateTimeZone('UTC'));
             if (!$datetime instanceof DateTimeInterface) {
-                // var_dump(DateTime::getLastErrors());
                 continue;
             }
             $intensities[] = [
-                'datetime' => $datetime->format(DateTime::ATOM),
+                'datetime' => $datetime->format('Y-m-d\TH:i:s'),
                 'intensity' => $record['carbonIntensity'],
             ];
         }
 
+        // Filter out already existing entries
+        $carbon_intensity = new CarbonIntensity();
+        $last_known_date = $carbon_intensity->getLastKnownDate($zone, $this->getSourceName());
+        $intensities = array_filter($intensities, function ($intensity) use ($last_known_date) {
+            $intensity_date = DateTime::createFromFormat('Y-m-d\TH:i:s', $intensity['datetime']);
+            return $intensity_date > $last_known_date;
+        });
+
         return [
             'source' => $this->getSourceName(),
-            $response['zone'] => $intensities,
+            $zone => $intensities,
         ];
     }
 
@@ -240,6 +257,26 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
             'source' => $this->getSourceName(),
             $response['zone'] => $intensities,
         ];
+    }
+
+    public function incrementalDownload(string $zone, DateTimeImmutable $start_date, CarbonIntensity $intensity, int $limit = 0): int
+    {
+        $end_date = new DateTimeImmutable('now');
+
+        $count = 0;
+        $saved = 0;
+        try {
+            $data = $this->fetchDay(new DateTimeImmutable(), $zone);
+        } catch (AbortException $e) {
+            throw $e;
+        }
+        $saved = $intensity->save($zone, $this->getSourceName(), $data[$zone]);
+        $count += abs($saved);
+        if ($limit > 0 && $count >= $limit) {
+            return $saved > 0 ? $count : -$count;
+        }
+
+        return $saved > 0 ? $count : -$count;
     }
 
     public function fullDownload(string $zone, DateTimeImmutable $start_date, DateTimeImmutable $stop_date, CarbonIntensity $intensity, int $limit = 0): int

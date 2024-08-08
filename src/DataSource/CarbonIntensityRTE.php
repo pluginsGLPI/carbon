@@ -98,6 +98,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
             }
         }
 
+        $this->setZoneSetupComplete();
         return 1;
     }
 
@@ -264,7 +265,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
                 if ($diff !== $step * 60) {
                     if ($diff == 4500 && $this->switchTowinterTime($date)) {
                         // 4500 = 1h + 15m
-                        $filled_date = DateTime::createFromFormat(DateTimeInterface::ATOM, end($intensities)['datetime']);
+                        $filled_date = DateTime::createFromFormat('Y-m-d\TH:i:s', end($intensities)['datetime']);
                         $filled_date->add(new DateInterval('PT1H'));
                         $intensities[] = [
                             'datetime'  => $filled_date->format('Y-m-d\TH:00:00'),
