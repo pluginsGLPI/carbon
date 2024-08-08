@@ -103,17 +103,6 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
         GlpiConfig::setConfigurationValues('plugin:carbon', [$config => 1]);
     }
 
-    // public function isDownloadComplete(): bool
-    // {
-    //     foreach ($this->getZones() as $zone) {
-    //         if ($this->isZoneDownloadComplete($zone) === false) {
-    //             return false;
-    //         }
-    //     }
-
-    //     return true;
-    // }
-
     public function isZoneDownloadComplete(string $zone_name): bool
     {
         $config = $this->getConfigFetchCompleteName($zone_name);
@@ -180,11 +169,12 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
         $end_date = new DateTimeImmutable('now');
 
         $count = 0;
+        $saved = 0;
         foreach ($this->sliceDateRangeByDay($start_date, $end_date) as $slice) {
             try {
                 $data = $this->fetchDay($slice, $zone);
             } catch (AbortException $e) {
-                break;
+                throw $e;
             }
             $saved = $intensity->save($zone, $this->getSourceName(), $data[$zone]);
             $count += abs($saved);

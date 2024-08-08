@@ -49,13 +49,13 @@ class CarbonIntensityElectricityMapTest extends DbTestCase
         $source = new CarbonIntensityElectricityMap($client);
 
         $date = new DateTimeImmutable('5 days ago');
-        $intensities = $source->fetchDay($date, '');
+        $intensities = $source->fetchDay($date, 'France');
 
         $this->assertIsArray($intensities);
         $this->assertArrayHasKey('source', $intensities);
         $this->assertEquals('ElectricityMap', $intensities['source']);
-        $this->assertArrayHasKey('FR', $intensities);
-        $this->assertIsArray($intensities['FR']);
-        $this->assertEquals(24, count($intensities['FR']));
+        $this->assertArrayHasKey('France', $intensities);
+        $this->assertIsArray($intensities['France']);
+        $this->assertEquals(24, count($intensities['France']));
     }
 }
