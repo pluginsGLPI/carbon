@@ -45,15 +45,12 @@
 {% block scripts %}
     <script>
         $(document).ready(function() {
-
             fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/totalCarbonEmission.php").then(response => {
-
                 return response.json();
             }).then(data => {
                 let totalCarbonEmission = data;
                 document.getElementById('carbonEmission').innerHTML = totalCarbonEmission;
             });
-
         });
     </script>
 {% endblock %}

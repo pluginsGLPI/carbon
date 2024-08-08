@@ -228,11 +228,12 @@ class Dashboard
 
     public static function getTotalCarbonEmission()
     {
-        if ($total = Provider::getSum(CarbonEmission::getTable(), 'emission_per_day')) {
+        $total = Provider::getSum(CarbonEmission::getTable(), 'emission_per_day');
+        if ($total !== false) {
             return CarbonEmission::getWeight($total);
         }
 
-        return "0.00 g";
+        return "N/A";
     }
 
     /**

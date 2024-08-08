@@ -64,7 +64,7 @@ class Provider
         ]);
 
         if ($result->numrows() == 1) {
-            return $result->current()['total'];
+            return $result->current()['total'] ?? 0;
         }
 
         return false;
@@ -520,7 +520,7 @@ class Provider
             'labels' => [],
             'series' => [
                 [
-                    'name' => __("gCO2eq / KWh", "carbon"),
+                    'name' => __("gCO₂eq", "carbon"),
                     'data' => []
                 ],
             ]
