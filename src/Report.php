@@ -79,6 +79,6 @@ class Report extends CommonDBTM
 
     public static function showInstantReport(): void
     {
-        TemplateRenderer::getInstance()->display('@carbon/interface.html.twig');
+        TemplateRenderer::getInstance()->display('@carbon/quick-report.html.twig');
     }
 }
