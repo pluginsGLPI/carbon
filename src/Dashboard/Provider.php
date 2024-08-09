@@ -52,17 +52,23 @@ use QueryExpression;
 
 class Provider
 {
-    public static function getSum(string $table, string $field)
+    public static function getSum(string $table, string $field, array $params = [])
     {
         global $DB;
 
-        $result = $DB->request([
+        $request = [
             'SELECT'    => [
                 'SUM' => "$field AS total"
             ],
             'FROM'      => $table,
-        ]);
+        ];
 
+        $request = array_merge_recursive(
+            $request,
+            self::getFiltersCriteria($table, $params['args']['apply_filters'])
+        );
+
+        $result = $DB->request($request);
         if ($result->numrows() == 1) {
             return $result->current()['total'] ?? 0;
         }

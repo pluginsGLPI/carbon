@@ -226,9 +226,9 @@ class Dashboard
         return "$power $unit";
     }
 
-    public static function getTotalCarbonEmission()
+    public static function getTotalCarbonEmission(array $params = [])
     {
-        $total = Provider::getSum(CarbonEmission::getTable(), 'emission_per_day');
+        $total = Provider::getSum(CarbonEmission::getTable(), 'emission_per_day', $params);
         if ($total !== false) {
             return CarbonEmission::getWeight($total);
         }

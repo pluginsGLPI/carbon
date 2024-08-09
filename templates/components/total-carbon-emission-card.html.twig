@@ -48,8 +48,11 @@
             fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/totalCarbonEmission.php").then(response => {
                 return response.json();
             }).then(data => {
-                let totalCarbonEmission = data;
+                let totalCarbonEmission = data.value;
                 document.getElementById('carbonEmission').innerHTML = totalCarbonEmission;
+                let start_date = data.date_interval[0];
+                let end_date   = data.date_interval[1];
+                document.querySelector('#carbonEmissionIconElement + div > div + div').textContent = start_date + ' - ' + end_date;
             });
         });
     </script>

@@ -36,7 +36,7 @@
     </div>
     <div class="col">
       <div class="subheader text-white">{{ __('Monthly carbon emission', 'carbon') }}</div>
-      <div class="subheader text-white">{{ __('April, 2024', 'carbon') }}</div>
+      <div class="subheader text-white" id="monthlyMonth">{{ __('April, 2024', 'carbon') }}</div>
       <div class="my-3 text-white nb-monthly-carbon-emission" id="monthlyEmission"></div>
       <p class="m-0 percent-color" id="monthlyComparison"></p>
       <div class="subheader text-white">{{ __('Compared to last month', 'carbon') }}</div>
@@ -47,7 +47,6 @@
 {% block scripts %}
 <script>
   $(document).ready(function () {
-
     fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/carbonEmissionPerMonth.php").then(response => {
         return response.json();
     }).then(data => {
@@ -57,7 +56,6 @@
           let currentMonthEmission = data.series[0].data[data.series[0].data.length - 1];
         }
         document.getElementById('monthlyEmission').textContent = currentMonthEmission + " gCO₂eq";
-
         // Calculate and display the percentage comparison with the previous month
         let comparisonText = '';
         if (data.series[0].data.length > 1) {
@@ -68,6 +66,7 @@
           document.querySelector('#monthlyComparison + div').textContent = '';
         }
         document.getElementById('monthlyComparison').textContent = comparisonText;
+        document.getElementById('monthlyMonth').textContent = data.date_interval[0];
     });
   });
 </script>
