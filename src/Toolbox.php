@@ -79,4 +79,20 @@ class Toolbox
         $start_date->setTime(0, 0, 0);
         return DateTimeImmutable::createFromMutable($start_date);
     }
+
+    public function getHistoryClasses(): array
+    {
+        $history_types = [];
+
+        foreach (PLUGIN_CARBON_TYPES as $itemtype) {
+            $history_type = [
+                __NAMESPACE__,
+                'History',
+                $itemtype
+            ];
+            $history_types[] = implode('\\', $history_type);
+        }
+
+        return $history_types;
+    }
 }

@@ -34,23 +34,17 @@
 namespace GlpiPlugin\Carbon;
 
 use CronTask as GlpiCronTask;
-use GlpiPlugin\Carbon\History\Computer as ComputerHistory;
-use GlpiPlugin\Carbon\History\Monitor as MonitorHistory;
-use GlpiPlugin\Carbon\History\NetworkEquipment as NetworkEquipmentHistory;
 use GlpiPlugin\Carbon\DataSource\RestApiClient;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensityRTE;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensityElectricityMap;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensityInterface;
+use GlpiPlugin\Carbon\Toolbox;
 
 class CronTask
 {
     public static function cronHistorize(GlpiCronTask $task): int
     {
-        $histories = [
-            ComputerHistory::class,
-            MonitorHistory::class,
-            NetworkEquipmentHistory::class,
-        ];
+        $histories = (new Toolbox())->getHistoryClasses();
         $task->setVolume(0); // start with zero
         $remaining = $task->fields['param'];
         $limit_per_type = floor(((int) $remaining) / count($histories));
