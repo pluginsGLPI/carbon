@@ -53,6 +53,7 @@ class Report extends CommonDBTM
     {
         return 'fa-solid fa-solar-panel';
     }
+
     public static function getMenuContent()
     {
         $menu = [];
@@ -102,7 +103,7 @@ class Report extends CommonDBTM
             $end_date   = DateTime::createFromFormat('Y-m-d\TH:i:s.v\Z', $params['args']['apply_filters'][1]);
         }
 
-        $value = Dashboard::getTotalCarbonEmission($params);
+        $value = Provider::getTotalCarbonEmission($params);
 
         // Prepare date format
         switch ($_SESSION['glpidate_format'] ?? 0) {
@@ -125,14 +126,14 @@ class Report extends CommonDBTM
         return json_encode($response);
     }
 
-    public static function getCarbonEmissionPerMonth($params): string
+    public static function getCarbonEmissionPerMonth(array $params = []): string
     {
         if (!isset($params['args']['apply_filters']['dates'][0]) || !isset($params['args']['apply_filters']['dates'][1])) {
             $end_date = new DateTime();
             $end_date->setTime(0, 0, 0, 0);
             $end_date->setDate($end_date->format('Y'), $end_date->format('m'), 0); // Last day of previous month
             $start_date = clone $end_date;
-            $start_date->modify('-1 months + 1 day');
+            $start_date->modify('-1 year');
 
             $params['args']['apply_filters']['dates'][0] = $start_date->format('Y-m-d\TH:i:s.v\Z');
             $params['args']['apply_filters']['dates'][1] = $end_date->format('Y-m-d\TH:i:s.v\Z');
@@ -159,5 +160,42 @@ class Report extends CommonDBTM
         ];
 
         return json_encode($data);
+    }
+
+    public static function getCarbonEmissionLastMonth(array $params): string
+    {
+        // Force dates filter to 2 last complete months
+        $end_date = new DateTime();
+        $end_date->setTime(0, 0, 0, 0);
+        $end_date->setDate($end_date->format('Y'), $end_date->format('m'), 0); // Last day of previous month
+        $start_date = clone $end_date;
+        $start_date->setDate($end_date->format('Y'), $end_date->format('m'), 0);
+        $start_date->setDate($start_date->format('Y'), $start_date->format('m'), 1);
+
+        $params['args']['apply_filters']['dates'][0] = $start_date->format('Y-m-d\TH:i:s.v\Z');
+        $params['args']['apply_filters']['dates'][1] = $end_date->format('Y-m-d\TH:i:s.v\Z');
+        $data = Provider::getCarbonEmissionPerMonth($params);
+
+        // Prepare date format
+        switch ($_SESSION['glpidate_format'] ?? 0) {
+            case 0:
+                $date_format = 'Y F';
+                break;
+            case 1:
+            case 2:
+                $date_format = 'F Y';
+                break;
+        }
+        $data['date_interval'] = [
+            $start_date->format($date_format),
+            $end_date->format($date_format),
+        ];
+
+        return json_encode($data);
+    }
+
+    public static function getHandledComputersCount(array $params = []): string
+    {
+        return Provider::getHandledComputersCount($params);
     }
 }

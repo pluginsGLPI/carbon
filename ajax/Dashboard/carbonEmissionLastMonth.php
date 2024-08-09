@@ -26,51 +26,30 @@
  * SOFTWARE.
  * -------------------------------------------------------------------------
  * @copyright Copyright (C) 2024 Teclib' and contributors.
- * @copyright Copyright (C) 2024 by the carbon plugin team.
  * @license   MIT https://opensource.org/licenses/mit-license.php
  * @link      https://github.com/pluginsGLPI/carbon
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\History;
+use Report as GlpiReport;
+use GlpiPlugin\Carbon\Report;
 
-use CommonDBTM;
-use DbUtils;
-use NetworkEquipment as GlpiNetworkEquipment;
-use NetworkEquipmentType;
-use NetworkEquipmentModel;
-use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
-use GlpiPlugin\Carbon\Engine\V1\Monitor as EngineMonitor;
+include('../../../../inc/includes.php');
 
-class NetworkEquipment extends AbstractAsset
-{
-    protected static string $itemtype = GlpiNetworkEquipment::class;
-    protected static string $type_itemtype  = NetworkEquipmentType::class;
-    protected static string $model_itemtype = NetworkEquipmentModel::class;
-
-    public static function getEngine(CommonDBTM $item): EngineInterface
-    {
-        return new EngineMonitor($item->getID());
-    }
-
-    public function getHistorizableQuery(): array
-    {
-        $table = self::$itemtype::getTable();
-        $request = [
-            'SELECT' => self::$itemtype::getTableField('*'),
-            'FROM'   => self::$itemtype::getTable(),
-        ];
-
-        $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($table, '', '', 'auto');
-        $request['WHERE'] += $entity_restrict;
-
-        return $request;
-    }
-
-    public function canHistorize(int $id): bool
-    {
-        // There is no specific conditions to historize carbon emissions
-        // of a network equipment (it is usually powered on 24/7)
-        return true;
-    }
+// Check if plugin is activated...
+if (!Plugin::isPluginActive('carbon')) {
+    http_response_code(404);
+    die();
 }
+
+if (!GlpiReport::canView()) {
+    // Will die
+    http_response_code(403);
+    die();
+}
+
+header("Content-Type: text/html; charset=UTF-8");
+
+$res = Report::getCarbonEmissionLastMonth($_GET);
+
+echo $res;

@@ -31,7 +31,6 @@
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Carbon\Dashboard\Provider;
 use Report as GlpiReport;
 use GlpiPlugin\Carbon\Report;
 

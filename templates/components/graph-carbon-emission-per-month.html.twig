@@ -38,7 +38,6 @@
 
 {% block scripts %}
 <script>
-
     $(document).ready(function () {
 
       var currentUrl = window.location.href;
@@ -75,10 +74,8 @@
       carbonEmissionPerMonthChart.render();
 
       fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/carbonEmissionPerMonth.php").then(response => {
-
           return response.json();
       }).then(data => {
-
           carbonEmissionPerMonthChart.updateOptions({
           xaxis: {
           categories: data.labels,

@@ -36,8 +36,8 @@
     </div>
     <div class="col">
       <div class="subheader text-white">{{ __('Monthly carbon emission', 'carbon') }}</div>
-      <div class="subheader text-white" id="monthlyMonth">{{ __('April, 2024', 'carbon') }}</div>
-      <div class="my-3 text-white nb-monthly-carbon-emission" id="monthlyEmission"></div>
+      <div class="subheader text-white" id="monthlyMonth">&nbsp;</div>
+      <div class="my-3 text-white nb-monthly-carbon-emission" id="monthlyEmission"><i class="fas fa-spinner fa-spin"></i></div>
       <p class="m-0 percent-color" id="monthlyComparison"></p>
       <div class="subheader text-white">{{ __('Compared to last month', 'carbon') }}</div>
     </div>
@@ -47,13 +47,13 @@
 {% block scripts %}
 <script>
   $(document).ready(function () {
-    fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/carbonEmissionPerMonth.php").then(response => {
+    fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/carbonEmissionLastMonth.php").then(response => {
         return response.json();
     }).then(data => {
         // update total carbon emission for month
         let currentMonthEmission = '0';
         if (data.series[0].data.length > 0) {
-          let currentMonthEmission = data.series[0].data[data.series[0].data.length - 1];
+          currentMonthEmission = data.series[0].data[data.series[0].data.length - 1];
         }
         document.getElementById('monthlyEmission').textContent = currentMonthEmission + " gCO₂eq";
         // Calculate and display the percentage comparison with the previous month
@@ -61,7 +61,7 @@
         if (data.series[0].data.length > 1) {
           let previousMonthEmission = data.series[0].data[data.series[0].data.length - 2];
           let percentageChange = ((currentMonthEmission - previousMonthEmission) / previousMonthEmission) * 100;
-          let comparisonText = (percentageChange >= 0 ? "↑ " : "↓ ") + Math.abs(percentageChange).toFixed(2) + " %";
+          comparisonText = (percentageChange >= 0 ? "↑ " : "↓ ") + Math.abs(percentageChange).toFixed(2) + " %";
         } else {
           document.querySelector('#monthlyComparison + div').textContent = '';
         }

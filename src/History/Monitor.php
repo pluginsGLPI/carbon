@@ -35,20 +35,51 @@
 namespace GlpiPlugin\Carbon\History;
 
 use CommonDBTM;
+use Computer as GlpiComputer;
+use Computer_Item;
+use DbUtils;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Engine\V1\Monitor as EngineMonitor;
-use Computer as GlpiComputer;
+use Monitor as GlpiMonitor;
 use MonitorType;
 use MonitorModel;
 
 class Monitor extends AbstractAsset
 {
-    protected static string $itemtype = GlpiComputer::class;
+    protected static string $itemtype = GlpiMonitor::class;
     protected static string $type_itemtype  = MonitorType::class;
     protected static string $model_itemtype = MonitorModel::class;
 
     public static function getEngine(CommonDBTM $item): EngineInterface
     {
         return new EngineMonitor($item->getID());
+    }
+
+    public function getHistorizableQuery(): array
+    {
+        $monitors_table = self::$itemtype::getTable();
+        $computers_table = GlpiComputer::getTable();
+        $computers_items_table = Computer_Item::getTable();
+        $glpi_monitors_table = GlpiMonitor::getTable();
+        $request = (new Computer())->getHistorizableQuery();
+        $request['FROM'] = $monitors_table;
+        $request['INNER JOIN'][$computers_table] = [
+            'FKEY' => [
+                $computers_table => 'id',
+                $computers_items_table => GlpiComputer::getForeignKeyField(),
+            ]
+        ];
+        $request['INNER JOIN'][$glpi_monitors_table] = [
+            'FKEY' => [
+                $glpi_monitors_table => 'id',
+                $computers_items_table => 'items_id',
+                ['AND' => [Computer_Item::getTableField('itemtype') => GlpiMonitor::class]],
+            ],
+        ];
+
+        $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($monitors_table, '', '', 'auto');
+        $request['WHERE'] += $entity_restrict;
+
+        return $request;
     }
 }

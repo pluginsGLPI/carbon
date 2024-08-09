@@ -41,18 +41,28 @@ use DateInterval;
 use DbUtils;
 use Glpi\Dashboard\Filter;
 use GlpiPlugin\Carbon\ComputerType;
+use GlpiPlugin\Carbon\Toolbox;
 use GlpiPlugin\Carbon\EnvironnementalImpact;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\History\Computer as HistoryComputer;
 use Location;
 use QueryExpression;
 
 class Provider
 {
-    public static function getSum(string $table, string $field, array $params = [])
+    /**
+     * Get the sum of values of a field in a table, limited to conditions
+     *
+     * @param string $table table to read
+     * @param string $field table field to use for the sum
+     * @param array $params additional parameters (filters)
+     * @return ?float
+     */
+    public static function getSum(string $table, string $field, array $params = []): ?float
     {
         global $DB;
 
@@ -65,7 +75,7 @@ class Provider
 
         $request = array_merge_recursive(
             $request,
-            self::getFiltersCriteria($table, $params['args']['apply_filters'])
+            self::getFiltersCriteria($table, $params['args']['apply_filters'] ?? [])
         );
 
         $result = $DB->request($request);
@@ -73,7 +83,7 @@ class Provider
             return $result->current()['total'] ?? 0;
         }
 
-        return false;
+        return null;
     }
 
     /**
@@ -251,13 +261,31 @@ class Provider
      * Counts the computers which are missing data to compute their
      * environnemental impact
      *
-     * @param array $where
+     * @param array $params
      * @return integer|null : count of computers or null if an error occurred
      */
-    public static function getUnhandledComputersCount(array $where = []): ?int
+    public static function getUnhandledComputersCount(array $params = []): ?int
     {
-        $total = (new DbUtils())->countElementsInTableForMyEntities(Computer::getTable(), $where);
-        $complete_computers_count = self::getHandledComputersCount($where);
+        global $DB;
+
+        $table = Computer::getTable();
+        $DbUtils = new DbUtils();
+        $itemtype = $DbUtils->getItemTypeForTable($table);
+        $item     = new $itemtype();
+        $criteria = $DbUtils->getEntitiesRestrictCriteria($table, '', '', $item->maybeRecursive());
+        $request = [
+            'COUNT' => 'cpt',
+            'FROM'   => $table,
+            'WHERE'  => $criteria
+        ];
+
+        $request = array_merge_recursive(
+            $request,
+            self::getFiltersCriteria($table, $params['args']['apply_filters'] ?? [])
+        );
+        $row = $DB->request($request)->current();
+        $total = ($row ? (int)$row['cpt'] : 0);
+        $complete_computers_count = self::getHandledComputersCount($params);
 
         if ($complete_computers_count === null || $complete_computers_count > $total) {
             return null;
@@ -267,107 +295,23 @@ class Provider
     }
 
     /**
-     * Count the computers having all required data to computer carbon intensity
+     * Count the computers having all required data to compute carbon intensity
      *
-     * @param array $where
-     * @return array
-     */
-    public static function getHandledComputersQuery(array $where = []): array
-    {
-        $computers_table = Computer::getTable();
-        $computermodels_table = ComputerModel::getTable();
-        $glpiComputertypes_table = GlpiComputerType::getTable();
-        $computertypes_table = ComputerType::getTable();
-        $location_table = Location::getTable();
-        $environnementalimpact_table = EnvironnementalImpact::getTable();
-        $computerUsageProfile_table = ComputerUsageProfile::getTable();
-
-        $request = [
-            'SELECT' => [
-                Computer::getTableField('*'),
-            ],
-            'FROM' => $computers_table,
-            'INNER JOIN' => [
-                $computermodels_table => [
-                    'FKEY'   => [
-                        $computers_table  => 'computermodels_id',
-                        $computermodels_table => 'id',
-                    ]
-                ],
-                $glpiComputertypes_table => [
-                    'FKEY'   => [
-                        $computers_table  => 'computertypes_id',
-                        $glpiComputertypes_table => 'id',
-                    ]
-                ],
-                $computertypes_table => [
-                    'FKEY'   => [
-                        $computertypes_table  => 'computertypes_id',
-                        $glpiComputertypes_table => 'id',
-                        ['AND' => [
-                            'NOT' => [GlpiComputerType::getTableField('id') => null]
-                        ],
-                        ]
-                    ]
-                ],
-                $location_table => [
-                    'FKEY'   => [
-                        $computers_table  => 'locations_id',
-                        $location_table => 'id',
-                    ]
-                ],
-                $environnementalimpact_table => [
-                    'FKEY'   => [
-                        $computers_table  => 'id',
-                        $environnementalimpact_table => 'computers_id',
-                    ]
-                ],
-                $computerUsageProfile_table => [
-                    'FKEY'   => [
-                        $environnementalimpact_table  => 'plugin_carbon_computerusageprofiles_id',
-                        $computerUsageProfile_table => 'id',
-                    ]
-                ]
-            ],
-            'WHERE' => [
-                'AND' => [
-                    'is_deleted' => 0,
-                    ['NOT' => [Location::getTableField('latitude') => '']],
-                    ['NOT' => [Location::getTableField('longitude') => '']],
-                    ['NOT' => [Location::getTableField('latitude') => null]],
-                    ['NOT' => [Location::getTableField('longitude') => null]],
-                    ComputerUsageProfile::getTableField('average_load') => ['>', 0],
-                    [
-                        'OR' => [
-                            ComputerType::getTableField('power_consumption') => ['>', 0],
-                            ComputerModel::getTableField('power_consumption') => ['>', 0],
-                        ],
-                    ],
-                ],
-            ]
-        ];
-
-        $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($computers_table, '', '', 'auto');
-        $request['WHERE'] += $where + $entity_restrict;
-
-        return $request;
-    }
-
-    /**
-     * Count the computers having all required data to computer carbon intensity
-     *
-     * @param array $where
+     * @param array $params
      * @return integer|null
      */
-    public static function getHandledComputersCount(array $where = []): ?int
+    public static function getHandledComputersCount(array $params = []): ?int
     {
         global $DB;
 
-        $request = self::getHandledComputersQuery($where);
+        $request = (new HistoryComputer())->getHistorizableQuery();
         $request['SELECT'] = [
             'COUNT' => Computer::getTableField('id') . ' AS nb_computers',
         ];
-
+        $request = array_merge_recursive(
+            $request,
+            self::getFiltersCriteria(Computer::getTable(), $params['args']['apply_filters'] ?? [])
+        );
         $result = $DB->request($request);
 
         if ($result->numrows() == 1) {
@@ -386,7 +330,7 @@ class Provider
     {
         global $DB;
 
-        $request = Provider::getHandledComputersQuery();
+        $request = (new HistoryComputer())->getHistorizableQuery();
         $request['SELECT'] = [
             'SUM' => ComputerType::getTableField('power_consumption') . ' AS total',
         ];
@@ -405,38 +349,14 @@ class Provider
      *
      * @return float|null
      */
-    public static function getTotalCarbonEmission(): ?float
+    public static function getTotalCarbonEmission(array $params = []): string
     {
-        global $DB;
-
-        $end_date = new DateTime('now');
-        $end_date->setDate($end_date->format('Y'), $end_date->format('m'), 1);
-
-        $start_date = clone $end_date;
-        $start_date = $start_date->sub(new DateInterval('P2D'));
-        $end_date->setDate($end_date->format('Y'), $end_date->format('m'), 1);
-
-        $end_date = $end_date->format('Y-m-d');
-        $start_date = $start_date->format('Y-m-d');
-        $emission_table = CarbonEmission::getTable();
-        $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($emission_table, '', '', 'auto');
-        $request = [
-            'SELECT' => [
-                'SUM' => 'emission_per_day AS total',
-            ],
-            'FROM'  => CarbonEmission::getTable(),
-            'WHERE' => [
-                ['date' => ['>=', $start_date]],
-                ['date' => ['<', $end_date]],
-            ] + $entity_restrict
-        ];
-        $result = $DB->request($request);
-
-        if ($result->numrows() == 1) {
-            return number_format($result->current()['total'] ?? 0, PLUGIN_CARBON_DECIMALS);
+        $value = self::getSum(CarbonEmission::getTable(), 'emission_per_day', $params);
+        if ($value === null) {
+            return 'N/A';
         }
 
-        return null;
+        return Toolbox::getWeight($value) . __('CO₂eq', 'carbon');
     }
 
     public static function getCarbonIntensity(array $params): array
@@ -494,33 +414,32 @@ class Provider
 
     /**
      * Get carbon emission per month for all assets in the current entity
+     * @param array $params
      *
      * @return array
      */
-    public static function getCarbonEmissionPerMonth(): array
+    public static function getCarbonEmissionPerMonth(array $params = []): array
     {
         global $DB;
 
         $emissions_table = CarbonEmission::getTable();
 
-        $start_date = new DateTime('now');
-        $start_date->modify('-1 year');
-
         $dbUtils = new DbUtils();
         $entityRestrict = $dbUtils->getEntitiesRestrictCriteria($emissions_table, '', '', 'auto');
-        $year_month = new QueryExpression("DATE_FORMAT(`date`, '%Y-%m')");
+        $sql_year_month = "DATE_FORMAT(`date`, '%Y-%m')";
         $request = [
             'SELECT'    => [
                 'SUM' => CarbonEmission::getTableField('emission_per_day') . ' AS total_emission_per_month',
-                new QueryExpression("DATE_FORMAT(`date`, '%Y-%m') as `date`")
+                new QueryExpression("$sql_year_month as `date`")
             ],
             'FROM'    => $emissions_table,
-            'GROUPBY' => $year_month,
-            'ORDER'   => $year_month,
-            'WHERE'   => [
-                'date' => ['>=', $start_date->format('Y-m-d')],
-            ] + $entityRestrict,
+            'GROUPBY' => new QueryExpression($sql_year_month),
+            'ORDER'   => new QueryExpression($sql_year_month),
+            'WHERE'   => $entityRestrict,
         ];
+        $filter = self::getFiltersCriteria($emissions_table, $params['args']['apply_filters'] ?? []);
+        $request = array_merge_recursive($request, $filter);
+        $result = $DB->request($request);
 
         $data = [
             'labels' => [],
@@ -532,7 +451,6 @@ class Provider
             ]
         ];
 
-        $result = $DB->request($request);
         foreach ($result as $row) {
             $date = new DateTime($row['date']);
             $data['labels'][] = $date->format('Y-m');

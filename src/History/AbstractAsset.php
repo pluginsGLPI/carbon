@@ -62,6 +62,26 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
 
     protected bool $limit_reached = false;
 
+    abstract public function getHistorizableQuery(): array;
+
+    /**
+     * Is it possible to historize carbon emissions for the item
+     * @param int $id : ID of the item to examinate
+     *
+     * @return boolean
+     */
+    public function canHistorize(int $id): bool
+    {
+        global $DB;
+
+        $request = $this->getHistorizableQuery();
+        $request['WHERE'][static::$itemtype::getTableField('id')] = $id;
+
+        $iterator = $DB->request($request);
+
+        return $iterator->count() > 0;
+    }
+
     public function setLimit(int $limit)
     {
         $this->limit = $limit;
@@ -111,6 +131,10 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         $itemtype = static::$itemtype;
         $item = $itemtype::getById($id);
         if ($item === false) {
+            return 0;
+        }
+
+        if (!$this->canHistorize($id)) {
             return 0;
         }
 

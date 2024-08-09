@@ -39,7 +39,8 @@ use GlpiPlugin\Carbon\Tests\History\CommonAsset;
 use Location;
 use DateTime;
 use ComputerModel;
-use ComputerType;
+use ComputerType as GlpiComputerType;
+use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\EnvironnementalImpact;
 
@@ -64,9 +65,12 @@ class ComputerTest extends CommonAsset
             'country' => PLUGIN_CARBON_TEST_FAKE_ZONE_NAME,
         ]);
         $model = $this->getItem(ComputerModel::class, ['power_consumption' => $model_power]);
-        $type = $this->getItem(ComputerType::class, []);
+        $glpi_type = $this->getItem(GlpiComputerType::class);
+        $type = $this->getItem(ComputerType::class, [
+            GlpiComputerType::getForeignKeyField() => $glpi_type->getID(),
+        ]);
         $computer = $this->getItem(GlpiComputer::class, [
-            'computertypes_id'  => $type->getID(),
+            'computertypes_id'  => $glpi_type->getID(),
             'computermodels_id' => $model->getID(),
             'locations_id'      => $location->getID(),
             'date_creation'     => null,
