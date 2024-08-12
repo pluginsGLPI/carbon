@@ -43,6 +43,7 @@ use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use Location;
+use Infocom;
 
 abstract class AbstractAsset extends CommonDBTM implements AssetInterface
 {
@@ -115,16 +116,19 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
 
         // TODO: determine zone and source
 
-        $last_entry = $this->getStartDate($id);
+        $last_entry = $this->getEmissionStartDate($id);
         if ($last_entry === null) {
             return 0;
         }
+
+        // Find first date of existence of the asset in nventory
+        $inventory_date = $this->getInventoryIncomingDate($id);
 
         // Determine first date to compute
         if ($start_date === null) {
             $start_date = $last_entry;
         } else {
-            $start_date = max($last_entry, $start_date);
+            $start_date = max($last_entry, $start_date, $inventory_date);
         }
 
         // Determine the last date to compute
@@ -189,7 +193,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      * @param integer $id
      * @return DateTime|null
      */
-    protected function getStartDate(int $id): ?DateTime
+    protected function getEmissionStartDate(int $id): ?DateTime
     {
         // Find the oldest carbon emissions date calculated for the item
         $itemtype = static::$itemtype;
@@ -225,6 +229,43 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
 
         // No carbon intensity in DB, cannot find a date
         return null;
+    }
+
+    /**
+     * Find the most accurate date to determine the first use of an asset
+     *
+     * @param integer $id id of the asset to examinate
+     * @return DateTime|null
+     */
+    protected function getInventoryIncomingDate(int $id): ?DateTime
+    {
+        $start_date = null;
+        $infocom = new Infocom();
+
+        $itemtype = static::$itemtype;
+        $infocom->getFromDBByCrit([
+            'itemtype' => $itemtype,
+            'items_id' => $id,
+        ]);
+        if (!$infocom->isNewItem()) {
+            $start_date = $infocom->fields['use_date']
+            ?? $infocom->fields['delivery_date']
+            ?? $infocom->fields['buy_date']
+            ?? null;
+        }
+
+        if ($start_date === null) {
+            $asset = new $itemtype();
+            if (!$asset->getFromDb($id)) {
+                return null;
+            }
+            $start_date = $asset->fields['date_creation'] ?? $asset->fields['date_mod'] ?? null;
+            if ($start_date === null) {
+                return null;
+            }
+        }
+
+        return new DateTime($start_date);
     }
 
     /**

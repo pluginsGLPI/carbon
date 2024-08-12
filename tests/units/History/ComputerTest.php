@@ -35,18 +35,18 @@ namespace GlpiPlugin\Carbon\History\Tests;
 
 use Computer as GlpiComputer;
 use GlpiPlugin\Carbon\History\Computer;
-use GlpiPlugin\Carbon\Tests\DbTestCase;
+use GlpiPlugin\Carbon\Tests\History\CommonAsset;
 use Location;
-use DateInterval;
 use DateTime;
 use ComputerModel;
 use ComputerType;
-use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\EnvironnementalImpact;
 
-class ComputerTest extends DbTestCase
+class ComputerTest extends CommonAsset
 {
+    protected string $history_type = \GlpiPlugin\Carbon\History\Computer::class;
+
     public function testGetEngine()
     {
         $computer = new GlpiComputer();
@@ -69,6 +69,8 @@ class ComputerTest extends DbTestCase
             'computertypes_id'  => $type->getID(),
             'computermodels_id' => $model->getID(),
             'locations_id'      => $location->getID(),
+            'date_creation'     => null,
+            'date_mod'          => null,
         ]);
         $usage_profile = $this->getItem(ComputerUsageProfile::class, [
             'average_load' => 0.3,
