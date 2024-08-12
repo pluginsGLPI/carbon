@@ -35,6 +35,9 @@ namespace GlpiPlugin\Carbon;
 
 use DateTime;
 use DateTimeImmutable;
+use GlpiPlugin\Carbon\History\Computer;
+use GlpiPlugin\Carbon\History\Monitor;
+use GlpiPlugin\Carbon\History\NetworkEquipment;
 
 class Toolbox
 {

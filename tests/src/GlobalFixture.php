@@ -102,6 +102,7 @@ class GlobalFixture
         if ($iterator->count() === 0) {
             $result = $DB->insert($zone_table, [
                 'name' => $fake_zone_name,
+                'electricitymap_code' => 'FZ',
             ]);
             $zone_id = $DB->insertId();
         } else {
