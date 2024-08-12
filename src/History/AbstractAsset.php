@@ -114,22 +114,12 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
             return 0;
         }
 
-        // TODO: determine zone and source
-
-        $last_entry = $this->getEmissionStartDate($id);
-        if ($last_entry === null) {
+        // Determine first date to compute
+        $resume_date = $this->getStartDate($id);
+        if ($resume_date === null) {
             return 0;
         }
-
-        // Find first date of existence of the asset in nventory
-        $inventory_date = $this->getInventoryIncomingDate($id);
-
-        // Determine first date to compute
-        if ($start_date === null) {
-            $start_date = $last_entry;
-        } else {
-            $start_date = max($last_entry, $start_date, $inventory_date);
-        }
+        $start_date = max($start_date, $resume_date);
 
         // Determine the last date to compute
         $last_available_date = $this->getStopDate($id);
@@ -189,6 +179,25 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
 
     /**
      * Find the date where daily computation must start
+     *
+     * @param integer $id
+     * @return DateTime|null
+     */
+    protected function getStartDate(int $id): ?DateTime
+    {
+        $last_known_emission_date = $this->getEmissionStartDate($id);
+        if ($last_known_emission_date === null) {
+            // no carbon intensity available
+            return null;
+        }
+        $inventory_date = $this->getInventoryIncomingDate($id);
+        $date = max($last_known_emission_date, $inventory_date);
+
+        return $date;
+    }
+
+    /**
+     * Find the last date of computed emissions
      *
      * @param integer $id
      * @return DateTime|null
