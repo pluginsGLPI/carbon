@@ -33,13 +33,9 @@
 
 namespace GlpiPlugin\Carbon\Dashboard;
 
-use Computer as GlpiComputer;
 use ComputerModel;
 use GlpiPlugin\Carbon\CarbonEmission;
-use GlpiPlugin\Carbon\ComputerType;
-use DateTime;
-use DbUtils;
-use QueryExpression;
+use GlpiPlugin\Carbon\Toolbox;
 
 class Dashboard
 {
@@ -95,7 +91,7 @@ class Dashboard
             'plugin_carbon_card_carbon_intensity' => [
                 'widgettype'   => ['lines', 'bars'],
                 'group'        => __("Carbon", "carbon"),
-                'label'        => __("Carbon intensity", 'carbon'),
+                'label'        => __("Carbon intensity  (gCO<sub>2</sub>eq / KWh)", 'carbon'),
                 'provider'     => Dashboard::class . "::cardCarbonintensityProvider",
             ],
             'plugin_carbon_card_carbon_emission_per_type' => [
@@ -214,7 +210,7 @@ class Dashboard
         return strval($total) . " $unit";
     }
 
-    public static function getTotalPower()
+    public static function getTotalPower(): string
     {
         $unit = 'W';
 
@@ -223,16 +219,7 @@ class Dashboard
             return 'N/A';
         }
 
-        return "$power $unit";
-    }
-
-    public static function getTotalCarbonEmission()
-    {
-        if ($total = Provider::getSum(CarbonEmission::getTable(), 'emission_per_day')) {
-            return CarbonEmission::getWeight($total);
-        }
-
-        return "0.00 g";
+        return Toolbox::getWeight($power);
     }
 
     /**

@@ -35,6 +35,7 @@
 namespace GlpiPlugin\Carbon\History;
 
 use CommonDBTM;
+use DbUtils;
 use NetworkEquipment as GlpiNetworkEquipment;
 use NetworkEquipmentType;
 use NetworkEquipmentModel;
@@ -50,5 +51,26 @@ class NetworkEquipment extends AbstractAsset
     public static function getEngine(CommonDBTM $item): EngineInterface
     {
         return new EngineMonitor($item->getID());
+    }
+
+    public function getHistorizableQuery(): array
+    {
+        $table = self::$itemtype::getTable();
+        $request = [
+            'SELECT' => self::$itemtype::getTableField('*'),
+            'FROM'   => self::$itemtype::getTable(),
+        ];
+
+        $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($table, '', '', 'auto');
+        $request['WHERE'] += $entity_restrict;
+
+        return $request;
+    }
+
+    public function canHistorize(int $id): bool
+    {
+        // There is no specific conditions to historize carbon emissions
+        // of a network equipment (it is usually powered on 24/7)
+        return true;
     }
 }

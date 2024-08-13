@@ -31,7 +31,8 @@
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Carbon\Dashboard\Dashboard;
+use GlpiPlugin\Carbon\Report;
+use Report as GlpiReport;
 
 include('../../../../inc/includes.php');
 
@@ -41,7 +42,7 @@ if (!Plugin::isPluginActive('carbon')) {
     die();
 }
 
-if (!Report::canView()) {
+if (!GlpiReport::canView()) {
     // Will die
     http_response_code(403);
     die();
@@ -49,6 +50,6 @@ if (!Report::canView()) {
 
 header("Content-Type: text/html; charset=UTF-8");
 
-$res = Dashboard::getTotalCarbonEmission();
+$res = Report::getTotalCarbonEmission($_GET);
 
-echo json_encode($res);
+echo $res;

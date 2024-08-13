@@ -36,24 +36,24 @@
         </div>
         <div class="col">
             <div class="subheader">{{ __('Total Carbon Emission', 'carbon') }}</div>
-            <div class="subheader">{{ __('May 2023 - April 2024', 'carbon') }}</div>
+            <div class="subheader">&nbsp;</div>
         </div>
-        <div class="my-3 nb-carbon-emission-size text-center" id="carbonEmission"></div>
+        <div class="my-3 nb-carbon-emission-size text-center" id="carbonEmission"><i class="fas fa-spinner fa-spin"></i></div>
     </div>
 </div>
 
 {% block scripts %}
     <script>
         $(document).ready(function() {
-
             fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/totalCarbonEmission.php").then(response => {
-
                 return response.json();
             }).then(data => {
-                let totalCarbonEmission = data;
+                let totalCarbonEmission = data.value;
                 document.getElementById('carbonEmission').innerHTML = totalCarbonEmission;
+                let start_date = data.date_interval[0];
+                let end_date   = data.date_interval[1];
+                document.querySelector('#carbonEmissionIconElement + div > div + div').textContent = start_date + ' - ' + end_date;
             });
-
         });
     </script>
 {% endblock %}

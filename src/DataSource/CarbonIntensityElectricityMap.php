@@ -159,8 +159,7 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
     {
         // $day argument is ignored : this endpoint gives the 24 last hours
         $zone_object = new CarbonIntensityZone();
-        $zone_object->getFromDbByCrit(['name' => $zone]);
-        if (!$zone_object) {
+        if (!$zone_object->getFromDbByCrit(['name' => $zone])) {
             return [];
         }
         $zone_code = $zone_object->fields['electricitymap_code'];

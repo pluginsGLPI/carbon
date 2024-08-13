@@ -84,15 +84,14 @@ class ProviderTest extends DbTestCase
         ]);
 
         $location_empty = $this->getItem(Location::class);
-        $location_empty_2 = $this->getItem(Location::class, [
-            'latitude' => 1,
-        ]);
-        $location_empty_3 = $this->getItem(Location::class, [
-            'longitude' => 1,
-        ]);
+        // $location_empty_2 = $this->getItem(Location::class, [
+        //     'latitude' => 1,
+        // ]);
+        // $location_empty_3 = $this->getItem(Location::class, [
+        //     'longitude' => 1,
+        // ]);
         $location = $this->getItem(Location::class, [
-            'latitude' => 1,
-            'longitude' => 1,
+            'country' => 'France',
         ]);
 
         $usage_profile_empty = $this->getItem(ComputerUsageProfile::class);
@@ -122,48 +121,6 @@ class ProviderTest extends DbTestCase
                     'computermodels_id' => $computer_model->getID(),
                     'computertypes_id'  => $glpi_computer_type->getID(),
                     'locations_id'      => $location_empty->getID(),
-                ],
-
-                [
-                    'computermodels_id' => $computer_model_empty->getID(),
-                    'computertypes_id'  => $glpi_computer_type_empty->getID(),
-                    'locations_id'      => $location_empty_2->getID(),
-                ],
-                [
-                    'computermodels_id' => $computer_model->getID(),
-                    'computertypes_id'  => $glpi_computer_type_empty->getID(),
-                    'locations_id'      => $location_empty_2->getID(),
-                ],
-                [
-                    'computermodels_id' => $computer_model_empty->getID(),
-                    'computertypes_id'  => $glpi_computer_type->getID(),
-                    'locations_id'      => $location_empty_2->getID(),
-                ],
-                [
-                    'computermodels_id' => $computer_model->getID(),
-                    'computertypes_id'  => $glpi_computer_type->getID(),
-                    'locations_id'      => $location_empty_2->getID(),
-                ],
-
-                [
-                    'computermodels_id' => $computer_model_empty->getID(),
-                    'computertypes_id'  => $glpi_computer_type_empty->getID(),
-                    'locations_id'      => $location_empty_3->getID(),
-                ],
-                [
-                    'computermodels_id' => $computer_model->getID(),
-                    'computertypes_id'  => $glpi_computer_type_empty->getID(),
-                    'locations_id'      => $location_empty_3->getID(),
-                ],
-                [
-                    'computermodels_id' => $computer_model_empty->getID(),
-                    'computertypes_id'  => $glpi_computer_type->getID(),
-                    'locations_id'      => $location_empty_3->getID(),
-                ],
-                [
-                    'computermodels_id' => $computer_model->getID(),
-                    'computertypes_id'  => $glpi_computer_type->getID(),
-                    'locations_id'      => $location_empty_3->getID(),
                 ],
 
                 [
@@ -222,7 +179,7 @@ class ProviderTest extends DbTestCase
         // 1 having both power_consumption from computer type and computer model
         // 1 having both power_consumption from computer type only
         // 1 having both power_consumption from computer model only
-        $handled_count = Provider::getHandledComputersCount([Computer::getTableField('entities_id') => Session::getActiveEntity()]);
+        $handled_count = Provider::getHandledComputersCount();
         $this->assertEquals(3, $handled_count);
     }
 
@@ -230,7 +187,7 @@ class ProviderTest extends DbTestCase
     {
         $total_count = $this->handledComputersCountFixture();
 
-        $unhandled_count = Provider::getUnhandledComputersCount([Computer::getTableField('entities_id') => Session::getActiveEntity()]);
+        $unhandled_count = Provider::getUnhandledComputersCount();
         $this->assertEquals($total_count - 3, $unhandled_count);
     }
 
@@ -285,11 +242,11 @@ class ProviderTest extends DbTestCase
         $output = Provider::getSumEmissionsPerModel();
         $expected = [
             [
-                'number' => '4 gCO2eq',
+                'number' => '4 gCO₂eq',
                 'url' => ComputerModel::getFormURLWithID($computer_model_1->getID()),
                 'label' => $computer_model_1->fields['name'] . " (1 Computer)",
             ], [
-                'number' => '8 gCO2eq',
+                'number' => '8 gCO₂eq',
                 'url' => ComputerModel::getFormURLWithID($computer_model_2->getID()),
                 'label' => $computer_model_2->fields['name'] . " (1 Computer)",
             ]

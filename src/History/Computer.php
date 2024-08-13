@@ -38,17 +38,102 @@ use CommonDBTM;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Engine\V1\Computer as EngineComputer;
 use Computer as GlpiComputer;
-use ComputerType;
-use ComputerModel;
+use GlpiPlugin\Carbon\ComputerType;
+use ComputerModel as GlpiComputerModel;
+use ComputerType as GlpiComputerType;
+use DbUtils;
+use GlpiPlugin\Carbon\EnvironnementalImpact;
+use GlpiPlugin\Carbon\ComputerUsageProfile;
+use Location;
 
 class Computer extends AbstractAsset
 {
     protected static string $itemtype       = GlpiComputer::class;
-    protected static string $type_itemtype  = ComputerType::class;
-    protected static string $model_itemtype = ComputerModel::class;
+    protected static string $type_itemtype  = GlpiComputerType::class;
+    protected static string $model_itemtype = GlpiComputerModel::class;
 
     public static function getEngine(CommonDBTM $item): EngineInterface
     {
         return new EngineComputer($item->getID());
+    }
+
+    public function getHistorizableQuery(): array
+    {
+        $computers_table = self::$itemtype::getTable();
+        $computermodels_table = GlpiComputerModel::getTable();
+        $glpiComputertypes_table = GlpiComputerType::getTable();
+        $computertypes_table = ComputerType::getTable();
+        $location_table = Location::getTable();
+        $environnementalimpact_table = EnvironnementalImpact::getTable();
+        $computerUsageProfile_table = ComputerUsageProfile::getTable();
+
+        $request = [
+            'SELECT' => [
+                self::$itemtype::getTableField('*'),
+            ],
+            'FROM' => $computers_table,
+            'INNER JOIN' => [
+                $computermodels_table => [
+                    'FKEY'   => [
+                        $computers_table  => 'computermodels_id',
+                        $computermodels_table => 'id',
+                    ]
+                ],
+                $glpiComputertypes_table => [
+                    'FKEY'   => [
+                        $computers_table  => 'computertypes_id',
+                        $glpiComputertypes_table => 'id',
+                    ]
+                ],
+                $computertypes_table => [
+                    'FKEY'   => [
+                        $computertypes_table  => 'computertypes_id',
+                        $glpiComputertypes_table => 'id',
+                        [
+                            'AND' => [
+                                'NOT' => [GlpiComputerType::getTableField('id') => null],
+                            ]
+                        ]
+                    ]
+                ],
+                $location_table => [
+                    'FKEY'   => [
+                        $computers_table  => 'locations_id',
+                        $location_table => 'id',
+                    ]
+                ],
+                $environnementalimpact_table => [
+                    'FKEY'   => [
+                        $computers_table  => 'id',
+                        $environnementalimpact_table => 'computers_id',
+                    ]
+                ],
+                $computerUsageProfile_table => [
+                    'FKEY'   => [
+                        $environnementalimpact_table  => 'plugin_carbon_computerusageprofiles_id',
+                        $computerUsageProfile_table => 'id',
+                    ]
+                ]
+            ],
+            'WHERE' => [
+                'AND' => [
+                    'is_deleted' => 0,
+                    ['NOT' => [Location::getTableField('country') => '']],
+                    ['NOT' => [Location::getTableField('country') => null]],
+                    ComputerUsageProfile::getTableField('average_load') => ['>', 0],
+                    [
+                        'OR' => [
+                            ComputerType::getTableField('power_consumption') => ['>', 0],
+                            GlpiComputerModel::getTableField('power_consumption') => ['>', 0],
+                        ],
+                    ],
+                ],
+            ]
+        ];
+
+        $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($computers_table, '', '', 'auto');
+        $request['WHERE'] += $entity_restrict;
+
+        return $request;
     }
 }

@@ -31,34 +31,25 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon;
+use Report as GlpiReport;
+use GlpiPlugin\Carbon\Report;
 
-use CommonDBChild;
-use DateTime;
-use CronTask;
-use GlpiPlugin\Carbon\History\Computer as ComputerHistory;
-use GlpiPlugin\Carbon\History\Monitor as MonitorHistory;
-use GlpiPlugin\Carbon\History\NetworkEquipment as NetworkEquipmentHistory;
+include('../../../../inc/includes.php');
 
-class CarbonEmission extends CommonDBChild
-{
-    public static $itemtype = 'itemtype';
-    public static $items_id = 'items_id';
-
-    public static function getTypeName($nb = 0)
-    {
-        return _n("Carbon Emission", "Carbon Emissions", $nb, 'carbon emission');
-    }
-
-    public function prepareInputForAdd($input)
-    {
-        $input = parent::prepareInputForAdd($input);
-        if ($input === false || count($input) === 0) {
-            return false;
-        }
-        $date = new DateTime($input['date']);
-        $date->setTime(0, 0, 0);
-        $input['date'] = $date->format('Y-m-d');
-        return $input;
-    }
+// Check if plugin is activated...
+if (!Plugin::isPluginActive('carbon')) {
+    http_response_code(404);
+    die();
 }
+
+if (!GlpiReport::canView()) {
+    // Will die
+    http_response_code(403);
+    die();
+}
+
+header("Content-Type: text/html; charset=UTF-8");
+
+$res = Report::getCarbonEmissionLastMonth($_GET);
+
+echo $res;
