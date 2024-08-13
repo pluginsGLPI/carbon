@@ -35,6 +35,7 @@ namespace GlpiPlugin\Carbon\DataSource\Tests;
 
 use GlpiPlugin\Carbon\DataSource\CarbonIntensityElectricityMap;
 use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
+use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use DateTimeImmutable;
 
@@ -47,6 +48,10 @@ class CarbonIntensityElectricityMapTest extends DbTestCase
         $client->method('request')->willReturn(json_decode($response, true));
 
         $source = new CarbonIntensityElectricityMap($client);
+        $zone = $this->getItem(CarbonIntensityZone::class, [
+            'name' => 'France',
+            'electricitymap_code' => 'FR',
+        ]);
 
         $date = new DateTimeImmutable('5 days ago');
         $intensities = $source->fetchDay($date, 'France');

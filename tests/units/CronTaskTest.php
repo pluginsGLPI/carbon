@@ -48,9 +48,9 @@ class CronTaskTest extends DbTestCase
         $intensity1 = $this->createStub(CarbonIntensity::class);
         $intensity1->method('downloadOneZone')->willReturn(0);
         yield 'download empty data' => [
-            'data_source' => $data_source1,
-            'intensity' => $intensity1,
-            'expected' => 0,
+            $data_source1,
+            $intensity1,
+            0,
         ];
 
         $data_source2 = $this->createStub(CarbonIntensityInterface::class);
@@ -58,9 +58,9 @@ class CronTaskTest extends DbTestCase
         $intensity2 = $this->createStub(CarbonIntensity::class);
         $intensity2->method('downloadOneZone')->willReturn(1024);
         yield 'download complete' => [
-            'data_source' => $data_source2,
-            'intensity' => $intensity2,
-            'expected' => 1,
+            $data_source2,
+            $intensity2,
+            1,
         ];
 
         $data_source3 = $this->createStub(CarbonIntensityInterface::class);
@@ -68,24 +68,22 @@ class CronTaskTest extends DbTestCase
         $intensity3 = $this->createStub(CarbonIntensity::class);
         $intensity3->method('downloadOneZone')->willReturn(-5);
         yield 'download incomplete' => [
-            'data_source' => $data_source3,
-            'intensity' => $intensity3,
-            'expected' => -1,
+            $data_source3,
+            $intensity3,
+            -1,
         ];
     }
 
-    /**
-     * @dataProvider downloadSourceProvider
-     *
-     * @return void
-     */
-    public function testDownloadCarbonIntensityFromSource($data_source, $intensity, $expected)
+    public function testDownloadCarbonIntensityFromSource()
     {
-        $cron_task = new CronTask();
-        $glpi_cron_task = new GlpiCronTask();
-        $glpi_cron_task->fields['param'] = 1000;
-        $output = $this->callPrivateMethod($cron_task, 'downloadCarbonIntensityFromSource', $glpi_cron_task, $data_source, $intensity);
+        foreach ($this->downloadSourceProvider() as $data) {
+            list ($data_source, $intensity, $expected) = $data;
+            $cron_task = new CronTask();
+            $glpi_cron_task = new GlpiCronTask();
+            $glpi_cron_task->fields['param'] = 1000;
+            $output = $this->callPrivateMethod($cron_task, 'downloadCarbonIntensityFromSource', $glpi_cron_task, $data_source, $intensity);
 
-        $this->assertEquals($expected, $output);
+            $this->assertEquals($expected, $output);
+        }
     }
 }

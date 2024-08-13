@@ -48,16 +48,16 @@ class AbstractCarbonIntensityTest extends DbTestCase
     public function sliceDateRangeByMonthProvider()
     {
         yield [
-            'start' => new DateTimeImmutable('2020-12-01'),
-            'stop'  => new DateTimeImmutable('2020-01-31'),
-            'expected' => [
+            new DateTimeImmutable('2020-12-01'),
+            new DateTimeImmutable('2020-01-31'),
+            [
             ]
         ];
 
         yield [
-            'start' => new DateTimeImmutable('2020-01-01'),
-            'stop'  => new DateTimeImmutable('2020-02-01'),
-            'expected' => [
+            new DateTimeImmutable('2020-01-01'),
+            new DateTimeImmutable('2020-02-01'),
+            [
                 [
                     'start' => new DateTimeImmutable('2020-01-01'),
                     'stop'  => new DateTimeImmutable('2020-02-01'),
@@ -66,9 +66,9 @@ class AbstractCarbonIntensityTest extends DbTestCase
         ];
 
         yield [
-            'start' => new DateTimeImmutable('2020-01-14'),
-            'stop'  => new DateTimeImmutable('2020-01-31'),
-            'expected' => [
+            new DateTimeImmutable('2020-01-14'),
+            new DateTimeImmutable('2020-01-31'),
+            [
                 [
                     'start' => new DateTimeImmutable('2020-01-14'),
                     'stop'  => new DateTimeImmutable('2020-01-31'),
@@ -77,9 +77,9 @@ class AbstractCarbonIntensityTest extends DbTestCase
         ];
 
         yield [
-            'start' => new DateTimeImmutable('2020-01-01'),
-            'stop'  => new DateTimeImmutable('2020-01-14'),
-            'expected' => [
+            new DateTimeImmutable('2020-01-01'),
+            new DateTimeImmutable('2020-01-14'),
+            [
                 [
                     'start' => new DateTimeImmutable('2020-01-01'),
                     'stop'  => new DateTimeImmutable('2020-01-14'),
@@ -89,9 +89,9 @@ class AbstractCarbonIntensityTest extends DbTestCase
 
         // Bissextile year
         yield [
-            'start' => new DateTimeImmutable('2020-01-14'),
-            'stop'  => new DateTimeImmutable('2020-03-31'),
-            'expected' => [
+            new DateTimeImmutable('2020-01-14'),
+            new DateTimeImmutable('2020-03-31'),
+            [
                 [
                     'start' => new DateTimeImmutable('2020-03-01'),
                     'stop'  => new DateTimeImmutable('2020-03-31'),
@@ -108,9 +108,9 @@ class AbstractCarbonIntensityTest extends DbTestCase
         ];
 
         yield [
-            'start' => new DateTimeImmutable('2021-01-14'),
-            'stop'  => new DateTimeImmutable('2021-03-27'),
-            'expected' => [
+            new DateTimeImmutable('2021-01-14'),
+            new DateTimeImmutable('2021-03-27'),
+            [
                 [
                     'start' => new DateTimeImmutable('2021-03-01'),
                     'stop'  => new DateTimeImmutable('2021-03-27'),
@@ -127,47 +127,47 @@ class AbstractCarbonIntensityTest extends DbTestCase
         ];
     }
 
-    /**
-     * @dataProvider sliceDateRangeByMonthProvider
-     */
-    public function testSliceDateRangeByMonth($start, $stop, $expected)
+    public function testSliceDateRangeByMonth()
     {
-        $stub = $this->getMockForAbstractClass(AbstractCarbonIntensity::class);
-        $output = $this->callPrivateMethod($stub, 'sliceDateRangeByMonth', $start, $stop);
+        foreach ($this->sliceDateRangeByMonthProvider() as $data) {
+            list ($start, $stop, $expected) = $data;
+            $stub = $this->getMockForAbstractClass(AbstractCarbonIntensity::class);
+            $output = $this->callPrivateMethod($stub, 'sliceDateRangeByMonth', $start, $stop);
 
-        if (count($expected) === 0) {
-            $this->assertNull($output->current());
-            return;
-        }
+            if (count($expected) === 0) {
+                $this->assertNull($output->current());
+                return;
+            }
 
-        foreach ($expected as $slice) {
-            $this->assertEquals($slice['start'], $output->current()['start']);
-            $this->assertEquals($slice['stop'], $output->current()['stop']);
-            $output->next();
+            foreach ($expected as $slice) {
+                $this->assertEquals($slice['start'], $output->current()['start']);
+                $this->assertEquals($slice['stop'], $output->current()['stop']);
+                $output->next();
+            }
         }
     }
 
     public function sliceDateRangeByDayProvider()
     {
         yield [
-            'start' => new DateTimeImmutable('2021-01-29'),
-            'stop'  => new DateTimeImmutable('2021-01-14'),
-            'expected' => [
+            new DateTimeImmutable('2021-01-29'),
+            new DateTimeImmutable('2021-01-14'),
+            [
             ]
         ];
 
         yield [
-            'start' => new DateTimeImmutable('2021-01-14'),
-            'stop'  => new DateTimeImmutable('2021-01-14'),
-            'expected' => [
+            new DateTimeImmutable('2021-01-14'),
+            new DateTimeImmutable('2021-01-14'),
+            [
                 new DateTimeImmutable('2021-01-14'),
             ]
         ];
 
         yield [
-            'start' => new DateTimeImmutable('2021-01-14'),
-            'stop'  => new DateTimeImmutable('2021-01-17'),
-            'expected' => [
+            new DateTimeImmutable('2021-01-14'),
+            new DateTimeImmutable('2021-01-17'),
+            [
                 new DateTimeImmutable('2021-01-14'),
                 new DateTimeImmutable('2021-01-15'),
                 new DateTimeImmutable('2021-01-16'),
@@ -176,22 +176,22 @@ class AbstractCarbonIntensityTest extends DbTestCase
         ];
     }
 
-    /**
-     * @dataProvider sliceDateRangeByDayProvider
-     */
-    public function testSliceDateRangeByDay($start, $stop, $expected)
+    public function testSliceDateRangeByDay()
     {
-        $stub = $this->getMockForAbstractClass(AbstractCarbonIntensity::class);
-        $output = $this->callPrivateMethod($stub, 'sliceDateRangeByDay', $start, $stop);
+        foreach ($this->sliceDateRangeByDayProvider() as $data) {
+            list ($start, $stop, $expected) = $data;
+            $stub = $this->getMockForAbstractClass(AbstractCarbonIntensity::class);
+            $output = $this->callPrivateMethod($stub, 'sliceDateRangeByDay', $start, $stop);
 
-        if (count($expected) === 0) {
-            $this->assertNull($output->current());
-            return;
-        }
+            if (count($expected) === 0) {
+                $this->assertNull($output->current());
+                return;
+            }
 
-        foreach ($expected as $slice) {
-            $this->assertEquals($slice, $output->current());
-            $output->next();
+            foreach ($expected as $slice) {
+                $this->assertEquals($slice, $output->current());
+                $output->next();
+            }
         }
     }
 

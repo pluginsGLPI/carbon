@@ -70,13 +70,13 @@ class NetworkEquipmentTest extends EngineTestCase
         ];
     }
 
-    /**
-     * @dataProvider getEnergyPerDayProvider
-     */
-    public function testGetEnergyPerDay(EngineInterface $engine, DateTime $date, float $expected_energy)
+    public function testGetEnergyPerDay()
     {
-        $output = $engine->getEnergyPerDay($date);
-        $this->assertEquals($expected_energy, $output);
+        foreach ($this->getEnergyPerDayProvider() as $data) {
+            list ($engine, $date, $expected_energy) = $data;
+            $output = $engine->getEnergyPerDay($date);
+            $this->assertEquals($expected_energy, $output);
+        }
     }
 
     public function getCarbonEmissionPerDateProvider(): \Generator

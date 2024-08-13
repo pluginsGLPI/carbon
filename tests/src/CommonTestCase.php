@@ -89,7 +89,7 @@ class CommonTestCase extends TestCase
 
     protected function setupGLPIFramework()
     {
-        global $DB, $LOADED_PLUGINS, $AJAX_INCLUDE, $PLUGINS_INCLUDED;
+        global $LOADED_PLUGINS, $AJAX_INCLUDE, $PLUGINS_INCLUDED;
 
         if (session_status() == PHP_SESSION_ACTIVE) {
             session_write_close();
@@ -100,8 +100,6 @@ class CommonTestCase extends TestCase
         $_SESSION = [];
         require_once GLPI_ROOT . "/inc/includes.php";
         //\Toolbox::setDebugMode(Session::DEBUG_MODE);
-
-        $DB = new DB();
 
         // Security of PHP_SELF
         $_SERVER['PHP_SELF'] = Html::cleanParametersURL($_SERVER['PHP_SELF']);

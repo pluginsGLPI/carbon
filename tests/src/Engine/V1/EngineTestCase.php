@@ -31,12 +31,10 @@
  * -------------------------------------------------------------------------
  */
 
- namespace GlpiPlugin\Carbon\Tests\Engine\V1;
+namespace GlpiPlugin\Carbon\Tests\Engine\V1;
 
-use Computer_Item;
 use DateTime;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
-use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 
 class EngineTestCase extends DbTestCase
@@ -116,31 +114,30 @@ class EngineTestCase extends DbTestCase
         ];
     }
 
-    /**
-     * @dataProvider getPowerProvider
-     */
-    public function testGetPower(EngineInterface $engine, int $expected_power)
+    public function testGetPower()
     {
-        $actual_power = $engine->getPower();
-        $this->assertEquals($expected_power, $actual_power);
+        foreach ($this->getPowerProvider() as $data) {
+            list ($engine, $expected_power) = $data;
+            $actual_power = $engine->getPower();
+            $this->assertEquals($expected_power, $actual_power);
+        }
     }
 
-    /**
-     * @dataProvider getEnergyPerDayProvider
-     */
-    public function testGetEnergyPerDay(EngineInterface $engine, DateTime $date, float $expected_energy)
+    public function testGetEnergyPerDay()
     {
-        $output = $engine->getEnergyPerDay($date);
-        $this->assertEquals($expected_energy, $output);
+        foreach ($this->getEnergyPerDayProvider() as $data) {
+            list($engine, $date, $expected_energy) = $data;
+            $output = $engine->getEnergyPerDay($date);
+            $this->assertEquals($expected_energy, $output);
+        }
     }
 
-    /**
-     *
-     * @dataProvider getCarbonEmissionPerDateProvider
-     */
-    public function testGetCarbonEmissionPerDay(EngineInterface $engine, DateTime $day, float $expected_emission)
+    public function testGetCarbonEmissionPerDay()
     {
-        $emission = $engine->getCarbonEmissionPerDay($day);
-        $this->assertEqualsWithDelta($expected_emission, $emission, self::EPSILON);
+        foreach ($this->getCarbonEmissionPerDateProvider() as $data) {
+            list($engine, $day, $expected_emission) = $data;
+            $emission = $engine->getCarbonEmissionPerDay($day);
+            $this->assertEqualsWithDelta($expected_emission, $emission, self::EPSILON);
+        }
     }
 }

@@ -40,7 +40,6 @@ use ComputerType as GlpiComputerType;
 use GlpiPlugin\Carbon\Engine\V1\Computer;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\Tests\Engine\V1\EngineTestCase;
-use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 
 class ComputerTest extends EngineTestCase
 {
@@ -120,16 +119,17 @@ class ComputerTest extends EngineTestCase
         ];
     }
 
-    /**
-     * @dataProvider computerUsageProfileProvider
-     */
-    public function testGetUsageProfile(Computer $computer, array $usage_profile_params)
-    {
-        $usage_profile = $computer->getUsageProfile();
-        $this->assertNotNull($usage_profile);
 
-        foreach ($usage_profile_params as $k => $v) {
-            $this->assertEquals($usage_profile->fields[$k], $v);
+    public function testGetUsageProfile()
+    {
+        foreach ($this->computerUsageProfileProvider() as $data) {
+            list ($computer, $usage_profile_params) = $data;
+            $usage_profile = $computer->getUsageProfile();
+            $this->assertNotNull($usage_profile);
+
+            foreach ($usage_profile_params as $k => $v) {
+                $this->assertEquals($usage_profile->fields[$k], $v);
+            }
         }
     }
 
