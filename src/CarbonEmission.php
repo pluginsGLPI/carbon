@@ -50,44 +50,6 @@ class CarbonEmission extends CommonDBChild
         return _n("Carbon Emission", "Carbon Emissions", $nb, 'carbon emission');
     }
 
-    public static function cronHistorize(CronTask $task): int
-    {
-        $histories = [
-            ComputerHistory::class,
-            MonitorHistory::class,
-            NetworkEquipmentHistory::class,
-        ];
-        $task->setVolume(0); // start with zero
-        foreach ($histories as $history_type) {
-            /** @var AbstractAsset $history */
-            $history = new $history_type();
-            $history->setLimit(0);
-            $count = $history->historizeItems();
-            $task->addVolume($count);
-        }
-
-        return ($count > 0 ? 1 : 0);
-    }
-
-    /**
-     * @deprecated uses deprecated methods
-     */
-    public static function cronInfo($name)
-    {
-        switch ($name) {
-            case 'ComputeCarbonEmissionsTask':
-                return [
-                    'description' => __('Compute carbon emissions for all computers', 'carbon')
-                ];
-
-            case 'Historize':
-                return ['description' => __('Compute daily environnemental impact for all assets', 'carbon'),
-                    'parameter' => __('Maximum number of entries to calculate', 'carbon'),
-                ];
-        }
-        return [];
-    }
-
     public function prepareInputForAdd($input)
     {
         $input = parent::prepareInputForAdd($input);

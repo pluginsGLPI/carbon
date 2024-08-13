@@ -42,6 +42,30 @@ use GlpiPlugin\Carbon\Toolbox;
 
 class CronTask
 {
+    public static function cronInfo($name)
+    {
+        switch ($name) {
+            case 'DownloadRte':
+                return [
+                    'description' => __('Download carbon emissions from RTE', 'carbon'),
+                    'parameter' => __('Maximum number of entries to download', 'carbon'),
+                ];
+
+            case 'DownloadElectricityMap':
+                return [
+                    'description' => __('Download carbon emissions from ElectricityMap', 'carbon'),
+                    'parameter' => __('Maximum number of entries to download', 'carbon'),
+                ];
+
+            case 'Historize':
+                return [
+                    'description' => __('Compute daily environnemental impact for all assets', 'carbon'),
+                    'parameter' => __('Maximum number of entries to calculate', 'carbon'),
+                ];
+        }
+        return [];
+    }
+
     public static function cronHistorize(GlpiCronTask $task): int
     {
         $histories = (new Toolbox())->getHistoryClasses();
