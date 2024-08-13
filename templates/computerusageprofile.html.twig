@@ -41,16 +41,10 @@
         { required: true }
     ) }}
 
-    {{ fields.dropdownNumberField(
-        'average_load',
-        item.fields['average_load'],
-        __('Average load', 'carbon'),
-        {
-            'min': 0,
-            'max': 100,
-            'step': 5,
-        }
-    ) }}
+    {{ fields.nullField({
+        label_class: 'col-xxl-4',
+        input_class: 'col-xxl-8',
+    }) }}
 
     {{ carbonFields.timeField(
         'time_start',

@@ -89,7 +89,6 @@ CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_computertypes` (
 CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_computerusageprofiles` (
   `id`           int unsigned NOT NULL AUTO_INCREMENT,
   `name`         varchar(255) DEFAULT NULL,
-  `average_load` int          NOT NULL DEFAULT '0',
   `time_start`   varchar(255) DEFAULT NULL,
   `time_stop`    varchar(255) DEFAULT NULL,
   `day_1`        tinyint(1)   NOT NULL DEFAULT '0',

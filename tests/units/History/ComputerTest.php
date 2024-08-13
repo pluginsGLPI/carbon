@@ -77,7 +77,6 @@ class ComputerTest extends CommonAsset
             'date_mod'          => null,
         ]);
         $usage_profile = $this->getItem(ComputerUsageProfile::class, [
-            'average_load' => 0.3,
             'time_start'   => '09:00:00',
             'time_stop'    => '18:00:00',
             'day_1'        => '1',
