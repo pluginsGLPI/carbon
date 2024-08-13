@@ -99,40 +99,4 @@ class CarbonEmission extends CommonDBChild
         $input['date'] = $date->format('Y-m-d');
         return $input;
     }
-
-    /**
-     * Format a weight passing a weight in grams
-     *
-     * @param float $weight  Weight in grams
-     *
-     * @return string  formatted weight
-     **/
-    public static function getWeight(float $weight): string
-    {
-       //TRANS: list of unit (o for octet)
-        $units = [
-            __('g', 'carbon'),
-            __('Kg', 'carbon'),
-            __('t', 'carbon'),
-            __('Kt', 'carbon'),
-            __('Mt', 'carbon'),
-            __('Gt', 'carbon'),
-            __('Tt', 'carbon'),
-            __('Pt', 'carbon'),
-            __('Et', 'carbon'),
-            __('Zt', 'carbon'),
-            __('Yt', 'carbon'),
-        ];
-        $multiple = 1000;
-        foreach ($units as $val) {
-            if ($weight < $multiple) {
-                break;
-            }
-            $weight = $weight / $multiple;
-        }
-
-        $val .= "CO₂eq";
-       //TRANS: %1$s is a number maybe float or string and %2$s the unit
-        return sprintf(__('%1$s %2$s'), round($weight, 2), $val);
-    }
 }

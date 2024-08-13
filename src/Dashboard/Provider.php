@@ -37,19 +37,15 @@ use Computer;
 use ComputerModel;
 use ComputerType as GlpiComputerType;
 use DateTime;
-use DateInterval;
 use DbUtils;
 use Glpi\Dashboard\Filter;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\Toolbox;
-use GlpiPlugin\Carbon\EnvironnementalImpact;
 use GlpiPlugin\Carbon\CarbonEmission;
-use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\History\Computer as HistoryComputer;
-use Location;
 use QueryExpression;
 
 class Provider
@@ -134,7 +130,7 @@ class Provider
         foreach ($result as $row) {
             $count = $row['nb_computers_per_model'];
             $data[] = [
-                'number' => CarbonEmission::getWeight($row['total_per_model'], PLUGIN_CARBON_DECIMALS),
+                'number' => Toolbox::getWeight($row['total_per_model'], PLUGIN_CARBON_DECIMALS) . 'CO₂eq',
                 'url' => ComputerModel::getFormURLWithID($row['id']),
                 'label' => $row['name'] . " (" . $row['nb_computers_per_model'] . " " . Computer::getTypeName($count) . ")",
             ];
