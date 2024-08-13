@@ -55,7 +55,6 @@ class CreateTestInventoryCommand extends Command
         'Desktop' => [
             'usage_profile' => [
                 'name' => 'Test desktop usage profile',
-                'average_load' => 20,
                 'time_start' => "10:00:00",
                 'time_stop' => "18:00:00",
                 'day_1' => 1,
@@ -72,7 +71,6 @@ class CreateTestInventoryCommand extends Command
         'Laptop' => [
             'usage_profile' => [
                 'name' => 'Test laptop usage profile',
-                'average_load' => 30,
                 'time_start' => "09:00:00",
                 'time_stop' => "17:00:00",
                 'day_1' => 1,
@@ -89,7 +87,6 @@ class CreateTestInventoryCommand extends Command
         'Server' => [
             'usage_profile' => [
                 'name' => 'Test server usage profile',
-                'average_load' => 50,
                 'time_start' => "00:00:00",
                 'time_stop' => "23:59:59",
                 'day_1' => 1,
@@ -106,7 +103,6 @@ class CreateTestInventoryCommand extends Command
         'Tablet' => [
             'usage_profile' => [
                 'name' => 'Test tablet usage profile',
-                'average_load' => 10,
                 'time_start' => "10:30:00",
                 'time_stop' => "16:30:00",
                 'day_1' => 1,

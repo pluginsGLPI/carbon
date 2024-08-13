@@ -53,12 +53,6 @@ class CarbonIntensityElectricityMapTest extends DbTestCase
             'electricitymap_code' => 'FR',
         ]);
 
-        $carbon_intensity_zone = new CarbonIntensityZone();
-        $carbon_intensity_zone->add([
-            'name' => 'France',
-            'electricitymap_code' => 'FR',
-        ]);
-
         $date = new DateTimeImmutable('5 days ago');
         $intensities = $source->fetchDay($date, 'France');
 

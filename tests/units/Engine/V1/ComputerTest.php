@@ -51,7 +51,6 @@ class ComputerTest extends EngineTestCase
 
     const TEST_LAPTOP_USAGE_PROFILE = [
         'name' => 'Test laptop usage profile',
-        'average_load' => 30,
         'time_start' => "09:00:00",
         'time_stop' => "17:00:00",
         'day_1' => 1,
@@ -68,7 +67,6 @@ class ComputerTest extends EngineTestCase
 
     const TEST_SERVER_USAGE_PROFILE = [
         'name' => 'Test server usage profile',
-        'average_load' => 50,
         'time_start' => "00:00:00",
         'time_stop' => "23:00:00",
         'day_1' => 1,
@@ -169,7 +167,6 @@ class ComputerTest extends EngineTestCase
 
         $profile = [
             'name' => 'Test laptop usage profile',
-            'average_load' => 30,
             'time_start' => "09:30:00",
             'time_stop' => "17:00:00",
             'day_1' => 1,
@@ -189,7 +186,6 @@ class ComputerTest extends EngineTestCase
 
         $profile = [
             'name' => 'Test laptop usage profile',
-            'average_load' => 30,
             'time_start' => "09:00:00",
             'time_stop' => "17:15:00",
             'day_1' => 1,
@@ -209,7 +205,6 @@ class ComputerTest extends EngineTestCase
 
         $profile = [
             'name' => 'Test laptop usage profile',
-            'average_load' => 30,
             'time_start' => "09:15:00",
             'time_stop' => "09:45:00",
             'day_1' => 1,

@@ -120,7 +120,6 @@ class Computer extends AbstractAsset
                     'is_deleted' => 0,
                     ['NOT' => [Location::getTableField('country') => '']],
                     ['NOT' => [Location::getTableField('country') => null]],
-                    ComputerUsageProfile::getTableField('average_load') => ['>', 0],
                     [
                         'OR' => [
                             ComputerType::getTableField('power_consumption') => ['>', 0],

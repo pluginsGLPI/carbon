@@ -85,7 +85,6 @@ class MonitorTest extends EngineTestCase
     {
         $profile = [
             'name' => 'Test laptop usage profile',
-            'average_load' => 30,
             'time_start' => "09:00:00",
             'time_stop' => "17:00:00",
             'day_1' => 1,
@@ -115,7 +114,6 @@ class MonitorTest extends EngineTestCase
 
         $profile = [
             'name' => 'Test laptop usage profile',
-            'average_load' => 30,
             'time_start' => "09:00:00",
             'time_stop' => "17:00:00",
             'day_1' => 1,
@@ -153,7 +151,6 @@ class MonitorTest extends EngineTestCase
 
         $usage_profile = [
             'name' => 'Test laptop usage profile',
-            'average_load' => 30,
             'time_start' => "09:00:00",
             'time_stop' => "17:00:00",
             'day_1' => 1,

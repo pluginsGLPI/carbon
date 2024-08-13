@@ -94,10 +94,7 @@ class ProviderTest extends DbTestCase
             'country' => 'France',
         ]);
 
-        $usage_profile_empty = $this->getItem(ComputerUsageProfile::class);
-        $usage_profile = $this->getItem(ComputerUsageProfile::class, [
-            'average_load' => 90,
-        ]);
+        $usage_profile = $this->getItem(ComputerUsageProfile::class);
 
         $total_count = 0;
         $computers_definition = [
@@ -147,16 +144,6 @@ class ProviderTest extends DbTestCase
         ];
         $computers = $this->getItems($computers_definition);
         $total_count += count($computers[Computer::class]);
-
-        // Computers with a empty usage profile
-        $computers = $this->getItems($computers_definition);
-        $total_count += count($computers[Computer::class]);
-        foreach ($computers[Computer::class] as $computers_id => $computer) {
-            $impact = $this->getItem(EnvironnementalImpact::class, [
-                'computers_id' => $computers_id,
-                'plugin_carbon_computerusageprofiles_id' => $usage_profile_empty->getID(),
-            ]);
-        }
 
         // computers with a usage profile; 3 of them are complete
         $computers = $this->getItems($computers_definition);
@@ -261,7 +248,6 @@ class ProviderTest extends DbTestCase
         $country = $this->getUniqueString();
         $usage_profile = [
             'name' => 'Test laptop usage profile',
-            'average_load' => 30,
             'time_start' => "09:00:00",
             'time_stop' => "17:00:00",
             'day_1' => 1,
@@ -322,7 +308,6 @@ class ProviderTest extends DbTestCase
         $source  = $this->getUniqueString();
         $usage_profile = [
             'name' => 'Test laptop usage profile',
-            'average_load' => 30,
             'time_start' => "09:00:00",
             'time_stop' => "17:00:00",
             'day_1' => 1,

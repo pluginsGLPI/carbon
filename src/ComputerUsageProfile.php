@@ -56,6 +56,7 @@ class ComputerUsageProfile extends CommonDropdown
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         $env       = new self();
+        /** @var \CommonDBTM $item */
         $found_env = $env->find([static::getForeignKeyField() => $item->getID()]);
         $nb        = $_SESSION['glpishow_count_on_tabs'] ? count($found_env) : 0;
         return self::createTabEntry(self::getTypeName($nb), $nb);
@@ -96,14 +97,6 @@ class ComputerUsageProfile extends CommonDropdown
     {
         $tab = parent::rawSearchOptions();
         $my_table = self::getTable();
-
-        $tab[] = [
-            'id'                 => '5',
-            'table'              => $my_table,
-            'field'              => 'average_load',
-            'name'               => __('Average load', 'carbon'),
-            'datatype'           => 'integer',
-        ];
 
         $tab[] = [
             'id'                 => '6',
