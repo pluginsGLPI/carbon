@@ -532,6 +532,7 @@ class Provider
         $scaled = Toolbox::scaleSerie($data['series'][0]['data'], $units);
         $data['series'][0]['data'] = $scaled['serie'];
         $data['series'][0]['name'] .= ' (' . $scaled['unit'] . __('CO₂eq', 'carbon') . ')';
+        $data['series'][0]['unit'] = $scaled['unit'] . __('CO₂eq', 'carbon'); // Not supported by apex charts
 
         // Scale energy consumption
         $units = [
@@ -547,6 +548,7 @@ class Provider
         $scaled = Toolbox::scaleSerie($data['series'][1]['data'], $units);
         $data['series'][1]['data'] = $scaled['serie'];
         $data['series'][1]['name'] .= ' (' . $scaled['unit'] . ')';
+        $data['series'][1]['unit'] = $scaled['unit']; // Not supported by apex charts
 
         return $data;
     }

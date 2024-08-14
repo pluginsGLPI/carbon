@@ -40,10 +40,14 @@ use Location;
 use DateTime;
 use ComputerModel;
 use ComputerType as GlpiComputerType;
+use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\EnvironnementalImpact;
 
+/**
+ * @covers \GlpiPlugin\Carbon\History\Computer
+ */
 class ComputerTest extends CommonAsset
 {
     protected string $history_type = \GlpiPlugin\Carbon\History\Computer::class;
@@ -73,7 +77,7 @@ class ComputerTest extends CommonAsset
             'computertypes_id'  => $glpi_type->getID(),
             'computermodels_id' => $model->getID(),
             'locations_id'      => $location->getID(),
-            'date_creation'     => null,
+            'date_creation'     => '2024-01-01',
             'date_mod'          => null,
         ]);
         $usage_profile = $this->getItem(ComputerUsageProfile::class, [
@@ -94,13 +98,62 @@ class ComputerTest extends CommonAsset
         ]);
 
         $history = new Computer();
+        $start_date = '2024-02-01 00:00:00';
+        $end_date =   '2024-02-08 00:00:00';
         $count = $history->historizeItem(
             $computer->getID(),
-            new DateTime('2024-02-01 00:00:00'),
-            new DateTime('2024-02-07 00:00:00')
+            new DateTime($start_date),
+            new DateTime($end_date)
         );
 
         // Days interval is [$start_date, $end_date[
         $this->assertEquals(7, $count);
+
+        $carbon_emission = new CarbonEmission();
+        $emissions = $carbon_emission->find([
+            ['date' => ['>=', $start_date]],
+            ['date' =>  ['<', $end_date]],
+        ], [
+            'date ASC',
+        ]);
+        $this->assertEquals(7, count($emissions));
+
+        // Values from the fake carbon intensities added in global fixtures
+        $expected = [
+            [
+                'date'             => '2024-02-01 00:00:00',
+                'energy_per_day'   => 0.495,
+                'emission_per_day' => 14.245,
+            ],[
+                'date' => '2024-02-02 00:00:00',
+                'energy_per_day'   => 0.495,
+                'emission_per_day' => 14.025,
+            ], [
+                'date' => '2024-02-03 00:00:00',
+                'energy_per_day'   => 0,
+                'emission_per_day' => 0,
+            ], [
+                'date' => '2024-02-04 00:00:00',
+                'energy_per_day'   => 0,
+                'emission_per_day' => 0,
+            ], [
+                'date' => '2024-02-05 00:00:00',
+                'energy_per_day'   => 0.495,
+                'emission_per_day' => 14.41,
+            ], [
+                'date' => '2024-02-06 00:00:00',
+                'energy_per_day'   => 0.495,
+                'emission_per_day' => 15.895,
+            ], [
+                'date' => '2024-02-07 00:00:00',
+                'energy_per_day'   => 0.495,
+                'emission_per_day' => 12.98,
+            ],
+        ];
+        foreach ($emissions as $emission) {
+            $expected_row = array_shift($expected);
+            $emission = array_intersect_key($emission, $expected_row);
+            $this->assertEquals($expected_row, $emission);
+        }
     }
 }

@@ -53,20 +53,20 @@
         // update total carbon emission for month
         let currentMonthEmission = '0';
         if (data.series[0].data.length > 0) {
-          currentMonthEmission = data.series[0].data[data.series[0].data.length - 1];
+          currentMonthEmission = data.series[0].data[data.series[0].data.length - 1].y;
         }
-        document.getElementById('monthlyEmission').textContent = currentMonthEmission + " " + data.series[0].name;
+        document.getElementById('monthlyEmission').textContent = currentMonthEmission + " " + data.series[0].unit;
         // Calculate and display the percentage comparison with the previous month
         let comparisonText = '';
         if (data.series[0].data.length > 1) {
-          let previousMonthEmission = data.series[0].data[data.series[0].data.length - 2];
+          let previousMonthEmission = data.series[0].data[data.series[0].data.length - 2].y;
           let percentageChange = ((currentMonthEmission - previousMonthEmission) / previousMonthEmission) * 100;
           comparisonText = (percentageChange >= 0 ? "↑ " : "↓ ") + Math.abs(percentageChange).toFixed(2) + " %";
         } else {
           document.querySelector('#monthlyComparison + div').textContent = '';
         }
         document.getElementById('monthlyComparison').textContent = comparisonText;
-        document.getElementById('monthlyMonth').textContent = data.date_interval[0];
+        document.getElementById('monthlyMonth').textContent = data.date_interval[1];
     });
   });
 </script>

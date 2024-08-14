@@ -156,7 +156,7 @@ class Dashboard
 
     public static function cardTotalCarbonEmissionProvider(array $params = [])
     {
-        return self::cardNumberProvider($params, "total carbon emission", self::getTotalCarbonEmission());
+        return self::cardNumberProvider($params, "total carbon emission", Provider::getTotalCarbonEmission());
     }
 
     public static function cardDataProvider(array $params = [], string $label = "", array $data = [])

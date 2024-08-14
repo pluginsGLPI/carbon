@@ -45,7 +45,6 @@ use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Toolbox;
 use Location;
-use Infocom;
 
 abstract class AbstractAsset extends CommonDBTM implements AssetInterface
 {
@@ -65,6 +64,11 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     protected bool $limit_reached = false;
 
     abstract public function getHistorizableQuery(): array;
+
+    public function getItemtype(): string
+    {
+        return static::$itemtype;
+    }
 
     /**
      * Is it possible to historize carbon emissions for the item
@@ -148,7 +152,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
             return 0;
         }
 
-        // Determine first date to compute
+        // Determine first date to compute. May be modified by available intensity data
         $resume_date = $this->getStartDate($id);
         if ($resume_date === null) {
             return 0;
@@ -166,17 +170,23 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         $engine = static::getEngine($item);
 
         $count = 0;
-        $date_cursor = $start_date;
-        $date_cursor->setTime(0, 0, 0, 0);
-        while ($date_cursor <= $end_date && !$this->limit_reached) {
-            $success = $this->historizeItemPerDay($item, $engine, $date_cursor);
-            if ($success) {
-                $count++;
-                if ($this->limit !== 0 && $count >= $this->limit) {
-                    $this->limit_reached = true;
+        $carbon_emission = new CarbonEmission();
+        $gaps = $carbon_emission->findGaps($itemtype, $id, $start_date, $end_date);
+        foreach ($gaps as $gap) {
+            $date_cursor = new DateTime($gap['start']);
+            $date_cursor->setTime(0, 0, 0, 0);
+            $end_date = new DateTime($gap['end']);
+            while ($date_cursor < $end_date) {
+                $success = $this->historizeItemPerDay($item, $engine, $date_cursor);
+                if ($success) {
+                    $count++;
+                    if ($this->limit !== 0 && $count >= $this->limit) {
+                        $this->limit_reached = true;
+                        break 2;
+                    }
                 }
+                $date_cursor = $date_cursor->add(new DateInterval(static::$date_increment));
             }
-            $date_cursor = $date_cursor->add(new DateInterval(static::$date_increment));
         }
 
         return $count;
@@ -185,13 +195,12 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     protected function historizeItemPerDay(CommonDBTM $item, EngineInterface $engine, DateTime $day): bool
     {
         $energy = $engine->getEnergyPerDay($day);
-        if ($energy === 0) {
-            return true;
-        }
-
-        $emission = $engine->getCarbonEmissionPerDay($day);
-        if ($emission === null) {
-            return false;
+        $emission = 0;
+        if ($energy !== 0) {
+            $emission = $engine->getCarbonEmissionPerDay($day);
+            if ($emission === null) {
+                return false;
+            }
         }
 
         $entry = new CarbonEmission();
@@ -218,11 +227,13 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      * @param integer $id
      * @return DateTime|null
      */
-    protected function getStartDate(int $id): ?DateTime
+    protected function getStartDate(int $id): ?DateTimeImmutable
     {
+        return $this->getInventoryIncomingDate($id);
+
         $last_known_emission_date = $this->getEmissionStartDate($id);
         if ($last_known_emission_date === null) {
-            // no carbon intensity available
+            // no carbon emission available
             return null;
         }
         $inventory_date = $this->getInventoryIncomingDate($id);
@@ -235,9 +246,9 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      * Find the last date of computed emissions
      *
      * @param integer $id
-     * @return DateTime|null
+     * @return DateTimeImmutable|null
      */
-    protected function getEmissionStartDate(int $id): ?DateTime
+    protected function getEmissionStartDate(int $id): ?DateTimeImmutable
     {
         // Find the oldest carbon emissions date calculated for the item
         $itemtype = static::$itemtype;
@@ -251,7 +262,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
 
         if (count($last_entry) === 1) {
             $last_entry = array_pop($last_entry);
-            $start_date = new DateTime($last_entry['date']);
+            $start_date = new DateTimeImmutable($last_entry['date']);
             return $start_date;
         }
 
@@ -267,7 +278,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
 
         if (count($first_entry) === 1) {
             $first_entry = array_pop($first_entry);
-            $start_date = new DateTime($first_entry['date']);
+            $start_date = new DateTimeImmutable($first_entry['date']);
             return $start_date;
         }
 
@@ -289,38 +300,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
             getTableForItemType(static::$itemtype) . '.id' => $id,
         ]);
 
-        if ($inventory_date === null) {
-            // return $toolbox->getDefaultCarbonIntensityDownloadDate();
-        }
         return $inventory_date;
-
-        // $start_date = null;
-        // $infocom = new Infocom();
-
-        // $itemtype = static::$itemtype;
-        // $infocom->getFromDBByCrit([
-        //     'itemtype' => $itemtype,
-        //     'items_id' => $id,
-        // ]);
-        // if (!$infocom->isNewItem()) {
-        //     $start_date = $infocom->fields['use_date']
-        //     ?? $infocom->fields['delivery_date']
-        //     ?? $infocom->fields['buy_date']
-        //     ?? null;
-        // }
-
-        // if ($start_date === null) {
-        //     $asset = new $itemtype();
-        //     if (!$asset->getFromDb($id)) {
-        //         return null;
-        //     }
-        //     $start_date = $asset->fields['date_creation'] ?? $asset->fields['date_mod'] ?? null;
-        //     if ($start_date === null) {
-        //         return null;
-        //     }
-        // }
-
-        // return new DateTimeImmutable($start_date);
     }
 
     /**

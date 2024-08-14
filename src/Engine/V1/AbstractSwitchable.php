@@ -127,14 +127,6 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
             return null;
         }
 
-        // if ($iterator->count() < 2) {
-        //     // Less than 1 hour to compute
-        //     $intensity = $iterator->current()['intensity'];
-        //     $energy_in_kwh = ($power * $total_seconds) / (1000.0 * 60 * 60);
-        //     $emission = $intensity * $energy_in_kwh;
-        //     return $emission;
-        // }
-
         $counted_seconds = 0;
         $total_emission = 0.0;
         while (($row = $iterator->current()) !== null) {
@@ -148,10 +140,6 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
             if ($counted_seconds + $seconds > $total_seconds) {
                 // Calculate emission of last hour (incomplete)
                 $seconds = $total_seconds - $counted_seconds;
-                // $energy_in_kwh = ($power * $seconds) / (1000.0 * 60 * 60);
-                // $emission = $row['intensity'] * $energy_in_kwh;
-                // $total_emission += $emission;
-                // return $total_emission;
             }
 
             // Calculate emission for a complete hour

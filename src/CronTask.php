@@ -118,7 +118,8 @@ class CronTask
 
         // Check the zones are configured
         // If not, set them up
-        if (!$data_source->isZoneSetupComplete()) {
+        $zones = $data_source->getZones();
+        if (!$data_source->isZoneSetupComplete() || count($zones) === 0) {
             $done_count = $data_source->createZones();
             $remaining -= $done_count;
             $task->addVolume($done_count);
