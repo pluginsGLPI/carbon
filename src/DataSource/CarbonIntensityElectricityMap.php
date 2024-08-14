@@ -62,13 +62,6 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
         return 'ElectricityMap';
     }
 
-    public function getZones(): array
-    {
-        return [
-            'France'
-        ];
-    }
-
     public function getDataInterval(): string
     {
         return 'P60M';
@@ -110,7 +103,8 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
             $zone = new CarbonIntensityZone();
             if ($zone->getFromDbByCrit($zone_input) === false) {
                 // $zone_input['electricitymap_code'] = $zone_key;
-                if ($zone->add($zone_input) === false) {;
+                if ($zone->add($zone_input) === false) {
+                    ;
                     $failed = true;
                     continue;
                 }

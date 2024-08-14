@@ -38,9 +38,12 @@ use CronTask;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
+use Iterator;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
+use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
+use phpDocumentor\Reflection\Types\Iterable_;
 
 abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
 {
@@ -114,31 +117,40 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
         return true;
     }
 
-    /**
-     * Automatic action in charge of loading
-     *
-     * @return int
-     */
-    public static function cronDownload(CronTask $task): int
+    public function getZones(array $crit = []): array
     {
-        $task->setVolume(0); // start with zero
-        $data_source = new static(new RestApiClient([]));
-        $zones = $data_source->getZones();
-        $limit_per_zone = floor(((int) $task->fields['param']) / count($zones));
-        $count = 0;
-        $failure = false;
-        $carbon_intensity = new CarbonIntensity();
-        foreach ($zones as $zone_name) {
-            $added = $carbon_intensity->downloadOneZone($data_source, $zone_name, $limit_per_zone);
-            $count += abs($added);
-            $failure |= $added < 0;
-        }
+        global $DB;
 
-        if ($count === 0) {
-            return 0;
-        }
-        return ($failure ? -1 : 1);
+        $source_table = CarbonIntensitySource::getTable();
+        $source_fk = CarbonIntensitySource::getForeignKeyField();
+        $zone_table = CarbonIntensityZone::getTable();
+        $zone_fk = CarbonIntensityZone::getForeignKeyField();
+        $source_zone_table = CarbonIntensitySource_CarbonIntensityZone::getTable();
+        $iterator = $DB->request([
+            'SELECT' => CarbonIntensityZone::getTableField('name'),
+            'FROM' => $zone_table,
+            'INNER JOIN' => [
+                $source_zone_table => [
+                    'ON' => [
+                        $zone_table => 'id',
+                        $source_zone_table => $zone_fk,
+                    ]
+                ],
+                $source_table => [
+                    'ON' => [
+                        $source_table => 'id',
+                        $source_zone_table => $source_fk,
+                    ]
+                ],
+            ],
+            'WHERE' => [
+                CarbonIntensitySource::getTableField('name') => $this->getSourceName(),
+            ] + $crit,
+        ]);
+
+        return iterator_to_array($iterator);
     }
+
 
     public function fullDownload(string $zone, DateTimeImmutable $start_date, DateTimeImmutable $stop_date, CarbonIntensity $intensity, int $limit = 0): int
     {

@@ -65,13 +65,6 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         return 'P15M';
     }
 
-    public function getZones(): array
-    {
-        return [
-            'France',
-        ];
-    }
-
     public function getHardStartDate(): DateTimeImmutable
     {
         return DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '2012-01-01T00:00:00+00:00');

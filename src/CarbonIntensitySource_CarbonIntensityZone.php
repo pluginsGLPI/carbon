@@ -38,6 +38,7 @@ use CommonGLPI;
 use CommonDBTM;
 use GlpiPlugin\Carbon\Application\View\Extension\DataHelpersExtension;
 use Glpi\Application\View\TemplateRenderer;
+use Html;
 
 class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
 {
@@ -73,7 +74,8 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
         $source_zone_table = self::getTable();
         $iterator = $DB->request([
             'SELECT' => [
-                $zone_table => '*',
+                $zone_table => 'name',
+                $source_zone_table => ['id', 'is_enabled']
             ],
             'FROM' => $source_zone_table,
             'INNER JOIN' => [
@@ -92,16 +94,18 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
             ],
             'WHERE' => [
                 CarbonIntensitySource::getTableField('id') => $item_id,
-            ]
+            ],
+            'ORDER'     => ['name ASC'],
         ]);
 
         $tot = $iterator->count();
+        $entries = [];
         foreach ($iterator as $data) {
             $entries[] = [
                 'itemtype'   => CarbonIntensitySource::class,
                 'id'         => $item->getID(),
                 'name'       => $data['name'],
-                'is_enabled' => '',
+                'is_enabled' => self::getToggleLink($data['id'], $data['is_enabled']),
             ];
         }
 
@@ -113,9 +117,11 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
             'nofilter' => true,
             'nosort' => true,
             'columns' => [
-                'name' => __('Name')
+                'name' => __('Name'),
+                'is_enabled' => __('Enabled', 'carbon'),
             ],
             'formatters' => [
+                'is_enabled' => 'raw_html',
             ],
             'footers' => [
                 ['', '', '', __('Total'), $tot, '']
@@ -130,6 +136,16 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
                 'container'     => 'mass' . static::class . mt_rand(),
             ]
         ]);
+
+        echo Html::scriptBlock('
+            var plugin_carbon_toggleZone = function (id) {
+                fetch(CFG_GLPI["root_doc"] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/toggleZoneDownload.php?id=" + id).then(response => {
+                    if (response.status === 200) {
+                        reloadTab();
+                    }
+                });
+            };
+        ');
     }
 
     public static function showForZone(CommonDBTM $item)
@@ -148,7 +164,8 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
         $source_zone_table = self::getTable();
         $iterator = $DB->request([
             'SELECT' => [
-                $source_table => '*',
+                $source_table => 'name',
+                $source_zone_table => ['id', 'is_enabled']
             ],
             'FROM' => $source_zone_table,
             'INNER JOIN' => [
@@ -167,16 +184,18 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
             ],
             'WHERE' => [
                 CarbonIntensityZone::getTableField('id') => $item_id,
-            ]
+            ],
+            'ORDER'     => ['name ASC'],
         ]);
 
         $tot = $iterator->count();
+        $entries = [];
         foreach ($iterator as $data) {
             $entries[] = [
                 'itemtype'   => CarbonIntensitySource::class,
                 'id'         => $item->getID(),
                 'name'       => $data['name'],
-                'is_enabled' => '',
+                'is_enabled' => self::getToggleLink($data['id'], $data['is_enabled']),
             ];
         }
 
@@ -188,7 +207,8 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
             'nofilter' => true,
             'nosort' => true,
             'columns' => [
-                'name' => __('Name')
+                'name' => __('Name'),
+                // 'is_enabled' => __('Enabled', 'carbon'),
             ],
             'formatters' => [
             ],
@@ -248,5 +268,19 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
         $zone_code = $iterator->current()['code'] ?? null;
 
         return $zone_code;
+    }
+
+    protected static function getToggleLink(int $zone_id, ?string $state)
+    {
+        $state = $state == 0 ? __('No') : __('Yes');
+        $link = '<a href="javascript:void(0)" onclick="plugin_carbon_toggleZone(' . $zone_id . ')" title="' . __('Enable / Disable', 'carbon') . '">' . $state . '</a>';
+        return $link;
+    }
+
+    public function toggleZone(): bool
+    {
+        $state = $this->fields['is_enabled'];
+        $state = $state == 0 ? 1 : 0;
+        return $this->update(['id' => $this->getID(), 'is_enabled' => $state]) !== false;
     }
 }
