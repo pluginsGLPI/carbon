@@ -205,6 +205,10 @@ class CreateTestInventoryCommand extends Command
                 GlpiComputerModel::getForeignKeyField() => $model->getID(),
             ]
         );
+        $glpi_computer->update([
+            'id' => $glpi_computer->getID(),
+            'date_creation' => '2021-01-01 00:00:00',
+        ]);
         $impact = $this->createItemIfNotExist(
             EnvironnementalImpact::class,
             [
