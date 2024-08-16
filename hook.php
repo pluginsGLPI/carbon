@@ -138,7 +138,6 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
             'field'        => 'name',
             'name'         => ComputerUsageProfile::getTypeName(),
             'datatype'     => 'itemlink',
-            'linkfield'    => 'computers_id',
             'joinparams' => [
                 'jointype' => 'empty',
                 'beforejoin' => [
