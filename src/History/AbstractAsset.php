@@ -105,7 +105,15 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         $count = 0;
 
         $type_instance = new $itemtype();
-        $rows = $type_instance->find();
+        $type_instance->getEmpty();
+        $crit = [];
+        if ($type_instance->maybeDeleted()) {
+            $crit['is_deleted'] = 0;
+        }
+        if ($type_instance->maybeTemplate()) {
+            $crit['is_template'] = 0;
+        }
+        $rows = $type_instance->find($crit);
         foreach ($rows as $row) {
             $count += $this->historizeItem($row['id']);
             if ($this->limit_reached) {
@@ -157,6 +165,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
 
         $count = 0;
         $date_cursor = $start_date;
+        $date_cursor->setTime(0, 0, 0, 0);
         while ($date_cursor <= $end_date && !$this->limit_reached) {
             $success = $this->historizeItemPerDay($item, $engine, $date_cursor);
             if ($success) {
