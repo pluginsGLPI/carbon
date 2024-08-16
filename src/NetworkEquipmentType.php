@@ -39,12 +39,4 @@ class NetworkEquipmentType extends AbstractType
 {
     public static $itemtype = GlpiNetworkEquipmentType::class;
     public static $items_id = 'networkequipmenttypes_id';
-
-    /**
-     * @todo fix type name
-     */
-    public static function getTypeName($nb = 0)
-    {
-        return _n("Power", "Powers", $nb, 'carbon');
-    }
 }

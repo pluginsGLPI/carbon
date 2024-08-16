@@ -35,8 +35,6 @@ namespace GlpiPlugin\Carbon;
 
 use CommonDBChild;
 use CommonGLPI;
-use Computer;
-use NetworkEquipmentType as GlpiNetworkEquipmentType;
 use Session;
 use Glpi\Application\View\TemplateRenderer;
 

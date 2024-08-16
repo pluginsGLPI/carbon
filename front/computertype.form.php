@@ -31,10 +31,9 @@
  * -------------------------------------------------------------------------
  */
 
-use Glpi\Event;
 use GlpiPlugin\Carbon\ComputerType;
 
-include("../../../inc/includes.php");
+include('../../../inc/includes.php');
 
 if (!Plugin::isPluginActive('carbon')) {
     Html::displayNotFoundError();
