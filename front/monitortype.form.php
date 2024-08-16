@@ -45,7 +45,6 @@ $item = new MonitorType();
 if (isset($_POST['update'])) {
     // Add a new Form
     Session::checkRight('entity', UPDATE);
-    $_POST['_create_empty_section'] = true;
     $item->update($_POST);
     Html::back();
 }
