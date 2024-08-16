@@ -269,6 +269,8 @@ class Provider
         $itemtype = $DbUtils->getItemTypeForTable($table);
         $item     = new $itemtype();
         $criteria = $DbUtils->getEntitiesRestrictCriteria($table, '', '', $item->maybeRecursive());
+        $criteria[]['is_deleted'] = 0;
+        $criteria[]['is_template'] = 0;
         $request = [
             'COUNT' => 'cpt',
             'FROM'   => $table,
