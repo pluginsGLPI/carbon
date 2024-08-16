@@ -452,9 +452,25 @@ class Provider
         foreach ($result as $row) {
             $date = new DateTime($row['date']);
             $data['labels'][] = $date->format('Y-m');
-            $data['series'][0]['data'][] = number_format($row['total_emission_per_month'], PLUGIN_CARBON_DECIMALS);
+            $data['series'][0]['data'][] = $row['total_emission_per_month'];
         }
 
+        $units = [
+            __('g', 'carbon'),
+            __('Kg', 'carbon'),
+            __('t', 'carbon'),
+            __('Kt', 'carbon'),
+            __('Mt', 'carbon'),
+            __('Gt', 'carbon'),
+            __('Tt', 'carbon'),
+            __('Pt', 'carbon'),
+            __('Et', 'carbon'),
+            __('Zt', 'carbon'),
+            __('Yt', 'carbon'),
+        ];
+        $scaled = Toolbox::scaleSerie($data['series'][0]['data'], $units);
+        $data['series'][0]['data'] = $scaled['serie'];
+        $data['series'][0]['name'] = $scaled['unit'] . __('CO₂eq', 'carbon');
         return $data;
     }
 

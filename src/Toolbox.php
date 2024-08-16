@@ -146,6 +146,38 @@ class Toolbox
         return sprintf(__('%1$s %2$s'), round($p, 2), $human_readable_unit);
     }
 
+    /**
+     * Find the best multiplier to normalize a values of a serie
+     *
+     * @param array $serie serie of numbers
+     * @param array $units unis ordered by power
+     * @return array modified serie and selected unit
+     */
+    public static function scaleSerie(array $serie, array $units): array
+    {
+        if (count($serie) === 0) {
+            return ['serie' => $serie, 'unit' => array_shift($units)];
+        };
+
+        $average = array_sum($serie) / count($serie);
+
+        $multiple = 1000;
+        $power = 1;
+        foreach ($units as $human_readable_unit) {
+            if ($average < $multiple) {
+                break;
+            }
+            $average = $average / $multiple;
+            $power++;
+        }
+
+        foreach ($serie as &$number) {
+            $number = number_format($number / ($multiple^$power), PLUGIN_CARBON_DECIMALS);
+        }
+
+        return ['serie' => $serie, 'unit' => $human_readable_unit];
+    }
+
     public function getHistoryClasses(): array
     {
         $history_types = [];

@@ -50,12 +50,13 @@
     fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/carbonEmissionLastMonth.php").then(response => {
         return response.json();
     }).then(data => {
+      debugger;
         // update total carbon emission for month
         let currentMonthEmission = '0';
         if (data.series[0].data.length > 0) {
           currentMonthEmission = data.series[0].data[data.series[0].data.length - 1];
         }
-        document.getElementById('monthlyEmission').textContent = currentMonthEmission + " gCO₂eq";
+        document.getElementById('monthlyEmission').textContent = currentMonthEmission + " " + data.series[0].name;
         // Calculate and display the percentage comparison with the previous month
         let comparisonText = '';
         if (data.series[0].data.length > 1) {
