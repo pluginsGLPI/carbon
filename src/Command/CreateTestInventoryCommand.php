@@ -37,6 +37,7 @@ use DateTime;
 use CommonDBTM;
 use Computer as GlpiComputer;
 use ComputerType as GlpiComputerType;
+use ComputerModel as GlpiComputerModel;
 use Entity;
 use Location;
 use GlpiPlugin\Carbon\ComputerType;
@@ -67,6 +68,7 @@ class CreateTestInventoryCommand extends Command
             ],
             'power' => 70 /* Watt */ ,
             'count' => 2,
+            'model' => ['name' => 'Desktop'],
         ],
         'Laptop' => [
             'usage_profile' => [
@@ -83,6 +85,7 @@ class CreateTestInventoryCommand extends Command
             ],
             'power' => 40 /* Watt */ ,
             'count' => 5,
+            'model' => ['name' => 'Laptop'],
         ],
         'Server' => [
             'usage_profile' => [
@@ -99,6 +102,7 @@ class CreateTestInventoryCommand extends Command
             ],
             'power' => 150 /* Watt */ ,
             'count' => 2,
+            'model' => ['name' => 'Server'],
         ],
         'Tablet' => [
             'usage_profile' => [
@@ -115,6 +119,7 @@ class CreateTestInventoryCommand extends Command
             ],
             'power' => 15 /* Watt */ ,
             'count' => 1,
+            'model' => ['name' => 'Tablet'],
         ],
     ];
 
@@ -188,7 +193,7 @@ class CreateTestInventoryCommand extends Command
         return $glpi_computer_type;
     }
 
-    private function getComputer(string $computer_name, int $entity_id, Location $location, GlpiComputerType $computer_type, ComputerUsageProfile $usage_profile): CommonDBTM
+    private function getComputer(string $computer_name, int $entity_id, Location $location, GlpiComputerType $computer_type, ComputerUsageProfile $usage_profile, GlpiComputerModel $model): CommonDBTM
     {
         $glpi_computer = $this->createItemIfNotExist(
             GlpiComputer::class,
@@ -197,6 +202,7 @@ class CreateTestInventoryCommand extends Command
                 Location::getForeignKeyField() => $location->getID(),
                 GlpiComputerType::getForeignKeyField() => $computer_type->getID(),
                 Entity::getForeignKeyField() => $entity_id,
+                GlpiComputerModel::getForeignKeyField() => $model->getID(),
             ]
         );
         $impact = $this->createItemIfNotExist(
@@ -227,9 +233,10 @@ class CreateTestInventoryCommand extends Command
         foreach ($inventory_data as $type_name => $type_data) {
             $computer_type = $this->getComputerType($type_name, $type_data['power']);
             $usage_profile = $this->createItemIfNotExist(ComputerUsageProfile::class, $type_data['usage_profile']);
+            $model = $this->createItemIfNotExist(GlpiComputerModel::class, $type_data['model']);
             for ($computer_count = 0; $computer_count < $type_data['count']; $computer_count++) {
                 $computer_name = $type_name . '-' . strval($computer_count);
-                $this->getComputer($computer_name, $entity_id, $location, $computer_type, $usage_profile);
+                $this->getComputer($computer_name, $entity_id, $location, $computer_type, $usage_profile, $model);
             }
         }
     }
