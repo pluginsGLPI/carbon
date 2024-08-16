@@ -31,19 +31,16 @@
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Carbon\CarbonEmission;
-use GlpiPlugin\Carbon\ComputerPower;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
-use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\Install;
 use GlpiPlugin\Carbon\Uninstall;
-use GlpiPlugin\Carbon\Upgrade;
-use GlpiPlugin\Carbon\Report;
 use GlpiPlugin\Carbon\EnvironnementalImpact;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\NetworkEquipmentType;
 use ComputerType as GlpiComputerType;
+use NetworkEquipmentType as GlpiNetworkEquipmentType;
 
 /**
  * Plugin install process
@@ -116,35 +113,65 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
         return $sopt;
     }
 
-    $sopt[] = [
-        'id' => 2222,
-        'table'        => ComputerType::getTable(),
-        'field'        => 'power_consumption',
-        'name'         => __('Power consumption (W)', 'power consumption (W)'),
-        'datatype'     => 'number',
-        'linkfield'    => 'computers_id',
-        'joinparams' => [
-            'jointype' => 'child',
-            'beforejoin' => [
-                'table' => GlpiComputerType::getTable(),
-                'joinparams' => [
-                    'jointype' => 'child',
-
+    if ($itemtype === Computer::class) {
+        $sopt[] = [
+            'id' => 2222,
+            'table'        => ComputerType::getTable(),
+            'field'        => 'power_consumption',
+            'name'         => __('Power consumption (W)', 'power consumption (W)'),
+            'datatype'     => 'number',
+            'linkfield'    => 'computers_id',
+            'joinparams' => [
+                'jointype' => 'child',
+                'beforejoin' => [
+                    'table' => GlpiComputerType::getTable(),
+                    'joinparams' => [
+                        'jointype' => 'child',
+                    ]
                 ]
             ]
-        ]
-    ];
-    $sopt[] = [
-        'id' => 2223,
-        'table'        => CarbonEmission::getTable(),
-        'field'        => 'emission_per_day',
-        'name'         => __('Carbon emission (kgCO2)', 'carbon emission (kgC02)'),
-        'datatype'     => 'number',
-        'linkfield'    => 'computers_id',
-        'joinparams' => [
-            'jointype' => 'child'
-        ]
-    ];
+        ];
+
+        $sopt[] = [
+            'id' => 2223,
+            'table'        => ComputerUsageProfile::getTable(),
+            'field'        => 'name',
+            'name'         => ComputerUsageProfile::getTypeName(),
+            'datatype'     => 'itemlink',
+            'linkfield'    => 'computers_id',
+            'joinparams' => [
+                'jointype' => 'empty',
+                'beforejoin' => [
+                    'table'    => EnvironnementalImpact::getTable(),
+                    'joinparams' => [
+                        'jointype' => 'child',
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    if ($itemtype  == NetworkEquipment::class) {
+        $sopt[] = [
+            'id' => 2222,
+            'table'        => NetworkEquipmentType::getTable(),
+            'field'        => 'power_consumption',
+            'name'         => __('Power consumption (W)', 'power consumption (W)'),
+            'datatype'     => 'number',
+            'linkfield'    => 'networkequipments_id',
+            'joinparams' => [
+                'jointype' => 'child',
+                'beforejoin' => [
+                    'table' => GlpiNetworkEquipmentType::getTable(),
+                    'joinparams' => [
+                        'jointype' => 'child',
+                    ]
+                ]
+            ]
+        ];
+
+        return $sopt;
+    }
 
     return $sopt;
 }
