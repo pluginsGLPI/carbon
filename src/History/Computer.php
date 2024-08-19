@@ -117,8 +117,8 @@ class Computer extends AbstractAsset
             ],
             'WHERE' => [
                 'AND' => [
-                    'is_deleted' => 0,
-                    'is_template' => 0,
+                    self::$itemtype::getTableField('is_deleted') => 0,
+                    self::$itemtype::getTableField('is_template') => 0,
                     ['NOT' => [Location::getTableField('country') => '']],
                     ['NOT' => [Location::getTableField('country') => null]],
                     [

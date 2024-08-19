@@ -62,8 +62,7 @@ class Monitor extends AbstractAsset
         $computers_items_table = Computer_Item::getTable();
         $glpi_monitors_table = GlpiMonitor::getTable();
         $request = (new Computer())->getHistorizableQuery();
-        $request['FROM'] = $monitors_table;
-        $request['INNER JOIN'][$computers_table] = [
+        $request['INNER JOIN'][$computers_items_table] = [
             'FKEY' => [
                 $computers_table => 'id',
                 $computers_items_table => GlpiComputer::getForeignKeyField(),
@@ -73,12 +72,14 @@ class Monitor extends AbstractAsset
             'FKEY' => [
                 $glpi_monitors_table => 'id',
                 $computers_items_table => 'items_id',
-                ['AND' => [Computer_Item::getTableField('itemtype') => GlpiMonitor::class]],
+                ['AND' => [Computer_Item::getTableField('itemtype') => self::$itemtype]],
             ],
         ];
 
-        $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($monitors_table, '', '', 'auto');
-        $request['WHERE'] += $entity_restrict;
+        $request['WHERE']['AND'] += [
+            self::$itemtype::getTableField('is_deleted') => 0,
+            self::$itemtype::getTableField('is_template') => 0,
+        ];
 
         return $request;
     }
