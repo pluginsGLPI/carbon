@@ -56,6 +56,7 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
 
     /**
      * Returns the consumed energy for the specified day.
+     * @return float energy (KWh)
      *
      * {@inheritDoc}
      */
@@ -115,41 +116,54 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
             return 0;
         }
 
-        $query_result = $this->requestCarbonIntensitiesPerDay($start_time, $length);
+        $iterator = $this->requestCarbonIntensitiesPerDay($start_time, $length);
 
-        if ($query_result->numrows() == 0) {
+        $total_seconds = (int) $length->format('%S');
+        if ($total_seconds === 0) {
+            return 0;
+        }
+
+        if ($iterator->count() === 0) {
             return null;
         }
 
+        if ($iterator->count() < 2) {
+            // Less than 1 hour to compute
+            $intensity = $iterator->current()['intensity'];
+            $energy_in_kwh = ($power * $total_seconds) / (1000.0 * 60 * 60);
+            $emission = $intensity * $energy_in_kwh;
+            return $emission;
+        }
+
+        $counted_seconds = 0;
         $total_emission = 0.0;
-        $previous_timestamp = 0;
-        $length_seconds = $length->format('%S');
-        foreach ($query_result as $row) {
-            $date = DateTime::createFromFormat('Y-m-d H:i:s', $row['date']);
-            if ($previous_timestamp == 0) {
-                $previous_timestamp = $date->getTimestamp();
-                continue;
+        while (($row = $iterator->current()) !== null) {
+            $current_hour = DateTime::createFromFormat('Y-m-d H:i:s', $row['date']);
+            // Calculate seconds to next hour
+            $next_hour = clone $current_hour;
+            $next_hour->add(new DateInterval('PT1H'));
+            $next_hour->setTime($next_hour->format('H'), 0, 0, 0);
+            $seconds = $next_hour->format('U') - $current_hour->format('U');
+
+            if ($counted_seconds + $seconds > $total_seconds) {
+                // Calculate emission of last hour (incomplete)
+                $seconds = $total_seconds - $counted_seconds;
+                $energy_in_kwh = ($power * $seconds) / (1000.0 * 60 * 60);
+                $emission = $row['intensity'] * $energy_in_kwh;
+                $total_emission += $emission;
+                return $total_emission;
             }
 
-            // calculate seconds where the asset is on within the hour
-            $current_timestamp = $date->format('U');
-            $next_hour = $current_timestamp;
-            $hour_fraction = ($next_hour - $start_time->format('U'));
-            $hour_fraction = min($hour_fraction, $length_seconds);
-
-            // units:
-            // power is in Watt
-            // delta_time is in seconds
-            // intensity is in gCO2/kWh
-            $energy_in_kwh = ($power * $hour_fraction) / (1000.0 * 60 * 60);
+            // Calculate emission for a complete hour
+            $energy_in_kwh = ($power * $seconds) / (1000.0 * 60 * 60);
             $emission = $row['intensity'] * $energy_in_kwh;
             $total_emission += $emission;
 
-            // Increment start_time using $date
-            // (because this loop assumes that carbon intensity is recorded for last hour)
-            // TODO: to define if it should be for the next hour instead
-            $start_time = clone $date;
-            $length_seconds -= $hour_fraction;
+            $counted_seconds += $seconds;
+            if ($counted_seconds >= $total_seconds) {
+                return $total_emission;
+            }
+            $iterator->next();
         }
 
         return $total_emission;
