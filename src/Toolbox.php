@@ -162,7 +162,7 @@ class Toolbox
         $average = array_sum($serie) / count($serie);
 
         $multiple = 1000;
-        $power = 1;
+        $power = 0;
         foreach ($units as $human_readable_unit) {
             if ($average < $multiple) {
                 break;
@@ -172,7 +172,7 @@ class Toolbox
         }
 
         foreach ($serie as &$number) {
-            $number = number_format($number / ($multiple^$power), PLUGIN_CARBON_DECIMALS);
+            $number = number_format($number / ($multiple ** $power), PLUGIN_CARBON_DECIMALS);
         }
 
         return ['serie' => $serie, 'unit' => $human_readable_unit];
