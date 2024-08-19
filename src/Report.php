@@ -132,7 +132,7 @@ class Report extends CommonDBTM
         return json_encode($response);
     }
 
-    public static function getCarbonEmissionPerMonth(array $params = []): string
+    public static function getCarbonEmissionPerMonth(array $params = [], array $crit = []): string
     {
         if (!isset($params['args']['apply_filters']['dates'][0]) || !isset($params['args']['apply_filters']['dates'][1])) {
             list($start_date, $end_date) = self::YearToLastMonth();
@@ -142,7 +142,7 @@ class Report extends CommonDBTM
             $start_date = DateTime::createFromFormat('Y-m-d\TH:i:s.v\Z', $params['args']['apply_filters'][0]);
             $end_date   = DateTime::createFromFormat('Y-m-d\TH:i:s.v\Z', $params['args']['apply_filters'][1]);
         }
-        $data = Provider::getCarbonEmissionPerMonth($params);
+        $data = Provider::getCarbonEmissionPerMonth($params, $crit);
 
         // Prepare date format
         switch ($_SESSION['glpidate_format'] ?? 0) {

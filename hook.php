@@ -99,6 +99,17 @@ function plugin_carbon_getDropdown()
     ];
 }
 
+function plugin_carbon_postShowTab(array $param)
+{
+    switch ($param['item']::getType()) {
+        case Computer::class:
+            if ($param['options']['itemtype'] == EnvironnementalImpact::class) {
+                EnvironnementalImpact::showCharts($param['item']);
+            }
+
+    }
+}
+
 /**
  * Undocumented function
  *

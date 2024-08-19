@@ -413,10 +413,11 @@ class Provider
     /**
      * Get carbon emission per month for all assets in the current entity
      * @param array $params
+     * @param array $crit   Plugin specific criteria, used to show data for a single item
      *
      * @return array
      */
-    public static function getCarbonEmissionPerMonth(array $params = []): array
+    public static function getCarbonEmissionPerMonth(array $params = [], $crit = []): array
     {
         global $DB;
 
@@ -433,7 +434,7 @@ class Provider
             'FROM'    => $emissions_table,
             'GROUPBY' => new QueryExpression($sql_year_month),
             'ORDER'   => new QueryExpression($sql_year_month),
-            'WHERE'   => $entityRestrict,
+            'WHERE'   => $entityRestrict + $crit,
         ];
         $filter = self::getFiltersCriteria($emissions_table, $params['args']['apply_filters'] ?? []);
         $request = array_merge_recursive($request, $filter);

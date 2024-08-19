@@ -147,4 +147,20 @@ class EnvironnementalImpact extends CommonDBChild
 
         return $tab;
     }
+
+    public static function showCharts(CommonGLPI $item)
+    {
+        $environnemental_impact = new self();
+        /** @var CommonDBTM $item */
+        $environnemental_impact->getFromDBByCrit([
+            'computers_id' => $item->getID(),
+        ]);
+        if ($environnemental_impact->isNewItem()) {
+            return;
+        }
+
+        TemplateRenderer::getInstance()->display('@carbon/environnementalimpact-item.html.twig', [
+            'item'     => $environnemental_impact,
+        ]);
+    }
 }

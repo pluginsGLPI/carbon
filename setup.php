@@ -96,6 +96,8 @@ function plugin_init_carbon()
     $PLUGIN_HOOKS['menu_toadd']['carbon']['tools'] = [Report::class];
     $PLUGIN_HOOKS['menu_toadd']['carbon']['admin'] = [CarbonIntensity::class];
 
+    $PLUGIN_HOOKS[Hooks::POST_SHOW_TAB]['carbon'] = 'plugin_carbon_postShowTab';
+
     Plugin::registerClass(Config::class, ['addtabon' => GlpiConfig::class]);
     Plugin::registerClass(Profile::class, ['addtabon' => GlpiProfile::class]);
     Plugin::registerClass(ComputerType::class, ['addtabon' => GlpiComputerType::class]);
