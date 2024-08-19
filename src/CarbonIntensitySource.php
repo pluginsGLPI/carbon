@@ -34,7 +34,9 @@
 namespace GlpiPlugin\Carbon;
 
 use CommonDropdown;
-use Entity;
+use CommonGLPI;
+use DBUtils;
+use Session;
 
 class CarbonIntensitySource extends CommonDropdown
 {
@@ -61,5 +63,41 @@ class CarbonIntensitySource extends CommonDropdown
     public static function canPurge()
     {
         return false;
+    }
+
+    public function defineTabs($options = [])
+    {
+        $tabs = parent::defineTabs($options);
+        $this->addStandardTab(CarbonIntensityZone::class, $tabs, $options);
+        return $tabs;
+    }
+
+    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    {
+        if (!$withtemplate) {
+            $nb = 0;
+            switch ($item->getType()) {
+                case CarbonIntensityZone::class:
+                    if ($_SESSION['glpishow_count_on_tabs']) {
+                        $nb = (new DBUtils())->countElementsInTable(
+                            CarbonIntensitySource_CarbonIntensityZone::getTable(),
+                            [self::getForeignKeyField() => $item->getID()]
+                        );
+                    }
+                    return self::createTabEntry(self::getTypeName(Session::getPluralNumber()), $nb);
+            }
+        }
+
+        return '';
+    }
+
+    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
+    {
+        switch ($item->getType()) {
+            case CarbonIntensityZone::class:
+                CarbonIntensitySource_CarbonIntensityZone::showForZone($item);
+        }
+
+        return true;
     }
 }

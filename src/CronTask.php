@@ -124,7 +124,7 @@ class CronTask
             $task->addVolume($done_count);
         }
 
-        $zones = $data_source->getZones();
+        $zones = $data_source->getZones(['is_enabled' => 1]);
         if (count($zones) === 0) {
             return 0;
         }
@@ -132,7 +132,8 @@ class CronTask
         $limit_per_zone = floor(((int) $remaining) / count($zones));
         $count = 0;
         $failure = false;
-        foreach ($zones as $zone_name) {
+        foreach ($zones as $zone) {
+            $zone_name = $zone['name'];
             try {
                 $added = $intensity->downloadOneZone($data_source, $zone_name, $limit_per_zone);
             } catch (\RuntimeException $e) {

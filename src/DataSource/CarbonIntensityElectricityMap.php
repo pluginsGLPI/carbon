@@ -38,7 +38,9 @@ use DateTimeInterface;
 use DateTimeZone;
 use DateTimeImmutable;
 use GlpiPlugin\Carbon\CarbonIntensity;
+use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
 use Config as GlpiConfig;
 use GLPIKey;
 
@@ -58,13 +60,6 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
     public function getSourceName(): string
     {
         return 'ElectricityMap';
-    }
-
-    public function getZones(): array
-    {
-        return [
-            'France'
-        ];
     }
 
     public function getDataInterval(): string
@@ -87,6 +82,12 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
 
     public function createZones(): int
     {
+        $source = new CarbonIntensitySource();
+        if (!$source->getFromDBByCrit(['name' => $this->getSourceName()])) {
+            // Failed to get the source (shoud not happen as it is created at installation time)
+            return -1;
+        }
+
         try {
             $zones = $this->downloadZones();
         } catch (\RuntimeException $e) {
@@ -96,20 +97,33 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
         $count = 0;
         $failed = false;
         foreach ($zones as $zone_key => $zone_spec) {
-            $input = [
+            $zone_input = [
                 'name' => $zone_spec['zoneName'],
             ];
             $zone = new CarbonIntensityZone();
-            if ($zone->getFromDbByCrit($input) === false) {
-                $input['electricitymap_code'] = $zone_key;
-                $zone_id = $zone->add($input);
-                if ($zone_id === false) {
+            if ($zone->getFromDbByCrit($zone_input) === false) {
+                // $zone_input['electricitymap_code'] = $zone_key;
+                if ($zone->add($zone_input) === false) {
+                    ;
                     $failed = true;
                     continue;
                 }
-            } else {
-                $zone->update(['electricitymap_code' => $zone_key] + $zone->fields);
+            // } else {
+            //     $zone_input = [
+            //         'id' => $zone->getID(),
+            //         'electricitymap_code' => $zone_key
+            //     ];
+            //     if (!$zone->update($zone_input)) {
+            //         $failed++;
+            //         continue;
+            //     }
             }
+            $source_zone = new CarbonIntensitySource_CarbonIntensityZone();
+            $source_zone->add([
+                CarbonIntensitySource::getForeignKeyField() => $source->getID(),
+                CarbonIntensityZone::getForeignKeyField() => $zone->getID(),
+                'code' => $zone_key,
+            ]);
             $count++;
         }
 
@@ -157,13 +171,13 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
      */
     public function fetchDay(DateTimeImmutable $day, string $zone): array
     {
-        // $day argument is ignored : this endpoint gives the 24 last hours
-        $zone_object = new CarbonIntensityZone();
-        if (!$zone_object->getFromDbByCrit(['name' => $zone])) {
-            return [];
+        $source_zone = new CarbonIntensitySource_CarbonIntensityZone();
+        $zone_code = $source_zone->getFromDbBySourceAndZone($this->getSourceName(), $zone);
+
+        if ($zone_code === null) {
+            throw new AbortException('Invalid zone');
         }
-        $zone_code = $zone_object->fields['electricitymap_code'];
-        $zone_code = 'FR';
+
         $params = [
             'zone' => $zone_code,
         ];

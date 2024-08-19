@@ -141,7 +141,7 @@ interface CarbonIntensityInterface
      *
      * @return array
      */
-    public function getZones(): array;
+    public function getZones(array $crit = []): array;
 
     public function getMaxIncrementalAge(): DateTimeImmutable;
 

@@ -31,45 +31,34 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\DataSource\Tests;
-
-use GlpiPlugin\Carbon\DataSource\CarbonIntensityElectricityMap;
-use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
-use GlpiPlugin\Carbon\Tests\DbTestCase;
-use DateTimeImmutable;
 use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
 
-class CarbonIntensityElectricityMapTest extends DbTestCase
-{
-    public function testFetchDay()
-    {
-        $client = $this->createStub(RestApiClientInterface::class);
-        $response = file_get_contents(__DIR__ . '/../../fixtures/ElectricityMap/api-sample.json');
-        $client->method('request')->willReturn(json_decode($response, true));
+include('../../../inc/includes.php');
 
-        $data_source = new CarbonIntensityElectricityMap($client);
-        $source = new CarbonIntensitySource();
-        $source->getFromDBByCrit(['name' => $data_source->getSourceName()]);
-        $this->assertFalse($source->isNewItem());
-        $zone = $this->getItem(CarbonIntensityZone::class, [
-            'name' => 'France',
-        ]);
-        $source_zone = $this->getItem(CarbonIntensitySource_CarbonIntensityZone::class, [
-            CarbonIntensitySource::getForeignKeyField() => $source->getID(),
-            CarbonIntensityZone::getForeignKeyField() => $zone->getID(),
-            'code' => 'FR'
-        ]);
+// Check if plugin is activated...
+if (!Plugin::isPluginActive('carbon')) {
+    http_response_code(404);
+    die();
+}
 
-        $date = new DateTimeImmutable('5 days ago');
-        $intensities = $data_source->fetchDay($date, 'France');
+if (!CarbonIntensitySource::canView()) {
+    // Will die
+    http_response_code(403);
+    die();
+}
 
-        $this->assertIsArray($intensities);
-        $this->assertArrayHasKey('source', $intensities);
-        $this->assertEquals('ElectricityMap', $intensities['source']);
-        $this->assertArrayHasKey('France', $intensities);
-        $this->assertIsArray($intensities['France']);
-        $this->assertEquals(24, count($intensities['France']));
-    }
+if (!isset($_GET['id'])) {
+    http_response_code(400);
+    die();
+}
+
+$source_zone = new CarbonIntensitySource_CarbonIntensityZone();
+if (!$source_zone->getFromDB($_GET['id'])) {
+    http_response_code(403);
+    die();
+}
+if (!$source_zone->toggleZone()) {
+    http_response_code(500);
+    die();
 }

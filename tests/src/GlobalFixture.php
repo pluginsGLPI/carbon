@@ -102,11 +102,26 @@ class GlobalFixture
         if ($iterator->count() === 0) {
             $result = $DB->insert($zone_table, [
                 'name' => $fake_zone_name,
-                'electricitymap_code' => 'FZ',
             ]);
             $zone_id = $DB->insertId();
         } else {
             $zone_id = $iterator->current()['id'];
+        }
+        $source_zone_table = 'glpi_plugin_carbon_carbonintensitysources_carbonintensityzones';
+        $iterator = $DB->request([
+            'SELECT' => ['id'],
+            'FROM' => $source_zone_table,
+            'WHERE' => [
+                'plugin_carbon_carbonintensitysources_id' => $source_id,
+                'plugin_carbon_carbonintensityzones_id'   => $zone_id,
+            ],
+        ]);
+        if ($iterator->count() === 0) {
+            $result = $DB->insert($source_zone_table, [
+                'plugin_carbon_carbonintensitysources_id' => $source_id,
+                'plugin_carbon_carbonintensityzones_id'   => $zone_id,
+                'code'                                    => 'FZ',
+            ]);
         }
 
         $intensity_table = 'glpi_plugin_carbon_carbonintensities';

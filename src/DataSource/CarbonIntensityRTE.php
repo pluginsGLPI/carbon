@@ -38,6 +38,8 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
+use GlpiPlugin\Carbon\CarbonIntensitySource;
+use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 
 class CarbonIntensityRTE extends AbstractCarbonIntensity
@@ -63,13 +65,6 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         return 'P15M';
     }
 
-    public function getZones(): array
-    {
-        return [
-            'France',
-        ];
-    }
-
     public function getHardStartDate(): DateTimeImmutable
     {
         return DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '2012-01-01T00:00:00+00:00');
@@ -85,19 +80,26 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
 
     public function createZones(): int
     {
+        $source = new CarbonIntensitySource();
+        if (!$source->getFromDBByCrit(['name' => $this->getSourceName()])) {
+            // Failed to get the source (shoud not happen as it is created at installation time)
+            return -1;
+        }
+
         $zone = new CarbonIntensityZone();
 
         $input = ['name' => 'France'];
-        if (!$zone->getFromDBByCrit($input)) {
+        if ($zone->getFromDBByCrit($input) === false) {
             if (!$zone->add($input)) {
-                $this->setZoneSetupComplete();
-                return 1;
-            } else {
-                // Failed to create item
                 return -1;
             }
         }
 
+        $source_zone = new CarbonIntensitySource_CarbonIntensityZone();
+        $source_zone->add([
+            CarbonIntensitySource::getForeignKeyField() => $source->getID(),
+            CarbonIntensityZone::getForeignKeyField() => $zone->getID(),
+        ]);
         $this->setZoneSetupComplete();
         return 1;
     }
