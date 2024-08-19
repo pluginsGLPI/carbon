@@ -183,8 +183,8 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     protected function historizeItemPerDay(CommonDBTM $item, EngineInterface $engine, DateTime $day): bool
     {
         $energy = $engine->getEnergyPerDay($day);
-        if ($energy === null) {
-            return false;
+        if ($energy === 0) {
+            return true;
         }
 
         $emission = $engine->getCarbonEmissionPerDay($day);
