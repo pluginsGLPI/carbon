@@ -106,7 +106,6 @@ function plugin_carbon_postShowTab(array $param)
             if ($param['options']['itemtype'] == EnvironnementalImpact::class) {
                 EnvironnementalImpact::showCharts($param['item']);
             }
-
     }
 }
 
