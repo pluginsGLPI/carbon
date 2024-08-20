@@ -33,6 +33,7 @@
 
 namespace GlpiPlugin\Carbon\DataSource;
 
+use DateInterval;
 use DateTime;
 use DateTimeInterface;
 use DateTimeZone;
@@ -299,5 +300,18 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
         $start_date->setTime($start_date->format('H'), 0, 0);
         $start_date = DateTimeImmutable::createFromMutable($start_date);
         return $this->incrementalDownload($zone, $start_date, $intensity, $limit);
+    }
+
+    protected function sliceDateRangeByDay(DateTimeImmutable $start, DateTimeImmutable $stop)
+    {
+        $real_start = $start;
+        $real_stop = $stop->setTime(0, 0, 0);
+
+        $current_date = DateTime::createFromImmutable($real_start);
+        while ($current_date <= $real_stop) {
+            yield DateTimeImmutable::createFromMutable($current_date);
+            $current_date->add(new DateInterval('P1D'));
+            $current_date->setTime(0, 0, 0);
+        }
     }
 }

@@ -1,0 +1,83 @@
+{#
+ # -------------------------------------------------------------------------
+ # carbon plugin for GLPI
+ # -------------------------------------------------------------------------
+ #
+ # MIT License
+ #
+ # Permission is hereby granted, free of charge, to any person obtaining a copy
+ # of this software and associated documentation files (the "Software"), to deal
+ # in the Software without restriction, including without limitation the rights
+ # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ # copies of the Software, and to permit persons to whom the Software is
+ # furnished to do so, subject to the following conditions:
+ #
+ # The above copyright notice and this permission notice shall be included in all
+ # copies or substantial portions of the Software.
+ #
+ # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ # SOFTWARE.
+ # -------------------------------------------------------------------------
+ # @copyright Copyright (C) 2024 Teclib' and contributors.
+ # @license   MIT https://opensource.org/licenses/mit-license.php
+ # @link      https://github.com/pluginsGLPI/carbon
+ # -------------------------------------------------------------------------
+ #}
+
+<div class="card-body" id="cardBodyBorder1">
+    <div class="subheader">{{ __('Carbon Emission per Month', 'carbon') }}</div>
+    <div class="h1 mb-3" id="carbonEmissionPerMonth"></div>
+    <div id="carbonEmissionPerMonthChart" class="chart-lg"></div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+      var carbonEmissionPerMonthOptions = {
+        chart: {
+          type: 'bar',
+          height: 350,
+        },
+        colors: ['#BBDA50'],
+        series : [],
+        plotOptions: {
+          bar: {
+            horizontal: false,
+            columnWidth: '55%',
+            endingShape: 'rounded'
+          },
+        },
+        dataLabels: {
+            style: {
+              colors: ['#145161'],
+            },
+        },
+        xaxis: {
+        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        },
+      };
+
+      var carbonEmissionPerMonthChart = new ApexCharts(document.querySelector("#carbonEmissionPerMonthChart"), carbonEmissionPerMonthOptions);
+      carbonEmissionPerMonthChart.render();
+
+      var itemtype = 'Computer';
+      var items_id = {{ item.fields.computers_id | raw }};
+
+      fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/carbonEmissionPerMonthForItem.php?itemtype=" + itemtype + "&items_id=" + items_id).then(response => {
+          return response.json();
+      }).then(data => {
+          carbonEmissionPerMonthChart.updateOptions({
+          xaxis: {
+          categories: data.labels,
+          },
+          series: data.series
+      });
+
+  });
+});
+
+</script>

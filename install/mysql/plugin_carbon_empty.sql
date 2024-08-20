@@ -40,7 +40,8 @@ CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_carbonemissions` (
   `energy_per_day`   float        DEFAULT '0',
   `emission_per_day` float        DEFAULT '0',
   `date`             timestamp    NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unicity` (`itemtype`, `items_id`, `date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_carbonintensities` (

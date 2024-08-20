@@ -92,7 +92,6 @@ abstract class AbstractAsset implements EngineInterface
         $start_date_s = $start_time->format('Y-m-d H:00:00'); // may be can use directly concatenation
         $stop_date = clone $start_time;
         $stop_date = $stop_date->add($length);
-        $stop_date = $stop_date->add(new DateInterval('PT1H')); // Add 1h again to include ending time with minutes or seconds
         $stop_date_s = $stop_date->format('Y-m-d H:i:s'); // idem, may be can use directly concatenation
 
         $itemtype = static::$itemtype;
@@ -131,7 +130,7 @@ abstract class AbstractAsset implements EngineInterface
                 'AND' => [
                     $itemtype::getTableField('id') => $this->items_id,
                     [CarbonIntensity::getTableField('date') => ['>=', $start_date_s]],
-                    [CarbonIntensity::getTableField('date') => ['<', $stop_date_s]],
+                    [CarbonIntensity::getTableField('date') => ['<=', $stop_date_s]],
                 ],
             ],
             'ORDER' => CarbonIntensity::getTableField('date') . ' ASC',

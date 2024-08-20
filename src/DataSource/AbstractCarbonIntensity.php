@@ -253,9 +253,8 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
      */
     protected function sliceDateRangeByDay(DateTimeImmutable $start, DateTimeImmutable $stop)
     {
-        // $real_start = $start->setTime(0, 0, 0);
         $real_start = $start;
-        $real_stop = $stop->setTime(0, 0, 0);
+        $real_stop = $stop->setTime($stop->format('H'), 0, 0);
 
         $current_date = DateTime::createFromImmutable($real_start);
         while ($current_date <= $real_stop) {
