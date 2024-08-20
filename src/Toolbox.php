@@ -149,7 +149,7 @@ class Toolbox
     /**
      * Find the best multiplier to normalize a values of a serie
      *
-     * @param array $serie serie of numbers
+     * @param array $serie serie of numbers (each item may be an array witk keys x and y)
      * @param array $units unis ordered by power
      * @return array modified serie and selected unit
      */
@@ -159,7 +159,18 @@ class Toolbox
             return ['serie' => $serie, 'unit' => array_shift($units)];
         };
 
-        $average = array_sum($serie) / count($serie);
+        $average = 0;
+        foreach ($serie as $value) {
+            if (is_scalar($value)) {
+                $average += $value;
+            } else if (is_array($value)) {
+                $average += $value['y'];
+            } else {
+                continue;
+            }
+        }
+        $average /= count($serie);
+        // $average = array_sum($serie) / count($serie);
 
         $multiple = 1000;
         $power = 0;
@@ -172,7 +183,11 @@ class Toolbox
         }
 
         foreach ($serie as &$number) {
-            $number = number_format($number / ($multiple ** $power), PLUGIN_CARBON_DECIMALS);
+            if (is_scalar($number)) {
+                $number = number_format($number / ($multiple ** $power), PLUGIN_CARBON_DECIMALS);
+            } else if (is_array($number)) {
+                $number['y'] = number_format($number['y'] / ($multiple ** $power), PLUGIN_CARBON_DECIMALS);
+            }
         }
 
         return ['serie' => $serie, 'unit' => $human_readable_unit];

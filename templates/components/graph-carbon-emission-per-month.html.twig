@@ -30,7 +30,7 @@
  #}
 
   <div class="card-body" id="cardBodyBorder1">
-      <div class="subheader">{{ __('Carbon Emission per Month', 'carbon') }}</div>
+      <div class="subheader">{{ __('Consumed energy and carbon emission per month', 'carbon') }}</div>
       <div class="h1 mb-3" id="carbonEmissionPerMonth"></div>
       <div id="carbonEmissionPerMonthChart" class="chart-lg"></div>
   </div>
@@ -38,53 +38,46 @@
 
 {% block scripts %}
 <script>
-    $(document).ready(function () {
+  $(document).ready(function () {
 
-      var currentUrl = window.location.href;
+    var currentUrl = window.location.href;
 
-      if (currentUrl.includes('dashboard')) {
-        document.getElementById('cardBodyBorder1').classList.add('border', 'border-2');
-      }
+    if (currentUrl.includes('dashboard')) {
+      document.getElementById('cardBodyBorder1').classList.add('border', 'border-2');
+    }
 
-      var carbonEmissionPerMonthOptions = {
-        chart: {
-          type: 'bar',
-          height: 350,
+    var carbonEmissionPerMonthOptions = {
+      chart: {
+        type: 'bar',
+        height: 350,
+      },
+      colors: ['#BBDA50', '#A00'],
+      series : [],
+      plotOptions: {
+        bar: {
+          horizontal: false,
+          columnWidth: '55%',
+          endingShape: 'rounded'
         },
-        colors: ['#BBDA50'],
-        series : [],
-        plotOptions: {
-          bar: {
-            horizontal: false,
-            columnWidth: '55%',
-            endingShape: 'rounded'
+      },
+      dataLabels: {
+          style: {
+            colors: ['#145161', '#800'],
           },
-        },
-        dataLabels: {
-            style: {
-              colors: ['#145161'],
-            },
-        },
-        xaxis: {
+      },
+      xaxis: {
         categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-        },
-      };
+      },
+    };
 
-      var carbonEmissionPerMonthChart = new ApexCharts(document.querySelector("#carbonEmissionPerMonthChart"), carbonEmissionPerMonthOptions);
-      carbonEmissionPerMonthChart.render();
+    var carbonEmissionPerMonthChart = new ApexCharts(document.querySelector("#carbonEmissionPerMonthChart"), carbonEmissionPerMonthOptions);
+    carbonEmissionPerMonthChart.render();
 
-      fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/carbonEmissionPerMonth.php").then(response => {
-          return response.json();
-      }).then(data => {
-          carbonEmissionPerMonthChart.updateOptions({
-          xaxis: {
-          categories: data.labels,
-          },
-          series: data.series
-      });
-
+    fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/carbonEmissionPerMonth.php").then(response => {
+        return response.json();
+    }).then(data => {
+      carbonEmissionPerMonthChart.updateOptions(data);
+    });
   });
-});
-
 </script>
 {% endblock %}
