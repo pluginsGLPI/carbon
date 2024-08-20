@@ -50,7 +50,6 @@
     fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/carbonEmissionLastMonth.php").then(response => {
         return response.json();
     }).then(data => {
-      debugger;
         // update total carbon emission for month
         let currentMonthEmission = '0';
         if (data.series[0].data.length > 0) {
