@@ -428,7 +428,10 @@ class Provider
         $sql_year_month = "DATE_FORMAT(`date`, '%Y-%m')";
         $request = [
             'SELECT'    => [
-                'SUM' => CarbonEmission::getTableField('emission_per_day') . ' AS total_emission_per_month',
+                'SUM' => [
+                    CarbonEmission::getTableField('emission_per_day') . ' AS total_emission_per_month',
+                    CarbonEmission::getTableField('energy_per_day') . ' AS total_energy_per_month'
+                ],
                 new QueryExpression("$sql_year_month as `date`")
             ],
             'FROM'    => $emissions_table,
@@ -441,21 +444,78 @@ class Provider
         $result = $DB->request($request);
 
         $data = [
+            'chart' => [
+                'type' => 'line',
+                'height' => 350,
+            ],
+            'colors' => ['#BBDA50', '#A00'],
+            // 'title' => [
+                // 'text' => __('Consumed energy and carbon emission', 'carbon'),
+            // ],
+            'plotOptions' => [
+                'bar' => [
+                    'horizontal' => false,
+                    'columnWidth' => '55%',
+                    'endingShape' => 'rounded'
+                ],
+            ],
+            'dataLabels' => [
+                'enabled' => false,
+                'enabledOnSeries' => [0, 1],
+                'style' => [
+                    'colors' => ['#145161', '#800'],
+                ],
+            ],
             'labels' => [],
+            'stroke' => [
+                'width' => [0, 4],
+            ],
             'series' => [
                 [
-                    'name' => __("gCO₂eq", "carbon"),
+                    'name' =>  __('Carbon emission', 'carbon'),
+                    'type' => 'bar',
                     'data' => []
                 ],
-            ]
+                [
+                    'name' => __('Consumed energy', 'carbon'),
+                    'type' => 'line',
+                    'data' => []
+                ],
+            ],
+            'xaxis' => [
+                'categories' => []
+            ],
+            'yaxis' => [
+                [
+                    'title' => ['text' => __('Carbon emission', 'carbon')],
+                ], [
+                    'opposite' => true,
+                    'title' => ['text' => __('Consumed energy', 'carbon')],
+                ]
+            ],
+            'markers' => [
+                'size' => [3, 3],
+            ],
+            'tooltip' => [
+                'enabled' => true,
+            ],
         ];
 
         foreach ($result as $row) {
             $date = new DateTime($row['date']);
-            $data['labels'][] = $date->format('Y-m');
-            $data['series'][0]['data'][] = $row['total_emission_per_month'];
+            $date_formatted = $date->format('Y-m');
+            $data['xaxis']['categories'][] = $date_formatted;
+            $data['series'][0]['data'][] = [
+                'x' => $date_formatted,
+                'y' => $row['total_emission_per_month'],
+            ];
+            $data['series'][1]['data'][] = [
+                'x' => $date_formatted,
+                'y' => $row['total_energy_per_month'],
+            ];
         }
 
+        // Scale carbon emission
         $units = [
             __('g', 'carbon'),
             __('Kg', 'carbon'),
@@ -471,7 +531,23 @@ class Provider
         ];
         $scaled = Toolbox::scaleSerie($data['series'][0]['data'], $units);
         $data['series'][0]['data'] = $scaled['serie'];
-        $data['series'][0]['name'] = $scaled['unit'] . __('CO₂eq', 'carbon');
+        $data['series'][0]['name'] .= ' (' . $scaled['unit'] . __('CO₂eq', 'carbon') . ')';
+
+        // Scale energy consumption
+        $units = [
+            __('KWh', 'carbon'),
+            __('MWh', 'carbon'),
+            __('GWh', 'carbon'),
+            __('TWh', 'carbon'),
+            __('PWh', 'carbon'),
+            __('EWh', 'carbon'),
+            __('ZWh', 'carbon'),
+            __('YWh', 'carbon'),
+        ];
+        $scaled = Toolbox::scaleSerie($data['series'][1]['data'], $units);
+        $data['series'][1]['data'] = $scaled['serie'];
+        $data['series'][1]['name'] .= ' (' . $scaled['unit'] . ')';
+
         return $data;
     }
 

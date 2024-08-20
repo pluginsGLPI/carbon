@@ -36,48 +36,41 @@
 </div>
 
 <script type="text/javascript">
-    $(document).ready(function () {
-      var carbonEmissionPerMonthOptions = {
-        chart: {
-          type: 'bar',
-          height: 350,
+  $(document).ready(function () {
+    var carbonEmissionPerMonthOptions = {
+      chart: {
+        type: 'bar',
+        height: 350,
+      },
+      colors: ['#BBDA50'],
+      series : [],
+      plotOptions: {
+        bar: {
+          horizontal: false,
+          columnWidth: '55%',
+          endingShape: 'rounded'
         },
-        colors: ['#BBDA50'],
-        series : [],
-        plotOptions: {
-          bar: {
-            horizontal: false,
-            columnWidth: '55%',
-            endingShape: 'rounded'
+      },
+      dataLabels: {
+          style: {
+            colors: ['#145161'],
           },
-        },
-        dataLabels: {
-            style: {
-              colors: ['#145161'],
-            },
-        },
-        xaxis: {
+      },
+      xaxis: {
         categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-        },
-      };
+      },
+    };
 
-      var carbonEmissionPerMonthChart = new ApexCharts(document.querySelector("#carbonEmissionPerMonthChart"), carbonEmissionPerMonthOptions);
-      carbonEmissionPerMonthChart.render();
+    var carbonEmissionPerMonthChart = new ApexCharts(document.querySelector("#carbonEmissionPerMonthChart"), carbonEmissionPerMonthOptions);
+    carbonEmissionPerMonthChart.render();
 
-      var itemtype = 'Computer';
-      var items_id = {{ item.fields.computers_id | raw }};
+    var itemtype = 'Computer';
+    var items_id = {{ item.fields.computers_id | raw }};
 
-      fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/carbonEmissionPerMonthForItem.php?itemtype=" + itemtype + "&items_id=" + items_id).then(response => {
-          return response.json();
-      }).then(data => {
-          carbonEmissionPerMonthChart.updateOptions({
-          xaxis: {
-          categories: data.labels,
-          },
-          series: data.series
-      });
-
+    fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/carbonEmissionPerMonthForItem.php?itemtype=" + itemtype + "&items_id=" + items_id).then(response => {
+        return response.json();
+    }).then(data => {
+      carbonEmissionPerMonthChart.updateOptions(data);
+    });
   });
-});
-
 </script>
