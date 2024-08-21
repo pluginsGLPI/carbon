@@ -98,7 +98,8 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
             'ORDER'     => ['name ASC'],
         ]);
 
-        $tot = $iterator->count();
+        $total = $iterator->count();
+
         $entries = [];
         foreach ($iterator as $data) {
             $entries[] = [
@@ -111,7 +112,7 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
 
         $renderer = TemplateRenderer::getInstance();
         $renderer->getEnvironment()->addExtension(new DataHelpersExtension());
-        $renderer->display('@carbon/components/datatable.html.twig', [
+        $renderer->display('@carbon/pages/CarbonIntensitySource/tab_zone.html.twig', [
             'is_tab' => true,
             'nopager' => true,
             'nofilter' => true,
@@ -124,7 +125,7 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
                 'is_enabled' => 'raw_html',
             ],
             'footers' => [
-                ['', '', '', __('Total'), $tot, '']
+                ['', '', '', __('Total'), $total, '']
             ],
             'footer_class' => 'fw-bold',
             'entries' => $entries,
