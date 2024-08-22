@@ -54,7 +54,12 @@ if (!file_exists(GLPI_CONFIG_DIR . '/config_db.php')) {
 unset($glpiConfigDir);
 
 define('GLPI_LOG_DIR', __DIR__ . '/logs');
-@mkdir(GLPI_LOG_DIR);
+if (!file_exists(GLPI_LOG_DIR)) {
+    if (!mkdir(GLPI_LOG_DIR)) {
+        echo "Failed to create log directory " . GLPI_LOG_DIR . PHP_EOL;
+        exit(1);
+    }
+}
 
 ini_set('session.use_cookies', 0); //disable session cookies
 require_once GLPI_ROOT . "/inc/includes.php";
