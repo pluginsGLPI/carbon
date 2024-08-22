@@ -35,34 +35,75 @@ namespace GlpiPlugin\Carbon;
 
 use DateTime;
 use DateTimeImmutable;
+use Infocom;
 
 class Toolbox
 {
     /**
      * Get the oldest asset date in the database
+     * @param array $crit
      *
      * @return DateTimeImmutable
      */
-    public function getOldestAssetDate(): ?DateTimeImmutable
+    public function getOldestAssetDate(array $crit = []): ?DateTimeImmutable
     {
+        global $DB;
+
         $itemtypes = Config::getSupportedAssets();
+        if (isset($crit['itemtype'])) {
+            $itemtypes = [$crit['itemtype']];
+            unset($crit['itemtype']);
+        }
         $oldest_date = null;
+        $infocom_table = Infocom::getTable();
         foreach ($itemtypes as $itemtype) {
-            /** @var CommonDBTM $item */
-            $item = new $itemtype();
-            $result = $item->find([], ['date_creation DESC'], 1);
-            if (count($result) === 1) {
-                $row = array_pop($result);
-                if ($oldest_date === null || $row['date_creation'] < $oldest_date) {
-                    $oldest_date = $row['date_creation'];
+            if (Infocom::canApplyOn($itemtype)) {
+                $item_table = getTableForItemType($itemtype);
+                $dates = $DB->request([
+                    'SELECT' => [
+                        'MIN' => [
+                            "$item_table.date_creation as date_creation",
+                            "$item_table.date_mod as date_mod",
+                            "$infocom_table.use_date as use_date",
+                            "$infocom_table.delivery_date as delivery_date",
+                            "$infocom_table.buy_date as buy_date",
+                        ],
+                    ],
+                    'FROM' => $item_table,
+                    'LEFT JOIN' => [
+                        $infocom_table => [
+                            'FKEY' => [
+                                $infocom_table => 'items_id',
+                                $item_table    => 'id',
+                                ['AND' => ['itemtype' => $itemtype]],
+                            ]
+                        ]
+                    ],
+                    'WHERE' => $crit,
+                ])->current();
+                $itemtype_oldest_date = $dates['use_date']
+                ?? $dates['delivery_date']
+                ?? $dates['buy_date']
+                ?? $dates['date_creation']
+                ?? $dates['date_mod']
+                ?? null;
+                if ($oldest_date === null) {
+                    $oldest_date = $itemtype_oldest_date;
+                } else if ($itemtype_oldest_date !== null) {
+                    $oldest_date = min($oldest_date, $itemtype_oldest_date);
                 }
             }
         }
-
         if ($oldest_date === null) {
-            return $this->getDefaultCarbonIntensityDownloadDate();
+            return null;
         }
-        return DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $oldest_date);
+        if (($output = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $oldest_date)) === false) {
+            // Infocom dates are date (without time)
+            $output = DateTimeImmutable::createFromFormat('Y-m-d', $oldest_date);
+            $output = $output->setTime(0, 0, 0, 0);
+        }
+
+        return $output;
     }
 
     /**
