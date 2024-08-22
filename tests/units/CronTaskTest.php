@@ -44,7 +44,7 @@ class CronTaskTest extends DbTestCase
     public function downloadSourceProvider()
     {
         $data_source1 = $this->createStub(CarbonIntensityInterface::class);
-        $data_source1->method('getZones')->willReturn(['test_zone']);
+        $data_source1->method('getZones')->willReturn([['name' => 'test_zone']]);
         $intensity1 = $this->createStub(CarbonIntensity::class);
         $intensity1->method('downloadOneZone')->willReturn(0);
         yield 'download empty data' => [
@@ -54,7 +54,7 @@ class CronTaskTest extends DbTestCase
         ];
 
         $data_source2 = $this->createStub(CarbonIntensityInterface::class);
-        $data_source2->method('getZones')->willReturn(['test_zone']);
+        $data_source2->method('getZones')->willReturn([['name' => 'test_zone']]);
         $intensity2 = $this->createStub(CarbonIntensity::class);
         $intensity2->method('downloadOneZone')->willReturn(1024);
         yield 'download complete' => [
@@ -64,7 +64,7 @@ class CronTaskTest extends DbTestCase
         ];
 
         $data_source3 = $this->createStub(CarbonIntensityInterface::class);
-        $data_source3->method('getZones')->willReturn(['test_zone']);
+        $data_source3->method('getZones')->willReturn([['name' => 'test_zone']]);
         $intensity3 = $this->createStub(CarbonIntensity::class);
         $intensity3->method('downloadOneZone')->willReturn(-5);
         yield 'download incomplete' => [

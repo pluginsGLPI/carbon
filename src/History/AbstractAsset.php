@@ -37,11 +37,13 @@ namespace GlpiPlugin\Carbon\History;
 use CommonDBTM;
 use DateInterval;
 use DateTime;
+use DateTimeImmutable;
 use DbUtils;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
+use GlpiPlugin\Carbon\Toolbox;
 use Location;
 use Infocom;
 
@@ -279,35 +281,46 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      * @param integer $id id of the asset to examinate
      * @return DateTime|null
      */
-    protected function getInventoryIncomingDate(int $id): ?DateTime
+    protected function getInventoryIncomingDate(int $id): ?DateTimeImmutable
     {
-        $start_date = null;
-        $infocom = new Infocom();
-
-        $itemtype = static::$itemtype;
-        $infocom->getFromDBByCrit([
-            'itemtype' => $itemtype,
-            'items_id' => $id,
+        $toolbox = new Toolbox();
+        $inventory_date = $toolbox->getOldestAssetDate([
+            'itemtype' => static::$itemtype,
+            getTableForItemType(static::$itemtype) . '.id' => $id,
         ]);
-        if (!$infocom->isNewItem()) {
-            $start_date = $infocom->fields['use_date']
-            ?? $infocom->fields['delivery_date']
-            ?? $infocom->fields['buy_date']
-            ?? null;
-        }
 
-        if ($start_date === null) {
-            $asset = new $itemtype();
-            if (!$asset->getFromDb($id)) {
-                return null;
-            }
-            $start_date = $asset->fields['date_creation'] ?? $asset->fields['date_mod'] ?? null;
-            if ($start_date === null) {
-                return null;
-            }
+        if ($inventory_date === null) {
+            // return $toolbox->getDefaultCarbonIntensityDownloadDate();
         }
+        return $inventory_date;
 
-        return new DateTime($start_date);
+        // $start_date = null;
+        // $infocom = new Infocom();
+
+        // $itemtype = static::$itemtype;
+        // $infocom->getFromDBByCrit([
+        //     'itemtype' => $itemtype,
+        //     'items_id' => $id,
+        // ]);
+        // if (!$infocom->isNewItem()) {
+        //     $start_date = $infocom->fields['use_date']
+        //     ?? $infocom->fields['delivery_date']
+        //     ?? $infocom->fields['buy_date']
+        //     ?? null;
+        // }
+
+        // if ($start_date === null) {
+        //     $asset = new $itemtype();
+        //     if (!$asset->getFromDb($id)) {
+        //         return null;
+        //     }
+        //     $start_date = $asset->fields['date_creation'] ?? $asset->fields['date_mod'] ?? null;
+        //     if ($start_date === null) {
+        //         return null;
+        //     }
+        // }
+
+        // return new DateTimeImmutable($start_date);
     }
 
     /**

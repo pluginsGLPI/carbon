@@ -34,16 +34,13 @@
 namespace GlpiPlugin\Carbon\DataSource;
 
 use Config as GlpiConfig;
-use CronTask;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
-use Iterator;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
-use phpDocumentor\Reflection\Types\Iterable_;
 
 abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
 {
