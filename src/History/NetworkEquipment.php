@@ -36,6 +36,7 @@ namespace GlpiPlugin\Carbon\History;
 
 use CommonDBTM;
 use DbUtils;
+use Location;
 use NetworkEquipment as GlpiNetworkEquipment;
 use NetworkEquipmentType;
 use NetworkEquipmentModel;
@@ -55,22 +56,37 @@ class NetworkEquipment extends AbstractAsset
 
     public function getHistorizableQuery(): array
     {
-        $table = self::$itemtype::getTable();
+        $item_table = self::$itemtype::getTable();
+        $item_model_table = self::$model_itemtype::getTable();
+        $location_table = Location::getTable();
         $request = [
             'SELECT' => self::$itemtype::getTableField('*'),
             'FROM'   => self::$itemtype::getTable(),
+            'INNER JOIN' => [
+                $item_model_table => [
+                    'FKEY'   => [
+                        $item_table  => 'computermodels_id',
+                        $item_model_table => 'id',
+                    ]
+                ],
+                $location_table => [
+                    'FKEY'   => [
+                        $item_table  => 'locations_id',
+                        $location_table => 'id',
+                    ]
+                ],
+            ],
+            'WHERE' => [
+                self::$itemtype::getTableField('is_deleted') => 0,
+                self::$itemtype::getTableField('is_template') => 0,
+                ['NOT' => [Location::getTableField('country') => '']],
+                ['NOT' => [Location::getTableField('country') => null]],
+            ]
         ];
 
-        $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($table, '', '', 'auto');
+        $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($item_table, '', '', 'auto');
         $request['WHERE'] += $entity_restrict;
 
         return $request;
-    }
-
-    public function canHistorize(int $id): bool
-    {
-        // There is no specific conditions to historize carbon emissions
-        // of a network equipment (it is usually powered on 24/7)
-        return true;
     }
 }

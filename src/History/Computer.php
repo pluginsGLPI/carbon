@@ -59,8 +59,8 @@ class Computer extends AbstractAsset
 
     public function getHistorizableQuery(): array
     {
-        $computers_table = self::$itemtype::getTable();
-        $computermodels_table = GlpiComputerModel::getTable();
+        $item_table = self::$itemtype::getTable();
+        $item_model_table = self::$model_itemtype::getTable();
         $glpiComputertypes_table = GlpiComputerType::getTable();
         $computertypes_table = ComputerType::getTable();
         $location_table = Location::getTable();
@@ -71,17 +71,17 @@ class Computer extends AbstractAsset
             'SELECT' => [
                 self::$itemtype::getTableField('*'),
             ],
-            'FROM' => $computers_table,
+            'FROM' => $item_table,
             'INNER JOIN' => [
-                $computermodels_table => [
+                $item_model_table => [
                     'FKEY'   => [
-                        $computers_table  => 'computermodels_id',
-                        $computermodels_table => 'id',
+                        $item_table  => 'computermodels_id',
+                        $item_model_table => 'id',
                     ]
                 ],
                 $glpiComputertypes_table => [
                     'FKEY'   => [
-                        $computers_table  => 'computertypes_id',
+                        $item_table  => 'computertypes_id',
                         $glpiComputertypes_table => 'id',
                     ]
                 ],
@@ -98,13 +98,13 @@ class Computer extends AbstractAsset
                 ],
                 $location_table => [
                     'FKEY'   => [
-                        $computers_table  => 'locations_id',
+                        $item_table  => 'locations_id',
                         $location_table => 'id',
                     ]
                 ],
                 $environnementalimpact_table => [
                     'FKEY'   => [
-                        $computers_table  => 'id',
+                        $item_table  => 'id',
                         $environnementalimpact_table => 'computers_id',
                     ]
                 ],
@@ -131,7 +131,7 @@ class Computer extends AbstractAsset
             ]
         ];
 
-        $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($computers_table, '', '', 'auto');
+        $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($item_table, '', '', 'auto');
         $request['WHERE'] += $entity_restrict;
 
         return $request;
