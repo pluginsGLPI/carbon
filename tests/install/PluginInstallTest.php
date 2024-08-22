@@ -52,8 +52,7 @@ class PluginInstallTest extends CommonTestCase
 {
     public function setUp(): void
     {
-        //   parent::setUp();
-        //   self::setupGLPIFramework();
+        parent::setUp();
         self::login('glpi', 'glpi', true);
     }
 

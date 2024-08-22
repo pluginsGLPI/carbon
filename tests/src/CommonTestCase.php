@@ -80,6 +80,26 @@ class CommonTestCase extends TestCase
         Toolbox::setDebugMode($this->debugMode);
     }
 
+    protected function setUp(): void
+    {
+        $this->resetGLPILogs();
+    }
+
+    protected function tearDown(): void
+    {
+        $method = $this->getName();
+
+        $logs = ['php-errors.log', 'sql-errors.log'];
+        foreach ($logs as $log) {
+            if (!file_exists(GLPI_LOG_DIR . '/' . $log)) {
+                // continue;
+            }
+
+            $log_content = file_get_contents(GLPI_LOG_DIR . "/$log");
+            $this->assertEquals('', $log_content, "log not empty");
+        }
+    }
+
     protected function resetGLPILogs()
     {
         // Reset error logs
