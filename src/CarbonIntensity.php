@@ -37,10 +37,14 @@ use CommonDBTM;
 use DateTime;
 use DateInterval;
 use DateTimeImmutable;
+use DateTimeInterface;
+use DBmysqlIterator;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensityInterface;
 use QueryParam;
+use QuerySubQuery;
+use QueryExpression;
 
 class CarbonIntensity extends CommonDBTM
 {
@@ -232,9 +236,26 @@ class CarbonIntensity extends CommonDBTM
      */
     public function downloadOneZone(CarbonIntensityInterface $data_source, string $zone_name, int $limit = 0): int
     {
-        // $incremental = $data_source->isZoneDownloadComplete($zone_name);
-
         $start_date = $this->getDownloadStartDate($zone_name, $data_source);
+
+        $total_count = 0;
+
+        // Check if there are gaps to fill
+        $source = new CarbonIntensitySource();
+        $source->getFromDBByCrit(['name' => $data_source->getSourceName()]);
+        $zone = new CarbonIntensityZone();
+        $zone->getFromDBByCrit(['name' => $zone_name]);
+        $gaps = $this->findGaps($source->getID(), $zone->getID(), $start_date);
+        foreach ($gaps as $gap) {
+            $gap_start = new DateTimeImmutable($gap['start']);
+            $gap_end = new DateTimeImmutable($gap['end']);
+            $count = $data_source->fullDownload($zone_name, $gap_start, $gap_end, $this, $limit);
+            $total_count += $count;
+            $limit -= $count;
+            if ($total_count >= $limit) {
+                return $total_count;
+            }
+        }
 
         $first_known_intensity_date = $this->getFirstKnownDate($zone_name, $data_source->getSourceName());
         $incremental = false;
@@ -248,11 +269,15 @@ class CarbonIntensity extends CommonDBTM
         if ($incremental) {
             $start_date = max($data_source->getMaxIncrementalAge(), $this->getLastKnownDate($zone_name, $data_source->getSourceName()));
             $start_date = $start_date->add(new DateInterval('PT1H'));
-            return $data_source->incrementalDownload($zone_name, $start_date, $this, $limit);
+            $count = $data_source->incrementalDownload($zone_name, $start_date, $this, $limit);
+            $total_count += $count;
+            return $total_count;
         }
 
         $stop_date  = $this->getDownloadStopDate($zone_name, $data_source);
-        return $data_source->fullDownload($zone_name, $start_date, $stop_date, $this, $limit);
+        $count = $data_source->fullDownload($zone_name, $start_date, $stop_date, $this, $limit);
+        $total_count += $count;
+        return $total_count;
     }
 
     public function getDownloadStartDate(string $zone_name, CarbonIntensityInterface $data_source): ?DateTimeImmutable
@@ -328,8 +353,8 @@ class CarbonIntensity extends CommonDBTM
             $DB->beginTransaction();
         }
 
-        try {
-            foreach ($data as $intensity) {
+        foreach ($data as $intensity) {
+            try {
                 $stmt->bind_param(
                     'siid',
                     $intensity['datetime'],
@@ -339,20 +364,72 @@ class CarbonIntensity extends CommonDBTM
                 );
                 $DB->executeStatement($stmt);
                 $count++;
+            } catch (\RuntimeException $e) {
+                $count++;
+                continue;
             }
-        } catch (\RuntimeException $e) {
-            if (!$in_transaction) {
-                $DB->commit();
-            }
-            trigger_error($e->getMessage(), E_USER_ERROR);
-            $count = -$count;
-        } finally {
-            if (!$in_transaction) {
-                $DB->commit();
-            }
+        }
+        if (!$in_transaction) {
+            $DB->commit();
         }
         $stmt->close();
 
         return $count;
+    }
+
+    /**
+     * Gets date intervals where data are missing
+     *
+     * @param integer $id
+     * @param DateTimeInterface $start
+     * @param DateTimeInterface|null $stop
+     * @return DBmysqlIterator
+     */
+    public function findGaps(int $source_id, int $zone_id, DateTimeInterface $start, ?DateTimeInterface $stop = null): DBmysqlIterator
+    {
+        global $DB;
+
+        $table = self::getTable();
+
+        // Build WHERE clause for boundaries
+        $boundaries = [];
+        if ($start !== null) {
+            $boundaries[] = ['date' => ['>=', $start->format('Y-m-d H:00:00')]];
+        }
+        if ($stop !== null) {
+            $boundaries[] = ['date' => ['<=', $stop->format('Y-m-d H:59:59')]];
+        }
+
+        $request = [
+            'SELECT' => [
+                // 'date AS start', 'next_available_date AS end'
+                new QueryExpression('`date` + INTERVAL 1 HOUR AS `start`'),
+                new QueryExpression('`next_available_date` - INTERVAL 1 HOUR AS `end`'),
+            ],
+            'FROM'  => new QuerySubQuery([
+                'SELECT' => [
+                    '*',
+                    new QueryExpression('IF(date + INTERVAL 1 HOUR < next_available_date, 1, 0) as gap_tag')
+                ],
+                'FROM'   => new QuerySubQuery([
+                    'SELECT' => [
+                        'date',
+                        new QueryExpression('LEAD(`date`, 1) OVER (ORDER BY `date`) AS `next_available_date`'),
+                    ],
+                    'FROM' => $table,
+                    'WHERE' => [
+                        CarbonIntensitySource::getForeignKeyField() => $source_id,
+                        CarbonIntensityZone::getForeignKeyField() => $zone_id,
+                    ] + $boundaries
+                ], 'rows')
+            ], 'gaps'),
+            'WHERE' => [
+                'gap_tag' => 1
+            ],
+        ];
+
+        $iterator = $DB->request($request);
+
+        return $iterator;
     }
 }

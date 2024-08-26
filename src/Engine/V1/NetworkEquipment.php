@@ -37,7 +37,6 @@ use NetworkEquipment as GlpiNetworkEquipment;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
 use NetworkEquipmentModel;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
-use DateTime;
 
 class NetworkEquipment extends AbstractAsset
 {

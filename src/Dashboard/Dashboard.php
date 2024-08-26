@@ -34,7 +34,6 @@
 namespace GlpiPlugin\Carbon\Dashboard;
 
 use ComputerModel;
-use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\Toolbox;
 
 class Dashboard
@@ -151,12 +150,13 @@ class Dashboard
 
     public static function cardTotalPowerProvider(array $params = [])
     {
-        return self::cardNumberProvider($params, "total power", self::getTotalPower());
+        // GLPI dashboard
+        return self::cardNumberProvider($params, "total power", Provider::getTotalPower());
     }
 
     public static function cardTotalCarbonEmissionProvider(array $params = [])
     {
-        return self::cardNumberProvider($params, "total carbon emission", self::getTotalCarbonEmission());
+        return self::cardNumberProvider($params, "total carbon emission", Provider::getTotalCarbonEmission());
     }
 
     public static function cardDataProvider(array $params = [], string $label = "", array $data = [])
@@ -210,18 +210,6 @@ class Dashboard
         return strval($total) . " $unit";
     }
 
-    public static function getTotalPower(): string
-    {
-        $unit = 'W';
-
-        $power = Provider::getTotalPower();
-        if ($power === null) {
-            return 'N/A';
-        }
-
-        return Toolbox::getWeight($power);
-    }
-
     /**
      * Returns total carbon emission per computer model.
      *
@@ -270,7 +258,7 @@ class Dashboard
         ];
         $params = array_merge($default_params, $params);
 
-        $data = Provider::getCarbonEmissionPerMonth();
+        $data = Provider::getCarbonEmissionPerMonth($params);
 
         return [
             'data'  => $data,

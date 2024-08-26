@@ -322,9 +322,9 @@ class Provider
     /**
      * Get total power of assets having all required data to compute carbon intensity
      *
-     * @return integer|null
+     * @return string|null
      */
-    public static function getTotalPower(): ?int
+    public static function getTotalPower(): ?string
     {
         global $DB;
 
@@ -336,7 +336,7 @@ class Provider
         $result = $DB->request($request);
 
         if ($result->numrows() == 1) {
-            return $result->current()['total'] ?? 0;
+            return Toolbox::getPower($result->current()['total'] ?? 0);
         }
 
         return null;
@@ -379,8 +379,6 @@ class Provider
             ],
             'FROM'  => CarbonIntensity::getTable(),
             'WHERE' => [
-                // [CarbonIntensity::getTableField('date') => ['>=', date('2024-03-01')]],
-                // [CarbonIntensity::getTableField('date') => ['<', date('2024-03-03')]],
                 CarbonIntensitySource::getForeignKeyField('sources_id') => $source->getID(),
                 CarbonIntensityZone::getForeignKeyField('zones_id') => $zone->getID(),
             ]
@@ -439,7 +437,7 @@ class Provider
             'ORDER'   => new QueryExpression($sql_year_month),
             'WHERE'   => $entityRestrict + $crit,
         ];
-        $filter = self::getFiltersCriteria($emissions_table, $params['args']['apply_filters'] ?? []);
+        $filter = self::getFiltersCriteria($emissions_table, $params['apply_filters'] ?? []);
         $request = array_merge_recursive($request, $filter);
         $result = $DB->request($request);
 
@@ -513,6 +511,7 @@ class Provider
                 'x' => $date_formatted,
                 'y' => $row['total_energy_per_month'],
             ];
+            $data['labels'][] = $date_formatted;
         }
 
         // Scale carbon emission
@@ -532,6 +531,7 @@ class Provider
         $scaled = Toolbox::scaleSerie($data['series'][0]['data'], $units);
         $data['series'][0]['data'] = $scaled['serie'];
         $data['series'][0]['name'] .= ' (' . $scaled['unit'] . __('CO₂eq', 'carbon') . ')';
+        $data['series'][0]['unit'] = $scaled['unit'] . __('CO₂eq', 'carbon'); // Not supported by apex charts
 
         // Scale energy consumption
         $units = [
@@ -547,10 +547,19 @@ class Provider
         $scaled = Toolbox::scaleSerie($data['series'][1]['data'], $units);
         $data['series'][1]['data'] = $scaled['serie'];
         $data['series'][1]['name'] .= ' (' . $scaled['unit'] . ')';
+        $data['series'][1]['unit'] = $scaled['unit']; // Not supported by apex charts
 
         return $data;
     }
 
+    /**
+     * Get the filters criteria
+     *
+     * @param string $table
+     * @param array $apply_filters
+     *
+     * @return array
+     */
     public static function getFiltersCriteria(string $table = "", array $apply_filters = []): array
     {
         $where = [];

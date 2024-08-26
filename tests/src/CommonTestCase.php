@@ -301,6 +301,16 @@ class CommonTestCase extends TestCase
 
     protected function createCarbonEmissionData(CommonDBTM $item, DateTime $start, DateInterval $length, float $energy, float $emission)
     {
+        $required_fields = [
+            'computertypes_id',
+            'computermodels_id',
+            'locations_id',
+        ];
+        if (count(array_intersect_key(array_flip($required_fields), $item->fields)) < count($required_fields)) {
+            // Abort test
+            throw new \LogicException('Not all required fields are set');
+        }
+
         $date_current = clone $start;
         $date_stop = $start->add($length);
         while ($date_current < $date_stop) {

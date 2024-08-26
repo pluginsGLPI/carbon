@@ -249,4 +249,15 @@ class Toolbox
 
         return $history_types;
     }
+
+    public function yearToLastMonth(DateTimeImmutable $date): array
+    {
+            $end_date = DateTime::createFromImmutable($date);
+            $end_date->setTime(0, 0, 0, 0);
+            $end_date->setDate($end_date->format('Y'), $end_date->format('m'), 0); // Last day of previous month
+            $start_date = clone $end_date;
+            $start_date->modify('-12 months + 1 day');
+
+        return [$start_date, $end_date];
+    }
 }

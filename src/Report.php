@@ -35,9 +35,8 @@ namespace GlpiPlugin\Carbon;
 
 use CommonDBTM;
 use DateTime;
-use DateTimeZone;
+use DateTimeImmutable;
 use Glpi\Application\View\TemplateRenderer;
-use GlpiPlugin\Carbon\Dashboard\Dashboard;
 use GlpiPlugin\Carbon\Dashboard\Provider;
 
 class Report extends CommonDBTM
@@ -87,21 +86,10 @@ class Report extends CommonDBTM
         TemplateRenderer::getInstance()->display('@carbon/quick-report.html.twig');
     }
 
-    protected static function YearToLastMonth(): array
-    {
-            $end_date = new DateTime();
-            $end_date->setTime(0, 0, 0, 0);
-            $end_date->setDate($end_date->format('Y'), $end_date->format('m'), 0); // Last day of previous month
-            $start_date = clone $end_date;
-            $start_date->modify('-12 months + 1 day');
-
-        return [$start_date, $end_date];
-    }
-
     public static function getTotalCarbonEmission(array $params = []): string
     {
         if (!isset($params['args']['apply_filters']['dates'][0]) || !isset($params['args']['apply_filters']['dates'][1])) {
-            list($start_date, $end_date) = self::YearToLastMonth();
+            list($start_date, $end_date) = (new Toolbox())->yearToLastMonth(new DateTimeImmutable('now'));
             $params['args']['apply_filters']['dates'][0] = $start_date->format('Y-m-d\TH:i:s.v\Z');
             $params['args']['apply_filters']['dates'][1] = $end_date->format('Y-m-d\TH:i:s.v\Z');
         } else {
@@ -135,14 +123,14 @@ class Report extends CommonDBTM
     public static function getCarbonEmissionPerMonth(array $params = [], array $crit = []): string
     {
         if (!isset($params['args']['apply_filters']['dates'][0]) || !isset($params['args']['apply_filters']['dates'][1])) {
-            list($start_date, $end_date) = self::YearToLastMonth();
+            list($start_date, $end_date) = (new Toolbox())->yearToLastMonth(new DateTimeImmutable('now'));
             $params['args']['apply_filters']['dates'][0] = $start_date->format('Y-m-d\TH:i:s.v\Z');
             $params['args']['apply_filters']['dates'][1] = $end_date->format('Y-m-d\TH:i:s.v\Z');
         } else {
             $start_date = DateTime::createFromFormat('Y-m-d\TH:i:s.v\Z', $params['args']['apply_filters'][0]);
             $end_date   = DateTime::createFromFormat('Y-m-d\TH:i:s.v\Z', $params['args']['apply_filters'][1]);
         }
-        $data = Provider::getCarbonEmissionPerMonth($params, $crit);
+        $data = Provider::getCarbonEmissionPerMonth($params['args'], $crit);
 
         // Prepare date format
         switch ($_SESSION['glpidate_format'] ?? 0) {
@@ -174,7 +162,7 @@ class Report extends CommonDBTM
 
         $params['args']['apply_filters']['dates'][0] = $start_date->format('Y-m-d\TH:i:s.v\Z');
         $params['args']['apply_filters']['dates'][1] = $end_date->format('Y-m-d\TH:i:s.v\Z');
-        $data = Provider::getCarbonEmissionPerMonth($params);
+        $data = Provider::getCarbonEmissionPerMonth($params['args']);
 
         // Prepare date format
         switch ($_SESSION['glpidate_format'] ?? 0) {

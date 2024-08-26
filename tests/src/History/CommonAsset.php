@@ -35,6 +35,10 @@ namespace GlpiPlugin\Carbon\Tests\History;
 
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use Computer as GlpiComputer;
+use DateTime;
+use DateInterval;
+use DateTimeImmutable;
+use GlpiPlugin\Carbon\CarbonEmission;
 use Infocom;
 
 class CommonAsset extends DbTestCase

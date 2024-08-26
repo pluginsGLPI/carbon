@@ -35,6 +35,7 @@ namespace GlpiPlugin\Carbon\Tests;
 
 use Computer;
 use DateTime;
+use DateTimeImmutable;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\Toolbox;
 
@@ -57,12 +58,25 @@ class ToolboxTest extends DbTestCase
 
     public function testGetDefaultCarbonIntensityDownloadDate()
     {
-        $toolbox = new Toolbox();
-        $output = $toolbox->getDefaultCarbonIntensityDownloadDate();
+        $instance = new Toolbox();
+        $output = $instance->getDefaultCarbonIntensityDownloadDate();
         $expected = new DateTime('1 year ago');
         $expected->setDate($expected->format('Y'), 1, 1);
         $expected->setTime(0, 0, 0);
         $expected->modify('-1 month');
+        $this->assertEquals($expected, $output);
+    }
+
+    public function testYearToLastMonth()
+    {
+        $end = new DateTimeImmutable('2023-04-09 13:45:17');
+        $instance = new Toolbox();
+        $output = $instance->yearToLastMonth($end);
+
+        $expected = [
+            new DateTime('2022-04-01 00:00:00'),
+            new DateTime('2023-03-31 00:00:00'),
+        ];
         $this->assertEquals($expected, $output);
     }
 }
