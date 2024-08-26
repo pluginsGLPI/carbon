@@ -82,11 +82,10 @@
     max-height: 380px !important;
 }
 
-.card {
+.plugin_carbon_quick_report .card {
     min-height: 185px !important;
 }
 
 .percent-color {
     color: #BBDA50;
 }
-
