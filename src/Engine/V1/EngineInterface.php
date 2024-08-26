@@ -46,6 +46,7 @@ interface EngineInterface
      * Returns the carbon emission for the specified day.
      *
      * @param DateTime $day the day
+     * @param int      $zone_id the zone where the asset is located at the given date
      *
      * @return float or null
      *
@@ -54,7 +55,7 @@ interface EngineInterface
      *
      * Unit of returned value, if float, is grams of CO2
      */
-    public function getCarbonEmissionPerDay(DateTime $day): ?float;
+    public function getCarbonEmissionPerDay(DateTime $day, int $zone_id): ?float;
 
     /**
      * Returns the consumed energy for the specified day.

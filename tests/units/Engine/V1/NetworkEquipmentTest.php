@@ -31,13 +31,13 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\History\Tests;
+namespace GlpiPlugin\Carbon\Engine\V1\Tests;
 
 use DateTime;
 use GlpiPlugin\Carbon\Tests\Engine\V1\EngineTestCase;
 use GlpiPlugin\Carbon\Engine\V1\NetworkEquipment;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
-use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
+use GlpiPlugin\Carbon\CarbonIntensityZone;
 use NetworkEquipment as GlpiNetworkEquipment;
 use NetworkEquipmentModel;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
@@ -84,6 +84,9 @@ class NetworkEquipmentTest extends EngineTestCase
         $country = $this->getUniqueString();
         $thursday = DateTime::createFromFormat('Y-m-d H:i:s', '1999-12-02 12:00:00');
         $this->createCarbonIntensityData($country, 'Test source', $thursday, 1);
+        $zone = new CarbonIntensityZone();
+        $zone->getFromDBByCrit(['name' => $country]);
+        $zone_id = $zone->getID();
 
         $model = $this->getItem(static::$model_class, ['power_consumption' => 80]);
         $item = $this->getItem(static::$itemtype_class, [
@@ -93,6 +96,7 @@ class NetworkEquipmentTest extends EngineTestCase
         yield 'Item' => [
             $engine,
             $thursday,
+            $zone_id,
             80 * 24 * 1 / 1000,
         ];
     }

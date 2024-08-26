@@ -41,8 +41,6 @@ use DbUtils;
 use DbMysql;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\CarbonIntensity;
-use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
 use Location;
 use QueryExpression;
 
@@ -80,9 +78,10 @@ abstract class AbstractAsset implements EngineInterface
      *
      * @param DateTime $start_time
      * @param DateInterval $length
+     * @param int          $zone_id
      * @return DBmysqlIterator
      */
-    protected function requestCarbonIntensitiesPerDay(DateTime $start_time, DateInterval $length): DBmysqlIterator
+    protected function requestCarbonIntensitiesPerDay(DateTime $start_time, DateInterval $length, int $zone_id): DBmysqlIterator
     {
         global $DB;
 
@@ -94,10 +93,6 @@ abstract class AbstractAsset implements EngineInterface
         $stop_date = $stop_date->add($length);
         $stop_date_s = $stop_date->format('Y-m-d H:i:s'); // idem, may be can use directly concatenation
 
-        $itemtype = static::$itemtype;
-        $items_table = $itemtype::getTable();
-        $locations_table = Location::getTable();
-        $zones_table = CarbonIntensityZone::getTable();
         $intensities_table = CarbonIntensity::getTable();
 
         $request = [
@@ -105,32 +100,12 @@ abstract class AbstractAsset implements EngineInterface
                 CarbonIntensity::getTableField('intensity') . ' AS intensity',
                 CarbonIntensity::getTableField('date') . ' AS date',
             ],
-            'FROM' => $items_table,
-            'INNER JOIN' => [
-                $locations_table => [
-                    'FKEY'   => [
-                        $items_table  => 'locations_id',
-                        $locations_table => 'id',
-                    ]
-                ],
-                $zones_table => [
-                    'FKEY'   => [
-                        $locations_table  => 'country',
-                        $zones_table => 'name',
-                    ]
-                ],
-                $intensities_table => [
-                    'FKEY'   => [
-                        $zones_table  => 'id',
-                        $intensities_table => 'plugin_carbon_carbonintensityzones_id',
-                    ]
-                ],
-            ],
+            'FROM' => $intensities_table,
             'WHERE' => [
                 'AND' => [
-                    $itemtype::getTableField('id') => $this->items_id,
+                    CarbonIntensity::getTableField('plugin_carbon_carbonintensityzones_id') => $zone_id,
                     [CarbonIntensity::getTableField('date') => ['>=', $start_date_s]],
-                    [CarbonIntensity::getTableField('date') => ['<=', $stop_date_s]],
+                    [CarbonIntensity::getTableField('date') => ['<', $stop_date_s]],
                 ],
             ],
             'ORDER' => CarbonIntensity::getTableField('date') . ' ASC',
@@ -189,39 +164,5 @@ abstract class AbstractAsset implements EngineInterface
         }
 
         return 0;
-    }
-
-    /**
-     * Returns the consumed energy for the specified day.
-     *
-     * {@inheritDoc}
-     */
-    public function getEnergyPerDay(DateTime $day): float
-    {
-        $power = $this->getPower();
-
-        $delta_time = 24;
-
-        // units:
-        // power is in Watt
-        // delta_time is in seconds
-        $energy_in_kwh = ($power * $delta_time) / (1000.0);
-
-        return $energy_in_kwh;
-    }
-
-    /**
-     * Returns the carbon emission for the specified day.
-     *
-     * {@inheritDoc}
-     */
-    public function getCarbonEmissionPerDay(DateTime $day): ?float
-    {
-        $power = $this->getPower();
-
-        // units:
-        // power is in Watt
-        // intensity is in gCO2eq/kWh
-        return $power * 24 / 1000;
     }
 }

@@ -38,6 +38,7 @@ use Computer as GlpiComputer;
 use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
 use GlpiPlugin\Carbon\Engine\V1\Computer;
+use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\Tests\Engine\V1\EngineTestCase;
 
@@ -155,6 +156,9 @@ class ComputerTest extends EngineTestCase
         $this->createCarbonIntensityData($country, self::TEST_CARBON_INTENSITY_SOURCE, $thursday, self::TEST_CARBON_INTENSITY_THURSDAY);
         $saturday = DateTime::createFromFormat('Y-m-d H:i:s', self::TEST_DATE_SATURDAY);
         $this->createCarbonIntensityData($country, self::TEST_CARBON_INTENSITY_SOURCE, $saturday, self::TEST_CARBON_INTENSITY_SATURDAY);
+        $zone = new CarbonIntensityZone();
+        $zone->getFromDBByCrit(['name' => $country]);
+        $zone_id = $zone->getID();
 
         $laptop_glpi_computer = $this->createComputerUsageProfilePowerLocation(self::TEST_LAPTOP_USAGE_PROFILE, self::TEST_LAPTOP_POWER, $country);
         $laptop_computer = new Computer($laptop_glpi_computer->getID());
@@ -162,6 +166,7 @@ class ComputerTest extends EngineTestCase
         yield 'Computer with laptop usage profile and type on a Thursday' => [
             $laptop_computer,
             $thursday,
+            $zone_id,
             self::TEST_LAPTOP_ENERGY_PER_DAY * self::TEST_CARBON_INTENSITY_THURSDAY,
         ];
 
@@ -181,6 +186,7 @@ class ComputerTest extends EngineTestCase
         yield 'Computer with laptop usage profile starting at half hour' => [
             new Computer($laptop_glpi_computer_2->getID()),
             $thursday,
+            $zone_id,
             self::TEST_LAPTOP_POWER * 7.5 / 1000,
         ];
 
@@ -200,6 +206,7 @@ class ComputerTest extends EngineTestCase
         yield 'Computer with laptop usage profile ending at quarter hour' => [
             new Computer($laptop_glpi_computer_2->getID()),
             $thursday,
+            $zone_id,
             self::TEST_LAPTOP_POWER * 8.25 / 1000,
         ];
 
@@ -219,6 +226,7 @@ class ComputerTest extends EngineTestCase
         yield 'Computer with laptop usage profile a few minutes in a single hour' => [
             new Computer($laptop_glpi_computer_3->getID()),
             $thursday,
+            $zone_id,
             self::TEST_LAPTOP_POWER * 0.5 / 1000,
         ];
 
@@ -227,18 +235,21 @@ class ComputerTest extends EngineTestCase
         yield 'Computer with server usage profile and type on a Thursday' => [
             $server_computer,
             $thursday,
+            $zone_id,
             self::TEST_SERVER_ENERGY_PER_DAY * self::TEST_CARBON_INTENSITY_THURSDAY,
         ];
 
         yield 'Computer with laptop usage profile and type on a Saturday' => [
             $laptop_computer,
             $saturday,
+            $zone_id,
             0.0,
         ];
 
         yield 'Computer with server usage profile and type on a Saturday' => [
             $server_computer,
             $saturday,
+            $zone_id,
             self::TEST_SERVER_ENERGY_PER_DAY * self::TEST_CARBON_INTENSITY_SATURDAY,
         ];
     }

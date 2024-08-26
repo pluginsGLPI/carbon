@@ -38,7 +38,7 @@ use NetworkEquipmentType as GlpiNetworkEquipmentType;
 use NetworkEquipmentModel;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
 
-class NetworkEquipment extends AbstractAsset
+class NetworkEquipment extends AbstractPermanent
 {
     protected static string $itemtype = GlpiNetworkEquipment::class;
     protected static string $type_itemtype  = GlpiNetworkEquipmentType::class;

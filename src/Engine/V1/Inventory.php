@@ -169,7 +169,7 @@ class Inventory implements EngineInterface
         return $energy;
     }
 
-    public function getCarbonEmissionPerDay(DateTime $day): ?float
+    public function getCarbonEmissionPerDay(DateTime $day, int $zone_id): ?float
     {
         $carbon_emission = 0;
 

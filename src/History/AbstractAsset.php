@@ -45,6 +45,7 @@ use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Toolbox;
 use Location;
+use LogicException;
 
 abstract class AbstractAsset extends CommonDBTM implements AssetInterface
 {
@@ -177,7 +178,8 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
             $date_cursor->setTime(0, 0, 0, 0);
             $end_date = new DateTime($gap['end']);
             while ($date_cursor < $end_date) {
-                $success = $this->historizeItemPerDay($item, $engine, $date_cursor);
+                $zone_id = $this->getZoneId($id /* ,$date_cursor */);
+                $success = $this->historizeItemPerDay($item, $engine, $date_cursor, $zone_id);
                 if ($success) {
                     $count++;
                     if ($this->limit !== 0 && $count >= $this->limit) {
@@ -192,12 +194,12 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         return $count;
     }
 
-    protected function historizeItemPerDay(CommonDBTM $item, EngineInterface $engine, DateTime $day): bool
+    protected function historizeItemPerDay(CommonDBTM $item, EngineInterface $engine, DateTime $day, int $zone_id): bool
     {
         $energy = $engine->getEnergyPerDay($day);
         $emission = 0;
         if ($energy !== 0) {
-            $emission = $engine->getCarbonEmissionPerDay($day);
+            $emission = $engine->getCarbonEmissionPerDay($day, $zone_id);
             if ($emission === null) {
                 return false;
             }
@@ -272,40 +274,46 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      * Location's country must match a zone name
      *
      * @param integer $items_id
+     * @param DateTime $date Date for which the zone must be found
      * @return integer|null
      */
-    protected function getZoneId(int $items_id): ?int
+    protected function getZoneId(int $items_id, DateTime $date = null): ?int
     {
         global $DB;
 
-        $item_table = (new DbUtils())->getTableForItemType(static::$itemtype);
-        $location_table = Location::getTable();
-        $zone_table = CarbonIntensityZone::getTable();
-        $iterator = $DB->request([
-            'SELECT' => CarbonIntensityZone::getTableField('id'),
-            'FROM' => $zone_table,
-            'INNER JOIN' => [
-                $location_table => [
-                    'FKEY' => [
-                        $zone_table => 'name',
-                        $location_table => 'country',
+        // TODO: use date to find where was the asset at the given date
+        if ($date === null) {
+            $item_table = (new DbUtils())->getTableForItemType(static::$itemtype);
+            $location_table = Location::getTable();
+            $zone_table = CarbonIntensityZone::getTable();
+            $iterator = $DB->request([
+                'SELECT' => CarbonIntensityZone::getTableField('id'),
+                'FROM' => $zone_table,
+                'INNER JOIN' => [
+                    $location_table => [
+                        'FKEY' => [
+                            $zone_table => 'name',
+                            $location_table => 'country',
+                        ],
                     ],
+                    $item_table => [
+                        'FKEY' => [
+                            $item_table => Location::getForeignKeyField(),
+                            $location_table => 'id',
+                        ],
+                    ]
                 ],
-                $item_table => [
-                    'FKEY' => [
-                        $item_table => Location::getForeignKeyField(),
-                        $location_table => 'id',
-                    ],
+                'WHERE' => [
+                    $item_table . '.id' => $items_id
                 ]
-            ],
-            'WHERE' => [
-                $item_table . '.id' => $items_id
-            ]
-        ]);
-        if ($iterator->count() !== 1) {
-            return null;
+            ]);
+            if ($iterator->count() !== 1) {
+                return null;
+            }
+
+            return $iterator->current()['id'];
         }
 
-        return $iterator->current()['id'];
+        throw new LogicException('Not implemented yet');
     }
 }

@@ -88,7 +88,7 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
      *
      * {@inheritDoc}
      */
-    public function getCarbonEmissionPerDay(DateTime $day): ?float
+    public function getCarbonEmissionPerDay(DateTime $day, int $zone_id): ?float
     {
         $usage_profile = $this->getUsageProfile();
 
@@ -107,16 +107,16 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
         $seconds_start = $seconds_start[0] * 3600 + $seconds_start[1] * 60 + $seconds_start[2];
         $seconds_stop = $seconds_stop[0] * 3600 + $seconds_stop[1] * 60 + $seconds_stop[2];
         $length = new DateInterval('PT' . ($seconds_stop - $seconds_start) . 'S');
-        return $this->computeEmissionPerDay($start_time, $power, $length);
+        return $this->computeEmissionPerDay($start_time, $power, $length, $zone_id);
     }
 
-    protected function computeEmissionPerDay(DateTime $start_time, int $power, DateInterval $length): ?float
+    protected function computeEmissionPerDay(DateTime $start_time, int $power, DateInterval $length, int $zone_id): ?float
     {
         if ($power === 0) {
             return 0;
         }
 
-        $iterator = $this->requestCarbonIntensitiesPerDay($start_time, $length);
+        $iterator = $this->requestCarbonIntensitiesPerDay($start_time, $length, $zone_id);
 
         $total_seconds = (int) $length->format('%S');
         if ($total_seconds === 0) {
