@@ -34,7 +34,6 @@
 namespace GlpiPlugin\Carbon\Dashboard;
 
 use Glpi\Application\View\TemplateRenderer;
-use Plugin;
 
 class Widget
 {
