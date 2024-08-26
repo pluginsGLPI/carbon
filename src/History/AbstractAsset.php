@@ -229,71 +229,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      */
     protected function getStartDate(int $id): ?DateTimeImmutable
     {
-        return $this->getInventoryIncomingDate($id);
-
-        $last_known_emission_date = $this->getEmissionStartDate($id);
-        if ($last_known_emission_date === null) {
-            // no carbon emission available
-            return null;
-        }
-        $inventory_date = $this->getInventoryIncomingDate($id);
-        $date = max($last_known_emission_date, $inventory_date);
-
-        return $date;
-    }
-
-    /**
-     * Find the last date of computed emissions
-     *
-     * @param integer $id
-     * @return DateTimeImmutable|null
-     */
-    protected function getEmissionStartDate(int $id): ?DateTimeImmutable
-    {
-        // Find the oldest carbon emissions date calculated for the item
-        $itemtype = static::$itemtype;
-        $carbon_emission = new CarbonEmission();
-        $last_entry = $carbon_emission->find([
-            'itemtype' => $itemtype,
-            'items_id' => $id,
-        ], [
-            'date DESC'
-        ], 1);
-
-        if (count($last_entry) === 1) {
-            $last_entry = array_pop($last_entry);
-            $start_date = new DateTimeImmutable($last_entry['date']);
-            return $start_date;
-        }
-
-        // No data found,
-        // Guess the oldest date to compute
-        $zones_id = $this->getZoneId($id);
-        $carbon_intensity = new CarbonIntensity();
-        $first_entry = $carbon_intensity->find([
-            'plugin_carbon_carbonintensityzones_id' => $zones_id,
-        ], [
-            'date ASC'
-        ], 1);
-
-        if (count($first_entry) === 1) {
-            $first_entry = array_pop($first_entry);
-            $start_date = new DateTimeImmutable($first_entry['date']);
-            return $start_date;
-        }
-
-        // No carbon intensity in DB, cannot find a date
-        return null;
-    }
-
-    /**
-     * Find the most accurate date to determine the first use of an asset
-     *
-     * @param integer $id id of the asset to examinate
-     * @return DateTime|null
-     */
-    protected function getInventoryIncomingDate(int $id): ?DateTimeImmutable
-    {
+        // Find the date the asset entered in the inventory
         $toolbox = new Toolbox();
         $inventory_date = $toolbox->getOldestAssetDate([
             'itemtype' => static::$itemtype,
