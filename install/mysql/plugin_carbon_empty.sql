@@ -55,8 +55,9 @@ CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_carbonintensities` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_carbonintensityzones` (
-  `id`                  int unsigned NOT NULL AUTO_INCREMENT,
-  `name`                varchar(255) DEFAULT NULL,
+  `id`                                                 int unsigned NOT NULL AUTO_INCREMENT,
+  `name`                                               varchar(255) DEFAULT NULL,
+  `plugin_carbon_carbonintensitysources_id_historical` int unsigned NOT NULL DEFAULT '0' COMMENT 'Source to be used for historical calculation',
   PRIMARY KEY (`id`),
   UNIQUE KEY `unicity` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -72,8 +73,8 @@ CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_carbonintensitysources_carboninte
   `id`               int unsigned NOT NULL AUTO_INCREMENT,
   `plugin_carbon_carbonintensitysources_id` int unsigned NOT NULL DEFAULT '0',
   `plugin_carbon_carbonintensityzones_id`   int unsigned NOT NULL DEFAULT '0',
-  `code`                                    varchar(255) DEFAULT NULL,
-  `is_enabled`                              tinyint(1)   NOT NULL DEFAULT '0',
+  `code`                                    varchar(255) DEFAULT NULL         COMMENT 'Zone identifier in the API of the source',
+  `is_download_enabled`                     tinyint(1)   NOT NULL DEFAULT '0' COMMENT 'Download enabled from the source for this zone',
   PRIMARY KEY (`id`),
   UNIQUE KEY `unicity` (`plugin_carbon_carbonintensitysources_id`, `plugin_carbon_carbonintensityzones_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

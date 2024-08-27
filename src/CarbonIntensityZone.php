@@ -55,7 +55,7 @@ class CarbonIntensityZone extends CommonDropdown
 
     public static function canUpdate()
     {
-        return false;
+        return true;
     }
 
     public static function canDelete()
@@ -79,6 +79,7 @@ class CarbonIntensityZone extends CommonDropdown
     {
         if (!$withtemplate) {
             $nb = 0;
+            /** @var CommonDBTM $item */
             switch ($item->getType()) {
                 case CarbonIntensitySource::class:
                     if ($_SESSION['glpishow_count_on_tabs']) {
@@ -94,6 +95,13 @@ class CarbonIntensityZone extends CommonDropdown
         return '';
     }
 
+    public function prepareInputForUpdate($input)
+    {
+        unset($input['name']);
+
+        return $input;
+    }
+
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
         switch ($item->getType()) {
@@ -102,5 +110,32 @@ class CarbonIntensityZone extends CommonDropdown
         }
 
         return true;
+    }
+
+    public function getAdditionalFields()
+    {
+        return [
+            [
+                'name'   => 'plugin_carbon_carbonintensitysources_id_historical',
+                'label'  => __('Data source for historical calculation', 'carbon'),
+                'type'   => 'dropdownValue',
+                'list'   => true
+            ]
+        ];
+    }
+
+    public function rawSearchOptions()
+    {
+        $tab = parent::rawSearchOptions();
+
+        $tab[] = [
+            'id'                 => '11',
+            'table'              => CarbonIntensitySource::getTable(),
+            'field'              => 'plugin_carbon_carbonintensitysources_id_historical',
+            'name'               => __('Data source for historical calculation', 'carbon'),
+            'datatype'           => 'dropdown',
+        ];
+
+        return $tab;
     }
 }

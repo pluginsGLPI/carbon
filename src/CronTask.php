@@ -125,7 +125,7 @@ class CronTask
             $task->addVolume($done_count);
         }
 
-        $zones = $data_source->getZones(['is_enabled' => 1]);
+        $zones = $data_source->getZones(['is_download_enabled' => 1]);
         if (count($zones) === 0) {
             return 0;
         }
