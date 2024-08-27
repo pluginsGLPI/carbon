@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_carbonemissions` (
   `types_id`         int unsigned NOT NULL DEFAULT '0',
   `models_id`        int unsigned NOT NULL DEFAULT '0',
   `locations_id`     int unsigned NOT NULL DEFAULT '0',
-  `energy_per_day`   float        DEFAULT '0'         COMMENT 'Wh',
+  `energy_per_day`   float        DEFAULT '0'         COMMENT 'KWh',
   `emission_per_day` float        DEFAULT '0'         COMMENT 'gCO2eq',
   `date`             timestamp    NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
