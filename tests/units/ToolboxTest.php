@@ -38,6 +38,7 @@ use DateTime;
 use DateTimeImmutable;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\Toolbox;
+use Infocom;
 
 class ToolboxTest extends DbTestCase
 {
@@ -48,10 +49,28 @@ class ToolboxTest extends DbTestCase
         $expected = null;
         $this->assertEquals($expected, $output);
 
-        $expected = new DateTime('1980-01-01 00:00:00');
-        $this->getItem(Computer::class, [
+        $expected = new DateTime('2020-01-01 00:00:00');
+        $computer = $this->getItem(Computer::class, [
             'date_creation' => $expected->format('Y-m-d H:i:s'),
         ]);
+        $output = $toolbox->getOldestAssetDate();
+        $this->assertEquals($expected, $output);
+
+        $expected = new DateTime('2000-01-01 00:00:00');
+        $infocom = $this->getItem(Infocom::class, [
+            'itemtype'    => $computer->getType(),
+            'items_id'    => $computer->getID(),
+            'entities_id' => $computer->fields['entities_id'],
+            'use_date'    => $expected->format('Y-m-d H:i:s'),
+        ]);
+        $output = $toolbox->getOldestAssetDate();
+        $this->assertEquals($expected, $output);
+
+        $success = $infocom->update([
+            'id' => $infocom->getID(),
+            'buy_date' => '1999-01-01 00:00:00'
+        ]);
+        $this->assertTrue($success);
         $output = $toolbox->getOldestAssetDate();
         $this->assertEquals($expected, $output);
     }
