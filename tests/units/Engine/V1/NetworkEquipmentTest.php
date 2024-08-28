@@ -86,7 +86,6 @@ class NetworkEquipmentTest extends EngineTestCase
         $this->createCarbonIntensityData($country, 'Test source', $thursday, 1);
         $zone = new CarbonIntensityZone();
         $zone->getFromDBByCrit(['name' => $country]);
-        $zone_id = $zone->getID();
 
         $model = $this->getItem(static::$model_class, ['power_consumption' => 80]);
         $item = $this->getItem(static::$itemtype_class, [
@@ -96,7 +95,7 @@ class NetworkEquipmentTest extends EngineTestCase
         yield 'Item' => [
             $engine,
             $thursday,
-            $zone_id,
+            $zone,
             80 * 24 * 1 / 1000,
         ];
     }

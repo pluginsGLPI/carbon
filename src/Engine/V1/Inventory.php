@@ -36,6 +36,7 @@ namespace GlpiPlugin\Carbon\Engine\V1;
 use DateTime;
 use Computer as GlpiComputer;
 use DbUtils;
+use GlpiPlugin\Carbon\CarbonIntensityZone;
 
 /**
  * Compute environnemental impact of a whole inventory
@@ -169,7 +170,7 @@ class Inventory implements EngineInterface
         return $energy;
     }
 
-    public function getCarbonEmissionPerDay(DateTime $day, int $zone_id): ?float
+    public function getCarbonEmissionPerDay(DateTime $day, CarbonIntensityZone $zone): ?float
     {
         $carbon_emission = 0;
 

@@ -102,6 +102,7 @@ class GlobalFixture
         if ($iterator->count() === 0) {
             $result = $DB->insert($zone_table, [
                 'name' => $fake_zone_name,
+                'plugin_carbon_carbonintensitysources_id_historical' => $source_id,
             ]);
             $zone_id = $DB->insertId();
         } else {

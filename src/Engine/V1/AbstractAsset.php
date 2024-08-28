@@ -78,10 +78,10 @@ abstract class AbstractAsset implements EngineInterface
      *
      * @param DateTime $start_time
      * @param DateInterval $length
-     * @param int          $zone_id
+     * @param CarbonIntensityZone $zone
      * @return DBmysqlIterator
      */
-    protected function requestCarbonIntensitiesPerDay(DateTime $start_time, DateInterval $length, int $zone_id): DBmysqlIterator
+    protected function requestCarbonIntensitiesPerDay(DateTime $start_time, DateInterval $length, CarbonIntensityZone $zone): DBmysqlIterator
     {
         global $DB;
 
@@ -103,7 +103,8 @@ abstract class AbstractAsset implements EngineInterface
             'FROM' => $intensities_table,
             'WHERE' => [
                 'AND' => [
-                    CarbonIntensity::getTableField('plugin_carbon_carbonintensityzones_id') => $zone_id,
+                    CarbonIntensity::getTableField('plugin_carbon_carbonintensityzones_id') => $zone->getID(),
+                    CarbonIntensity::getTableField('plugin_carbon_carbonintensitysources_id') => $zone->fields['plugin_carbon_carbonintensitysources_id_historical'],
                     [CarbonIntensity::getTableField('date') => ['>=', $start_date_s]],
                     [CarbonIntensity::getTableField('date') => ['<', $stop_date_s]],
                 ],

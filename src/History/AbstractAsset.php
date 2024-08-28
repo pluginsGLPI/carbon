@@ -178,8 +178,8 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
             $date_cursor->setTime(0, 0, 0, 0);
             $end_date = new DateTime($gap['end']);
             while ($date_cursor < $end_date) {
-                $zone_id = $this->getZoneId($id /* ,$date_cursor */);
-                $success = $this->historizeItemPerDay($item, $engine, $date_cursor, $zone_id);
+                $zone = $this->getZone($id /* ,$date_cursor */);
+                $success = $this->historizeItemPerDay($item, $engine, $date_cursor, $zone);
                 if ($success) {
                     $count++;
                     if ($this->limit !== 0 && $count >= $this->limit) {
@@ -194,12 +194,12 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         return $count;
     }
 
-    protected function historizeItemPerDay(CommonDBTM $item, EngineInterface $engine, DateTime $day, int $zone_id): bool
+    protected function historizeItemPerDay(CommonDBTM $item, EngineInterface $engine, DateTime $day, CarbonIntensityZone $zone): bool
     {
         $energy = $engine->getEnergyPerDay($day);
         $emission = 0;
         if ($energy !== 0) {
-            $emission = $engine->getCarbonEmissionPerDay($day, $zone_id);
+            $emission = $engine->getCarbonEmissionPerDay($day, $zone);
             if ($emission === null) {
                 return false;
             }
@@ -254,10 +254,10 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         $today = $today->sub(new DateInterval(static::$date_end_shift));
 
         $carbon_intensity = new CarBonIntensity();
-        $zone_id = $this->getZoneId($id);
+        $zone = $this->getZone($id);
         $last = $carbon_intensity->find(
             [
-                CarbonIntensityZone::getForeignKeyField() => $zone_id,
+                CarbonIntensityZone::getForeignKeyField() => $zone->getID(),
             ],
             ['date DESC'],
             '1'
@@ -275,20 +275,18 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      *
      * @param integer $items_id
      * @param DateTime $date Date for which the zone must be found
-     * @return integer|null
+     * @return CarbonIntensityZone|null
      */
-    protected function getZoneId(int $items_id, DateTime $date = null): ?int
+    protected function getZone(int $items_id, DateTime $date = null): ?CarbonIntensityZone
     {
-        global $DB;
-
         // TODO: use date to find where was the asset at the given date
         if ($date === null) {
             $item_table = (new DbUtils())->getTableForItemType(static::$itemtype);
             $location_table = Location::getTable();
             $zone_table = CarbonIntensityZone::getTable();
-            $iterator = $DB->request([
-                'SELECT' => CarbonIntensityZone::getTableField('id'),
-                'FROM' => $zone_table,
+
+            $zone = new CarbonIntensityZone();
+            $found = $zone->getFromDBByRequest([
                 'INNER JOIN' => [
                     $location_table => [
                         'FKEY' => [
@@ -307,11 +305,11 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
                     $item_table . '.id' => $items_id
                 ]
             ]);
-            if ($iterator->count() !== 1) {
+            if ($found === false) {
                 return null;
             }
 
-            return $iterator->current()['id'];
+            return $zone;
         }
 
         throw new LogicException('Not implemented yet');

@@ -46,6 +46,7 @@ class CarbonIntensityElectricityMapTest extends DbTestCase
     public function testEnableHistorical()
     {
         $client = $this->createStub(RestApiClientInterface::class);
+        /** @var RestApiClientInterface $client */
         $instance = new CarbonIntensityElectricityMap($client);
         $output = $this->callPrivateMethod($instance, 'enableHistorical', 'France');
         $this->assertFalse($output);
@@ -60,6 +61,7 @@ class CarbonIntensityElectricityMapTest extends DbTestCase
         $response = file_get_contents(__DIR__ . '/../../fixtures/ElectricityMap/api-sample.json');
         $client->method('request')->willReturn(json_decode($response, true));
 
+        /** @var RestApiClientInterface $client */
         $data_source = new CarbonIntensityElectricityMap($client);
         $source = new CarbonIntensitySource();
         $source->getFromDBByCrit(['name' => $data_source->getSourceName()]);

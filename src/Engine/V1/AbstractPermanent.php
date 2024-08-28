@@ -35,6 +35,7 @@ namespace GlpiPlugin\Carbon\Engine\V1;
 
 use DateTime;
 use DateInterval;
+use GlpiPlugin\Carbon\CarbonIntensityZone;
 
 abstract class AbstractPermanent extends AbstractAsset implements EngineInterface
 {
@@ -57,19 +58,14 @@ abstract class AbstractPermanent extends AbstractAsset implements EngineInterfac
         return $energy_in_kwh;
     }
 
-    /**
-     * Returns the carbon emission for the specified day.
-     *
-     * {@inheritDoc}
-     */
-    public function getCarbonEmissionPerDay(DateTime $day, int $zone_id): ?float
+    public function getCarbonEmissionPerDay(DateTime $day, CarbonIntensityZone $zone): ?float
     {
         $power = $this->getPower();
 
         $start_time = clone $day;
         $start_time->setTime(0, 0, 0, 0);
         $length = new DateInterval('PT' . 86400 . 'S'); // 24h = 86400 seconds
-        $iterator = $this->requestCarbonIntensitiesPerDay($start_time, $length, $zone_id);
+        $iterator = $this->requestCarbonIntensitiesPerDay($start_time, $length, $zone);
 
         $total_emission = 0.0;
         $energy_in_kwh = ($power) / 1000.0;
