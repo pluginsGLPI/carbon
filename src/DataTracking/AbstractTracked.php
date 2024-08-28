@@ -49,7 +49,8 @@ abstract class AbstractTracked
      */
     public const DATA_QUALITY_UNSPECIFIED = 0;
     public const DATA_QUALITY_MANUAL = 1;
-    public const DATA_QUALITY_REAL_TIME_MEASUREMENT = 2;
+    public const DATA_QUALITY_RAW_REAL_TIME_MEASUREMENT_DOWNSAMPLED = 2;
+    public const DATA_QUALITY_RAW_REAL_TIME_MEASUREMENT = 3;
 
     protected array $source = [];
 
@@ -69,5 +70,10 @@ abstract class AbstractTracked
     public function getSource(): array
     {
         return $this->source;
+    }
+
+    public function getLowestSource()
+    {
+        return min($this->source);
     }
 }

@@ -93,7 +93,7 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
         );
     }
 
-    public function getCarbonEmissionPerDay(DateTime $day, CarbonIntensityZone $zone): ?float
+    public function getCarbonEmissionPerDay(DateTime $day, CarbonIntensityZone $zone): ?TrackedFloat
     {
         $usage_profile = $this->getUsageProfile();
 

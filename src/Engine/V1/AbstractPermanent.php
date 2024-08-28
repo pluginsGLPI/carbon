@@ -62,7 +62,7 @@ abstract class AbstractPermanent extends AbstractAsset implements EngineInterfac
         );
     }
 
-    public function getCarbonEmissionPerDay(DateTime $day, CarbonIntensityZone $zone): ?float
+    public function getCarbonEmissionPerDay(DateTime $day, CarbonIntensityZone $zone): ?TrackedFloat
     {
         $power = $this->getPower();
 
@@ -77,6 +77,9 @@ abstract class AbstractPermanent extends AbstractAsset implements EngineInterfac
             $total_emission += $row['intensity'] * $energy_in_kwh;
         }
 
-        return $total_emission;
+        return new TrackedFloat(
+            array_merge($power->getSource(), $row['data_quality']),
+            $total_emission
+        );
     }
 }

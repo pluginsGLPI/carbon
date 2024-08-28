@@ -41,6 +41,7 @@ use DateTimeZone;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 
 class CarbonIntensityRTE extends AbstractCarbonIntensity
 {
@@ -267,13 +268,14 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
                 // Ensure that current date is 15 minutes ahead than previous record date
                 $diff = $date->getTimestamp() - $previous_record_date->getTimestamp();
                 if ($diff !== $step * 60) {
-                    if ($diff == 4500 && $this->switchTowinterTime($date)) {
+                    if ($diff == 4500 && $this->switchToWinterTime($date)) {
                         // 4500 = 1h + 15m
                         $filled_date = DateTime::createFromFormat('Y-m-d\TH:i:s', end($intensities)['datetime']);
                         $filled_date->add(new DateInterval('PT1H'));
                         $intensities[] = [
                             'datetime'  => $filled_date->format('Y-m-d\TH:00:00'),
                             'intensity' => (end($intensities)['intensity'] + $record['taux_co2']) / 2,
+                            'data_quality' => AbstractTracked::DATA_QUALITY_RAW_REAL_TIME_MEASUREMENT_DOWNSAMPLED,
                         ];
                     } else {
                         // Unexpected gap in the records. What to do with this ?
@@ -288,6 +290,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
                 $intensities[] = [
                     'datetime' => $date->format('Y-m-d\TH:00:00'),
                     'intensity' => (float) $intensity / $count,
+                    'data_quality' => AbstractTracked::DATA_QUALITY_RAW_REAL_TIME_MEASUREMENT_DOWNSAMPLED,
                 ];
                 $intensity = 0.0;
                 $count = 0;
@@ -299,7 +302,12 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         return $intensities;
     }
 
-    private function switchTowinterTime(DateTime $date): bool
+    /**
+     * Detect if the given datetime matches a switching ot winter time (DST)
+     *
+     * @return bool
+     */
+    private function switchToWinterTime(DateTime $date): bool
     {
         // We assume that the datetime is already switched to winter time
         // Therefore summer time is 03:00:00 and winter time is 02:00:00

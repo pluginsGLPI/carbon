@@ -56,14 +56,14 @@ interface EngineInterface
      * @param DateTime $day the day
      * @param CarbonIntensityZone $zone_id the zone where the asset is located at the given date
      *
-     * @return float or null
+     * @return TrackedFloat|null
      *
      * If no carbon intensity data are available for the specified day, returns null
      * Otherwise, returns the CO2 emission of the day, which can be 0
      *
      * Unit of returned value, if float, is grams of CO2
      */
-    public function getCarbonEmissionPerDay(DateTime $day, CarbonIntensityZone $zone): ?float;
+    public function getCarbonEmissionPerDay(DateTime $day, CarbonIntensityZone $zone): ?TrackedFloat;
 
     /**
      * Returns the consumed energy for the specified day.

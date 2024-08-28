@@ -218,9 +218,11 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
             'types_id'          => $item->fields[$type_fk],
             'models_id'         => $item->fields[$model_fk],
             'locations_id'      => $item->fields['locations_id'],
-            'energy_per_day'    => $energy,
-            'emission_per_day'  => $emission,
+            'energy_per_day'    => $energy->getValue(),
+            'emission_per_day'  => $emission->getValue(),
             'date'              => $day->format('Y-m-d 00:00:00'),
+            'energy_quality'    => $energy->getLowestSource(),
+            'emission_quality'  => $emission->getLowestSource(),
         ]);
 
         return !$this->isNewID($id);

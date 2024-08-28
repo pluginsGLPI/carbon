@@ -40,6 +40,8 @@ CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_carbonemissions` (
   `energy_per_day`   float        DEFAULT '0'         COMMENT 'KWh',
   `emission_per_day` float        DEFAULT '0'         COMMENT 'gCO2eq',
   `date`             timestamp    NULL DEFAULT NULL,
+  `energy_quality`   int unsigned NOT NULL DEFAULT '0' COMMENT 'DataTtacking\\AbstractTracked::DATA_QUALITY_* constants',
+  `emission_quality` int unsigned NOT NULL DEFAULT '0' COMMENT 'DataTtacking\\AbstractTracked::DATA_QUALITY_* constants',
   PRIMARY KEY (`id`),
   UNIQUE KEY `unicity` (`itemtype`, `items_id`, `date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

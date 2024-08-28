@@ -44,6 +44,7 @@ use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
 use Config as GlpiConfig;
 use GLPIKey;
+use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 
 class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
 {
@@ -219,9 +220,11 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
             if (!$datetime instanceof DateTimeInterface) {
                 continue;
             }
+            $data_quality = $this->getDataQuality($record);
             $intensities[] = [
                 'datetime' => $datetime->format('Y-m-d\TH:i:s'),
                 'intensity' => $record['carbonIntensity'],
+                'data_quality' => $data_quality,
             ];
         }
 
@@ -268,9 +271,11 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
                 var_dump(DateTime::getLastErrors());
                 continue;
             }
+            $data_quality = $this->getDataQuality($record);
             $intensities[] = [
-                'datetime' => $datetime->format(DateTime::ATOM),
-                'intensity' => $record['carbonIntensity'],
+                'datetime'     => $datetime->format(DateTime::ATOM),
+                'intensity'    => $record['carbonIntensity'],
+                'data_quality' => $data_quality,
             ];
         }
 
@@ -280,10 +285,24 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
         ];
     }
 
+    /**
+     * Try ti determine the data quality of record
+     *
+     * @param array $record
+     * @return integer
+     */
+    protected function getDataQuality(array $record): int
+    {
+        $data_quality = 0;
+        if (!$record['isEstimated']) {
+            $data_quality = AbstractTracked::DATA_QUALITY_RAW_REAL_TIME_MEASUREMENT;
+        }
+
+        return $data_quality;
+    }
+
     public function incrementalDownload(string $zone, DateTimeImmutable $start_date, CarbonIntensity $intensity, int $limit = 0): int
     {
-        $end_date = new DateTimeImmutable('now');
-
         $count = 0;
         $saved = 0;
         try {
