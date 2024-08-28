@@ -80,15 +80,17 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
 
     public function createZones(): int
     {
-        $source = new CarbonIntensitySource();
-        if (!$source->getFromDBByCrit(['name' => $this->getSourceName()])) {
-            // Failed to get the source (shoud not happen as it is created at installation time)
+        $source = $this->getOrCreateSource();
+        if ($source === null) {
             return -1;
         }
+        $source_id = $source->getID();
 
         $zone = new CarbonIntensityZone();
-
-        $input = ['name' => 'France'];
+        $input = [
+            'name' => 'France',
+            'plugin_carbon_carbonintensitysources_id_historical' => $source_id,
+        ];
         if ($zone->getFromDBByCrit($input) === false) {
             if (!$zone->add($input)) {
                 return -1;
@@ -97,7 +99,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
 
         $source_zone = new CarbonIntensitySource_CarbonIntensityZone();
         $source_zone->add([
-            CarbonIntensitySource::getForeignKeyField() => $source->getID(),
+            CarbonIntensitySource::getForeignKeyField() => $source_id,
             CarbonIntensityZone::getForeignKeyField() => $zone->getID(),
         ]);
         $this->setZoneSetupComplete();

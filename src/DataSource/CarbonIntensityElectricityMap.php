@@ -83,11 +83,11 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
 
     public function createZones(): int
     {
-        $source = new CarbonIntensitySource();
-        if (!$source->getFromDBByCrit(['name' => $this->getSourceName()])) {
-            // Failed to get the source (shoud not happen as it is created at installation time)
+        $source = $this->getOrCreateSource();
+        if ($source === null) {
             return -1;
         }
+        $source_id = $source->getID();
 
         try {
             $zones = $this->downloadZones();
@@ -101,27 +101,19 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
             $zone_input = [
                 'name' => $zone_spec['zoneName'],
             ];
+            if ($this->enableHistorical($zone_spec['zoneName'])) {
+                $zone_input['plugin_carbon_carbonintensitysources_id_historical'] = $source_id;
+            }
             $zone = new CarbonIntensityZone();
             if ($zone->getFromDbByCrit($zone_input) === false) {
-                // $zone_input['electricitymap_code'] = $zone_key;
                 if ($zone->add($zone_input) === false) {
-                    ;
                     $failed = true;
                     continue;
                 }
-            // } else {
-            //     $zone_input = [
-            //         'id' => $zone->getID(),
-            //         'electricitymap_code' => $zone_key
-            //     ];
-            //     if (!$zone->update($zone_input)) {
-            //         $failed++;
-            //         continue;
-            //     }
             }
             $source_zone = new CarbonIntensitySource_CarbonIntensityZone();
             $source_zone->add([
-                CarbonIntensitySource::getForeignKeyField() => $source->getID(),
+                CarbonIntensitySource::getForeignKeyField() => $source_id,
                 CarbonIntensityZone::getForeignKeyField() => $zone->getID(),
                 'code' => $zone_key,
             ]);
@@ -135,6 +127,20 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
         }
 
         return $count;
+    }
+
+    /**
+     * Enable historical for this source depending in the zone to configure
+     *
+     * @return boolean
+     */
+    protected function enableHistorical($zone_name): bool
+    {
+        if (in_array($zone_name, ['France'])) {
+            return false;
+        }
+
+        return true;
     }
 
     private function getToken(): string

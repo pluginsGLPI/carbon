@@ -115,13 +115,17 @@ class CronTask
     {
         $task->setVolume(0); // start with zero
         $remaining = $task->fields['param'];
+        $failure = false;
 
         // Check the zones are configured
         // If not, set them up
         $zones = $data_source->getZones();
         if (!$data_source->isZoneSetupComplete() || count($zones) === 0) {
             $done_count = $data_source->createZones();
-            $remaining -= $done_count;
+            if ($done_count < 0) {
+                $failure = true;
+            }
+            $remaining -= abs($done_count);
             $task->addVolume($done_count);
         }
 
@@ -132,7 +136,6 @@ class CronTask
 
         $limit_per_zone = floor(((int) $remaining) / count($zones));
         $count = 0;
-        $failure = false;
         foreach ($zones as $zone) {
             $zone_name = $zone['name'];
             try {

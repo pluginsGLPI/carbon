@@ -43,6 +43,17 @@ use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
 
 class CarbonIntensityElectricityMapTest extends DbTestCase
 {
+    public function testEnableHistorical()
+    {
+        $client = $this->createStub(RestApiClientInterface::class);
+        $instance = new CarbonIntensityElectricityMap($client);
+        $output = $this->callPrivateMethod($instance, 'enableHistorical', 'France');
+        $this->assertFalse($output);
+
+        $output = $this->callPrivateMethod($instance, 'enableHistorical', 'Brazil');
+        $this->assertTrue($output);
+    }
+
     public function testFetchDay()
     {
         $client = $this->createStub(RestApiClientInterface::class);
