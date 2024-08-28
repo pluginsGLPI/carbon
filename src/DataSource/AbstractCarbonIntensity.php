@@ -54,7 +54,8 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
      *
      * @return CarbonIntensitySource
      */
-    protected function getOrCreateSource(): ?CarbonIntensitySource {
+    protected function getOrCreateSource(): ?CarbonIntensitySource
+    {
         $source = new CarbonIntensitySource();
         if (!$source->getFromDBByCrit(['name' => $this->getSourceName()])) {
             $source->add([

@@ -46,6 +46,7 @@ use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Toolbox;
 use Location;
 use LogicException;
+use Log;
 
 abstract class AbstractAsset extends CommonDBTM implements AssetInterface
 {
@@ -178,8 +179,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
             $date_cursor->setTime(0, 0, 0, 0);
             $end_date = new DateTime($gap['end']);
             while ($date_cursor < $end_date) {
-                $zone = $this->getZone($id /* ,$date_cursor */);
-                $success = $this->historizeItemPerDay($item, $engine, $date_cursor, $zone);
+                $success = $this->historizeItemPerDay($item, $engine, $date_cursor);
                 if ($success) {
                     $count++;
                     if ($this->limit !== 0 && $count >= $this->limit) {
@@ -194,9 +194,12 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         return $count;
     }
 
-    protected function historizeItemPerDay(CommonDBTM $item, EngineInterface $engine, DateTime $day, CarbonIntensityZone $zone): bool
+    protected function historizeItemPerDay(CommonDBTM $item, EngineInterface $engine, DateTime $day): bool
     {
         $energy = $engine->getEnergyPerDay($day);
+        $item_id = $item->getID();
+        $zone = $this->getZone($item_id /* ,$date_cursor */);
+
         $emission = 0;
         if ($energy !== 0) {
             $emission = $engine->getCarbonEmissionPerDay($day, $zone);
@@ -210,7 +213,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         $model_fk = static::$model_itemtype::getForeignKeyField();
         $id = $entry->add([
             'itemtype'          => $item->getType(),
-            'items_id'          => $item->getID(),
+            'items_id'          => $item_id,
             'entities_id'       => $item->fields['entities_id'],
             'types_id'          => $item->fields[$type_fk],
             'models_id'         => $item->fields[$model_fk],

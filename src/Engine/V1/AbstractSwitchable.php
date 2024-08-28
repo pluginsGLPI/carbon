@@ -35,8 +35,12 @@ namespace GlpiPlugin\Carbon\Engine\V1;
 
 use DateTime;
 use DateInterval;
+use DbUtils;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
+use Location;
+use Log;
+use LogicException;
 
 abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInterface
 {

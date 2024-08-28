@@ -35,6 +35,7 @@ namespace GlpiPlugin\Carbon\Engine\V1;
 
 use DateTime;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
+
 /**
  * Compute environnemental impact of a computer
  */
