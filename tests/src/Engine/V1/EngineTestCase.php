@@ -33,17 +33,19 @@
 
 namespace GlpiPlugin\Carbon\Tests\Engine\V1;
 
-use DateTime;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
-use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 
-class EngineTestCase extends DbTestCase
+abstract class EngineTestCase extends DbTestCase
 {
     protected static string $engine_class = '';
     protected static string $itemtype_class = '';
     protected static string $glpi_type_class = '';
     protected static string $type_class = '';
     protected static string $model_class = '';
+
+    abstract public function getEnergyPerDayProvider(): \Generator;
+
+    abstract public function getCarbonEmissionPerDateProvider(): \Generator;
 
     /**
      * The delta for comparison of computed emission with expected value,

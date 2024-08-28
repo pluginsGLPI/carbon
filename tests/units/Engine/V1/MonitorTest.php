@@ -142,7 +142,7 @@ class MonitorTest extends EngineTestCase
         ];
     }
 
-    public function getCarbonEmissionPerDateProvider()
+    public function getCarbonEmissionPerDateProvider(): \Generator
     {
         $country = $this->getUniqueString();
         $thursday = DateTime::createFromFormat('Y-m-d H:i:s', '1999-12-02 12:00:00');
