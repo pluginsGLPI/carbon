@@ -41,7 +41,7 @@ use DbUtils;
 use DbMysql;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\CarbonIntensity;
-use Location;
+use GlpiPlugin\Carbon\DataTracking\TrackedInt;
 use QueryExpression;
 
 abstract class AbstractAsset implements EngineInterface
@@ -95,10 +95,14 @@ abstract class AbstractAsset implements EngineInterface
 
         $intensities_table = CarbonIntensity::getTable();
 
+        /**
+         * Keep the lowest data quality of the set of intensities
+         */
         $request = [
             'SELECT' => [
                 CarbonIntensity::getTableField('intensity') . ' AS intensity',
                 CarbonIntensity::getTableField('date') . ' AS date',
+                'MIN' => CarbonIntensity::getTableField('data_quality') . ' AS data_quality'
             ],
             'FROM' => $intensities_table,
             'WHERE' => [
@@ -109,6 +113,7 @@ abstract class AbstractAsset implements EngineInterface
                     [CarbonIntensity::getTableField('date') => ['<', $stop_date_s]],
                 ],
             ],
+            'GROUP' => [CarbonIntensity::getTableField('date')],
             'ORDER' => CarbonIntensity::getTableField('date') . ' ASC',
         ];
 
@@ -118,7 +123,7 @@ abstract class AbstractAsset implements EngineInterface
     /**
      * Returns the declared power for a computer
      */
-    public function getPower(): int
+    public function getPower(): TrackedInt
     {
         global $DB;
 
@@ -161,9 +166,9 @@ abstract class AbstractAsset implements EngineInterface
 
         if ($result->numrows() === 1) {
             $power = $result->current()['power_consumption'];
-            return $power;
+            return new TrackedInt(TrackedInt::DATA_QUALITY_MANUAL, $power);
         }
 
-        return 0;
+        return new TrackedInt(TrackedInt::DATA_QUALITY_MANUAL, 0);
     }
 }

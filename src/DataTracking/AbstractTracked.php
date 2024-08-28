@@ -31,52 +31,43 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\Engine\V1;
+namespace GlpiPlugin\Carbon\DataTracking;
 
-use DateTime;
-use DateInterval;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
-use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
+use LogicException;
 
-abstract class AbstractPermanent extends AbstractAsset implements EngineInterface
+/**
+ * Tracks the source of the contained data
+ *
+ * When the instance modelizes the result of a calculation
+ * sources are ordered by retrieval order.
+ * This allows an evaluation of the quality of the stored value.
+ */
+abstract class AbstractTracked
 {
     /**
-     * Returns the consumed energy for the specified day.
-     *
-     * {@inheritDoc}
+     * Quality of data, must be ordered from 0 (lowest quality) to highest quality
      */
-    public function getEnergyPerDay(DateTime $day): TrackedFloat
+    public const DATA_QUALITY_UNSPECIFIED = 0;
+    public const DATA_QUALITY_MANUAL = 1;
+    public const DATA_QUALITY_REAL_TIME_MEASUREMENT = 2;
+
+    protected array $source = [];
+
+    abstract public function getValue(): mixed;
+
+    public function __construct(int|array $source)
     {
-        $power = $this->getPower();
-
-        $delta_time = 24;
-
-        // units:
-        // power is in Watt
-        // delta_time is in seconds
-        $energy_in_kwh = ($power->getValue() * $delta_time) / (1000.0);
-
-        return new TrackedFloat(
-            $power->getSource(),
-            $energy_in_kwh
-        );
+        if (is_integer($source)) {
+            $this->source[] = $source;
+        } elseif (is_array($source)) {
+            $this->source = array_values($source);
+        } else {
+            throw new LogicException('Invalid source');
+        }
     }
 
-    public function getCarbonEmissionPerDay(DateTime $day, CarbonIntensityZone $zone): ?float
+    public function getSource(): array
     {
-        $power = $this->getPower();
-
-        $start_time = clone $day;
-        $start_time->setTime(0, 0, 0, 0);
-        $length = new DateInterval('PT' . 86400 . 'S'); // 24h = 86400 seconds
-        $iterator = $this->requestCarbonIntensitiesPerDay($start_time, $length, $zone);
-
-        $total_emission = 0.0;
-        $energy_in_kwh = ($power->getValue()) / 1000.0;
-        foreach ($iterator as $row) {
-            $total_emission += $row['intensity'] * $energy_in_kwh;
-        }
-
-        return $total_emission;
+        return $this->source;
     }
 }

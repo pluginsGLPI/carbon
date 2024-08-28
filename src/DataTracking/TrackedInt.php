@@ -31,52 +31,20 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\Engine\V1;
+namespace GlpiPlugin\Carbon\DataTracking;
 
-use DateTime;
-use DateInterval;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
-use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
-
-abstract class AbstractPermanent extends AbstractAsset implements EngineInterface
+class TrackedInt extends AbstractTracked
 {
-    /**
-     * Returns the consumed energy for the specified day.
-     *
-     * {@inheritDoc}
-     */
-    public function getEnergyPerDay(DateTime $day): TrackedFloat
+    private int $value;
+
+    public function __construct(int|array $source, int $value)
     {
-        $power = $this->getPower();
-
-        $delta_time = 24;
-
-        // units:
-        // power is in Watt
-        // delta_time is in seconds
-        $energy_in_kwh = ($power->getValue() * $delta_time) / (1000.0);
-
-        return new TrackedFloat(
-            $power->getSource(),
-            $energy_in_kwh
-        );
+        parent::__construct($source);
+        $this->value = $value;
     }
 
-    public function getCarbonEmissionPerDay(DateTime $day, CarbonIntensityZone $zone): ?float
+    public function getValue(): int
     {
-        $power = $this->getPower();
-
-        $start_time = clone $day;
-        $start_time->setTime(0, 0, 0, 0);
-        $length = new DateInterval('PT' . 86400 . 'S'); // 24h = 86400 seconds
-        $iterator = $this->requestCarbonIntensitiesPerDay($start_time, $length, $zone);
-
-        $total_emission = 0.0;
-        $energy_in_kwh = ($power->getValue()) / 1000.0;
-        foreach ($iterator as $row) {
-            $total_emission += $row['intensity'] * $energy_in_kwh;
-        }
-
-        return $total_emission;
+        return $this->value;
     }
 }

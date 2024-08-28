@@ -154,6 +154,11 @@ function plugin_carbon_check_prerequisites()
         $prerequisitesSuccess = false;
     }
 
+    if (version_compare(PHP_VERSION, '8.0.0') < 0) {
+        echo "This plugin requires PHP >= 8.0<br>";
+        $prerequisitesSuccess = false;
+    }
+
     return $prerequisitesSuccess;
 }
 

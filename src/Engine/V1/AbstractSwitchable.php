@@ -38,6 +38,8 @@ use DateInterval;
 use DbUtils;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
+use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
+use GlpiPlugin\Carbon\DataTracking\TrackedInt;
 use Location;
 use Log;
 use LogicException;
@@ -61,11 +63,11 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
 
     /**
      * Returns the consumed energy for the specified day.
-     * @return float energy (KWh)
+     * @return TrackedFloat energy (KWh)
      *
      * {@inheritDoc}
      */
-    public function getEnergyPerDay(DateTime $day): float
+    public function getEnergyPerDay(DateTime $day): TrackedFloat
     {
         $usage_profile = $this->getUsageProfile();
 
@@ -83,9 +85,12 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
         // units:
         // power is in Watt
         // delta_time is in seconds
-        $energy_in_kwh = ($power * $delta_time) / (1000.0 * 60 * 60);
+        $energy_in_kwh = ($power->getValue() * $delta_time) / (1000.0 * 60 * 60);
 
-        return $energy_in_kwh;
+        return new TrackedFloat(
+            array_merge($power->getSource(), TrackedFloat::DATA_QUALITY_MANUAL),
+            $energy_in_kwh
+        );
     }
 
     public function getCarbonEmissionPerDay(DateTime $day, CarbonIntensityZone $zone): ?float
@@ -110,9 +115,9 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
         return $this->computeEmissionPerDay($start_time, $power, $length, $zone);
     }
 
-    protected function computeEmissionPerDay(DateTime $start_time, int $power, DateInterval $length, CarbonIntensityZone $zone): ?float
+    protected function computeEmissionPerDay(DateTime $start_time, TrackedInt $power, DateInterval $length, CarbonIntensityZone $zone): ?TrackedFloat
     {
-        if ($power === 0) {
+        if ($power->getValue() === 0) {
             return 0;
         }
 
@@ -120,7 +125,10 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
 
         $total_seconds = (int) $length->format('%S');
         if ($total_seconds === 0) {
-            return 0;
+            return new TrackedFloat(
+                $power->getSource(),
+                0
+            );
         }
 
         if ($iterator->count() === 0) {
@@ -143,17 +151,23 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
             }
 
             // Calculate emission for a complete hour
-            $energy_in_kwh = ($power * $seconds) / (1000.0 * 60 * 60);
+            $energy_in_kwh = ($power->getValue() * $seconds) / (1000.0 * 60 * 60);
             $emission = $row['intensity'] * $energy_in_kwh;
             $total_emission += $emission;
 
             $counted_seconds += $seconds;
             if ($counted_seconds >= $total_seconds) {
-                return $total_emission;
+                return new TrackedFloat(
+                    array_merge($power->getSource(), $row['data_quality']),
+                    $total_emission
+                );
             }
             $iterator->next();
         }
 
-        return $total_emission;
+        return new TrackedFloat(
+            array_merge($power->getSource(), $row['data_quality']),
+            $total_emission
+        );
     }
 }
