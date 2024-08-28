@@ -75,7 +75,8 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
         $iterator = $DB->request([
             'SELECT' => [
                 $zone_table => 'name',
-                $source_zone_table => ['id', 'is_download_enabled']
+                $source_zone_table => ['id', 'is_download_enabled'],
+                CarbonIntensitySource::getTableField('name') . ' AS historical_source_name'
             ],
             'FROM' => $source_zone_table,
             'INNER JOIN' => [
@@ -103,10 +104,11 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
         $entries = [];
         foreach ($iterator as $data) {
             $entries[] = [
-                'itemtype'   => CarbonIntensitySource::class,
-                'id'         => $item->getID(),
-                'name'       => $data['name'],
-                'is_download_enabled' => self::getToggleLink($data['id'], $data['is_download_enabled']),
+                'itemtype'               => CarbonIntensitySource::class,
+                'id'                     => $item->getID(),
+                'name'                   => $data['name'],
+                'historical_source_name' => $data['historical_source_name'],
+                'is_download_enabled'    => self::getToggleLink($data['id'], $data['is_download_enabled']),
             ];
         }
 
@@ -120,6 +122,7 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
             'columns' => [
                 'name' => __('Name'),
                 'is_download_enabled' => __('Download enabled', 'carbon'),
+                'historical_source_name' => __('Source for historical', 'carbon'),
             ],
             'formatters' => [
                 'is_download_enabled' => 'raw_html',

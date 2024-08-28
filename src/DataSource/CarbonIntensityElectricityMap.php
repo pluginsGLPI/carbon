@@ -137,6 +137,7 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
     protected function enableHistorical($zone_name): bool
     {
         if (in_array($zone_name, ['France'])) {
+            // Prefer an other source for France
             return false;
         }
 
