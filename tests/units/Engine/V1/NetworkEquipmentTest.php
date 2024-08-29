@@ -75,7 +75,7 @@ class NetworkEquipmentTest extends EngineTestCase
         foreach ($this->getEnergyPerDayProvider() as $data) {
             list ($engine, $date, $expected_energy) = $data;
             $output = $engine->getEnergyPerDay($date);
-            $this->assertEquals($expected_energy, $output);
+            $this->assertEquals($expected_energy, $output->getValue());
         }
     }
 

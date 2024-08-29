@@ -37,7 +37,7 @@ class TrackedInt extends AbstractTracked
 {
     private int $value;
 
-    public function __construct(mixed $origin, int $value, ?int $source = null)
+    public function __construct(int $value = 0, ?AbstractTracked $origin = null, ?int $source = null)
     {
         parent::__construct($origin);
         if ($source !== null) {
@@ -46,8 +46,14 @@ class TrackedInt extends AbstractTracked
         $this->value = $value;
     }
 
-    public function getValue(): int
+    public function getValue(): mixed
     {
-        return $this->value;
+        return (int) $this->value;
+    }
+
+    public function setValue(int $value): self
+    {
+        $this->value = $value;
+        return $this;
     }
 }

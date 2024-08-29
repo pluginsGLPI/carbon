@@ -57,8 +57,8 @@ abstract class AbstractPermanent extends AbstractAsset implements EngineInterfac
         $energy_in_kwh = ($power->getValue() * $delta_time) / (1000.0);
 
         return new TrackedFloat(
-            $power->getSource(),
-            $energy_in_kwh
+            $energy_in_kwh,
+            $power
         );
     }
 
@@ -78,8 +78,8 @@ abstract class AbstractPermanent extends AbstractAsset implements EngineInterfac
         }
 
         return new TrackedFloat(
-            $power->getSource(),
             $total_emission,
+            $power,
             $row['data_quality']
         );
     }

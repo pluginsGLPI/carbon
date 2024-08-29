@@ -37,7 +37,7 @@ class TrackedFloat extends AbstractTracked
 {
     private float $value;
 
-    public function __construct(mixed $origin, float $value, ?int $source = null)
+    public function __construct(float $value = 0, ?AbstractTracked $origin = null, ?int $source = null)
     {
         parent::__construct($origin);
         if ($source !== null) {
@@ -46,8 +46,14 @@ class TrackedFloat extends AbstractTracked
         $this->value = $value;
     }
 
-    public function getValue(): float
+    public function getValue(): mixed
     {
-        return $this->value;
+        return (float) $this->value;
+    }
+
+    public function setValue(float $value): self
+    {
+        $this->value = $value;
+        return $this;
     }
 }

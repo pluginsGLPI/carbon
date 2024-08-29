@@ -37,6 +37,9 @@ use DateTime;
 use Computer as GlpiComputer;
 use DbUtils;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
+use GlpiPlugin\Carbon\DataTracking\TrackedInt;
+use GlpiPlugin\Carbon\Tests\Engine\V1\EngineTestCase;
 
 /**
  * Compute environnemental impact of a whole inventory
@@ -144,43 +147,53 @@ class Inventory implements EngineInterface
         return true;
     }
 
-    public function getPower(): int
+    public function getPower(): TrackedInt
     {
-        $power = 0;
+        $total_power = 0;
+        $power = new TrackedInt(0);
 
-        foreach ($this->items as $itemtype => $items) {
-            foreach ($items as $tems_id => $item) {
-                $power += $item->getPower();
+        foreach ($this->items as $itemtype => $engines) {
+            foreach ($engines as $tems_id => $engine) {
+                /** @var EngineInterface $engine */
+                $total_power += $engine->getPower()->getValue();
+                $power->appendSource($engine->getPower()->getSource());
             }
         }
 
-        return $power;
+        return $power->setValue($total_power);
     }
 
-    public function getEnergyPerDay(DateTime $day): float
+    public function getEnergyPerDay(DateTime $day): TrackedFloat
     {
-        $energy = 0;
+        $total_energy = 0;
+        $energy = new TrackedFloat();
 
-        foreach ($this->items as $itemtype => $items) {
-            foreach ($items as $tems_id => $item) {
-                $energy += $item->getEnergyPerDay($day);
+        foreach ($this->items as $itemtype => $engines) {
+            foreach ($engines as $tems_id => $engine) {
+                /** @var EngineInterface $engine */
+                $item_energy = $engine->getEnergyPerDay($day);
+                $total_energy += $item_energy->getValue();
+                $energy->appendSource($item_energy);
             }
         }
 
-        return $energy;
+        return $energy->setValue($total_energy);
     }
 
-    public function getCarbonEmissionPerDay(DateTime $day, CarbonIntensityZone $zone): ?float
+    public function getCarbonEmissionPerDay(DateTime $day, CarbonIntensityZone $zone): ?TrackedFloat
     {
-        $carbon_emission = 0;
+        $total_emission = 0;
+        $emission = new TrackedFloat();
 
         foreach ($this->items as $itemtype => $items) {
             foreach ($items as $tems_id => $item) {
-                $carbon_emission += $item->getCarbonEmissionPerDay($day);
+                $item_emission = $item->getCarbonEmissionPerDay($day);
+                $total_emission += $item_emission->getValue();
+                $emission->appendSource($item_emission);
             }
         }
 
-        return $carbon_emission;
+        return $emission->setValue($total_emission);
     }
 
     /**

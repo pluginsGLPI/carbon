@@ -51,6 +51,7 @@ use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use Entity;
 use GlpiPlugin\Carbon\CarbonEmission;
+use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use Html;
 use Location;
 use ReflectionMethod;
@@ -299,7 +300,12 @@ class CommonTestCase extends TestCase
                 'date' => $current_date->format('Y-m-d H:i:s'),
                 'intensity' => $intensity,
             ];
-            $emission = $this->getItem(CarbonIntensity::class, $crit);
+            $emission = $this->getItem(
+                CarbonIntensity::class,
+                $crit + [
+                    'data_quality' => AbstractTracked::DATA_QUALITY_MANUAL
+                ],
+            );
             $current_date->add($one_hour);
         }
     }

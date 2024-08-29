@@ -56,7 +56,20 @@ abstract class AbstractTracked
 
     abstract public function getValue(): mixed;
 
-    public function __construct(mixed $source)
+    public function __construct(mixed $source = null)
+    {
+        if ($source === null) {
+            return;
+        }
+        $this->appendSource($source);
+    }
+
+    public function getSource(): array
+    {
+        return $this->sources;
+    }
+
+    public function appendSource(mixed $source): AbstractTracked
     {
         if (is_integer($source)) {
             $this->sources[] = $source;
@@ -65,16 +78,6 @@ abstract class AbstractTracked
         } else {
             throw new LogicException('Invalid source');
         }
-    }
-
-    public function getSource(): array
-    {
-        return $this->sources;
-    }
-
-    protected function appendSource(int $source): AbstractTracked
-    {
-        $this->sources[] = $source;
         return $this;
     }
 

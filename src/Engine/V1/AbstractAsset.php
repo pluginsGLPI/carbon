@@ -166,9 +166,9 @@ abstract class AbstractAsset implements EngineInterface
 
         if ($result->numrows() === 1) {
             $power = $result->current()['power_consumption'];
-            return new TrackedInt(TrackedInt::DATA_QUALITY_MANUAL, $power);
+            return new TrackedInt($power, null, TrackedInt::DATA_QUALITY_MANUAL);
         }
 
-        return new TrackedInt(TrackedInt::DATA_QUALITY_MANUAL, 0);
+        return new TrackedInt(0, null, TrackedInt::DATA_QUALITY_MANUAL);
     }
 }

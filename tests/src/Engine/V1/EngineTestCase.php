@@ -121,7 +121,7 @@ abstract class EngineTestCase extends DbTestCase
         foreach ($this->getPowerProvider() as $data) {
             list ($engine, $expected_power) = $data;
             $actual_power = $engine->getPower();
-            $this->assertEquals($expected_power, $actual_power);
+            $this->assertEquals($expected_power, $actual_power->getValue());
         }
     }
 
@@ -130,7 +130,7 @@ abstract class EngineTestCase extends DbTestCase
         foreach ($this->getEnergyPerDayProvider() as $data) {
             list($engine, $date, $expected_energy) = $data;
             $output = $engine->getEnergyPerDay($date);
-            $this->assertEquals($expected_energy, $output);
+            $this->assertEquals($expected_energy, $output->getValue());
         }
     }
 
@@ -139,7 +139,7 @@ abstract class EngineTestCase extends DbTestCase
         foreach ($this->getCarbonEmissionPerDateProvider() as $data) {
             list($engine, $day, $zone, $expected_emission) = $data;
             $emission = $engine->getCarbonEmissionPerDay($day, $zone);
-            $this->assertEqualsWithDelta($expected_emission, $emission, self::EPSILON);
+            $this->assertEqualsWithDelta($expected_emission, $emission->getValue(), self::EPSILON);
         }
     }
 }

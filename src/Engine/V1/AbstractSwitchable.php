@@ -72,7 +72,7 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
         $usage_profile = $this->getUsageProfile();
 
         if ($usage_profile === null || !self::isUsageDay($usage_profile, $day)) {
-            return 0;
+            return new TrackedFloat(0, null, TrackedFloat::DATA_QUALITY_MANUAL);
         }
 
         $power = $this->getPower();
@@ -88,8 +88,8 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
         $energy_in_kwh = ($power->getValue() * $delta_time) / (1000.0 * 60 * 60);
 
         return new TrackedFloat(
-            $power->getSource(),
             $energy_in_kwh,
+            $power,
             TrackedFloat::DATA_QUALITY_MANUAL
         );
     }
@@ -99,7 +99,7 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
         $usage_profile = $this->getUsageProfile();
 
         if ($usage_profile === null || !self::isUsageDay($usage_profile, $day)) {
-            return 0.0;
+            return new TrackedFloat(0, null, TrackedFloat::DATA_QUALITY_MANUAL);
         }
 
         $power = $this->getPower();
@@ -127,8 +127,8 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
         $total_seconds = (int) $length->format('%S');
         if ($total_seconds === 0) {
             return new TrackedFloat(
-                $power->getSource(),
-                0
+                0,
+                $power
             );
         }
 
@@ -147,20 +147,19 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
             $seconds = $next_hour->format('U') - $current_hour->format('U');
 
             if ($counted_seconds + $seconds > $total_seconds) {
-                // Calculate emission of last hour (incomplete)
+                // Calculate emission of incomplete hour
                 $seconds = $total_seconds - $counted_seconds;
             }
 
-            // Calculate emission for a complete hour
+            // Calculate emission
             $energy_in_kwh = ($power->getValue() * $seconds) / (1000.0 * 60 * 60);
-            $emission = $row['intensity'] * $energy_in_kwh;
-            $total_emission += $emission;
+            $total_emission += $row['intensity'] * $energy_in_kwh;
 
             $counted_seconds += $seconds;
             if ($counted_seconds >= $total_seconds) {
                 return new TrackedFloat(
-                    $power->getSource(),
                     $total_emission,
+                    $power,
                     $row['data_quality']
                 );
             }
@@ -168,8 +167,8 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
         }
 
         return new TrackedFloat(
-            $power->getSource(),
-            $total_emission
+            $total_emission,
+            $power
         );
     }
 }
