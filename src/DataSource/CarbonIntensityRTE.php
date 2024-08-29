@@ -126,7 +126,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         $stop->setTime(23, 59, 59);
 
         $format = DateTime::ATOM;
-        $timezone = $start->getTimezone()->getName();
+        $timezone = $this->prepareTimezone($start->getTimezone()->getName());
         $from = $start->format($format);
         $to = $stop->format($format);
 
@@ -143,6 +143,10 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         if (!$response) {
             return [];
         }
+        if (isset($response['error_code'])) {
+            trigger_error($this->formatError($response));
+            return [];
+        }
 
         // Drop data with no carbon intensity (may be returned by the provider)
         $response['results'] = array_filter($response['results'], function ($item) {
@@ -151,7 +155,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
 
         // Drop last rows until we reach
         $safety_count = 0;
-        while (($last_item = end($response['results'])) !== null) {
+        while (($last_item = end($response['results'])) !== false) {
             $time = DateTime::createFromFormat(DateTimeInterface::ATOM, $last_item['date_heure']);
             if ($time->format('i') === '45') {
                 // We expect 15 minutes steps
@@ -184,7 +188,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         $from = $start->format($format);
         $to = $stop->format($format);
 
-        $timezone = $start->getTimezone()->getName();
+        $timezone = $this->prepareTimezone($start->getTimezone()->getName());
         $params = [
             'select' => 'taux_co2,date_heure',
             'where' => "date_heure IN [date'$from' TO date'$to']",
@@ -200,6 +204,10 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         }
         $response = $this->client->request('GET', $url, ['timeout' => 8, 'query' => $params]);
         if (!$response) {
+            return [];
+        }
+        if (isset($response['error_code'])) {
+            trigger_error($this->formatError($response));
             return [];
         }
 
@@ -324,5 +332,22 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         }
 
         return false;
+    }
+
+    private function formatError(array $response): string
+    {
+        $message = $message = $response['error_code']
+        . ' ' . $response['message'];
+        return $message;
+    }
+
+    private function prepareTimezone(string $timezone): string
+    {
+        switch ($timezone) {
+            case '+00:00':
+                return 'UTC';
+        }
+
+        return $timezone;
     }
 }

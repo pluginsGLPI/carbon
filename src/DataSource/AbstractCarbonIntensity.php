@@ -226,8 +226,8 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
      */
     protected function sliceDateRangeByMonth(DateTimeImmutable $start, DateTimeImmutable $stop): \Generator
     {
-        $real_start = $start->setTime(0, 0, 0);
-        $real_stop = $stop->setTime(0, 0, 0);
+        $real_start = $start->setTime($start->format('H'), 0, 0, 0);
+        $real_stop = $stop->setTime($stop->format('H'), 0, 0, 0);
         $slice = [
             'start' => null,
             'stop'  => null,
