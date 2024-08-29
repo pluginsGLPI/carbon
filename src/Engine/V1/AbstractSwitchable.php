@@ -169,8 +169,7 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
 
         return new TrackedFloat(
             $power->getSource(),
-            $total_emission,
-            $row['data_quality']
+            $total_emission
         );
     }
 }
