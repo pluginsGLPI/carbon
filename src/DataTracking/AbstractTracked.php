@@ -52,16 +52,16 @@ abstract class AbstractTracked
     public const DATA_QUALITY_RAW_REAL_TIME_MEASUREMENT_DOWNSAMPLED = 2;
     public const DATA_QUALITY_RAW_REAL_TIME_MEASUREMENT = 3;
 
-    protected array $source = [];
+    protected array $sources = [];
 
     abstract public function getValue(): mixed;
 
-    public function __construct(int|array $source)
+    public function __construct(mixed $source)
     {
         if (is_integer($source)) {
-            $this->source[] = $source;
-        } elseif (is_array($source)) {
-            $this->source = array_values($source);
+            $this->sources[] = $source;
+        } elseif ($source instanceof AbstractTracked) {
+            $this->sources = $source->getSource();
         } else {
             throw new LogicException('Invalid source');
         }
@@ -69,11 +69,17 @@ abstract class AbstractTracked
 
     public function getSource(): array
     {
-        return $this->source;
+        return $this->sources;
+    }
+
+    protected function appendSource(int $source): AbstractTracked
+    {
+        $this->sources[] = $source;
+        return $this;
     }
 
     public function getLowestSource()
     {
-        return min($this->source);
+        return min($this->sources);
     }
 }

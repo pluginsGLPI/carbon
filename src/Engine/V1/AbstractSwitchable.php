@@ -88,8 +88,9 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
         $energy_in_kwh = ($power->getValue() * $delta_time) / (1000.0 * 60 * 60);
 
         return new TrackedFloat(
-            array_merge($power->getSource(), TrackedFloat::DATA_QUALITY_MANUAL),
-            $energy_in_kwh
+            $power->getSource(),
+            $energy_in_kwh,
+            TrackedFloat::DATA_QUALITY_MANUAL
         );
     }
 
@@ -158,16 +159,18 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
             $counted_seconds += $seconds;
             if ($counted_seconds >= $total_seconds) {
                 return new TrackedFloat(
-                    array_merge($power->getSource(), $row['data_quality']),
-                    $total_emission
+                    $power->getSource(),
+                    $total_emission,
+                    $row['data_quality']
                 );
             }
             $iterator->next();
         }
 
         return new TrackedFloat(
-            array_merge($power->getSource(), $row['data_quality']),
-            $total_emission
+            $power->getSource(),
+            $total_emission,
+            $row['data_quality']
         );
     }
 }

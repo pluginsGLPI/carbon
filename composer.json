@@ -1,6 +1,6 @@
 {
     "require": {
-        "php": ">=8.0",
+        "php": ">=7.4.0",
         "xylemical/php-expressions" : "*"
     },
     "require-dev": {
@@ -12,7 +12,7 @@
     "config": {
         "optimize-autoloader": true,
         "platform": {
-            "php": "8.0.0"
+            "php": "7.4.0"
         },
         "sort-packages": true,
         "allow-plugins": {

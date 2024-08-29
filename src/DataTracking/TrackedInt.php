@@ -37,9 +37,12 @@ class TrackedInt extends AbstractTracked
 {
     private int $value;
 
-    public function __construct(int|array $source, int $value)
+    public function __construct(mixed $origin, int $value, ?int $source = null)
     {
-        parent::__construct($source);
+        parent::__construct($origin);
+        if ($source !== null) {
+            $this->appendSource($source);
+        }
         $this->value = $value;
     }
 

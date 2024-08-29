@@ -78,8 +78,9 @@ abstract class AbstractPermanent extends AbstractAsset implements EngineInterfac
         }
 
         return new TrackedFloat(
-            array_merge($power->getSource(), $row['data_quality']),
-            $total_emission
+            $power->getSource(),
+            $total_emission,
+            $row['data_quality']
         );
     }
 }
