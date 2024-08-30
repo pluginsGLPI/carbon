@@ -107,6 +107,65 @@ class Toolbox
     }
 
     /**
+     * Find the date where an asset leaves the inventory
+     *
+     * @param array $crit
+     * @return DateTimeImmutable|null
+     */
+    public function getLatestAssetDate(array $crit = []): ?DateTimeImmutable
+    {
+        global $DB;
+
+        $itemtypes = Config::getSupportedAssets();
+        if (isset($crit['itemtype'])) {
+            $itemtypes = [$crit['itemtype']];
+            unset($crit['itemtype']);
+        }
+        $latest_date = null;
+        $infocom_table = Infocom::getTable();
+        foreach ($itemtypes as $itemtype) {
+            if (Infocom::canApplyOn($itemtype)) {
+                $item_table = getTableForItemType($itemtype);
+                $dates = $DB->request([
+                    'SELECT' => [
+                        'MIN' => [
+                            "$infocom_table.decommission_date as decommission_date",
+                        ],
+                    ],
+                    'FROM' => $item_table,
+                    'LEFT JOIN' => [
+                        $infocom_table => [
+                            'FKEY' => [
+                                $infocom_table => 'items_id',
+                                $item_table    => 'id',
+                                ['AND' => ['itemtype' => $itemtype]],
+                            ]
+                        ]
+                    ],
+                    'WHERE' => $crit,
+                ])->current();
+                $itemtype_latest_date = $dates['decommission_date']
+                ?? null;
+                if ($latest_date === null) {
+                    $latest_date = $itemtype_latest_date;
+                } else if ($itemtype_latest_date !== null) {
+                    $latest_date = max($latest_date, $itemtype_latest_date);
+                }
+            }
+        }
+        if ($latest_date === null) {
+            return null;
+        }
+        if (($output = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $latest_date)) === false) {
+            // Infocom dates are date (without time)
+            $output = DateTimeImmutable::createFromFormat('Y-m-d', $latest_date);
+            $output = $output->setTime(23, 59, 59, 0);
+        }
+
+        return $output;
+    }
+
+    /**
      * Get default date where environnemental imapct shouw be known
      * when no inventory data is available
      */

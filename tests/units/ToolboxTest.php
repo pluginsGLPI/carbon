@@ -49,7 +49,12 @@ class ToolboxTest extends DbTestCase
         $expected = null;
         $this->assertEquals($expected, $output);
 
-        $expected = new DateTime('2020-01-01 00:00:00');
+        $computer = $this->getItem(Computer::class);
+        $output = $toolbox->getLatestAssetDate();
+        $expected = null;
+        $this->assertEquals($expected, $output);
+
+        $expected = new DateTime('1980-01-01 00:00:00');
         $computer = $this->getItem(Computer::class, [
             'date_creation' => $expected->format('Y-m-d H:i:s'),
         ]);
@@ -72,6 +77,29 @@ class ToolboxTest extends DbTestCase
         ]);
         $this->assertTrue($success);
         $output = $toolbox->getOldestAssetDate();
+        $this->assertEquals($expected, $output);
+    }
+
+    public function testGetLatestAssetDate()
+    {
+        $toolbox = new Toolbox();
+        $output = $toolbox->getLatestAssetDate();
+        $expected = null;
+        $this->assertEquals($expected, $output);
+
+        $computer = $this->getItem(Computer::class);
+        $output = $toolbox->getLatestAssetDate();
+        $expected = null;
+        $this->assertEquals($expected, $output);
+
+
+        $expected = new DateTime('2024-06-15 00:00:00');
+        $infocom = $this->getItem(Infocom::class, [
+            'itemtype' => $computer->getType(),
+            'items_id' => $computer->getID(),
+            'decommission_date' => $expected->format('Y-m-d H:i:s'),
+        ]);
+        $output = $toolbox->getLatestAssetDate();
         $this->assertEquals($expected, $output);
     }
 

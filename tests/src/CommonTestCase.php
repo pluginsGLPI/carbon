@@ -224,6 +224,13 @@ class CommonTestCase extends TestCase
         return $output;
     }
 
+    public function updateItem(CommonDBTM $item, array $input): CommonDBTM
+    {
+        $sucess = $item->update(['id' => $item->fields['id']] + $input);
+        $this->assertTrue($sucess);
+        return $item;
+    }
+
     protected function createComputerUsageProfile(array $usage_profile_params): Computer
     {
         $usage_profile = $this->getItem(ComputerUsageProfile::class, $usage_profile_params);
