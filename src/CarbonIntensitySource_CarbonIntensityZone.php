@@ -36,6 +36,7 @@ namespace GlpiPlugin\Carbon;
 use CommonDBRelation;
 use CommonGLPI;
 use CommonDBTM;
+use CronTask;
 use GlpiPlugin\Carbon\Application\View\Extension\DataHelpersExtension;
 use Glpi\Application\View\TemplateRenderer;
 use Html;
@@ -135,18 +136,22 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
             'massiveactionparams' => [
                 'num_displayed' => count($entries),
                 'container'     => 'mass' . static::class . mt_rand(),
-            ]
+            ],
+            'automatic_actions_url' => CronTask::getSearchURL(),
         ]);
 
-        echo Html::scriptBlock('
-            var plugin_carbon_toggleZone = function (id) {
-                fetch(CFG_GLPI["root_doc"] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/toggleZoneDownload.php?id=" + id).then(response => {
-                    if (response.status === 200) {
-                        reloadTab();
-                    }
-                });
-            };
-        ');
+        if (count($entries) !== 0) {
+            // At least 1 entry then add JS to toggle the state of zones
+            echo Html::scriptBlock('
+                var plugin_carbon_toggleZone = function (id) {
+                    fetch(CFG_GLPI["root_doc"] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/toggleZoneDownload.php?id=" + id).then(response => {
+                        if (response.status === 200) {
+                            reloadTab();
+                        }
+                    });
+                };
+            ');
+        }
     }
 
     public static function showForZone(CommonDBTM $item)
