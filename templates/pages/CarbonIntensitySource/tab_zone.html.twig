@@ -34,7 +34,7 @@
 {% if entries|length == 0 %}
     {{ fields.smallTitle(__('No zone available', 'carbon')) }}
 
-    <p>{{ __('Please run the automatic action to downlaod data from this source.', 'carbon') }}</p>
+    <p><a href="{{ automatic_actions_url }}">{{ __('Please run the automatic action to downlaod data from this source.', 'carbon') }}</a></p>
 {% else %}
     {% include '@carbon/components/datatable.html.twig' %}
 {% endif %}
