@@ -46,7 +46,7 @@ class TrackedInt extends AbstractTracked
         $this->value = $value;
     }
 
-    public function getValue(): mixed
+    public function getValue()
     {
         return (int) $this->value;
     }

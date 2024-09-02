@@ -46,7 +46,7 @@ class TrackedFloat extends AbstractTracked
         $this->value = $value;
     }
 
-    public function getValue(): mixed
+    public function getValue()
     {
         return (float) $this->value;
     }

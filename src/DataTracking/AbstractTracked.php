@@ -54,9 +54,9 @@ abstract class AbstractTracked
 
     protected array $sources = [];
 
-    abstract public function getValue(): mixed;
+    abstract public function getValue();
 
-    public function __construct(mixed $source = null)
+    public function __construct($source = null)
     {
         if ($source === null) {
             return;
@@ -69,7 +69,7 @@ abstract class AbstractTracked
         return $this->sources;
     }
 
-    public function appendSource(mixed $source): AbstractTracked
+    public function appendSource($source): AbstractTracked
     {
         if (is_integer($source)) {
             $this->sources[] = $source;
