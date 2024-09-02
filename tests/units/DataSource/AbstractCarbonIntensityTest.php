@@ -33,12 +33,9 @@
 
 namespace GlpiPlugin\Carbon\DataSource\Tests;
 
-use Config as GlpiConfig;
-use CronTask;
 use DateTime;
 use DateTimeImmutable;
 use GlpiPlugin\Carbon\CarbonIntensity;
-use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\DataSource\AbstractCarbonIntensity;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
@@ -246,19 +243,23 @@ class AbstractCarbonIntensityTest extends DbTestCase
         }
         $intensity = $this->createStub(CarbonIntensity::class);
 
+        $start_date = new DateTime('3 months ago');
+        $start_date->setTime(0, 0, 0);
+        $start_date = DateTimeImmutable::createFromMutable($start_date);
+        $stop_date = new DateTimeImmutable('2 days ago');
+
         // 4 calls to fetchRange                                example
         // Current month (1 to today)                           2024-07-01 to 2024-07-19
         // month - 1 (1 to last day of month)                   2024-06-01 to 2024-06-30
         // month - 2 (1 to last day of month)                   2024-05-01 to 2024-05-31
         // month - 3 (same day as today to last day of month)   2024-04-19 to 2024-04-30
-        $intensity->expects($this->exactly(4))->method('save');
+        // Warning : current month may be ignored if (now - 2 days) results to a date in the previous month
+        // This may happen if (day of month) < 2
+        $count = $stop_date->format('m') - $start_date->format('m') + 1;
+        $intensity->expects($this->exactly($count))->method('save');
 
         $instance = $this->getMockForAbstractClass(AbstractCarbonIntensity::class);
         $instance->method('fetchRange')->willReturn(['FR' => []]);
-        $start_date = new DateTime('3 months ago');
-        $start_date->setTime(0, 0, 0);
-        $start_date = DateTimeImmutable::createFromMutable($start_date);
-        $stop_date = new DateTimeImmutable('2 days ago');
         $instance->fullDownload('FR', $start_date, $stop_date, $intensity);
     }
 
