@@ -70,6 +70,10 @@ abstract class AbstractPermanent extends AbstractAsset implements EngineInterfac
         $start_time->setTime(0, 0, 0, 0);
         $length = new DateInterval('PT' . 86400 . 'S'); // 24h = 86400 seconds
         $iterator = $this->requestCarbonIntensitiesPerDay($start_time, $length, $zone);
+        if ($iterator->count() != 24) {
+            trigger_error('required count of carbon intensity samples not met (24 expected)');
+            return null;
+        }
 
         $total_emission = 0.0;
         $energy_in_kwh = ($power->getValue()) / 1000.0;

@@ -54,6 +54,7 @@ use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use Html;
 use Location;
+use QueryExpression;
 use ReflectionMethod;
 use Session;
 use Ticket;
@@ -336,7 +337,7 @@ class CommonTestCase extends TestCase
                 'locations_id'     => $item->fields['locations_id'],
                 'energy_per_day'   => $energy,
                 'emission_per_day' => $emission,
-                'date'             => $date_current->format('Y-m-d'),
+                'date'             => $date_current->format('Y-m-d H:i:s'),
             ]);
             $date_current = $date_current->add(new DateInterval('P1D'));
         }

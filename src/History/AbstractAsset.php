@@ -102,6 +102,8 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      */
     public function historizeItems(): int
     {
+        global $DB;
+
         $itemtype = static::$itemtype;
         if ($itemtype === '') {
             throw new \LogicException('Itemtype not set');
@@ -121,8 +123,12 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         if ($type_instance->maybeTemplate()) {
             $crit['is_template'] = 0;
         }
-        $rows = $type_instance->find($crit);
-        foreach ($rows as $row) {
+        $iterator = $DB->request([
+            'SELECT' => 'id',
+            'FROM'  => getTableForItemType($itemtype),
+            'WHERE' => $crit,
+        ]);
+        foreach ($iterator as $row) {
             $count += $this->historizeItem($row['id']);
             if ($this->limit_reached) {
                 break;
@@ -175,9 +181,9 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         $carbon_emission = new CarbonEmission();
         $gaps = $carbon_emission->findGaps($itemtype, $id, $start_date, $end_date);
         foreach ($gaps as $gap) {
-            $date_cursor = new DateTime($gap['start']);
+            $date_cursor = DateTime::createFromFormat('U', $gap['start']);
             $date_cursor->setTime(0, 0, 0, 0);
-            $end_date = new DateTime($gap['end']);
+            $end_date = DateTime::createFromFormat('U', $gap['end']);
             while ($date_cursor < $end_date) {
                 $success = $this->historizeItemPerDay($item, $engine, $date_cursor);
                 if ($success) {
@@ -220,7 +226,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
             'locations_id'      => $item->fields['locations_id'],
             'energy_per_day'    => $energy->getValue(),
             'emission_per_day'  => $emission->getValue(),
-            'date'              => $day->format('Y-m-d 00:00:00'),
+            'date'              => $day->format('Y-m-d H:i:s'),
             'energy_quality'    => $energy->getLowestSource(),
             'emission_quality'  => $emission->getLowestSource(),
         ]);

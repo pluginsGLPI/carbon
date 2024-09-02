@@ -344,6 +344,7 @@ class CarbonIntensity extends CommonDBTM
                 CarbonIntensitySource::getForeignKeyField() => new QueryParam(),
                 CarbonIntensityZone::getForeignKeyField() => new QueryParam(),
                 'intensity' => new QueryParam(),
+                'data_quality' => new QueryParam(),
             ],
         );
         $stmt = $DB->prepare($query);
@@ -356,11 +357,12 @@ class CarbonIntensity extends CommonDBTM
         foreach ($data as $intensity) {
             try {
                 $stmt->bind_param(
-                    'siid',
+                    'siidi',
                     $intensity['datetime'],
                     $source->fields['id'],
                     $zone->fields['id'],
-                    $intensity['intensity']
+                    $intensity['intensity'],
+                    $intensity['data_quality']
                 );
                 $DB->executeStatement($stmt);
                 $count++;

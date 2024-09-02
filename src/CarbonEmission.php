@@ -56,14 +56,16 @@ class CarbonEmission extends CommonDBChild
         if ($input === false || count($input) === 0) {
             return false;
         }
-        $date = new DateTime($input['date']);
-        $date->setTime(0, 0, 0);
-        $input['date'] = $date->format('Y-m-d');
+        // $date = new DateTime($input['date']);
+        // $date->setTime(0, 0, 0);
+        // $input['date'] = $date->format('Y-m-d');
         return $input;
     }
 
     /**
      * Gets date intervals where data are missing
+     * Gaps are returned as an array of start and end
+     * where start is the 1st msising date and end is the last missing date
      *
      * @param integer $id
      * @param DateTimeInterface $start
@@ -79,10 +81,14 @@ class CarbonEmission extends CommonDBChild
         // Build WHERE clause for boundaries
         $boundaries = [];
         if ($start !== null) {
-            $boundaries[] = ['date' => ['>=', $start->format('Y-m-d 00:00:00')]];
+            $unix_start = $start->format('U');
+            $unix_start = $unix_start - ($unix_start % 3600);
+            $boundaries[] = new QueryExpression('UNIX_TIMESTAMP(`date`) >= ' . $unix_start);
         }
         if ($stop !== null) {
-            $boundaries[] = ['date' => ['<=', $stop->format('Y-m-d 23:59:59')]];
+            $unix_stop = $stop->format('U');
+            $unix_stop = $unix_stop - ($unix_stop % 3600);
+            $boundaries[] = new QueryExpression('UNIX_TIMESTAMP(`date`) <= ' . $unix_stop);
         }
 
         $gaps = [];
@@ -102,47 +108,40 @@ class CarbonEmission extends CommonDBChild
             if ($first === null) {
                 return [
                     [
-                        'start' => $start->format('Y-m-d H:i:s'),
-                        'end'   => ($stop ?? new DateTime('now'))->format('Y-m-d H:i:s'),
+                        'start' => $start->format('U'),
+                        'end'   => ($stop ?? new DateTime('now'))->format('U'),
                     ]
                 ];
             }
             $first_date = new DateTime($first['date']);
             if ($first_date > $start) {
-                // $first_date->modify('-1 second');
                 $gaps[] = [
-                    'start' => $start->format('Y-m-d H:i:s'),
-                    'end'   => $first_date->format('Y-m-d H:i:s'),
+                    'start' => $start->format('U'),
+                    'end'   => $first_date->modify(('-1 day'))->format('U'),
                 ];
             }
         }
 
+        $date_1 = 'UNIX_TIMESTAMP(`date`)';
+        $date_2 = 'LEAD(UNIX_TIMESTAMP(`date`), 1) OVER (ORDER BY UNIX_TIMESTAMP(`date`))';
         $request = [
             'SELECT' => [
-                // 'date AS start', 'next_available_date AS end'
-                new QueryExpression('`date` + INTERVAL 1 DAY AS `start`'),
-                new QueryExpression('`next_available_date` - INTERVAL 1 DAY AS `end`'),
+                new QueryExpression('date + 86400 as start'), // 1st missing day
+                new QueryExpression('next_available_date - 86400 as end'), // last missing day
             ],
             'FROM'  => new QuerySubQuery([
                 'SELECT' => [
-                    '*',
-                    new QueryExpression('IF(date + INTERVAL 1 DAY < next_available_date, 1, 0) as gap_tag')
+                    new QueryExpression("$date_1 as `date`"),
+                    new QueryExpression("$date_2  AS `next_available_date`"),
+                    new QueryExpression("$date_2 - $date_1 as `diff`"),
                 ],
-                'FROM'   => new QuerySubQuery([
-                    'SELECT' => [
-                        'date',
-                        new QueryExpression('LEAD(`date`, 1) OVER (ORDER BY `date`) AS `next_available_date`'),
-                    ],
-                    'FROM' => $table,
-                    'WHERE' => [
-                        'itemtype' => $itemtype,
-                        'items_id' => $id,
-                    ] + $boundaries
-                ], 'rows')
-            ], 'gaps'),
-            'WHERE' => [
-                'gap_tag' => 1
-            ],
+                'FROM' => $table,
+                'WHERE' => [
+                    'itemtype' => $itemtype,
+                    'items_id' => $id,
+                ] + $boundaries
+            ], 'rows'),
+            'WHERE' => ['diff' => ['>', 86400 + 3600]] // 1 day + 1 hour to ignore DST changes
         ];
 
         $iterator = $DB->request($request);
@@ -163,10 +162,9 @@ class CarbonEmission extends CommonDBChild
             ])->current();
             $last_date = new DateTime($last['date']);
             if ($last_date < $stop) {
-                // $last_date->modify('+1 day');
                 $gaps[] = [
-                    'start' => $last_date->format('Y-m-d H:i:s'),
-                    'end'   => $stop->format('Y-m-d H:i:s'),
+                    'start' => $last_date->modify(('+1 day'))->format('U'),
+                    'end'   => $stop->format('U'),
                 ];
             }
         }
