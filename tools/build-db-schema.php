@@ -130,10 +130,12 @@ function completeMissingData(&$schema_tables)
             $schema_tables[] = [
                 'name'   => $link['table'],
                 'links'  => [],
-                'fields' => [[
-                    'int',
-                    'id',
-                ]],
+                'fields' => [
+                    [
+                        'int',
+                        'id',
+                    ]
+                ],
             ];
         }
     }

@@ -169,11 +169,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
 
         // Determine the last date to compute
         $last_available_date = $this->getStopDate($id);
-        if ($end_date === null) {
-            $end_date = $last_available_date;
-        } else {
-            $end_date = min($last_available_date, $end_date);
-        }
+        $end_date = $end_date ?? $last_available_date ?? (new DateTime('now'))->sub(new DateInterval(self::$date_end_shift));
 
         $engine = static::getEngine($item);
 
@@ -243,8 +239,36 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     protected function getStartDate(int $id): ?DateTimeImmutable
     {
         // Find the date the asset entered in the inventory
+        return $this->getInventoryIncomingDate($id);
+    }
+
+    /**
+     * Find the most accurate date to determine the first use of an asset
+     *
+     * @param integer $id id of the asset to examinate
+     * @return DateTime|null
+     */
+    protected function getInventoryIncomingDate(int $id): ?DateTimeImmutable
+    {
         $toolbox = new Toolbox();
         $inventory_date = $toolbox->getOldestAssetDate([
+            'itemtype' => static::$itemtype,
+            getTableForItemType(static::$itemtype) . '.id' => $id,
+        ]);
+
+        return $inventory_date;
+    }
+
+    /**
+     * Find the most accurate date to determine the end of use of an asset
+     *
+     * @param integer $id
+     * @return DateTimeImmutable|null
+     */
+    protected function getInventoryExitDate(int $id): ?DateTimeImmutable
+    {
+        $toolbox = new Toolbox();
+        $inventory_date = $toolbox->getLatestAssetDate([
             'itemtype' => static::$itemtype,
             getTableForItemType(static::$itemtype) . '.id' => $id,
         ]);
@@ -260,24 +284,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      */
     protected function getStopDate(int $id): ?DateTime
     {
-        $today = new DateTime('now');
-        $today->setTime(0, 0, 0);
-        $today = $today->sub(new DateInterval(static::$date_end_shift));
-
-        $carbon_intensity = new CarBonIntensity();
-        $zone = $this->getZone($id);
-        $last = $carbon_intensity->find(
-            [
-                CarbonIntensityZone::getForeignKeyField() => $zone->getID(),
-            ],
-            ['date DESC'],
-            '1'
-        );
-
-        $last_intensity_date = DateTime::createFromFormat('Y-m-d H:i:s', reset($last)['date']);
-        $stop_date = min($today, $last_intensity_date);
-
-        return $stop_date;
+        return $this->getInventoryExitDate($id);
     }
 
     /**
