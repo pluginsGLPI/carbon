@@ -115,9 +115,16 @@ function findRelations(&$schema_tables)
 
 function completeMissingData(&$schema_tables)
 {
-    foreach ($schema_tables as $table_data) {
-        foreach ($table_data['links'] as $link) {
+    global $DB;
+
+    foreach ($schema_tables as &$table_data) {
+        foreach ($table_data['links'] as $linkId => $link) {
             if (hasTable($schema_tables, $link['table'])) {
+                continue;
+            }
+            if (!$DB->tableExists($link['table'])) {
+                // Do not add a table which does not exists in the database
+                unset($table_data['links'][$linkId]);
                 continue;
             }
             $schema_tables[] = [
@@ -126,8 +133,7 @@ function completeMissingData(&$schema_tables)
                 'fields' => [[
                     'int',
                     'id',
-                ]
-                ],
+                ]],
             ];
         }
     }
@@ -300,7 +306,6 @@ function isRelationTableWithProperties($table): bool
 
 function showEntityRelations($schema_tables)
 {
-
     $generator = new PlantUml();
     $generator->generate($schema_tables);
 }
