@@ -41,9 +41,7 @@ use DbUtils;
 use DbMysql;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\CarbonIntensity;
-use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
-use Location;
+use GlpiPlugin\Carbon\DataTracking\TrackedInt;
 use QueryExpression;
 
 abstract class AbstractAsset implements EngineInterface
@@ -80,9 +78,10 @@ abstract class AbstractAsset implements EngineInterface
      *
      * @param DateTime $start_time
      * @param DateInterval $length
+     * @param CarbonIntensityZone $zone
      * @return DBmysqlIterator
      */
-    protected function requestCarbonIntensitiesPerDay(DateTime $start_time, DateInterval $length): DBmysqlIterator
+    protected function requestCarbonIntensitiesPerDay(DateTime $start_time, DateInterval $length, CarbonIntensityZone $zone): DBmysqlIterator
     {
         global $DB;
 
@@ -94,45 +93,27 @@ abstract class AbstractAsset implements EngineInterface
         $stop_date = $stop_date->add($length);
         $stop_date_s = $stop_date->format('Y-m-d H:i:s'); // idem, may be can use directly concatenation
 
-        $itemtype = static::$itemtype;
-        $items_table = $itemtype::getTable();
-        $locations_table = Location::getTable();
-        $zones_table = CarbonIntensityZone::getTable();
         $intensities_table = CarbonIntensity::getTable();
 
+        /**
+         * Keep the lowest data quality of the set of intensities
+         */
         $request = [
             'SELECT' => [
                 CarbonIntensity::getTableField('intensity') . ' AS intensity',
                 CarbonIntensity::getTableField('date') . ' AS date',
+                'MIN' => CarbonIntensity::getTableField('data_quality') . ' AS data_quality'
             ],
-            'FROM' => $items_table,
-            'INNER JOIN' => [
-                $locations_table => [
-                    'FKEY'   => [
-                        $items_table  => 'locations_id',
-                        $locations_table => 'id',
-                    ]
-                ],
-                $zones_table => [
-                    'FKEY'   => [
-                        $locations_table  => 'country',
-                        $zones_table => 'name',
-                    ]
-                ],
-                $intensities_table => [
-                    'FKEY'   => [
-                        $zones_table  => 'id',
-                        $intensities_table => 'plugin_carbon_carbonintensityzones_id',
-                    ]
-                ],
-            ],
+            'FROM' => $intensities_table,
             'WHERE' => [
                 'AND' => [
-                    $itemtype::getTableField('id') => $this->items_id,
+                    CarbonIntensity::getTableField('plugin_carbon_carbonintensityzones_id') => $zone->getID(),
+                    CarbonIntensity::getTableField('plugin_carbon_carbonintensitysources_id') => $zone->fields['plugin_carbon_carbonintensitysources_id_historical'],
                     [CarbonIntensity::getTableField('date') => ['>=', $start_date_s]],
-                    [CarbonIntensity::getTableField('date') => ['<=', $stop_date_s]],
+                    [CarbonIntensity::getTableField('date') => ['<', $stop_date_s]],
                 ],
             ],
+            'GROUP' => [CarbonIntensity::getTableField('date')],
             'ORDER' => CarbonIntensity::getTableField('date') . ' ASC',
         ];
 
@@ -142,7 +123,7 @@ abstract class AbstractAsset implements EngineInterface
     /**
      * Returns the declared power for a computer
      */
-    public function getPower(): int
+    public function getPower(): TrackedInt
     {
         global $DB;
 
@@ -185,43 +166,9 @@ abstract class AbstractAsset implements EngineInterface
 
         if ($result->numrows() === 1) {
             $power = $result->current()['power_consumption'];
-            return $power;
+            return new TrackedInt($power, null, TrackedInt::DATA_QUALITY_MANUAL);
         }
 
-        return 0;
-    }
-
-    /**
-     * Returns the consumed energy for the specified day.
-     *
-     * {@inheritDoc}
-     */
-    public function getEnergyPerDay(DateTime $day): float
-    {
-        $power = $this->getPower();
-
-        $delta_time = 24;
-
-        // units:
-        // power is in Watt
-        // delta_time is in seconds
-        $energy_in_kwh = ($power * $delta_time) / (1000.0);
-
-        return $energy_in_kwh;
-    }
-
-    /**
-     * Returns the carbon emission for the specified day.
-     *
-     * {@inheritDoc}
-     */
-    public function getCarbonEmissionPerDay(DateTime $day): ?float
-    {
-        $power = $this->getPower();
-
-        // units:
-        // power is in Watt
-        // intensity is in gCO2eq/kWh
-        return $power * 24 / 1000;
+        return new TrackedInt(0, null, TrackedInt::DATA_QUALITY_MANUAL);
     }
 }

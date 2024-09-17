@@ -36,6 +36,7 @@ namespace GlpiPlugin\Carbon\History\Tests;
 use Computer as GlpiComputer;
 use Computer_Item;
 use DateTime;
+use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\Tests\Engine\V1\EngineTestCase;
 use Monitor as GlpiMonitor;
 use MonitorType as GlpiMonitorType;
@@ -142,12 +143,14 @@ class MonitorTest extends EngineTestCase
         ];
     }
 
-    public function getCarbonEmissionPerDateProvider()
+    public function getCarbonEmissionPerDateProvider(): \Generator
     {
         $country = $this->getUniqueString();
         $thursday = DateTime::createFromFormat('Y-m-d H:i:s', '1999-12-02 12:00:00');
         $intensity = 1;
         $this->createCarbonIntensityData($country, $this->getUniqueString(), $thursday, $intensity);
+        $zone = new CarbonIntensityZone();
+        $zone->getFromDBByCrit(['name' => $country]);
 
         $usage_profile = [
             'name' => 'Test laptop usage profile',
@@ -183,6 +186,7 @@ class MonitorTest extends EngineTestCase
         yield 'Monitor' => [
             $engine,
             $thursday,
+            $zone,
             $expected_emission,
         ];
     }

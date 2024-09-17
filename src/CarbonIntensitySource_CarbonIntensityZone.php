@@ -76,7 +76,8 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
         $iterator = $DB->request([
             'SELECT' => [
                 $zone_table => 'name',
-                $source_zone_table => ['id', 'is_enabled']
+                $source_zone_table => ['id', 'is_download_enabled'],
+                CarbonIntensitySource::getTableField('name') . ' AS historical_source_name'
             ],
             'FROM' => $source_zone_table,
             'INNER JOIN' => [
@@ -104,10 +105,11 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
         $entries = [];
         foreach ($iterator as $data) {
             $entries[] = [
-                'itemtype'   => CarbonIntensitySource::class,
-                'id'         => $item->getID(),
-                'name'       => $data['name'],
-                'is_enabled' => self::getToggleLink($data['id'], $data['is_enabled']),
+                'itemtype'               => CarbonIntensitySource::class,
+                'id'                     => $item->getID(),
+                'name'                   => $data['name'],
+                'historical_source_name' => $data['historical_source_name'],
+                'is_download_enabled'    => self::getToggleLink($data['id'], $data['is_download_enabled']),
             ];
         }
 
@@ -120,10 +122,11 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
             'nosort' => true,
             'columns' => [
                 'name' => __('Name'),
-                'is_enabled' => __('Enabled', 'carbon'),
+                'is_download_enabled' => __('Download enabled', 'carbon'),
+                'historical_source_name' => __('Source for historical', 'carbon'),
             ],
             'formatters' => [
-                'is_enabled' => 'raw_html',
+                'is_download_enabled' => 'raw_html',
             ],
             'footers' => [
                 ['', '', '', __('Total'), $total, '']
@@ -171,7 +174,7 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
         $iterator = $DB->request([
             'SELECT' => [
                 $source_table => 'name',
-                $source_zone_table => ['id', 'is_enabled']
+                $source_zone_table => ['id', 'is_download_enabled']
             ],
             'FROM' => $source_zone_table,
             'INNER JOIN' => [
@@ -201,7 +204,7 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
                 'itemtype'   => CarbonIntensitySource::class,
                 'id'         => $item->getID(),
                 'name'       => $data['name'],
-                'is_enabled' => self::getToggleLink($data['id'], $data['is_enabled']),
+                'is_download_enabled' => self::getToggleLink($data['id'], $data['is_download_enabled']),
             ];
         }
 
@@ -214,7 +217,7 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
             'nosort' => true,
             'columns' => [
                 'name' => __('Name'),
-                // 'is_enabled' => __('Enabled', 'carbon'),
+                // 'is_download_enabled' => __('Download enabled', 'carbon'),
             ],
             'formatters' => [
             ],
@@ -285,8 +288,8 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
 
     public function toggleZone(): bool
     {
-        $state = $this->fields['is_enabled'];
+        $state = $this->fields['is_download_enabled'];
         $state = $state == 0 ? 1 : 0;
-        return $this->update(['id' => $this->getID(), 'is_enabled' => $state]) !== false;
+        return $this->update(['id' => $this->getID(), 'is_download_enabled' => $state]) !== false;
     }
 }

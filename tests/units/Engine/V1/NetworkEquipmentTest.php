@@ -31,13 +31,13 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\History\Tests;
+namespace GlpiPlugin\Carbon\Engine\V1\Tests;
 
 use DateTime;
 use GlpiPlugin\Carbon\Tests\Engine\V1\EngineTestCase;
 use GlpiPlugin\Carbon\Engine\V1\NetworkEquipment;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
-use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
+use GlpiPlugin\Carbon\CarbonIntensityZone;
 use NetworkEquipment as GlpiNetworkEquipment;
 use NetworkEquipmentModel;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
@@ -75,7 +75,7 @@ class NetworkEquipmentTest extends EngineTestCase
         foreach ($this->getEnergyPerDayProvider() as $data) {
             list ($engine, $date, $expected_energy) = $data;
             $output = $engine->getEnergyPerDay($date);
-            $this->assertEquals($expected_energy, $output);
+            $this->assertEquals($expected_energy, $output->getValue());
         }
     }
 
@@ -84,6 +84,8 @@ class NetworkEquipmentTest extends EngineTestCase
         $country = $this->getUniqueString();
         $thursday = DateTime::createFromFormat('Y-m-d H:i:s', '1999-12-02 12:00:00');
         $this->createCarbonIntensityData($country, 'Test source', $thursday, 1);
+        $zone = new CarbonIntensityZone();
+        $zone->getFromDBByCrit(['name' => $country]);
 
         $model = $this->getItem(static::$model_class, ['power_consumption' => 80]);
         $item = $this->getItem(static::$itemtype_class, [
@@ -93,6 +95,7 @@ class NetworkEquipmentTest extends EngineTestCase
         yield 'Item' => [
             $engine,
             $thursday,
+            $zone,
             80 * 24 * 1 / 1000,
         ];
     }

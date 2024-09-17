@@ -247,8 +247,8 @@ class CarbonIntensity extends CommonDBTM
         $zone->getFromDBByCrit(['name' => $zone_name]);
         $gaps = $this->findGaps($source->getID(), $zone->getID(), $start_date);
         foreach ($gaps as $gap) {
-            $gap_start = new DateTimeImmutable($gap['start']);
-            $gap_end = new DateTimeImmutable($gap['end']);
+            $gap_start = DateTimeImmutable::createFromFormat('U', $gap['start']);
+            $gap_end = DateTimeImmutable::createFromFormat('U', $gap['end']);
             $count = $data_source->fullDownload($zone_name, $gap_start, $gap_end, $this, $limit);
             $total_count += $count;
             $limit -= $count;
@@ -344,6 +344,7 @@ class CarbonIntensity extends CommonDBTM
                 CarbonIntensitySource::getForeignKeyField() => new QueryParam(),
                 CarbonIntensityZone::getForeignKeyField() => new QueryParam(),
                 'intensity' => new QueryParam(),
+                'data_quality' => new QueryParam(),
             ],
         );
         $stmt = $DB->prepare($query);
@@ -356,11 +357,12 @@ class CarbonIntensity extends CommonDBTM
         foreach ($data as $intensity) {
             try {
                 $stmt->bind_param(
-                    'siid',
+                    'siidi',
                     $intensity['datetime'],
                     $source->fields['id'],
                     $zone->fields['id'],
-                    $intensity['intensity']
+                    $intensity['intensity'],
+                    $intensity['data_quality']
                 );
                 $DB->executeStatement($stmt);
                 $count++;
@@ -394,40 +396,37 @@ class CarbonIntensity extends CommonDBTM
         // Build WHERE clause for boundaries
         $boundaries = [];
         if ($start !== null) {
-            $boundaries[] = ['date' => ['>=', $start->format('Y-m-d H:00:00')]];
+            $unix_start = $start->format('U');
+            $unix_start = $unix_start - ($unix_start % 3600);
+            $boundaries[] = new QueryExpression('UNIX_TIMESTAMP(`date`) >= ' . $unix_start);
         }
         if ($stop !== null) {
-            $boundaries[] = ['date' => ['<=', $stop->format('Y-m-d H:59:59')]];
+            $unix_stop = $stop->format('U');
+            $unix_stop = $unix_stop - ($unix_stop % 3600);
+            $boundaries[] = new QueryExpression('UNIX_TIMESTAMP(`date`) <= ' . $unix_stop);
         }
 
+        $date_1 = 'UNIX_TIMESTAMP(`date`)';
+        $date_2 = 'LEAD(UNIX_TIMESTAMP(`date`), 1) OVER (ORDER BY UNIX_TIMESTAMP(`date`))';
         $request = [
             'SELECT' => [
-                // 'date AS start', 'next_available_date AS end'
-                new QueryExpression('`date` + INTERVAL 1 HOUR AS `start`'),
-                new QueryExpression('`next_available_date` - INTERVAL 1 HOUR AS `end`'),
+                'date as start',
+                'next_available_date as end'
             ],
             'FROM'  => new QuerySubQuery([
                 'SELECT' => [
-                    '*',
-                    new QueryExpression('IF(date + INTERVAL 1 HOUR < next_available_date, 1, 0) as gap_tag')
+                    new QueryExpression("$date_1 as `date`"),
+                    new QueryExpression("$date_2  AS `next_available_date`"),
+                    new QueryExpression("$date_2 - $date_1 as `diff`"),
                 ],
-                'FROM'   => new QuerySubQuery([
-                    'SELECT' => [
-                        'date',
-                        new QueryExpression('LEAD(`date`, 1) OVER (ORDER BY `date`) AS `next_available_date`'),
-                    ],
-                    'FROM' => $table,
-                    'WHERE' => [
-                        CarbonIntensitySource::getForeignKeyField() => $source_id,
-                        CarbonIntensityZone::getForeignKeyField() => $zone_id,
-                    ] + $boundaries
-                ], 'rows')
-            ], 'gaps'),
-            'WHERE' => [
-                'gap_tag' => 1
-            ],
+                'FROM' => $table,
+                'WHERE' => [
+                    CarbonIntensitySource::getForeignKeyField() => $source_id,
+                    CarbonIntensityZone::getForeignKeyField() => $zone_id,
+                ] + $boundaries
+            ], 'rows'),
+            'WHERE' => ['diff' => ['>', 3600]]
         ];
-
         $iterator = $DB->request($request);
 
         return $iterator;

@@ -33,17 +33,19 @@
 
 namespace GlpiPlugin\Carbon\Tests\Engine\V1;
 
-use DateTime;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
-use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 
-class EngineTestCase extends DbTestCase
+abstract class EngineTestCase extends DbTestCase
 {
     protected static string $engine_class = '';
     protected static string $itemtype_class = '';
     protected static string $glpi_type_class = '';
     protected static string $type_class = '';
     protected static string $model_class = '';
+
+    abstract public function getEnergyPerDayProvider(): \Generator;
+
+    abstract public function getCarbonEmissionPerDateProvider(): \Generator;
 
     /**
      * The delta for comparison of computed emission with expected value,
@@ -119,7 +121,7 @@ class EngineTestCase extends DbTestCase
         foreach ($this->getPowerProvider() as $data) {
             list ($engine, $expected_power) = $data;
             $actual_power = $engine->getPower();
-            $this->assertEquals($expected_power, $actual_power);
+            $this->assertEquals($expected_power, $actual_power->getValue());
         }
     }
 
@@ -128,16 +130,16 @@ class EngineTestCase extends DbTestCase
         foreach ($this->getEnergyPerDayProvider() as $data) {
             list($engine, $date, $expected_energy) = $data;
             $output = $engine->getEnergyPerDay($date);
-            $this->assertEquals($expected_energy, $output);
+            $this->assertEquals($expected_energy, $output->getValue());
         }
     }
 
     public function testGetCarbonEmissionPerDay()
     {
         foreach ($this->getCarbonEmissionPerDateProvider() as $data) {
-            list($engine, $day, $expected_emission) = $data;
-            $emission = $engine->getCarbonEmissionPerDay($day);
-            $this->assertEqualsWithDelta($expected_emission, $emission, self::EPSILON);
+            list($engine, $day, $zone, $expected_emission) = $data;
+            $emission = $engine->getCarbonEmissionPerDay($day, $zone);
+            $this->assertEqualsWithDelta($expected_emission, $emission->getValue(), self::EPSILON);
         }
     }
 }

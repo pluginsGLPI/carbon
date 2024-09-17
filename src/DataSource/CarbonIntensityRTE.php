@@ -41,6 +41,7 @@ use DateTimeZone;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 
 class CarbonIntensityRTE extends AbstractCarbonIntensity
 {
@@ -80,15 +81,17 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
 
     public function createZones(): int
     {
-        $source = new CarbonIntensitySource();
-        if (!$source->getFromDBByCrit(['name' => $this->getSourceName()])) {
-            // Failed to get the source (shoud not happen as it is created at installation time)
+        $source = $this->getOrCreateSource();
+        if ($source === null) {
             return -1;
         }
+        $source_id = $source->getID();
 
         $zone = new CarbonIntensityZone();
-
-        $input = ['name' => 'France'];
+        $input = [
+            'name' => 'France',
+            'plugin_carbon_carbonintensitysources_id_historical' => $source_id,
+        ];
         if ($zone->getFromDBByCrit($input) === false) {
             if (!$zone->add($input)) {
                 return -1;
@@ -97,7 +100,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
 
         $source_zone = new CarbonIntensitySource_CarbonIntensityZone();
         $source_zone->add([
-            CarbonIntensitySource::getForeignKeyField() => $source->getID(),
+            CarbonIntensitySource::getForeignKeyField() => $source_id,
             CarbonIntensityZone::getForeignKeyField() => $zone->getID(),
         ]);
         $this->setZoneSetupComplete();
@@ -123,7 +126,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         $stop->setTime(23, 59, 59);
 
         $format = DateTime::ATOM;
-        $timezone = $start->getTimezone()->getName();
+        $timezone = $this->prepareTimezone($start->getTimezone()->getName());
         $from = $start->format($format);
         $to = $stop->format($format);
 
@@ -140,6 +143,10 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         if (!$response) {
             return [];
         }
+        if (isset($response['error_code'])) {
+            trigger_error($this->formatError($response));
+            return [];
+        }
 
         // Drop data with no carbon intensity (may be returned by the provider)
         $response['results'] = array_filter($response['results'], function ($item) {
@@ -148,7 +155,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
 
         // Drop last rows until we reach
         $safety_count = 0;
-        while (($last_item = end($response['results'])) !== null) {
+        while (($last_item = end($response['results'])) !== false) {
             $time = DateTime::createFromFormat(DateTimeInterface::ATOM, $last_item['date_heure']);
             if ($time->format('i') === '45') {
                 // We expect 15 minutes steps
@@ -181,7 +188,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         $from = $start->format($format);
         $to = $stop->format($format);
 
-        $timezone = $start->getTimezone()->getName();
+        $timezone = $this->prepareTimezone($start->getTimezone()->getName());
         $params = [
             'select' => 'taux_co2,date_heure',
             'where' => "date_heure IN [date'$from' TO date'$to']",
@@ -197,6 +204,10 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         }
         $response = $this->client->request('GET', $url, ['timeout' => 8, 'query' => $params]);
         if (!$response) {
+            return [];
+        }
+        if (isset($response['error_code'])) {
+            trigger_error($this->formatError($response));
             return [];
         }
 
@@ -265,13 +276,14 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
                 // Ensure that current date is 15 minutes ahead than previous record date
                 $diff = $date->getTimestamp() - $previous_record_date->getTimestamp();
                 if ($diff !== $step * 60) {
-                    if ($diff == 4500 && $this->switchTowinterTime($date)) {
+                    if ($diff == 4500 && $this->switchToWinterTime($date)) {
                         // 4500 = 1h + 15m
                         $filled_date = DateTime::createFromFormat('Y-m-d\TH:i:s', end($intensities)['datetime']);
                         $filled_date->add(new DateInterval('PT1H'));
                         $intensities[] = [
                             'datetime'  => $filled_date->format('Y-m-d\TH:00:00'),
                             'intensity' => (end($intensities)['intensity'] + $record['taux_co2']) / 2,
+                            'data_quality' => AbstractTracked::DATA_QUALITY_RAW_REAL_TIME_MEASUREMENT_DOWNSAMPLED,
                         ];
                     } else {
                         // Unexpected gap in the records. What to do with this ?
@@ -286,6 +298,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
                 $intensities[] = [
                     'datetime' => $date->format('Y-m-d\TH:00:00'),
                     'intensity' => (float) $intensity / $count,
+                    'data_quality' => AbstractTracked::DATA_QUALITY_RAW_REAL_TIME_MEASUREMENT_DOWNSAMPLED,
                 ];
                 $intensity = 0.0;
                 $count = 0;
@@ -297,7 +310,12 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         return $intensities;
     }
 
-    private function switchTowinterTime(DateTime $date): bool
+    /**
+     * Detect if the given datetime matches a switching ot winter time (DST)
+     *
+     * @return bool
+     */
+    private function switchToWinterTime(DateTime $date): bool
     {
         // We assume that the datetime is already switched to winter time
         // Therefore summer time is 03:00:00 and winter time is 02:00:00
@@ -314,5 +332,22 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         }
 
         return false;
+    }
+
+    private function formatError(array $response): string
+    {
+        $message = $message = $response['error_code']
+        . ' ' . $response['message'];
+        return $message;
+    }
+
+    private function prepareTimezone(string $timezone): string
+    {
+        switch ($timezone) {
+            case '+00:00':
+                return 'UTC';
+        }
+
+        return $timezone;
     }
 }

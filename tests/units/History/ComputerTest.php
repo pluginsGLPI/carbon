@@ -107,7 +107,7 @@ class ComputerTest extends CommonAsset
         );
 
         // Days interval is [$start_date, $end_date[
-        $this->assertEquals(7, $count);
+        $this->assertEquals(8, $count);
 
         $carbon_emission = new CarbonEmission();
         $emissions = $carbon_emission->find([

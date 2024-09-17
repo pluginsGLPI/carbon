@@ -49,6 +49,27 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
     abstract public function getDataInterval(): string;
 
     /**
+     * Create the source in the database
+     * Should not be called as it shall be created at plugin installation
+     *
+     * @return CarbonIntensitySource
+     */
+    protected function getOrCreateSource(): ?CarbonIntensitySource
+    {
+        $source = new CarbonIntensitySource();
+        if (!$source->getFromDBByCrit(['name' => $this->getSourceName()])) {
+            $source->add([
+                'name' => $this->getSourceName(),
+            ]);
+            if ($source->isNewItem()) {
+                return null;
+            }
+        }
+
+        return $source;
+    }
+
+    /**
      * Download all data for a single day from the datasource
      *
      * @param DateTimeImmutable $day
@@ -205,8 +226,8 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
      */
     protected function sliceDateRangeByMonth(DateTimeImmutable $start, DateTimeImmutable $stop): \Generator
     {
-        $real_start = $start->setTime(0, 0, 0);
-        $real_stop = $stop->setTime(0, 0, 0);
+        $real_start = $start->setTime($start->format('H'), 0, 0, 0);
+        $real_stop = $stop->setTime($stop->format('H'), 0, 0, 0);
         $slice = [
             'start' => null,
             'stop'  => null,

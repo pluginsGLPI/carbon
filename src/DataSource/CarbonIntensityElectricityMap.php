@@ -44,6 +44,7 @@ use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
 use Config as GlpiConfig;
 use GLPIKey;
+use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 
 class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
 {
@@ -83,11 +84,11 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
 
     public function createZones(): int
     {
-        $source = new CarbonIntensitySource();
-        if (!$source->getFromDBByCrit(['name' => $this->getSourceName()])) {
-            // Failed to get the source (shoud not happen as it is created at installation time)
+        $source = $this->getOrCreateSource();
+        if ($source === null) {
             return -1;
         }
+        $source_id = $source->getID();
 
         try {
             $zones = $this->downloadZones();
@@ -101,27 +102,19 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
             $zone_input = [
                 'name' => $zone_spec['zoneName'],
             ];
+            if ($this->enableHistorical($zone_spec['zoneName'])) {
+                $zone_input['plugin_carbon_carbonintensitysources_id_historical'] = $source_id;
+            }
             $zone = new CarbonIntensityZone();
             if ($zone->getFromDbByCrit($zone_input) === false) {
-                // $zone_input['electricitymap_code'] = $zone_key;
                 if ($zone->add($zone_input) === false) {
-                    ;
                     $failed = true;
                     continue;
                 }
-            // } else {
-            //     $zone_input = [
-            //         'id' => $zone->getID(),
-            //         'electricitymap_code' => $zone_key
-            //     ];
-            //     if (!$zone->update($zone_input)) {
-            //         $failed++;
-            //         continue;
-            //     }
             }
             $source_zone = new CarbonIntensitySource_CarbonIntensityZone();
             $source_zone->add([
-                CarbonIntensitySource::getForeignKeyField() => $source->getID(),
+                CarbonIntensitySource::getForeignKeyField() => $source_id,
                 CarbonIntensityZone::getForeignKeyField() => $zone->getID(),
                 'code' => $zone_key,
             ]);
@@ -135,6 +128,21 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
         }
 
         return $count;
+    }
+
+    /**
+     * Enable historical for this source depending in the zone to configure
+     *
+     * @return boolean
+     */
+    protected function enableHistorical($zone_name): bool
+    {
+        if (in_array($zone_name, ['France'])) {
+            // Prefer an other source for France
+            return false;
+        }
+
+        return true;
     }
 
     private function getToken(): string
@@ -212,9 +220,11 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
             if (!$datetime instanceof DateTimeInterface) {
                 continue;
             }
+            $data_quality = $this->getDataQuality($record);
             $intensities[] = [
                 'datetime' => $datetime->format('Y-m-d\TH:i:s'),
                 'intensity' => $record['carbonIntensity'],
+                'data_quality' => $data_quality,
             ];
         }
 
@@ -261,9 +271,11 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
                 var_dump(DateTime::getLastErrors());
                 continue;
             }
+            $data_quality = $this->getDataQuality($record);
             $intensities[] = [
-                'datetime' => $datetime->format(DateTime::ATOM),
-                'intensity' => $record['carbonIntensity'],
+                'datetime'     => $datetime->format(DateTime::ATOM),
+                'intensity'    => $record['carbonIntensity'],
+                'data_quality' => $data_quality,
             ];
         }
 
@@ -273,10 +285,24 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
         ];
     }
 
+    /**
+     * Try ti determine the data quality of record
+     *
+     * @param array $record
+     * @return integer
+     */
+    protected function getDataQuality(array $record): int
+    {
+        $data_quality = 0;
+        if (!$record['isEstimated']) {
+            $data_quality = AbstractTracked::DATA_QUALITY_RAW_REAL_TIME_MEASUREMENT;
+        }
+
+        return $data_quality;
+    }
+
     public function incrementalDownload(string $zone, DateTimeImmutable $start_date, CarbonIntensity $intensity, int $limit = 0): int
     {
-        $end_date = new DateTimeImmutable('now');
-
         $count = 0;
         $saved = 0;
         try {

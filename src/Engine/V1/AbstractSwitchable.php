@@ -35,7 +35,10 @@ namespace GlpiPlugin\Carbon\Engine\V1;
 
 use DateTime;
 use DateInterval;
+use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
+use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
+use GlpiPlugin\Carbon\DataTracking\TrackedInt;
 
 abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInterface
 {
@@ -56,16 +59,16 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
 
     /**
      * Returns the consumed energy for the specified day.
-     * @return float energy (KWh)
+     * @return TrackedFloat energy (KWh)
      *
      * {@inheritDoc}
      */
-    public function getEnergyPerDay(DateTime $day): float
+    public function getEnergyPerDay(DateTime $day): TrackedFloat
     {
         $usage_profile = $this->getUsageProfile();
 
         if ($usage_profile === null || !self::isUsageDay($usage_profile, $day)) {
-            return 0;
+            return new TrackedFloat(0, null, TrackedFloat::DATA_QUALITY_MANUAL);
         }
 
         $power = $this->getPower();
@@ -78,22 +81,21 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
         // units:
         // power is in Watt
         // delta_time is in seconds
-        $energy_in_kwh = ($power * $delta_time) / (1000.0 * 60 * 60);
+        $energy_in_kwh = ($power->getValue() * $delta_time) / (1000.0 * 60 * 60);
 
-        return $energy_in_kwh;
+        return new TrackedFloat(
+            $energy_in_kwh,
+            $power,
+            TrackedFloat::DATA_QUALITY_MANUAL
+        );
     }
 
-    /**
-     * Returns the carbon emission for the specified day.
-     *
-     * {@inheritDoc}
-     */
-    public function getCarbonEmissionPerDay(DateTime $day): ?float
+    public function getCarbonEmissionPerDay(DateTime $day, CarbonIntensityZone $zone): ?TrackedFloat
     {
         $usage_profile = $this->getUsageProfile();
 
         if ($usage_profile === null || !self::isUsageDay($usage_profile, $day)) {
-            return 0.0;
+            return new TrackedFloat(0, null, TrackedFloat::DATA_QUALITY_MANUAL);
         }
 
         $power = $this->getPower();
@@ -107,20 +109,27 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
         $seconds_start = $seconds_start[0] * 3600 + $seconds_start[1] * 60 + $seconds_start[2];
         $seconds_stop = $seconds_stop[0] * 3600 + $seconds_stop[1] * 60 + $seconds_stop[2];
         $length = new DateInterval('PT' . ($seconds_stop - $seconds_start) . 'S');
-        return $this->computeEmissionPerDay($start_time, $power, $length);
+        return $this->computeEmissionPerDay($start_time, $power, $length, $zone);
     }
 
-    protected function computeEmissionPerDay(DateTime $start_time, int $power, DateInterval $length): ?float
+    protected function computeEmissionPerDay(DateTime $start_time, TrackedInt $power, DateInterval $length, CarbonIntensityZone $zone): ?TrackedFloat
     {
-        if ($power === 0) {
+        if ($power->getValue() === 0) {
             return 0;
         }
 
-        $iterator = $this->requestCarbonIntensitiesPerDay($start_time, $length);
-
+        $iterator = $this->requestCarbonIntensitiesPerDay($start_time, $length, $zone);
         $total_seconds = (int) $length->format('%S');
+        $expected_count = ceil($total_seconds / 3600);
+        if ($iterator->count() != $expected_count) {
+            trigger_error('required count of carbon intensity samples not met (' . $expected_count . ' expected)');
+            return null;
+        }
         if ($total_seconds === 0) {
-            return 0;
+            return new TrackedFloat(
+                0,
+                $power
+            );
         }
 
         if ($iterator->count() === 0) {
@@ -138,22 +147,28 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
             $seconds = $next_hour->format('U') - $current_hour->format('U');
 
             if ($counted_seconds + $seconds > $total_seconds) {
-                // Calculate emission of last hour (incomplete)
+                // Calculate emission of incomplete hour
                 $seconds = $total_seconds - $counted_seconds;
             }
 
-            // Calculate emission for a complete hour
-            $energy_in_kwh = ($power * $seconds) / (1000.0 * 60 * 60);
-            $emission = $row['intensity'] * $energy_in_kwh;
-            $total_emission += $emission;
+            // Calculate emission
+            $energy_in_kwh = ($power->getValue() * $seconds) / (1000.0 * 60 * 60);
+            $total_emission += $row['intensity'] * $energy_in_kwh;
 
             $counted_seconds += $seconds;
             if ($counted_seconds >= $total_seconds) {
-                return $total_emission;
+                return new TrackedFloat(
+                    $total_emission,
+                    $power,
+                    $row['data_quality']
+                );
             }
             $iterator->next();
         }
 
-        return $total_emission;
+        return new TrackedFloat(
+            $total_emission,
+            $power
+        );
     }
 }

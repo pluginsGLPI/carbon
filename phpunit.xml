@@ -5,7 +5,17 @@
   backupGlobals="false"
   colors="true"
   stderr="true">
-  <coverage />
+  <coverage>
+    <include>
+      <directory suffix=".php">src</directory>
+      <file>setup.php</file>
+      <file>hook.php</file>
+    </include>
+    <report>
+      <html outputDirectory="docs/coverage/html" lowUpperBound="50" highLowerBound="90"/>
+      <text outputFile="docs/coverage/coverage.txt" showUncoveredFiles="false" showOnlySummary="true"/>
+    </report>
+  </coverage>
   <logging>
     <junit outputFile="./tests/logs/junit_install.xml" />
   </logging>

@@ -45,6 +45,8 @@ use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Toolbox;
 use Location;
+use LogicException;
+use Log;
 
 abstract class AbstractAsset extends CommonDBTM implements AssetInterface
 {
@@ -100,6 +102,8 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      */
     public function historizeItems(): int
     {
+        global $DB;
+
         $itemtype = static::$itemtype;
         if ($itemtype === '') {
             throw new \LogicException('Itemtype not set');
@@ -119,8 +123,12 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         if ($type_instance->maybeTemplate()) {
             $crit['is_template'] = 0;
         }
-        $rows = $type_instance->find($crit);
-        foreach ($rows as $row) {
+        $iterator = $DB->request([
+            'SELECT' => 'id',
+            'FROM'  => getTableForItemType($itemtype),
+            'WHERE' => $crit,
+        ]);
+        foreach ($iterator as $row) {
             $count += $this->historizeItem($row['id']);
             if ($this->limit_reached) {
                 break;
@@ -173,9 +181,9 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         $carbon_emission = new CarbonEmission();
         $gaps = $carbon_emission->findGaps($itemtype, $id, $start_date, $end_date);
         foreach ($gaps as $gap) {
-            $date_cursor = new DateTime($gap['start']);
+            $date_cursor = DateTime::createFromFormat('U', $gap['start']);
             $date_cursor->setTime(0, 0, 0, 0);
-            $end_date = new DateTime($gap['end']);
+            $end_date = DateTime::createFromFormat('U', $gap['end']);
             while ($date_cursor < $end_date) {
                 $success = $this->historizeItemPerDay($item, $engine, $date_cursor);
                 if ($success) {
@@ -195,9 +203,12 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     protected function historizeItemPerDay(CommonDBTM $item, EngineInterface $engine, DateTime $day): bool
     {
         $energy = $engine->getEnergyPerDay($day);
+        $item_id = $item->getID();
+        $zone = $this->getZone($item_id /* ,$date_cursor */);
+
         $emission = 0;
         if ($energy !== 0) {
-            $emission = $engine->getCarbonEmissionPerDay($day);
+            $emission = $engine->getCarbonEmissionPerDay($day, $zone);
             if ($emission === null) {
                 return false;
             }
@@ -208,14 +219,16 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         $model_fk = static::$model_itemtype::getForeignKeyField();
         $id = $entry->add([
             'itemtype'          => $item->getType(),
-            'items_id'          => $item->getID(),
+            'items_id'          => $item_id,
             'entities_id'       => $item->fields['entities_id'],
             'types_id'          => $item->fields[$type_fk],
             'models_id'         => $item->fields[$model_fk],
             'locations_id'      => $item->fields['locations_id'],
-            'energy_per_day'    => $energy,
-            'emission_per_day'  => $emission,
-            'date'              => $day->format('Y-m-d 00:00:00'),
+            'energy_per_day'    => $energy->getValue(),
+            'emission_per_day'  => $emission->getValue(),
+            'date'              => $day->format('Y-m-d H:i:s'),
+            'energy_quality'    => $energy->getLowestSource(),
+            'emission_quality'  => $emission->getLowestSource(),
         ]);
 
         return !$this->isNewID($id);
@@ -229,71 +242,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      */
     protected function getStartDate(int $id): ?DateTimeImmutable
     {
-        return $this->getInventoryIncomingDate($id);
-
-        $last_known_emission_date = $this->getEmissionStartDate($id);
-        if ($last_known_emission_date === null) {
-            // no carbon emission available
-            return null;
-        }
-        $inventory_date = $this->getInventoryIncomingDate($id);
-        $date = max($last_known_emission_date, $inventory_date);
-
-        return $date;
-    }
-
-    /**
-     * Find the last date of computed emissions
-     *
-     * @param integer $id
-     * @return DateTimeImmutable|null
-     */
-    protected function getEmissionStartDate(int $id): ?DateTimeImmutable
-    {
-        // Find the oldest carbon emissions date calculated for the item
-        $itemtype = static::$itemtype;
-        $carbon_emission = new CarbonEmission();
-        $last_entry = $carbon_emission->find([
-            'itemtype' => $itemtype,
-            'items_id' => $id,
-        ], [
-            'date DESC'
-        ], 1);
-
-        if (count($last_entry) === 1) {
-            $last_entry = array_pop($last_entry);
-            $start_date = new DateTimeImmutable($last_entry['date']);
-            return $start_date;
-        }
-
-        // No data found,
-        // Guess the oldest date to compute
-        $zones_id = $this->getZoneId($id);
-        $carbon_intensity = new CarbonIntensity();
-        $first_entry = $carbon_intensity->find([
-            'plugin_carbon_carbonintensityzones_id' => $zones_id,
-        ], [
-            'date ASC'
-        ], 1);
-
-        if (count($first_entry) === 1) {
-            $first_entry = array_pop($first_entry);
-            $start_date = new DateTimeImmutable($first_entry['date']);
-            return $start_date;
-        }
-
-        // No carbon intensity in DB, cannot find a date
-        return null;
-    }
-
-    /**
-     * Find the most accurate date to determine the first use of an asset
-     *
-     * @param integer $id id of the asset to examinate
-     * @return DateTime|null
-     */
-    protected function getInventoryIncomingDate(int $id): ?DateTimeImmutable
-    {
+        // Find the date the asset entered in the inventory
         $toolbox = new Toolbox();
         $inventory_date = $toolbox->getOldestAssetDate([
             'itemtype' => static::$itemtype,
@@ -316,10 +265,10 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         $today = $today->sub(new DateInterval(static::$date_end_shift));
 
         $carbon_intensity = new CarBonIntensity();
-        $zone_id = $this->getZoneId($id);
+        $zone = $this->getZone($id);
         $last = $carbon_intensity->find(
             [
-                CarbonIntensityZone::getForeignKeyField() => $zone_id,
+                CarbonIntensityZone::getForeignKeyField() => $zone->getID(),
             ],
             ['date DESC'],
             '1'
@@ -336,40 +285,44 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      * Location's country must match a zone name
      *
      * @param integer $items_id
-     * @return integer|null
+     * @param DateTime $date Date for which the zone must be found
+     * @return CarbonIntensityZone|null
      */
-    protected function getZoneId(int $items_id): ?int
+    protected function getZone(int $items_id, DateTime $date = null): ?CarbonIntensityZone
     {
-        global $DB;
+        // TODO: use date to find where was the asset at the given date
+        if ($date === null) {
+            $item_table = (new DbUtils())->getTableForItemType(static::$itemtype);
+            $location_table = Location::getTable();
+            $zone_table = CarbonIntensityZone::getTable();
 
-        $item_table = (new DbUtils())->getTableForItemType(static::$itemtype);
-        $location_table = Location::getTable();
-        $zone_table = CarbonIntensityZone::getTable();
-        $iterator = $DB->request([
-            'SELECT' => CarbonIntensityZone::getTableField('id'),
-            'FROM' => $zone_table,
-            'INNER JOIN' => [
-                $location_table => [
-                    'FKEY' => [
-                        $zone_table => 'name',
-                        $location_table => 'country',
+            $zone = new CarbonIntensityZone();
+            $found = $zone->getFromDBByRequest([
+                'INNER JOIN' => [
+                    $location_table => [
+                        'FKEY' => [
+                            $zone_table => 'name',
+                            $location_table => 'country',
+                        ],
                     ],
+                    $item_table => [
+                        'FKEY' => [
+                            $item_table => Location::getForeignKeyField(),
+                            $location_table => 'id',
+                        ],
+                    ]
                 ],
-                $item_table => [
-                    'FKEY' => [
-                        $item_table => Location::getForeignKeyField(),
-                        $location_table => 'id',
-                    ],
+                'WHERE' => [
+                    $item_table . '.id' => $items_id
                 ]
-            ],
-            'WHERE' => [
-                $item_table . '.id' => $items_id
-            ]
-        ]);
-        if ($iterator->count() !== 1) {
-            return null;
+            ]);
+            if ($found === false) {
+                return null;
+            }
+
+            return $zone;
         }
 
-        return $iterator->current()['id'];
+        throw new LogicException('Not implemented yet');
     }
 }
