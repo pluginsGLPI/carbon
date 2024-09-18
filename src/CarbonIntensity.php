@@ -131,7 +131,7 @@ class CarbonIntensity extends CommonDBTM
             'field'              => 'intensity',
             'name'               => __('Intensity', 'carbon'),
             'massiveaction'      => false, // implicit field is id
-            'datatype'           => 'integer',
+            'datatype'           => 'decimal',
             'unit'               => 'gCO<sub>2</sub>eq/KWh',
         ];
 
