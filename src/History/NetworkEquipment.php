@@ -65,7 +65,7 @@ class NetworkEquipment extends AbstractAsset
             'INNER JOIN' => [
                 $item_model_table => [
                     'FKEY'   => [
-                        $item_table  => 'computermodels_id',
+                        $item_table  => 'networkequipmentmodels_id',
                         $item_model_table => 'id',
                     ]
                 ],
