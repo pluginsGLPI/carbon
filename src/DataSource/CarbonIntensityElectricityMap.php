@@ -102,11 +102,11 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
             $zone_input = [
                 'name' => $zone_spec['zoneName'],
             ];
-            if ($this->enableHistorical($zone_spec['zoneName'])) {
-                $zone_input['plugin_carbon_carbonintensitysources_id_historical'] = $source_id;
-            }
             $zone = new CarbonIntensityZone();
             if ($zone->getFromDbByCrit($zone_input) === false) {
+                if ($this->enableHistorical($zone_spec['zoneName'])) {
+                    $zone_input['plugin_carbon_carbonintensitysources_id_historical'] = $source_id;
+                }
                 if ($zone->add($zone_input) === false) {
                     $failed = true;
                     continue;

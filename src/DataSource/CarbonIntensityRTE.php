@@ -90,9 +90,9 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         $zone = new CarbonIntensityZone();
         $input = [
             'name' => 'France',
-            'plugin_carbon_carbonintensitysources_id_historical' => $source_id,
         ];
         if ($zone->getFromDBByCrit($input) === false) {
+            $input['plugin_carbon_carbonintensitysources_id_historical'] = $source_id;
             if (!$zone->add($input)) {
                 return -1;
             }
