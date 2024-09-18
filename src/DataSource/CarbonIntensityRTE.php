@@ -42,6 +42,7 @@ use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
+use GlpiPlugin\Carbon\Toolbox;
 
 class CarbonIntensityRTE extends AbstractCarbonIntensity
 {
@@ -108,6 +109,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         $source_zone->add([
             CarbonIntensitySource::getForeignKeyField() => $source_id,
             CarbonIntensityZone::getForeignKeyField() => $zone->getID(),
+            'is_download_enabled' => Toolbox::isLocationExistForZone($zone->fields['name']),
         ]);
         $this->setZoneSetupComplete();
         return 1;
