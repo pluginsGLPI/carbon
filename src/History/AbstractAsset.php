@@ -42,6 +42,7 @@ use DbUtils;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\CarbonEmission;
+use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Toolbox;
 use Location;
@@ -201,8 +202,11 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         $energy = $engine->getEnergyPerDay($day);
         $item_id = $item->getID();
         $zone = $this->getZone($item_id /* ,$date_cursor */);
+        if ($zone === null) {
+            return false;
+        }
 
-        $emission = 0;
+        $emission = new TrackedFloat(0, $energy);
         if ($energy !== 0) {
             $emission = $engine->getCarbonEmissionPerDay($day, $zone);
             if ($emission === null) {
@@ -288,7 +292,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     }
 
     /**
-     * Get the ID of the zone the asset belongs to
+     * Get the zone the asset belongs to
      * Location's country must match a zone name
      *
      * @param integer $items_id
