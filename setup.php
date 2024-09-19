@@ -97,6 +97,12 @@ function plugin_init_carbon()
     $PLUGIN_HOOKS['menu_toadd']['carbon']['admin'] = [CarbonIntensity::class];
 
     $PLUGIN_HOOKS[Hooks::POST_SHOW_TAB]['carbon'] = 'plugin_carbon_postShowTab';
+    foreach (PLUGIN_CARBON_TYPES as $itemtype) {
+        $PLUGIN_HOOKS[Hooks::ITEM_ADD]['carbon'][$itemtype] = 'plugin_carbon_hook_add_asset';
+        $PLUGIN_HOOKS[Hooks::ITEM_UPDATE]['carbon'][$itemtype] = 'plugin_carbon_hook_update_asset';
+    }
+    $PLUGIN_HOOKS[Hooks::ITEM_ADD]['carbon'][Location::class] = 'plugin_carbon_hook_add_location';
+    $PLUGIN_HOOKS[Hooks::ITEM_UPDATE]['carbon'][Location::class] = 'plugin_carbon_hook_update_location';
 
     Plugin::registerClass(Config::class, ['addtabon' => GlpiConfig::class]);
     Plugin::registerClass(Profile::class, ['addtabon' => GlpiProfile::class]);

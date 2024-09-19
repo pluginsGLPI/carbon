@@ -281,4 +281,14 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
             $current_date->setTime(0, 0, 0);
         }
     }
+
+    protected function toggleZoneDownload(CarbonIntensityZone $zone, CarbonIntensitySource $source, ?bool $state): bool
+    {
+        $source_zone = new CarbonIntensitySource_CarbonIntensityZone();
+        $source_zone->getFromDBByCrit([
+            $zone->getForeignKeyField() => $zone->getID(),
+            $source->getForeignKeyField() => $source->getID(),
+        ]);
+        return $source_zone->toggleZone($state);
+    }
 }

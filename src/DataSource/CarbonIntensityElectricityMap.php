@@ -45,6 +45,7 @@ use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
 use Config as GlpiConfig;
 use GLPIKey;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
+use GlpiPlugin\Carbon\Toolbox;
 
 class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
 {
@@ -117,6 +118,7 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
                 CarbonIntensitySource::getForeignKeyField() => $source_id,
                 CarbonIntensityZone::getForeignKeyField() => $zone->getID(),
                 'code' => $zone_key,
+                'is_download_enabled' => Toolbox::isLocationExistForZone($zone->fields['name']),
             ]);
             $count++;
         }

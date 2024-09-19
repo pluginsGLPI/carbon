@@ -40,6 +40,8 @@ use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
 use ComputerType as GlpiComputerType;
+use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
+use GlpiPlugin\Carbon\Toolbox;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
 
 /**
@@ -183,4 +185,98 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
     }
 
     return $sopt;
+}
+
+function plugin_carbon_hook_add_location(CommonDBTM $item)
+{
+    if (!in_array('country', array_keys($item->fields))) {
+        return;
+    }
+    $zone = CarbonIntensityZone::getByLocation($item);
+    if ($zone === null) {
+        return;
+    }
+    $source_zone = new CarbonIntensitySource_CarbonIntensityZone();
+    $source_zone->getFromDBByCrit([
+        $zone->getForeignKeyField() => $zone->fields['id'],
+        CarbonIntensitySource::getForeignKeyField() => $zone->fields['plugin_carbon_carbonintensitysources_id_historical'],
+    ]);
+    if ($source_zone === null) {
+        return;
+    }
+    $source_zone->toggleZone(true);
+}
+
+function plugin_carbon_hook_update_location(CommonDBTM $item)
+{
+    if (!in_array('country', $item->updates)) {
+        return;
+    }
+    $zone = CarbonIntensityZone::getByLocation($item);
+    if ($zone === null) {
+        return;
+    }
+    $source_zone = new CarbonIntensitySource_CarbonIntensityZone();
+    $source_zone->getFromDBByCrit([
+        $zone->getForeignKeyField() => $zone->fields['id'],
+        CarbonIntensitySource::getForeignKeyField() => $zone->fields['plugin_carbon_carbonintensitysources_id_historical'],
+    ]);
+    if ($source_zone === null) {
+        return;
+    }
+    $source_zone->toggleZone(true);
+}
+
+function plugin_carbon_hook_add_asset(CommonDBTM $item)
+{
+    if (!in_array($item::getType(), PLUGIN_CARBON_TYPES)) {
+        return;
+    }
+    $location_fk = Location::getForeignKeyField();
+    if (!in_array($location_fk, array_keys($item->fields))) {
+        return;
+    }
+    if (Location::isNewID($item->fields[$location_fk])) {
+        return;
+    }
+    $zone = CarbonIntensityZone::getByAsset($item);
+    if ($zone === null) {
+        return;
+    }
+    $source_zone = new CarbonIntensitySource_CarbonIntensityZone();
+    $source_zone->getFromDBByCrit([
+        $zone->getForeignKeyField() => $zone->fields['id'],
+        CarbonIntensitySource::getForeignKeyField() => $zone->fields['plugin_carbon_carbonintensitysources_id_historical'],
+    ]);
+    if ($source_zone === null) {
+        return;
+    }
+    $source_zone->toggleZone(true);
+}
+
+function plugin_carbon_hook_update_asset(CommonDBTM $item)
+{
+    if (!in_array($item::getType(), PLUGIN_CARBON_TYPES)) {
+        return;
+    }
+    $location_fk = Location::getForeignKeyField();
+    if (!in_array($location_fk, $item->updates)) {
+        return;
+    }
+    if (Location::isNewID($item->fields[$location_fk])) {
+        return;
+    }
+    $zone = CarbonIntensityZone::getByAsset($item);
+    if ($zone === null) {
+        return;
+    }
+    $source_zone = new CarbonIntensitySource_CarbonIntensityZone();
+    $source_zone->getFromDBByCrit([
+        $zone->getForeignKeyField() => $zone->fields['id'],
+        CarbonIntensitySource::getForeignKeyField() => $zone->fields['plugin_carbon_carbonintensitysources_id_historical'],
+    ]);
+    if ($source_zone === null) {
+        return;
+    }
+    $source_zone->toggleZone(true);
 }

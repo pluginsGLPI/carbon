@@ -34,8 +34,10 @@
 namespace GlpiPlugin\Carbon;
 
 use CommonDropdown;
+use CommonDBTM;
 use CommonGLPI;
 use DBUtils;
+use Location;
 use Session;
 
 /**
@@ -137,5 +139,107 @@ class CarbonIntensityZone extends CommonDropdown
         ];
 
         return $tab;
+    }
+
+    /**
+     * Get a zone by a location criteria
+     *
+     * @param Location $item
+     * @return CarbonIntensityZone|null
+     */
+    public static function getByLocation(Location $item): ?CarbonIntensityZone
+    {
+        global $DB;
+
+        if ($item->isNewItem()) {
+            return null;
+        }
+
+        if ($item->fields['country'] == '') {
+            return null;
+        }
+
+        // TODO: support translations
+        $location_table = Location::getTable();
+        $zone_table = CarbonIntensityZone::getTable();
+        $iterator = $DB->request([
+            'SELECT' => CarbonIntensityZone::getTableField('id'),
+            'FROM'   => $zone_table,
+            'INNER JOIN' => [
+                $location_table => [
+                    'FKEY' => [
+                        $location_table => 'country',
+                        $zone_table => 'name',
+                    ],
+                ],
+            ],
+            'WHERE'  => [
+                Location::getTableField('id') => $item->getID(),
+            ]
+        ]);
+
+        if ($iterator->count() !== 1) {
+            return null;
+        }
+
+        $zone_id = $iterator->current()['id'];
+        $zone = CarbonIntensityZone::getById($zone_id);
+        if ($zone === false) {
+            return null;
+        }
+
+        return $zone;
+    }
+
+    public static function getByAsset(CommonDBTM $item): ?CarbonIntensityZone
+    {
+        global $DB;
+
+        if (!isset($item->fields[Location::getForeignKeyField()])) {
+            return null;
+        }
+
+        if ($item->isNewItem()) {
+            return null;
+        }
+
+        // TODO: support translations
+        $location_table = Location::getTable();
+        $zone_table = CarbonIntensityZone::getTable();
+        $item_table = $item::getTable();
+        $iterator = $DB->request([
+            'SELECT' => CarbonIntensityZone::getTableField('id'),
+            'FROM'   => $zone_table,
+            'INNER JOIN' => [
+                $location_table => [
+                    'FKEY' => [
+                        $location_table => 'country',
+                        $zone_table => 'name',
+                    ],
+                ],
+                $item_table => [
+                    'FKEY' => [
+                        $item_table => 'locations_id',
+                        $location_table => 'id',
+                    ],
+                ],
+            ],
+            'WHERE'  => [
+                Location::getTableField('country') => ['<>', ''],
+                $item::getTableField('id') => $item->getID(),
+            ]
+        ]);
+
+        if ($iterator->count() !== 1) {
+            return null;
+        }
+
+        $zone_id = $iterator->current()['id'];
+        $zone = CarbonIntensityZone::getById($zone_id);
+        if ($zone === false) {
+            return null;
+        }
+
+        return $zone;
     }
 }

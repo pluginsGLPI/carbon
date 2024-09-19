@@ -286,10 +286,17 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
         return $link;
     }
 
-    public function toggleZone(): bool
+    public function toggleZone(?bool $state): bool
     {
-        $state = $this->fields['is_download_enabled'];
-        $state = $state == 0 ? 1 : 0;
-        return $this->update(['id' => $this->getID(), 'is_download_enabled' => $state]) !== false;
+        if ($state === null) {
+            $state = $this->fields['is_download_enabled'];
+            $state = $state == 0 ? 1 : 0;
+        }
+
+        $input = [
+            'id' => $this->getID(),
+            'is_download_enabled' => $state
+        ];
+        return $this->update($input) !== false;
     }
 }

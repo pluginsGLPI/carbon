@@ -33,9 +33,11 @@
 
 namespace GlpiPlugin\Carbon;
 
+use CommonDBTM;
 use DateTime;
 use DateTimeImmutable;
 use Infocom;
+use Location;
 
 class Toolbox
 {
@@ -318,5 +320,19 @@ class Toolbox
             $start_date->modify('-12 months + 1 day');
 
         return [$start_date, $end_date];
+    }
+
+    public static function isLocationExistForZone(string $name): bool
+    {
+        global $DB;
+
+        $result = $DB->request([
+            'COUNT' => 'c',
+            'FROM'   => Location::getTable(),
+            'WHERE'  => [
+                'country' => $name,
+            ],
+        ]);
+        return $result->current()['c'] > 0;
     }
 }
