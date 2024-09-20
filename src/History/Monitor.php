@@ -37,18 +37,19 @@ namespace GlpiPlugin\Carbon\History;
 use CommonDBTM;
 use Computer as GlpiComputer;
 use Computer_Item;
-use DbUtils;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Engine\V1\Monitor as EngineMonitor;
+use GlpiPlugin\Carbon\MonitorType;
+use Location;
 use Monitor as GlpiMonitor;
-use MonitorType;
-use MonitorModel;
+use MonitorType as GLPIMonitorType;
+use MonitorModel as GlpiMonitorModel;
 
 class Monitor extends AbstractAsset
 {
     protected static string $itemtype = GlpiMonitor::class;
-    protected static string $type_itemtype  = MonitorType::class;
-    protected static string $model_itemtype = MonitorModel::class;
+    protected static string $type_itemtype  = GLPIMonitorType::class;
+    protected static string $model_itemtype = GlpiMonitorModel::class;
 
     public static function getEngine(CommonDBTM $item): EngineInterface
     {
@@ -57,28 +58,44 @@ class Monitor extends AbstractAsset
 
     public function getHistorizableQuery(): array
     {
-        $monitors_table = self::$itemtype::getTable();
+        // Monitors must be attached to a computer to be used
+        // then lets create the query based on the equivalent request for computers
+        $item_table = self::$itemtype::getTable();
         $computers_table = GlpiComputer::getTable();
         $computers_items_table = Computer_Item::getTable();
-        $glpi_monitors_table = GlpiMonitor::getTable();
         $request = (new Computer())->getHistorizableQuery();
+        // Add joins to reach monitor from computer
         $request['INNER JOIN'][$computers_items_table] = [
             'FKEY' => [
                 $computers_table => 'id',
                 $computers_items_table => GlpiComputer::getForeignKeyField(),
             ]
         ];
-        $request['INNER JOIN'][$glpi_monitors_table] = [
+        $request['INNER JOIN'][$item_table] = [
             'FKEY' => [
-                $glpi_monitors_table => 'id',
+                $item_table => 'id',
                 $computers_items_table => 'items_id',
                 ['AND' => [Computer_Item::getTableField('itemtype') => self::$itemtype]],
             ],
         ];
 
-        $request['WHERE']['AND'] += [
-            self::$itemtype::getTableField('is_deleted') => 0,
-            self::$itemtype::getTableField('is_template') => 0,
+        // Replace SELECT on computer by select on monitor
+        $request['SELECT'] = [
+            self::$itemtype::getTableField('*'),
+        ];
+        $request['WHERE'] = [
+            'AND' => [
+                self::$itemtype::getTableField('is_deleted') => 0,
+                self::$itemtype::getTableField('is_template') => 0,
+                ['NOT' => [Location::getTableField('country') => '']],
+                ['NOT' => [Location::getTableField('country') => null]],
+                [
+                    'OR' => [
+                        MonitorType::getTableField('power_consumption') => ['>', 0],
+                        self::$model_itemtype::getTableField('power_consumption') => ['>', 0],
+                    ],
+                ],
+            ],
         ];
 
         return $request;

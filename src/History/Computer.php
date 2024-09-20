@@ -124,7 +124,7 @@ class Computer extends AbstractAsset
                     [
                         'OR' => [
                             ComputerType::getTableField('power_consumption') => ['>', 0],
-                            GlpiComputerModel::getTableField('power_consumption') => ['>', 0],
+                            self::$model_itemtype::getTableField('power_consumption') => ['>', 0],
                         ],
                     ],
                 ],
