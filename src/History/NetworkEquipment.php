@@ -38,16 +38,17 @@ use CommonDBTM;
 use DbUtils;
 use Location;
 use NetworkEquipment as GlpiNetworkEquipment;
-use NetworkEquipmentType;
-use NetworkEquipmentModel;
+use NetworkEquipmentType as GlpiNetworkEquipmentType;
+use NetworkEquipmentModel as GlpiNetworkEquipmentModel;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Engine\V1\Monitor as EngineMonitor;
+use GlpiPlugin\Carbon\NetworkEquipmentType;
 
 class NetworkEquipment extends AbstractAsset
 {
     protected static string $itemtype = GlpiNetworkEquipment::class;
-    protected static string $type_itemtype  = NetworkEquipmentType::class;
-    protected static string $model_itemtype = NetworkEquipmentModel::class;
+    protected static string $type_itemtype  = GlpiNetworkEquipmentType::class;
+    protected static string $model_itemtype = GlpiNetworkEquipmentModel::class;
 
     public static function getEngine(CommonDBTM $item): EngineInterface
     {
@@ -81,6 +82,12 @@ class NetworkEquipment extends AbstractAsset
                 self::$itemtype::getTableField('is_template') => 0,
                 ['NOT' => [Location::getTableField('country') => '']],
                 ['NOT' => [Location::getTableField('country') => null]],
+                [
+                    'OR' => [
+                        NetworkEquipmentType::getTableField('power_consumption') => ['>', 0],
+                        self::$model_itemtype::getTableField('power_consumption') => ['>', 0],
+                    ],
+                ],
             ]
         ];
 
