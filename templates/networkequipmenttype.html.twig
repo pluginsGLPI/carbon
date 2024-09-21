@@ -34,7 +34,7 @@
 
 {% block form_fields %}
     {{ fields.smallTitle(__('This power value is used as default when the power of a network equipment model is unknown', 'carbon')) }}
-    {{ fields.numberField('power_consumption', item.fields['power_consumption'], __('Power', 'carbon'), {
+    {{ fields.numberField('power_consumption', item.fields['power_consumption'], _n('Power', 'Powers', 1, 'carbon'), {
         min: 0
     }) }}
 {% endblock %}
