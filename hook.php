@@ -41,7 +41,7 @@ use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
 use ComputerType as GlpiComputerType;
 use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
-use GlpiPlugin\Carbon\Toolbox;
+use Toolbox;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
 
 /**
@@ -128,11 +128,12 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
     if ($itemtype === Computer::class) {
         $sopt[] = [
             'id' => 2222,
-            'table'        => ComputerType::getTable(),
-            'field'        => 'power_consumption',
-            'name'         => __('Power consumption (W)', 'power consumption (W)'),
-            'datatype'     => 'number',
-            'linkfield'    => 'computers_id',
+            'table'         => ComputerType::getTable(),
+            'field'         => 'power_consumption',
+            'name'          => __('Power consumption (W)', 'power consumption (W)'),
+            'datatype'      => 'number',
+            'massiveaction' => false,
+            'linkfield'     => 'computers_id',
             'joinparams' => [
                 'jointype' => 'child',
                 'beforejoin' => [
@@ -146,10 +147,11 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
 
         $sopt[] = [
             'id' => 2223,
-            'table'        => ComputerUsageProfile::getTable(),
-            'field'        => 'name',
-            'name'         => ComputerUsageProfile::getTypeName(),
-            'datatype'     => 'itemlink',
+            'table'         => ComputerUsageProfile::getTable(),
+            'field'         => 'name',
+            'name'          => ComputerUsageProfile::getTypeName(),
+            'datatype'      => 'itemlink',
+            'massiveaction' => false,
             'joinparams' => [
                 'jointype' => 'empty',
                 'beforejoin' => [
