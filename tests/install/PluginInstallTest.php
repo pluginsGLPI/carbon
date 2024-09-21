@@ -42,9 +42,9 @@ use Plugin;
 use Profile;
 use ProfileRight;
 use Glpi\System\Diagnostic\DatabaseSchemaIntegrityChecker;
-use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
+use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\CronTask;
 use GlpiPlugin\Carbon\Report;
 
@@ -123,6 +123,7 @@ class PluginInstallTest extends CommonTestCase
         $this->checkRights();
         $this->checkDataSources();
         $this->checkDisplayPrefs();
+        $this->checkPredefinedUsageProfiles();
     }
 
     public function testConfigurationExists()
@@ -309,5 +310,12 @@ class PluginInstallTest extends CommonTestCase
             ]);
             $this->assertFalse($source->isNewItem());
         }
+    }
+
+    private function checkPredefinedUsageProfiles()
+    {
+        $usage_profile = new ComputerUsageProfile();
+        $rows = $usage_profile->find();
+        $this->assertEquals(2, count($rows));
     }
 }
