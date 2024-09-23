@@ -281,3 +281,15 @@ function plugin_carbon_hook_update_asset(CommonDBTM $item)
     }
     $source_zone->toggleZone(true);
 }
+
+function plugin_carbon_MassiveActions($itemtype)
+{
+    switch ($itemtype) {
+        case Computer::class:
+            return [
+                ComputerUsageProfile::class . MassiveAction::CLASS_ACTION_SEPARATOR . 'MassAssociateItems' => __('Associate to an usage profile', 'carbon')
+            ];
+    }
+
+    return [];
+}

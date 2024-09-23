@@ -33,10 +33,13 @@
 
 namespace GlpiPlugin\Carbon;
 
+use CommonDBTM;
 use CommonDropdown;
 use CommonGLPI;
 use Entity;
 use Glpi\Application\View\TemplateRenderer;
+use Html;
+use MassiveAction;
 
 /**
  * Usage profile of a computer
@@ -171,5 +174,56 @@ class ComputerUsageProfile extends CommonDropdown
         ];
 
         return $tab;
+    }
+
+    public static function showMassiveActionsSubForm(MassiveAction $ma)
+    {
+        switch ($ma->getAction()) {
+            case 'MassAssociateItems':
+                self::dropdown();
+                echo '<br /><br />' . Html::submit(_x('button', 'Post'), ['name' => 'massiveaction']);
+                return true;
+        }
+
+        return parent::showMassiveActionsSubForm($ma);
+    }
+
+    public static function processMassiveActionsForOneItemtype(MassiveAction $ma, CommonDBTM $item, array $ids)
+    {
+        switch ($ma->getAction()) {
+            case 'MassAssociateItems':
+                $usage_profile_fk = ComputerUsageProfile::getForeignKeyField();
+                $usage_profile_id = $ma->POST[$usage_profile_fk];
+                foreach ($ids as $id) {
+                    if ($item->getFromDB($id) && self::assignToItem($item, $usage_profile_id)) {
+                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
+                    } else {
+                        // Example of ko count
+                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
+                    }
+                }
+                return;
+        }
+    }
+
+    public static function assignToItem(CommonDBTM $item, int $usage_profile_id)
+    {
+        $environmental_imapct = new EnvironnementalImpact();
+        $computers_id = $item->getID();
+        $usage_profile_fk = ComputerUsageProfile::getForeignKeyField();
+        $environmental_imapct->getFromDBByCrit([
+            'computers_id' => $computers_id
+        ]);
+        if ($environmental_imapct->isNewItem()) {
+            $environmental_imapct->add([
+                'computers_id'    => $computers_id,
+                $usage_profile_fk => $usage_profile_id,
+            ]);
+        } else {
+            $environmental_imapct->update([
+                'id'              => $environmental_imapct->getID(),
+                $usage_profile_fk => $usage_profile_id,
+            ]);
+        }
     }
 }
