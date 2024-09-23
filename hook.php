@@ -287,7 +287,11 @@ function plugin_carbon_MassiveActions($itemtype)
     switch ($itemtype) {
         case Computer::class:
             return [
-                ComputerUsageProfile::class . MassiveAction::CLASS_ACTION_SEPARATOR . 'MassAssociateItems' => __('Associate to an usage profile', 'carbon')
+                ComputerUsageProfile::class . MassiveAction::CLASS_ACTION_SEPARATOR . 'MassAssociateItems' => __('Associate to an usage profile', 'carbon'),
+            ];
+        case GlpiComputerType::class:
+            return [
+                ComputerType::class . MassiveAction::CLASS_ACTION_SEPARATOR . 'MassUpdatePower' => __('Upate power consumption', 'carbon'),
             ];
     }
 

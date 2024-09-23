@@ -33,10 +33,65 @@
 
 namespace GlpiPlugin\Carbon;
 
+use CommonDBTM;
 use ComputerType as GlpiComputerType;
+use Html;
+use MassiveAction;
 
 class ComputerType extends AbstractType
 {
     public static $itemtype = GlpiComputerType::class;
     public static $items_id = 'computertypes_id';
+
+    public static function showMassiveActionsSubForm(MassiveAction $ma)
+    {
+        switch ($ma->getAction()) {
+            case 'MassUpdatePower':
+                echo '<div>';
+                echo __('Power consumption', 'carbon') . '&nbsp;';
+                echo Html::input('power_consumption', ['type' => 'number']);
+                echo '</div>';
+                echo '<br /><br />' . Html::submit(_x('button', 'Post'), ['name' => 'massiveaction']);
+                return true;
+        }
+
+        return parent::showMassiveActionsSubForm($ma);
+    }
+
+    public static function processMassiveActionsForOneItemtype(MassiveAction $ma, CommonDBTM $item, array $ids)
+    {
+        switch ($ma->getAction()) {
+            case 'MassUpdatePower':
+                foreach ($ids as $id) {
+                    if ($item->getFromDB($id) && self::updatePowerConsumption($item, $ma->POST['power_consumption'])) {
+                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
+                    } else {
+                        // Example of ko count
+                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
+                    }
+                }
+                return;
+        }
+    }
+
+    public static function updatePowerConsumption(CommonDBTM $item, int $power)
+    {
+        $computer_type = new ComputerType();
+        $core_computer_type_id = $item->getID();
+        $id = $computer_type->getFromDBByCrit([
+            'computertypes_id' => $core_computer_type_id,
+        ]);
+        if ($computer_type->isNewItem()) {
+            $id = $computer_type->add([
+                'computertypes_id'  => $core_computer_type_id,
+                'power_consumption' => $power,
+            ]);
+            return !$computer_type->isNewId($id);
+        } else {
+            return $computer_type->update([
+                'id'                => $id,
+                'power_consumption' => $power,
+            ]);
+        }
+    }
 }
