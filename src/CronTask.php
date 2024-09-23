@@ -151,6 +151,8 @@ class CronTask
         if ($count === 0) {
             return 0;
         }
+
+        $task->addVolume($count);
         return ($failure ? -1 : 1);
     }
 }
