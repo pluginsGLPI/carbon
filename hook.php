@@ -41,7 +41,6 @@ use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
 use ComputerType as GlpiComputerType;
 use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
-use Toolbox;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
 
 /**
