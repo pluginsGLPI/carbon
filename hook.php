@@ -301,7 +301,7 @@ function plugin_carbon_MassiveActions($itemtype)
             ];
         case GlpiComputerType::class:
             return [
-                ComputerType::class . MassiveAction::CLASS_ACTION_SEPARATOR . 'MassUpdatePower' => __('Upate power consumption', 'carbon'),
+                ComputerType::class . MassiveAction::CLASS_ACTION_SEPARATOR . 'MassUpdatePower' => __('Update power consumption', 'carbon'),
             ];
     }
 
