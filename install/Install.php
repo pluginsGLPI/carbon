@@ -34,14 +34,9 @@
 namespace GlpiPlugin\Carbon;
 
 use Config;
-use CronTask;
 use DirectoryIterator;
 use Migration;
 use Plugin;
-use ProfileRight;
-use Profile;
-use GlpiPlugin\Carbon\History\Computer;
-use Glpi\Plugin\Hooks;
 
 class Install
 {
