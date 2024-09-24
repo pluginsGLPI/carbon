@@ -63,5 +63,5 @@ $dbUtil = new DbUtils();
 $usage_profile_table = $dbUtil->getTableForItemType(ComputerUsageProfile::class);
 foreach ($usage_profiles as $input) {
     $query = $DB->buildInsert($usage_profile_table, $input);
-    $migration->addPostQuery($query);
+    $DB->doQuery($query);
 }

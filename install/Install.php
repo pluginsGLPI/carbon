@@ -34,14 +34,9 @@
 namespace GlpiPlugin\Carbon;
 
 use Config;
-use CronTask;
 use DirectoryIterator;
 use Migration;
 use Plugin;
-use ProfileRight;
-use Profile;
-use GlpiPlugin\Carbon\History\Computer;
-use Glpi\Plugin\Hooks;
 
 class Install
 {
@@ -65,6 +60,38 @@ class Install
         }
 
         return $version;
+    }
+
+    /**
+     * Fresh install of the plugin
+     *
+     * @param array $args
+     * @return boolean
+     */
+    public function install(array $args = []): bool
+    {
+        global $DB;
+
+        $dbFile = plugin_carbon_getSchemaPath();
+        if ($dbFile === null || !$DB->runFile($dbFile)) {
+            $this->migration->displayWarning("Error creating tables : " . $DB->error(), true);
+            return false;
+        }
+
+        // Execute all install sub tasks
+        $install_dir = __DIR__ . '/install/';
+        $update_scripts = scandir($install_dir);
+        $migration = $this->migration; // Used in called scripts in for loop
+        foreach ($update_scripts as $update_script) {
+            if (preg_match('/\.php$/', $update_script) !== 1) {
+                continue;
+            }
+            require $install_dir . $update_script;
+        }
+
+        Config::setConfigurationValues('plugin:carbon', ['dbversion' => PLUGIN_CARBON_SCHEMA_VERSION]);
+
+        return true;
     }
 
     /**

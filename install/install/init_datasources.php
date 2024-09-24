@@ -53,5 +53,5 @@ foreach ($data_sources as $data_source) {
         }
     }
     $query = $DB->buildInsert($source_table, ['name' => $data_source]);
-    $migration->addPostQuery($query);
+    $DB->doQuery($query);
 }

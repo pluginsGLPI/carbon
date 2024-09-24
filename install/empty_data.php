@@ -31,37 +31,50 @@
  * -------------------------------------------------------------------------
  */
 
-function update000to001(Migration $migration)
+use CronTask as GlpiCronTask;
+
+$empty_data_builder = new class
 {
-    global $DB;
+    public function getEmptyData(): array
+    {
+        $tables = [];
 
-    $updateresult = true;
-    $from_version = '0.0.0';
-    $to_version   = '0.0.1';
-    $update_dir = __DIR__ . "/update_{$from_version}_to_{$to_version}/";
+        $tables['glpi_plugin_carbon_computerusageprofiles'] = [
+            [
+                'name'       => __('Always on', 'carbon'),
+                'time_start' => '00:00',
+                'time_stop'  => '23:59',
+                'day_1'      => '1',
+                'day_2'      => '1',
+                'day_3'      => '1',
+                'day_4'      => '1',
+                'day_5'      => '1',
+                'day_6'      => '1',
+                'day_7'      => '1',
+            ], [
+                'name'       => __('Office hours', 'carbon'),
+                'time_start' => '9:00',
+                'time_stop'  => '18:00',
+                'day_1'      => '1',
+                'day_2'      => '1',
+                'day_3'      => '1',
+                'day_4'      => '1',
+                'day_5'      => '1',
+                'day_6'      => '0',
+                'day_7'      => '0',
+            ],
+        ];
 
-    //TRANS: %s is the number of new version
-    $migration->displayTitle(sprintf(__('Update to %s'), $to_version));
-    $migration->setVersion($to_version);
+        $tables['glpi_plugin_carbon_carbonintensitysources'] = [
+            [
+                'name' => 'RTE'
+            ], [
+                'name' => 'ElectricityMap'
+            ]
+        ];
 
-    // New tables are already created from enpty.sql filer
-
-    $update_scripts = scandir($update_dir);
-    foreach ($update_scripts as $update_script) {
-        if (preg_match('/\.php$/', $update_script) !== 1) {
-            continue;
-        }
-        require $update_dir . $update_script;
+        return $tables;
     }
+};
 
-    $dbFile = plugin_carbon_getSchemaPath($to_version);
-    if ($dbFile === null || !$DB->runFile($dbFile)) {
-        $migration->displayWarning("Error creating tables : " . $DB->error(), true);
-        $updateresult = false;
-    }
-
-    // ************ Keep it at the end **************
-    $migration->executeMigration();
-
-    return $updateresult;
-}
+return $empty_data_builder->getEmptyData();
