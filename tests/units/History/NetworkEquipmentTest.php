@@ -96,6 +96,8 @@ class NetworkEquipmentTest extends CommonAsset
         $emissions = $carbon_emission->find([
             ['date' => ['>=', $start_date]],
             ['date' =>  ['<', $end_date]],
+            'itemtype' => $asset->getType(),
+            'items_id' => $asset->getID(),
         ], [
             'date ASC',
         ]);

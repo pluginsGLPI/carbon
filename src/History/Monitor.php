@@ -37,18 +37,20 @@ namespace GlpiPlugin\Carbon\History;
 use CommonDBTM;
 use Computer as GlpiComputer;
 use Computer_Item;
+use DBmysql;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Engine\V1\Monitor as EngineMonitor;
 use GlpiPlugin\Carbon\MonitorType;
 use Location;
 use Monitor as GlpiMonitor;
-use MonitorType as GLPIMonitorType;
+use MonitorType as GlpiMonitorType;
 use MonitorModel as GlpiMonitorModel;
+use QueryExpression;
 
 class Monitor extends AbstractAsset
 {
     protected static string $itemtype = GlpiMonitor::class;
-    protected static string $type_itemtype  = GLPIMonitorType::class;
+    protected static string $type_itemtype  = GlpiMonitorType::class;
     protected static string $model_itemtype = GlpiMonitorModel::class;
 
     public static function getEngine(CommonDBTM $item): EngineInterface
@@ -61,21 +63,43 @@ class Monitor extends AbstractAsset
         // Monitors must be attached to a computer to be used
         // then lets create the query based on the equivalent request for computers
         $item_table = self::$itemtype::getTable();
+        $item_model_table = self::$model_itemtype::getTable();
         $computers_table = GlpiComputer::getTable();
         $computers_items_table = Computer_Item::getTable();
+        $glpi_monitor_types_table = GlpiMonitorType::getTable();
+        $glpi_monitor_types_fk = GlpiMonitorType::getForeignKeyField();
+        $monitor_types_table = MonitorType::getTable();
         $request = (new Computer())->getHistorizableQuery();
         // Add joins to reach monitor from computer
         $request['INNER JOIN'][$computers_items_table] = [
             'FKEY' => [
                 $computers_table => 'id',
                 $computers_items_table => GlpiComputer::getForeignKeyField(),
+                ['AND' => [Computer_Item::getTableField('itemtype') => self::$itemtype]],
             ]
         ];
         $request['INNER JOIN'][$item_table] = [
             'FKEY' => [
                 $item_table => 'id',
                 $computers_items_table => 'items_id',
-                ['AND' => [Computer_Item::getTableField('itemtype') => self::$itemtype]],
+            ],
+        ];
+        $request['INNER JOIN'][$glpi_monitor_types_table] = [
+            'FKEY' => [
+                $glpi_monitor_types_table => 'id',
+                $item_table => $glpi_monitor_types_fk,
+            ],
+        ];
+        $request['INNER JOIN'][$monitor_types_table] = [
+            'FKEY' => [
+                $glpi_monitor_types_table => 'id',
+                $monitor_types_table => $glpi_monitor_types_fk,
+            ],
+        ];
+        $request['INNER JOIN'][$item_model_table] = [
+            'FKEY' => [
+                $item_model_table => 'id',
+                $item_table => 'monitormodels_id',
             ],
         ];
 
@@ -87,6 +111,8 @@ class Monitor extends AbstractAsset
             'AND' => [
                 self::$itemtype::getTableField('is_deleted') => 0,
                 self::$itemtype::getTableField('is_template') => 0,
+                // Check the monitor is located the same place as the attached computer
+                self::$itemtype::getTableField('locations_id') => new QueryExpression(DBmysql::quoteName(GlpiComputer::getTableField('locations_id'))),
                 ['NOT' => [Location::getTableField('country') => '']],
                 ['NOT' => [Location::getTableField('country') => null]],
                 [
