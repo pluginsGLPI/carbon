@@ -31,7 +31,7 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\History\Tests;
+namespace GlpiPlugin\Carbon\Engine\V1\Tests;
 
 use Computer as GlpiComputer;
 use Computer_Item;

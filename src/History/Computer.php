@@ -61,7 +61,7 @@ class Computer extends AbstractAsset
     {
         $item_table = self::$itemtype::getTable();
         $item_model_table = self::$model_itemtype::getTable();
-        $glpiComputertypes_table = GlpiComputerType::getTable();
+        $glpi_computertypes_table = GlpiComputerType::getTable();
         $computertypes_table = ComputerType::getTable();
         $location_table = Location::getTable();
         $environnementalimpact_table = EnvironnementalImpact::getTable();
@@ -79,16 +79,16 @@ class Computer extends AbstractAsset
                         $item_model_table => 'id',
                     ]
                 ],
-                $glpiComputertypes_table => [
+                $glpi_computertypes_table => [
                     'FKEY'   => [
                         $item_table  => 'computertypes_id',
-                        $glpiComputertypes_table => 'id',
+                        $glpi_computertypes_table => 'id',
                     ]
                 ],
                 $computertypes_table => [
                     'FKEY'   => [
                         $computertypes_table  => 'computertypes_id',
-                        $glpiComputertypes_table => 'id',
+                        $glpi_computertypes_table => 'id',
                         [
                             'AND' => [
                                 'NOT' => [GlpiComputerType::getTableField('id') => null],

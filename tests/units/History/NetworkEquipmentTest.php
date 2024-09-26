@@ -50,11 +50,12 @@ use NetworkEquipmentModel;
 class NetworkEquipmentTest extends CommonAsset
 {
     protected string $history_type =  \GlpiPlugin\Carbon\History\NetworkEquipment::class;
+    protected string $asset_type = GlpiNetworkEquipment::class;
 
     public function testGetEngine()
     {
-        $network_equipment = new GlpiNetworkEquipment();
-        $engine = NetworkEquipment::getEngine($network_equipment);
+        $asset = new GlpiNetworkEquipment();
+        $engine = NetworkEquipment::getEngine($asset);
         $this->assertInstanceOf(\GlpiPlugin\Carbon\Engine\V1\NetworkEquipment::class, $engine);
     }
 
@@ -72,7 +73,7 @@ class NetworkEquipmentTest extends CommonAsset
         $type = $this->getItem(NetworkEquipmentType::class, [
             GlpiNetworkEquipmentType::getForeignKeyField() => $glpi_type->getID(),
         ]);
-        $network_equipment = $this->getItem(GlpiNetworkEquipment::class, [
+        $asset = $this->getItem(GlpiNetworkEquipment::class, [
             'networkequipmenttypes_id'  => $glpi_type->getID(),
             'networkequipmentmodels_id' => $model->getID(),
             'locations_id'              => $location->getID(),
@@ -83,7 +84,7 @@ class NetworkEquipmentTest extends CommonAsset
         $start_date = '2024-02-01 00:00:00';
         $end_date =   '2024-02-08 00:00:00';
         $count = $history->historizeItem(
-            $network_equipment->getID(),
+            $asset->getID(),
             new DateTime($start_date),
             new DateTime($end_date)
         );
@@ -95,6 +96,8 @@ class NetworkEquipmentTest extends CommonAsset
         $emissions = $carbon_emission->find([
             ['date' => ['>=', $start_date]],
             ['date' =>  ['<', $end_date]],
+            'itemtype' => $asset->getType(),
+            'items_id' => $asset->getID(),
         ], [
             'date ASC',
         ]);
