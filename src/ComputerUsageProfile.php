@@ -40,6 +40,7 @@ use Entity;
 use Glpi\Application\View\TemplateRenderer;
 use Html;
 use MassiveAction;
+use Session;
 
 /**
  * Usage profile of a computer
@@ -76,6 +77,50 @@ class ComputerUsageProfile extends CommonDropdown
             'no_header' => !$new_item && !$in_modal
         ]);
         return true;
+    }
+
+    public function prepareInputForAdd($input)
+    {
+        return $this->inputIntegrityCheck($input);
+    }
+
+    public function prepareInputForUpdate($input)
+    {
+        return $this->inputIntegrityCheck($input);
+    }
+
+    /**
+     * Check integrity of fields
+     *
+     * @param array $input
+     * @return array
+     */
+    protected function inputIntegrityCheck(array $input): array
+    {
+        if (isset($input['time_start']) && !$this->isValidTime($input['time_start'])) {
+            Session::addMessageAfterRedirect(__('Start time is invalid', 'carbon'), true, ERROR);
+            return [];
+        }
+
+        if (isset($input['time_stop']) && !$this->isValidTime($input['time_stop'])) {
+            Session::addMessageAfterRedirect(__('Stop time is invalid', 'carbon'), true, ERROR);
+            return [];
+        }
+
+        return $input;
+    }
+
+    /**
+     * Check format of time string against HH:MM:SS pattern
+     *
+     * @param string $time
+     * @return boolean
+     */
+    protected function isValidTime(string $time): bool
+    {
+        $time_pattern = '/^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/';
+        $found = preg_match($time_pattern, $time, $matches);
+        return ($found === 1);
     }
 
     public function getAdditionalFields()
