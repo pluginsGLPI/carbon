@@ -41,7 +41,7 @@ use NetworkEquipment as GlpiNetworkEquipment;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
 use NetworkEquipmentModel as GlpiNetworkEquipmentModel;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
-use GlpiPlugin\Carbon\Engine\V1\Monitor as EngineMonitor;
+use GlpiPlugin\Carbon\Engine\V1\NetworkEquipment as EngineNetworkEquipment;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
 
 class NetworkEquipment extends AbstractAsset
@@ -52,13 +52,15 @@ class NetworkEquipment extends AbstractAsset
 
     public static function getEngine(CommonDBTM $item): EngineInterface
     {
-        return new EngineMonitor($item->getID());
+        return new EngineNetworkEquipment($item->getID());
     }
 
     public function getHistorizableQuery(): array
     {
         $item_table = self::$itemtype::getTable();
         $item_model_table = self::$model_itemtype::getTable();
+        $item_glpitype_table = self::$type_itemtype::getTable();
+        $item_type_table = NetworkEquipmentType::getTable();
         $location_table = Location::getTable();
         $request = [
             'SELECT' => self::$itemtype::getTableField('*'),
@@ -74,6 +76,23 @@ class NetworkEquipment extends AbstractAsset
                     'FKEY'   => [
                         $item_table  => 'locations_id',
                         $location_table => 'id',
+                    ]
+                ],
+                $item_glpitype_table => [
+                    'FKEY'   => [
+                        $item_table  => 'networkequipmenttypes_id',
+                        $item_glpitype_table => 'id',
+                    ]
+                ],
+                $item_type_table => [
+                    'FKEY'   => [
+                        $item_type_table  => 'networkequipmenttypes_id',
+                        $item_glpitype_table => 'id',
+                        [
+                            'AND' => [
+                                'NOT' => [GlpiNetworkEquipmentType::getTableField('id') => null],
+                            ]
+                        ]
                     ]
                 ],
             ],
