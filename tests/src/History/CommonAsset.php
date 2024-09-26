@@ -40,55 +40,56 @@ use Infocom;
 class CommonAsset extends DbTestCase
 {
     protected string $history_type = '';
+    protected string $asset_type = '';
 
     public function testGetStartDate()
     {
-        $computer = $this->getItem(GlpiComputer::class, ['date_creation' => null, 'date_mod' => null]);
+        $asset = $this->getItem($this->asset_type, ['date_creation' => null, 'date_mod' => null]);
         $instance = new $this->history_type();
-        $output = $this->callPrivateMethod($instance, 'getStartDate', $computer->getID());
+        $output = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
         $this->assertNull($output);
 
-        $computer->update([
-            'id' => $computer->getID(),
+        $asset->update([
+            'id' => $asset->getID(),
             'comment' => 'test date_mod',
         ]);
-        $output = $this->callPrivateMethod($instance, 'getStartDate', $computer->getID());
+        $output = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
         $this->assertEquals($_SESSION["glpi_currenttime"], $output->format('Y-m-d H:i:s'));
 
-        $computer->update([
-            'id' => $computer->getID(),
+        $asset->update([
+            'id' => $asset->getID(),
             'date_creation' => '2019-01-01 00:00:00',
         ]);
-        $output = $this->callPrivateMethod($instance, 'getStartDate', $computer->getID());
+        $output = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
         $this->assertEquals('2019-01-01 00:00:00', $output->format('Y-m-d H:i:s'));
 
         $infocom = $this->getItem(Infocom::class, [
-            'itemtype' => $computer->getType(),
-            'items_id' => $computer->getID(),
+            'itemtype' => $asset->getType(),
+            'items_id' => $asset->getID(),
         ]);
 
-        $output = $this->callPrivateMethod($instance, 'getStartDate', $computer->getID());
+        $output = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
         $this->assertEquals('2019-01-01 00:00:00', $output->format('Y-m-d H:i:s'));
 
         $infocom->update([
             'id'       => $infocom->getID(),
             'buy_date' => '2018-01-01 00:00:00',
         ]);
-        $output = $this->callPrivateMethod($instance, 'getStartDate', $computer->getID());
+        $output = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
         $this->assertEquals('2018-01-01 00:00:00', $output->format('Y-m-d H:i:s'));
 
         $infocom->update([
             'id'            => $infocom->getID(),
             'delivery_date' => '2018-01-01 00:00:00',
         ]);
-        $output = $this->callPrivateMethod($instance, 'getStartDate', $computer->getID());
+        $output = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
         $this->assertEquals('2018-01-01 00:00:00', $output->format('Y-m-d H:i:s'));
 
         $infocom->update([
             'id'       => $infocom->getID(),
             'use_date' => '2017-01-01 00:00:00',
         ]);
-        $output = $this->callPrivateMethod($instance, 'getStartDate', $computer->getID());
+        $output = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
         $this->assertEquals('2017-01-01 00:00:00', $output->format('Y-m-d H:i:s'));
     }
 }

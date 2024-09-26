@@ -51,11 +51,12 @@ use GlpiPlugin\Carbon\EnvironnementalImpact;
 class ComputerTest extends CommonAsset
 {
     protected string $history_type = \GlpiPlugin\Carbon\History\Computer::class;
+    protected string $asset_type = GlpiComputer::class;
 
     public function testGetEngine()
     {
-        $computer = new GlpiComputer();
-        $engine = Computer::getEngine($computer);
+        $asset = new GlpiComputer();
+        $engine = Computer::getEngine($asset);
         $this->assertInstanceOf(\GlpiPlugin\Carbon\Engine\V1\Computer::class, $engine);
     }
 
@@ -73,7 +74,7 @@ class ComputerTest extends CommonAsset
         $type = $this->getItem(ComputerType::class, [
             GlpiComputerType::getForeignKeyField() => $glpi_type->getID(),
         ]);
-        $computer = $this->getItem(GlpiComputer::class, [
+        $asset = $this->getItem(GlpiComputer::class, [
             'computertypes_id'  => $glpi_type->getID(),
             'computermodels_id' => $model->getID(),
             'locations_id'      => $location->getID(),
@@ -93,7 +94,7 @@ class ComputerTest extends CommonAsset
         ]);
         $impact = $this->getItem(EnvironnementalImpact::class, [
             $usage_profile->getForeignKeyField() => $usage_profile->getID(),
-            'computers_id' => $computer->getID(),
+            'computers_id' => $asset->getID(),
             $usage_profile->getForeignKeyField() => $usage_profile->getID(),
         ]);
 
@@ -101,7 +102,7 @@ class ComputerTest extends CommonAsset
         $start_date = '2024-02-01 00:00:00';
         $end_date =   '2024-02-08 00:00:00';
         $count = $history->historizeItem(
-            $computer->getID(),
+            $asset->getID(),
             new DateTime($start_date),
             new DateTime($end_date)
         );
