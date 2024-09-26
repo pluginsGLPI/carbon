@@ -37,8 +37,8 @@ Plugin::loadLang('carbon');
 $usage_profiles = [
     [
         'name'       => __('Always on', 'carbon'),
-        'time_start' => '00:00',
-        'time_stop'  => '23:59',
+        'time_start' => '00:00:00',
+        'time_stop'  => '23:59:00',
         'day_1'      => '1',
         'day_2'      => '1',
         'day_3'      => '1',
@@ -48,8 +48,8 @@ $usage_profiles = [
         'day_7'      => '1',
     ], [
         'name'       => __('Office hours', 'carbon'),
-        'time_start' => '9:00',
-        'time_stop'  => '18:00',
+        'time_start' => '09:00:00',
+        'time_stop'  => '18:00:00',
         'day_1'      => '1',
         'day_2'      => '1',
         'day_3'      => '1',
