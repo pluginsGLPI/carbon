@@ -47,7 +47,7 @@ use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Toolbox;
 use Location;
 use LogicException;
-use Log;
+use Toolbox as GlpiToolbox;
 
 abstract class AbstractAsset extends CommonDBTM implements AssetInterface
 {
@@ -177,6 +177,13 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         $count = 0;
         $carbon_emission = new CarbonEmission();
         $gaps = $carbon_emission->findGaps($itemtype, $id, $start_date, $end_date);
+
+        /**
+         * Huge quantity of SQL queries will be executed
+         * We NEED to check memory usage to avoid running out of memory
+         * @see DbMysql::doQuery()
+         */
+        $memory_limit = GlpiToolbox::getMemoryLimit() - 8 * 1024 * 1024;
         foreach ($gaps as $gap) {
             $date_cursor = DateTime::createFromFormat('U', $gap['start']);
             $date_cursor->setTime(0, 0, 0, 0);
@@ -189,6 +196,11 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
                         $this->limit_reached = true;
                         break 2;
                     }
+                }
+                if ($memory_limit < memory_get_usage()) {
+                    // 1 MB memory left, emergency exit
+                    $this->limit_reached = true;
+                    break 2;
                 }
                 $date_cursor = $date_cursor->add(new DateInterval(static::$date_increment));
             }

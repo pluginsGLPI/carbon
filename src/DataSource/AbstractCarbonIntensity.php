@@ -37,6 +37,7 @@ use Config as GlpiConfig;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
+use Toolbox as GlpiToolbox;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
@@ -174,7 +175,13 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
     {
         $count = 0;
         $saved = 0;
-        // $max_date = $this->getMaxIncrementalAge();
+
+        /**
+         * Huge quantity of SQL queries will be executed
+         * We NEED to check memory usage to avoid running out of memory
+         * @see DbMysql::doQuery()
+         */
+        $memory_limit = GlpiToolbox::getMemoryLimit() - 8 * 1024 * 1024;
         foreach ($this->sliceDateRangeByMonth($start_date, $stop_date) as $slice) {
             try {
                 $data = $this->fetchRange($slice['start'], $slice['stop'], $zone);
@@ -187,6 +194,10 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
             $saved = $intensity->save($zone, $this->getSourceName(), $data[$zone]);
             $count += abs($saved);
             if ($limit > 0 && $count >= $limit) {
+                return $saved > 0 ? $count : -$count;
+            }
+            if ($memory_limit < memory_get_usage()) {
+                // 1 MB memory left, emergency exit
                 return $saved > 0 ? $count : -$count;
             }
         }
