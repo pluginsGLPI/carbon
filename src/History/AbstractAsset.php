@@ -39,7 +39,6 @@ use DateInterval;
 use DateTime;
 use DateTimeImmutable;
 use DbUtils;
-use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
@@ -115,20 +114,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
 
         $count = 0;
 
-        $type_instance = new $itemtype();
-        $type_instance->getEmpty();
-        $crit = [];
-        if ($type_instance->maybeDeleted()) {
-            $crit['is_deleted'] = 0;
-        }
-        if ($type_instance->maybeTemplate()) {
-            $crit['is_template'] = 0;
-        }
-        $iterator = $DB->request([
-            'SELECT' => 'id',
-            'FROM'  => getTableForItemType($itemtype),
-            'WHERE' => $crit,
-        ]);
+        $iterator = $DB->request($this->getHistorizableQuery());
         foreach ($iterator as $row) {
             $count += $this->historizeItem($row['id']);
             if ($this->limit_reached) {
@@ -219,7 +205,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         }
 
         $emission = new TrackedFloat(0, $energy);
-        if ($energy !== 0) {
+        if ($energy->getValue() !== 0) {
             $emission = $engine->getCarbonEmissionPerDay($day, $zone);
             if ($emission === null) {
                 return false;
@@ -236,10 +222,10 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
             'types_id'          => $item->fields[$type_fk],
             'models_id'         => $item->fields[$model_fk],
             'locations_id'      => $item->fields['locations_id'],
-            'energy_per_day'    => $energy->getValue(),
-            'emission_per_day'  => $emission->getValue(),
             'date'              => $day->format('Y-m-d H:i:s'),
+            'energy_per_day'    => $energy->getValue(),
             'energy_quality'    => $energy->getLowestSource(),
+            'emission_per_day'  => $emission->getValue(),
             'emission_quality'  => $emission->getLowestSource(),
         ]);
 

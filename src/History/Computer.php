@@ -70,7 +70,7 @@ class Computer extends AbstractAsset
 
         $request = [
             'SELECT' => [
-                self::$itemtype::getTableField('*'),
+                self::$itemtype::getTableField('id'),
             ],
             'FROM' => $item_table,
             'INNER JOIN' => [

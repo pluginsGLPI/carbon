@@ -106,7 +106,7 @@ class Monitor extends AbstractAsset
 
         // Replace SELECT on computer by select on monitor
         $request['SELECT'] = [
-            self::$itemtype::getTableField('*'),
+            self::$itemtype::getTableField('id'),
         ];
         $request['WHERE'] = [
             'AND' => [

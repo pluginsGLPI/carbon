@@ -64,7 +64,7 @@ class NetworkEquipment extends AbstractAsset
         $item_type_table = NetworkEquipmentType::getTable();
         $location_table = Location::getTable();
         $request = [
-            'SELECT' => self::$itemtype::getTableField('*'),
+            'SELECT' => self::$itemtype::getTableField('id'),
             'FROM'   => self::$itemtype::getTable(),
             'INNER JOIN' => [
                 $item_model_table => [
