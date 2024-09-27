@@ -75,6 +75,12 @@ define('PLUGIN_CARBON_TYPES', [
  */
 function plugin_init_carbon()
 {
+    plugin_carbon_setupHooks();
+    plugin_carbon_registerClasses();
+}
+
+function plugin_carbon_setupHooks()
+{
     global $PLUGIN_HOOKS;
 
     $PLUGIN_HOOKS[Hooks::CSRF_COMPLIANT]['carbon'] = true;
@@ -104,13 +110,6 @@ function plugin_init_carbon()
     $PLUGIN_HOOKS[Hooks::ITEM_ADD]['carbon'][Location::class] = 'plugin_carbon_hook_add_location';
     $PLUGIN_HOOKS[Hooks::ITEM_UPDATE]['carbon'][Location::class] = 'plugin_carbon_hook_update_location';
 
-    Plugin::registerClass(Config::class, ['addtabon' => GlpiConfig::class]);
-    Plugin::registerClass(Profile::class, ['addtabon' => GlpiProfile::class]);
-    Plugin::registerClass(ComputerType::class, ['addtabon' => GlpiComputerType::class]);
-    Plugin::registerClass(EnvironnementalImpact::class, ['addtabon' => Computer::class]);
-    Plugin::registerClass(MonitorType::class, ['addtabon' => GlpiMonitorType::class]);
-    Plugin::registerClass(NetworkEquipmentType::class, ['addtabon' => GlpiNetworkEquipmentType::class]);
-
     // Add ApexCharts.js library
     $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][] = 'dist/bundle.js';
 
@@ -118,6 +117,16 @@ function plugin_init_carbon()
     $PLUGIN_HOOKS[Hooks::ADD_CSS]['carbon'][] = 'dist/main.css';
 
     $PLUGIN_HOOKS['use_massive_action']['carbon'] = 1;
+}
+
+function plugin_carbon_registerClasses()
+{
+    Plugin::registerClass(Config::class, ['addtabon' => GlpiConfig::class]);
+    Plugin::registerClass(Profile::class, ['addtabon' => GlpiProfile::class]);
+    Plugin::registerClass(ComputerType::class, ['addtabon' => GlpiComputerType::class]);
+    Plugin::registerClass(EnvironnementalImpact::class, ['addtabon' => Computer::class]);
+    Plugin::registerClass(MonitorType::class, ['addtabon' => GlpiMonitorType::class]);
+    Plugin::registerClass(NetworkEquipmentType::class, ['addtabon' => GlpiNetworkEquipmentType::class]);
 }
 
 /**
