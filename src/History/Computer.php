@@ -42,6 +42,7 @@ use GlpiPlugin\Carbon\ComputerType;
 use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
 use DbUtils;
+use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\EnvironnementalImpact;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use Location;
@@ -135,5 +136,53 @@ class Computer extends AbstractAsset
         $request['WHERE'] += $entity_restrict;
 
         return $request;
+    }
+
+    public static function showHistorizableDiagnosis(CommonDBTM $item)
+    {
+        global $DB;
+
+        $history = new self();
+        $request = $history->getHistorizableQuery();
+        // Select fields to review
+        $request['SELECT'] = [
+            self::$itemtype::getTableField('is_deleted'),
+            self::$itemtype::getTableField('is_template'),
+            Location::getTableField('id as location_id'),
+            Location::getTableField('country'),
+            GlpiComputerModel::getTableField('id as model_id'),
+            GlpiComputerModel::getTableField('power_consumption as model_power_consumption'),
+            GlpiComputerType::getTableField('id as type_id'),
+            ComputerType::getTableField('id as plugin_carbon_type_id'),
+            ComputerType::getTableField('power_consumption  as type_power_consumption'),
+            EnvironnementalImpact::getTableField('plugin_carbon_computerusageprofiles_id'),
+        ];
+        // Change inner joins into left joins to identify missing data
+        $request['LEFT JOIN'] = $request['INNER JOIN'];
+        unset($request['INNER JOIN']);
+        // remove where criterias
+        unset($request['WHERE']);
+        // Limit to the item only
+        $request['WHERE'][self::$itemtype::getTableField('id')] = $item->getID();
+
+        $iterator = $DB->request($request);
+        $data = $iterator->current();
+
+        // Each state is analyzed, with bool results
+        // false means that data is missing or invalid for historization
+        $status['is_deleted'] = ($data['is_deleted'] === 0);
+        $status['is_template'] = ($data['is_template'] === 0);
+        $status['has_location'] = ($data['location_id'] !== 0);
+        $status['has_country'] = (strlen($data['country'] ?? '') > 0);
+        $status['has_model'] = ($data['model_id'] !== 0);
+        $status['has_model_power_consumption'] = (($data['model_power_consumption'] ?? 0) !== 0);
+        $status['has_type'] = ($data['type_id'] !== 0);
+        $status['has_type_power_consumption'] = (($data['type_power_consumption'] ?? 0) !== 0);
+        $status['has_usage_profile'] = ($data['plugin_carbon_computerusageprofiles_id'] !== 0);
+
+        TemplateRenderer::getInstance()->display('@carbon/history/status-item.html.twig', [
+            'have_status' => ($iterator->count() === 1),
+            'status' => $status,
+        ]);
     }
 }

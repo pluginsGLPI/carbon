@@ -37,6 +37,8 @@ use Computer;
 use CommonDBChild;
 use CommonGLPI;
 use Glpi\Application\View\TemplateRenderer;
+use Monitor;
+use NetworkEquipment;
 
 /**
  * Relation between a computer and a usage profile
@@ -64,6 +66,10 @@ class EnvironnementalImpact extends CommonDBChild
         $tabNames = [];
         if (!$withtemplate) {
             if ($item->getType() == Computer::class) {
+                $tabNames[1] = self::getTypeName();
+            } else if ($item->getType() == Monitor::class) {
+                $tabNames[1] = self::getTypeName();
+            } else if ($item->getType() == NetworkEquipment::class) {
                 $tabNames[1] = self::getTypeName();
             }
         }
@@ -94,6 +100,12 @@ class EnvironnementalImpact extends CommonDBChild
                 );
             }
             $environnementalImpact->showForComputer($environnementalImpact->getID());
+        } else if ($item->getType() == Monitor::class) {
+            $environnementalImpact = new self();
+            $environnementalImpact->showForMonitor(0);
+        } else if ($item->getType() == NetworkEquipment::class) {
+            $environnementalImpact = new self();
+            $environnementalImpact->showForNetworkEquipment(0);
         }
     }
 
@@ -120,6 +132,20 @@ class EnvironnementalImpact extends CommonDBChild
             'params'   => $options,
             'item'     => $this,
         ]);
+    }
+
+    public function showForMonitor($ID, $withtemplate = '')
+    {
+        // Empty as there is no usage profile for monitor at the moment
+        // this method is needed to trigger Hooks::POQT_SHOW_TAB in GLPI
+        // and show historization status
+    }
+
+    public function showForNetworkEquipment($ID, $withtemplate = '')
+    {
+        // Empty as there is no usage profile for Network equipment at the moment
+        // this method is needed to trigger Hooks::POQT_SHOW_TAB in GLPI
+        // and show historization status
     }
 
     public function rawSearchOptions()
@@ -150,17 +176,8 @@ class EnvironnementalImpact extends CommonDBChild
 
     public static function showCharts(CommonGLPI $item)
     {
-        $environnemental_impact = new self();
-        /** @var CommonDBTM $item */
-        $environnemental_impact->getFromDBByCrit([
-            'computers_id' => $item->getID(),
-        ]);
-        if ($environnemental_impact->isNewItem()) {
-            return;
-        }
-
         TemplateRenderer::getInstance()->display('@carbon/environnementalimpact-item.html.twig', [
-            'item'     => $environnemental_impact,
+            'item'     => $item,
         ]);
     }
 }

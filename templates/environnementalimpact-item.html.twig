@@ -29,6 +29,13 @@
  # -------------------------------------------------------------------------
  #}
 
+{% import 'components/form/fields_macros.html.twig' as fields %}
+
+{{ fields.largeTitle(
+    __('Report', 'carbon'),
+    'fas fa-chart-pie'
+) }}
+
 <div class="card-body" id="cardBodyBorder1">
     <div class="subheader">{{ __('Carbon Emission per Month', 'carbon') }}</div>
     <div class="h1 mb-3" id="carbonEmissionPerMonth"></div>
@@ -64,8 +71,8 @@
     var carbonEmissionPerMonthChart = new ApexCharts(document.querySelector("#carbonEmissionPerMonthChart"), carbonEmissionPerMonthOptions);
     carbonEmissionPerMonthChart.render();
 
-    var itemtype = 'Computer';
-    var items_id = {{ item.fields.computers_id | raw }};
+    var itemtype = '{{ item.getType() }}';
+    var items_id = {{ item.getID() }};
 
     fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/carbonEmissionPerMonthForItem.php?itemtype=" + itemtype + "&items_id=" + items_id).then(response => {
         return response.json();
