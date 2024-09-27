@@ -1,0 +1,142 @@
+{#
+ # -------------------------------------------------------------------------
+ # carbon plugin for GLPI
+ # -------------------------------------------------------------------------
+ #
+ # MIT License
+ #
+ # Permission is hereby granted, free of charge, to any person obtaining a copy
+ # of this software and associated documentation files (the "Software"), to deal
+ # in the Software without restriction, including without limitation the rights
+ # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ # copies of the Software, and to permit persons to whom the Software is
+ # furnished to do so, subject to the following conditions:
+ #
+ # The above copyright notice and this permission notice shall be included in all
+ # copies or substantial portions of the Software.
+ #
+ # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ # SOFTWARE.
+ # -------------------------------------------------------------------------
+ # @copyright Copyright (C) 2024 Teclib' and contributors.
+ # @license   MIT https://opensource.org/licenses/mit-license.php
+ # @link      https://github.com/pluginsGLPI/carbon
+ # -------------------------------------------------------------------------
+ #}
+
+{% import 'components/form/fields_macros.html.twig' as fields %}
+
+{{ fields.largeTitle(
+    __('Historization status', 'carbon'),
+    'fas fa-file-contract'
+) }}
+
+{% if not have_status %}
+    fields.smallTitle(__('No status', 'carbon'))
+{% else %}
+    {% set ok_field %}
+        <div class="icons_block">
+            <i class="fa fa-check-circle ok"><span class='sr-only'></span></i>
+        </div>
+    {% endset %}
+    {% set nok_field %}
+        <div class="icons_block">
+            <i class="fa fa-xmark-circle missing"><span class='sr-only'></span></i>
+        </div>
+    {% endset %}
+    <div class="card-body d-flex flex-wrap">
+        <div class="col-12 col-xxl-{{ item_has_pictures ? '9' : '12' }} flex-column">
+            <div class="d-flex flex-row flex-wrap flex-xl-nowrap">
+                <div class="row flex-row align-items-start flex-grow-1">
+                    <div class="row flex-row">
+                        {% if status.is_deleted is defined %}
+                            {% set field = nok_field %}
+                            {% if status.is_deleted %}
+                                {% set field = ok_field %}
+                            {% endif %}
+                            {{ fields.field('', field, __('Is not in the trash bin', 'carbon')) }}
+                        {% endif %}
+
+                        {% if status.is_template is defined %}
+                            {% set field = nok_field %}
+                            {% if status.is_template %}
+                                {% set field = ok_field %}
+                            {% endif %}
+                            {{ fields.field('', field, __('Is not a template', 'carbon')) }}
+                        {% endif %}
+
+                        {% if status.has_computer is defined %}
+                            {% set field = nok_field %}
+                            {% if status.has_computer %}
+                                {% set field = ok_field %}
+                            {% endif %}
+                            {{ fields.field('', field, __('Linked to a computer', 'carbon')) }}
+                        {% endif %}
+
+                        {% if status.has_location is defined %}
+                            {% set field = nok_field %}
+                            {% if status.has_location %}
+                                {% set field = ok_field %}
+                            {% endif %}
+                            {{ fields.field('', field, __('Has a location', 'carbon')) }}
+                        {% endif %}
+
+                        {% if status.has_country is defined %}
+                            {% set field = nok_field %}
+                            {% if status.has_country %}
+                                {% set field = ok_field %}
+                            {% endif %}
+                            {{ fields.field('', field, __('The location has a country', 'carbon')) }}
+                        {% endif %}
+
+                        {% if status.has_model is defined %}
+                            {% set field = nok_field %}
+                            {% if status.has_model %}
+                                {% set field = ok_field %}
+                            {% endif %}
+                            {{ fields.field('', field, __('The asset has a model', 'carbon')) }}
+                        {% endif %}
+
+                        {% if status.has_model_power_consumption is defined %}
+                            {% set field = nok_field %}
+                            {% if status.has_model_power_consumption %}
+                                {% set field = ok_field %}
+                            {% endif %}
+                            {{ fields.field('', field, __('The model has a power consumption', 'carbon')) }}
+                        {% endif %}
+
+                        {% if status.has_type is defined %}
+                            {% set field = nok_field %}
+                            {% if status.has_type %}
+                                {% set field = ok_field %}
+                            {% endif %}
+                            {{ fields.field('', field, __('The asset has a type', 'carbon')) }}
+                        {% endif %}
+
+                        {% if status.has_type_power_consumption is defined %}
+                            {% set field = nok_field %}
+                            {% if status.has_type_power_consumption %}
+                                {% set field = ok_field %}
+                            {% endif %}
+                            {{ fields.field('', field, __('The type has a power consumption', 'carbon')) }}
+                        {% endif %}
+
+                        {% if status.has_usage_profile is defined %}
+                            {% set field = nok_field %}
+                            {% if status.has_usage_profile %}
+                                {% set field = ok_field %}
+                            {% endif %}
+                            {{ fields.field('', field, __('The asset has usage profile', 'carbon')) }}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endif %}

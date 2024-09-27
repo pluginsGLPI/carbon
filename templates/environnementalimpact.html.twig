@@ -33,6 +33,11 @@
 {% import "components/form/fields_macros.html.twig" as fields %}
 
 {% block form_fields %}
+    {{ fields.largeTitle(
+        __('Asset usage', 'carbon'),
+        'fas fa-calendar-days'
+    ) }}
+
     {{ fields.smallTitle(__('Usage information', 'carbon')) }}
     {{ fields.dropdownField(
         '\\GlpiPlugin\\Carbon\\ComputerUsageProfile',

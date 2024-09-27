@@ -40,4 +40,6 @@ use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 interface AssetInterface
 {
     public static function getEngine(CommonDBTM $item): EngineInterface;
+
+    public static function showHistorizableDiagnosis(CommonDBTM $item);
 }

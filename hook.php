@@ -41,6 +41,9 @@ use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
 use ComputerType as GlpiComputerType;
 use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
+use GlpiPlugin\Carbon\History\Computer as ComputerHistory;
+use GlpiPlugin\Carbon\History\Monitor as MonitorHistory;
+use GlpiPlugin\Carbon\History\NetworkEquipment as NetworkEquipmentHistory;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
 
 /**
@@ -115,8 +118,22 @@ function plugin_carbon_postShowTab(array $param)
     switch ($param['item']::getType()) {
         case Computer::class:
             if ($param['options']['itemtype'] == EnvironnementalImpact::class) {
+                ComputerHistory::showHistorizableDiagnosis($param['item']);
                 EnvironnementalImpact::showCharts($param['item']);
             }
+            break;
+        case Monitor::class:
+            if ($param['options']['itemtype'] == EnvironnementalImpact::class) {
+                MonitorHistory::showHistorizableDiagnosis($param['item']);
+                EnvironnementalImpact::showCharts($param['item']);
+            }
+            break;
+        case NetworkEquipment::class:
+            if ($param['options']['itemtype'] == EnvironnementalImpact::class) {
+                NetworkEquipmentHistory::showHistorizableDiagnosis($param['item']);
+                EnvironnementalImpact::showCharts($param['item']);
+            }
+            break;
     }
 }
 

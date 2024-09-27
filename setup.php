@@ -125,6 +125,8 @@ function plugin_carbon_registerClasses()
     Plugin::registerClass(Profile::class, ['addtabon' => GlpiProfile::class]);
     Plugin::registerClass(ComputerType::class, ['addtabon' => GlpiComputerType::class]);
     Plugin::registerClass(EnvironnementalImpact::class, ['addtabon' => Computer::class]);
+    Plugin::registerClass(EnvironnementalImpact::class, ['addtabon' => Monitor::class]);
+    Plugin::registerClass(EnvironnementalImpact::class, ['addtabon' => NetworkEquipment::class]);
     Plugin::registerClass(MonitorType::class, ['addtabon' => GlpiMonitorType::class]);
     Plugin::registerClass(NetworkEquipmentType::class, ['addtabon' => GlpiNetworkEquipmentType::class]);
 }
