@@ -38,8 +38,10 @@ use GlpiPlugin\Carbon\Uninstall;
 use GlpiPlugin\Carbon\EnvironnementalImpact;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
 use ComputerType as GlpiComputerType;
+use MonitorType as GlpiMonitorType;
 use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
 use GlpiPlugin\Carbon\History\Computer as ComputerHistory;
 use GlpiPlugin\Carbon\History\Monitor as MonitorHistory;
@@ -202,6 +204,29 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
                 'jointype' => 'child',
                 'beforejoin' => [
                     'table' => GlpiNetworkEquipmentType::getTable(),
+                    'joinparams' => [
+                        'jointype' => 'child',
+                    ]
+                ]
+            ]
+        ];
+
+        return $sopt;
+    }
+
+
+    if ($itemtype  == Monitor::class) {
+        $sopt[] = [
+            'id' => 2222,
+            'table'        => MonitorType::getTable(),
+            'field'        => 'power_consumption',
+            'name'         => __('Power consumption (W)', 'power consumption (W)'),
+            'datatype'     => 'number',
+            'linkfield'    => 'monitors_id',
+            'joinparams' => [
+                'jointype' => 'child',
+                'beforejoin' => [
+                    'table' => GlpiMonitorType::getTable(),
                     'joinparams' => [
                         'jointype' => 'child',
                     ]
