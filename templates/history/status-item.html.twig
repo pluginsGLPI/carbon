@@ -46,7 +46,12 @@
     {% endset %}
     {% set nok_field %}
         <div class="icons_block">
-            <i class="fa fa-xmark-circle missing"><span class='sr-only'></span></i>
+            <i class="fa fa-xmark-circle disabled" title="{{ __('This data is missing and prevents from environmental impact calculation.', 'carbon') }}" data-bs-toggle="tooltip"><span class='sr-only'></span></i>
+        </div>
+    {% endset %}
+    {% set warning_field %}
+        <div class="icons_block">
+            <i class="fa fa-xmark-circle missing"  title="{{ __('This data is missing and may reduce the quality of environmental impact calculation.', 'carbon') }}" data-bs-toggle="tooltip"><span class='sr-only'></span></i>
         </div>
     {% endset %}
     <div class="card-body d-flex flex-wrap">
@@ -104,6 +109,11 @@
 
                         {% if status.has_model_power_consumption is defined %}
                             {% set field = nok_field %}
+                            {% if status.has_type_power_consumption is defined %}
+                                {% if status.has_type_power_consumption %}
+                                    {% set field = warning_field %}
+                                {% endif %}
+                            {% endif %}
                             {% if status.has_model_power_consumption %}
                                 {% set field = ok_field %}
                             {% endif %}
@@ -120,6 +130,11 @@
 
                         {% if status.has_type_power_consumption is defined %}
                             {% set field = nok_field %}
+                            {% if status.has_model_power_consumption is defined %}
+                                {% if status.has_model_power_consumption %}
+                                    {% set field = warning_field %}
+                                {% endif %}
+                            {% endif %}
                             {% if status.has_type_power_consumption %}
                                 {% set field = ok_field %}
                             {% endif %}
