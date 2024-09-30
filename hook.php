@@ -158,7 +158,7 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
             'id' => 2222,
             'table'         => ComputerType::getTable(),
             'field'         => 'power_consumption',
-            'name'          => __('Power consumption (W)', 'power consumption (W)'),
+            'name'          => __('Power consumption (W)', 'carbon'),
             'datatype'      => 'number',
             'massiveaction' => false,
             'linkfield'     => 'computers_id',
@@ -197,7 +197,7 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
             'id' => 2222,
             'table'        => NetworkEquipmentType::getTable(),
             'field'        => 'power_consumption',
-            'name'         => __('Power consumption (W)', 'power consumption (W)'),
+            'name'         => __('Power consumption (W)', 'carbon'),
             'datatype'     => 'number',
             'linkfield'    => 'networkequipments_id',
             'joinparams' => [
@@ -220,7 +220,7 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
             'id' => 2222,
             'table'        => MonitorType::getTable(),
             'field'        => 'power_consumption',
-            'name'         => __('Power consumption (W)', 'power consumption (W)'),
+            'name'         => __('Power consumption (W)', 'carbon'),
             'datatype'     => 'number',
             'linkfield'    => 'monitors_id',
             'joinparams' => [
