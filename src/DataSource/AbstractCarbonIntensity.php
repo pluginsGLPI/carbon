@@ -182,6 +182,11 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
          * @see DbMysql::doQuery()
          */
         $memory_limit = GlpiToolbox::getMemoryLimit() - 8 * 1024 * 1024;
+        if ($memory_limit < 0) {
+            // May happen in test seems that ini_get("memory_limits") returns
+            // enpty string in PHPUnit environment
+            $memory_limit = null;
+        }
         foreach ($this->sliceDateRangeByMonth($start_date, $stop_date) as $slice) {
             try {
                 $data = $this->fetchRange($slice['start'], $slice['stop'], $zone);
@@ -196,8 +201,8 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
             if ($limit > 0 && $count >= $limit) {
                 return $saved > 0 ? $count : -$count;
             }
-            if ($memory_limit < memory_get_usage()) {
-                // 1 MB memory left, emergency exit
+            if ($memory_limit && $memory_limit< memory_get_usage()) {
+                // 8 MB memory left, emergency exit
                 return $saved > 0 ? $count : -$count;
             }
         }
