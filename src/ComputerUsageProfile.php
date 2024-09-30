@@ -264,8 +264,9 @@ class ComputerUsageProfile extends CommonDropdown
                 'computers_id'    => $computers_id,
                 $usage_profile_fk => $usage_profile_id,
             ]);
+            return !$environmental_imapct->isNewItem();
         } else {
-            $environmental_imapct->update([
+            return $environmental_imapct->update([
                 'id'              => $environmental_imapct->getID(),
                 $usage_profile_fk => $usage_profile_id,
             ]);
