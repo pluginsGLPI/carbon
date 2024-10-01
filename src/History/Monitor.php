@@ -38,6 +38,7 @@ use CommonDBTM;
 use Computer as GlpiComputer;
 use Computer_Item;
 use DBmysql;
+use DbUtils;
 use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Engine\V1\Monitor as EngineMonitor;
@@ -124,6 +125,9 @@ class Monitor extends AbstractAsset
                 ],
             ],
         ];
+
+        $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($item_table, '', '', 'auto');
+        $request['WHERE'] += $entity_restrict;
 
         return $request;
     }
