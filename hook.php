@@ -190,6 +190,25 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
                 ]
             ]
         ];
+
+        $sopt[] = [
+            'id' => 2224,
+            'table'         => ComputerType::getTable(),
+            'field'         => 'id',
+            'name'          => __('Is historizable', 'carbon'),
+            'datatype'      => 'number',
+            'massiveaction' => false,
+            'linkfield'     => 'computers_id',
+            'joinparams' => [
+                'jointype' => 'child',
+                'beforejoin' => [
+                    'table' => GlpiComputerType::getTable(),
+                    'joinparams' => [
+                        'jointype' => 'child',
+                    ]
+                ]
+            ],
+        ];
     }
 
     if ($itemtype  == NetworkEquipment::class) {
@@ -238,6 +257,44 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
     }
 
     return $sopt;
+}
+
+function plugin_carbon_addDefaultSelect($itemtype): string
+{
+    switch ($itemtype) {
+        default:
+            return '';
+        case Computer::class:
+    }
+
+    $display_preference = new DisplayPreference();
+    $display_preferences = $display_preference->find([
+        'itemtype' => $itemtype,
+        'num'      => 0,
+        'users_id' => [0, Session::getLoginUserID()],
+    ]);
+    if (count($display_preferences) === 0) {
+        return '';
+    }
+}
+
+function plugin_carbon_addDefaultJoin($itemtype, $ref_table, &$already_link_tables): string
+{
+    switch ($itemtype) {
+        default:
+            return '';
+        case Computer::class:
+    }
+
+    $display_preference = new DisplayPreference();
+    $display_preferences = $display_preference->find([
+        'itemtype' => $itemtype,
+        'num'      => 0,
+        'users_id' => [0, Session::getLoginUserID()],
+    ]);
+    if (count($display_preferences) === 0) {
+        return '';
+    }
 }
 
 function plugin_carbon_hook_add_location(CommonDBTM $item)

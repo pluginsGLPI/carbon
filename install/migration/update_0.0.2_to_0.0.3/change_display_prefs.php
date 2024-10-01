@@ -31,14 +31,45 @@
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Carbon\CarbonIntensity;
+$itemtype = GlpiPlugin\Carbon\CarbonIntensity::class;
+$map = [
+    4 => 10401,
+    5 => 10402,
+    6 => 10403,
+];
+foreach ($map as $src => $dst) {
+    $migration->changeSearchOption($itemtype, $src, $dst);
+}
 
-$migration->updateDisplayPrefs(
-    [
-        CarbonIntensity::class => [
-            2, 3, PLUGIN_CARBON_SEARCH_OPTION_BASE + 401, PLUGIN_CARBON_SEARCH_OPTION_BASE + 402, PLUGIN_CARBON_SEARCH_OPTION_BASE + 403
-        ]
-    ],
-    [],
-    true
-);
+$itemtype = GlpiPlugin\Carbon\ComputerUsageProfile::class;
+$map = [
+    6   => 10101,
+    7   => 10102,
+    201 => 10110,
+    202 => 10111,
+    203 => 10112,
+    204 => 10113,
+    205 => 10114,
+    206 => 10115,
+    207 => 10116,
+];
+foreach ($map as $src => $dst) {
+    $migration->changeSearchOption($itemtype, $src, $dst);
+}
+
+$itemtype = GlpiPlugin\Carbon\CarbonIntensityZone::class;
+$map = [
+    11 => 10301,
+];
+foreach ($map as $src => $dst) {
+    $migration->changeSearchOption($itemtype, $src, $dst);
+}
+
+$itemtype = GlpiPlugin\Carbon\EnvironnementalImpact::class;
+$map = [
+    5 => 10201,
+    6 => 10202,
+];
+foreach ($map as $src => $dst) {
+    $migration->changeSearchOption($itemtype, $src, $dst);
+}

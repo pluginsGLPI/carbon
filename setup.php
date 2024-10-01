@@ -48,7 +48,7 @@ use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
 
-define('PLUGIN_CARBON_VERSION', '0.0.2');
+define('PLUGIN_CARBON_VERSION', '0.0.3');
 define('PLUGIN_CARBON_SCHEMA_VERSION', '0.0.1');
 
 // Minimal GLPI version, inclusive
@@ -66,6 +66,9 @@ define('PLUGIN_CARBON_TYPES', [
     //    Phone::class,
     //    Printer::class,
 ]);
+
+// Sets the base of search options ID, to be able to change it easily if a conflict is discovered
+define('PLUGIN_CARBON_SEARCH_OPTION_BASE', 10000);
 
 /**
  * Init hooks of the plugin.

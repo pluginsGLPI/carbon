@@ -130,8 +130,10 @@ class CarbonIntensityZone extends CommonDropdown
     {
         $tab = parent::rawSearchOptions();
 
+        $search_option_base = PLUGIN_CARBON_SEARCH_OPTION_BASE + 300;
+
         $tab[] = [
-            'id'                 => '11',
+            'id'                 => $search_option_base + 1,
             'table'              => CarbonIntensitySource::getTable(),
             'field'              => 'plugin_carbon_carbonintensitysources_id_historical',
             'name'               => __('Data source for historical calculation', 'carbon'),
