@@ -37,7 +37,7 @@
 ) }}
 
 {% if not have_status %}
-    fields.smallTitle(__('No status', 'carbon'))
+    {{ fields.smallTitle(__('No status', 'carbon')) }}
 {% else %}
     {% set ok_field %}
         <div class="icons_block">
