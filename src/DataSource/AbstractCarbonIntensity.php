@@ -201,7 +201,7 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
             if ($limit > 0 && $count >= $limit) {
                 return $saved > 0 ? $count : -$count;
             }
-            if ($memory_limit && $memory_limit< memory_get_usage()) {
+            if ($memory_limit && $memory_limit < memory_get_usage()) {
                 // 8 MB memory left, emergency exit
                 return $saved > 0 ? $count : -$count;
             }
@@ -233,7 +233,8 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
     }
 
     /**
-     * Divide a time range into a group of 1 month time ranges (1 to last day of month)
+     * Divide a time range into a group of 1 month time ranges (1st day of month to 1st day of next month)
+     * Range must be processed as [start; stop[
      * Handles input ranges not matching a month boundary
      *
      * @param DateTimeImmutable $start
@@ -258,10 +259,11 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
         // If stop date day is > 1 then return a slice to the begining of the same month
         if ($real_stop->format('d') > 1 || $real_stop->format('H') > 0) {
             $slice['start'] = $real_stop->setDate($stop->format('Y'), $real_stop->format('m'), 1);
+            $slice['start'] = $slice['start']->setTime(0, 0, 0, 0);
             if ($slice['start'] < $real_start) {
                 $slice['start'] = $real_start;
             }
-            $slice['stop']  = $real_stop;
+            $slice['stop'] = $real_stop;
             yield $slice;
             $current_date = clone $slice['start'];
         }
