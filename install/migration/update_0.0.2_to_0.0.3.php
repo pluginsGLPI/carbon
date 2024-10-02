@@ -31,14 +31,38 @@
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Carbon\CarbonIntensity;
+function update002to003(Migration $migration)
+{
+    global $DB;
 
-$migration->updateDisplayPrefs(
-    [
-        CarbonIntensity::class => [
-            2, 3, PLUGIN_CARBON_SEARCH_OPTION_BASE + 401, PLUGIN_CARBON_SEARCH_OPTION_BASE + 402, PLUGIN_CARBON_SEARCH_OPTION_BASE + 403
-        ]
-    ],
-    [],
-    true
-);
+    $updateresult       = true;
+    $from_version       = '0.0.2';
+    $to_version         = '0.0.3';
+    $update_dir = __DIR__ . "/update_{$from_version}_to_{$to_version}/";
+
+    //TRANS: %s is the number of new version
+    $migration->displayTitle(sprintf(__('Update to %s'), $to_version));
+    $migration->setVersion($to_version);
+
+    // New tables from enpty.sql file after the migration
+    // If a script requires a new table, it may create it by itself
+
+    $update_scripts = scandir($update_dir);
+    foreach ($update_scripts as $update_script) {
+        if (preg_match('/\.php$/', $update_script) !== 1) {
+            continue;
+        }
+        require $update_dir . $update_script;
+    }
+
+    $dbFile = plugin_carbon_getSchemaPath($to_version);
+    if ($dbFile === null || !$DB->runFile($dbFile)) {
+        $migration->displayWarning("Error creating tables : " . $DB->error(), true);
+        $updateresult = false;
+    }
+
+    // ************ Keep it at the end **************
+    $migration->executeMigration();
+
+    return $updateresult;
+}
