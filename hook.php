@@ -179,7 +179,7 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
             'table'         => ComputerUsageProfile::getTable(),
             'field'         => 'name',
             'name'          => ComputerUsageProfile::getTypeName(),
-            'datatype'      => 'itemlink',
+            'datatype'      => 'dropdown',
             'massiveaction' => false,
             'joinparams' => [
                 'jointype' => 'empty',
