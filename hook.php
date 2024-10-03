@@ -170,7 +170,8 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
                         'jointype' => 'child',
                     ]
                 ]
-            ]
+            ],
+            'computation' => "IF(TABLE.power_consumption IS NULL, 0, TABLE.power_consumption)",
         ];
 
         $sopt[] = [
