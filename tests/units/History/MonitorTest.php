@@ -49,7 +49,6 @@ use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\EnvironnementalImpact;
-use GlpiPlugin\Carbon\History\Computer as ComputerHistory;
 
 /**
  * @covers \GlpiPlugin\Carbon\History\NetworkEquipment

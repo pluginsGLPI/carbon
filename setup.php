@@ -48,7 +48,7 @@ use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
 
-define('PLUGIN_CARBON_VERSION', '0.0.3');
+define('PLUGIN_CARBON_VERSION', '0.0.4');
 define('PLUGIN_CARBON_SCHEMA_VERSION', '0.0.1');
 
 // Minimal GLPI version, inclusive

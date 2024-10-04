@@ -60,7 +60,7 @@ class Monitor extends AbstractAsset
         return new EngineMonitor($item->getID());
     }
 
-    public function getHistorizableQuery(): array
+    public function getHistorizableQuery(bool $entity_restrict = true): array
     {
         // Monitors must be attached to a computer to be used
         // then lets create the query based on the equivalent request for computers
@@ -72,18 +72,24 @@ class Monitor extends AbstractAsset
         $glpi_monitor_types_fk = GlpiMonitorType::getForeignKeyField();
         $monitor_types_table = MonitorType::getTable();
         $request = (new Computer())->getHistorizableQuery();
+        $computer_inner_joins = $request['INNER JOIN'];
+        unset($request['INNER JOIN']);
+
         // Add joins to reach monitor from computer
+        $request['FROM'] = $item_table;
         $request['INNER JOIN'][$computers_items_table] = [
             'FKEY' => [
-                $computers_table => 'id',
-                $computers_items_table => GlpiComputer::getForeignKeyField(),
+                // $computers_table => 'id',
+                // $computers_items_table => GlpiComputer::getForeignKeyField(),
+                $computers_items_table => 'items_id',
+                $item_table => 'id',
                 ['AND' => [Computer_Item::getTableField('itemtype') => self::$itemtype]],
             ]
         ];
-        $request['INNER JOIN'][$item_table] = [
+        $request['INNER JOIN'][$computers_table] = [
             'FKEY' => [
-                $item_table => 'id',
-                $computers_items_table => 'items_id',
+                $computers_table => 'id',
+                $computers_items_table => GlpiComputer::getForeignKeyField(),
             ],
         ];
         $request['INNER JOIN'][$glpi_monitor_types_table] = [
@@ -104,6 +110,10 @@ class Monitor extends AbstractAsset
                 $item_table => 'monitormodels_id',
             ],
         ];
+
+        // re-add inner joins of computer, after those for monitor
+        // Needed to join tables before theyr foreign keys are used
+        $request['INNER JOIN'] = array_merge($request['INNER JOIN'], $computer_inner_joins);
 
         // Replace SELECT on computer by select on monitor
         $request['SELECT'] = [
@@ -126,8 +136,10 @@ class Monitor extends AbstractAsset
             ],
         ];
 
-        $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($item_table, '', '', 'auto');
-        $request['WHERE'] += $entity_restrict;
+        if ($entity_restrict) {
+            $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($item_table, '', '', 'auto');
+            $request['WHERE'] += $entity_restrict;
+        }
 
         return $request;
     }
