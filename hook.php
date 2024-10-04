@@ -153,29 +153,35 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
         return $sopt;
     }
 
-    if ($itemtype === Computer::class) {
+    $item_type_class = '\\GlpiPlugin\\Carbon\\' . $itemtype . 'Type';
+    $glpi_item_type_class = '\\' . $itemtype . 'Type';
+    if (class_exists($item_type_class) && is_subclass_of($item_type_class, CommonDBTM::class)) {
         $sopt[] = [
-            'id' => 2222,
-            'table'         => ComputerType::getTable(),
-            'field'         => 'power_consumption',
-            'name'          => __('Power consumption (W)', 'carbon'),
-            'datatype'      => 'number',
-            'massiveaction' => false,
-            'linkfield'     => 'computers_id',
+            'id'           => PLUGIN_CARBON_SEARCH_OPTION_BASE + 500,
+            'table'        => getTableForItemType($item_type_class),
+            'field'        => 'power_consumption',
+            'name'         => __('Power consumption', 'carbon'),
+            'datatype'     => 'number',
+            'min'          => 0,
+            'max'          => 10000,
+            'unit'         => 'W',
+            'linkfield'    => 'monitors_id',
             'joinparams' => [
                 'jointype' => 'child',
                 'beforejoin' => [
-                    'table' => GlpiComputerType::getTable(),
+                    'table' => getTableForItemType($glpi_item_type_class),
                     'joinparams' => [
                         'jointype' => 'child',
                     ]
                 ]
             ],
-            'computation' => "IF(TABLE.power_consumption IS NULL, 0, TABLE.power_consumption)",
+            'computation' => "IF(TABLE.`power_consumption` IS NULL, 0, TABLE.`power_consumption`)",
         ];
+    }
 
+    if ($itemtype === Computer::class) {
         $sopt[] = [
-            'id' => 2223,
+            'id'           => PLUGIN_CARBON_SEARCH_OPTION_BASE + 501,
             'table'         => ComputerUsageProfile::getTable(),
             'field'         => 'name',
             'name'          => ComputerUsageProfile::getTypeName(),
@@ -193,7 +199,7 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
         ];
 
         $sopt[] = [
-            'id' => 2224,
+            'id'           => PLUGIN_CARBON_SEARCH_OPTION_BASE + 502,
             'table'         => ComputerType::getTable(),
             'field'         => 'id',
             'name'          => __('Is historizable', 'carbon'),
@@ -210,51 +216,6 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
                 ]
             ],
         ];
-    }
-
-    if ($itemtype  == NetworkEquipment::class) {
-        $sopt[] = [
-            'id' => 2222,
-            'table'        => NetworkEquipmentType::getTable(),
-            'field'        => 'power_consumption',
-            'name'         => __('Power consumption (W)', 'carbon'),
-            'datatype'     => 'number',
-            'linkfield'    => 'networkequipments_id',
-            'joinparams' => [
-                'jointype' => 'child',
-                'beforejoin' => [
-                    'table' => GlpiNetworkEquipmentType::getTable(),
-                    'joinparams' => [
-                        'jointype' => 'child',
-                    ]
-                ]
-            ]
-        ];
-
-        return $sopt;
-    }
-
-
-    if ($itemtype  == Monitor::class) {
-        $sopt[] = [
-            'id' => 2222,
-            'table'        => MonitorType::getTable(),
-            'field'        => 'power_consumption',
-            'name'         => __('Power consumption (W)', 'carbon'),
-            'datatype'     => 'number',
-            'linkfield'    => 'monitors_id',
-            'joinparams' => [
-                'jointype' => 'child',
-                'beforejoin' => [
-                    'table' => GlpiMonitorType::getTable(),
-                    'joinparams' => [
-                        'jointype' => 'child',
-                    ]
-                ]
-            ]
-        ];
-
-        return $sopt;
     }
 
     return $sopt;
