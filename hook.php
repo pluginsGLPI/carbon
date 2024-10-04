@@ -38,15 +38,11 @@ use GlpiPlugin\Carbon\Uninstall;
 use GlpiPlugin\Carbon\EnvironnementalImpact;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
-use GlpiPlugin\Carbon\MonitorType;
-use GlpiPlugin\Carbon\NetworkEquipmentType;
 use ComputerType as GlpiComputerType;
-use MonitorType as GlpiMonitorType;
 use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
 use GlpiPlugin\Carbon\History\Computer as ComputerHistory;
 use GlpiPlugin\Carbon\History\Monitor as MonitorHistory;
 use GlpiPlugin\Carbon\History\NetworkEquipment as NetworkEquipmentHistory;
-use NetworkEquipmentType as GlpiNetworkEquipmentType;
 
 /**
  * Plugin install process
@@ -147,6 +143,8 @@ function plugin_carbon_postShowTab(array $param)
  */
 function plugin_carbon_getAddSearchOptionsNew($itemtype): array
 {
+    global $DB;
+
     $sopt = [];
 
     if (!in_array($itemtype, PLUGIN_CARBON_TYPES)) {
@@ -177,6 +175,35 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
             ],
             'computation' => "IF(TABLE.`power_consumption` IS NULL, 0, TABLE.`power_consumption`)",
         ];
+
+        $item_history_class = '\\GlpiPlugin\\Carbon\\History\\' . $itemtype;
+        $historizable_query = (new $item_history_class())->getHistorizableQuery(false);
+        $joins = $historizable_query['INNER JOIN'];
+        $historizable_query['FROM'] = key($joins); // table of the 1st join of the original query
+        array_shift($historizable_query['INNER JOIN']); // Remove 1st join
+
+        $where = array_shift($joins)['FKEY'];
+        $left_expression = key($where) . '.' . $where[key($where)];
+        array_shift($where);
+        $right_expression = key($where) . '.' . $where[key($where)];
+        $where = [
+            $left_expression => new QueryExpression($right_expression)
+        ];
+        $historizable_query['WHERE']['AND'] = array_merge($historizable_query['WHERE'], $where);
+
+        $iterator = new DBmysqlIterator($DB);
+        $iterator->buildQuery($historizable_query);
+        $historizable_query = $iterator->getSQL();
+        $historizable_query = "IF(($historizable_query) > 0, 1, 0)";
+        $sopt[] = [
+            'id'           => PLUGIN_CARBON_SEARCH_OPTION_BASE + 502,
+            'table'         => getTableForItemType($itemtype),
+            'field'         => 'id',
+            'name'          => __('Is historizable', 'carbon'),
+            'datatype'      => 'bool',
+            'massiveaction' => false,
+            'computation' => $historizable_query
+        ];
     }
 
     if ($itemtype === Computer::class) {
@@ -196,25 +223,6 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
                     ]
                 ]
             ]
-        ];
-
-        $sopt[] = [
-            'id'           => PLUGIN_CARBON_SEARCH_OPTION_BASE + 502,
-            'table'         => ComputerType::getTable(),
-            'field'         => 'id',
-            'name'          => __('Is historizable', 'carbon'),
-            'datatype'      => 'number',
-            'massiveaction' => false,
-            'linkfield'     => 'computers_id',
-            'joinparams' => [
-                'jointype' => 'child',
-                'beforejoin' => [
-                    'table' => GlpiComputerType::getTable(),
-                    'joinparams' => [
-                        'jointype' => 'child',
-                    ]
-                ]
-            ],
         ];
     }
 

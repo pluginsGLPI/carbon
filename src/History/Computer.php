@@ -58,7 +58,7 @@ class Computer extends AbstractAsset
         return new EngineComputer($item->getID());
     }
 
-    public function getHistorizableQuery(): array
+    public function getHistorizableQuery(bool $entity_restrict = true): array
     {
         $item_table = self::$itemtype::getTable();
         $item_model_table = self::$model_itemtype::getTable();
@@ -132,8 +132,10 @@ class Computer extends AbstractAsset
             ]
         ];
 
-        $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($item_table, '', '', 'auto');
-        $request['WHERE'] += $entity_restrict;
+        if ($entity_restrict) {
+            $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($item_table, '', '', 'auto');
+            $request['WHERE'] += $entity_restrict;
+        }
 
         return $request;
     }
