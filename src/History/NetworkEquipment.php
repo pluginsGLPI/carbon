@@ -159,7 +159,6 @@ class NetworkEquipment extends AbstractAsset
         $status['has_model_power_consumption'] = (($data['model_power_consumption'] ?? 0) !== 0);
         $status['has_type'] = ($data['type_id'] !== 0);
         $status['has_type_power_consumption'] = (($data['type_power_consumption'] ?? 0) !== 0);
-        $status['has_usage_profile'] = ($data['plugin_carbon_computerusageprofiles_id'] !== 0);
 
         TemplateRenderer::getInstance()->display('@carbon/history/status-item.html.twig', [
             'have_status' => ($iterator->count() === 1),
