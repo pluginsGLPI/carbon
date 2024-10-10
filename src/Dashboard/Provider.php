@@ -45,7 +45,7 @@ use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
-use GlpiPlugin\Carbon\History\Computer as HistoryComputer;
+use GlpiPlugin\Carbon\History\Computer as ComputerHistory;
 use QueryExpression;
 
 class Provider
@@ -302,7 +302,7 @@ class Provider
     {
         global $DB;
 
-        $request = (new HistoryComputer())->getHistorizableQuery();
+        $request = (new ComputerHistory())->getHistorizableQuery();
         $request['SELECT'] = [
             'COUNT' => Computer::getTableField('id') . ' AS nb_computers',
         ];
@@ -328,7 +328,7 @@ class Provider
     {
         global $DB;
 
-        $request = (new HistoryComputer())->getHistorizableQuery();
+        $request = (new ComputerHistory())->getHistorizableQuery();
         $request['SELECT'] = [
             'SUM' => ComputerType::getTableField('power_consumption') . ' AS total',
         ];
