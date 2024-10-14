@@ -65,7 +65,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
 
     protected bool $limit_reached = false;
 
-    abstract public function getHistorizableQuery(): array;
+    abstract public function getHistorizableQuery(bool $entity_restrict = true): array;
 
     public function getItemtype(): string
     {
@@ -114,7 +114,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
 
         $count = 0;
 
-        $iterator = $DB->request($this->getHistorizableQuery());
+        $iterator = $DB->request($this->getHistorizableQuery(false));
         foreach ($iterator as $row) {
             $count += $this->historizeItem($row['id']);
             if ($this->limit_reached) {
@@ -143,9 +143,9 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
             return 0;
         }
 
-        if (!$this->canHistorize($id)) {
-            return 0;
-        }
+        // if (!$this->canHistorize($id)) {
+        //     return 0;
+        // }
 
         // Determine first date to compute. May be modified by available intensity data
         $resume_date = $this->getStartDate($id);
