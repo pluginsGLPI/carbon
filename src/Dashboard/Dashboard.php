@@ -254,7 +254,8 @@ class Dashboard
                         'position' => 'bottom'
                     ]
                 ]
-            ]],
+            ]
+            ],
             'subtitle' => [
                 'style' => []
             ],

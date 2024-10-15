@@ -228,15 +228,17 @@ class ProviderTest extends DbTestCase
 
         $output = Provider::getSumEmissionsPerModel();
         $expected = [
-            [
-                'number' => '4 gCO₂eq',
-                'url' => ComputerModel::getFormURLWithID($computer_model_1->getID()),
-                'label' => $computer_model_1->fields['name'] . " (1 Computer)",
-            ], [
-                'number' => '8 gCO₂eq',
-                'url' => ComputerModel::getFormURLWithID($computer_model_2->getID()),
-                'label' => $computer_model_2->fields['name'] . " (1 Computer)",
-            ]
+            'series'   => [
+                4.0,
+                8.0
+            ],
+            'labels'   => [
+                $computer_model_1->fields['name'] . " (1 Computer)",
+                $computer_model_2->fields['name'] . " (1 Computer)",
+            ],
+            'subtitle' => [
+                'text' => 'g CO₂eq',
+            ],
         ];
         $this->assertEquals($expected, $output);
     }
