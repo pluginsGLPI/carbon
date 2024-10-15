@@ -218,8 +218,53 @@ class Dashboard
      *   - string 'url': url to redirect when clicking on the slice
      *   - string 'label': name of the computer model
      */
-    public static function getTotalCarbonEmissionPerModel()
+    public static function getTotalCarbonEmissionPerModel(array $params = [])
     {
+        $default_params = [
+            'label' => __('Carbon Emission per model', 'carbon'),
+            'icon'  => "fas fa-computer",
+            'color' => '#ea9999',
+        ];
+        $params = array_merge($default_params, $params);
+
+        $data = [
+            'colors' => ['#146151', '#FEEC5C', '#BBDA50', '#F78343', '#97989C'],
+            'chart' => [
+                'type' => 'donut',
+            ],
+            'plotOptions' => [
+                'pie' => [
+                    'startAngle' => -90,
+                    'endAngle' => 90,
+                    'offsetY' => 10
+                ]
+            ],
+            'grid' => [
+                'padding' => [
+                    'bottom' => -80
+                ]
+            ],
+            'responsive' => [[
+                'breakpoint' => 480,
+                'options' => [
+                    'chart' => [
+                        'width' => 200
+                    ],
+                    'legend' => [
+                        'position' => 'bottom'
+                    ]
+                ]
+            ]],
+            'subtitle' => [
+                'style' => []
+            ],
+            'series' => [],
+            'labels' => [],
+        ];
+
+        $data = array_merge($data, Provider::getSumEmissionsPerModel());
+        return $data;
+
         return Provider::getSumEmissionsPerModel();
     }
 

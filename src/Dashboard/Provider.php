@@ -99,7 +99,6 @@ class Provider
         $carbonemissions_table = CarbonEmission::getTable();
 
         $sql_year_month = "DATE_FORMAT(`date`, '%Y-%m')";
-
         $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($carbonemissions_table, '', '', 'auto');
         $subrequest = [
             'SELECT'    => [
@@ -165,15 +164,15 @@ class Provider
             __('Yt', 'carbon') .  ' ' . $co2eq,
         ];
         $emissions = Toolbox::scaleSerie($emissions, $units);
-        $data = [];
+        // $data = [];
         foreach ($result as $row) {
             $count = $row['nb_computers_per_model'];
-            $data[] = [
-                'number' => $emissions['serie'][$row['id']] . $emissions['unit'],
-                'url' => ComputerModel::getFormURLWithID($row['id']),
-                'label' => $row['name'] . " (" . $row['nb_computers_per_model'] . " " . Computer::getTypeName($count) . ")",
-            ];
+            $data['series'][] = (float) $emissions['serie'][$row['id']];
+            $data['labels'][] = $row['name'] . " (" . $row['nb_computers_per_model'] . " " . Computer::getTypeName($count) . ")";
+            // $data['url'][] = ComputerModel::getFormURLWithID($row['id']);
         }
+
+        $data['subtitle']['text'] = $emissions['unit'];
 
         return $data;
     }
