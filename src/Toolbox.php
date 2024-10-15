@@ -272,7 +272,6 @@ class Toolbox
             }
         }
         $average /= count($serie);
-        // $average = array_sum($serie) / count($serie);
 
         $multiple = 1000;
         $power = 0;

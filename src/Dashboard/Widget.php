@@ -79,7 +79,7 @@ class Widget
     public static function DisplayGraphCarbonEmissionPerType(): string
     {
 
-         return TemplateRenderer::getInstance()->render('@carbon/components/graph-carbon-emission-per-type.html.twig');
+         return TemplateRenderer::getInstance()->render('@carbon/components/graph-carbon-emission-per-model.html.twig');
     }
 
     public static function DisplayGraphCarbonEmissionPerMonth(): string
