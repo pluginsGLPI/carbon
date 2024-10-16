@@ -185,7 +185,7 @@ class Provider
             $data['url'][] = Computer::getSearchURL() . '?' . rawurldecode(GlpiToolbox::append_params($search_criteria));
         }
 
-        $data['subtitle']['text'] = $emissions['unit'];
+        $data['unit'] = $emissions['unit'];
 
         return $data;
     }

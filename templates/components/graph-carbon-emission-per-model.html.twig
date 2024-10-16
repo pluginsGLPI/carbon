@@ -29,10 +29,10 @@
  # -------------------------------------------------------------------------
  #}
 
-<div class="card-body card-max-height">
-  <div class="subheader">{{ __('Biggest carbon emission per model (monthly average)', 'carbon') }}</div>
+<div id="carbonEmissionPerModelChart" class="card-body card-max-height">
+  <div class="subheader">{{ __('Biggest monthly averaged carbon emission per model', 'carbon') }}</div>
   <div class="h1 mb-3" id="carbonEmissionPerModel"></div>
-  <div id="carbonEmissionPerModelChart" class="chart-lg "></div>
+  <div class="chart-lg"></div>
 </div>
 
 
@@ -85,7 +85,7 @@
          }]
       };
 
-      var carbonEmissionPerModelChart = new ApexCharts(document.querySelector("#carbonEmissionPerModelChart"), carbonEmissionPerTypeOptions);
+      var carbonEmissionPerModelChart = new ApexCharts(document.querySelector("#carbonEmissionPerModelChart .chart-lg"), carbonEmissionPerTypeOptions);
       carbonEmissionPerModelChart.render();
 
       // Carbon emission per type
@@ -97,7 +97,7 @@
                window.location.href = data.url[seriesIndex];
             }
          };
-
+         document.querySelector("#carbonEmissionPerModelChart .subheader").innerText += ' (' + data.unit + ')';
          carbonEmissionPerModelChart.updateOptions(data, true, true);
       });
    });
