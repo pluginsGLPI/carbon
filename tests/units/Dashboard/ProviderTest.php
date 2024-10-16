@@ -236,9 +236,11 @@ class ProviderTest extends DbTestCase
                 $computer_model_1->fields['name'] . " (1 Computer)",
                 $computer_model_2->fields['name'] . " (1 Computer)",
             ],
-            'subtitle' => [
-                'text' => 'g CO₂eq',
+            'url' => [
+                Computer::getSearchURL() . '?criteria[0][field]=40&criteria[0][searchtype]=equals&criteria[0][value]=' . $computer_model_1->getID() . '&reset=reset',
+                Computer::getSearchURL() . '?criteria[0][field]=40&criteria[0][searchtype]=equals&criteria[0][value]=' . $computer_model_2->getID() . '&reset=reset',
             ],
+            'unit' => 'g CO₂eq',
         ];
         $this->assertEquals($expected, $output);
     }

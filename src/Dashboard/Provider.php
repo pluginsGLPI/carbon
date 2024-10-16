@@ -48,6 +48,7 @@ use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\History\Computer as HistoryComputer;
 use QueryExpression;
 use QuerySubQuery;
+use Toolbox as GlpiToolbox;
 
 class Provider
 {
@@ -164,12 +165,24 @@ class Provider
             __('Yt', 'carbon') .  ' ' . $co2eq,
         ];
         $emissions = Toolbox::scaleSerie($emissions, $units);
-        // $data = [];
+        $models_id = null;
+        $search_criteria = [
+            'criteria' => [
+                [
+                    'field'      => 40,
+                    'searchtype' => 'equals',
+                    'value'      => &$models_id // Reference to $models_id !
+                ],
+            ],
+            'reset'    => 'reset'
+        ];
+
         foreach ($result as $row) {
             $count = $row['nb_computers_per_model'];
             $data['series'][] = (float) $emissions['serie'][$row['id']];
             $data['labels'][] = $row['name'] . " (" . $row['nb_computers_per_model'] . " " . Computer::getTypeName($count) . ")";
-            // $data['url'][] = ComputerModel::getFormURLWithID($row['id']);
+            $models_id = $row['id'];
+            $data['url'][] = Computer::getSearchURL() . '?' . rawurldecode(GlpiToolbox::append_params($search_criteria));
         }
 
         $data['subtitle']['text'] = $emissions['unit'];

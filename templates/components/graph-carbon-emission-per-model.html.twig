@@ -39,55 +39,67 @@
 {% block scripts %}
 <script>
 	$(document).ready(function () {
+      var carbonColorPalette = ['#146151', '#FEEC5C', '#BBDA50', '#F78343', '#97989C' ];
 
-        var carbonColorPalette = ['#146151', '#FEEC5C', '#BBDA50', '#F78343', '#97989C' ];
-
-        var carbonEmissionPerTypeOptions = {
-          // noData: {
-          //   text: i18n.textdomain('carbon').__('No data', 'carbon'),
-          //   align: 'center',
-          //   verticalAlign: 'middle',
-          // },
-          series: [],
-          labels: [],
-          colors: carbonColorPalette,
-          chart: {
+      var carbonEmissionPerTypeOptions = {
+         series: [],
+         labels: [],
+         noData: {
+            text: i18n.textdomain('carbon').__('Loading...', 'carbon'),
+            align: 'center',
+            verticalAlign: 'middle',
+            offsetX: 0,
+            offsetY: 0,
+            style: {
+               // color: undefined,
+               fontSize: '14px',
+               // fontFamily: undefined
+            }
+         },
+         colors: carbonColorPalette,
+         chart: {
             type: 'donut',
-          },
-          plotOptions: {
+         },
+         plotOptions: {
             pie: {
-              startAngle: -90,
-              endAngle: 90,
-              offsetY: 10
+               startAngle: -90,
+               endAngle: 90,
+               offsetY: 10
             }
-          },
-          grid: {
+         },
+         grid: {
             padding: {
-              bottom: -80
+               bottom: -80
             }
-          },
-          responsive: [{
+         },
+         responsive: [{
             breakpoint: 480,
             options: {
-              chart: {
-                width: 200
-              },
-              legend: {
-                position: 'bottom'
-              }
+               chart: {
+                  width: 200
+               },
+               legend: {
+                  position: 'bottom'
+               }
             }
-          }]
-        };
+         }]
+      };
 
-        var carbonEmissionPerModelChart = new ApexCharts(document.querySelector("#carbonEmissionPerModelChart"), carbonEmissionPerTypeOptions);
-        carbonEmissionPerModelChart.render();
+      var carbonEmissionPerModelChart = new ApexCharts(document.querySelector("#carbonEmissionPerModelChart"), carbonEmissionPerTypeOptions);
+      carbonEmissionPerModelChart.render();
 
-        // Carbon emission per type
-        fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/totalCarbonEmissionPerModel.php").then(response => {
-            return response.json();
-        }).then(data => {
-            carbonEmissionPerModelChart.updateOptions(data, true, true);
-        });
-    });
+      // Carbon emission per type
+      fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/totalCarbonEmissionPerModel.php").then(response => {
+         return response.json();
+      }).then(data => {
+         data.chart.events = {
+            legendClick: function(chartContext, seriesIndex, opts) {
+               window.location.href = data.url[seriesIndex];
+            }
+         };
+
+         carbonEmissionPerModelChart.updateOptions(data, true, true);
+      });
+   });
 </script>
 {% endblock %}
