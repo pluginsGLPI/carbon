@@ -47,6 +47,8 @@ use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\History\Computer as HistoryComputer;
 use QueryExpression;
+use QuerySubQuery;
+use Toolbox as GlpiToolbox;
 
 class Provider
 {
@@ -97,12 +99,14 @@ class Provider
         $computermodels_table = ComputerModel::getTable();
         $carbonemissions_table = CarbonEmission::getTable();
 
+        $sql_year_month = "DATE_FORMAT(`date`, '%Y-%m')";
         $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($carbonemissions_table, '', '', 'auto');
-        $request = [
+        $subrequest = [
             'SELECT'    => [
                 ComputerModel::getTableField('id'),
                 ComputerModel::getTableField('name'),
-                'SUM' => 'emission_per_day AS total_per_model',
+                new QueryExpression("$sql_year_month as `date`"),
+                'SUM' => 'emission_per_day AS monthly_emission_per_model',
                 new QueryExpression('COUNT(DISTINCT ' . CarbonEmission::getTableField('items_id') . ') AS nb_computers_per_model'),
             ],
             'FROM'      => $computermodels_table,
@@ -117,8 +121,24 @@ class Provider
             'WHERE' => [
                 CarbonEmission::getTableField('itemtype') => Computer::class
             ] + $entity_restrict,
-            'GROUPBY' => ComputerModel::getTableField('id'),
+            'GROUPBY' => [
+                ComputerModel::getTableField('id'),
+                new QueryExpression($sql_year_month)
+            ],
             'ORDER'   => ComputerModel::getTableField('name'),
+        ];
+
+        $request = [
+            'SELECT'    => [
+                'id',
+                'name',
+                'AVG' => 'monthly_emission_per_model AS total_per_model',
+                'MAX' => 'nb_computers_per_model AS nb_computers_per_model'
+            ],
+            'FROM' => new QuerySubQuery($subrequest, 'montly_per_model'),
+            'GROUPBY' => ['id'],
+            'ORDERBY' => 'total_per_model',
+            'LIMIT'   => 10,
         ];
 
         if (!empty($where)) {
@@ -126,15 +146,46 @@ class Provider
         }
         $result = $DB->request($request);
 
-        $data = [];
+        $emissions = [];
+        foreach ($result as $row) {
+            $emissions[$row['id']] = $row['total_per_model'];
+        }
+        $co2eq = __('CO₂eq', 'carbon');
+        $units = [
+            __('g', 'carbon')  .  ' ' . $co2eq,
+            __('Kg', 'carbon') .  ' ' . $co2eq,
+            __('t', 'carbon')  .  ' ' . $co2eq,
+            __('Kt', 'carbon') .  ' ' . $co2eq,
+            __('Mt', 'carbon') .  ' ' . $co2eq,
+            __('Gt', 'carbon') .  ' ' . $co2eq,
+            __('Tt', 'carbon') .  ' ' . $co2eq,
+            __('Pt', 'carbon') .  ' ' . $co2eq,
+            __('Et', 'carbon') .  ' ' . $co2eq,
+            __('Zt', 'carbon') .  ' ' . $co2eq,
+            __('Yt', 'carbon') .  ' ' . $co2eq,
+        ];
+        $emissions = Toolbox::scaleSerie($emissions, $units);
+        $models_id = null;
+        $search_criteria = [
+            'criteria' => [
+                [
+                    'field'      => 40,
+                    'searchtype' => 'equals',
+                    'value'      => &$models_id // Reference to $models_id !
+                ],
+            ],
+            'reset'    => 'reset'
+        ];
+
         foreach ($result as $row) {
             $count = $row['nb_computers_per_model'];
-            $data[] = [
-                'number' => Toolbox::getWeight($row['total_per_model'], PLUGIN_CARBON_DECIMALS) . 'CO₂eq',
-                'url' => ComputerModel::getFormURLWithID($row['id']),
-                'label' => $row['name'] . " (" . $row['nb_computers_per_model'] . " " . Computer::getTypeName($count) . ")",
-            ];
+            $data['series'][] = (float) $emissions['serie'][$row['id']];
+            $data['labels'][] = $row['name'] . " (" . $row['nb_computers_per_model'] . " " . Computer::getTypeName($count) . ")";
+            $models_id = $row['id'];
+            $data['url'][] = Computer::getSearchURL() . '?' . rawurldecode(GlpiToolbox::append_params($search_criteria));
         }
+
+        $data['unit'] = $emissions['unit'];
 
         return $data;
     }
