@@ -43,7 +43,7 @@ use DateInterval;
 use DateTimeInterface;
 use DB;
 use Glpi\Inventory\Conf;
-use GlpiPlugin\Carbon\EnvironnementalImpact;
+use GlpiPlugin\Carbon\EnvironmentalImpact;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
@@ -235,7 +235,7 @@ class CommonTestCase extends TestCase
     {
         $usage_profile = $this->getItem(ComputerUsageProfile::class, $usage_profile_params);
         $glpi_computer = $this->getItem(Computer::class);
-        $impact = $this->getItem(EnvironnementalImpact::class, [
+        $impact = $this->getItem(EnvironmentalImpact::class, [
             Computer::getForeignKeyField() => $glpi_computer->getId(),
             ComputerUsageProfile::getForeignKeyField() => $usage_profile->getID(),
         ]);

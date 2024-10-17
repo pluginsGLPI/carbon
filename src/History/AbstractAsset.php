@@ -43,7 +43,7 @@ use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
-use GlpiPlugin\Carbon\EnvironnementalImpact;
+use GlpiPlugin\Carbon\EnvironmentalImpact;
 use GlpiPlugin\Carbon\Toolbox;
 use Location;
 use LogicException;
@@ -127,7 +127,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     }
 
     /**
-     * Historize environnemental impact data of an asset
+     * Historize environmental impact data of an asset
      * Days interval is [$start_date, $end_date[
      *
      * @param integer  $id

@@ -31,45 +31,19 @@
  * -------------------------------------------------------------------------
  */
 
-$itemtype = 'GlpiPlugin\\Carbon\\CarbonIntensity';
-$map = [
-    4 => 10401,
-    5 => 10402,
-    6 => 10403,
-];
-foreach ($map as $src => $dst) {
-    $migration->changeSearchOption($itemtype, $src, $dst);
-}
+global $DB;
 
-$itemtype = 'GlpiPlugin\\Carbon\\ComputerUsageProfile';
-$map = [
-    6   => 10101,
-    7   => 10102,
-    201 => 10110,
-    202 => 10111,
-    203 => 10112,
-    204 => 10113,
-    205 => 10114,
-    206 => 10115,
-    207 => 10116,
-];
-foreach ($map as $src => $dst) {
-    $migration->changeSearchOption($itemtype, $src, $dst);
-}
+// Move data to new table
+$old_table = 'glpi_plugin_carbon_environnementalimpacts';
+$new_table = 'glpi_plugin_carbon_environmentalimpacts';
+$migration->addPostQuery("INSERT INTO `$new_table` SELECT * FROM `$old_table`");
+$migration->addPostQuery("RENAME TABLE `$old_table` TO `backup_$old_table`");
+$old_itemtype = '\\GlpiPlugin\\Carbon\\EnvironnementalImpact';
+$new_itemtype = '\\GlpiPlugin\\Carbon\\EnvironmentalImpact';
 
-$itemtype = 'GlpiPlugin\\Carbon\\CarbonIntensityZone';
-$map = [
-    11 => 10301,
-];
-foreach ($map as $src => $dst) {
-    $migration->changeSearchOption($itemtype, $src, $dst);
-}
-
-$itemtype = 'GlpiPlugin\\Carbon\\EnvironnementalImpact';
-$map = [
-    5 => 10201,
-    6 => 10202,
-];
-foreach ($map as $src => $dst) {
-    $migration->changeSearchOption($itemtype, $src, $dst);
-}
+// Update display preferences
+$DB->update(DisplayPreference::getTable(), [
+    'itemtype' => $new_itemtype
+], [
+    'itemtype' => $old_itemtype
+]);

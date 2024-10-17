@@ -39,7 +39,7 @@ use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\DataTracking\TrackedInt;
 
 /**
- * Compute environnemental impact of a computer
+ * Compute environmental impact of a computer
  */
 interface EngineInterface
 {

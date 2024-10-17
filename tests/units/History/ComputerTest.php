@@ -43,7 +43,7 @@ use ComputerType as GlpiComputerType;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
-use GlpiPlugin\Carbon\EnvironnementalImpact;
+use GlpiPlugin\Carbon\EnvironmentalImpact;
 
 /**
  * @covers \GlpiPlugin\Carbon\History\Computer
@@ -92,7 +92,7 @@ class ComputerTest extends CommonAsset
             'day_6'        => '0',
             'day_7'        => '0',
         ]);
-        $impact = $this->getItem(EnvironnementalImpact::class, [
+        $impact = $this->getItem(EnvironmentalImpact::class, [
             $usage_profile->getForeignKeyField() => $usage_profile->getID(),
             'computers_id' => $asset->getID(),
         ]);

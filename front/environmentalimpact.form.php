@@ -32,7 +32,7 @@
  */
 
 use Glpi\Event;
-use GlpiPlugin\Carbon\EnvironnementalImpact;
+use GlpiPlugin\Carbon\EnvironmentalImpact;
 use GlpiPlugin\Carbon\History\AbstractAsset as AbstractAssetHistory;
 
 include('../../../inc/includes.php');
@@ -42,13 +42,13 @@ if (!Plugin::isPluginActive('carbon')) {
     Html::displayNotFoundError();
 }
 
-Session::checkRight(EnvironnementalImpact::$rightname, READ);
+Session::checkRight(EnvironmentalImpact::$rightname, READ);
 
-$environemental_impact = new EnvironnementalImpact();
+$environmental_impact = new EnvironmentalImpact();
 
 if (isset($_POST['update'])) {
-    $environemental_impact->check($_POST['id'], UPDATE);
-    $environemental_impact->update($_POST);
+    $environmental_impact->check($_POST['id'], UPDATE);
+    $environmental_impact->update($_POST);
     Event::log(
         $_POST['id'],
         'computers',
@@ -64,7 +64,7 @@ if (isset($_POST['update'])) {
         Html::back();
     }
 
-    if (!EnvironnementalImpact::canPurge()) {
+    if (!EnvironmentalImpact::canPurge()) {
         Session::addMessageAfterRedirect(__('Reset denied.', 'carbon'), false, ERROR);
         Html::back();
     }

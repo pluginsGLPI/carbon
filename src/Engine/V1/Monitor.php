@@ -41,7 +41,7 @@ use MonitorType as GlpiMonitorType;
 use MonitorModel;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\MonitorType;
-use GlpiPlugin\Carbon\EnvironnementalImpact;
+use GlpiPlugin\Carbon\EnvironmentalImpact;
 
 /**
  * Compute CO2 emission of a computer
@@ -64,7 +64,7 @@ class Monitor extends AbstractSwitchable
 
         $computers_table = GlpiComputer::getTable();
         $computer_item_table = Computer_Item::getTable();
-        $environnementalimpact_table = EnvironnementalImpact::getTable();
+        $environmentalimpact_table = EnvironmentalImpact::getTable();
         $computerUsageProfile_table = ComputerUsageProfile::getTable();
 
         $request = [
@@ -77,15 +77,15 @@ class Monitor extends AbstractSwitchable
                         $computers_table     => 'id',
                     ]
                 ],
-                $environnementalimpact_table => [
+                $environmentalimpact_table => [
                     'FKEY'   => [
                         $computers_table  => 'id',
-                        $environnementalimpact_table => 'computers_id',
+                        $environmentalimpact_table => 'computers_id',
                     ]
                 ],
                 $computerUsageProfile_table => [
                     'FKEY'   => [
-                        $environnementalimpact_table  => 'plugin_carbon_computerusageprofiles_id',
+                        $environmentalimpact_table  => 'plugin_carbon_computerusageprofiles_id',
                         $computerUsageProfile_table => 'id',
                     ]
                 ]

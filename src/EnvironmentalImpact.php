@@ -43,7 +43,7 @@ use NetworkEquipment;
 /**
  * Relation between a computer and a usage profile
  */
-class EnvironnementalImpact extends CommonDBChild
+class EnvironmentalImpact extends CommonDBChild
 {
     public static $itemtype = Computer::class;
     public static $items_id = 'computers_id';
@@ -128,7 +128,7 @@ class EnvironnementalImpact extends CommonDBChild
             'can_edit' => $canedit,
         ];
         $this->initForm($this->getID(), $options);
-        TemplateRenderer::getInstance()->display('@carbon/environnementalimpact.html.twig', [
+        TemplateRenderer::getInstance()->display('@carbon/environmentalimpact.html.twig', [
             'params'   => $options,
             'item'     => $this,
         ]);
@@ -178,7 +178,7 @@ class EnvironnementalImpact extends CommonDBChild
 
     public static function showCharts(CommonGLPI $item)
     {
-        TemplateRenderer::getInstance()->display('@carbon/environnementalimpact-item.html.twig', [
+        TemplateRenderer::getInstance()->display('@carbon/environmentalimpact-item.html.twig', [
             'item' => $item,
         ]);
     }
