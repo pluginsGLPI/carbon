@@ -179,7 +179,7 @@ class EnvironnementalImpact extends CommonDBChild
     public static function showCharts(CommonGLPI $item)
     {
         TemplateRenderer::getInstance()->display('@carbon/environnementalimpact-item.html.twig', [
-            'item'     => $item,
+            'item' => $item,
         ]);
     }
 }

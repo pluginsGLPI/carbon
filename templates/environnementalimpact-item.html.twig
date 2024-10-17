@@ -40,6 +40,10 @@
     <div class="subheader">{{ __('Carbon Emission per Month', 'carbon') }}</div>
     <div class="h1 mb-3" id="carbonEmissionPerMonth"></div>
     <div id="carbonEmissionPerMonthChart" class="chart-lg"></div>
+    <div>
+      {% set reset_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', reset: '', itemtype: '" ~ item.getType() ~ "', items_id: '" ~ item.getID() ~ "'}" %}
+      <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/environmentalimpact.form.php' }}', {{ reset_args }})">{{ __('Reset data', 'carbon') }}</a>
+    </div>
 </div>
 
 <script type="text/javascript">

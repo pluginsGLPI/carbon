@@ -252,7 +252,7 @@ class PluginInstallTest extends CommonTestCase
     {
         // Key is ID of the profile, value is the name of the profile
         $expected_profiles = [
-            4 =>  READ, // 'Super-Admin'
+            4 =>  READ + PURGE, // 'Super-Admin'
         ];
         $this->checkRight(Report::$rightname, $expected_profiles);
     }

@@ -79,7 +79,7 @@ class Report extends CommonDBTM
     {
         $values = parent::getRights();
 
-        return array_intersect_key($values, [READ => true]);
+        return array_intersect_key($values, [READ => true, PURGE => true]);
     }
 
     public static function showInstantReport(): void

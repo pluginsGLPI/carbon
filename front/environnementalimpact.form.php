@@ -33,6 +33,7 @@
 
 use Glpi\Event;
 use GlpiPlugin\Carbon\EnvironnementalImpact;
+use GlpiPlugin\Carbon\History\AbstractAsset as AbstractAssetHistory;
 
 include('../../../inc/includes.php');
 
@@ -57,6 +58,35 @@ if (isset($_POST['update'])) {
         sprintf(__('%s updates an item'), $_SESSION['glpiname'])
     );
     Html::back();
+} else if (isset($_POST['reset'])) {
+    if (!isset($_POST['itemtype']) || !isset($_POST['items_id'])) {
+        Session::addMessageAfterRedirect(__('Missing arguments in request.', 'carbon'), false, ERROR);
+        Html::back();
+    }
+
+    if (!EnvironnementalImpact::canPurge()) {
+        Session::addMessageAfterRedirect(__('Reset denied.', 'carbon'), false, ERROR);
+        Html::back();
+    }
+
+    $history = '\\GlpiPlugin\\Carbon\\History\\' . (string) $_POST['itemtype'];
+    if (!class_exists($history) || !is_subclass_of($history, AbstractAssetHistory::class)) {
+        Session::addMessageAfterRedirect(__('Bad arguments.', 'carbon'), false, ERROR);
+        Html::back();
+    }
+
+    $history = new $history();
+    $itemtype = $history->getItemtype();
+    $item = new $itemtype();
+    $item->getFromDB($_POST['items_id']);
+    if (!$item->canUpdate()) {
+        Session::addMessageAfterRedirect(__('Reset denied.', 'carbon'), false, ERROR);
+        Html::back();
+    }
+
+    if (!$history->resetHistory($_POST['items_id'])) {
+        Session::addMessageAfterRedirect(__('Reset failed.', 'carbon'), false, ERROR);
+    }
 }
 
 Html::back();
