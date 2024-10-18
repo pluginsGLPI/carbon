@@ -151,8 +151,8 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
         return $sopt;
     }
 
-    $item_type_class = '\\GlpiPlugin\\Carbon\\' . $itemtype . 'Type';
-    $glpi_item_type_class = '\\' . $itemtype . 'Type';
+    $item_type_class = 'GlpiPlugin\\Carbon\\' . $itemtype . 'Type';
+    $glpi_item_type_class = $itemtype . 'Type';
     if (class_exists($item_type_class) && is_subclass_of($item_type_class, CommonDBTM::class)) {
         $sopt[] = [
             'id'           => PLUGIN_CARBON_SEARCH_OPTION_BASE + 500,
