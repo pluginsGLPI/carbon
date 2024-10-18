@@ -43,6 +43,7 @@ use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
 use GlpiPlugin\Carbon\History\Computer as ComputerHistory;
 use GlpiPlugin\Carbon\History\Monitor as MonitorHistory;
 use GlpiPlugin\Carbon\History\NetworkEquipment as NetworkEquipmentHistory;
+use GlpiPlugin\Carbon\SearchOptions;
 
 /**
  * Plugin install process
@@ -155,7 +156,7 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
     $glpi_item_type_class = $itemtype . 'Type';
     if (class_exists($item_type_class) && is_subclass_of($item_type_class, CommonDBTM::class)) {
         $sopt[] = [
-            'id'           => PLUGIN_CARBON_SEARCH_OPTION_BASE + 500,
+            'id'           => SearchOptions::POWER_CONSUMPTION,
             'table'        => getTableForItemType($item_type_class),
             'field'        => 'power_consumption',
             'name'         => __('Power consumption', 'carbon'),
@@ -196,7 +197,7 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
         $historizable_query = $iterator->getSQL();
         $historizable_query = "IF(($historizable_query) > 0, 1, 0)";
         $sopt[] = [
-            'id'           => PLUGIN_CARBON_SEARCH_OPTION_BASE + 502,
+            'id'           => SearchOptions::IS_HISTORIZABLE,
             'table'         => getTableForItemType($itemtype),
             'field'         => 'id',
             'name'          => __('Is historizable', 'carbon'),
@@ -208,7 +209,7 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
 
     if ($itemtype === Computer::class) {
         $sopt[] = [
-            'id'           => PLUGIN_CARBON_SEARCH_OPTION_BASE + 501,
+            'id'           => SearchOptions::USAGE_PROFILE,
             'table'         => ComputerUsageProfile::getTable(),
             'field'         => 'name',
             'name'          => ComputerUsageProfile::getTypeName(),
