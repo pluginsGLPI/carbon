@@ -41,7 +41,7 @@ use GlpiPlugin\Carbon\Dashboard\Provider;
 
 class Report extends CommonDBTM
 {
-    public    static $rightname = 'carbon:report';
+    public static $rightname = 'carbon:report';
     protected static $notable   = true;
 
     public static function getTypeName($nb = 0)
