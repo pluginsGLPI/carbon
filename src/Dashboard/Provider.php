@@ -182,7 +182,7 @@ class Provider
             $data['series'][] = (float) $emissions['serie'][$row['id']];
             $data['labels'][] = $row['name'] . " (" . $row['nb_computers_per_model'] . " " . Computer::getTypeName($count) . ")";
             $models_id = $row['id'];
-            $data['url'][] = Computer::getSearchURL() . '?' . rawurldecode(GlpiToolbox::append_params($search_criteria));
+            $data['url'][] = Computer::getSearchURL() . '?' . GlpiToolbox::append_params($search_criteria);
         }
 
         $data['unit'] = $emissions['unit'];
