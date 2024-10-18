@@ -37,7 +37,7 @@ use GlpiPlugin\Carbon\Dashboard\Widget;
 use Glpi\Plugin\Hooks;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\Config;
-use GlpiPlugin\Carbon\EnvironnementalImpact;
+use GlpiPlugin\Carbon\EnvironmentalImpact;
 use GlpiPlugin\Carbon\Profile;
 use GlpiPlugin\Carbon\Report;
 use ComputerType as GlpiComputerType;
@@ -49,7 +49,7 @@ use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
 
 define('PLUGIN_CARBON_VERSION', '0.0.4');
-define('PLUGIN_CARBON_SCHEMA_VERSION', '0.0.1');
+define('PLUGIN_CARBON_SCHEMA_VERSION', '0.0.4');
 
 // Minimal GLPI version, inclusive
 define("PLUGIN_CARBON_MIN_GLPI_VERSION", "10.0.0");
@@ -127,9 +127,9 @@ function plugin_carbon_registerClasses()
     Plugin::registerClass(Config::class, ['addtabon' => GlpiConfig::class]);
     Plugin::registerClass(Profile::class, ['addtabon' => GlpiProfile::class]);
     Plugin::registerClass(ComputerType::class, ['addtabon' => GlpiComputerType::class]);
-    Plugin::registerClass(EnvironnementalImpact::class, ['addtabon' => Computer::class]);
-    Plugin::registerClass(EnvironnementalImpact::class, ['addtabon' => Monitor::class]);
-    Plugin::registerClass(EnvironnementalImpact::class, ['addtabon' => NetworkEquipment::class]);
+    Plugin::registerClass(EnvironmentalImpact::class, ['addtabon' => Computer::class]);
+    Plugin::registerClass(EnvironmentalImpact::class, ['addtabon' => Monitor::class]);
+    Plugin::registerClass(EnvironmentalImpact::class, ['addtabon' => NetworkEquipment::class]);
     Plugin::registerClass(MonitorType::class, ['addtabon' => GlpiMonitorType::class]);
     Plugin::registerClass(NetworkEquipmentType::class, ['addtabon' => GlpiNetworkEquipmentType::class]);
 }

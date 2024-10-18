@@ -35,7 +35,7 @@ use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Install;
 use GlpiPlugin\Carbon\Uninstall;
-use GlpiPlugin\Carbon\EnvironnementalImpact;
+use GlpiPlugin\Carbon\EnvironmentalImpact;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 use ComputerType as GlpiComputerType;
@@ -115,21 +115,21 @@ function plugin_carbon_postShowTab(array $param)
 {
     switch ($param['item']::getType()) {
         case Computer::class:
-            if ($param['options']['itemtype'] == EnvironnementalImpact::class) {
+            if ($param['options']['itemtype'] == EnvironmentalImpact::class) {
                 ComputerHistory::showHistorizableDiagnosis($param['item']);
-                EnvironnementalImpact::showCharts($param['item']);
+                EnvironmentalImpact::showCharts($param['item']);
             }
             break;
         case Monitor::class:
-            if ($param['options']['itemtype'] == EnvironnementalImpact::class) {
+            if ($param['options']['itemtype'] == EnvironmentalImpact::class) {
                 MonitorHistory::showHistorizableDiagnosis($param['item']);
-                EnvironnementalImpact::showCharts($param['item']);
+                EnvironmentalImpact::showCharts($param['item']);
             }
             break;
         case NetworkEquipment::class:
-            if ($param['options']['itemtype'] == EnvironnementalImpact::class) {
+            if ($param['options']['itemtype'] == EnvironmentalImpact::class) {
                 NetworkEquipmentHistory::showHistorizableDiagnosis($param['item']);
-                EnvironnementalImpact::showCharts($param['item']);
+                EnvironmentalImpact::showCharts($param['item']);
             }
             break;
     }
@@ -217,7 +217,7 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
             'joinparams' => [
                 'jointype' => 'empty',
                 'beforejoin' => [
-                    'table'    => EnvironnementalImpact::getTable(),
+                    'table'    => EnvironmentalImpact::getTable(),
                     'joinparams' => [
                         'jointype' => 'child',
                     ]

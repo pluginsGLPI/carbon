@@ -66,17 +66,17 @@ class PluginInstallTest extends CommonTestCase
     {
         global $DB;
 
-        $pluginName = TEST_PLUGIN_NAME;
+        $plugin_name = TEST_PLUGIN_NAME;
 
         $this->setupGLPIFramework();
         $this->assertTrue($DB->connected);
 
         //Drop plugin configuration if exists
         $config = new Config();
-        $config->deleteByCriteria(['context' => $pluginName]);
+        $config->deleteByCriteria(['context' => $plugin_name]);
 
         // Drop tables of the plugin if they exist
-        $result = $DB->listTables('glpi_plugin_' . $pluginName . '_%');
+        $result = $DB->listTables('glpi_plugin_' . $plugin_name . '_%');
         foreach ($result as $data) {
             $DB->dropTable($data['TABLE_NAME']);
         }
@@ -87,7 +87,7 @@ class PluginInstallTest extends CommonTestCase
         $plugin = new Plugin();
         // Since GLPI 9.4 plugins list is cached
         $plugin->checkStates(true);
-        $plugin->getFromDBbyDir($pluginName);
+        $plugin->getFromDBbyDir($plugin_name);
         $this->assertFalse($plugin->isNewItem());
 
         // Install the plugin
@@ -95,16 +95,16 @@ class PluginInstallTest extends CommonTestCase
             return $in;
         });
         $plugin->install($plugin->fields['id']);
-        $installOutput = ob_get_contents();
+        $install_output = ob_get_contents();
         ob_end_clean();
-        $this->assertTrue($plugin->isInstalled($pluginName), $installOutput);
+        $this->assertTrue($plugin->isInstalled($plugin_name), $install_output);
 
         // Enable the plugin
         $plugin->activate($plugin->fields['id']);
         $plugin->init();
         $messages = $_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR] ?? [];
         $messages = implode(PHP_EOL, $messages);
-        $this->assertTrue(Plugin::isPluginActive($pluginName), 'Cannot enable the plugin: ' . $messages);
+        $this->assertTrue(Plugin::isPluginActive($plugin_name), 'Cannot enable the plugin: ' . $messages);
     }
 
     public function testInstallPlugin()
@@ -117,7 +117,6 @@ class PluginInstallTest extends CommonTestCase
         $this->checkSchema(PLUGIN_CARBON_VERSION);
 
         $this->checkConfig();
-        // $this->checkRequestType();
         $this->checkAutomaticAction();
         // $this->checkDashboard();
         $this->checkRights();
@@ -225,7 +224,7 @@ class PluginInstallTest extends CommonTestCase
         $this->assertFalse($cronTask->isNewItem());
     }
 
-    private function checkConfig()
+    protected function checkConfig()
     {
         $plugin_path = Plugin::getPhpDir(TEST_PLUGIN_NAME, true);
         require_once($plugin_path . '/setup.php');
@@ -236,7 +235,7 @@ class PluginInstallTest extends CommonTestCase
         ];
 
         $config = Config::getConfigurationValues('plugin:' . TEST_PLUGIN_NAME);
-        $this->assertCount(count($expected), $config); // 1 more key : dbversion
+        $this->assertCount(count($expected), $config);
 
         $glpi_key = new GLPIKey();
         foreach ($expected as $key => $expected_value) {
@@ -252,7 +251,7 @@ class PluginInstallTest extends CommonTestCase
     {
         // Key is ID of the profile, value is the name of the profile
         $expected_profiles = [
-            4 =>  READ, // 'Super-Admin'
+            4 =>  READ + PURGE, // 'Super-Admin'
         ];
         $this->checkRight(Report::$rightname, $expected_profiles);
     }

@@ -31,32 +31,19 @@
  * -------------------------------------------------------------------------
  */
 
-use Glpi\Event;
-use GlpiPlugin\Carbon\EnvironnementalImpact;
+global $DB;
 
-include('../../../inc/includes.php');
+// Move data to new table
+$old_table = 'glpi_plugin_carbon_environnementalimpacts';
+$new_table = 'glpi_plugin_carbon_environmentalimpacts';
+$migration->renameTable($old_table, $new_table);
 
-// Check if plugin is activated...
-if (!Plugin::isPluginActive('carbon')) {
-    Html::displayNotFoundError();
-}
+$old_itemtype = '\\GlpiPlugin\\Carbon\\EnvironnementalImpact';
+$new_itemtype = '\\GlpiPlugin\\Carbon\\EnvironmentalImpact';
 
-Session::checkRight(EnvironnementalImpact::$rightname, READ);
-
-$environemental_impact = new EnvironnementalImpact();
-
-if (isset($_POST['update'])) {
-    $environemental_impact->check($_POST['id'], UPDATE);
-    $environemental_impact->update($_POST);
-    Event::log(
-        $_POST['id'],
-        'computers',
-        4,
-        'inventory',
-        //TRANS: %s is the user login
-        sprintf(__('%s updates an item'), $_SESSION['glpiname'])
-    );
-    Html::back();
-}
-
-Html::back();
+// Update display preferences
+$DB->update(DisplayPreference::getTable(), [
+    'itemtype' => $new_itemtype
+], [
+    'itemtype' => $old_itemtype
+]);

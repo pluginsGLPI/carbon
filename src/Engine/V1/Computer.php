@@ -36,7 +36,7 @@ namespace GlpiPlugin\Carbon\Engine\V1;
 use Computer as GlpiComputer;
 use ComputerType as GlpiComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
-use GlpiPlugin\Carbon\EnvironnementalImpact;
+use GlpiPlugin\Carbon\EnvironmentalImpact;
 use ComputerModel;
 use GlpiPlugin\Carbon\ComputerType;
 
@@ -56,22 +56,22 @@ class Computer extends AbstractSwitchable
         global $DB;
 
         $computers_table = GlpiComputer::getTable();
-        $environnementalimpact_table = EnvironnementalImpact::getTable();
+        $environmentalimpact_table = EnvironmentalImpact::getTable();
         $computerUsageProfile_table = ComputerUsageProfile::getTable();
 
         $request = [
             'SELECT' => ComputerUsageProfile::getTableField('id'),
             'FROM' => $computers_table,
             'INNER JOIN' => [
-                $environnementalimpact_table => [
+                $environmentalimpact_table => [
                     'FKEY'   => [
                         $computers_table  => 'id',
-                        $environnementalimpact_table => 'computers_id',
+                        $environmentalimpact_table => 'computers_id',
                     ]
                 ],
                 $computerUsageProfile_table => [
                     'FKEY'   => [
-                        $environnementalimpact_table  => 'plugin_carbon_computerusageprofiles_id',
+                        $environmentalimpact_table  => 'plugin_carbon_computerusageprofiles_id',
                         $computerUsageProfile_table => 'id',
                     ]
                 ]

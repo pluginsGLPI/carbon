@@ -306,7 +306,7 @@ class Provider
 
     /**
      * Counts the computers which are missing data to compute their
-     * environnemental impact
+     * environmental impact
      *
      * @param array $params
      * @return integer|null : count of computers or null if an error occurred

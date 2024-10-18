@@ -31,7 +31,7 @@
  * -------------------------------------------------------------------------
  */
 
-$itemtype = GlpiPlugin\Carbon\CarbonIntensity::class;
+$itemtype = 'GlpiPlugin\\Carbon\\CarbonIntensity';
 $map = [
     4 => 10401,
     5 => 10402,
@@ -41,7 +41,7 @@ foreach ($map as $src => $dst) {
     $migration->changeSearchOption($itemtype, $src, $dst);
 }
 
-$itemtype = GlpiPlugin\Carbon\ComputerUsageProfile::class;
+$itemtype = 'GlpiPlugin\\Carbon\\ComputerUsageProfile';
 $map = [
     6   => 10101,
     7   => 10102,
@@ -57,7 +57,7 @@ foreach ($map as $src => $dst) {
     $migration->changeSearchOption($itemtype, $src, $dst);
 }
 
-$itemtype = GlpiPlugin\Carbon\CarbonIntensityZone::class;
+$itemtype = 'GlpiPlugin\\Carbon\\CarbonIntensityZone';
 $map = [
     11 => 10301,
 ];
@@ -65,7 +65,7 @@ foreach ($map as $src => $dst) {
     $migration->changeSearchOption($itemtype, $src, $dst);
 }
 
-$itemtype = GlpiPlugin\Carbon\EnvironnementalImpact::class;
+$itemtype = 'GlpiPlugin\\Carbon\\EnvironnementalImpact';
 $map = [
     5 => 10201,
     6 => 10202,

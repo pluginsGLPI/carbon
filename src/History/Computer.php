@@ -43,7 +43,7 @@ use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
 use DbUtils;
 use Glpi\Application\View\TemplateRenderer;
-use GlpiPlugin\Carbon\EnvironnementalImpact;
+use GlpiPlugin\Carbon\EnvironmentalImpact;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use Location;
 
@@ -65,7 +65,7 @@ class Computer extends AbstractAsset
         $glpi_computertypes_table = GlpiComputerType::getTable();
         $computertypes_table = ComputerType::getTable();
         $location_table = Location::getTable();
-        $environnementalimpact_table = EnvironnementalImpact::getTable();
+        $environmentalimpact_table = EnvironmentalImpact::getTable();
         $computerUsageProfile_table = ComputerUsageProfile::getTable();
 
         $request = [
@@ -103,15 +103,15 @@ class Computer extends AbstractAsset
                         $location_table => 'id',
                     ]
                 ],
-                $environnementalimpact_table => [
+                $environmentalimpact_table => [
                     'FKEY'   => [
                         $item_table  => 'id',
-                        $environnementalimpact_table => 'computers_id',
+                        $environmentalimpact_table => 'computers_id',
                     ]
                 ],
                 $computerUsageProfile_table => [
                     'FKEY'   => [
-                        $environnementalimpact_table  => 'plugin_carbon_computerusageprofiles_id',
+                        $environmentalimpact_table  => 'plugin_carbon_computerusageprofiles_id',
                         $computerUsageProfile_table => 'id',
                     ]
                 ]
@@ -157,7 +157,7 @@ class Computer extends AbstractAsset
             GlpiComputerType::getTableField('id as type_id'),
             ComputerType::getTableField('id as plugin_carbon_type_id'),
             ComputerType::getTableField('power_consumption  as type_power_consumption'),
-            EnvironnementalImpact::getTableField('plugin_carbon_computerusageprofiles_id'),
+            EnvironmentalImpact::getTableField('plugin_carbon_computerusageprofiles_id'),
         ];
         // Change inner joins into left joins to identify missing data
         $request['LEFT JOIN'] = $request['INNER JOIN'];

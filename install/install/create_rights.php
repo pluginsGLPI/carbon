@@ -50,7 +50,7 @@ foreach ($profiles as $profile) {
     if (($rights[Config::$rightname] & (READ + UPDATE)) != READ + UPDATE) {
         continue;
     }
-    $right = READ;
+    $right = READ + PURGE;
     ProfileRight::updateProfileRights($profile['id'], [
         Report::$rightname => $right,
     ]);

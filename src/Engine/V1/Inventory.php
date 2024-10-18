@@ -42,7 +42,7 @@ use GlpiPlugin\Carbon\DataTracking\TrackedInt;
 use GlpiPlugin\Carbon\Tests\Engine\V1\EngineTestCase;
 
 /**
- * Compute environnemental impact of a whole inventory
+ * Compute environmental impact of a whole inventory
  *
  * To compute the environemental impact we need to add all items
  * to take into account with the method addItem()

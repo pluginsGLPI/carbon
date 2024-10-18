@@ -41,7 +41,7 @@ use GlpiPlugin\Carbon\Dashboard\Provider;
 
 class Report extends CommonDBTM
 {
-    public    static $rightname = 'carbon:report';
+    public static $rightname = 'carbon:report';
     protected static $notable   = true;
 
     public static function getTypeName($nb = 0)
@@ -79,7 +79,7 @@ class Report extends CommonDBTM
     {
         $values = parent::getRights();
 
-        return array_intersect_key($values, [READ => true]);
+        return array_intersect_key($values, [READ => true, PURGE => true]);
     }
 
     public static function showInstantReport(): void
