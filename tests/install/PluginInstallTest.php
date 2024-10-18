@@ -117,7 +117,6 @@ class PluginInstallTest extends CommonTestCase
         $this->checkSchema(PLUGIN_CARBON_VERSION);
 
         $this->checkConfig();
-        // $this->checkRequestType();
         $this->checkAutomaticAction();
         // $this->checkDashboard();
         $this->checkRights();
