@@ -36,8 +36,8 @@ global $DB;
 // Move data to new table
 $old_table = 'glpi_plugin_carbon_environnementalimpacts';
 $new_table = 'glpi_plugin_carbon_environmentalimpacts';
-$migration->addPostQuery("INSERT INTO `$new_table` SELECT * FROM `$old_table`");
-$migration->addPostQuery("RENAME TABLE `$old_table` TO `backup_$old_table`");
+$migration->renameTable($old_table, $new_table);
+
 $old_itemtype = '\\GlpiPlugin\\Carbon\\EnvironnementalImpact';
 $new_itemtype = '\\GlpiPlugin\\Carbon\\EnvironmentalImpact';
 

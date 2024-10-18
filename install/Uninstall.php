@@ -34,14 +34,11 @@
 namespace GlpiPlugin\Carbon;
 
 use Config;
-use DBUtils;
 use DisplayPreference;
 use Migration;
 use ProfileRight;
 use CronTask as GlpiCronTask;
 use GlpiPlugin\Carbon\CronTask;
-use GlpiPlugin\Carbon\ComputerPower;
-use GlpiPlugin\Carbon\CarbonEmission;
 
 class Uninstall
 {
@@ -54,19 +51,23 @@ class Uninstall
 
     public function uninstall()
     {
-        global $DB;
-
-        $iterator = $DB->listTables('glpi_plugin_carbon_%');
-        foreach ($iterator as $table) {
-            $DB->dropTable($table['TABLE_NAME']);
-        }
-
+        $this->deleteTables();
         $this->deleteConfig();
         $this->deleteAutomaticActions();
         $this->deleteRights();
         $this->deleteDisplayPrefs();
 
         return true;
+    }
+
+    private function deleteTables()
+    {
+        global $DB;
+
+        $iterator = $DB->listTables('glpi_plugin_carbon_%');
+        foreach ($iterator as $table) {
+            $DB->dropTable($table['TABLE_NAME']);
+        }
     }
 
     private function deleteConfig()

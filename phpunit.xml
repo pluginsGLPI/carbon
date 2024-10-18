@@ -35,5 +35,8 @@
     <testsuite name="Uninstall">
       <directory>./tests/uninstall/</directory>
     </testsuite>
+    <testsuite name="Upgrade">
+      <directory>./tests/upgrade/</directory>
+    </testsuite>
   </testsuites>
 </phpunit>
