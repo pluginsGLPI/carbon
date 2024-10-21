@@ -255,7 +255,7 @@ class ComputerUsageProfile extends CommonDropdown
 
     public static function assignToItem(CommonDBTM $item, int $usage_profile_id)
     {
-        $environmental_imapct = new EnvironnementalImpact();
+        $environmental_imapct = new EnvironmentalImpact();
         $computers_id = $item->getID();
         $usage_profile_fk = ComputerUsageProfile::getForeignKeyField();
         $environmental_imapct->getFromDBByCrit([

@@ -167,7 +167,7 @@ class ProviderTest extends DbTestCase
         // 1 having both power_consumption from computer type only
         // 1 having both power_consumption from computer model only
         $handled_count = Provider::getHandledComputersCount();
-        $this->assertEquals(3, $handled_count);
+        $this->assertEquals(3, $handled_count['number']);
     }
 
     public function testGetUnhandledComputersCount()
@@ -175,7 +175,7 @@ class ProviderTest extends DbTestCase
         $total_count = $this->handledComputersCountFixture();
 
         $unhandled_count = Provider::getUnhandledComputersCount();
-        $this->assertEquals($total_count - 3, $unhandled_count);
+        $this->assertEquals($total_count - 3, $unhandled_count['number']);
     }
 
     public function testGetSumEmissionsPerModel()
@@ -237,8 +237,8 @@ class ProviderTest extends DbTestCase
                 $computer_model_2->fields['name'] . " (1 Computer)",
             ],
             'url' => [
-                Computer::getSearchURL() . '?criteria[0][field]=40&criteria[0][searchtype]=equals&criteria[0][value]=' . $computer_model_1->getID() . '&reset=reset',
-                Computer::getSearchURL() . '?criteria[0][field]=40&criteria[0][searchtype]=equals&criteria[0][value]=' . $computer_model_2->getID() . '&reset=reset',
+                Computer::getSearchURL() . '?criteria%5B0%5D%5Bfield%5D=40&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=' . $computer_model_1->getID() . '&reset=reset',
+                Computer::getSearchURL() . '?criteria%5B0%5D%5Bfield%5D=40&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=' . $computer_model_2->getID() . '&reset=reset',
             ],
             'unit' => 'g CO₂eq',
         ];

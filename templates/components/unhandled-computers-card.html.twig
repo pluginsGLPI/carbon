@@ -36,43 +36,16 @@
     </div>
     <div class="col">
       <div class="font-weight-medium">{{ __('Warning', 'carbon') }}</div>
-      <div class="text-secondary" id="unhandledComputers"></div>
+      <div class="text-secondary"><a id="unhandledComputers" href="{{ handled.url }}">{{ handled.number }} unhandled computers</a></div>
     </div>
   </div>
   <div class="row">
     <div class="col align-items-center">
-      <div class="text-secondary p-3" id="unhandledComputersPercentage"></div>
+      {% set totalComputers = handled.number + unhandled.number%}
+      {% set ratio = 100 * unhandled.number / totalComputers %}
+      <div class="text-secondary p-3">
+        {{ __("It represents %s percent of your parc that contains %s computers.", "carbon")|format(ratio|round(2, 'common'), totalComputers) }}
+        </div>
     </div>
   </div>
 </div>
-
-{% block scripts %}
-<script>
-
-  $(document).ready(function () {
-
-    var currentUrl = window.location.href;
-    if (currentUrl.includes('dashboard')) {
-      document.getElementById('cardBodyBorder').classList.add('border', 'border-2');
-    }
-
-    Promise.all([
-      fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/unhandledComputersCount.php").then(response => response.json()),
-      fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/handledComputersCount.php").then(response => response.json())
-      ]).then(([unhandledComputersCount, handledComputersCount]) => {
-
-          unhandledComputersCount = Number(unhandledComputersCount);
-          handledComputersCount   = Number(handledComputersCount);
-
-          document.getElementById('unhandledComputers').innerHTML = unhandledComputersCount + " unhandled computers";
-
-          let totalComputers      = unhandledComputersCount + handledComputersCount;
-
-          let unhandledComputersPercentage = totalComputers > 0 ? (unhandledComputersCount / totalComputers) * 100 : 0;
-          document.getElementById('unhandledComputersPercentage').textContent = "It represents " + unhandledComputersPercentage.toFixed(2) + "%" + " of your parc that contains " + totalComputers + " computers.";
-    });
-  });
-
-</script>
-{% endblock %}
-

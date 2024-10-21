@@ -37,6 +37,7 @@ use Computer;
 use ComputerModel;
 use ComputerType as GlpiComputerType;
 use DateTime;
+use DBmysqlIterator;
 use DbUtils;
 use Glpi\Dashboard\Filter;
 use GlpiPlugin\Carbon\ComputerType;
@@ -46,8 +47,10 @@ use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\History\Computer as ComputerHistory;
+use GlpiPlugin\Carbon\SearchOptions;
 use QueryExpression;
 use QuerySubQuery;
+use Search;
 use Toolbox as GlpiToolbox;
 
 class Provider
@@ -311,36 +314,9 @@ class Provider
      * @param array $params
      * @return integer|null : count of computers or null if an error occurred
      */
-    public static function getUnhandledComputersCount(array $params = []): ?int
+    public static function getUnhandledComputersCount(array $params = []): array
     {
-        global $DB;
-
-        $table = Computer::getTable();
-        $DbUtils = new DbUtils();
-        $itemtype = $DbUtils->getItemTypeForTable($table);
-        $item     = new $itemtype();
-        $criteria = $DbUtils->getEntitiesRestrictCriteria($table, '', '', $item->maybeRecursive());
-        $criteria[]['is_deleted'] = 0;
-        $criteria[]['is_template'] = 0;
-        $request = [
-            'COUNT' => 'cpt',
-            'FROM'   => $table,
-            'WHERE'  => $criteria
-        ];
-
-        $request = array_merge_recursive(
-            $request,
-            self::getFiltersCriteria($table, $params['args']['apply_filters'] ?? [])
-        );
-        $row = $DB->request($request)->current();
-        $total = ($row ? (int)$row['cpt'] : 0);
-        $complete_computers_count = self::getHandledComputersCount($params);
-
-        if ($complete_computers_count === null || $complete_computers_count > $total) {
-            return null;
-        }
-
-        return $total - $complete_computers_count;
+        return self::getHandledComputersCount($params, false);
     }
 
     /**
@@ -349,25 +325,38 @@ class Provider
      * @param array $params
      * @return integer|null
      */
-    public static function getHandledComputersCount(array $params = []): ?int
+    public static function getHandledComputersCount(array $params = [], $handled = true): array
     {
         global $DB;
 
-        $request = (new ComputerHistory())->getHistorizableQuery();
-        $request['SELECT'] = [
-            'COUNT' => Computer::getTableField('id') . ' AS nb_computers',
+        $search_criteria = [
+            'criteria' => [
+                [
+                    'field'      => SearchOptions::IS_HISTORIZABLE,
+                    'searchtype' => 'equals',
+                    'value'      => $handled ? 1 : 0
+                ],
+            ],
+            'reset'    => 'reset'
         ];
-        $request = array_merge_recursive(
-            $request,
-            self::getFiltersCriteria(Computer::getTable(), $params['args']['apply_filters'] ?? [])
-        );
-        $result = $DB->request($request);
-
-        if ($result->numrows() == 1) {
-            return $result->current()['nb_computers'];
+        // Exploit defaultWhere to inject WHERE criterias from dashboard filters
+        $filter_criteria = self::getFiltersCriteria(Computer::getTable(), $params['apply_filters'] ?? []);
+        if (isset($filter_criteria['WHERE'])) {
+            $_SESSION['plugin:carbon']['defaultwhere']['itemtype'] = Computer::class;
+            $_SESSION['plugin:carbon']['defaultwhere']['filter'] = (new DBmysqlIterator($DB))->analyseCrit($filter_criteria['WHERE']);
         }
+        $search_data = Search::prepareDatasForSearch(Computer::class, $search_criteria);
+        Search::constructSQL($search_data);
+        Search::constructData($search_data, true);
 
-        return null;
+        $count = $search_data['data']['totalcount'] ?? null;
+        $url = Computer::getSearchURL() . '?' . GlpiToolbox::append_params($search_criteria);
+        return [
+            'number' => $count,
+            'url'    => $url,
+            // 'label'  => $item::getTypeName($nb_items),
+            // 'icon'   => $item::getIcon(),
+        ];
     }
 
     /**

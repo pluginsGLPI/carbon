@@ -33,6 +33,9 @@
 
 namespace GlpiPlugin\Carbon\Dashboard;
 
+use Computer;
+use Glpi\Dashboard\Filter;
+
 class Grid
 {
     public static function getDashboardCards($cards = [])
@@ -47,12 +50,19 @@ class Grid
                 'group'        => __("Carbon", "carbon"),
                 'label'        => __("Unhandled computers", "carbon"),
                 'provider'     => Dashboard::class . "::cardUnhandledComputersCountProvider",
+                'filter'       => Filter::getAppliableFilters(Computer::getTable()),
             ],
             'plugin_carbon_card_complete_computers' => [
                 'widgettype'   => ["bigNumber"],
                 'group'        => __("Carbon", "carbon"),
                 'label'        => __("Handled computers", "carbon"),
                 'provider'     => Dashboard::class . "::cardHandledComputersCountProvider",
+                'filter'       => Filter::getAppliableFilters(Computer::getTable()),
+            ],
+            'plugin_carbon_card_unhandled_computers' => [
+                'widgettype'   => ['unhandledcomputers'],
+                'group'        => __("Carbon", "carbon"),
+                'label'        => __("Unhandled computers", 'carbon'),
             ],
             'plugin_carbon_card_total_power' => [
                 'widgettype'   => ["bigNumber"],
@@ -104,11 +114,6 @@ class Grid
                 'widgettype'   => ['monthlycarbonemission'],
                 'group'        => __("Carbon", "carbon"),
                 'label'        => __("Monthly carbon emission", 'carbon'),
-            ],
-            'plugin_carbon_card_unhandled_computers' => [
-                'widgettype'   => ['unhandledcomputers'],
-                'group'        => __("Carbon", "carbon"),
-                'label'        => __("Unhandled computers", 'carbon'),
             ],
             'plugin_carbon_card_graph_carbon_emission_per_month' => [
                 'widgettype'   => ['graphpermonth'],

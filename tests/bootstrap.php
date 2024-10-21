@@ -39,7 +39,7 @@ global $CFG_GLPI, $PLUGIN_HOOKS;
 define('TEST_PLUGIN_NAME', 'carbon');
 
 if (!$glpiConfigDir = getenv('TEST_GLPI_CONFIG_DIR')) {
-    fwrite(STDOUT, "Environment var TEST_GLPI_CONFIG_DIR is not set" . PHP_EOL);
+    fwrite(STDOUT, "Environment var TEST_GLPI_CONFIG_DIR is not set, using tests/config in GLPI directory" . PHP_EOL);
     $glpiConfigDir = 'tests/config';
 }
 

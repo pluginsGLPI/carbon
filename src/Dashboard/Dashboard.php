@@ -55,12 +55,12 @@ class Dashboard
 
     public static function cardUnhandledComputersCountProvider(array $params = [])
     {
-        return self::cardNumberProvider($params, "unhandled computers", self::getUnhandledComputersCount());
+        return self::cardNumberProvider($params, "unhandled computers", self::getUnhandledComputersCount($params));
     }
 
     public static function cardHandledComputersCountProvider(array $params = [])
     {
-        return self::cardNumberProvider($params, "unhandled computers", self::getHandledComputersCount());
+        return self::cardNumberProvider($params, "unhandled computers", self::getHandledComputersCount($params));
     }
 
     public static function cardTotalPowerProvider(array $params = [])
@@ -101,28 +101,28 @@ class Dashboard
         return self::cardDataProvider($params, "total carbon emission per model", self::getTotalCarbonEmissionPerModel());
     }
 
-    public static function getUnhandledComputersCount()
+    public static function getUnhandledComputersCount(array $params = [])
     {
         $unit = ''; // This is a count, no unit
 
-        $total = Provider::getUnhandledComputersCount();
-        if ($total === null) {
+        $total = Provider::getUnhandledComputersCount($params);
+        if ($total['number'] === null) {
             return 'N/A';
         }
 
-        return strval($total) . " $unit";
+        return strval($total['number']) . " $unit";
     }
 
-    public static function getHandledComputersCount()
+    public static function getHandledComputersCount(array $params = [])
     {
         $unit = ''; // This is a count, no unit
 
-        $total = Provider::getHandledComputersCount();
-        if ($total === null) {
+        $total = Provider::getHandledComputersCount($params);
+        if ($total['number'] === null) {
             return 'N/A';
         }
 
-        return strval($total) . " $unit";
+        return strval($total['number']) . " $unit";
     }
 
     /**

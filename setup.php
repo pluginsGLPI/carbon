@@ -119,6 +119,8 @@ function plugin_carbon_setupHooks()
     // Import CSS
     $PLUGIN_HOOKS[Hooks::ADD_CSS]['carbon'][] = 'dist/main.css';
 
+    $PLUGIN_HOOKS['add_default_where']['carbon'] = 'plugin_carbon_add_default_where';
+
     $PLUGIN_HOOKS['use_massive_action']['carbon'] = 1;
 }
 

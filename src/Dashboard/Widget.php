@@ -103,7 +103,10 @@ class Widget
 
     public static function DisplayUnhandledComputers(): string
     {
-
+        // $params = [
+        //     'handled' => Provider::getHandledComputersCount(),
+        //     'unhandled' => Provider::getUnhandledComputersCount(),
+        // ];
         return TemplateRenderer::getInstance()->render('@carbon/components/unhandled-computers-card.html.twig');
     }
 }
