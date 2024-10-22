@@ -177,33 +177,69 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
             'computation' => "IF(TABLE.`power_consumption` IS NULL, 0, TABLE.`power_consumption`)",
         ];
 
-        $item_history_class = '\\GlpiPlugin\\Carbon\\History\\' . $itemtype;
-        $historizable_query = (new $item_history_class())->getHistorizableQuery(false);
-        $joins = $historizable_query['INNER JOIN'];
-        $historizable_query['FROM'] = key($joins); // table of the 1st join of the original query
-        array_shift($historizable_query['INNER JOIN']); // Remove 1st join
-
-        $where = array_shift($joins)['FKEY'];
-        $left_expression = key($where) . '.' . $where[key($where)];
-        array_shift($where);
-        $right_expression = key($where) . '.' . $where[key($where)];
-        $where = [
-            $left_expression => new QueryExpression($right_expression)
-        ];
-        $historizable_query['WHERE']['AND'] = array_merge($historizable_query['WHERE'], $where);
-
-        $iterator = new DBmysqlIterator($DB);
-        $iterator->buildQuery($historizable_query);
-        $historizable_query = $iterator->getSQL();
-        $historizable_query = "IF(($historizable_query) > 0, 1, 0)";
+        $computation = "IF(`glpi_computers_id_e1f6cdb2d63e8a0252da5d4cb339a927`.`is_deleted` = 0
+            AND `glpi_computers_id_e1f6cdb2d63e8a0252da5d4cb339a927`.`is_template` = 0
+            AND NOT `glpi_locations`.`country`  = ''
+            AND NOT `glpi_locations`.`country` IS NULL
+            AND `glpi_plugin_carbon_computerusageprofiles_0c9cc3f1bd96f0f64dd5e8e36ff34149`.`id` > 0
+            AND (
+                `glpi_plugin_carbon_computertypes_a643ab3ffd70abf99533ed214da87d60`.`power_consumption` > 0
+                OR `glpi_computermodels`.`power_consumption` > 0
+            ), 1, 0)";
         $sopt[] = [
             'id'           => SearchOptions::IS_HISTORIZABLE,
             'table'         => getTableForItemType($itemtype),
             'field'         => 'id',
+            'linkfield'     => 'id',
             'name'          => __('Is historizable', 'carbon'),
             'datatype'      => 'bool',
             'massiveaction' => false,
-            'computation' => $historizable_query
+            'joinparams' => [
+                'jointype' => 'empty',
+                'beforejoin' => [
+                    [
+                        'table' => Location::getTable(),
+                        'joinparams' => [
+                            'jointype' => 'empty',
+                            'nolink'   => true,
+                        ]
+                    ],
+                    [
+                        'table' => ComputerType::getTable(),
+                        'joinparams' => [
+                            'jointype' => 'child',
+                            'nolink'   => true,
+                            'beforejoin' => [
+                                'table' => GlpiComputerType::getTable(),
+                                'joinparams' => [
+                                    'jointype' => 'empty',
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'table' => ComputerModel::getTable(),
+                        'joinparams' => [
+                            'jointype' => 'empty',
+                            'nolink'   => true,
+                        ]
+                    ],
+                    [
+                        'table' => ComputerUsageProfile::getTable(),
+                        'joinparams' => [
+                            'jointype' => 'empty',
+                            'nolink'   => true,
+                            'beforejoin' => [
+                                'table' => EnvironmentalImpact::getTable(),
+                                'joinparams' => [
+                                    'jointype' => 'child',
+                                ]
+                            ]
+                        ]
+                    ],
+                ],
+            ],
+            'computation' => $computation,
         ];
     }
 
@@ -249,7 +285,6 @@ function plugin_carbon_addDefaultSelect($itemtype): string
     }
 }
 
-
 function plugin_carbon_addDefaultJoin($itemtype, $ref_table, &$already_link_tables): string
 {
     switch ($itemtype) {
@@ -267,26 +302,6 @@ function plugin_carbon_addDefaultJoin($itemtype, $ref_table, &$already_link_tabl
     if (count($display_preferences) === 0) {
         return '';
     }
-}
-
-/**
- * Callback for Search::adDefaultWhere
- * Used to restrict search with additional criterias on core's itemtypes
- *
- * @param [type] $options
- * @return void
- */
-function plugin_carbon_add_default_where($options)
-{
-    if (($_SESSION['plugin:carbon']['defaultwhere']['itemtype'] ?? '') != $options[0]) {
-        return '';
-    }
-
-    // Inject a WHERE clause in SQL query generated by Search class
-    // Used in Provider::getHandledComputersCount()
-    $options[1] = $_SESSION['plugin:carbon']['defaultwhere']['filter'];
-    unset($_SESSION['plugin:carbon']['defaultwhere']);
-    return $options;
 }
 
 function plugin_carbon_hook_add_location(CommonDBTM $item)

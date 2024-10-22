@@ -341,10 +341,6 @@ class Provider
         ];
         // Exploit defaultWhere to inject WHERE criterias from dashboard filters
         $filter_criteria = self::getFiltersCriteria(Computer::getTable(), $params['apply_filters'] ?? []);
-        if (isset($filter_criteria['WHERE'])) {
-            $_SESSION['plugin:carbon']['defaultwhere']['itemtype'] = Computer::class;
-            $_SESSION['plugin:carbon']['defaultwhere']['filter'] = (new DBmysqlIterator($DB))->analyseCrit($filter_criteria['WHERE']);
-        }
         $search_data = Search::prepareDatasForSearch(Computer::class, $search_criteria);
         Search::constructSQL($search_data);
         Search::constructData($search_data, true);
