@@ -38,91 +38,6 @@ use GlpiPlugin\Carbon\Toolbox;
 
 class Dashboard
 {
-    public static function dashboardCards($cards = [])
-    {
-        if (is_null($cards)) {
-            $cards = [];
-        }
-
-        $new_cards = [
-            'plugin_carbon_card_incomplete_computers' => [
-                'widgettype'   => ["bigNumber"],
-                'group'        => __("Carbon", "carbon"),
-                'label'        => __("Unhandled computers", "carbon"),
-                'provider'     => Dashboard::class . "::cardUnhandledComputersCountProvider",
-            ],
-            'plugin_carbon_card_complete_computers' => [
-                'widgettype'   => ["bigNumber"],
-                'group'        => __("Carbon", "carbon"),
-                'label'        => __("Handled computers", "carbon"),
-                'provider'     => Dashboard::class . "::cardHandledComputersCountProvider",
-            ],
-            'plugin_carbon_card_total_power' => [
-                'widgettype'   => ["bigNumber"],
-                'group'        => __("Carbon", "carbon"),
-                'label'        => __("Total power consumption", "carbon"),
-                'provider'     => Dashboard::class . "::cardTotalPowerProvider",
-            ],
-            'plugin_carbon_card_total_carbon_emission' => [
-                'widgettype'   => ["bigNumber"],
-                'group'        => __("Carbon", "carbon"),
-                'label'        => __("Total carbon emission", "carbon"),
-                'provider'     => Dashboard::class . "::cardTotalCarbonEmissionProvider",
-            ],
-            'plugin_carbon_card_total_power_per_model' => [
-                'widgettype'   => ['pie', 'donut', 'halfpie', 'halfdonut', 'bar', 'hbar'],
-                'group'        => __("Carbon", "carbon"),
-                'label'        => __("Total power consumption per model", "carbon"),
-                'provider'     => Dashboard::class . "::cardTotalPowerPerModelProvider",
-            ],
-            'plugin_carbon_card_total_carbon_emission_per_model' => [
-                'widgettype'   => ['pie', 'donut', 'halfpie', 'halfdonut', 'bar', 'hbar'],
-                'group'        => __("Carbon", "carbon"),
-                'label'        => __("Total carbon emission per model", 'carbon'),
-                'provider'     => Dashboard::class . "::cardTotalCarbonEmissionPerModelProvider",
-            ],
-            'plugin_carbon_card_carbon_emission_per_month' => [
-                'widgettype'   => ['lines', 'areas', 'bars', 'stackedbars'],
-                'group'        => __("Carbon", "carbon"),
-                'label'        => __("Carbon emission per month", 'carbon'),
-                'provider'     => Dashboard::class . "::cardCarbonEmissionPerMonthProvider",
-            ],
-            'plugin_carbon_card_carbon_intensity' => [
-                'widgettype'   => ['lines', 'bars'],
-                'group'        => __("Carbon", "carbon"),
-                'label'        => __("Carbon intensity  (gCO<sub>2</sub>eq / KWh)", 'carbon'),
-                'provider'     => Dashboard::class . "::cardCarbonintensityProvider",
-            ],
-            'plugin_carbon_card_carbon_emission_per_type' => [
-                'widgettype'   => ['graphpertype'],
-                'group'        => __("Carbon", "carbon"),
-                'label'        => __("Carbon emission per type", 'carbon'),
-            ],
-            'plugin_carbon_card_total_carbon_emission' => [
-                'widgettype'   => ['totalcarbonemission'],
-                'group'        => __("Carbon", "carbon"),
-                'label'        => __("Total carbon emission", 'carbon'),
-            ],
-            'plugin_carbon_card_monthly_carbon_emission' => [
-                'widgettype'   => ['monthlycarbonemission'],
-                'group'        => __("Carbon", "carbon"),
-                'label'        => __("Monthly carbon emission", 'carbon'),
-            ],
-            'plugin_carbon_card_unhandled_computers' => [
-                'widgettype'   => ['unhandledcomputers'],
-                'group'        => __("Carbon", "carbon"),
-                'label'        => __("Unhandled computers", 'carbon'),
-            ],
-            'plugin_carbon_card_graph_carbon_emission_per_month' => [
-                'widgettype'   => ['graphpermonth'],
-                'group'        => __("Carbon", "carbon"),
-                'label'        => __("Carbon emission per month graph", 'carbon'),
-            ],
-        ];
-
-        return array_merge($cards, $new_cards);
-    }
-
     public static function cardNumberProvider(array $params = [], string $label = "", string $number = "")
     {
         $default_params = [
@@ -140,12 +55,12 @@ class Dashboard
 
     public static function cardUnhandledComputersCountProvider(array $params = [])
     {
-        return self::cardNumberProvider($params, "unhandled computers", self::getUnhandledComputersCount());
+        return self::cardNumberProvider($params, "unhandled computers", self::getUnhandledComputersCount($params));
     }
 
     public static function cardHandledComputersCountProvider(array $params = [])
     {
-        return self::cardNumberProvider($params, "unhandled computers", self::getHandledComputersCount());
+        return self::cardNumberProvider($params, "unhandled computers", self::getHandledComputersCount($params));
     }
 
     public static function cardTotalPowerProvider(array $params = [])
@@ -186,28 +101,28 @@ class Dashboard
         return self::cardDataProvider($params, "total carbon emission per model", self::getTotalCarbonEmissionPerModel());
     }
 
-    public static function getUnhandledComputersCount()
+    public static function getUnhandledComputersCount(array $params = [])
     {
         $unit = ''; // This is a count, no unit
 
-        $total = Provider::getUnhandledComputersCount();
-        if ($total === null) {
+        $total = Provider::getUnhandledComputersCount($params);
+        if ($total['number'] === null) {
             return 'N/A';
         }
 
-        return strval($total) . " $unit";
+        return strval($total['number']) . " $unit";
     }
 
-    public static function getHandledComputersCount()
+    public static function getHandledComputersCount(array $params = [])
     {
         $unit = ''; // This is a count, no unit
 
-        $total = Provider::getHandledComputersCount();
-        if ($total === null) {
+        $total = Provider::getHandledComputersCount($params);
+        if ($total['number'] === null) {
             return 'N/A';
         }
 
-        return strval($total) . " $unit";
+        return strval($total['number']) . " $unit";
     }
 
     /**

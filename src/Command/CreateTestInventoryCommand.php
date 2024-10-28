@@ -42,7 +42,7 @@ use Entity;
 use Location;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
-use GlpiPlugin\Carbon\EnvironnementalImpact;
+use GlpiPlugin\Carbon\EnvironmentalImpact;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
@@ -210,7 +210,7 @@ class CreateTestInventoryCommand extends Command
             'date_creation' => '2021-01-01 00:00:00',
         ]);
         $impact = $this->createItemIfNotExist(
-            EnvironnementalImpact::class,
+            EnvironmentalImpact::class,
             [
                 GlpiComputer::getForeignKeyField() => $glpi_computer->getId(),
                 ComputerUsageProfile::getForeignKeyField() => $usage_profile->getID(),

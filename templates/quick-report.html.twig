@@ -57,13 +57,18 @@
 
                 <div class="col-sm-6 col-lg-3" id="responsiveClassElement3">
                   <div class="card card-sm card-height" id="cardElement3">
-                    {% include '@carbon/components/unhandled-computers-card.html.twig' %}
+                    {% include '@carbon/components/unhandled-computers-card.html.twig'
+                      with {
+                        'handled': handled,
+                        'unhandled': unhandled
+                      }
+                    %}
                   </div>
                 </div>
 
                 {% include '@carbon/components/information-video-card.html.twig' %}
                 <!-- Row for score cards -->
-            </>
+            </div>
         </div>
                 <div class="col-12">
                     <div class="row row-cards pb-3 align-items-center">

@@ -32,7 +32,6 @@
  */
 
 use Config as GlpiConfig;
-use GlpiPlugin\Carbon\Dashboard\Dashboard;
 use GlpiPlugin\Carbon\Dashboard\Widget;
 use Glpi\Plugin\Hooks;
 use GlpiPlugin\Carbon\CarbonIntensity;
@@ -45,6 +44,7 @@ use MonitorType as GlpiMonitorType;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
 use Profile as GlpiProfile;
 use GlpiPlugin\Carbon\ComputerType;
+use GlpiPlugin\Carbon\Dashboard\Grid;
 use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
 
@@ -95,7 +95,7 @@ function plugin_carbon_setupHooks()
     ];
 
     // add new cards to the dashboard
-    $PLUGIN_HOOKS[Hooks::DASHBOARD_CARDS]['carbon'] = [Dashboard::class, 'dashboardCards'];
+    $PLUGIN_HOOKS[Hooks::DASHBOARD_CARDS]['carbon'] = [Grid::class, 'getDashboardCards'];
     $PLUGIN_HOOKS[Hooks::DASHBOARD_TYPES]['carbon'] = [Widget::class, 'WidgetTypes'];
 
     if (Session::haveRight('config', UPDATE)) {
@@ -118,6 +118,8 @@ function plugin_carbon_setupHooks()
 
     // Import CSS
     $PLUGIN_HOOKS[Hooks::ADD_CSS]['carbon'][] = 'dist/main.css';
+
+    $PLUGIN_HOOKS['add_default_where']['carbon'] = 'plugin_carbon_add_default_where';
 
     $PLUGIN_HOOKS['use_massive_action']['carbon'] = 1;
 }
