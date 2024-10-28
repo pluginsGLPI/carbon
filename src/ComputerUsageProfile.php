@@ -146,10 +146,8 @@ class ComputerUsageProfile extends CommonDropdown
         $tab = parent::rawSearchOptions();
         $my_table = self::getTable();
 
-        $search_option_base = PLUGIN_CARBON_SEARCH_OPTION_BASE + 100;
-
         $tab[] = [
-            'id'                 => $search_option_base + 1,
+            'id'                 => SearchOptions::COMPUTER_USAGE_PROFILE_START_TIME,
             'table'              => $my_table,
             'field'              => 'time_start',
             'name'               => __('Start time', 'carbon'),
@@ -157,7 +155,7 @@ class ComputerUsageProfile extends CommonDropdown
         ];
 
         $tab[] = [
-            'id'                 => $search_option_base + 2,
+            'id'                 => SearchOptions::COMPUTER_USAGE_PROFILE_STOP_TIME,
             'table'              => $my_table,
             'field'              => 'time_stop',
             'name'               => __('Stop time', 'carbon'),
@@ -165,7 +163,7 @@ class ComputerUsageProfile extends CommonDropdown
         ];
 
         $tab[] = [
-            'id'                 => $search_option_base + 10,
+            'id'                 => SearchOptions::COMPUTER_USAGE_PROFILE_DAY_1,
             'table'              => $my_table,
             'field'              => 'day_1',
             'name'               => __('Monday'),
@@ -173,7 +171,7 @@ class ComputerUsageProfile extends CommonDropdown
         ];
 
         $tab[] = [
-            'id'                 => $search_option_base + 11,
+            'id'                 => SearchOptions::COMPUTER_USAGE_PROFILE_DAY_2,
             'table'              => $my_table,
             'field'              => 'day_2',
             'name'               => __('Tuesday'),
@@ -181,7 +179,7 @@ class ComputerUsageProfile extends CommonDropdown
         ];
 
         $tab[] = [
-            'id'                 => $search_option_base + 12,
+            'id'                 => SearchOptions::COMPUTER_USAGE_PROFILE_DAY_3,
             'table'              => $my_table,
             'field'              => 'day_3',
             'name'               => __('Wednesday'),
@@ -189,7 +187,7 @@ class ComputerUsageProfile extends CommonDropdown
         ];
 
         $tab[] = [
-            'id'                 => $search_option_base + 13,
+            'id'                 => SearchOptions::COMPUTER_USAGE_PROFILE_DAY_4,
             'table'              => $my_table,
             'field'              => 'day_4',
             'name'               => __('Thursday'),
@@ -197,7 +195,7 @@ class ComputerUsageProfile extends CommonDropdown
         ];
 
         $tab[] = [
-            'id'                 => $search_option_base + 14,
+            'id'                 => SearchOptions::COMPUTER_USAGE_PROFILE_DAY_5,
             'table'              => $my_table,
             'field'              => 'day_5',
             'name'               => __('Friday'),
@@ -205,7 +203,7 @@ class ComputerUsageProfile extends CommonDropdown
         ];
 
         $tab[] = [
-            'id'                 => $search_option_base + 15,
+            'id'                 => SearchOptions::COMPUTER_USAGE_PROFILE_DAY_6,
             'table'              => $my_table,
             'field'              => 'day_6',
             'name'               => __('Saturday'),
@@ -213,7 +211,7 @@ class ComputerUsageProfile extends CommonDropdown
         ];
 
         $tab[] = [
-            'id'                 => $search_option_base + 16,
+            'id'                 => SearchOptions::COMPUTER_USAGE_PROFILE_DAY_7,
             'table'              => $my_table,
             'field'              => 'day_7',
             'name'               => __('Sunday'),

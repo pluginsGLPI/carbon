@@ -153,10 +153,8 @@ class EnvironmentalImpact extends CommonDBChild
         $tab = parent::rawSearchOptions();
         $my_table = self::getTable();
 
-        $search_option_base = PLUGIN_CARBON_SEARCH_OPTION_BASE + 200;
-
         $tab[] = [
-            'id'                 => $search_option_base + 1,
+            'id'                 => SearchOptions::ENVIRONMENTAL_IMPACT_COMPUTER_TYPE,
             'table'              => $my_table,
             'field'              => Computer::getForeignKeyField(),
             'name'               => Computer::getTypeName(1),
@@ -165,7 +163,7 @@ class EnvironmentalImpact extends CommonDBChild
         ];
 
         $tab[] = [
-            'id'                 => $search_option_base + 2,
+            'id'                 => SearchOptions::ENVIRONMENTAL_IMPACT_COMPUTER_USAGE_PROFILE,
             'table'              => $my_table,
             'field'              => ComputerUsageProfile::getForeignKeyField(),
             'name'               => ComputerUsageProfile::getTypeName(1),

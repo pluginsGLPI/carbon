@@ -36,7 +36,7 @@ use GlpiPlugin\Carbon\CarbonIntensity;
 $migration->updateDisplayPrefs(
     [
         CarbonIntensity::class => [
-            2, 3, PLUGIN_CARBON_SEARCH_OPTION_BASE + 401, PLUGIN_CARBON_SEARCH_OPTION_BASE + 402, PLUGIN_CARBON_SEARCH_OPTION_BASE + 403
+            2, 3, 10000 + 401, 10000 + 402, 10000 + 403
         ]
     ],
     [],
