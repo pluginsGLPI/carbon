@@ -35,6 +35,8 @@ namespace GlpiPlugin\Carbon\Tests;
 
 use Computer;
 use GlpiPlugin\Carbon\SearchOptions;
+use Monitor;
+use NetworkEquipment;
 use Search;
 
 class SearchTest extends DbTestCase
@@ -54,6 +56,34 @@ class SearchTest extends DbTestCase
         ];
 
         $data = Search::getDatas(Computer::class, $criterias);
+        $sql = $data['sql']['search'];
+        $this->assertIsArray($data);
+
+        $criterias = [
+            'criteria' => [
+                ['field' => SearchOptions::IS_HISTORIZABLE,
+                    'searchtype' => 'equals',
+                    'value'      => '1'
+                ],
+            ],
+            'reset'    => 'reset'
+        ];
+
+        $data = Search::getDatas(NetworkEquipment::class, $criterias);
+        $sql = $data['sql']['search'];
+        $this->assertIsArray($data);
+
+        $criterias = [
+            'criteria' => [
+                ['field' => SearchOptions::IS_HISTORIZABLE,
+                    'searchtype' => 'equals',
+                    'value'      => '1'
+                ],
+            ],
+            'reset'    => 'reset'
+        ];
+
+        $data = Search::getDatas(Monitor::class, $criterias);
         $sql = $data['sql']['search'];
         $this->assertIsArray($data);
     }
