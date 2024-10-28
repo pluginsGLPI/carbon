@@ -89,8 +89,6 @@ class CarbonIntensity extends CommonDBTM
 
         $table = self::getTable();
 
-        $search_option_base = PLUGIN_CARBON_SEARCH_OPTION_BASE + 400;
-
         $tab[] = [
             'id'                 => '2',
             'table'              => $table,
@@ -110,7 +108,7 @@ class CarbonIntensity extends CommonDBTM
         ];
 
         $tab[] = [
-            'id'                 => $search_option_base + 1,
+            'id'                 => SearchOptions::CARBON_INTENSITY_SOURCE,
             'table'              => CarbonIntensitySource::getTable(),
             'field'              => 'name',
             'name'               => CarbonIntensitySource::getTypeName(1),
@@ -119,7 +117,7 @@ class CarbonIntensity extends CommonDBTM
         ];
 
         $tab[] = [
-            'id'                 => $search_option_base + 2,
+            'id'                 => SearchOptions::CARBON_INTENSITY_ZONE,
             'table'              => CarbonIntensityZone::getTable(),
             'field'              => 'name',
             'name'               => CarbonIntensityZone::getTypeName(1),
@@ -128,7 +126,7 @@ class CarbonIntensity extends CommonDBTM
         ];
 
         $tab[] = [
-            'id'                 => $search_option_base + 3,
+            'id'                 => SearchOptions::CARBON_INTENSITY_INTENSITY,
             'table'              => $table,
             'field'              => 'intensity',
             'name'               => __('Intensity', 'carbon'),

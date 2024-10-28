@@ -67,9 +67,6 @@ define('PLUGIN_CARBON_TYPES', [
     //    Printer::class,
 ]);
 
-// Sets the base of search options ID, to be able to change it easily if a conflict is discovered
-define('PLUGIN_CARBON_SEARCH_OPTION_BASE', 10000);
-
 /**
  * Init hooks of the plugin.
  * REQUIRED
