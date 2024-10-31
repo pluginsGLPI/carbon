@@ -89,7 +89,7 @@ class Grid
                 'provider'     => Dashboard::class . "::cardTotalCarbonEmissionPerModelProvider",
             ],
             'plugin_carbon_card_carbon_emission_per_month' => [
-                'widgettype'   => ['lines', 'areas', 'bars', 'stackedbars'],
+                'widgettype'   => ['apex_lines'],
                 'group'        => __("Carbon", "carbon"),
                 'label'        => __("Carbon emission per month", 'carbon'),
                 'provider'     => Dashboard::class . "::cardCarbonEmissionPerMonthProvider",

@@ -38,6 +38,7 @@ use DateTime;
 use DateTimeImmutable;
 use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\Dashboard\Provider;
+use GlpiPlugin\Carbon\Dashboard\Widget;
 
 class Report extends CommonDBTM
 {
