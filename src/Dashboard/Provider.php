@@ -327,8 +327,6 @@ class Provider
      */
     public static function getHandledComputersCount(array $params = [], $handled = true): array
     {
-        global $DB;
-
         $search_criteria = [
             'criteria' => [
                 [
@@ -407,24 +405,61 @@ class Provider
         ]);
 
         $request = [
-            'SELECT' => [
-                CarbonIntensity::getTable() => [
-                    'intensity',
-                    'date',
-                ]
-            ],
+            // 'SELECT' => [
+                // CarbonIntensity::getTableField('intensity'),
+                // CarbonIntensity::getTableField('date'),
+            // ],
             'FROM'  => CarbonIntensity::getTable(),
             'WHERE' => [
                 CarbonIntensitySource::getForeignKeyField('sources_id') => $source->getID(),
                 CarbonIntensityZone::getForeignKeyField('zones_id') => $zone->getID(),
-            ]
+            ],
         ];
 
-        $filters = self::getFiltersCriteria(CarbonIntensity::getTable(), $params['apply_filters']);
+        $filters = self::getFiltersCriteria(CarbonIntensity::getTable(), $params['apply_filters'] ?? []);
         $request = array_merge_recursive(
             $request,
             $filters
         );
+
+        // Limit deepness
+        $count_request = $request;
+        // unset($count_request['SELECT']);
+        $count_request['COUNT'] = 'c';
+        $count = $DB->request($count_request);
+        if ($count->numrows() !== 1) {
+            throw new \RuntimeException("Failed to count carbon intensity samples");
+        }
+        $date = CarbonIntensity::getTableField('date');
+        $intensity = CarbonIntensity::getTableField('intensity');
+        $count = $count->current()['c'];
+        if ($count > 365 * 5 * 24) {
+            $date = $DB->quoteName($date);
+            $date = "DATE_FORMAT($date, '%Y')";
+            $intensity = ['AVG' => "$intensity AS `intensity`"];
+            $request['GROUPBY'] = new QueryExpression($date);
+            $request['LIMIT'] = 10;
+        } else if ($count > 365 * 24) {
+            $date = $DB->quoteName($date);
+            $date = "DATE_FORMAT($date, '%Y-%m')";
+            $intensity = ['AVG' => "$intensity AS `intensity`"];
+            $request['GROUPBY'] = new QueryExpression($date);
+        } else if ($count > 30 * 24) {
+            $date = $DB->quoteName($date);
+            $date = "DATE_FORMAT($date, '%Y-%m-%d')";
+            $intensity = ['AVG' => "$intensity AS `intensity`"];
+            $request['GROUPBY'] = new QueryExpression($date);
+        } else {
+            $intensity = [$intensity];
+        }
+
+        unset($request['COUNT']);
+        $request['SELECT'] = array_merge(
+            [new QueryExpression("$date AS `date`")],
+            $intensity
+        );
+        $request['ORDERBY'] = 'date';
+        $rows = $DB->request($request);
 
         $data = [
             'labels' => [],
@@ -435,7 +470,6 @@ class Provider
                 ]
             ],
         ];
-        $rows = $DB->request($request);
         foreach ($rows as $row) {
             $data['labels'][]            = $row['date'];
             $data['series'][0]['data'][] = number_format($row['intensity'], PLUGIN_CARBON_DECIMALS);
