@@ -213,7 +213,6 @@ class Dashboard
     public static function cardCarbonEmissionPerMonthProvider(array $params = [])
     {
         $default_params = [
-            'label' => __('Carbon emission per month', 'carbon'),
             'icon'  => "fas fa-computer",
             'color' => '#ea9999',
         ];

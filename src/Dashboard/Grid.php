@@ -82,17 +82,11 @@ class Grid
                 'label'        => __("Total power consumption per model", "carbon"),
                 'provider'     => Dashboard::class . "::cardTotalPowerPerModelProvider",
             ],
-            'plugin_carbon_card_total_carbon_emission_per_model' => [
-                'widgettype'   => ['pie', 'donut', 'halfpie', 'halfdonut', 'bar', 'hbar'],
-                'group'        => __("Carbon", "carbon"),
-                'label'        => __("Total carbon emission per model", 'carbon'),
-                'provider'     => Dashboard::class . "::cardTotalCarbonEmissionPerModelProvider",
-            ],
             'plugin_carbon_card_carbon_emission_per_month' => [
                 'widgettype'   => ['apex_lines'],
                 'group'        => __("Carbon", "carbon"),
                 'label'        => __("Carbon emission per month", 'carbon'),
-                'provider'     => Dashboard::class . "::cardCarbonEmissionPerMonthProvider",
+                'provider'     => Provider::class . "::getCarbonEmissionPerMonth",
             ],
             'plugin_carbon_card_carbon_intensity' => [
                 'widgettype'   => ['lines', 'bars'],
@@ -104,6 +98,7 @@ class Grid
                 'widgettype'   => ['graphpertype'],
                 'group'        => __("Carbon", "carbon"),
                 'label'        => __("Carbon emission per type", 'carbon'),
+                'provider'     => Provider::class . "::getSumEmissionsPerModel",
             ],
             'plugin_carbon_card_total_carbon_emission' => [
                 'widgettype'   => ['totalcarbonemission'],
@@ -114,11 +109,6 @@ class Grid
                 'widgettype'   => ['monthlycarbonemission'],
                 'group'        => __("Carbon", "carbon"),
                 'label'        => __("Monthly carbon emission", 'carbon'),
-            ],
-            'plugin_carbon_card_graph_carbon_emission_per_month' => [
-                'widgettype'   => ['graphpermonth'],
-                'group'        => __("Carbon", "carbon"),
-                'label'        => __("Carbon emission per month graph", 'carbon'),
             ],
         ];
 

@@ -38,7 +38,6 @@ use DateTime;
 use DateTimeImmutable;
 use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\Dashboard\Provider;
-use GlpiPlugin\Carbon\Dashboard\Widget;
 
 class Report extends CommonDBTM
 {
@@ -85,6 +84,8 @@ class Report extends CommonDBTM
 
     public static function showInstantReport(): void
     {
+        // $carbon_emission_per_month = Provider::getCarbonEmissionPerMonth();
+
         TemplateRenderer::getInstance()->display('@carbon/quick-report.html.twig', [
             'handled'   => Provider::getHandledComputersCount(),
             'unhandled' => Provider::getUnhandledComputersCount(),
@@ -151,8 +152,72 @@ class Report extends CommonDBTM
             $start_date->format($date_format),
             $end_date->format($date_format),
         ];
-
-        return json_encode($data);
+        $apex_data = [
+            'chart' => [
+                'type' => 'line',
+                'height' => 350,
+            ],
+            'colors' => ['#BBDA50', '#A00'],
+            // 'title' => [
+                // 'text' => __('Consumed energy and carbon emission', 'carbon'),
+            // ],
+            'plotOptions' => [
+                'bar' => [
+                    'horizontal' => false,
+                    'columnWidth' => '55%',
+                    'endingShape' => 'rounded'
+                ],
+            ],
+            'dataLabels' => [
+                'enabled' => false,
+                'enabledOnSeries' => [0, 1],
+                'style' => [
+                    'colors' => ['#145161', '#800'],
+                ],
+            ],
+            'labels' => [],
+            'stroke' => [
+                'width' => [0, 4],
+            ],
+            'series' => [
+                [
+                    'name' =>  __('Carbon emission', 'carbon'),
+                    'type' => 'bar',
+                    'data' => []
+                ],
+                [
+                    'name' => __('Consumed energy', 'carbon'),
+                    'type' => 'line',
+                    'data' => []
+                ],
+            ],
+            'xaxis' => [
+                'categories' => []
+            ],
+            'yaxis' => [
+                [
+                    'title' => ['text' => __('Carbon emission', 'carbon')],
+                ], [
+                    'opposite' => true,
+                    'title' => ['text' => __('Consumed energy', 'carbon')],
+                ]
+            ],
+            'markers' => [
+                'size' => [3, 3],
+            ],
+            'tooltip' => [
+                'enabled' => true,
+            ],
+        ];
+        foreach ($data['data']['series'] as $key => $serie) {
+            $apex_data['series'][$key]['data'] = $serie['data'];
+            $apex_data['series'][$key]['name'] = $serie['name'];
+            $apex_data['series'][$key]['type'] = $serie['type'];
+        }
+        // $apex_data['series'] = $data['data']['series'];
+        $apex_data['labels'] = $data['data']['labels'];
+        $apex_data['xaxis']['categories'] = $data['data']['labels'];
+        return json_encode($apex_data);
     }
 
     public static function getCarbonEmissionLastMonth(array $params): string
@@ -179,12 +244,12 @@ class Report extends CommonDBTM
                 $date_format = 'F Y';
                 break;
         }
-        $data['date_interval'] = [
+        $data['data']['date_interval'] = [
             $start_date->format($date_format),
             $end_date->format($date_format),
         ];
 
-        return json_encode($data);
+        return json_encode($data['data']);
     }
 
     public static function getHandledComputersCount(array $params = []): string
