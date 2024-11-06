@@ -317,6 +317,12 @@ class Provider
      */
     public static function getUnhandledComputersCount(array $params = []): array
     {
+        $default_params = [
+            'label' => __("plugin carbon - unhandled computers", 'carbon'),
+            'icon'  => "fas fa-computer",
+        ];
+        $params = array_merge($default_params, $params);
+
         return self::getHandledComputersCount($params, false);
     }
 
@@ -328,6 +334,12 @@ class Provider
      */
     public static function getHandledComputersCount(array $params = [], $handled = true): array
     {
+        $default_params = [
+            'label' => __("plugin carbon - handled computers", 'carbon'),
+            'icon'  => "fas fa-computer",
+        ];
+        $params = array_merge($default_params, $params);
+
         $search_criteria = [
             'criteria' => [
                 [
@@ -349,8 +361,8 @@ class Provider
         return [
             'number' => $count,
             'url'    => $url,
-            // 'label'  => $item::getTypeName($nb_items),
-            // 'icon'   => $item::getIcon(),
+            'label'  => $params['label'],
+            'icon'   => $params['icon'],
         ];
     }
 

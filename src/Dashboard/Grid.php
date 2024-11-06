@@ -49,14 +49,14 @@ class Grid
                 'widgettype'   => ["bigNumber"],
                 'group'        => __("Carbon", "carbon"),
                 'label'        => __("Unhandled computers", "carbon"),
-                'provider'     => Dashboard::class . "::cardUnhandledComputersCountProvider",
+                'provider'     => Provider::class . "::getUnhandledComputersCount",
                 'filter'       => Filter::getAppliableFilters(Computer::getTable()),
             ],
             'plugin_carbon_card_complete_computers' => [
                 'widgettype'   => ["bigNumber"],
                 'group'        => __("Carbon", "carbon"),
                 'label'        => __("Handled computers", "carbon"),
-                'provider'     => Dashboard::class . "::cardHandledComputersCountProvider",
+                'provider'     => Provider::class . "::getHandledComputersCount",
                 'filter'       => Filter::getAppliableFilters(Computer::getTable()),
             ],
             'plugin_carbon_card_unhandled_computers' => [

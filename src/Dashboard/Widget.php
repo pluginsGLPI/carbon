@@ -260,8 +260,7 @@ class Widget extends GlpiDashboardWidget
      */
     public static function pie(
         array $params = []
-    ): string
-    {
+    ): string {
         $default = [
             'type'         => 'pie',
             'data'         => [],
@@ -291,7 +290,8 @@ class Widget extends GlpiDashboardWidget
             'startAngle' => 0,
             'endAngle'   => 360,
             'offsetY'    => 0,
-        ]];
+        ]
+        ];
         if ($p['donut']) {
             $p['type'] = 'donut';
         }
@@ -312,7 +312,10 @@ class Widget extends GlpiDashboardWidget
         $palette_style = "";
         if ($p['use_gradient']) {
             $palette_style = self::getCssGradientPalette(
-                $p['color'], $nb_series, "#{$chart_id}");
+                $p['color'],
+                $nb_series,
+                "#{$chart_id}"
+            );
         }
 
         $label_class = '';
@@ -347,8 +350,7 @@ class Widget extends GlpiDashboardWidget
         array $params = [],
         array $labels = [],
         array $series = []
-        ): string
-    {
+    ): string {
         return self::pie(
             array_merge($params, ['donut' => true]),
             $labels,
@@ -360,8 +362,7 @@ class Widget extends GlpiDashboardWidget
         array $params = [],
         array $labels = [],
         array $series = []
-        ): string
-    {
+    ): string {
         return self::pie(
             array_merge($params, ['donut' => true, 'half' => true]),
             $labels,
