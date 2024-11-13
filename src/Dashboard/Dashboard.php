@@ -60,7 +60,7 @@ class Dashboard
 
     public static function cardHandledComputersCountProvider(array $params = [])
     {
-        return self::cardNumberProvider($params, "unhandled computers", self::getHandledComputersCount($params));
+        return self::cardNumberProvider($params, "handled computers", self::getHandledComputersCount($params));
     }
 
     public static function cardTotalPowerProvider(array $params = [])
@@ -213,7 +213,6 @@ class Dashboard
     public static function cardCarbonEmissionPerMonthProvider(array $params = [])
     {
         $default_params = [
-            'label' => __('Carbon emission per month', 'carbon'),
             'icon'  => "fas fa-computer",
             'color' => '#ea9999',
         ];

@@ -139,13 +139,14 @@ class Provider
                 'MAX' => 'nb_computers_per_model AS nb_computers_per_model'
             ],
             'FROM' => new QuerySubQuery($subrequest, 'montly_per_model'),
+            'WHERE' => [],
             'GROUPBY' => ['id'],
-            'ORDERBY' => 'total_per_model',
-            'LIMIT'   => 10,
+            'ORDERBY' => 'monthly_emission_per_model DESC',
         ];
 
         if (!empty($where)) {
-            $request['WHERE'] = $request['WHERE'] + $where;
+            $filter_criteria = self::getFiltersCriteria(Computer::getTable(), $params['apply_filters'] ?? []);
+            $request['WHERE'] = $request['WHERE'] + $filter_criteria;
         }
         $result = $DB->request($request);
 
@@ -316,6 +317,12 @@ class Provider
      */
     public static function getUnhandledComputersCount(array $params = []): array
     {
+        $default_params = [
+            'label' => __("plugin carbon - unhandled computers", 'carbon'),
+            'icon'  => "fas fa-computer",
+        ];
+        $params = array_merge($default_params, $params);
+
         return self::getHandledComputersCount($params, false);
     }
 
@@ -327,6 +334,12 @@ class Provider
      */
     public static function getHandledComputersCount(array $params = [], $handled = true): array
     {
+        $default_params = [
+            'label' => __("plugin carbon - handled computers", 'carbon'),
+            'icon'  => "fas fa-computer",
+        ];
+        $params = array_merge($default_params, $params);
+
         $search_criteria = [
             'criteria' => [
                 [
@@ -348,8 +361,8 @@ class Provider
         return [
             'number' => $count,
             'url'    => $url,
-            // 'label'  => $item::getTypeName($nb_items),
-            // 'icon'   => $item::getIcon(),
+            'label'  => $params['label'],
+            'icon'   => $params['icon'],
         ];
     }
 
@@ -489,6 +502,13 @@ class Provider
     {
         global $DB;
 
+        $default_params = [
+            'icon'  => "fas fa-computer",
+            // 'color' => '#ea9999',
+            'apply_filters' => [],
+        ];
+        $params = array_merge($default_params, $params);
+
         $emissions_table = CarbonEmission::getTable();
 
         $dbUtils = new DbUtils();
@@ -507,68 +527,11 @@ class Provider
             'ORDER'   => new QueryExpression($sql_year_month),
             'WHERE'   => $entityRestrict + $crit,
         ];
-        $filter = self::getFiltersCriteria($emissions_table, $params['apply_filters'] ?? []);
+        $filter = self::getFiltersCriteria($emissions_table, $params['apply_filters']);
         $request = array_merge_recursive($request, $filter);
         $result = $DB->request($request);
 
-        $data = [
-            'chart' => [
-                'type' => 'line',
-                'height' => 350,
-            ],
-            'colors' => ['#BBDA50', '#A00'],
-            // 'title' => [
-                // 'text' => __('Consumed energy and carbon emission', 'carbon'),
-            // ],
-            'plotOptions' => [
-                'bar' => [
-                    'horizontal' => false,
-                    'columnWidth' => '55%',
-                    'endingShape' => 'rounded'
-                ],
-            ],
-            'dataLabels' => [
-                'enabled' => false,
-                'enabledOnSeries' => [0, 1],
-                'style' => [
-                    'colors' => ['#145161', '#800'],
-                ],
-            ],
-            'labels' => [],
-            'stroke' => [
-                'width' => [0, 4],
-            ],
-            'series' => [
-                [
-                    'name' =>  __('Carbon emission', 'carbon'),
-                    'type' => 'bar',
-                    'data' => []
-                ],
-                [
-                    'name' => __('Consumed energy', 'carbon'),
-                    'type' => 'line',
-                    'data' => []
-                ],
-            ],
-            'xaxis' => [
-                'categories' => []
-            ],
-            'yaxis' => [
-                [
-                    'title' => ['text' => __('Carbon emission', 'carbon')],
-                ], [
-                    'opposite' => true,
-                    'title' => ['text' => __('Consumed energy', 'carbon')],
-                ]
-            ],
-            'markers' => [
-                'size' => [3, 3],
-            ],
-            'tooltip' => [
-                'enabled' => true,
-            ],
-        ];
-
+        $data = [];
         foreach ($result as $row) {
             $date = new DateTime($row['date']);
             $date_formatted = $date->format('Y-m');
@@ -600,8 +563,9 @@ class Provider
         ];
         $scaled = Toolbox::scaleSerie($data['series'][0]['data'], $units);
         $data['series'][0]['data'] = $scaled['serie'];
-        $data['series'][0]['name'] .= ' (' . $scaled['unit'] . __('CO₂eq', 'carbon') . ')';
+        $data['series'][0]['name'] =  __('Carbon emission', 'carbon') . ' (' . $scaled['unit'] . __('CO₂eq', 'carbon') . ')';
         $data['series'][0]['unit'] = $scaled['unit'] . __('CO₂eq', 'carbon'); // Not supported by apex charts
+        $data['series'][0]['type'] = 'bar';
 
         // Scale energy consumption
         $units = [
@@ -616,10 +580,15 @@ class Provider
         ];
         $scaled = Toolbox::scaleSerie($data['series'][1]['data'], $units);
         $data['series'][1]['data'] = $scaled['serie'];
-        $data['series'][1]['name'] .= ' (' . $scaled['unit'] . ')';
+        $data['series'][1]['name'] = __('Consumed energy', 'carbon') . ' (' . $scaled['unit'] . ')';
         $data['series'][1]['unit'] = $scaled['unit']; // Not supported by apex charts
+        $data['series'][1]['type'] = 'line';
 
-        return $data;
+        return [
+            'data'  => $data,
+            'label' => $params['label'],
+            'icon'  => $params['icon'],
+        ];
     }
 
     /**
