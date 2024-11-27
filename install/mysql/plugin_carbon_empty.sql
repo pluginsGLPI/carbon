@@ -95,13 +95,13 @@ CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_computerusageprofiles` (
   `name`         varchar(255) DEFAULT NULL,
   `time_start`   varchar(255) DEFAULT NULL,
   `time_stop`    varchar(255) DEFAULT NULL,
-  `day_1`        tinyint(1)   NOT NULL DEFAULT '0',
-  `day_2`        tinyint(1)   NOT NULL DEFAULT '0',
-  `day_3`        tinyint(1)   NOT NULL DEFAULT '0',
-  `day_4`        tinyint(1)   NOT NULL DEFAULT '0',
-  `day_5`        tinyint(1)   NOT NULL DEFAULT '0',
-  `day_6`        tinyint(1)   NOT NULL DEFAULT '0',
-  `day_7`        tinyint(1)   NOT NULL DEFAULT '0',
+  `day_1`        tinyint      NOT NULL DEFAULT '0',
+  `day_2`        tinyint      NOT NULL DEFAULT '0',
+  `day_3`        tinyint      NOT NULL DEFAULT '0',
+  `day_4`        tinyint      NOT NULL DEFAULT '0',
+  `day_5`        tinyint      NOT NULL DEFAULT '0',
+  `day_6`        tinyint      NOT NULL DEFAULT '0',
+  `day_7`        tinyint      NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
