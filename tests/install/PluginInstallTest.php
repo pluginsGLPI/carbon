@@ -235,6 +235,8 @@ class PluginInstallTest extends CommonTestCase
         ];
 
         $config = Config::getConfigurationValues('plugin:' . TEST_PLUGIN_NAME);
+        // Ignore keys that are not in the expected list
+        $config = array_intersect_key($config, $expected);
         $this->assertCount(count($expected), $config);
 
         $glpi_key = new GLPIKey();

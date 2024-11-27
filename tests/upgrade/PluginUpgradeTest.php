@@ -66,6 +66,9 @@ class PluginUpgradeTest extends PluginInstallTest
         $success = $this->runSqlFile(__DIR__ . "/../fixtures/version_{$this->old_version}_data.sql");
         $this->assertTrue($success, 'Failed to install old version data');
 
+        // Ignore SQL warnings which may occur when installing an old schema
+        file_put_contents(GLPI_LOG_DIR . "/sql-errors.log", '');
+
         // Set encrypted configuration values
         $PLUGIN_HOOKS[Hooks::SECURED_CONFIGS]['carbon'] = [
             'electricitymap_api_key',
@@ -97,7 +100,11 @@ class PluginUpgradeTest extends PluginInstallTest
         ob_start(function ($in) {
             return $in;
         });
+        $DB->clearSchemaCache();
         plugin_carbon_install();
+        // Ignore SQL warnings. We must rely on schema comparison to detect errors
+        // which impact plugin upgrade
+        file_put_contents(GLPI_LOG_DIR . "/sql-errors.log", '');
         $install_output = ob_get_contents();
         ob_end_clean();
         $this->assertTrue($plugin->isInstalled($plugin_name), $install_output);

@@ -328,7 +328,10 @@ class ProviderTest extends DbTestCase
         $duration = 'P4M';
         $this->createCarbonIntensityData($country, $source, $start_date, 1, $duration);
         $this->createCarbonEmissionData($computer_1, $start_date, new DateInterval($duration), 1, 2);
-        $output = Provider::getCarbonEmissionPerMonth();
+        $output = Provider::getCarbonEmissionPerMonth([
+            'label' => '',
+            'icon' => '',
+        ]);
 
         // TODO: check all values
     }
