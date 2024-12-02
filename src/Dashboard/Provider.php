@@ -504,6 +504,7 @@ class Provider
 
         $default_params = [
             'icon'  => "fas fa-computer",
+            'label' => '',
             // 'color' => '#ea9999',
             'apply_filters' => [],
         ];
