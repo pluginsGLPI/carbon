@@ -305,10 +305,11 @@ class CommonTestCase extends TestCase
             $crit = [
                 CarbonIntensitySource::getForeignKeyField()  => $source->getID(),
                 CarbonIntensityZone::getForeignKeyField() => $zone->getID(),
-                'date' => $current_date->format('Y-m-d H:i:s'),
+                'date' => $current_date->format('Y-m-d H:00:00'),
                 'intensity' => $intensity,
             ];
-            $emission = $this->getItem(
+            fprintf(STDOUT, $current_date->format('Y-m-d H:00:00') . PHP_EOL);
+            $item = $this->getItem(
                 CarbonIntensity::class,
                 $crit + [
                     'data_quality' => AbstractTracked::DATA_QUALITY_MANUAL
