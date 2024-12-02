@@ -82,12 +82,12 @@ class CarbonEmission extends CommonDBChild
         $boundaries = [];
         if ($start !== null) {
             $unix_start = $start->format('U');
-            $unix_start = $unix_start - ($unix_start % 3600);
+            $unix_start = $unix_start - ($unix_start % (3600 * 24));
             $boundaries[] = new QueryExpression('UNIX_TIMESTAMP(`date`) >= ' . $unix_start);
         }
         if ($stop !== null) {
             $unix_stop = $stop->format('U');
-            $unix_stop = $unix_stop - ($unix_stop % 3600);
+            $unix_stop = $unix_stop - ($unix_stop % (3600 * 24) );
             $boundaries[] = new QueryExpression('UNIX_TIMESTAMP(`date`) <= ' . $unix_stop);
         }
 
@@ -114,10 +114,11 @@ class CarbonEmission extends CommonDBChild
                 ];
             }
             $first_date = new DateTime($first['date']);
+            $first_date->modify(('-1 day'));
             if ($first_date > $start) {
                 $gaps[] = [
                     'start' => $start->format('U'),
-                    'end'   => $first_date->modify(('-1 day'))->format('U'),
+                    'end'   => $first_date->format('U'),
                 ];
             }
         }
@@ -161,9 +162,10 @@ class CarbonEmission extends CommonDBChild
                 'LIMIT' => 1,
             ])->current();
             $last_date = new DateTime($last['date']);
+            $last_date->modify('+1 day');
             if ($last_date < $stop) {
                 $gaps[] = [
-                    'start' => $last_date->modify(('+1 day'))->format('U'),
+                    'start' => $last_date->format('U'),
                     'end'   => $stop->format('U'),
                 ];
             }

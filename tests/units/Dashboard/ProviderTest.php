@@ -43,7 +43,9 @@ use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Dashboard\Provider;
 use GlpiPlugin\Carbon\EnvironmentalImpact;
+use GlpiPlugin\Carbon\History\Computer as HistoryComputer;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
+use Infocom;
 use Location;
 use Session;
 
@@ -193,7 +195,9 @@ class ProviderTest extends DbTestCase
         $computer_1 = $this->getItem(Computer::class);
         $computer_2 = $this->getItem(Computer::class);
 
-        $date = new DateTime('now');
+        // Create carbon emissions for the assets
+        // $date = new DateTime('now');
+        $date = new DateTime('2024-08-15');
         $date->setTime(0, 0, 0);
         for ($shift = 1; $shift < 5; $shift++) {
             $date = $date->sub(new DateInterval('P1D'));
@@ -308,6 +312,8 @@ class ProviderTest extends DbTestCase
 
     public function testGetCarbonEmissionPerMonth()
     {
+        global $DB;
+
         $country = $this->getUniqueString();
         $source  = $this->getUniqueString();
         $usage_profile = [
@@ -322,15 +328,30 @@ class ProviderTest extends DbTestCase
             'day_6' => 1,
             'day_7' => 1,
         ];
-        $computer_1 = $this->createComputerUsageProfilePowerLocation($usage_profile, 60, $country);
+        $computer_1 = $this->createComputerUsageProfilePowerLocation($usage_profile, 60, PLUGIN_CARBON_TEST_FAKE_ZONE_NAME);
+        $infocom = $this->getItem(Infocom::class, [
+            'itemtype' => $computer_1->getType(),
+            'items_id' => $computer_1->getID(),
+            'buy_date' => '2024-01-01',
+        ]);
+
         $start_date = new DateTime('now');
         $start_date->modify('-5 month');
         $duration = 'P4M';
-        $this->createCarbonIntensityData($country, $source, $start_date, 1, $duration);
-        $this->createCarbonEmissionData($computer_1, $start_date, new DateInterval($duration), 1, 2);
+        // $this->createCarbonIntensityData($country, $source, $start_date, 1, $duration);
+        // $this->createCarbonEmissionData($computer_1, $start_date, new DateInterval($duration), 1, 2);
+        $history = new HistoryComputer();
+        $history->historizeItem($computer_1->getID(), new DateTime('2024-02-01'), new DateTime('2024-05-31'));
         $output = Provider::getCarbonEmissionPerMonth([
             'label' => '',
             'icon' => '',
+        ], [
+            [
+                'date' => ['<=', '2024-05-31'],
+            ],
+            [
+                'date' => ['>=', '2024-02-01'],
+            ]
         ]);
 
         // TODO: check all values

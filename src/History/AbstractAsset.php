@@ -47,6 +47,7 @@ use GlpiPlugin\Carbon\EnvironmentalImpact;
 use GlpiPlugin\Carbon\Toolbox;
 use Location;
 use LogicException;
+use Session;
 use Toolbox as GlpiToolbox;
 
 abstract class AbstractAsset extends CommonDBTM implements AssetInterface
@@ -348,5 +349,18 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
             'itemtype' => static::getItemtype(),
             'items_id' => $items_id
         ]);
+    }
+
+    public function calculateHistory(int $items_id): bool
+    {
+        $calculated = $this->historizeItem($items_id);
+        if ($calculated == 0) {
+            return false;
+        }
+
+        Session::addMessageAfterRedirect(
+            sprintf(__('%d entries calculated', 'carbon'), $calculated),
+        );
+        return true;
     }
 }

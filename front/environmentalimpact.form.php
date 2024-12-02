@@ -87,6 +87,35 @@ if (isset($_POST['update'])) {
     if (!$history->resetHistory($_POST['items_id'])) {
         Session::addMessageAfterRedirect(__('Reset failed.', 'carbon'), false, ERROR);
     }
+} else if (isset($_POST['calculate'])) {
+    if (!isset($_POST['itemtype']) || !isset($_POST['items_id'])) {
+        Session::addMessageAfterRedirect(__('Missing arguments in request.', 'carbon'), false, ERROR);
+        Html::back();
+    }
+
+    if (!EnvironmentalImpact::canUpdate()) {
+        Session::addMessageAfterRedirect(__('Update denied.', 'carbon'), false, ERROR);
+        Html::back();
+    }
+
+    $history = '\\GlpiPlugin\\Carbon\\History\\' . (string) $_POST['itemtype'];
+    if (!class_exists($history) || !is_subclass_of($history, AbstractAssetHistory::class)) {
+        Session::addMessageAfterRedirect(__('Bad arguments.', 'carbon'), false, ERROR);
+        Html::back();
+    }
+
+    $history = new $history();
+    $itemtype = $history->getItemtype();
+    $item = new $itemtype();
+    $item->getFromDB($_POST['items_id']);
+    if (!$item->canUpdate()) {
+        Session::addMessageAfterRedirect(__('Update denied.', 'carbon'), false, ERROR);
+        Html::back();
+    }
+
+    if (!$history->calculateHistory($_POST['items_id'])) {
+        Session::addMessageAfterRedirect(__('Update failed.', 'carbon'), false, ERROR);
+    }
 }
 
 Html::back();
