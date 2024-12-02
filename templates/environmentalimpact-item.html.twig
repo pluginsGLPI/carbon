@@ -43,6 +43,8 @@
     <div>
       {% set reset_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', reset: '', itemtype: '" ~ item.getType() ~ "', items_id: '" ~ item.getID() ~ "'}" %}
       <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/environmentalimpact.form.php' }}', {{ reset_args }})">{{ __('Reset data', 'carbon') }}</a>
+      {% set calculate_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', calculate: '', itemtype: '" ~ item.getType() ~ "', items_id: '" ~ item.getID() ~ "'}" %}
+      <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/environmentalimpact.form.php' }}', {{ calculate_args }})">{{ __('Calculate data', 'carbon') }}</a>
     </div>
 </div>
 
