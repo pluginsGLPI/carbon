@@ -82,12 +82,12 @@ class CarbonEmission extends CommonDBChild
         $boundaries = [];
         if ($start !== null) {
             $unix_start = $start->format('U');
-            $unix_start = $unix_start - ($unix_start % 3600);
+            $unix_start = $unix_start - ($unix_start % (3600 * 24));
             $boundaries[] = new QueryExpression('UNIX_TIMESTAMP(`date`) >= ' . $unix_start);
         }
         if ($stop !== null) {
             $unix_stop = $stop->format('U');
-            $unix_stop = $unix_stop - ($unix_stop % 3600);
+            $unix_stop = $unix_stop - ($unix_stop % (3600 * 24) );
             $boundaries[] = new QueryExpression('UNIX_TIMESTAMP(`date`) <= ' . $unix_stop);
         }
 
