@@ -39,6 +39,7 @@ use GlpiPlugin\Carbon\EnvironmentalImpact;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 use ComputerType as GlpiComputerType;
+use GlpiPlugin\Carbon\CarbonIntensity;
 use MonitorType as GlpiMonitorType;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
 use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
@@ -113,6 +114,7 @@ function plugin_carbon_getDropdown()
         ComputerUsageProfile::class  => ComputerUsageProfile::getTypeName(),
         CarbonIntensitySource::class => CarbonIntensitySource::getTypeName(),
         CarbonIntensityZone::class   => CarbonIntensityZone::getTypeName(),
+        CarbonIntensity::class       => CarbonIntensity::getTypeName(),
     ];
 }
 
