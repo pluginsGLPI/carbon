@@ -100,7 +100,7 @@ function plugin_carbon_setupHooks()
     }
 
     $PLUGIN_HOOKS['menu_toadd']['carbon']['tools'] = [Report::class];
-    $PLUGIN_HOOKS['menu_toadd']['carbon']['admin'] = [CarbonIntensity::class];
+    // $PLUGIN_HOOKS['menu_toadd']['carbon']['admin'] = [CarbonIntensity::class];
 
     $PLUGIN_HOOKS[Hooks::POST_SHOW_TAB]['carbon'] = 'plugin_carbon_postShowTab';
     foreach (PLUGIN_CARBON_TYPES as $itemtype) {

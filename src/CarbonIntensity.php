@@ -33,7 +33,7 @@
 
 namespace GlpiPlugin\Carbon;
 
-use CommonDBTM;
+use CommonDropdown;
 use DateTime;
 use DateInterval;
 use DateTimeImmutable;
@@ -46,7 +46,7 @@ use QueryParam;
 use QuerySubQuery;
 use QueryExpression;
 
-class CarbonIntensity extends CommonDBTM
+class CarbonIntensity extends CommonDropdown
 {
     private const MIN_HISTORY_LENGTH = '13 months ago';
 
@@ -62,41 +62,36 @@ class CarbonIntensity extends CommonDBTM
         return 'fa-solid fa-solar-panel';
     }
 
-    public static function getMenuContent()
-    {
-        $menu = [];
+    // public static function getMenuContent()
+    // {
+    //     $menu = [];
 
-        if (self::canView()) {
-            $menu = [
-                'title' => self::getTypeName(0),
-                'shortcut' => self::getMenuShorcut(),
-                'page' => self::getSearchURL(false),
-                'icon' => self::getIcon(),
-                'lists_itemtype' => self::getType(),
-                'links' => [
-                    'search' => self::getSearchURL(),
-                    'lists' => '',
-                ]
-            ];
-        }
+    //     if (self::canView()) {
+    //         $menu = [
+    //             'title' => self::getTypeName(0),
+    //             'shortcut' => self::getMenuShorcut(),
+    //             'page' => self::getSearchURL(false),
+    //             'icon' => self::getIcon(),
+    //             'lists_itemtype' => self::getType(),
+    //             'links' => [
+    //                 'search' => self::getSearchURL(),
+    //                 'lists' => '',
+    //             ]
+    //         ];
+    //     }
 
-        return $menu;
-    }
+    //     return $menu;
+    // }
 
     public function rawSearchOptions()
     {
         $tab = parent::rawSearchOptions();
 
-        $table = self::getTable();
+        // Name is useless; do not show it. The column is required to avoid SQL errors, all dropdown must have a name column
+        // $tab[1]['datatype'] = 'text'; // To show 'name' column but make it not clickable
+        unset($tab[1]);
 
-        $tab[] = [
-            'id'                 => '2',
-            'table'              => $table,
-            'field'              => 'id',
-            'name'               => __('ID'),
-            'massiveaction'      => false, // implicit field is id
-            'datatype'           => 'number',
-        ];
+        $table = self::getTable();
 
         $tab[] = [
             'id'                 => '3',

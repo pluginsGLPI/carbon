@@ -40,15 +40,5 @@ if (!Plugin::isPluginActive('carbon')) {
     Html::displayNotFoundError();
 }
 
-$carbon_intensity = new CarbonIntensity();
-
-Html::header(
-    CarbonIntensity::getTypeName(Session::getPluralNumber()),
-    $_SERVER['PHP_SELF'],
-    'admin',
-    CarbonIntensity::class,
-    'option'
-);
-Search::show(CarbonIntensity::class);
-
-Html::footer();
+$dropdown = new CarbonIntensity();
+include(GLPI_ROOT . "/front/dropdown.common.php");
