@@ -35,7 +35,7 @@ global $DB;
 
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 
-// Create RTE and Electrucuty map data sources in DB
+// Create RTE and Electricity map data sources in DB
 
 $data_sources = ['RTE', 'ElectricityMap'];
 $dbUtil = new DbUtils();
