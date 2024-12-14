@@ -137,14 +137,14 @@ class EnvironmentalImpact extends CommonDBChild
     public function showForMonitor($ID, $withtemplate = '')
     {
         // Empty as there is no usage profile for monitor at the moment
-        // this method is needed to trigger Hooks::POQT_SHOW_TAB in GLPI
+        // this method is needed to trigger Hooks::POST_SHOW_TAB in GLPI
         // and show historization status
     }
 
     public function showForNetworkEquipment($ID, $withtemplate = '')
     {
         // Empty as there is no usage profile for Network equipment at the moment
-        // this method is needed to trigger Hooks::POQT_SHOW_TAB in GLPI
+        // this method is needed to trigger Hooks::POST_SHOW_TAB in GLPI
         // and show historization status
     }
 
