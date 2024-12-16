@@ -36,22 +36,6 @@ global $DB;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 
 // Create RTE and Electricity map data sources in DB
-
-$data_sources = ['RTE', 'ElectricityMap'];
-$dbUtil = new DbUtils();
-$source_table = $dbUtil->getTableForItemType(CarbonIntensitySource::class);
-$source_table_exists = $DB->tableExists($source_table);
-foreach ($data_sources as $data_source) {
-    if ($source_table_exists) {
-        $iterator = $DB->request([
-            'SELECT' => ['id'],
-            'FROM' => $source_table,
-            'WHERE' => ['name' => $data_source]
-        ]);
-        if ($iterator->count() === 1) {
-            continue;
-        }
-    }
-    $query = $DB->buildInsert($source_table, ['name' => $data_source]);
-    $DB->doQuery($query);
+if (!$DB->runFile(__DIR__ . '/../mysql/plugin_carbon_initial.sql')) {
+    throw new \RuntimeException('Error creating data sources in DB');
 }

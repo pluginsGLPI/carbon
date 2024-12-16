@@ -294,6 +294,11 @@ class Toolbox
         return ['serie' => $serie, 'unit' => $human_readable_unit];
     }
 
+    /**
+     * Get asset class names for energy consumption impact
+     *
+     * @return array
+     */
     public function getHistoryClasses(): array
     {
         $history_types = [];

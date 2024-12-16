@@ -66,9 +66,9 @@ class CarbonIntensityElectricityMapTest extends DbTestCase
         $source = new CarbonIntensitySource();
         $source->getFromDBByCrit(['name' => $data_source->getSourceName()]);
         $this->assertFalse($source->isNewItem());
-        $zone = $this->getItem(CarbonIntensityZone::class, [
-            'name' => 'France',
-        ]);
+        $zone = new CarbonIntensityZone();
+        $zone->getFromDbByCrit(['name' => 'France']);
+        $this->assertFalse($zone->isNewItem());
         $source_zone = $this->getItem(CarbonIntensitySource_CarbonIntensityZone::class, [
             CarbonIntensitySource::getForeignKeyField() => $source->getID(),
             CarbonIntensityZone::getForeignKeyField() => $zone->getID(),
