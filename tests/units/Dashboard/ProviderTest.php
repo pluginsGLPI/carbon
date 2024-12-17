@@ -43,7 +43,7 @@ use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Dashboard\Provider;
 use GlpiPlugin\Carbon\EnvironmentalImpact;
-use GlpiPlugin\Carbon\History\Computer as HistoryComputer;
+use GlpiPlugin\Carbon\Impact\History\Computer as HistoryComputer;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use Infocom;
 use Location;
@@ -341,7 +341,7 @@ class ProviderTest extends DbTestCase
         // $this->createCarbonIntensityData($country, $source, $start_date, 1, $duration);
         // $this->createCarbonEmissionData($computer_1, $start_date, new DateInterval($duration), 1, 2);
         $history = new HistoryComputer();
-        $history->historizeItem($computer_1->getID(), new DateTime('2024-02-01'), new DateTime('2024-05-31'));
+        $history->evaluateItem($computer_1->getID(), new DateTime('2024-02-01'), new DateTime('2024-05-31'));
         $output = Provider::getCarbonEmissionPerMonth([
             'label' => '',
             'icon' => '',

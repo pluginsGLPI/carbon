@@ -33,7 +33,7 @@
 
 use Glpi\Event;
 use GlpiPlugin\Carbon\EnvironmentalImpact;
-use GlpiPlugin\Carbon\History\AbstractAsset as AbstractAssetHistory;
+use GlpiPlugin\Carbon\Impact\History\AbstractAsset as AbstractAssetHistory;
 
 include('../../../inc/includes.php');
 
@@ -69,7 +69,7 @@ if (isset($_POST['update'])) {
         Html::back();
     }
 
-    $history = '\\GlpiPlugin\\Carbon\\History\\' . (string) $_POST['itemtype'];
+    $history = '\\GlpiPlugin\\Carbon\\Impact\\History\\' . (string) $_POST['itemtype'];
     if (!class_exists($history) || !is_subclass_of($history, AbstractAssetHistory::class)) {
         Session::addMessageAfterRedirect(__('Bad arguments.', 'carbon'), false, ERROR);
         Html::back();
@@ -98,7 +98,7 @@ if (isset($_POST['update'])) {
         Html::back();
     }
 
-    $history = '\\GlpiPlugin\\Carbon\\History\\' . (string) $_POST['itemtype'];
+    $history = '\\GlpiPlugin\\Carbon\\Impact\\History\\' . (string) $_POST['itemtype'];
     if (!class_exists($history) || !is_subclass_of($history, AbstractAssetHistory::class)) {
         Session::addMessageAfterRedirect(__('Bad arguments.', 'carbon'), false, ERROR);
         Html::back();
@@ -113,7 +113,7 @@ if (isset($_POST['update'])) {
         Html::back();
     }
 
-    if (!$history->calculateHistory($_POST['items_id'])) {
+    if (!$history->calculateUsageImpact($_POST['items_id'])) {
         Session::addMessageAfterRedirect(__('Update failed.', 'carbon'), false, ERROR);
     }
 }

@@ -299,14 +299,13 @@ class Toolbox
      *
      * @return array
      */
-    public function getHistoryClasses(): array
+    public static function getUsageImpactClasses(): array
     {
+        $base_namespace = __NAMESPACE__ . '\\Impact\\History';
         $history_types = [];
-
         foreach (PLUGIN_CARBON_TYPES as $itemtype) {
             $history_type = [
-                __NAMESPACE__,
-                'History',
+                $base_namespace,
                 $itemtype
             ];
             $history_types[] = implode('\\', $history_type);

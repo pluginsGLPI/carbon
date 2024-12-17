@@ -32,7 +32,7 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\History;
+namespace GlpiPlugin\Carbon\Impact\History;
 
 use CommonDBTM;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;

@@ -32,7 +32,7 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\History;
+namespace GlpiPlugin\Carbon\Impact\History;
 
 use CommonDBTM;
 use DbUtils;
@@ -56,7 +56,7 @@ class NetworkEquipment extends AbstractAsset
         return new EngineNetworkEquipment($item->getID());
     }
 
-    public function getHistorizableQuery(bool $entity_restrict = true): array
+    public function getEvaluableQuery(bool $entity_restrict = true): array
     {
         $item_table = self::$itemtype::getTable();
         $item_model_table = self::$model_itemtype::getTable();
@@ -125,7 +125,7 @@ class NetworkEquipment extends AbstractAsset
         global $DB;
 
         $history = new self();
-        $request = $history->getHistorizableQuery();
+        $request = $history->getEvaluableQuery();
         // Select fields to review
         $request['SELECT'] = [
             self::$itemtype::getTableField('is_deleted'),

@@ -31,20 +31,82 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\Tests\History;
+namespace GlpiPlugin\Carbon\Impact\History\Tests;
 
-use GlpiPlugin\Carbon\Tests\DbTestCase;
-use Computer as GlpiComputer;
+use DateTime;
+use GlpiPlugin\Carbon\CarbonEmission;
+use GlpiPlugin\Carbon\Tests\Impact\History\CommonAsset;
+use GlpiPlugin\Carbon\Impact\History\NetworkEquipment;
+use GlpiPlugin\Carbon\NetworkEquipmentType;
 use Infocom;
+use NetworkEquipmentType as GlpiNetworkEquipmentType;
+use NetworkEquipment as GlpiNetworkEquipment;
+use Location;
+use NetworkEquipmentModel;
 
-class CommonAsset extends DbTestCase
+/**
+ * @covers \GlpiPlugin\Carbon\Impact\History\NetworkEquipment
+ */
+class NetworkEquipmentTest extends CommonAsset
 {
-    protected string $history_type = '';
-    protected string $asset_type = '';
+    protected string $history_type =  \GlpiPlugin\Carbon\Impact\History\NetworkEquipment::class;
+    protected string $asset_type = GlpiNetworkEquipment::class;
+
+    public function testGetEngine()
+    {
+        $asset = new GlpiNetworkEquipment();
+        $engine = NetworkEquipment::getEngine($asset);
+        $this->assertInstanceOf(\GlpiPlugin\Carbon\Engine\V1\NetworkEquipment::class, $engine);
+    }
+
+    public function testEvaluateItem()
+    {
+        $this->login('glpi', 'glpi');
+        $entities_id = $this->isolateInEntity('glpi', 'glpi');
+
+        $model_power = 100;
+        $location = $this->getItem(Location::class, [
+            'country' => PLUGIN_CARBON_TEST_FAKE_ZONE_NAME,
+        ]);
+        $model = $this->getItem(NetworkEquipmentModel::class, ['power_consumption' => $model_power]);
+        $glpi_type = $this->getItem(GlpiNetworkEquipmentType::class);
+        $type = $this->getItem(NetworkEquipmentType::class, [
+            GlpiNetworkEquipmentType::getForeignKeyField() => $glpi_type->getID(),
+        ]);
+        $asset = $this->getItem(GlpiNetworkEquipment::class, [
+            'networkequipmenttypes_id'  => $glpi_type->getID(),
+            'networkequipmentmodels_id' => $model->getID(),
+            'locations_id'              => $location->getID(),
+            'date_creation'             => '2024-01-01',
+            'date_mod'                  => null,
+        ]);
+        $history = new NetworkEquipment();
+        $start_date = '2024-02-01 00:00:00';
+        $end_date =   '2024-02-08 00:00:00';
+        $count = $history->evaluateItem(
+            $asset->getID(),
+            new DateTime($start_date),
+            new DateTime($end_date)
+        );
+
+        // Days interval is [$start_date, $end_date[
+        $this->assertEquals(8, $count);
+
+        $carbon_emission = new CarbonEmission();
+        $emissions = $carbon_emission->find([
+            ['date' => ['>=', $start_date]],
+            ['date' =>  ['<', $end_date]],
+            'itemtype' => $asset->getType(),
+            'items_id' => $asset->getID(),
+        ], [
+            'date ASC',
+        ]);
+        $this->assertEquals(7, count($emissions));
+    }
 
     public function testGetStartDate()
     {
-        $asset = $this->getItem($this->asset_type, ['date_creation' => null, 'date_mod' => null]);
+        $asset = $this->getItem(GlpiNetworkEquipment::class, ['date_creation' => null, 'date_mod' => null]);
         $instance = new $this->history_type();
         $output = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
         $this->assertNull($output);

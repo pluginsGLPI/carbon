@@ -32,7 +32,7 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\History;
+namespace GlpiPlugin\Carbon\Impact\History;
 
 use CommonDBTM;
 use DateInterval;
@@ -65,9 +65,18 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     /** @var int $limit maximum number of entries to build */
     protected int $limit = 0;
 
+    /** @var bool tells if the batch evaluation must stop */
     protected bool $limit_reached = false;
 
-    abstract public function getHistorizableQuery(bool $entity_restrict = true): array;
+    /**
+     * Get request in Query builder format to find evaluable items
+     *
+     * @param boolean $entity_restrict
+     * @return array
+     */
+    abstract public function getEvaluableQuery(bool $entity_restrict = true): array;
+
+    abstract public static function getEngine(CommonDBTM $item): EngineInterface;
 
     public function getItemtype(): string
     {
@@ -84,7 +93,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     {
         global $DB;
 
-        $request = $this->getHistorizableQuery();
+        $request = $this->getEvaluableQuery();
         $request['WHERE'][static::$itemtype::getTableField('id')] = $id;
 
         $iterator = $DB->request($request);
@@ -102,7 +111,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      *
      * @return int count of entries generated
      */
-    public function historizeItems(): int
+    public function evaluateItems(): int
     {
         global $DB;
 
@@ -116,9 +125,9 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
 
         $count = 0;
 
-        $iterator = $DB->request($this->getHistorizableQuery(false));
+        $iterator = $DB->request($this->getEvaluableQuery(false));
         foreach ($iterator as $row) {
-            $count += $this->historizeItem($row['id']);
+            $count += $this->evaluateItem($row['id']);
             if ($this->limit_reached) {
                 break;
             }
@@ -136,7 +145,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      * @param DateTime $end_date   Last date to compute (if not set use now - 1 day)
      * @return int     count of generated entries
      */
-    public function historizeItem(int $id, ?DateTime $start_date = null, ?DateTime $end_date = null): int
+    public function evaluateItem(int $id, ?DateTime $start_date = null, ?DateTime $end_date = null): int
     {
         /** @var CommonDBTM $item */
         $itemtype = static::$itemtype;
@@ -144,10 +153,6 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         if ($item === false) {
             return 0;
         }
-
-        // if (!$this->canHistorize($id)) {
-        //     return 0;
-        // }
 
         // Determine first date to compute. May be modified by available intensity data
         $resume_date = $this->getStartDate($id);
@@ -182,7 +187,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
             $date_cursor->setTime(0, 0, 0, 0);
             $end_date = DateTime::createFromFormat('U', $gap['end']);
             while ($date_cursor < $end_date) {
-                $success = $this->historizeItemPerDay($item, $engine, $date_cursor);
+                $success = $this->evaluateItemPerDay($item, $engine, $date_cursor);
                 if ($success) {
                     $count++;
                     if ($this->limit !== 0 && $count >= $this->limit) {
@@ -202,7 +207,15 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         return $count;
     }
 
-    protected function historizeItemPerDay(CommonDBTM $item, EngineInterface $engine, DateTime $day): bool
+    /**
+     * Evaluate usage carbon emission for a single day
+     *
+     * @param CommonDBTM $item item ti evaluate
+     * @param EngineInterface $engine Calculatin engine to use
+     * @param DateTime $day Day to calculate
+     * @return boolean
+     */
+    protected function evaluateItemPerDay(CommonDBTM $item, EngineInterface $engine, DateTime $day): bool
     {
         $energy = $engine->getEnergyPerDay($day);
         $item_id = $item->getID();
@@ -342,6 +355,12 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         throw new LogicException('Not implemented yet');
     }
 
+    /**
+     * Ddelete all calculated usage impact for an asset
+     *
+     * @param integer $items_id
+     * @return boolean
+     */
     public function resetHistory(int $items_id): bool
     {
         $environmental_impact = new CarbonEmission();
@@ -351,10 +370,19 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         ]);
     }
 
-    public function calculateHistory(int $items_id): bool
+    /**
+     * Calculate usage impact of an asset
+     *
+     * @param integer $items_id
+     * @return boolean
+     */
+    public function calculateUsageImpact(int $items_id): bool
     {
-        $calculated = $this->historizeItem($items_id);
-        if ($calculated == 0) {
+        $calculated = $this->evaluateItem($items_id);
+        if ($calculated === 0) {
+            Session::addMessageAfterRedirect(
+                sprintf(__('Failed to calculate usage impact', 'carbon'), $calculated),
+            );
             return false;
         }
 

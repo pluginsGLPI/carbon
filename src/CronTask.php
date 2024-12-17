@@ -57,26 +57,34 @@ class CronTask
                     'parameter' => __('Maximum number of entries to download', 'carbon'),
                 ];
 
-            case 'Historize':
+            case 'UsageImpact':
                 return [
-                    'description' => __('Compute daily environnemental impact for all assets', 'carbon'),
+                    'description' => __('Compute usage environnemental impact for all assets', 'carbon'),
                     'parameter' => __('Maximum number of entries to calculate', 'carbon'),
                 ];
         }
         return [];
     }
 
-    public static function cronHistorize(GlpiCronTask $task): int
+    /**
+     * Calculate usage impact for all assets
+     *
+     * @param GlpiCronTask $task
+     * @return integer
+     */
+    public static function cronUsageImpact(GlpiCronTask $task): int
     {
-        $histories = (new Toolbox())->getHistoryClasses();
+        $count = 0;
+
+        $usage_impacts = Toolbox::getUsageImpactClasses();
         $task->setVolume(0); // start with zero
         $remaining = $task->fields['param'];
-        $limit_per_type = floor(((int) $remaining) / count($histories));
-        foreach ($histories as $history_type) {
-            /** @var AbstractAsset $history */
-            $history = new $history_type();
-            $history->setLimit($limit_per_type);
-            $count = $history->historizeItems();
+        $limit_per_type = floor(((int) $remaining) / count($usage_impacts));
+        foreach ($usage_impacts as $usage_impact_type) {
+            /** @var AbstractAsset $usage_impact */
+            $usage_impact = new $usage_impact_type();
+            $usage_impact->setLimit($limit_per_type);
+            $count = $usage_impact->evaluateItems();
             $task->addVolume($count);
         }
 

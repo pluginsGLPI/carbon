@@ -31,44 +31,37 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\History\Tests;
+namespace GlpiPlugin\Carbon\Impact\History\Tests;
 
 use Computer as GlpiComputer;
-use ComputerModel;
-use Computer_Item;
-use Monitor as GlpiMonitor;
-use GlpiPlugin\Carbon\History\Monitor;
-use GlpiPlugin\Carbon\Tests\History\CommonAsset;
+use GlpiPlugin\Carbon\Impact\History\Computer;
+use GlpiPlugin\Carbon\Tests\Impact\History\CommonAsset;
 use Location;
 use DateTime;
-use MonitorModel;
-use MonitorType as GlpiMonitorType;
+use ComputerModel;
 use ComputerType as GlpiComputerType;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
-use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\EnvironmentalImpact;
 
 /**
- * @covers \GlpiPlugin\Carbon\History\NetworkEquipment
+ * @covers \GlpiPlugin\Carbon\Impact\History\Computer
  */
-class MonitorTest extends CommonAsset
+class ComputerTest extends CommonAsset
 {
-    protected string $history_type = \GlpiPlugin\Carbon\History\Monitor::class;
-    protected string $asset_type = GlpiMonitor::class;
+    protected string $history_type = \GlpiPlugin\Carbon\Impact\History\Computer::class;
+    protected string $asset_type = GlpiComputer::class;
 
     public function testGetEngine()
     {
-        $asset = new GlpiMonitor();
-        $engine = Monitor::getEngine($asset);
-        $this->assertInstanceOf(\GlpiPlugin\Carbon\Engine\V1\Monitor::class, $engine);
+        $asset = new GlpiComputer();
+        $engine = Computer::getEngine($asset);
+        $this->assertInstanceOf(\GlpiPlugin\Carbon\Engine\V1\Computer::class, $engine);
     }
 
-
-    public function testHistorizeItem()
+    public function testEvaluateItem()
     {
-        global $DB;
         $this->login('glpi', 'glpi');
         $entities_id = $this->isolateInEntity('glpi', 'glpi');
 
@@ -76,17 +69,17 @@ class MonitorTest extends CommonAsset
         $location = $this->getItem(Location::class, [
             'country' => PLUGIN_CARBON_TEST_FAKE_ZONE_NAME,
         ]);
-
-        $computer_model_power = 80;
-        $computer_model = $this->getItem(ComputerModel::class, ['power_consumption' => $computer_model_power]);
-        $glpi_computer_type = $this->getItem(GlpiComputerType::class);
-        $computer_type = $this->getItem(ComputerType::class, [
-            GlpiComputerType::getForeignKeyField() => $glpi_computer_type->getID(),
+        $model = $this->getItem(ComputerModel::class, ['power_consumption' => $model_power]);
+        $glpi_type = $this->getItem(GlpiComputerType::class);
+        $type = $this->getItem(ComputerType::class, [
+            GlpiComputerType::getForeignKeyField() => $glpi_type->getID(),
         ]);
-        $computer = $this->getItem(GlpiComputer::class, [
-            'computertypes_id'  => $glpi_computer_type->getID(),
-            'computermodels_id' => $computer_model->getID(),
+        $asset = $this->getItem(GlpiComputer::class, [
+            'computertypes_id'  => $glpi_type->getID(),
+            'computermodels_id' => $model->getID(),
             'locations_id'      => $location->getID(),
+            'date_creation'     => '2024-01-01',
+            'date_mod'          => null,
         ]);
         $usage_profile = $this->getItem(ComputerUsageProfile::class, [
             'time_start'   => '09:00:00',
@@ -101,31 +94,13 @@ class MonitorTest extends CommonAsset
         ]);
         $impact = $this->getItem(EnvironmentalImpact::class, [
             $usage_profile->getForeignKeyField() => $usage_profile->getID(),
-            'computers_id' => $computer->getID(),
+            'computers_id' => $asset->getID(),
         ]);
 
-        $model = $this->getItem(MonitorModel::class, ['power_consumption' => $model_power]);
-        $glpi_type = $this->getItem(GlpiMonitorType::class);
-        $type = $this->getItem(MonitorType::class, [
-            GlpiMonitorType::getForeignKeyField() => $glpi_type->getID(),
-        ]);
-        $asset = $this->getItem(GlpiMonitor::class, [
-            'monitortypes_id'   => $glpi_type->getID(),
-            'monitormodels_id'  => $model->getID(),
-            'locations_id'      => $location->getID(),
-            'date_creation'     => '2024-01-01',
-            'date_mod'          => null,
-        ]);
-        $computer_asset = $this->getItem(Computer_Item::class, [
-            'computers_id' => $computer->getID(),
-            'itemtype' => $asset->getType(),
-            'items_id' => $asset->getID(),
-        ]);
-
-        $history = new Monitor();
+        $history = new Computer();
         $start_date = '2024-02-01 00:00:00';
         $end_date =   '2024-02-08 00:00:00';
-        $count = $history->historizeItem(
+        $count = $history->evaluateItem(
             $asset->getID(),
             new DateTime($start_date),
             new DateTime($end_date)
