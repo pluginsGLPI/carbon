@@ -74,7 +74,7 @@ abstract class AbstractAsset implements EngineInterface
     }
 
     /**
-     * get all carbon intensities diring the day, between 2 hours boundaries
+     * get all carbon intensities during the day, between 2 hours boundaries
      *
      * @param DateTime $start_time
      * @param DateInterval $length
@@ -121,7 +121,8 @@ abstract class AbstractAsset implements EngineInterface
     }
 
     /**
-     * Returns the declared power for a computer
+     * Returns the declared power for an asset
+     * @return TrackedInt
      */
     public function getPower(): TrackedInt
     {
