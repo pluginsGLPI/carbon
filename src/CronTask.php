@@ -42,7 +42,14 @@ use GlpiPlugin\Carbon\Toolbox;
 
 class CronTask
 {
-    public static function cronInfo($name)
+
+    /**
+     * Get description of an automatic action
+     *
+     * @param string $name
+     * @return void
+     */
+    public static function cronInfo(string $name)
     {
         switch ($name) {
             case 'DownloadRte':
