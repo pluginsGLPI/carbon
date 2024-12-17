@@ -155,9 +155,9 @@ class ToolboxTest extends DbTestCase
         ], $output);
     }
 
-    public function testGetEmbeddedImpactClasses()
+    public function testGetEmbodiedImpactClasses()
     {
-        $output = Toolbox::getEmbeddedImpactClasses();
+        $output = Toolbox::getEmbodiedImpactClasses();
         $this->assertIsArray($output);
         $this->assertEquals([
             'GlpiPlugin\\Carbon\\Impact\\Embedded\\Boavizta\\Computer',

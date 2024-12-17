@@ -314,6 +314,25 @@ class Toolbox
         return $history_types;
     }
 
+    /**
+     * Get asset class names for embedded impact
+     *
+     * @return array
+     */
+    public static function getEmbeddedImpactClasses(): array
+    {
+        $base_namespace = Config::getEmbodiedImpactEngine();
+        $embedded_impact_types = [];
+        foreach (PLUGIN_CARBON_TYPES as $itemtype) {
+            $embedded_impact_types[] = implode('\\', [
+                $base_namespace,
+                $itemtype
+            ]);
+        }
+
+        return $embedded_impact_types;
+    }
+
     public function yearToLastMonth(DateTimeImmutable $date): array
     {
             $end_date = DateTime::createFromImmutable($date);

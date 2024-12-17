@@ -43,6 +43,29 @@
             __('Key for electricitymap.org API', 'carbon')
         ) }}
 
+                {{ fields.largeTitle(
+            __('Embedded impact engine', 'carbon'),
+            'fas fa-gears'
+        ) }}
+
+        {{ fields.dropdownArrayField(
+            'embedded_impact_engine',
+            current_config['embedded_impact_engine'],
+            embedded_impact_engines,
+            __('Embedded impact engine', 'carbon')
+        )}}
+
+        {{ fields.largeTitle(
+            __('Boavizta', 'carbon'),
+            'fas fa-gears'
+        ) }}
+
+        {{ fields.textField(
+            'boaviztapi_base_url',
+            current_config['boaviztapi_base_url'],
+            __('Base URL to the Boaviztapi instance', 'carbon')
+        ) }}
+
         <button type="submit" class="btn btn-primary mx-1" name="update" value="1">
             <i class="ti ti-device-floppy"></i>
             <span>{{ _x('button', 'Save') }}</span>
