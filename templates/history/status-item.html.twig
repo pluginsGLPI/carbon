@@ -146,7 +146,15 @@
                             {% if status.has_usage_profile %}
                                 {% set field = ok_field %}
                             {% endif %}
-                            {{ fields.field('', field, __('The asset has usage profile', 'carbon')) }}
+                            {{ fields.field('', field, __('The asset has a usage profile', 'carbon')) }}
+                        {% endif %}
+
+                        {% if status.has_inventory_entry_date is defined %}
+                            {% set field = nok_field %}
+                            {% if status.has_inventory_entry_date %}
+                                {% set field = ok_field %}
+                            {% endif %}
+                            {{ fields.field('', field, __('The asset has an inventory entry date', 'carbon')) }}
                         {% endif %}
                     </div>
                 </div>
