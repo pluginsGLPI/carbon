@@ -38,6 +38,7 @@ use GlpiPlugin\Carbon\DataSource\RestApiClient;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensityRTE;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensityElectricityMap;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensityInterface;
+use GlpiPlugin\Carbon\DataSource\Boaviztapi;
 use GlpiPlugin\Carbon\Toolbox;
 
 class CronTask
@@ -69,6 +70,11 @@ class CronTask
                     'description' => __('Compute usage environnemental impact for all assets', 'carbon'),
                     'parameter' => __('Maximum number of entries to calculate', 'carbon'),
                 ];
+            case 'EmbodiedImpact':
+                return [
+                    'description' => __('Compute embodied environnemental impact for all assets', 'carbon'),
+                    'parameter' => __('Maximum number of entries to calculate', 'carbon'),
+                ];
         }
         return [];
     }
@@ -95,6 +101,31 @@ class CronTask
             $task->addVolume($count);
         }
 
+        return ($count > 0 ? 1 : 0);
+    }
+
+    /**
+     * Calculate embodied impact for all assets
+     *
+     * @param GlpiCronTask $task
+     * @return integer
+     */
+    public static function cronEmbodiedImpact(GlpiCronTask $task): int
+    {
+        $count = 0;
+
+        $embeddedImpacts = Toolbox::getEmbodiedImpactClasses();
+        $task->setVolume(0); // start with zero
+        $remaining = $task->fields['param'];
+        $limit_per_type = floor(((int) $remaining) / count($embeddedImpacts));
+        foreach ($embeddedImpacts as $embeddedImpact_type) {
+            /** @var AbstractAsset $embeddedImpact */
+            $embedded_impact = new $embeddedImpact_type();
+            $embedded_impact->setLimit($limit_per_type);
+            $embedded_impact->setClient(new Boaviztapi(new RestApiClient()));
+            $count = $embedded_impact->evaluateItems();
+            $task->addVolume($count);
+        }
         return ($count > 0 ? 1 : 0);
     }
 

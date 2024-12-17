@@ -315,11 +315,11 @@ class Toolbox
     }
 
     /**
-     * Get asset class names for embedded impact
+     * Get asset class names for embodied impact
      *
      * @return array
      */
-    public static function getEmbeddedImpactClasses(): array
+    public static function getEmbodiedImpactClasses(): array
     {
         $base_namespace = Config::getEmbodiedImpactEngine();
         $embedded_impact_types = [];
