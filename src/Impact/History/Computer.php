@@ -45,7 +45,6 @@ use DbUtils;
 use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\EnvironmentalImpact;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
-use GlpiPlugin\Carbon\Toolbox;
 use Infocom;
 use Location;
 

@@ -49,8 +49,9 @@ abstract class AbstractTracked
      */
     public const DATA_QUALITY_UNSPECIFIED = 0;
     public const DATA_QUALITY_MANUAL = 1;
-    public const DATA_QUALITY_RAW_REAL_TIME_MEASUREMENT_DOWNSAMPLED = 2;
-    public const DATA_QUALITY_RAW_REAL_TIME_MEASUREMENT = 3;
+    public const DATA_QUALITY_ESTIMATED = 2;
+    public const DATA_QUALITY_RAW_REAL_TIME_MEASUREMENT_DOWNSAMPLED = 3;
+    public const DATA_QUALITY_RAW_REAL_TIME_MEASUREMENT = 4;
 
     protected array $sources = [];
 

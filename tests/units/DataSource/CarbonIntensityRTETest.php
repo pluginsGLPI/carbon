@@ -37,6 +37,7 @@ use GlpiPlugin\Carbon\DataSource\CarbonIntensityRTE;
 use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use DateTimeImmutable;
+use GlpiPlugin\Carbon\CarbonIntensity;
 
 class CarbonIntensityRTETest extends DbTestCase
 {
@@ -77,5 +78,35 @@ class CarbonIntensityRTETest extends DbTestCase
         $this->assertIsArray($intensities['France']);
         // There are 288 intensities in the sample file
         $this->assertEquals((288 / 4), count($intensities['France']));
+    }
+
+    public function testFullDownload()
+    {
+        $client = $this->createStub(RestApiClientInterface::class);
+        $client->method('request')->willReturn([
+            [
+                'taux_co2'   => 1,
+                'date_heure' => '2024-10-08T18:00:00+00:00'
+            ],
+            [
+                'taux_co2'   => 1,
+                'date_heure' => '2024-10-08T18:15:00+00:00'
+            ],
+            [
+                'taux_co2'   => 1,
+                'date_heure' => '2024-10-08T18:30:00+00:00'
+            ],
+            [
+                'taux_co2'   => 1,
+                'date_heure' => '2024-10-08T18:45:00+00:00'
+            ],
+        ]);
+        /** @var RestApiClientInterface $client */
+        $instance = new CarbonIntensityRTE($client);
+        $start_date = new DateTimeImmutable('2024-10-08');
+        $stop_date = new DateTimeImmutable('2024-10-08');
+        $carbon_intensity = new CarbonIntensity();
+        $output = $instance->fullDownload('France', $start_date, $stop_date, $carbon_intensity);
+        $this->assertEquals(1, $output);
     }
 }

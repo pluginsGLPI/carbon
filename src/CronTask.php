@@ -43,7 +43,6 @@ use GlpiPlugin\Carbon\Toolbox;
 
 class CronTask
 {
-
     /**
      * Get description of an automatic action
      *

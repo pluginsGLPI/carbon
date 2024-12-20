@@ -43,7 +43,6 @@ use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
-use GlpiPlugin\Carbon\EnvironmentalImpact;
 use GlpiPlugin\Carbon\Toolbox;
 use Location;
 use LogicException;
@@ -363,8 +362,8 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      */
     public function resetHistory(int $items_id): bool
     {
-        $environmental_impact = new CarbonEmission();
-        return $environmental_impact->deleteByCriteria([
+        $carbon_emission = new CarbonEmission();
+        return $carbon_emission->deleteByCriteria([
             'itemtype' => static::getItemtype(),
             'items_id' => $items_id
         ]);
@@ -376,7 +375,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      * @param integer $items_id
      * @return boolean
      */
-    public function calculateUsageImpact(int $items_id): bool
+    public function calculateImpact(int $items_id): bool
     {
         $calculated = $this->evaluateItem($items_id);
         if ($calculated === 0) {

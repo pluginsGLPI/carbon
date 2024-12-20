@@ -333,6 +333,12 @@ class Toolbox
         return $embedded_impact_types;
     }
 
+    /**
+     * Get an array of 2 dates from the beginning of the current year to yesterday
+     *
+     * @param DateTimeImmutable $date
+     * @return array
+     */
     public function yearToLastMonth(DateTimeImmutable $date): array
     {
             $end_date = DateTime::createFromImmutable($date);

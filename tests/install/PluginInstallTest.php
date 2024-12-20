@@ -254,6 +254,7 @@ class PluginInstallTest extends CommonTestCase
             }
             $this->assertEquals($expected_value, $value, "configuration key $key mismatch");
         }
+        $this->assertCount(2, $config);
     }
 
     private function checkRights()
