@@ -286,7 +286,7 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
         return $link;
     }
 
-    public function toggleZone(?bool $state): bool
+    public function toggleZone(?bool $state = null): bool
     {
         if ($state === null) {
             $state = $this->fields['is_download_enabled'];
