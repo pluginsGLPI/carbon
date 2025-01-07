@@ -121,8 +121,9 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
         $iterator = $this->requestCarbonIntensitiesPerDay($start_time, $length, $zone);
         $total_seconds = (int) $length->format('%S');
         $expected_count = ceil($total_seconds / 3600);
+        $count = $iterator->count();
         if ($iterator->count() != $expected_count) {
-            trigger_error('required count of carbon intensity samples not met (' . $expected_count . ' expected)');
+            trigger_error('required count of carbon intensity samples not met (' . $expected_count . ' expected, got ' . $count . ')', E_USER_WARNING);
             return null;
         }
         if ($total_seconds === 0) {
@@ -132,7 +133,7 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
             );
         }
 
-        if ($iterator->count() === 0) {
+        if ($count === 0) {
             return null;
         }
 
