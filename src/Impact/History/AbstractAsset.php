@@ -38,6 +38,7 @@ use CommonDBTM;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
+use DateTimeZone;
 use DbUtils;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\CarbonEmission;
@@ -146,6 +147,8 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      */
     public function evaluateItem(int $id, ?DateTime $start_date = null, ?DateTime $end_date = null): int
     {
+        global $DB;
+
         /** @var CommonDBTM $item */
         $itemtype = static::$itemtype;
         $item = $itemtype::getById($id);
@@ -181,10 +184,13 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
             // enpty string in PHPUnit environment
             $memory_limit = null;
         }
+        $timezone = $DB->guessTimezone();
         foreach ($gaps as $gap) {
             $date_cursor = DateTime::createFromFormat('U', $gap['start']);
+            $date_cursor->setTimezone(new DateTimeZone($timezone));
             $date_cursor->setTime(0, 0, 0, 0);
             $end_date = DateTime::createFromFormat('U', $gap['end']);
+            $end_date->setTimezone(new DateTimeZone($timezone));
             while ($date_cursor < $end_date) {
                 $success = $this->evaluateItemPerDay($item, $engine, $date_cursor);
                 if ($success) {

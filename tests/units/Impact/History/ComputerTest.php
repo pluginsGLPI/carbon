@@ -101,6 +101,7 @@ class ComputerTest extends CommonAsset
         $history = new Computer();
         $start_date = '2024-02-01 00:00:00';
         $end_date =   '2024-02-08 00:00:00';
+
         $count = $history->evaluateItem(
             $asset->getID(),
             new DateTime($start_date),
@@ -108,7 +109,7 @@ class ComputerTest extends CommonAsset
         );
 
         // Days interval is [$start_date, $end_date[
-        $this->assertEquals(8, $count);
+        $this->assertEquals(7, $count);
 
         $carbon_emission = new CarbonEmission();
         $emissions = $carbon_emission->find([
