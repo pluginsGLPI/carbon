@@ -115,6 +115,11 @@ if (isset($_POST['update'])) {
         Html::back();
     }
 
+    if (!$usage_impact->canHistorize($_POST['items_id'])) {
+        Session::addMessageAfterRedirect(__('Missing data prevents historization of this asset.', 'carbon'), false, ERROR);
+        Html::back();
+    }
+
     if (!$usage_impact->calculateImpact($_POST['items_id'])) {
         Session::addMessageAfterRedirect(__('Update failed.', 'carbon'), false, ERROR);
     }

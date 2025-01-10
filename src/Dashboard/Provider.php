@@ -532,7 +532,31 @@ class Provider
         $request = array_merge_recursive($request, $filter);
         $result = $DB->request($request);
 
-        $data = [];
+        // get last 12 months in format YYYY-MM
+        $date = new DateTime();
+        $date->setTime(0, 0, 0, 0);
+        $date->setDate($date->format('Y'), $date->format('m'), 1); // First day of current month
+        $date->modify('-12 months');
+        $months = [];
+        for ($i = 0; $i < 12; $i++) {
+            $months[] = $date->format('Y-m');
+            $date->modify('+1 month');
+        }
+
+        $data = [
+            'series' => [
+                0 => [
+                    'data' => []
+                ],
+                1 => [
+                    'data' => []
+                ],
+            ],
+            'labels' => $months,
+        ];
+        if ($result->count() > 0) {
+            $data['labels'] = [];
+        }
         foreach ($result as $row) {
             $date = new DateTime($row['date']);
             $date_formatted = $date->format('Y-m');
