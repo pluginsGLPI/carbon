@@ -138,15 +138,15 @@ class Computer extends AbstractAsset
                         ],
                     ],
                     // TODO : enable this code to check inventory entry date
-                    // [
-                    //     'OR' => [
-                    //         ['NOT' => [Infocom::getTableField('use_date')]],
-                    //         ['NOT' => [Infocom::getTableField('delivery_date')]],
-                    //         ['NOT' => [Infocom::getTableField('buy_date')]],
-                    //         ['NOT' => [Infocom::getTableField('date_creation')]],
-                    //         ['NOT' => [Infocom::getTableField('date_mod')]],
-                    //     ]
-                    // ]
+                    [
+                        'OR' => [
+                            ['NOT' => [Infocom::getTableField('use_date') => null]],
+                            ['NOT' => [Infocom::getTableField('delivery_date') => null]],
+                            ['NOT' => [Infocom::getTableField('buy_date') => null]],
+                            ['NOT' => [Infocom::getTableField('date_creation') => null]],
+                            ['NOT' => [Infocom::getTableField('date_mod') => null]],
+                        ]
+                    ]
                 ],
             ]
         ];
@@ -180,8 +180,8 @@ class Computer extends AbstractAsset
             Infocom::getTableField('use_date'),
             Infocom::getTableField('delivery_date'),
             Infocom::getTableField('buy_date'),
-            Infocom::getTableField('date_creation'),
-            Infocom::getTableField('date_mod'),
+            self::$itemtype::getTableField('date_creation'),
+            self::$itemtype::getTableField('date_mod'),
         ];
         $infocom_table = Infocom::getTable();
         $item_table = self::$itemtype::getTable();
@@ -218,8 +218,8 @@ class Computer extends AbstractAsset
         $item_oldest_date = $data['use_date']
                 ?? $data['delivery_date']
                 ?? $data['buy_date']
-                ?? $data['date_creation']
-                ?? $data['date_mod']
+                // ?? $data['date_creation']
+                // ?? $data['date_mod']
                 ?? null;
         $status['has_inventory_entry_date'] = ($item_oldest_date !== null);
 

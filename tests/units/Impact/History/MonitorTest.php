@@ -183,4 +183,8 @@ class MonitorTest extends CommonAsset
             $this->assertEquals($expected_row, $emission);
         }
     }
+
+    public function testCanHistorize()
+    {
+    }
 }

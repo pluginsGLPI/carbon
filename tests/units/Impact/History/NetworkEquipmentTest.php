@@ -154,4 +154,108 @@ class NetworkEquipmentTest extends CommonAsset
         $output = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
         $this->assertEquals('2017-01-01 00:00:00', $output->format('Y-m-d H:i:s'));
     }
+
+    public function testCanHistorize()
+    {
+        $network_equipment = $this->getItem(GlpiNetworkEquipment::class);
+        $id = $network_equipment->getID();
+
+        // Check we cannot historize an empty item
+        $history = new NetworkEquipment();
+        $this->assertFalse($history->canHistorize($id));
+
+        // Add empty info on the asset
+        $management = $this->getItem(Infocom::class, [
+            'itemtype' => $network_equipment->getType(),
+            'items_id' => $id,
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Add a date of inventory entry
+        $management->update([
+            'id' => $management->getID(),
+            'use_date' => '2020-01-01',
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Add an empty location
+        $location = $this->getItem(Location::class);
+        $network_equipment->update([
+            'id' => $id,
+            'locations_id' => $location->getID(),
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Add a country to the location
+        $location->update([
+            'id' => $location->getID(),
+            'country' => 'France',
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Add a model
+        $model = $this->getItem(NetworkEquipmentModel::class);
+        $network_equipment->update([
+            'id' => $id,
+            'networkequipmentmodels_id' => $model->getID(),
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Add a power consumption to the model
+        $model->update([
+            'id' => $model->getID(),
+            'power_consumption' => 55,
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // add a type
+        $type = $this->getItem(GlpiNetworkEquipmentType::class);
+        $network_equipment->update([
+            'id' => $id,
+            'networkequipmenttypes_id' => $type->getID(),
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // add a type power consumption
+        $power_consumption = $this->getItem(NetworkEquipmentType::class, [
+            GlpiNetworkEquipmentType::getForeignKeyField() => $type->getID(),
+        ]);
+        $this->assertTrue($history->canHistorize($id));
+
+        // Set a type power consumption
+        $type->update([
+            'id' => $type->getID(),
+            'power_consumption' => 55,
+        ]);
+        $this->assertTrue($history->canHistorize($id));
+
+        // *** test blocking conditions ***
+
+        // Put the asset in the trash bin
+        $network_equipment->update([
+            'id' => $id,
+            'is_deleted' => 1,
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Restore the asset
+        $network_equipment->update([
+            'id' => $id,
+            'is_deleted' => 0,
+        ]);
+
+        // Transform the asset into a template
+        $network_equipment->update([
+            'id' => $id,
+            'is_template' => 1,
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Restore the asset
+        $network_equipment->update([
+            'id' => $id,
+            'is_template' => 0,
+        ]);
+        $this->assertTrue($history->canHistorize($id));
+    }
 }

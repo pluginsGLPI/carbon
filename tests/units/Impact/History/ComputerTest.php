@@ -37,9 +37,10 @@ use Computer as GlpiComputer;
 use GlpiPlugin\Carbon\Impact\History\Computer;
 use GlpiPlugin\Carbon\Tests\Impact\History\CommonAsset;
 use Location;
-use DateTime;
 use ComputerModel;
 use ComputerType as GlpiComputerType;
+use DateTime;
+use Infocom;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
@@ -157,5 +158,117 @@ class ComputerTest extends CommonAsset
             $emission = array_intersect_key($emission, $expected_row);
             $this->assertEquals($expected_row, $emission);
         }
+    }
+
+    public function testCanHistorize()
+    {
+        $computer = $this->getItem(GlpiComputer::class);
+        $id = $computer->getID();
+
+        // Check we cannot historize an empty item
+        $history = new Computer();
+        $this->assertFalse($history->canHistorize($id));
+
+        // Add empty info on the asset
+        $management = $this->getItem(Infocom::class, [
+            'itemtype' => $computer->getType(),
+            'items_id' => $id,
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Add a date of inventory entry
+        $management->update([
+            'id' => $management->getID(),
+            'use_date' => '2020-01-01',
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Add an empty location
+        $location = $this->getItem(Location::class);
+        $computer->update([
+            'id' => $id,
+            'locations_id' => $location->getID(),
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Add a country to the location
+        $location->update([
+            'id' => $location->getID(),
+            'country' => 'France',
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Add a usage profile
+        $usage_profile = $this->getItem(ComputerUsageProfile::class);
+        $this->assertFalse($history->canHistorize($id));
+        $impact = $this->getItem(EnvironmentalImpact::class, [
+            $usage_profile->getForeignKeyField() => $usage_profile->getID(),
+            'computers_id' => $id,
+        ]);
+
+        // Add a model
+        $model = $this->getItem(ComputerModel::class);
+        $computer->update([
+            'id' => $id,
+            'computermodels_id' => $model->getID(),
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Add a power consumption to the model
+        $model->update([
+            'id' => $model->getID(),
+            'power_consumption' => 55,
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // add a type
+        $type = $this->getItem(GlpiComputerType::class);
+        $computer->update([
+            'id' => $id,
+            'computertypes_id' => $type->getID(),
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // add a type power consumption
+        $power_consumption = $this->getItem(ComputerType::class, [
+            GlpiComputerType::getForeignKeyField() => $type->getID(),
+        ]);
+        $this->assertTrue($history->canHistorize($id));
+
+        // Set a type power consumption
+        $power_consumption->update([
+            'id' => $power_consumption->getID(),
+            'power_consumption' => 55,
+        ]);
+        $this->assertTrue($history->canHistorize($id));
+
+        // *** test blocking conditions ***
+
+        // Put the asset in the trash bin
+        $computer->update([
+            'id' => $id,
+            'is_deleted' => 1,
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Restore the asset
+        $computer->update([
+            'id' => $id,
+            'is_deleted' => 0,
+        ]);
+
+        // Transform the asset into a template
+        $computer->update([
+            'id' => $id,
+            'is_template' => 1,
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Restore the asset
+        $computer->update([
+            'id' => $id,
+            'is_template' => 0,
+        ]);
+        $this->assertTrue($history->canHistorize($id));
     }
 }
