@@ -38,8 +38,8 @@ $itemtypes = [
 ];
 foreach ($itemtypes as $itemtype) {
     $map = [
-        2222 => 10500,
-        2223 => 10501,
+        2222 => 128500,
+        2223 => 128501,
     ];
     foreach ($map as $src => $dst) {
         $migration->changeSearchOption($itemtype, $src, $dst);

@@ -33,9 +33,18 @@
 
 namespace GlpiPlugin\Carbon;
 
+/**
+ * This file is *REQUIRED* in the whole life time of the plugin
+ * used in install process
+ */
+
+/**
+ * Centralize ID of search options in a single place for btter handling
+ * in case of conflict with an other plugin
+ */
 class SearchOptions
 {
-    private const SEARCH_OPTION_BASE = 10000;
+    private const SEARCH_OPTION_BASE = 128000;
 
     public const COMPUTER_USAGE_PROFILE_START_TIME = self::SEARCH_OPTION_BASE + 101;
     public const COMPUTER_USAGE_PROFILE_STOP_TIME  = self::SEARCH_OPTION_BASE + 102;
