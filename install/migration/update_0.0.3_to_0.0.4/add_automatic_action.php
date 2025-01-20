@@ -34,6 +34,21 @@
 use GlpiPlugin\Carbon\CronTask;
 use CronTask as GlpiCronTask;
 
+// Rename Historize task into UsageImpact
+$crontask = new GlpiCronTask();
+$crontask->getFromDBByCrit([
+    'itemtype' => CronTask::class,
+    'name'     => 'Historize'
+]);
+
+if (!$crontask->isNewItem()) {
+    $crontask->update([
+        'id'   => $crontask->getID(),
+        'name' => 'UsageImpact',
+    ]);
+}
+
+// Add new tasks
 $automatic_actions = [
     [
         'itemtype'  => CronTask::class,
