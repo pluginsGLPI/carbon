@@ -42,9 +42,9 @@
     <div id="carbonEmissionPerMonthChart" class="chart-lg"></div>
     <div>
       {% set reset_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', reset: '', itemtype: '" ~ item.getType() ~ "', items_id: '" ~ item.getID() ~ "'}" %}
-      <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/environmentalimpact.form.php' }}', {{ reset_args }})">{{ __('Reset data', 'carbon') }}</a>
+      <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/usageimpact.form.php' }}', {{ reset_args }})">{{ __('Reset data', 'carbon') }}</a>
       {% set calculate_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', calculate: '', itemtype: '" ~ item.getType() ~ "', items_id: '" ~ item.getID() ~ "'}" %}
-      <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/environmentalimpact.form.php' }}', {{ calculate_args }})">{{ __('Calculate data', 'carbon') }}</a>
+      <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/usageimpact.form.php' }}', {{ calculate_args }})">{{ __('Calculate data', 'carbon') }}</a>
     </div>
 </div>
 
@@ -87,3 +87,18 @@
     });
   });
 </script>
+
+{{ fields.largeTitle(
+    __('Embedded impact', 'carbon'),
+    'fas fa-chart-pie'
+) }}
+
+<div class="card-body" id="cardBodyBorder1">
+    <div class="subheader">{{ __('Embedded impact', 'carbon') }}</div>
+    <div>
+      {% set reset_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', reset: '', itemtype: '" ~ item.getType() ~ "', items_id: '" ~ item.getID() ~ "'}" %}
+      <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/embeddedimpact.form.php' }}', {{ reset_args }})">{{ __('Reset data', 'carbon') }}</a>
+      {% set calculate_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', calculate: '', itemtype: '" ~ item.getType() ~ "', items_id: '" ~ item.getID() ~ "'}" %}
+      <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/embeddedimpact.form.php' }}', {{ calculate_args }})">{{ __('Calculate data', 'carbon') }}</a>
+    </div>
+</div>

@@ -26,22 +26,24 @@
  * SOFTWARE.
  * -------------------------------------------------------------------------
  * @copyright Copyright (C) 2024 Teclib' and contributors.
+ * @copyright Copyright (C) 2024 by the carbon plugin team.
  * @license   MIT https://opensource.org/licenses/mit-license.php
  * @link      https://github.com/pluginsGLPI/carbon
  * -------------------------------------------------------------------------
  */
 
-$itemtypes = [
-    Computer::class,
-    Monitor::class,
-    NetworkEquipment::class,
-];
-foreach ($itemtypes as $itemtype) {
-    $map = [
-        2222 => 128500,
-        2223 => 128501,
-    ];
-    foreach ($map as $src => $dst) {
-        $migration->changeSearchOption($itemtype, $src, $dst);
-    }
+namespace GlpiPlugin\Carbon\Impact\Embedded\Boavizta;
+
+use CommonDBTM;
+use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
+
+interface AssetInterface
+{
+    const IMPACT_GWP = 0; // Global warming potential
+    const IMPACT_ADP = 1; // Abiotic Depletion Potential
+    const IMPACT_PE  = 2; // Primary Energy
+
+    public static function getEngine(CommonDBTM $item): EngineInterface;
+
+    public function setLimit(int $limit);
 }

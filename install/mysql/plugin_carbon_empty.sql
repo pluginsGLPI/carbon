@@ -105,6 +105,20 @@ CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_computerusageprofiles` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_embeddedimpacts` (
+  `id`          int          unsigned NOT NULL AUTO_INCREMENT,
+  `itemtype`    varchar(255) DEFAULT NULL,
+  `items_id`    int          unsigned NOT NULL DEFAULT '0',
+  `gwp`         float        unsigned DEFAULT '0' COMMENT '(unit gCO2eq) Global warming potential',
+  `gwp_quality` int          unsigned NOT NULL DEFAULT '0' COMMENT 'DataTtacking\\AbstractTracked::DATA_QUALITY_* constants',
+  `adp`         float        unsigned DEFAULT '0' COMMENT '(unit gSbeq) Abiotic depletion potential',
+  `adp_quality` int          unsigned NOT NULL DEFAULT '0' COMMENT 'DataTtacking\\AbstractTracked::DATA_QUALITY_* constants',
+  `pe`          float        unsigned DEFAULT '0' COMMENT '(unit J) Primary energy',
+  `pe_quality`  int          unsigned NOT NULL DEFAULT '0' COMMENT 'DataTtacking\\AbstractTracked::DATA_QUALITY_* constants',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unicity` (`itemtype`, `items_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_environmentalimpacts` (
   `id`                                     int unsigned NOT NULL AUTO_INCREMENT,
   `computers_id`                           int unsigned NOT NULL DEFAULT '0',

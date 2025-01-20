@@ -77,4 +77,11 @@ interface EngineInterface
      * Unit of returned value is kWh (kiloWattHour)
      */
     public function getEnergyPerDay(DateTime $day): TrackedFloat;
+
+    /**
+     * Get embedded impact
+     *
+     * @return array
+     */
+    // public function getEmbeddedImpact(): array;
 }

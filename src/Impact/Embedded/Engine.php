@@ -31,17 +31,19 @@
  * -------------------------------------------------------------------------
  */
 
-$itemtypes = [
-    Computer::class,
-    Monitor::class,
-    NetworkEquipment::class,
-];
-foreach ($itemtypes as $itemtype) {
-    $map = [
-        2222 => 128500,
-        2223 => 128501,
-    ];
-    foreach ($map as $src => $dst) {
-        $migration->changeSearchOption($itemtype, $src, $dst);
+namespace GlpiPlugin\Carbon\Impact\Embedded;
+
+use CommonGLPI;
+
+class Engine extends CommonGLPI
+{
+    public static function getAvailableBackends(): array
+    {
+        return [
+            // 'Internal' => __('Internal', 'carbon'),
+            'Boavizta' => __('Boavizta', 'carbon'),
+            // 'NumEcoVal' => __('NumEcoVal', 'carbon'),
+            // 'Resilio' => __('Resilio', 'carbon'),
+        ];
     }
 }

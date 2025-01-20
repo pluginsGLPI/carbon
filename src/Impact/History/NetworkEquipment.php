@@ -32,11 +32,12 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\History;
+namespace GlpiPlugin\Carbon\Impact\History;
 
 use CommonDBTM;
 use DbUtils;
 use Glpi\Application\View\TemplateRenderer;
+use Infocom;
 use Location;
 use NetworkEquipment as GlpiNetworkEquipment;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
@@ -56,7 +57,7 @@ class NetworkEquipment extends AbstractAsset
         return new EngineNetworkEquipment($item->getID());
     }
 
-    public function getHistorizableQuery(bool $entity_restrict = true): array
+    public function getEvaluableQuery(bool $entity_restrict = true): array
     {
         $item_table = self::$itemtype::getTable();
         $item_model_table = self::$model_itemtype::getTable();
@@ -125,7 +126,7 @@ class NetworkEquipment extends AbstractAsset
         global $DB;
 
         $history = new self();
-        $request = $history->getHistorizableQuery();
+        $request = $history->getEvaluableQuery();
         // Select fields to review
         $request['SELECT'] = [
             self::$itemtype::getTableField('is_deleted'),
@@ -137,6 +138,20 @@ class NetworkEquipment extends AbstractAsset
             GlpiNetworkEquipmentType::getTableField('id as type_id'),
             NetworkEquipmentType::getTableField('id as plugin_carbon_type_id'),
             NetworkEquipmentType::getTableField('power_consumption  as type_power_consumption'),
+            Infocom::getTableField('use_date'),
+            Infocom::getTableField('delivery_date'),
+            Infocom::getTableField('buy_date'),
+            self::$itemtype::getTableField('date_creation'),
+            self::$itemtype::getTableField('date_mod'),
+        ];
+        $infocom_table = Infocom::getTable();
+        $item_table = self::$itemtype::getTable();
+        $request['INNER JOIN'][$infocom_table] = [
+            'FKEY' => [
+                $infocom_table => 'items_id',
+                $item_table => 'id',
+                ['AND' => ['itemtype' => self::$itemtype]],
+            ]
         ];
         // Change inner joins into left joins to identify missing data
         $request['LEFT JOIN'] = $request['INNER JOIN'];
@@ -159,6 +174,14 @@ class NetworkEquipment extends AbstractAsset
         $status['has_model_power_consumption'] = (($data['model_power_consumption'] ?? 0) !== 0);
         $status['has_type'] = ($data['type_id'] !== 0);
         $status['has_type_power_consumption'] = (($data['type_power_consumption'] ?? 0) !== 0);
+
+        $item_oldest_date = $data['use_date']
+            ?? $data['delivery_date']
+            ?? $data['buy_date']
+            // ?? $data['date_creation']
+            // ?? $data['date_mod']
+            ?? null;
+        $status['has_inventory_entry_date'] = ($item_oldest_date !== null);
 
         TemplateRenderer::getInstance()->display('@carbon/history/status-item.html.twig', [
             'have_status' => ($iterator->count() === 1),

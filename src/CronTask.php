@@ -38,11 +38,18 @@ use GlpiPlugin\Carbon\DataSource\RestApiClient;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensityRTE;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensityElectricityMap;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensityInterface;
+use GlpiPlugin\Carbon\DataSource\Boaviztapi;
 use GlpiPlugin\Carbon\Toolbox;
 
 class CronTask
 {
-    public static function cronInfo($name)
+    /**
+     * Get description of an automatic action
+     *
+     * @param string $name
+     * @return void
+     */
+    public static function cronInfo(string $name)
     {
         switch ($name) {
             case 'DownloadRte':
@@ -57,29 +64,67 @@ class CronTask
                     'parameter' => __('Maximum number of entries to download', 'carbon'),
                 ];
 
-            case 'Historize':
+            case 'UsageImpact':
                 return [
-                    'description' => __('Compute daily environnemental impact for all assets', 'carbon'),
+                    'description' => __('Compute usage environnemental impact for all assets', 'carbon'),
+                    'parameter' => __('Maximum number of entries to calculate', 'carbon'),
+                ];
+            case 'EmbodiedImpact':
+                return [
+                    'description' => __('Compute embodied environnemental impact for all assets', 'carbon'),
                     'parameter' => __('Maximum number of entries to calculate', 'carbon'),
                 ];
         }
         return [];
     }
 
-    public static function cronHistorize(GlpiCronTask $task): int
+    /**
+     * Calculate usage impact for all assets
+     *
+     * @param GlpiCronTask $task
+     * @return integer
+     */
+    public static function cronUsageImpact(GlpiCronTask $task): int
     {
-        $histories = (new Toolbox())->getHistoryClasses();
+        $count = 0;
+
+        $usage_impacts = Toolbox::getUsageImpactClasses();
         $task->setVolume(0); // start with zero
         $remaining = $task->fields['param'];
-        $limit_per_type = floor(((int) $remaining) / count($histories));
-        foreach ($histories as $history_type) {
-            /** @var AbstractAsset $history */
-            $history = new $history_type();
-            $history->setLimit($limit_per_type);
-            $count = $history->historizeItems();
+        $limit_per_type = floor(((int) $remaining) / count($usage_impacts));
+        foreach ($usage_impacts as $usage_impact_type) {
+            /** @var AbstractAsset $usage_impact */
+            $usage_impact = new $usage_impact_type();
+            $usage_impact->setLimit($limit_per_type);
+            $count = $usage_impact->evaluateItems();
             $task->addVolume($count);
         }
 
+        return ($count > 0 ? 1 : 0);
+    }
+
+    /**
+     * Calculate embodied impact for all assets
+     *
+     * @param GlpiCronTask $task
+     * @return integer
+     */
+    public static function cronEmbodiedImpact(GlpiCronTask $task): int
+    {
+        $count = 0;
+
+        $embeddedImpacts = Toolbox::getEmbodiedImpactClasses();
+        $task->setVolume(0); // start with zero
+        $remaining = $task->fields['param'];
+        $limit_per_type = floor(((int) $remaining) / count($embeddedImpacts));
+        foreach ($embeddedImpacts as $embeddedImpact_type) {
+            /** @var AbstractAsset $embeddedImpact */
+            $embedded_impact = new $embeddedImpact_type();
+            $embedded_impact->setLimit($limit_per_type);
+            $embedded_impact->setClient(new Boaviztapi(new RestApiClient()));
+            $count = $embedded_impact->evaluateItems();
+            $task->addVolume($count);
+        }
         return ($count > 0 ? 1 : 0);
     }
 

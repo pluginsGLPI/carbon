@@ -308,7 +308,6 @@ class CommonTestCase extends TestCase
                 'date' => $current_date->format('Y-m-d H:00:00'),
                 'intensity' => $intensity,
             ];
-            fprintf(STDOUT, $current_date->format('Y-m-d H:00:00') . PHP_EOL);
             $item = $this->getItem(
                 CarbonIntensity::class,
                 $crit + [

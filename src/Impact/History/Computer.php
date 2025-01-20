@@ -32,7 +32,7 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\History;
+namespace GlpiPlugin\Carbon\Impact\History;
 
 use CommonDBTM;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
@@ -45,6 +45,7 @@ use DbUtils;
 use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\EnvironmentalImpact;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
+use Infocom;
 use Location;
 
 class Computer extends AbstractAsset
@@ -58,7 +59,7 @@ class Computer extends AbstractAsset
         return new EngineComputer($item->getID());
     }
 
-    public function getHistorizableQuery(bool $entity_restrict = true): array
+    public function getEvaluableQuery(bool $entity_restrict = true): array
     {
         $item_table = self::$itemtype::getTable();
         $item_model_table = self::$model_itemtype::getTable();
@@ -67,6 +68,7 @@ class Computer extends AbstractAsset
         $location_table = Location::getTable();
         $environmentalimpact_table = EnvironmentalImpact::getTable();
         $computerUsageProfile_table = ComputerUsageProfile::getTable();
+        $infocom_table = Infocom::getTable();
 
         $request = [
             'SELECT' => [
@@ -114,7 +116,14 @@ class Computer extends AbstractAsset
                         $environmentalimpact_table  => 'plugin_carbon_computerusageprofiles_id',
                         $computerUsageProfile_table => 'id',
                     ]
-                ]
+                ],
+                $infocom_table => [
+                    'FKEY' => [
+                        $infocom_table => 'items_id',
+                        $item_table => 'id',
+                        ['AND' => ['itemtype' => self::$itemtype]],
+                    ]
+                ],
             ],
             'WHERE' => [
                 'AND' => [
@@ -128,6 +137,16 @@ class Computer extends AbstractAsset
                             self::$model_itemtype::getTableField('power_consumption') => ['>', 0],
                         ],
                     ],
+                    // TODO : enable this code to check inventory entry date
+                    [
+                        'OR' => [
+                            ['NOT' => [Infocom::getTableField('use_date') => null]],
+                            ['NOT' => [Infocom::getTableField('delivery_date') => null]],
+                            ['NOT' => [Infocom::getTableField('buy_date') => null]],
+                            ['NOT' => [Infocom::getTableField('date_creation') => null]],
+                            ['NOT' => [Infocom::getTableField('date_mod') => null]],
+                        ]
+                    ]
                 ],
             ]
         ];
@@ -145,7 +164,7 @@ class Computer extends AbstractAsset
         global $DB;
 
         $history = new self();
-        $request = $history->getHistorizableQuery();
+        $request = $history->getEvaluableQuery();
         // Select fields to review
         $request['SELECT'] = [
             self::$itemtype::getTableField('is_deleted'),
@@ -158,6 +177,20 @@ class Computer extends AbstractAsset
             ComputerType::getTableField('id as plugin_carbon_type_id'),
             ComputerType::getTableField('power_consumption  as type_power_consumption'),
             EnvironmentalImpact::getTableField('plugin_carbon_computerusageprofiles_id'),
+            Infocom::getTableField('use_date'),
+            Infocom::getTableField('delivery_date'),
+            Infocom::getTableField('buy_date'),
+            self::$itemtype::getTableField('date_creation'),
+            self::$itemtype::getTableField('date_mod'),
+        ];
+        $infocom_table = Infocom::getTable();
+        $item_table = self::$itemtype::getTable();
+        $request['INNER JOIN'][$infocom_table] = [
+            'FKEY' => [
+                $infocom_table => 'items_id',
+                $item_table => 'id',
+                ['AND' => ['itemtype' => self::$itemtype]],
+            ]
         ];
         // Change inner joins into left joins to identify missing data
         $request['LEFT JOIN'] = $request['INNER JOIN'];
@@ -181,6 +214,14 @@ class Computer extends AbstractAsset
         $status['has_type'] = ($data['type_id'] !== 0);
         $status['has_type_power_consumption'] = (($data['type_power_consumption'] ?? 0) !== 0);
         $status['has_usage_profile'] = ($data['plugin_carbon_computerusageprofiles_id'] !== 0);
+
+        $item_oldest_date = $data['use_date']
+                ?? $data['delivery_date']
+                ?? $data['buy_date']
+                // ?? $data['date_creation']
+                // ?? $data['date_mod']
+                ?? null;
+        $status['has_inventory_entry_date'] = ($item_oldest_date !== null);
 
         TemplateRenderer::getInstance()->display('@carbon/history/status-item.html.twig', [
             'have_status' => ($iterator->count() === 1),

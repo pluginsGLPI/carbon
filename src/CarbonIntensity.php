@@ -344,10 +344,7 @@ class CarbonIntensity extends CommonDropdown
         );
         $stmt = $DB->prepare($query);
 
-        $in_transaction = $DB->inTransaction();
-        if (!$in_transaction) {
-            $DB->beginTransaction();
-        }
+        $in_transaction = $DB->inTransaction() || $DB->beginTransaction();
 
         foreach ($data as $intensity) {
             try {
@@ -366,7 +363,7 @@ class CarbonIntensity extends CommonDropdown
                 continue;
             }
         }
-        if (!$in_transaction) {
+        if ($in_transaction) {
             $DB->commit();
         }
         $stmt->close();

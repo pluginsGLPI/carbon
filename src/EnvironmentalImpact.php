@@ -39,6 +39,7 @@ use CommonGLPI;
 use Glpi\Application\View\TemplateRenderer;
 use Monitor;
 use NetworkEquipment;
+use Plugin;
 
 /**
  * Relation between a computer and a usage profile
@@ -126,6 +127,7 @@ class EnvironmentalImpact extends CommonDBChild
         $options = [
             'candel'   => false,
             'can_edit' => $canedit,
+            'target'   => Plugin::getWebDir('carbon') . '/front/usageimpact.form.php',
         ];
         $this->initForm($this->getID(), $options);
         TemplateRenderer::getInstance()->display('@carbon/environmentalimpact.html.twig', [

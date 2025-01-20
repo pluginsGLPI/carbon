@@ -299,14 +299,13 @@ class Toolbox
      *
      * @return array
      */
-    public function getHistoryClasses(): array
+    public static function getUsageImpactClasses(): array
     {
+        $base_namespace = __NAMESPACE__ . '\\Impact\\History';
         $history_types = [];
-
         foreach (PLUGIN_CARBON_TYPES as $itemtype) {
             $history_type = [
-                __NAMESPACE__,
-                'History',
+                $base_namespace,
                 $itemtype
             ];
             $history_types[] = implode('\\', $history_type);
@@ -315,6 +314,31 @@ class Toolbox
         return $history_types;
     }
 
+    /**
+     * Get asset class names for embodied impact
+     *
+     * @return array
+     */
+    public static function getEmbodiedImpactClasses(): array
+    {
+        $base_namespace = Config::getEmbodiedImpactEngine();
+        $embedded_impact_types = [];
+        foreach (PLUGIN_CARBON_TYPES as $itemtype) {
+            $embedded_impact_types[] = implode('\\', [
+                $base_namespace,
+                $itemtype
+            ]);
+        }
+
+        return $embedded_impact_types;
+    }
+
+    /**
+     * Get an array of 2 dates from the beginning of the current year to yesterday
+     *
+     * @param DateTimeImmutable $date
+     * @return array
+     */
     public function yearToLastMonth(DateTimeImmutable $date): array
     {
             $end_date = DateTime::createFromImmutable($date);

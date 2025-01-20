@@ -129,7 +129,7 @@ class ComputerUsageProfile extends CommonDropdown
             [
                 'name'      => 'time_start',
                 'type'      => 'dropdownValue',
-                'label'     => __('Knowbase category', 'formcreator'),
+                'label'     => __('Start time', 'carbon'),
                 'list'      => false
             ],
             [

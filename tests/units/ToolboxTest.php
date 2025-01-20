@@ -143,4 +143,26 @@ class ToolboxTest extends DbTestCase
         $output = Toolbox::isLocationExistForZone('foo');
         $this->assertTrue($output);
     }
+
+    public function testGetUsageImpactClasses()
+    {
+        $output = Toolbox::getUsageImpactClasses();
+        $this->assertIsArray($output);
+        $this->assertEquals([
+            'GlpiPlugin\\Carbon\\Impact\\History\\Computer',
+            'GlpiPlugin\\Carbon\\Impact\\History\\Monitor',
+            'GlpiPlugin\\Carbon\\Impact\\History\\NetworkEquipment',
+        ], $output);
+    }
+
+    public function testGetEmbodiedImpactClasses()
+    {
+        $output = Toolbox::getEmbodiedImpactClasses();
+        $this->assertIsArray($output);
+        $this->assertEquals([
+            'GlpiPlugin\\Carbon\\Impact\\Embedded\\Boavizta\\Computer',
+            'GlpiPlugin\\Carbon\\Impact\\Embedded\\Boavizta\\Monitor',
+            'GlpiPlugin\\Carbon\\Impact\\Embedded\\Boavizta\\NetworkEquipment',
+        ], $output);
+    }
 }

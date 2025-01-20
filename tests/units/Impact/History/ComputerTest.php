@@ -31,26 +31,27 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\History\Tests;
+namespace GlpiPlugin\Carbon\Impact\History\Tests;
 
 use Computer as GlpiComputer;
-use GlpiPlugin\Carbon\History\Computer;
-use GlpiPlugin\Carbon\Tests\History\CommonAsset;
+use GlpiPlugin\Carbon\Impact\History\Computer;
+use GlpiPlugin\Carbon\Tests\Impact\History\CommonAsset;
 use Location;
-use DateTime;
 use ComputerModel;
 use ComputerType as GlpiComputerType;
+use DateTime;
+use Infocom;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\EnvironmentalImpact;
 
 /**
- * @covers \GlpiPlugin\Carbon\History\Computer
+ * @covers \GlpiPlugin\Carbon\Impact\History\Computer
  */
 class ComputerTest extends CommonAsset
 {
-    protected string $history_type = \GlpiPlugin\Carbon\History\Computer::class;
+    protected string $history_type = \GlpiPlugin\Carbon\Impact\History\Computer::class;
     protected string $asset_type = GlpiComputer::class;
 
     public function testGetEngine()
@@ -60,7 +61,7 @@ class ComputerTest extends CommonAsset
         $this->assertInstanceOf(\GlpiPlugin\Carbon\Engine\V1\Computer::class, $engine);
     }
 
-    public function testHistorizeItem()
+    public function testEvaluateItem()
     {
         $this->login('glpi', 'glpi');
         $entities_id = $this->isolateInEntity('glpi', 'glpi');
@@ -100,14 +101,15 @@ class ComputerTest extends CommonAsset
         $history = new Computer();
         $start_date = '2024-02-01 00:00:00';
         $end_date =   '2024-02-08 00:00:00';
-        $count = $history->historizeItem(
+
+        $count = $history->evaluateItem(
             $asset->getID(),
             new DateTime($start_date),
             new DateTime($end_date)
         );
 
         // Days interval is [$start_date, $end_date[
-        $this->assertEquals(8, $count);
+        $this->assertEquals(7, $count);
 
         $carbon_emission = new CarbonEmission();
         $emissions = $carbon_emission->find([
@@ -157,5 +159,117 @@ class ComputerTest extends CommonAsset
             $emission = array_intersect_key($emission, $expected_row);
             $this->assertEquals($expected_row, $emission);
         }
+    }
+
+    public function testCanHistorize()
+    {
+        $computer = $this->getItem(GlpiComputer::class);
+        $id = $computer->getID();
+
+        // Check we cannot historize an empty item
+        $history = new Computer();
+        $this->assertFalse($history->canHistorize($id));
+
+        // Add empty info on the asset
+        $management = $this->getItem(Infocom::class, [
+            'itemtype' => $computer->getType(),
+            'items_id' => $id,
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Add a date of inventory entry
+        $management->update([
+            'id' => $management->getID(),
+            'use_date' => '2020-01-01',
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Add an empty location
+        $location = $this->getItem(Location::class);
+        $computer->update([
+            'id' => $id,
+            'locations_id' => $location->getID(),
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Add a country to the location
+        $location->update([
+            'id' => $location->getID(),
+            'country' => 'France',
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Add a usage profile
+        $usage_profile = $this->getItem(ComputerUsageProfile::class);
+        $this->assertFalse($history->canHistorize($id));
+        $impact = $this->getItem(EnvironmentalImpact::class, [
+            $usage_profile->getForeignKeyField() => $usage_profile->getID(),
+            'computers_id' => $id,
+        ]);
+
+        // Add a model
+        $model = $this->getItem(ComputerModel::class);
+        $computer->update([
+            'id' => $id,
+            'computermodels_id' => $model->getID(),
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Add a power consumption to the model
+        $model->update([
+            'id' => $model->getID(),
+            'power_consumption' => 55,
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // add a type
+        $type = $this->getItem(GlpiComputerType::class);
+        $computer->update([
+            'id' => $id,
+            'computertypes_id' => $type->getID(),
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // add a type power consumption
+        $power_consumption = $this->getItem(ComputerType::class, [
+            GlpiComputerType::getForeignKeyField() => $type->getID(),
+        ]);
+        $this->assertTrue($history->canHistorize($id));
+
+        // Set a type power consumption
+        $power_consumption->update([
+            'id' => $power_consumption->getID(),
+            'power_consumption' => 55,
+        ]);
+        $this->assertTrue($history->canHistorize($id));
+
+        // *** test blocking conditions ***
+
+        // Put the asset in the trash bin
+        $computer->update([
+            'id' => $id,
+            'is_deleted' => 1,
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Restore the asset
+        $computer->update([
+            'id' => $id,
+            'is_deleted' => 0,
+        ]);
+
+        // Transform the asset into a template
+        $computer->update([
+            'id' => $id,
+            'is_template' => 1,
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Restore the asset
+        $computer->update([
+            'id' => $id,
+            'is_template' => 0,
+        ]);
+        $this->assertTrue($history->canHistorize($id));
     }
 }

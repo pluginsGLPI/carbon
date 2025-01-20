@@ -32,7 +32,7 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\History;
+namespace GlpiPlugin\Carbon\Impact\History;
 
 use CommonDBTM;
 use Computer as GlpiComputer;
@@ -60,7 +60,7 @@ class Monitor extends AbstractAsset
         return new EngineMonitor($item->getID());
     }
 
-    public function getHistorizableQuery(bool $entity_restrict = true): array
+    public function getEvaluableQuery(bool $entity_restrict = true): array
     {
         // Monitors must be attached to a computer to be used
         // then lets create the query based on the equivalent request for computers
@@ -71,7 +71,7 @@ class Monitor extends AbstractAsset
         $glpi_monitor_types_table = GlpiMonitorType::getTable();
         $glpi_monitor_types_fk = GlpiMonitorType::getForeignKeyField();
         $monitor_types_table = MonitorType::getTable();
-        $request = (new Computer())->getHistorizableQuery();
+        $request = (new Computer())->getEvaluableQuery();
         $computer_inner_joins = $request['INNER JOIN'];
         unset($request['INNER JOIN']);
 
@@ -150,7 +150,7 @@ class Monitor extends AbstractAsset
         global $DB;
 
         $history = new self();
-        $request = $history->getHistorizableQuery();
+        $request = $history->getEvaluableQuery();
         // Select fields to review
         $request['SELECT'] = [
             self::$itemtype::getTableField('is_deleted'),

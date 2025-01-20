@@ -256,6 +256,8 @@ class AbstractCarbonIntensityTest extends DbTestCase
         // Warning : current month may be ignored if (now - 2 days) results to a date in the previous month
         // This may happen if (day of month) < 2
         $count = $stop_date->format('m') - $start_date->format('m') + 1;
+        $count = (($stop_date->format('Y')  - $start_date->format('Y')) * 12)
+            + ($stop_date->format('m') - $start_date->format('m') ) + 1;
         $intensity->expects($this->exactly($count))->method('save');
 
         $instance = $this->getMockForAbstractClass(AbstractCarbonIntensity::class);

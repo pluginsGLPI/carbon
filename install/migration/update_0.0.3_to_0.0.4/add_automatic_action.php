@@ -31,17 +31,36 @@
  * -------------------------------------------------------------------------
  */
 
-$itemtypes = [
-    Computer::class,
-    Monitor::class,
-    NetworkEquipment::class,
+use GlpiPlugin\Carbon\CronTask;
+use CronTask as GlpiCronTask;
+
+$automatic_actions = [
+    [
+        'itemtype'  => CronTask::class,
+        'name'      => 'EmbodiedImpact',
+        'frequency' => DAY_TIMESTAMP,
+        'options'   => [
+            'mode' => GlpiCronTask::MODE_EXTERNAL,
+            'allowmode' => GlpiCronTask::MODE_INTERNAL + GlpiCronTask::MODE_EXTERNAL,
+            'logs_lifetime' => 30,
+            'comment' => __('Compute embodied impact of assets', 'carbon'),
+            'param'   => 10000, // Maximum rows to generate per execution
+        ]
+    ],
 ];
-foreach ($itemtypes as $itemtype) {
-    $map = [
-        2222 => 128500,
-        2223 => 128501,
-    ];
-    foreach ($map as $src => $dst) {
-        $migration->changeSearchOption($itemtype, $src, $dst);
+
+foreach ($automatic_actions as $action) {
+    $task = new GlpiCronTask();
+    if ($task->getFromDBByCrit(['name' => $action['name']]) !== false) {
+        $task->delete(['id' => $task->getID()]);
+    }
+    $success = GlpiCronTask::Register(
+        $action['itemtype'],
+        $action['name'],
+        $action['frequency'],
+        $action['options']
+    );
+    if (!$success) {
+        throw new \RuntimeException('Error while creating automatic action: ' . $action['name']);
     }
 }

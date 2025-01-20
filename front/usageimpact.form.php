@@ -33,7 +33,7 @@
 
 use Glpi\Event;
 use GlpiPlugin\Carbon\EnvironmentalImpact;
-use GlpiPlugin\Carbon\History\AbstractAsset as AbstractAssetHistory;
+use GlpiPlugin\Carbon\Impact\History\AbstractAsset;
 
 include('../../../inc/includes.php');
 
@@ -69,14 +69,15 @@ if (isset($_POST['update'])) {
         Html::back();
     }
 
-    $history = '\\GlpiPlugin\\Carbon\\History\\' . (string) $_POST['itemtype'];
-    if (!class_exists($history) || !is_subclass_of($history, AbstractAssetHistory::class)) {
+    $usage_impact_class = '\\GlpiPlugin\\Carbon\\Impact\\History\\' . (string) $_POST['itemtype'];
+    if (!class_exists($usage_impact_class) || !is_subclass_of($usage_impact_class, AbstractAsset::class)) {
         Session::addMessageAfterRedirect(__('Bad arguments.', 'carbon'), false, ERROR);
         Html::back();
     }
 
-    $history = new $history();
-    $itemtype = $history->getItemtype();
+    /** @var AbstractAsset $history */
+    $usage_impact = new $usage_impact_class();
+    $itemtype = $usage_impact->getItemtype();
     $item = new $itemtype();
     $item->getFromDB($_POST['items_id']);
     if (!$item->canUpdate()) {
@@ -84,7 +85,7 @@ if (isset($_POST['update'])) {
         Html::back();
     }
 
-    if (!$history->resetHistory($_POST['items_id'])) {
+    if (!$usage_impact->resetHistory($_POST['items_id'])) {
         Session::addMessageAfterRedirect(__('Reset failed.', 'carbon'), false, ERROR);
     }
 } else if (isset($_POST['calculate'])) {
@@ -98,14 +99,15 @@ if (isset($_POST['update'])) {
         Html::back();
     }
 
-    $history = '\\GlpiPlugin\\Carbon\\History\\' . (string) $_POST['itemtype'];
-    if (!class_exists($history) || !is_subclass_of($history, AbstractAssetHistory::class)) {
+    $usage_impact_class = '\\GlpiPlugin\\Carbon\\Impact\\History\\' . (string) $_POST['itemtype'];
+    if (!class_exists($usage_impact_class) || !is_subclass_of($usage_impact_class, AbstractAsset::class)) {
         Session::addMessageAfterRedirect(__('Bad arguments.', 'carbon'), false, ERROR);
         Html::back();
     }
 
-    $history = new $history();
-    $itemtype = $history->getItemtype();
+    /** @var AbstractAsset $usage_impact */
+    $usage_impact = new $usage_impact_class();
+    $itemtype = $usage_impact->getItemtype();
     $item = new $itemtype();
     $item->getFromDB($_POST['items_id']);
     if (!$item->canUpdate()) {
@@ -113,7 +115,12 @@ if (isset($_POST['update'])) {
         Html::back();
     }
 
-    if (!$history->calculateHistory($_POST['items_id'])) {
+    if (!$usage_impact->canHistorize($_POST['items_id'])) {
+        Session::addMessageAfterRedirect(__('Missing data prevents historization of this asset.', 'carbon'), false, ERROR);
+        Html::back();
+    }
+
+    if (!$usage_impact->calculateImpact($_POST['items_id'])) {
         Session::addMessageAfterRedirect(__('Update failed.', 'carbon'), false, ERROR);
     }
 }

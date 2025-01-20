@@ -31,17 +31,32 @@
  * -------------------------------------------------------------------------
  */
 
-$itemtypes = [
-    Computer::class,
-    Monitor::class,
-    NetworkEquipment::class,
-];
-foreach ($itemtypes as $itemtype) {
-    $map = [
-        2222 => 128500,
-        2223 => 128501,
-    ];
-    foreach ($map as $src => $dst) {
-        $migration->changeSearchOption($itemtype, $src, $dst);
+namespace GlpiPlugin\Carbon\DataSource;
+
+use Config;
+
+class Boaviztapi
+{
+    private RestApiClientInterface $client;
+
+    private string $base_url;
+
+    public function __construct(RestApiClientInterface $client)
+    {
+        $this->client = $client;
+        $this->base_url = Config::getConfigurationValue('plugin:carbon', 'boaviztapi_base_url');
+    }
+
+    public function request(string $endpoint, array $options): array
+    {
+        $options['headers'] = [
+            'Accept'       => 'application/json',
+        ];
+        $response = $this->client->request('POST', $this->base_url . '/v1/' . $endpoint, $options);
+        if (!$response) {
+            return [];
+        }
+
+        return $response;
     }
 }

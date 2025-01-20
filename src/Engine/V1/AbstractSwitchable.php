@@ -123,7 +123,12 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
         $expected_count = ceil($total_seconds / 3600);
         $count = $iterator->count();
         if ($iterator->count() != $expected_count) {
-            trigger_error('required count of carbon intensity samples not met (' . $expected_count . ' expected, got ' . $count . ')', E_USER_WARNING);
+            trigger_error(sprintf(
+                "required count of carbon intensity %d samples not met. Got %d samples for date %s",
+                $expected_count,
+                $count,
+                $start_time->format('Y-m-d H:i:s')
+            ), E_USER_WARNING);
             return null;
         }
         if ($total_seconds === 0) {

@@ -71,6 +71,18 @@ $automatic_actions = [
             'param'   => 10000, // Maximum rows to generate per execution
         ]
     ],
+    [
+        'itemtype'  => CronTask::class,
+        'name'      => 'EmbodiedImpact',
+        'frequency' => DAY_TIMESTAMP,
+        'options'   => [
+            'mode' => GlpiCronTask::MODE_EXTERNAL,
+            'allowmode' => GlpiCronTask::MODE_INTERNAL + GlpiCronTask::MODE_EXTERNAL,
+            'logs_lifetime' => 30,
+            'comment' => __('Compute embodied impact of assets', 'carbon'),
+            'param'   => 10000, // Maximum rows to generate per execution
+        ]
+    ],
 ];
 
 foreach ($automatic_actions as $action) {

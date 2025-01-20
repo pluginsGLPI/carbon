@@ -31,14 +31,14 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\History\Tests;
+namespace GlpiPlugin\Carbon\Impact\History\Tests;
 
 use Computer as GlpiComputer;
 use ComputerModel;
 use Computer_Item;
 use Monitor as GlpiMonitor;
-use GlpiPlugin\Carbon\History\Monitor;
-use GlpiPlugin\Carbon\Tests\History\CommonAsset;
+use GlpiPlugin\Carbon\Impact\History\Monitor;
+use GlpiPlugin\Carbon\Tests\Impact\History\CommonAsset;
 use Location;
 use DateTime;
 use MonitorModel;
@@ -51,11 +51,11 @@ use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\EnvironmentalImpact;
 
 /**
- * @covers \GlpiPlugin\Carbon\History\NetworkEquipment
+ * @covers \GlpiPlugin\Carbon\Impact\History\NetworkEquipment
  */
 class MonitorTest extends CommonAsset
 {
-    protected string $history_type = \GlpiPlugin\Carbon\History\Monitor::class;
+    protected string $history_type = \GlpiPlugin\Carbon\Impact\History\Monitor::class;
     protected string $asset_type = GlpiMonitor::class;
 
     public function testGetEngine()
@@ -66,7 +66,7 @@ class MonitorTest extends CommonAsset
     }
 
 
-    public function testHistorizeItem()
+    public function testEvaluateItem()
     {
         global $DB;
         $this->login('glpi', 'glpi');
@@ -125,14 +125,14 @@ class MonitorTest extends CommonAsset
         $history = new Monitor();
         $start_date = '2024-02-01 00:00:00';
         $end_date =   '2024-02-08 00:00:00';
-        $count = $history->historizeItem(
+        $count = $history->evaluateItem(
             $asset->getID(),
             new DateTime($start_date),
             new DateTime($end_date)
         );
 
         // Days interval is [$start_date, $end_date[
-        $this->assertEquals(8, $count);
+        $this->assertEquals(7, $count);
 
         $carbon_emission = new CarbonEmission();
         $emissions = $carbon_emission->find([
@@ -182,5 +182,9 @@ class MonitorTest extends CommonAsset
             $emission = array_intersect_key($emission, $expected_row);
             $this->assertEquals($expected_row, $emission);
         }
+    }
+
+    public function testCanHistorize()
+    {
     }
 }

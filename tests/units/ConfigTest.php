@@ -31,17 +31,24 @@
  * -------------------------------------------------------------------------
  */
 
-$itemtypes = [
-    Computer::class,
-    Monitor::class,
-    NetworkEquipment::class,
-];
-foreach ($itemtypes as $itemtype) {
-    $map = [
-        2222 => 128500,
-        2223 => 128501,
-    ];
-    foreach ($map as $src => $dst) {
-        $migration->changeSearchOption($itemtype, $src, $dst);
+namespace GlpiPlugin\Carbon\Tests;
+
+use GlpiPlugin\Carbon\Config;
+use Config as GlpiConfig;
+
+class ConfigTest extends DbTestCase
+{
+    public function testGetEmbodiedImpactEngine()
+    {
+        $output = Config::getEmbodiedImpactEngine();
+        $this->assertEquals('GlpiPlugin\\Carbon\\Impact\\Embedded\\Boavizta', $output);
+
+        GlpiConfig::setConfigurationValues('plugin:carbon', ['embedded_impact_engine' => 'foo']);
+        $output = Config::getEmbodiedImpactEngine();
+        $this->assertEquals('GlpiPlugin\\Carbon\\Impact\\Embedded\\foo', $output);
+
+        GlpiConfig::setConfigurationValues('plugin:carbon', ['embedded_impact_engine' => 'Boavizta']);
+        $output = Config::getEmbodiedImpactEngine();
+        $this->assertEquals('GlpiPlugin\\Carbon\\Impact\\Embedded\\Boavizta', $output);
     }
 }

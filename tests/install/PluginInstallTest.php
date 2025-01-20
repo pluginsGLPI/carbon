@@ -199,7 +199,7 @@ class PluginInstallTest extends CommonTestCase
         $rows = $cronTask->find([
             'itemtype' => ['LIKE', '%' . 'Carbon' . '%'],
         ]);
-        $this->assertEquals(3, count($rows));
+        $this->assertEquals(4, count($rows));
 
         $cronTask = new GLPICronTask();
         $cronTask->getFromDBByCrit([
@@ -220,6 +220,13 @@ class PluginInstallTest extends CommonTestCase
         $cronTask->getFromDBByCrit([
             'itemtype' => CronTask::class,
             'name'     => 'DownloadElectricityMap',
+        ]);
+        $this->assertFalse($cronTask->isNewItem());
+
+        $cronTask = new GLPICronTask();
+        $cronTask->getFromDBByCrit([
+            'itemtype' => CronTask::class,
+            'name'     => 'EmbodiedImpact',
         ]);
         $this->assertFalse($cronTask->isNewItem());
     }
@@ -247,6 +254,7 @@ class PluginInstallTest extends CommonTestCase
             }
             $this->assertEquals($expected_value, $value, "configuration key $key mismatch");
         }
+        $this->assertCount(2, $config);
     }
 
     private function checkRights()
