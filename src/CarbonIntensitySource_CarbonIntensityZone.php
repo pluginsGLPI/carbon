@@ -59,6 +59,45 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
         return self::createTabEntry(CarbonIntensitySource::getTypeName(), 0);
     }
 
+    public function rawSearchOptions()
+    {
+        $tab = parent::rawSearchOptions();
+
+        $tab[] = [
+            'id'          => '5',
+            'table'       => CarbonIntensitySource::getTable(),
+            'field'       => 'name',
+            'name'        => __('Source name', 'carbon'),
+            'datatype'    => 'dropdown',
+        ];
+
+        $tab[] = [
+            'id'          => '6',
+            'table'       => CarbonIntensityZone::getTable(),
+            'field'       => 'name',
+            'name'        => __('Zone name', 'carbon'),
+            'datatype'    => 'dropdown',
+        ];
+
+        $tab[] = [
+            'id'          => '7',
+            'table'       => CarbonIntensitySource::getTable(),
+            'field'       => 'is_download_enabled',
+            'name'        => __('Download enabled', 'carbon'),
+            'datatype'    => 'bool',
+        ];
+
+        $tab[] = [
+            'id'          => '8',
+            'table'       => self::getTable(),
+            'field'       => 'code',
+            'name'        => __('Code', 'carbon'),
+            'datatype'    => 'string',
+        ];
+
+        return $tab;
+    }
+
     public static function showForSource(CommonDBTM $item)
     {
         global $DB;
