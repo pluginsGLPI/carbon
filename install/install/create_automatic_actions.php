@@ -37,7 +37,7 @@ use CronTask as GlpiCronTask;
 $automatic_actions = [
     [
         'itemtype'  => CronTask::class,
-        'name'      => 'Historize',
+        'name'      => 'UsageImpact',
         'frequency' => DAY_TIMESTAMP,
         'options'   => [
             'mode' => GlpiCronTask::MODE_EXTERNAL,

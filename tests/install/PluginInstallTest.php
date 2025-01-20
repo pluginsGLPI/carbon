@@ -204,7 +204,7 @@ class PluginInstallTest extends CommonTestCase
         $cronTask = new GLPICronTask();
         $cronTask->getFromDBByCrit([
             'itemtype' => CronTask::class,
-            'name'     => 'Historize',
+            'name'     => 'UsageImpact',
         ]);
         $this->assertFalse($cronTask->isNewItem());
         $this->assertEquals(10000, $cronTask->fields['param']);
