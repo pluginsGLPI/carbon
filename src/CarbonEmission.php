@@ -69,6 +69,15 @@ class CarbonEmission extends CommonDBChild
         $tab = parent::rawSearchOptions();
 
         $tab[] = [
+            'id'                 => '2',
+            'table'              => $this->getTable(),
+            'field'              => 'id',
+            'name'               => __('ID'),
+            'massiveaction'      => false, // implicit field is id
+            'datatype'           => 'number'
+        ];
+
+        $tab[] = [
             'id'                 => '3',
             'table'              => $this->getTable(),
             'field'              => 'items_id',
@@ -114,14 +123,16 @@ class CarbonEmission extends CommonDBChild
             'id'                 => SearchOptions::CARBON_EMISSION_ENERGY_PER_DAY,
             'table'              => self::getTable(),
             'field'              => 'energy_per_day',
-            'name'               => sprintf('Energy', 'carbon')
+            'name'               => sprintf('Energy', 'carbon'),
+            'unit'               => 'KWh',
         ];
 
         $tab[] = [
             'id'                 => SearchOptions::CARBON_EMISSION_PER_DAY,
             'table'              => self::getTable(),
             'field'              => 'emission_per_day',
-            'name'               => sprintf('Emission', 'carbon')
+            'name'               => sprintf('Emission', 'carbon'),
+            'unit'               => 'gCO<sub>2</sub>eq',
         ];
 
         $tab[] = [
@@ -129,6 +140,7 @@ class CarbonEmission extends CommonDBChild
             'table'              => self::getTable(),
             'field'              => 'energy_quality',
             'name'               => sprintf('Energy quality', 'carbon')
+
         ];
 
         $tab[] = [

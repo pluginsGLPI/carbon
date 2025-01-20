@@ -34,6 +34,12 @@
 namespace GlpiPlugin\Carbon\Tests;
 
 use GlpiPlugin\Carbon\CarbonEmission;
+use GlpiPlugin\Carbon\CarbonIntensity;
+use GlpiPlugin\Carbon\ComputerType;
+use GlpiPlugin\Carbon\EmbeddedImpact;
+use GlpiPlugin\Carbon\EnvironmentalImpact;
+use GlpiPlugin\Carbon\MonitorType;
+use GlpiPlugin\Carbon\NetworkEquipmentType;
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
 use CommonDBTM;
@@ -45,10 +51,28 @@ class SearchOptionTest extends CommonTestCase
 {
     private array $exceptions = [
         CarbonEmission::class => [
-            'id',
             'types_id',
             'models_id',
         ],
+        ComputerType::class => [],
+        MonitorType::class => [],
+        EnvironmentalImpact::class => [],
+        CarbonIntensity::class => [
+            'data_quality'
+        ],
+        EmbeddedImpact::class => [
+            'gwp_quality',
+            'adp_quality',
+            'pe_quality',
+        ],
+        NetworkEquipmentType::class => [],
+    ];
+
+    private array $mapping = [
+        CarbonIntensity::class => [
+            'plugin_carbon_carbonintensitysources_id' => 'name',
+            'plugin_carbon_carbonintensityzones_id'   => 'name',
+        ]
     ];
 
     public function testSearchOption()
@@ -105,10 +129,16 @@ class SearchOptionTest extends CommonTestCase
             // Check that a search option exists for each field
             foreach ($table_fields as $key => $value) {
                 if (isset($this->exceptions[$class_name]) && count($this->exceptions[$class_name]) === 0) {
+                    // the itemtype is ignored (no search option for any field and this is intended)
                     continue;
                 }
                 if (isset($this->exceptions[$class_name]) && in_array($key, $this->exceptions[$class_name])) {
+                    // The field is ignored (aka no search option and this is intended)
                     continue;
+                }
+
+                if (isset($this->mapping[$class_name]) && isset($this->mapping[$class_name][$key])) {
+                    $key = $this->mapping[$class_name][$key];
                 }
                 $search_option = $instance->getSearchOptionByField('field', $key);
                 $this->assertTrue(!empty($search_option), "No search option for field $key in class $class_name");
