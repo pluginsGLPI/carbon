@@ -368,11 +368,15 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      */
     public function resetHistory(int $items_id): bool
     {
-        $carbon_emission = new CarbonEmission();
-        return $carbon_emission->deleteByCriteria([
-            'itemtype' => static::getItemtype(),
-            'items_id' => $items_id
-        ]);
+        global $DB;
+
+        return $DB->delete(
+            CarbonEmission::getTable(),
+            [
+                'itemtype' => static::getItemtype(),
+                'items_id' => $items_id
+            ]
+        );
     }
 
     /**
