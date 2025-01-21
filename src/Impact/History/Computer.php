@@ -88,17 +88,6 @@ class Computer extends AbstractAsset
                         $glpi_computertypes_table => 'id',
                     ]
                 ],
-                $computertypes_table => [
-                    'FKEY'   => [
-                        $computertypes_table  => 'computertypes_id',
-                        $glpi_computertypes_table => 'id',
-                        [
-                            'AND' => [
-                                'NOT' => [GlpiComputerType::getTableField('id') => null],
-                            ]
-                        ]
-                    ]
-                ],
                 $location_table => [
                     'FKEY'   => [
                         $item_table  => 'locations_id',
@@ -122,6 +111,19 @@ class Computer extends AbstractAsset
                         $infocom_table => 'items_id',
                         $item_table => 'id',
                         ['AND' => ['itemtype' => self::$itemtype]],
+                    ]
+                ],
+            ],
+            'LEFT JOIN' => [
+                $computertypes_table => [
+                    'FKEY'   => [
+                        $computertypes_table  => 'computertypes_id',
+                        $glpi_computertypes_table => 'id',
+                        [
+                            'AND' => [
+                                'NOT' => [GlpiComputerType::getTableField('id') => null],
+                            ]
+                        ]
                     ]
                 ],
             ],
@@ -193,7 +195,7 @@ class Computer extends AbstractAsset
             ]
         ];
         // Change inner joins into left joins to identify missing data
-        $request['LEFT JOIN'] = $request['INNER JOIN'];
+        $request['LEFT JOIN'] = $request['INNER JOIN'] + $request['LEFT JOIN'];
         unset($request['INNER JOIN']);
         // remove where criterias
         unset($request['WHERE']);

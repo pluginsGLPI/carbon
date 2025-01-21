@@ -228,17 +228,31 @@ class ComputerTest extends CommonAsset
             'id' => $id,
             'computertypes_id' => $type->getID(),
         ]);
+        $this->assertTrue($history->canHistorize($id));
+
+        // Remove power consumption on model
+        $model->update([
+            'id' => $model->getID(),
+            'power_consumption' => 0,
+        ]);
         $this->assertFalse($history->canHistorize($id));
 
         // add a type power consumption
         $power_consumption = $this->getItem(ComputerType::class, [
             GlpiComputerType::getForeignKeyField() => $type->getID(),
         ]);
-        $this->assertTrue($history->canHistorize($id));
+        $this->assertFalse($history->canHistorize($id));
 
         // Set a type power consumption
         $power_consumption->update([
             'id' => $power_consumption->getID(),
+            'power_consumption' => 55,
+        ]);
+        $this->assertTrue($history->canHistorize($id));
+
+        // Add a power consumption to the model (both model and type have power consumption)
+        $model->update([
+            'id' => $model->getID(),
             'power_consumption' => 55,
         ]);
         $this->assertTrue($history->canHistorize($id));
