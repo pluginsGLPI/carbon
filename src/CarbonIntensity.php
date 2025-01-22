@@ -292,7 +292,9 @@ class CarbonIntensity extends CommonDropdown
 
         $toolbox = new Toolbox();
         $oldest_asset_date = $toolbox->getOldestAssetDate();
-        $start_date = min($start_date, $oldest_asset_date);
+        if ($oldest_asset_date !== null) {
+            $start_date = min($start_date, $oldest_asset_date);
+        }
 
         return $start_date;
     }
