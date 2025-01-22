@@ -132,7 +132,7 @@ class CarbonIntensityZone extends CommonDropdown
 
         $tab[] = [
             'id'                 => SearchOptions::HISTORICAL_DATA_SOURCE,
-            'table'              => CarbonIntensitySource::getTable(),
+            'table'              => self::getTable(),
             'field'              => 'plugin_carbon_carbonintensitysources_id_historical',
             'name'               => __('Data source for historical calculation', 'carbon'),
             'datatype'           => 'dropdown',
