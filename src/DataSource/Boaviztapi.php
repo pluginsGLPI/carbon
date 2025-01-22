@@ -44,7 +44,11 @@ class Boaviztapi
     public function __construct(RestApiClientInterface $client)
     {
         $this->client = $client;
-        $this->base_url = Config::getConfigurationValue('plugin:carbon', 'boaviztapi_base_url');
+        $url = Config::getConfigurationValue('plugin:carbon', 'boaviztapi_base_url');
+        if (!is_string($url)) {
+            throw new \Exception('Invalid Boaviztapi base URL');
+        }
+        $this->base_url = $url;
     }
 
     public function request(string $endpoint, array $options): array
