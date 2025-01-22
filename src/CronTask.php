@@ -176,6 +176,7 @@ class CronTask
 
         $zones = $data_source->getZones(['is_download_enabled' => 1]);
         if (count($zones) === 0) {
+            trigger_error(__('No zone to download', 'carbon'), E_USER_WARNING);
             return 0;
         }
 

@@ -241,6 +241,15 @@ class CarbonIntensity extends CommonDropdown
         $zone = new CarbonIntensityZone();
         $zone->getFromDBByCrit(['name' => $zone_name]);
         $gaps = $this->findGaps($source->getID(), $zone->getID(), $start_date);
+        if (count($gaps) === 0) {
+            // Log a notice specifying the source and the zone
+            trigger_error(sprintf(
+                "No gap to fill for source %s and zone %s",
+                $data_source->getSourceName(),
+                $zone_name
+                ), E_USER_WARNING
+            );
+        }
         foreach ($gaps as $gap) {
             $gap_start = DateTimeImmutable::createFromFormat('U', $gap['start']);
             $gap_end = DateTimeImmutable::createFromFormat('U', $gap['end']);
