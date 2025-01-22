@@ -113,16 +113,16 @@ class CronTask
     {
         $count = 0;
 
-        $embeddedImpacts = Toolbox::getEmbodiedImpactClasses();
+        $embodied_impacts = Toolbox::getEmbodiedImpactClasses();
         $task->setVolume(0); // start with zero
         $remaining = $task->fields['param'];
-        $limit_per_type = floor(((int) $remaining) / count($embeddedImpacts));
-        foreach ($embeddedImpacts as $embeddedImpact_type) {
+        $limit_per_type = floor(((int) $remaining) / count($embodied_impacts));
+        foreach ($embodied_impacts as $embodied_impact_type) {
             /** @var AbstractAsset $embeddedImpact */
-            $embedded_impact = new $embeddedImpact_type();
-            $embedded_impact->setLimit($limit_per_type);
-            $embedded_impact->setClient(new Boaviztapi(new RestApiClient()));
-            $count = $embedded_impact->evaluateItems();
+            $embodied_impact = new $embodied_impact_type();
+            $embodied_impact->setLimit($limit_per_type);
+            $embodied_impact->setClient(new Boaviztapi(new RestApiClient()));
+            $count = $embodied_impact->evaluateItems();
             $task->addVolume($count);
         }
         return ($count > 0 ? 1 : 0);
