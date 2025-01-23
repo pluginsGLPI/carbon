@@ -246,7 +246,7 @@ class CarbonIntensity extends CommonDropdown
             trigger_error(sprintf(
                 "No gap to fill for source %s and zone %s between %s and %s",
                 $data_source->getSourceName(),
-                $zone_name
+                $zone_name,
                 $start_date->format('Y-m-d'),
                 'now'
             ), E_USER_WARNING);
