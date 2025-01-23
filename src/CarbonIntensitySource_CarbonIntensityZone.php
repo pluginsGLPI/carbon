@@ -197,7 +197,7 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
             'ORDER'     => ['name ASC'],
         ]);
 
-        $tot = $iterator->count();
+        $total = $iterator->count();
         $entries = [];
         foreach ($iterator as $data) {
             $entries[] = [
@@ -217,12 +217,13 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
             'nosort' => true,
             'columns' => [
                 'name' => __('Name'),
-                // 'is_download_enabled' => __('Download enabled', 'carbon'),
+                'is_download_enabled' => __('Download enabled', 'carbon'),
             ],
             'formatters' => [
+                'is_download_enabled' => 'raw_html',
             ],
             'footers' => [
-                ['', '', '', __('Total'), $tot, '']
+                ['', '', '', __('Total'), $total, '']
             ],
             'footer_class' => 'fw-bold',
             'entries' => $entries,
@@ -234,6 +235,19 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
                 'container'     => 'mass' . static::class . mt_rand(),
             ]
         ]);
+
+        if (count($entries) !== 0) {
+            // At least 1 entry then add JS to toggle the state of zones
+            echo Html::scriptBlock('
+                var plugin_carbon_toggleZone = function (id) {
+                    fetch(CFG_GLPI["root_doc"] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/toggleZoneDownload.php?id=" + id).then(response => {
+                        if (response.status === 200) {
+                            reloadTab();
+                        }
+                    });
+                };
+            ');
+        }
     }
 
     /**
