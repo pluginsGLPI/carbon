@@ -247,8 +247,7 @@ class CarbonIntensity extends CommonDropdown
                 "No gap to fill for source %s and zone %s",
                 $data_source->getSourceName(),
                 $zone_name
-                ), E_USER_WARNING
-            );
+            ), E_USER_WARNING);
         }
         foreach ($gaps as $gap) {
             $gap_start = DateTimeImmutable::createFromFormat('U', $gap['start']);
