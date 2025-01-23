@@ -244,9 +244,11 @@ class CarbonIntensity extends CommonDropdown
         if (count($gaps) === 0) {
             // Log a notice specifying the source and the zone
             trigger_error(sprintf(
-                "No gap to fill for source %s and zone %s",
+                "No gap to fill for source %s and zone %s between %s and %s",
                 $data_source->getSourceName(),
                 $zone_name
+                $start_date->format('Y-m-d'),
+                'now'
             ), E_USER_WARNING);
         }
         foreach ($gaps as $gap) {
