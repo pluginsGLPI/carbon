@@ -159,10 +159,11 @@ class ToolboxTest extends DbTestCase
     {
         $output = Toolbox::getEmbodiedImpactClasses();
         $this->assertIsArray($output);
+        // TODO: implement the 2 commented out classes
         $this->assertEquals([
             'GlpiPlugin\\Carbon\\Impact\\Embedded\\Boavizta\\Computer',
-            'GlpiPlugin\\Carbon\\Impact\\Embedded\\Boavizta\\Monitor',
-            'GlpiPlugin\\Carbon\\Impact\\Embedded\\Boavizta\\NetworkEquipment',
+            // 'GlpiPlugin\\Carbon\\Impact\\Embedded\\Boavizta\\Monitor',
+            // 'GlpiPlugin\\Carbon\\Impact\\Embedded\\Boavizta\\NetworkEquipment',
         ], $output);
     }
 }

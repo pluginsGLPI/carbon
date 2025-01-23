@@ -48,8 +48,8 @@ use GlpiPlugin\Carbon\Dashboard\Grid;
 use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
 
-define('PLUGIN_CARBON_VERSION', '0.0.4');
-define('PLUGIN_CARBON_SCHEMA_VERSION', '0.0.4');
+define('PLUGIN_CARBON_VERSION', '0.0.5');
+define('PLUGIN_CARBON_SCHEMA_VERSION', '0.0.5');
 
 // Minimal GLPI version, inclusive
 define("PLUGIN_CARBON_MIN_GLPI_VERSION", "10.0.0");

@@ -212,6 +212,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         }
         $response = $this->client->request('GET', $url, ['timeout' => 8, 'query' => $params]);
         if (!$response) {
+            trigger_error('No response from RTE API for ' . $zone->getField('name'), E_USER_WARNING);
             return [];
         }
         if (isset($response['error_code'])) {
