@@ -44,6 +44,7 @@ use ProfileRight;
 use Glpi\System\Diagnostic\DatabaseSchemaIntegrityChecker;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
+use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\CronTask;
 use GlpiPlugin\Carbon\Report;
