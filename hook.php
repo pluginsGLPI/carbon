@@ -161,6 +161,7 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
     $item_type_class = 'GlpiPlugin\\Carbon\\' . $itemtype . 'Type';
     $glpi_item_type_class = $itemtype . 'Type';
     if (class_exists($item_type_class) && is_subclass_of($item_type_class, CommonDBTM::class)) {
+        $itemtype_fk = $itemtype::getForeignKeyField();
         $sopt[] = [
             'id'           => SearchOptions::POWER_CONSUMPTION,
             'table'        => getTableForItemType($item_type_class),
@@ -170,7 +171,7 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
             'min'          => 0,
             'max'          => 10000,
             'unit'         => 'W',
-            'linkfield'    => 'monitors_id',
+            'linkfield'    => $itemtype_fk,
             'joinparams' => [
                 'jointype' => 'child',
                 'beforejoin' => [

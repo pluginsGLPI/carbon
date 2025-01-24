@@ -52,6 +52,70 @@ class EmbeddedImpact extends CommonDBTM
         return false;
     }
 
+    public function rawSearchOptions()
+    {
+        $tab = parent::rawSearchOptions();
+
+        $tab[] = [
+            'id'                 => '2',
+            'table'              => $this->getTable(),
+            'field'              => 'id',
+            'name'               => __('ID'),
+            'massiveaction'      => false, // implicit field is id
+            'datatype'           => 'number'
+        ];
+
+        $tab[] = [
+            'id'                 => '3',
+            'table'              => $this->getTable(),
+            'field'              => 'items_id',
+            'name'               => __('Associated item ID'),
+            'massiveaction'      => false,
+            'datatype'           => 'specific',
+            'additionalfields'   => ['itemtype']
+        ];
+
+        $tab[] = [
+            'id'                 => '4',
+            'table'              => $this->getTable(),
+            'field'              => 'itemtype',
+            'name'               => _n('Type', 'Types', 1),
+            'massiveaction'      => false,
+            'datatype'           => 'itemtypename',
+        ];
+
+        $tab[] = [
+            'id'                 => '5',
+            'table'              => $this->getTable(),
+            'field'              => 'gwp',
+            'name'               => __('Global Warming Potential', 'carbon'),
+            'massiveaction'      => false,
+            'datatype'           => 'number',
+            'unit'               => 'gCO<sub>2</sub>eq',
+        ];
+
+        $tab[] = [
+            'id'                 => '6',
+            'table'              => $this->getTable(),
+            'field'              => 'adp',
+            'name'               => __('Abiotic Depletion Potential', 'carbon'),
+            'massiveaction'      => false,
+            'datatype'           => 'number',
+            'unit'               => 'KgSbeq',
+        ];
+
+        $tab[] = [
+            'id'                 => '7',
+            'table'              => $this->getTable(),
+            'field'              => 'pe',
+            'name'               => __('Primary energy', 'carbon'),
+            'massiveaction'      => false,
+            'datatype'           => 'number',
+            'unit'               => 'J',
+        ];
+        return $tab;
+    }
+
     /**
      * Get iterator of items without known embedded impact for a specified itemtype
      *

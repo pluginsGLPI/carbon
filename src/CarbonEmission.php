@@ -37,6 +37,8 @@ use CommonDBChild;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
+use Entity;
+use Location;
 use QueryExpression;
 use QuerySubQuery;
 
@@ -60,6 +62,95 @@ class CarbonEmission extends CommonDBChild
         // $date->setTime(0, 0, 0);
         // $input['date'] = $date->format('Y-m-d');
         return $input;
+    }
+
+    public function rawSearchOptions()
+    {
+        $tab = parent::rawSearchOptions();
+
+        $tab[] = [
+            'id'                 => '2',
+            'table'              => $this->getTable(),
+            'field'              => 'id',
+            'name'               => __('ID'),
+            'massiveaction'      => false, // implicit field is id
+            'datatype'           => 'number'
+        ];
+
+        $tab[] = [
+            'id'                 => '3',
+            'table'              => $this->getTable(),
+            'field'              => 'items_id',
+            'name'               => __('Associated item ID'),
+            'massiveaction'      => false,
+            'datatype'           => 'specific',
+            'additionalfields'   => ['itemtype']
+        ];
+
+        $tab[] = [
+            'id'                 => '4',
+            'table'              => $this->getTable(),
+            'field'              => 'itemtype',
+            'name'               => _n('Type', 'Types', 1),
+            'massiveaction'      => false,
+            'datatype'           => 'itemtypename',
+        ];
+
+        $tab[] = [
+            'id'                 => '5',
+            'table'              => self::getTable(),
+            'field'              => 'entities_id',
+            'name'               => sprintf('%s-%s', Entity::getTypeName(1), __('ID'))
+        ];
+
+        $tab[] = [
+            'id'                 => '6',
+            'table'              => 'glpi_locations',
+            'field'              => 'name',
+            'linkfield'          => 'locations_id',
+            'name'               => Location::getTypeName(1),
+            'datatype'           => 'dropdown',
+        ];
+
+        $tab[] = [
+            'id'                 => SearchOptions::CARBON_EMISSION_DATE,
+            'table'              => self::getTable(),
+            'field'              => 'date',
+            'name'               => sprintf('Date')
+        ];
+
+        $tab[] = [
+            'id'                 => SearchOptions::CARBON_EMISSION_ENERGY_PER_DAY,
+            'table'              => self::getTable(),
+            'field'              => 'energy_per_day',
+            'name'               => sprintf('Energy', 'carbon'),
+            'unit'               => 'KWh',
+        ];
+
+        $tab[] = [
+            'id'                 => SearchOptions::CARBON_EMISSION_PER_DAY,
+            'table'              => self::getTable(),
+            'field'              => 'emission_per_day',
+            'name'               => sprintf('Emission', 'carbon'),
+            'unit'               => 'gCO<sub>2</sub>eq',
+        ];
+
+        $tab[] = [
+            'id'                 => SearchOptions::CARBON_EMISSION_ENERGY_QUALITY,
+            'table'              => self::getTable(),
+            'field'              => 'energy_quality',
+            'name'               => sprintf('Energy quality', 'carbon')
+
+        ];
+
+        $tab[] = [
+            'id'                 => SearchOptions::CARBON_EMISSION_EMISSION_QUALITY,
+            'table'              => self::getTable(),
+            'field'              => 'emission_quality',
+            'name'               => sprintf('Emission quality', 'carbon')
+        ];
+
+        return $tab;
     }
 
     /**

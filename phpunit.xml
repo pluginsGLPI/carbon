@@ -32,6 +32,9 @@
     <testsuite name="Unit">
       <directory>./tests/units/</directory>
     </testsuite>
+    <testsuite name="Integration">
+      <directory>./tests/integration/</directory>
+    </testsuite>
     <testsuite name="Uninstall">
       <directory>./tests/uninstall/</directory>
     </testsuite>

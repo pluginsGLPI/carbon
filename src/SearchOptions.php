@@ -68,4 +68,10 @@ class SearchOptions
     public const POWER_CONSUMPTION = self::SEARCH_OPTION_BASE + 500;
     public const IS_HISTORIZABLE   = self::SEARCH_OPTION_BASE + 502;
     public const USAGE_PROFILE     = self::SEARCH_OPTION_BASE + 501;
+
+    public const CARBON_EMISSION_DATE              = self::SEARCH_OPTION_BASE + 600;
+    public const CARBON_EMISSION_ENERGY_PER_DAY    = self::SEARCH_OPTION_BASE + 601;
+    public const CARBON_EMISSION_PER_DAY           = self::SEARCH_OPTION_BASE + 602;
+    public const CARBON_EMISSION_ENERGY_QUALITY    = self::SEARCH_OPTION_BASE + 603;
+    public const CARBON_EMISSION_EMISSION_QUALITY  = self::SEARCH_OPTION_BASE + 604;
 }
