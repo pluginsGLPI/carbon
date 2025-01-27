@@ -139,7 +139,6 @@ class Computer extends AbstractAsset
                             self::$model_itemtype::getTableField('power_consumption') => ['>', 0],
                         ],
                     ],
-                    // TODO : enable this code to check inventory entry date
                     [
                         'OR' => [
                             ['NOT' => [Infocom::getTableField('use_date') => null]],
@@ -187,13 +186,6 @@ class Computer extends AbstractAsset
         ];
         $infocom_table = Infocom::getTable();
         $item_table = self::$itemtype::getTable();
-        $request['INNER JOIN'][$infocom_table] = [
-            'FKEY' => [
-                $infocom_table => 'items_id',
-                $item_table => 'id',
-                ['AND' => ['itemtype' => self::$itemtype]],
-            ]
-        ];
         // Change inner joins into left joins to identify missing data
         $request['LEFT JOIN'] = $request['INNER JOIN'] + $request['LEFT JOIN'];
         unset($request['INNER JOIN']);
