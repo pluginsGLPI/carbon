@@ -184,7 +184,8 @@ class CarbonEmission extends CommonDBChild
 
         $gaps = [];
         if ($start !== null) {
-            $first = $DB->request([
+            // Find the first calculated date
+            $first_calculated = $DB->request([
                 'SELECT' => [
                     'date',
                 ],
@@ -204,12 +205,12 @@ class CarbonEmission extends CommonDBChild
                     ]
                 ];
             }
-            $first_date = new DateTime($first['date']);
-            $first_date->modify(('-1 day'));
-            if ($first_date > $start) {
+            $first_gap_end = (new DateTime($first_calculated['date']))->modify(('-1 day'));
+            // Check if requested interval starts before the first calculated date
+            if ($first_gap_end > $start) {
                 $gaps[] = [
                     'start' => $start->format('U'),
-                    'end'   => $first_date->format('U'),
+                    'end'   => $first_gap_end->format('U'),
                 ];
             }
         }
@@ -240,7 +241,8 @@ class CarbonEmission extends CommonDBChild
         $gaps = array_merge($gaps, iterator_to_array($iterator));
 
         if ($stop !== null) {
-            $last = $DB->request([
+            // Find the last calculated date
+            $last_calculated = $DB->request([
                 'SELECT' => [
                     'date',
                 ],
@@ -252,11 +254,11 @@ class CarbonEmission extends CommonDBChild
                 'ORDER' => ['date DESC'],
                 'LIMIT' => 1,
             ])->current();
-            $last_date = new DateTime($last['date']);
-            $last_date->modify('+1 day');
-            if ($last_date < $stop) {
+            $last_gap_start = (new DateTime($last_calculated['date']))->modify('+1 day');
+            // Check if requested interval ends after the last calculated date
+            if ($last_gap_start < $stop) {
                 $gaps[] = [
-                    'start' => $last_date->format('U'),
+                    'start' => $last_gap_start->format('U'),
                     'end'   => $stop->format('U'),
                 ];
             }
