@@ -206,6 +206,7 @@ class ComputerTest extends CommonAsset
             $usage_profile->getForeignKeyField() => $usage_profile->getID(),
             'computers_id' => $id,
         ]);
+        $this->assertFalse($history->canHistorize($id));
 
         // Add a model
         $model = $this->getItem(ComputerModel::class);
