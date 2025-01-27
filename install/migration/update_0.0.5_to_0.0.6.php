@@ -31,28 +31,38 @@
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Carbon\CarbonIntensity;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
-use GlpiPlugin\Carbon\SearchOptions;
+function update005to006(Migration $migration)
+{
+    global $DB;
 
-include_once __DIR__ . '/../../src/SearchOptions.php';
+    $updateresult       = true;
+    $from_version       = '0.0.5';
+    $to_version         = '0.0.6';
+    $update_dir = __DIR__ . "/update_{$from_version}_to_{$to_version}/";
 
-$migration->updateDisplayPrefs(
-    [
-        CarbonIntensity::class => [
-            2,
-            3,
-            SearchOptions::CARBON_INTENSITY_SOURCE,
-            SearchOptions::CARBON_INTENSITY_ZONE,
-            SearchOptions::CARBON_INTENSITY_INTENSITY,
-        ],
-        CarbonIntensityZone::class => [
-            2,
-            3,
-            SearchOptions::HISTORICAL_DATA_SOURCE,
-            SearchOptions::HISTORICAL_DATA_DL_ENABLED,
-        ]
-    ],
-    [],
-    true
-);
+    //TRANS: %s is the number of new version
+    $migration->displayTitle(sprintf(__('Update to %s'), $to_version));
+    $migration->setVersion($to_version);
+
+    // New tables from enpty.sql file after the migration
+    // If a script requires a new table, it may create it by itself
+
+    $update_scripts = scandir($update_dir);
+    foreach ($update_scripts as $update_script) {
+        if (preg_match('/\.php$/', $update_script) !== 1) {
+            continue;
+        }
+        require $update_dir . $update_script;
+    }
+
+    $dbFile = plugin_carbon_getSchemaPath($to_version);
+    if ($dbFile === null || !$DB->runFile($dbFile)) {
+        $migration->displayWarning("Error creating tables : " . $DB->error(), true);
+        $updateresult = false;
+    }
+
+    // ************ Keep it at the end **************
+    $migration->executeMigration();
+
+    return $updateresult;
+}

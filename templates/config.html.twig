@@ -37,13 +37,18 @@
         <input type="hidden" name="config_context" value="plugin:carbon">
         <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token() }}">
 
+        {{ fields.largeTitle(
+            __('Electricity maps', 'carbon'),
+            'fas fa-gears'
+        ) }}
+
         {{ fields.passwordField(
             'electricitymap_api_key',
             current_config['electricitymap_api_key'],
             __('Key for electricitymap.org API', 'carbon')
         ) }}
 
-                {{ fields.largeTitle(
+        {{ fields.largeTitle(
             __('Embedded impact engine', 'carbon'),
             'fas fa-gears'
         ) }}

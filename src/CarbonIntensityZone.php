@@ -131,11 +131,27 @@ class CarbonIntensityZone extends CommonDropdown
         $tab = parent::rawSearchOptions();
 
         $tab[] = [
-            'id'                 => SearchOptions::HISTORICAL_DATA_SOURCE,
-            'table'              => self::getTable(),
-            'field'              => 'plugin_carbon_carbonintensitysources_id_historical',
-            'name'               => __('Data source for historical calculation', 'carbon'),
-            'datatype'           => 'dropdown',
+            'id'            => SearchOptions::HISTORICAL_DATA_SOURCE,
+            'table'         => CarbonIntensitySource::getTable(),
+            'field'         => 'name',
+            'name'          => __('Data source for historical calculation', 'carbon'),
+            'datatype'      => 'dropdown',
+            'joinparams'         => [
+                'beforejoin'    => [
+                    'table'         => CarbonIntensitySource_CarbonIntensityZone::getTable(),
+                    'joinparams'    => [
+                        'jointype'      => 'child',
+                    ],
+                ],
+            ],
+        ];
+
+        $tab[] = [
+            'id'            => SearchOptions::HISTORICAL_DATA_DL_ENABLED,
+            'table'         => CarbonIntensitySource_CarbonIntensityZone::getTable(),
+            'field'         => 'is_download_enabled',
+            'name'          => __('Download enabled', 'carbon'),
+            'datatype'      => 'bool',
         ];
 
         return $tab;
