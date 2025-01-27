@@ -35,6 +35,7 @@ namespace GlpiPlugin\Carbon\Tests;
 
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\CarbonIntensity;
+use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\EmbeddedImpact;
 use GlpiPlugin\Carbon\EnvironmentalImpact;
@@ -72,6 +73,9 @@ class SearchOptionTest extends CommonTestCase
         CarbonIntensity::class => [
             'plugin_carbon_carbonintensitysources_id' => 'name',
             'plugin_carbon_carbonintensityzones_id'   => 'name',
+        ],
+        CarbonIntensityZone::class => [
+            'plugin_carbon_carbonintensitysources_id_historical' => 'name',
         ]
     ];
 
