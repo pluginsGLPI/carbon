@@ -37,6 +37,7 @@ use CommonDBChild;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
+use DateTimeZone;
 use Entity;
 use Location;
 use QueryExpression;
@@ -167,6 +168,7 @@ class CarbonEmission extends CommonDBChild
     {
         global $DB;
 
+        $tz = new DateTimeZone($DB->guessTimezone());
         $table = CarbonEmission::getTable();
 
         // Build WHERE clause for boundaries
@@ -197,11 +199,11 @@ class CarbonEmission extends CommonDBChild
                 'ORDER' => ['date ASC'],
                 'LIMIT' => 1,
             ])->current();
-            if ($first === null) {
+            if ($first_calculated === null) {
                 return [
                     [
-                        'start' => $start->format('U'),
-                        'end'   => ($stop ?? new DateTime('now'))->format('U'),
+                        'start' => $start,
+                        'end'   => ($stop ?? new DateTime('now', $tz)),
                     ]
                 ];
             }
@@ -254,7 +256,7 @@ class CarbonEmission extends CommonDBChild
                 'ORDER' => ['date DESC'],
                 'LIMIT' => 1,
             ])->current();
-            $last_gap_start = (new DateTime($last_calculated['date']))->modify('+1 day');
+            $last_gap_start = (new DateTime($last_calculated['date'], $tz))->modify('+1 day');
             // Check if requested interval ends after the last calculated date
             if ($last_gap_start < $stop) {
                 $gaps[] = [
@@ -262,6 +264,12 @@ class CarbonEmission extends CommonDBChild
                     'end'   => $stop->format('U'),
                 ];
             }
+        }
+
+        // Convert unix timetamps to DateTime with current timezone
+        foreach ($gaps as &$gap) {
+            $gap['start'] = (new DateTimeImmutable())->setTimezone($tz)->setTimestamp($gap['start']);
+            $gap['end'] = (new DateTimeImmutable())->setTimezone($tz)->setTimestamp($gap['end']);
         }
 
         return $gaps;
