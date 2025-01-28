@@ -252,8 +252,8 @@ class CarbonIntensity extends CommonDropdown
             ), E_USER_WARNING);
         }
         foreach ($gaps as $gap) {
-            $gap_start = DateTimeImmutable::createFromFormat('U', $gap['start']);
-            $gap_end = DateTimeImmutable::createFromFormat('U', $gap['end']);
+            $gap_start = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $gap['start']);
+            $gap_end = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $gap['end']);
             $count = $data_source->fullDownload($zone_name, $gap_start, $gap_end, $this, $limit);
             $total_count += $count;
             $limit -= $count;
@@ -410,18 +410,22 @@ class CarbonIntensity extends CommonDropdown
             $boundaries[] = new QueryExpression('UNIX_TIMESTAMP(`date`) <= ' . $unix_stop);
         }
 
-        $date_1 = 'UNIX_TIMESTAMP(`date`)';
-        $date_2 = 'LEAD(UNIX_TIMESTAMP(`date`), 1) OVER (ORDER BY UNIX_TIMESTAMP(`date`))';
+        $timestamp_1 = 'UNIX_TIMESTAMP(`date`)';
+        $timestamp_2 = 'LEAD(UNIX_TIMESTAMP(`date`), 1) OVER (ORDER BY UNIX_TIMESTAMP(`date`))';
+        $date_1      = '`date`';
+        $date_2      =  'LEAD(`date`, 1) OVER (ORDER BY `date`)';
         $request = [
             'SELECT' => [
-                'date as start',
-                'next_available_date as end'
+                'start',
+                'end'
             ],
             'FROM'  => new QuerySubQuery([
                 'SELECT' => [
-                    new QueryExpression("$date_1 as `date`"),
-                    new QueryExpression("$date_2  AS `next_available_date`"),
-                    new QueryExpression("$date_2 - $date_1 as `diff`"),
+                    new QueryExpression("$timestamp_1 as `timestamp`"),
+                    new QueryExpression("$timestamp_2  AS `next_available_timestamp`"),
+                    new QueryExpression("$timestamp_2 - $timestamp_1 as `diff`"),
+                    new QueryExpression("$date_1 as `start`"),
+                    new QueryExpression("$date_2 as `end`"),
                 ],
                 'FROM' => $table,
                 'WHERE' => [
