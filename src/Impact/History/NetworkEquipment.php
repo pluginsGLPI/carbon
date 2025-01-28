@@ -64,6 +64,8 @@ class NetworkEquipment extends AbstractAsset
         $item_glpitype_table = self::$type_itemtype::getTable();
         $item_type_table = NetworkEquipmentType::getTable();
         $location_table = Location::getTable();
+        $infocom_table = Infocom::getTable();
+
         $request = [
             'SELECT' => self::$itemtype::getTableField('id'),
             'FROM'   => self::$itemtype::getTable(),
@@ -86,6 +88,15 @@ class NetworkEquipment extends AbstractAsset
                         $item_glpitype_table => 'id',
                     ]
                 ],
+                $infocom_table => [
+                    'FKEY' => [
+                        $infocom_table => 'items_id',
+                        $item_table => 'id',
+                        ['AND' => ['itemtype' => self::$itemtype]],
+                    ]
+                ],
+            ],
+            'LEFT JOIN' => [
                 $item_type_table => [
                     'FKEY'   => [
                         $item_type_table  => 'networkequipmenttypes_id',
@@ -109,6 +120,15 @@ class NetworkEquipment extends AbstractAsset
                         self::$model_itemtype::getTableField('power_consumption') => ['>', 0],
                     ],
                 ],
+                [
+                    'OR' => [
+                        ['NOT' => [Infocom::getTableField('use_date') => null]],
+                        ['NOT' => [Infocom::getTableField('delivery_date') => null]],
+                        ['NOT' => [Infocom::getTableField('buy_date') => null]],
+                        ['NOT' => [Infocom::getTableField('date_creation') => null]],
+                        ['NOT' => [Infocom::getTableField('date_mod') => null]],
+                    ]
+                ]
             ]
         ];
 
@@ -154,7 +174,7 @@ class NetworkEquipment extends AbstractAsset
             ]
         ];
         // Change inner joins into left joins to identify missing data
-        $request['LEFT JOIN'] = $request['INNER JOIN'];
+        $request['LEFT JOIN'] = $request['INNER JOIN'] + $request['LEFT JOIN'];
         unset($request['INNER JOIN']);
         // remove where criterias
         unset($request['WHERE']);

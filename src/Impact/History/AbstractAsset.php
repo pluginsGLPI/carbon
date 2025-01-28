@@ -186,11 +186,13 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         }
         $timezone = $DB->guessTimezone();
         foreach ($gaps as $gap) {
-            $date_cursor = DateTime::createFromFormat('U', $gap['start']);
-            $date_cursor->setTimezone(new DateTimeZone($timezone));
-            $date_cursor->setTime(0, 0, 0, 0);
-            $end_date = DateTime::createFromFormat('U', $gap['end']);
-            $end_date->setTimezone(new DateTimeZone($timezone));
+            // $date_cursor = DateTime::createFromFormat('U', $gap['start']);
+            // $date_cursor->setTimezone(new DateTimeZone($timezone));
+            // $date_cursor->setTime(0, 0, 0, 0);
+            // $end_date = DateTime::createFromFormat('U', $gap['end']);
+            // $end_date->setTimezone(new DateTimeZone($timezone));
+            $date_cursor = $gap['start']->setTime(0, 0, 0, 0);
+            $end_date = $gap['end']->setTime(0, 0, 0, 0);
             while ($date_cursor < $end_date) {
                 $success = $this->evaluateItemPerDay($item, $engine, $date_cursor);
                 if ($success) {

@@ -195,6 +195,7 @@ class NetworkEquipmentTest extends CommonAsset
 
         // Add a model
         $model = $this->getItem(NetworkEquipmentModel::class);
+        $this->assertFalse($history->canHistorize($id));
         $network_equipment->update([
             'id' => $id,
             'networkequipmentmodels_id' => $model->getID(),
@@ -214,16 +215,23 @@ class NetworkEquipmentTest extends CommonAsset
             'id' => $id,
             'networkequipmenttypes_id' => $type->getID(),
         ]);
+        $this->assertTrue($history->canHistorize($id));
+
+        // Remove power consumption on model
+        $model->update([
+            'id' => $model->getID(),
+            'power_consumption' => 0,
+        ]);
         $this->assertFalse($history->canHistorize($id));
 
         // add a type power consumption
         $power_consumption = $this->getItem(NetworkEquipmentType::class, [
             GlpiNetworkEquipmentType::getForeignKeyField() => $type->getID(),
         ]);
-        $this->assertTrue($history->canHistorize($id));
+        $this->assertFalse($history->canHistorize($id));
 
         // Set a type power consumption
-        $type->update([
+        $power_consumption->update([
             'id' => $type->getID(),
             'power_consumption' => 55,
         ]);

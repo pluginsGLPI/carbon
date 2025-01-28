@@ -71,7 +71,12 @@ abstract class AbstractPermanent extends AbstractAsset implements EngineInterfac
         $length = new DateInterval('PT' . 86400 . 'S'); // 24h = 86400 seconds
         $iterator = $this->requestCarbonIntensitiesPerDay($start_time, $length, $zone);
         if ($iterator->count() != 24) {
-            trigger_error('required count of carbon intensity samples not met (24 expected)');
+            trigger_error(sprintf(
+                'required count of carbon intensity %d samples not met. Got %d samples for date %s',
+                24,
+                $count,
+                $start_time->format('Y-m-d H:i:s')
+            ), E_USER_WARNING);
             return null;
         }
 
