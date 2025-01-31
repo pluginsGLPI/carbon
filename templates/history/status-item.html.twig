@@ -156,6 +156,12 @@
                             {% endif %}
                             {{ fields.field('', field, __('The asset has an inventory entry date', 'carbon')) }}
                         {% endif %}
+
+                        {{ fields.smallTitle(__('Legend', 'carbon')) }}
+
+                        {{ fields.field('', ok_field, __('Satisfied requirement', 'carbon')) }}
+                        {{ fields.field('', nok_field, __('Missing requirement', 'carbon')) }}
+                        {{ fields.field('', warning_field, __('Optional missing data', 'carbon')) }}
                     </div>
                 </div>
             </div>
