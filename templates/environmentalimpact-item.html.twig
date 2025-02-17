@@ -89,12 +89,12 @@
 </script>
 
 {{ fields.largeTitle(
-    __('Embedded impact', 'carbon'),
+    __('Embodied impact', 'carbon'),
     'fas fa-chart-pie'
 ) }}
 
 <div class="card-body" id="cardBodyBorder1">
-    <div class="subheader">{{ __('Embedded impact', 'carbon') }}</div>
+    <div class="subheader">{{ __('Embodied impact', 'carbon') }}</div>
     <div>
       {% set reset_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', reset: '', itemtype: '" ~ item.getType() ~ "', items_id: '" ~ item.getID() ~ "'}" %}
       <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/embodiedimpact.form.php' }}', {{ reset_args }})">{{ __('Reset data', 'carbon') }}</a>

@@ -36,8 +36,8 @@ use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\DataSource\Boaviztapi;
 use GlpiPlugin\Carbon\DataSource\RestApiClient;
 use GlpiPlugin\Carbon\EmbodiedImpact;
-use GlpiPlugin\Carbon\Impact\Embedded\AbstractEmbeddedImpact;
-use GlpiPlugin\Carbon\Impact\Embedded\Boavizta\AbstractAsset;
+use GlpiPlugin\Carbon\Impact\Embodied\AbstractEmbodiedImpact;
+use GlpiPlugin\Carbon\Impact\Embodied\Boavizta\AbstractAsset;
 
 include('../../../inc/includes.php');
 

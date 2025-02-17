@@ -322,16 +322,16 @@ class Toolbox
     public static function getEmbodiedImpactClasses(): array
     {
         $base_namespace = Config::getEmbodiedImpactEngine();
-        $embedded_impact_types = [];
+        $embodied_impact_types = [];
         foreach (PLUGIN_CARBON_TYPES as $itemtype) {
-            $embedded_impact_types[] = implode('\\', [
+            $embodied_impact_types[] = implode('\\', [
                 $base_namespace,
                 $itemtype
             ]);
         }
 
         return [$base_namespace . '\\Computer'];
-        return $embedded_impact_types;
+        return $embodied_impact_types;
     }
 
     /**

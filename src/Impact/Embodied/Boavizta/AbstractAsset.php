@@ -112,15 +112,15 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
     }
 
     /**
-     * Ddelete all calculated embedded impact for an asset
+     * Delete all calculated embodied impact for an asset
      *
      * @param integer $items_id
      * @return boolean
      */
     public function resetImpact(int $items_id): bool
     {
-        $embedded_impact = new EmbeddedImpact();
-        return $embedded_impact->deleteByCriteria([
+        $embodied_impact = new EmbodiedImpact();
+        return $embodied_impact->deleteByCriteria([
             'itemtype' => static::getItemtype(),
             'items_id' => $items_id
         ]);
@@ -256,23 +256,23 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
             // No impact returned
         }
 
-        $embedded_impact = new EmbodiedImpact();
+        $embodied_impact = new EmbodiedImpact();
         $input_item = [
             'itemtype' => static::getItemtype(),
             'items_id' => $id,
         ];
-        $embedded_impact->getFromDBByCrit($input_item);
-        if ($embedded_impact->isNewItem()) {
+        $embodied_impact->getFromDBByCrit($input_item);
+        if ($embodied_impact->isNewItem()) {
             $input = array_merge($input, $input_item);
-            if ($embedded_impact->add($input) === false) {
+            if ($embodied_impact->add($input) === false) {
                 return 0;
             }
 
             return 1;
         }
 
-        $input = array_merge($input, ['id' => $embedded_impact->getID()]);
-        if ($embedded_impact->update($input) === false) {
+        $input = array_merge($input, ['id' => $embodied_impact->getID()]);
+        if ($embodied_impact->update($input) === false) {
             return 0;
         }
 
@@ -280,7 +280,7 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
     }
 
     /**
-     * Calculate embedded impact for an item
+     * Calculate embodied impact for an item
      *
      * requres prior call to setClient()
      *
@@ -292,13 +292,13 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
         $calculated = $this->evaluateItem($items_id);
         if ($calculated === 0) {
             Session::addMessageAfterRedirect(
-                sprintf(__('Failed to calculate embedded impact', 'carbon'), $calculated),
+                sprintf(__('Failed to calculate embodied impact', 'carbon'), $calculated),
             );
             return false;
         }
 
         Session::addMessageAfterRedirect(
-            sprintf(__('Embedded impact sucessfully evaluated', 'carbon'), $calculated),
+            sprintf(__('Embodied impact sucessfully evaluated', 'carbon'), $calculated),
         );
         return true;
     }

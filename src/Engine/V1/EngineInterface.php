@@ -79,7 +79,7 @@ interface EngineInterface
     public function getEnergyPerDay(DateTime $day): TrackedFloat;
 
     /**
-     * Get embedded impact
+     * Get embodied impact
      *
      * @return array
      */
