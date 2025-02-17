@@ -36,6 +36,7 @@ namespace GlpiPlugin\Carbon\Engine\V1;
 use CommonDBTM;
 use DateInterval;
 use DateTime;
+use DateTimeInterface;
 use DBmysqlIterator;
 use DbUtils;
 use DbMysql;
@@ -76,12 +77,12 @@ abstract class AbstractAsset implements EngineInterface
     /**
      * get all carbon intensities during the day, between 2 hours boundaries
      *
-     * @param DateTime $start_time
+     * @param DateTimeInterface $start_time
      * @param DateInterval $length
      * @param CarbonIntensityZone $zone
      * @return DBmysqlIterator
      */
-    protected function requestCarbonIntensitiesPerDay(DateTime $start_time, DateInterval $length, CarbonIntensityZone $zone): DBmysqlIterator
+    protected function requestCarbonIntensitiesPerDay(DateTimeInterface $start_time, DateInterval $length, CarbonIntensityZone $zone): DBmysqlIterator
     {
         global $DB;
 

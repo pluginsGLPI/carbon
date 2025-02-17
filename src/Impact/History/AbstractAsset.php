@@ -38,6 +38,7 @@ use CommonDBTM;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
+use DateTimeInterface;
 use DateTimeZone;
 use DbUtils;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
@@ -222,7 +223,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      * @param DateTime $day Day to calculate
      * @return boolean
      */
-    protected function evaluateItemPerDay(CommonDBTM $item, EngineInterface $engine, DateTime $day): bool
+    protected function evaluateItemPerDay(CommonDBTM $item, EngineInterface $engine, DateTimeInterface $day): bool
     {
         $energy = $engine->getEnergyPerDay($day);
         $item_id = $item->getID();

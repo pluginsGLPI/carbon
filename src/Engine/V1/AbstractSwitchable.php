@@ -35,6 +35,7 @@ namespace GlpiPlugin\Carbon\Engine\V1;
 
 use DateTime;
 use DateInterval;
+use DateTimeInterface;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
@@ -46,10 +47,10 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
      * Tells if the asset is expected to run in the specified date and usage profile
      *
      * @param ComputerUsageProfile $usage_profile
-     * @param DateTime $dateTime
+     * @param DateTimeInterface $dateTime
      * @return boolean true if the asset is powered on
      */
-    protected static function isUsageDay(ComputerUsageProfile $usage_profile, DateTime $dateTime): bool
+    protected static function isUsageDay(ComputerUsageProfile $usage_profile, DateTimeInterface $dateTime): bool
     {
         $day_of_week = $dateTime->format('N');
         $key = 'day_' . strval($day_of_week);
@@ -59,11 +60,12 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
 
     /**
      * Returns the consumed energy for the specified day.
+     * @param DateTimeInterface $day
      * @return TrackedFloat energy (KWh)
      *
      * {@inheritDoc}
      */
-    public function getEnergyPerDay(DateTime $day): TrackedFloat
+    public function getEnergyPerDay(DateTimeInterface $day): TrackedFloat
     {
         $usage_profile = $this->getUsageProfile();
 
@@ -90,7 +92,7 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
         );
     }
 
-    public function getCarbonEmissionPerDay(DateTime $day, CarbonIntensityZone $zone): ?TrackedFloat
+    public function getCarbonEmissionPerDay(DateTimeInterface $day, CarbonIntensityZone $zone): ?TrackedFloat
     {
         $usage_profile = $this->getUsageProfile();
 
@@ -112,7 +114,7 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
         return $this->computeEmissionPerDay($start_time, $power, $length, $zone);
     }
 
-    protected function computeEmissionPerDay(DateTime $start_time, TrackedInt $power, DateInterval $length, CarbonIntensityZone $zone): ?TrackedFloat
+    protected function computeEmissionPerDay(DateTimeInterface $start_time, TrackedInt $power, DateInterval $length, CarbonIntensityZone $zone): ?TrackedFloat
     {
         if ($power->getValue() === 0) {
             return 0;
