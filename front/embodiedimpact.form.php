@@ -35,7 +35,7 @@ use Glpi\Event;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\DataSource\Boaviztapi;
 use GlpiPlugin\Carbon\DataSource\RestApiClient;
-use GlpiPlugin\Carbon\EmbeddedImpact;
+use GlpiPlugin\Carbon\EmbodiedImpact;
 use GlpiPlugin\Carbon\Impact\Embedded\AbstractEmbeddedImpact;
 use GlpiPlugin\Carbon\Impact\Embedded\Boavizta\AbstractAsset;
 
@@ -46,9 +46,9 @@ if (!Plugin::isPluginActive('carbon')) {
     Html::displayNotFoundError();
 }
 
-Session::checkRight(EmbeddedImpact::$rightname, READ);
+Session::checkRight(EmbodiedImpact::$rightname, READ);
 
-$environmental_impact = new EmbeddedImpact();
+$environmental_impact = new EmbodiedImpact();
 
 if (isset($_POST['update'])) {
     $environmental_impact->check($_POST['id'], UPDATE);
@@ -68,20 +68,20 @@ if (isset($_POST['update'])) {
         Html::back();
     }
 
-    if (!EmbeddedImpact::canPurge()) {
+    if (!EmbodiedImpact::canPurge()) {
         Session::addMessageAfterRedirect(__('Reset denied.', 'carbon'), false, ERROR);
         Html::back();
     }
 
-    $embedded_impact_namespace = Config::getEmbeddedImpactEngine();
-    $embedded_impact_class = $embedded_impact_namespace . '\\' . (string) $_POST['itemtype'];
-    if (!class_exists($embedded_impact_class) || !is_subclass_of($embedded_impact_class, AbstractEmbeddedImpact::class)) {
+    $embodied_impact_namespace = Config::getEmbeddedImpactEngine();
+    $embodied_impact_class = $embodied_impact_namespace . '\\' . (string) $_POST['itemtype'];
+    if (!class_exists($embodied_impact_class) || !is_subclass_of($embodied_impact_class, AbstractEmbeddedImpact::class)) {
         Session::addMessageAfterRedirect(__('Bad arguments.', 'carbon'), false, ERROR);
         Html::back();
     }
 
-    $embedded_impact = new $embedded_impact_class();
-    $itemtype = $embedded_impact->getItemtype();
+    $embodied_impact = new $embodied_impact_class();
+    $itemtype = $embodied_impact->getItemtype();
     $item = new $itemtype();
     $item->getFromDB($_POST['items_id']);
     if (!$item->canUpdate()) {
@@ -89,7 +89,7 @@ if (isset($_POST['update'])) {
         Html::back();
     }
 
-    if (!$embedded_impact->resetImpact($_POST['items_id'])) {
+    if (!$embodied_impact->resetImpact($_POST['items_id'])) {
         Session::addMessageAfterRedirect(__('Reset failed.', 'carbon'), false, ERROR);
     }
 } else if (isset($_POST['calculate'])) {
@@ -98,21 +98,21 @@ if (isset($_POST['update'])) {
         Html::back();
     }
 
-    if (!EmbeddedImpact::canUpdate()) {
+    if (!EmbodiedImpact::canUpdate()) {
         Session::addMessageAfterRedirect(__('Update denied.', 'carbon'), false, ERROR);
         Html::back();
     }
 
-    $embedded_impact_namespace = Config::getEmbeddedImpactEngine();
-    $embedded_impact_class = $embedded_impact_namespace . '\\' . (string) $_POST['itemtype'];
-    if (!class_exists($embedded_impact_class) || !is_subclass_of($embedded_impact_class, AbstractEmbeddedImpact::class)) {
+    $embodied_impact_namespace = Config::getEmbeddedImpactEngine();
+    $embodied_impact_class = $embodied_impact_namespace . '\\' . (string) $_POST['itemtype'];
+    if (!class_exists($embodied_impact_class) || !is_subclass_of($embodied_impact_class, AbstractEmbeddedImpact::class)) {
         Session::addMessageAfterRedirect(__('Bad arguments.', 'carbon'), false, ERROR);
         Html::back();
     }
 
-    /** @var AbstractAsset $embedded_impact */
-    $embedded_impact = new $embedded_impact_class();
-    $itemtype = $embedded_impact->getItemtype();
+    /** @var AbstractAsset $embodied_impact */
+    $embodied_impact = new $embodied_impact_class();
+    $itemtype = $embodied_impact->getItemtype();
     $item = new $itemtype();
     $item->getFromDB($_POST['items_id']);
     if (!$item->canUpdate()) {
@@ -120,8 +120,8 @@ if (isset($_POST['update'])) {
         Html::back();
     }
 
-    $embedded_impact->setClient(new Boaviztapi(new RestApiClient()));
-    if (!$embedded_impact->calculateImpact($_POST['items_id'])) {
+    $embodied_impact->setClient(new Boaviztapi(new RestApiClient()));
+    if (!$embodied_impact->calculateImpact($_POST['items_id'])) {
         Session::addMessageAfterRedirect(__('Update failed.', 'carbon'), false, ERROR);
     }
 }

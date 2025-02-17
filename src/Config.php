@@ -39,7 +39,7 @@ use Computer as GlpiComputer;
 use Monitor as GlpiMonitor;
 use NetworkEquipment as GlpiNetworkEquipment;
 use Glpi\Application\View\TemplateRenderer;
-use GlpiPlugin\Carbon\Impact\Embedded\Engine;
+use GlpiPlugin\Carbon\Impact\Embodied\Engine;
 use Session;
 
 class Config extends GlpiConfig
@@ -85,7 +85,7 @@ class Config extends GlpiConfig
         TemplateRenderer::getInstance()->display('@carbon/config.html.twig', [
             'can_edit'                => $canedit,
             'current_config'          => $current_config,
-            'embedded_impact_engines' => Engine::getAvailableBackends(),
+            'embodied_impact_engines' => Engine::getAvailableBackends(),
             'action'                  => (isset($options['plugin_config']) ? Config::getFormURL() : GlpiConfig::getFormURL()),
         ]);
     }
@@ -135,12 +135,12 @@ class Config extends GlpiConfig
     public static function getEmbodiedImpactEngine(): string
     {
         $default_engine = 'Boavizta';
-        $engine = GlpiConfig::getConfigurationValue('plugin:carbon', 'embedded_impact_engine');
+        $engine = GlpiConfig::getConfigurationValue('plugin:carbon', 'embodied_impact_engines');
         if ($engine === null || $engine === '') {
-            GlpiConfig::setConfigurationValues('plugin:carbon', ['embedded_impact_engine' => $default_engine]);
+            GlpiConfig::setConfigurationValues('plugin:carbon', ['embodied_impact_engines' => $default_engine]);
             $engine = $default_engine;
         }
 
-        return __NAMESPACE__ . '\\Impact\\Embedded\\' . $engine;
+        return __NAMESPACE__ . '\\Impact\\Embodied\\' . $engine;
     }
 }

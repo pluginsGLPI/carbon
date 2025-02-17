@@ -32,19 +32,19 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\Impact\Embedded\Boavizta;
+namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta;
 
 use CommonDBTM;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\DataSource\Boaviztapi;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
-use GlpiPlugin\Carbon\EmbeddedImpact;
-use GlpiPlugin\Carbon\Impact\Embedded\AbstractEmbeddedImpact;
+use GlpiPlugin\Carbon\EmbodiedImpact;
+use GlpiPlugin\Carbon\Impact\Embodied\AbstractEmbodiedImpact;
 use Session;
 use Toolbox as GlpiToolbox;
 
-abstract class AbstractAsset extends AbstractEmbeddedImpact implements AssetInterface
+abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInterface
 {
     protected static string $itemtype = '';
 
@@ -256,7 +256,7 @@ abstract class AbstractAsset extends AbstractEmbeddedImpact implements AssetInte
             // No impact returned
         }
 
-        $embedded_impact = new EmbeddedImpact();
+        $embedded_impact = new EmbodiedImpact();
         $input_item = [
             'itemtype' => static::getItemtype(),
             'items_id' => $id,

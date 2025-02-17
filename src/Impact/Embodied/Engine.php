@@ -31,7 +31,7 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\Impact\Embedded;
+namespace GlpiPlugin\Carbon\Impact\Embodied;
 
 use CommonGLPI;
 

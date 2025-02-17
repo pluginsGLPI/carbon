@@ -31,57 +31,17 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\Engine\V1;
+ // Move data to new table
+$old_table = 'glpi_plugin_carbon_embeddedimpacts';
+$new_table = 'glpi_plugin_carbon_embodiedimpacts';
+$migration->renameTable($old_table, $new_table);
 
-use DateTime;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
-use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
-use GlpiPlugin\Carbon\DataTracking\TrackedInt;
+$old_itemtype = '\\GlpiPlugin\\Carbon\\EmbeddedImpact';
+$new_itemtype = '\\GlpiPlugin\\Carbon\\EmbodiedImpact';
 
-/**
- * Compute environmental impact of a computer
- */
-interface EngineInterface
-{
-    /**
-     * Returns the power of the computer
-     *
-     * @return TrackedInt
-     */
-    public function getPower(): TrackedInt;
-
-    /**
-     * Returns the carbon emission for the specified day.
-     *
-     * @param DateTime $day the day
-     * @param CarbonIntensityZone $zone_id the zone where the asset is located at the given date
-     *
-     * @return TrackedFloat|null
-     *
-     * If no carbon intensity data are available for the specified day, returns null
-     * Otherwise, returns the CO2 emission of the day, which can be 0
-     *
-     * Unit of returned value, if float, is grams of CO2
-     */
-    public function getCarbonEmissionPerDay(DateTime $day, CarbonIntensityZone $zone): ?TrackedFloat;
-
-    /**
-     * Returns the consumed energy for the specified day.
-     *
-     * @param DateTime $day the day
-     *
-     * @return TrackedFloat
-     *
-     * Returns the consumed energy
-     *
-     * Unit of returned value is kWh (kiloWattHour)
-     */
-    public function getEnergyPerDay(DateTime $day): TrackedFloat;
-
-    /**
-     * Get embedded impact
-     *
-     * @return array
-     */
-    // public function getEmbodiedImpact(): array;
-}
+// Update display preferences
+$DB->update(DisplayPreference::getTable(), [
+    'itemtype' => $new_itemtype
+], [
+    'itemtype' => $old_itemtype
+]);

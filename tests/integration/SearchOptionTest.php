@@ -37,7 +37,7 @@ use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\ComputerType;
-use GlpiPlugin\Carbon\EmbeddedImpact;
+use GlpiPlugin\Carbon\EmbodiedImpact;
 use GlpiPlugin\Carbon\EnvironmentalImpact;
 use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
@@ -61,7 +61,7 @@ class SearchOptionTest extends CommonTestCase
         CarbonIntensity::class => [
             'data_quality'
         ],
-        EmbeddedImpact::class => [
+        EmbodiedImpact::class => [
             'gwp_quality',
             'adp_quality',
             'pe_quality',

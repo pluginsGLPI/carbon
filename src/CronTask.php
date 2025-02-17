@@ -118,7 +118,7 @@ class CronTask
         $remaining = $task->fields['param'];
         $limit_per_type = floor(((int) $remaining) / count($embodied_impacts));
         foreach ($embodied_impacts as $embodied_impact_type) {
-            /** @var AbstractAsset $embeddedImpact */
+            /** @var AbstractAsset $embodied_impact */
             $embodied_impact = new $embodied_impact_type();
             $embodied_impact->setLimit($limit_per_type);
             $embodied_impact->setClient(new Boaviztapi(new RestApiClient()));

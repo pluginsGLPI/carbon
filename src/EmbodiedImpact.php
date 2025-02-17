@@ -38,11 +38,11 @@ use DBmysqlIterator;
 use QuerySubQuery;
 
 /**
- * Embedded impact of assets
+ * Embodied impact of assets
  *
- * Embedded impact is the impact of the asset while it is built and destroyed or recycled
+ * Embodied impact is the impact of the asset while it is built and destroyed or recycled
  */
-class EmbeddedImpact extends CommonDBTM
+class EmbodiedImpact extends CommonDBTM
 {
     // Use core computer right
     public static $rightname = 'computer';
@@ -117,7 +117,7 @@ class EmbeddedImpact extends CommonDBTM
     }
 
     /**
-     * Get iterator of items without known embedded impact for a specified itemtype
+     * Get iterator of items without known embodied impact for a specified itemtype
      *
      * @param string $itemtype
      * @param array $crit Criteria array of WHERE, ORDER, GROUP BY, LEFT JOIN, INNER JOIN, RIGHT JOIN, HAVING, LIMIT

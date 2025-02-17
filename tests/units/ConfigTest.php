@@ -40,14 +40,19 @@ class ConfigTest extends DbTestCase
 {
     public function testGetEmbodiedImpactEngine()
     {
+        $configuration_key = 'embodied_impact_engines';
+
+        // test when engine is not set
         $output = Config::getEmbodiedImpactEngine();
         $this->assertEquals('GlpiPlugin\\Carbon\\Impact\\Embedded\\Boavizta', $output);
 
-        GlpiConfig::setConfigurationValues('plugin:carbon', ['embedded_impact_engine' => 'foo']);
+        // test a engine is set
+        GlpiConfig::setConfigurationValues('plugin:carbon', [$configuration_key => 'foo']);
         $output = Config::getEmbodiedImpactEngine();
         $this->assertEquals('GlpiPlugin\\Carbon\\Impact\\Embedded\\foo', $output);
 
-        GlpiConfig::setConfigurationValues('plugin:carbon', ['embedded_impact_engine' => 'Boavizta']);
+        // test change of the engine
+        GlpiConfig::setConfigurationValues('plugin:carbon', [$configuration_key => 'Boavizta']);
         $output = Config::getEmbodiedImpactEngine();
         $this->assertEquals('GlpiPlugin\\Carbon\\Impact\\Embedded\\Boavizta', $output);
     }

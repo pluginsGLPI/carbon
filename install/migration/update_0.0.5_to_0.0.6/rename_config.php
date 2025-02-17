@@ -26,24 +26,20 @@
  * SOFTWARE.
  * -------------------------------------------------------------------------
  * @copyright Copyright (C) 2024 Teclib' and contributors.
- * @copyright Copyright (C) 2024 by the carbon plugin team.
  * @license   MIT https://opensource.org/licenses/mit-license.php
  * @link      https://github.com/pluginsGLPI/carbon
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\Impact\Embedded\Boavizta;
-
-use CommonDBTM;
-use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
-
-interface AssetInterface
-{
-    const IMPACT_GWP = 0; // Global warming potential
-    const IMPACT_ADP = 1; // Abiotic Depletion Potential
-    const IMPACT_PE  = 2; // Primary Energy
-
-    public static function getEngine(CommonDBTM $item): EngineInterface;
-
-    public function setLimit(int $limit);
+// Rename configuration key embedded_impact_engine
+$value = Config::getConfigurationValue('plugin:carbon', 'embedded_impact_engine');
+if ($value !== null) {
+    Config::setConfigurationValues('plugin:carbon', [
+        'embodied_impact_engine' => $value,
+    ]);
 }
+$config = new Config();
+$config->deleteByCriteria([
+    'context' => 'plugin:carbon',
+    'name' => 'embedded_impact_engine',
+]);

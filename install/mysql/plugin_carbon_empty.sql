@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_computerusageprofiles` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_embeddedimpacts` (
+CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_embodiedimpacts` (
   `id`          int          unsigned NOT NULL AUTO_INCREMENT,
   `itemtype`    varchar(255) DEFAULT NULL,
   `items_id`    int          unsigned NOT NULL DEFAULT '0',

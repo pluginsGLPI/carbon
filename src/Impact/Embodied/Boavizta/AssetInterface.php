@@ -32,8 +32,18 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\Impact\Embedded;
+namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta;
 
-abstract class AbstractEmbeddedImpact
+use CommonDBTM;
+use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
+
+interface AssetInterface
 {
+    const IMPACT_GWP = 0; // Global warming potential
+    const IMPACT_ADP = 1; // Abiotic Depletion Potential
+    const IMPACT_PE  = 2; // Primary Energy
+
+    public static function getEngine(CommonDBTM $item): EngineInterface;
+
+    public function setLimit(int $limit);
 }

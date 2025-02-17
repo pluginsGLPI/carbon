@@ -32,7 +32,7 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\Impact\Embedded\Boavizta;
+namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta;
 
 use CommonDBTM;
 use Computer as GlpiComputer;
