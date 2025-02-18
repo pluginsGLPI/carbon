@@ -73,9 +73,9 @@ if (isset($_POST['update'])) {
         Html::back();
     }
 
-    $embodied_impact_namespace = Config::getEmbeddedImpactEngine();
+    $embodied_impact_namespace = Config::getEmbodiedImpactEngine();
     $embodied_impact_class = $embodied_impact_namespace . '\\' . (string) $_POST['itemtype'];
-    if (!class_exists($embodied_impact_class) || !is_subclass_of($embodied_impact_class, AbstractEmbeddedImpact::class)) {
+    if (!class_exists($embodied_impact_class) || !is_subclass_of($embodied_impact_class, AbstractEmbodiedImpact::class)) {
         Session::addMessageAfterRedirect(__('Bad arguments.', 'carbon'), false, ERROR);
         Html::back();
     }
@@ -103,9 +103,9 @@ if (isset($_POST['update'])) {
         Html::back();
     }
 
-    $embodied_impact_namespace = Config::getEmbeddedImpactEngine();
+    $embodied_impact_namespace = Config::getEmbodiedImpactEngine();
     $embodied_impact_class = $embodied_impact_namespace . '\\' . (string) $_POST['itemtype'];
-    if (!class_exists($embodied_impact_class) || !is_subclass_of($embodied_impact_class, AbstractEmbeddedImpact::class)) {
+    if (!class_exists($embodied_impact_class) || !is_subclass_of($embodied_impact_class, AbstractEmbodiedImpact::class)) {
         Session::addMessageAfterRedirect(__('Bad arguments.', 'carbon'), false, ERROR);
         Html::back();
     }
