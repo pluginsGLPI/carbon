@@ -75,6 +75,7 @@ class Monitor extends AbstractSwitchable
                     'FKEY' => [
                         $computer_item_table => 'computers_id',
                         $computers_table     => 'id',
+                        ['AND' => [Computer_Item::getTableField('itemtype') => self::$itemtype]],
                     ]
                 ],
                 $environmentalimpact_table => [
