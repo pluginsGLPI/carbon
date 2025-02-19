@@ -168,7 +168,7 @@ class Toolbox
     }
 
     /**
-     * Get default date where environnemental imapct shouw be known
+     * Get default date where environnemental imapct should be known
      * when no inventory data is available
      */
     public function getDefaultCarbonIntensityDownloadDate(): DateTimeImmutable
@@ -224,7 +224,7 @@ class Toolbox
      **/
     public static function getPower(float $p): string
     {
-       //TRANS: list of unit (o for octet)
+       //TRANS: list of unit (W for watt)
         $units = [
             __('W', 'carbon'),
             __('KW', 'carbon'),
