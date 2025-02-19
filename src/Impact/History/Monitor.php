@@ -36,13 +36,17 @@ namespace GlpiPlugin\Carbon\Impact\History;
 
 use CommonDBTM;
 use Computer as GlpiComputer;
+use ComputerModel as GlpiComputerModel;
+use ComputerType as GlpiComputerType;
 use Computer_Item;
 use DBmysql;
 use DbUtils;
 use Glpi\Application\View\TemplateRenderer;
+use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Engine\V1\Monitor as EngineMonitor;
 use GlpiPlugin\Carbon\MonitorType;
+use Infocom;
 use Location;
 use Monitor as GlpiMonitor;
 use MonitorType as GlpiMonitorType;
@@ -68,19 +72,30 @@ class Monitor extends AbstractAsset
         $item_model_table = self::$model_itemtype::getTable();
         $computers_table = GlpiComputer::getTable();
         $computers_items_table = Computer_Item::getTable();
+        $computer_model_table = GlpiComputerModel::getTable();
         $glpi_monitor_types_table = GlpiMonitorType::getTable();
         $glpi_monitor_types_fk = GlpiMonitorType::getForeignKeyField();
         $monitor_types_table = MonitorType::getTable();
+        $infocom_table = Infocom::getTable();
+        $location_table = Location::getTable();
+
         $request = (new Computer())->getEvaluableQuery();
         $computer_inner_joins = $request['INNER JOIN'];
-        unset($request['INNER JOIN']);
+        $computer_left_joins  = $request['LEFT JOIN'];
+        unset($request['INNER JOIN'], $request['LEFT JOIN']);
+        unset($computer_inner_joins[$location_table]);
+
+        $glpi_computertypes_table = GlpiComputerType::getTable();
+        $computertypes_table = ComputerType::getTable();
+        unset($computer_left_joins[$infocom_table]);
+        unset($computer_left_joins[$computer_model_table]);
+        unset($computer_left_joins[$glpi_computertypes_table]);
+        unset($computer_left_joins[$computertypes_table]);
 
         // Add joins to reach monitor from computer
         $request['FROM'] = $item_table;
-        $request['INNER JOIN'][$computers_items_table] = [
+        $request['LEFT JOIN'][$computers_items_table] = [
             'FKEY' => [
-                // $computers_table => 'id',
-                // $computers_items_table => GlpiComputer::getForeignKeyField(),
                 $computers_items_table => 'items_id',
                 $item_table => 'id',
                 ['AND' => [Computer_Item::getTableField('itemtype') => self::$itemtype]],
@@ -92,28 +107,42 @@ class Monitor extends AbstractAsset
                 $computers_items_table => GlpiComputer::getForeignKeyField(),
             ],
         ];
-        $request['INNER JOIN'][$glpi_monitor_types_table] = [
+        $request['LEFT JOIN'][$location_table] = [
+            'FKEY'   => [
+                $item_table  => 'locations_id',
+                $location_table => 'id',
+            ]
+        ];
+        $request['LEFT JOIN'][$glpi_monitor_types_table] = [
             'FKEY' => [
                 $glpi_monitor_types_table => 'id',
                 $item_table => $glpi_monitor_types_fk,
             ],
         ];
-        $request['INNER JOIN'][$monitor_types_table] = [
+        $request['LEFT JOIN'][$monitor_types_table] = [
             'FKEY' => [
                 $glpi_monitor_types_table => 'id',
                 $monitor_types_table => $glpi_monitor_types_fk,
             ],
         ];
-        $request['INNER JOIN'][$item_model_table] = [
+        $request['LEFT JOIN'][$item_model_table] = [
             'FKEY' => [
                 $item_model_table => 'id',
                 $item_table => 'monitormodels_id',
             ],
         ];
+        $request['LEFT JOIN'][$infocom_table] = [
+            'FKEY' => [
+                $infocom_table => 'items_id',
+                $item_table => 'id',
+                ['AND' => [Infocom::getTableField('itemtype') => self::$itemtype]],
+            ]
+        ];
 
         // re-add inner joins of computer, after those for monitor
         // Needed to join tables before theyr foreign keys are used
         $request['INNER JOIN'] = array_merge($request['INNER JOIN'], $computer_inner_joins);
+        $request['LEFT JOIN'] = array_merge($request['LEFT JOIN'], $computer_left_joins);
 
         // Replace SELECT on computer by select on monitor
         $request['SELECT'] = [
@@ -123,8 +152,10 @@ class Monitor extends AbstractAsset
             'AND' => [
                 self::$itemtype::getTableField('is_deleted') => 0,
                 self::$itemtype::getTableField('is_template') => 0,
+
                 // Check the monitor is located the same place as the attached computer
-                self::$itemtype::getTableField('locations_id') => new QueryExpression(DBmysql::quoteName(GlpiComputer::getTableField('locations_id'))),
+                // self::$itemtype::getTableField('locations_id') => new QueryExpression(DBmysql::quoteName(GlpiComputer::getTableField('locations_id'))),
+
                 ['NOT' => [Location::getTableField('country') => '']],
                 ['NOT' => [Location::getTableField('country') => null]],
                 [
@@ -144,8 +175,7 @@ class Monitor extends AbstractAsset
         return $request;
     }
 
-
-    public static function showHistorizableDiagnosis(CommonDBTM $item)
+    public static function getHistorizableDiagnosis(CommonDBTM $item): ?array
     {
         global $DB;
 
@@ -165,7 +195,8 @@ class Monitor extends AbstractAsset
             MonitorType::getTableField('power_consumption  as type_power_consumption'),
         ];
         // Change inner joins into left joins to identify missing data
-        $request['LEFT JOIN'] = $request['INNER JOIN'];
+        // Warning : the order of the array merge below is important or the resulting SQL query will fail
+        $request['LEFT JOIN'] = $request['LEFT JOIN'] + $request['INNER JOIN'];
         unset($request['INNER JOIN']);
         // remove where criterias
         unset($request['WHERE']);
@@ -174,6 +205,9 @@ class Monitor extends AbstractAsset
 
         $iterator = $DB->request($request);
         $data = $iterator->current();
+        if ($data === null) {
+            return null;
+        }
 
         // Each state is analyzed, with bool results
         // false means that data is missing or invalid for historization
@@ -187,8 +221,23 @@ class Monitor extends AbstractAsset
         $status['has_type'] = ($data['type_id'] !== 0);
         $status['has_type_power_consumption'] = (($data['type_power_consumption'] ?? 0) !== 0);
 
+        $item_oldest_date = $data['use_date']
+            ?? $data['delivery_date']
+            ?? $data['buy_date']
+            // ?? $data['date_creation']
+            // ?? $data['date_mod']
+            ?? null;
+        $status['has_inventory_entry_date'] = ($item_oldest_date !== null);
+
+        return $status;
+    }
+
+    public static function showHistorizableDiagnosis(CommonDBTM $item)
+    {
+        $status = self::getHistorizableDiagnosis($item);
+
         TemplateRenderer::getInstance()->display('@carbon/history/status-item.html.twig', [
-            'have_status' => ($iterator->count() === 1),
+            'has_status' => ($status !== null),
             'status' => $status,
         ]);
     }

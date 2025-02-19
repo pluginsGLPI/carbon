@@ -39,6 +39,7 @@ use Computer_Item;
 use Monitor as GlpiMonitor;
 use GlpiPlugin\Carbon\Impact\History\Monitor;
 use GlpiPlugin\Carbon\Tests\Impact\History\CommonAsset;
+use Infocom;
 use Location;
 use DateTime;
 use MonitorModel;
@@ -184,7 +185,139 @@ class MonitorTest extends CommonAsset
         }
     }
 
+
     public function testCanHistorize()
     {
+        $computer = $this->getItem(GlpiComputer::class);
+
+        $monitor = $this->getItem(GlpiMonitor::class);
+        $id = $monitor->getID();
+
+        $computer_item = $this->getItem(Computer_Item::class, [
+            'computers_id' => $computer->getID(),
+            'itemtype' => $monitor->getType(),
+            'items_id' => $id,
+        ]);
+
+        // Check we cannot historize an empty item
+        $history = new Monitor();
+        $this->assertFalse($history->canHistorize($id));
+
+        // Add empty info on the asset
+        $management = $this->getItem(Infocom::class, [
+            'itemtype' => $monitor->getType(),
+            'items_id' => $id,
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Add a date of inventory entry
+        $management->update([
+            'id' => $management->getID(),
+            'use_date' => '2020-01-01',
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Add an empty location
+        $location = $this->getItem(Location::class);
+        $monitor->update([
+            'id' => $id,
+            'locations_id' => $location->getID(),
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Add a country to the location
+        $location->update([
+            'id' => $location->getID(),
+            'country' => 'France',
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Add a usage profile
+        $usage_profile = $this->getItem(ComputerUsageProfile::class);
+        $this->assertFalse($history->canHistorize($id));
+        $impact = $this->getItem(EnvironmentalImpact::class, [
+            $usage_profile->getForeignKeyField() => $usage_profile->getID(),
+            'computers_id' => $computer->getID(),
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Add a model
+        $model = $this->getItem(MonitorModel::class);
+        $monitor->update([
+            'id' => $id,
+            'monitormodels_id' => $model->getID(),
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Add a power consumption to the model
+        $model->update([
+            'id' => $model->getID(),
+            'power_consumption' => 55,
+        ]);
+        $this->assertTrue($history->canHistorize($id));
+
+        // add a type
+        $type = $this->getItem(GlpiMonitorType::class);
+        $monitor->update([
+            'id' => $id,
+            'monitortypes_id' => $type->getID(),
+        ]);
+        $this->assertTrue($history->canHistorize($id));
+
+        // Remove power consumption on model
+        $model->update([
+            'id' => $model->getID(),
+            'power_consumption' => 0,
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // add a type power consumption
+        $power_consumption = $this->getItem(MonitorType::class, [
+            GlpiMonitorType::getForeignKeyField() => $type->getID(),
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Set a type power consumption
+        $power_consumption->update([
+            'id' => $power_consumption->getID(),
+            'power_consumption' => 55,
+        ]);
+        $this->assertTrue($history->canHistorize($id));
+
+        // Add a power consumption to the model (both model and type have power consumption)
+        $model->update([
+            'id' => $model->getID(),
+            'power_consumption' => 55,
+        ]);
+        $this->assertTrue($history->canHistorize($id));
+
+        // *** test blocking conditions ***
+
+        // Put the asset in the trash bin
+        $monitor->update([
+            'id' => $id,
+            'is_deleted' => 1,
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Restore the asset
+        $monitor->update([
+            'id' => $id,
+            'is_deleted' => 0,
+        ]);
+
+        // Transform the asset into a template
+        $monitor->update([
+            'id' => $id,
+            'is_template' => 1,
+        ]);
+        $this->assertFalse($history->canHistorize($id));
+
+        // Restore the asset
+        $monitor->update([
+            'id' => $id,
+            'is_template' => 0,
+        ]);
+        $this->assertTrue($history->canHistorize($id));
     }
 }
