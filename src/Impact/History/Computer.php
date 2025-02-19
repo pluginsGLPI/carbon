@@ -76,18 +76,6 @@ class Computer extends AbstractAsset
             ],
             'FROM' => $item_table,
             'INNER JOIN' => [
-                $item_model_table => [
-                    'FKEY'   => [
-                        $item_table  => 'computermodels_id',
-                        $item_model_table => 'id',
-                    ]
-                ],
-                $glpi_computertypes_table => [
-                    'FKEY'   => [
-                        $item_table  => 'computertypes_id',
-                        $glpi_computertypes_table => 'id',
-                    ]
-                ],
                 $location_table => [
                     'FKEY'   => [
                         $item_table  => 'locations_id',
@@ -106,15 +94,20 @@ class Computer extends AbstractAsset
                         $computerUsageProfile_table => 'id',
                     ]
                 ],
-                $infocom_table => [
-                    'FKEY' => [
-                        $infocom_table => 'items_id',
-                        $item_table => 'id',
-                        ['AND' => ['itemtype' => self::$itemtype]],
-                    ]
-                ],
             ],
             'LEFT JOIN' => [
+                $item_model_table => [
+                    'FKEY'   => [
+                        $item_table  => 'computermodels_id',
+                        $item_model_table => 'id',
+                    ]
+                ],
+                $glpi_computertypes_table => [
+                    'FKEY'   => [
+                        $item_table  => 'computertypes_id',
+                        $glpi_computertypes_table => 'id',
+                    ]
+                ],
                 $computertypes_table => [
                     'FKEY'   => [
                         $computertypes_table  => 'computertypes_id',
@@ -124,6 +117,13 @@ class Computer extends AbstractAsset
                                 'NOT' => [GlpiComputerType::getTableField('id') => null],
                             ]
                         ]
+                    ]
+                ],
+                $infocom_table => [
+                    'FKEY' => [
+                        $infocom_table => 'items_id',
+                        $item_table => 'id',
+                        ['AND' => [Infocom::getTableField('itemtype') => self::$itemtype]],
                     ]
                 ],
             ],
@@ -160,7 +160,7 @@ class Computer extends AbstractAsset
         return $request;
     }
 
-    public static function showHistorizableDiagnosis(CommonDBTM $item)
+    public static function getHistorizableDiagnosis(CommonDBTM $item): ?array
     {
         global $DB;
 
@@ -187,7 +187,7 @@ class Computer extends AbstractAsset
         $infocom_table = Infocom::getTable();
         $item_table = self::$itemtype::getTable();
         // Change inner joins into left joins to identify missing data
-        $request['LEFT JOIN'] = $request['INNER JOIN'] + $request['LEFT JOIN'];
+        $request['LEFT JOIN'] = $request['LEFT JOIN'] + $request['INNER JOIN'];
         unset($request['INNER JOIN']);
         // remove where criterias
         unset($request['WHERE']);
@@ -196,6 +196,9 @@ class Computer extends AbstractAsset
 
         $iterator = $DB->request($request);
         $data = $iterator->current();
+        if ($data === null) {
+            return null;
+        }
 
         // Each state is analyzed, with bool results
         // false means that data is missing or invalid for historization
@@ -210,15 +213,22 @@ class Computer extends AbstractAsset
         $status['has_usage_profile'] = ($data['plugin_carbon_computerusageprofiles_id'] !== 0);
 
         $item_oldest_date = $data['use_date']
-                ?? $data['delivery_date']
-                ?? $data['buy_date']
-                // ?? $data['date_creation']
-                // ?? $data['date_mod']
-                ?? null;
+            ?? $data['delivery_date']
+            ?? $data['buy_date']
+            // ?? $data['date_creation']
+            // ?? $data['date_mod']
+            ?? null;
         $status['has_inventory_entry_date'] = ($item_oldest_date !== null);
 
+        return $status;
+    }
+
+    public static function showHistorizableDiagnosis(CommonDBTM $item)
+    {
+        $status = self::getHistorizableDiagnosis($item);
+
         TemplateRenderer::getInstance()->display('@carbon/history/status-item.html.twig', [
-            'have_status' => ($iterator->count() === 1),
+            'has_status' => ($status !== null),
             'status' => $status,
         ]);
     }

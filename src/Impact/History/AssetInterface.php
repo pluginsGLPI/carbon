@@ -42,4 +42,12 @@ interface AssetInterface
     public static function getEngine(CommonDBTM $item): EngineInterface;
 
     public static function showHistorizableDiagnosis(CommonDBTM $item);
+
+    /**
+     * Get detailed info to tell if the item is historizable
+     *
+     * @param CommonDBTM $item
+     * @return array|null
+     */
+    public static function getHistorizableDiagnosis(CommonDBTM $item): ?array;
 }

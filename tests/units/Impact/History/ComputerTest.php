@@ -221,7 +221,7 @@ class ComputerTest extends CommonAsset
             'id' => $model->getID(),
             'power_consumption' => 55,
         ]);
-        $this->assertFalse($history->canHistorize($id));
+        $this->assertTrue($history->canHistorize($id));
 
         // add a type
         $type = $this->getItem(GlpiComputerType::class);

@@ -88,13 +88,6 @@ class NetworkEquipment extends AbstractAsset
                         $item_glpitype_table => 'id',
                     ]
                 ],
-                $infocom_table => [
-                    'FKEY' => [
-                        $infocom_table => 'items_id',
-                        $item_table => 'id',
-                        ['AND' => ['itemtype' => self::$itemtype]],
-                    ]
-                ],
             ],
             'LEFT JOIN' => [
                 $item_type_table => [
@@ -106,6 +99,13 @@ class NetworkEquipment extends AbstractAsset
                                 'NOT' => [GlpiNetworkEquipmentType::getTableField('id') => null],
                             ]
                         ]
+                    ]
+                ],
+                $infocom_table => [
+                    'FKEY' => [
+                        $infocom_table => 'items_id',
+                        $item_table => 'id',
+                        ['AND' => ['itemtype' => self::$itemtype]],
                     ]
                 ],
             ],
@@ -141,7 +141,7 @@ class NetworkEquipment extends AbstractAsset
     }
 
 
-    public static function showHistorizableDiagnosis(CommonDBTM $item)
+    public static function getHistorizableDiagnosis(CommonDBTM $item): ?array
     {
         global $DB;
 
@@ -166,11 +166,11 @@ class NetworkEquipment extends AbstractAsset
         ];
         $infocom_table = Infocom::getTable();
         $item_table = self::$itemtype::getTable();
-        $request['INNER JOIN'][$infocom_table] = [
+        $request['LEFT JOIN'][$infocom_table] = [
             'FKEY' => [
                 $infocom_table => 'items_id',
                 $item_table => 'id',
-                ['AND' => ['itemtype' => self::$itemtype]],
+                ['AND' => [Infocom::getTableField('itemtype') => self::$itemtype]],
             ]
         ];
         // Change inner joins into left joins to identify missing data
@@ -183,7 +183,9 @@ class NetworkEquipment extends AbstractAsset
 
         $iterator = $DB->request($request);
         $data = $iterator->current();
-
+        if ($data === null) {
+            return null;
+        }
         // Each state is analyzed, with bool results
         // false means that data is missing or invalid for historization
         $status['is_deleted'] = ($data['is_deleted'] === 0);
@@ -203,8 +205,15 @@ class NetworkEquipment extends AbstractAsset
             ?? null;
         $status['has_inventory_entry_date'] = ($item_oldest_date !== null);
 
+        return $status;
+    }
+
+    public static function showHistorizableDiagnosis(CommonDBTM $item)
+    {
+        $status = self::getHistorizableDiagnosis($item);
+
         TemplateRenderer::getInstance()->display('@carbon/history/status-item.html.twig', [
-            'have_status' => ($iterator->count() === 1),
+            'has_status' => ($status !== null),
             'status' => $status,
         ]);
     }
