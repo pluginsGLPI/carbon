@@ -285,9 +285,9 @@ class Toolbox
 
         foreach ($serie as &$number) {
             if (is_scalar($number)) {
-                $number = number_format($number / ($multiple ** $power), PLUGIN_CARBON_DECIMALS);
+                $number = number_format($number / ($multiple ** $power), PLUGIN_CARBON_DECIMALS, '.', '');
             } else if (is_array($number)) {
-                $number['y'] = number_format($number['y'] / ($multiple ** $power), PLUGIN_CARBON_DECIMALS);
+                $number['y'] = number_format($number['y'] / ($multiple ** $power), PLUGIN_CARBON_DECIMALS, '.', '');
             }
         }
 

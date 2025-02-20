@@ -234,7 +234,7 @@ class Provider
         foreach ($result as $row) {
             $count = $row['nb_computers_per_type'];
             $data[] = [
-                'number' => number_format($row['total_per_type'], PLUGIN_CARBON_DECIMALS),
+                'number' => number_format($row['total_per_type'], PLUGIN_CARBON_DECIMALS, ',', ''),
                 'url' => GlpiComputerType::getFormURLWithID($row['id']),
                 'label' => $row['name'] . " (" . $row['nb_computers_per_type'] . " " . Computer::getTypeName($count) . ")",
             ];
