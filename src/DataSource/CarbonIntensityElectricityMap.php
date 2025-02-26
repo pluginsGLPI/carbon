@@ -325,7 +325,7 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
     {
         // Disable full download because we miss documentation for PAST_URL endpoint
         $start_date = new DateTime('24 hours ago');
-        $start_date->setTime($start_date->format('H'), 0, 0);
+        $start_date->setTime((int) $start_date->format('H'), 0, 0);
         $start_date = DateTimeImmutable::createFromMutable($start_date);
         return $this->incrementalDownload($zone, $start_date, $intensity, $limit);
     }

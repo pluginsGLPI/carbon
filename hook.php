@@ -68,7 +68,7 @@ function plugin_carbon_install(array $args = []): bool
         try {
             return $install->install($args);
         } catch (\Exception $e) {
-            $backtrace = Toolbox::backtrace(false);
+            $backtrace = Toolbox::backtrace('');
             trigger_error($e->getMessage() . PHP_EOL . $backtrace, E_USER_WARNING);
             return false;
         }
@@ -76,13 +76,11 @@ function plugin_carbon_install(array $args = []): bool
         try {
             return $install->upgrade($version, $args);
         } catch (\Exception $e) {
-            $backtrace = Toolbox::backtrace(false);
+            $backtrace = Toolbox::backtrace('');
             trigger_error($e->getMessage() . PHP_EOL . $backtrace, E_USER_WARNING);
             return false;
         }
     }
-
-    return true;
 }
 
 /**
@@ -96,11 +94,11 @@ function plugin_carbon_uninstall(): bool
         return false;
     }
     require_once(__DIR__ . '/install/Uninstall.php');
-    $uninstall = new Uninstall(new Migration(PLUGIN_CARBON_VERSION));
+    $uninstall = new Uninstall();
     try {
         $uninstall->uninstall();
     } catch (\Exception $e) {
-        $backtrace = Toolbox::backtrace(false);
+        $backtrace = Toolbox::backtrace('');
         trigger_error($e->getMessage() . PHP_EOL . $backtrace, E_USER_WARNING);
         return false;
     }
@@ -143,13 +141,14 @@ function plugin_carbon_postShowTab(array $param)
 }
 
 /**
- * Undocumented function
+ * Add search options to core itemtypes
  *
- * @param [type] $itemtype
+ * @param string $itemtype
  * @return array
  */
 function plugin_carbon_getAddSearchOptionsNew($itemtype): array
 {
+    /** @var DBmysql $DB */
     global $DB;
 
     $sopt = [];
@@ -387,44 +386,6 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
     return $sopt;
 }
 
-function plugin_carbon_addDefaultSelect($itemtype): string
-{
-    switch ($itemtype) {
-        default:
-            return '';
-        case Computer::class:
-    }
-
-    $display_preference = new DisplayPreference();
-    $display_preferences = $display_preference->find([
-        'itemtype' => $itemtype,
-        'num'      => 0,
-        'users_id' => [0, Session::getLoginUserID()],
-    ]);
-    if (count($display_preferences) === 0) {
-        return '';
-    }
-}
-
-function plugin_carbon_addDefaultJoin($itemtype, $ref_table, &$already_link_tables): string
-{
-    switch ($itemtype) {
-        default:
-            return '';
-        case Computer::class:
-    }
-
-    $display_preference = new DisplayPreference();
-    $display_preferences = $display_preference->find([
-        'itemtype' => $itemtype,
-        'num'      => 0,
-        'users_id' => [0, Session::getLoginUserID()],
-    ]);
-    if (count($display_preferences) === 0) {
-        return '';
-    }
-}
-
 function plugin_carbon_hook_add_location(CommonDBTM $item)
 {
     if (!in_array('country', array_keys($item->fields))) {
@@ -439,7 +400,7 @@ function plugin_carbon_hook_add_location(CommonDBTM $item)
         $zone->getForeignKeyField() => $zone->fields['id'],
         CarbonIntensitySource::getForeignKeyField() => $zone->fields['plugin_carbon_carbonintensitysources_id_historical'],
     ]);
-    if ($source_zone === null) {
+    if ($source_zone->isNewItem()) {
         return;
     }
     $source_zone->toggleZone(true);
@@ -459,7 +420,7 @@ function plugin_carbon_hook_update_location(CommonDBTM $item)
         $zone->getForeignKeyField() => $zone->fields['id'],
         CarbonIntensitySource::getForeignKeyField() => $zone->fields['plugin_carbon_carbonintensitysources_id_historical'],
     ]);
-    if ($source_zone === null) {
+    if ($source_zone->isNewItem()) {
         return;
     }
     $source_zone->toggleZone(true);
@@ -486,7 +447,7 @@ function plugin_carbon_hook_add_asset(CommonDBTM $item)
         $zone->getForeignKeyField() => $zone->fields['id'],
         CarbonIntensitySource::getForeignKeyField() => $zone->fields['plugin_carbon_carbonintensitysources_id_historical'],
     ]);
-    if ($source_zone === null) {
+    if ($source_zone->isNewItem()) {
         return;
     }
     $source_zone->toggleZone(true);
@@ -513,7 +474,7 @@ function plugin_carbon_hook_update_asset(CommonDBTM $item)
         $zone->getForeignKeyField() => $zone->fields['id'],
         CarbonIntensitySource::getForeignKeyField() => $zone->fields['plugin_carbon_carbonintensitysources_id_historical'],
     ]);
-    if ($source_zone === null) {
+    if ($source_zone->isNewItem()) {
         return;
     }
     $source_zone->toggleZone(true);

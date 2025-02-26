@@ -31,11 +31,13 @@
  * -------------------------------------------------------------------------
  */
 
+/** @var DBmysql $DB */
 global $DB;
 
 // Move data to new table
 $old_table = 'glpi_plugin_carbon_environnementalimpacts';
 $new_table = 'glpi_plugin_carbon_environmentalimpacts';
+/** @var Migration $migration */
 $migration->renameTable($old_table, $new_table);
 
 $old_itemtype = '\\GlpiPlugin\\Carbon\\EnvironnementalImpact';

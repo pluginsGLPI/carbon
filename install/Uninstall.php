@@ -34,6 +34,7 @@
 namespace GlpiPlugin\Carbon;
 
 use Config;
+use DBmysql;
 use DisplayPreference;
 use Migration;
 use ProfileRight;
@@ -42,13 +43,6 @@ use GlpiPlugin\Carbon\CronTask;
 
 class Uninstall
 {
-    private Migration $migration;
-
-    public function __construct(Migration $migration)
-    {
-        $this->migration = $migration;
-    }
-
     public function uninstall()
     {
         $this->deleteTables();
@@ -62,6 +56,7 @@ class Uninstall
 
     private function deleteTables()
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $iterator = $DB->listTables('glpi_plugin_carbon_%');

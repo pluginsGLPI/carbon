@@ -33,6 +33,7 @@
 
 function update004to005(Migration $migration)
 {
+    /** @var DBmysql $DB */
     global $DB;
 
     $updateresult       = true;

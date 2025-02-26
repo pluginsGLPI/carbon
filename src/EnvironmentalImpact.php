@@ -64,17 +64,17 @@ class EnvironmentalImpact extends CommonDBChild
 
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
-        $tabNames = [];
+        $tabName = '';
         if (!$withtemplate) {
             if ($item->getType() == Computer::class) {
-                $tabNames[1] = self::getTypeName();
+                $tabName = self::getTypeName();
             } else if ($item->getType() == Monitor::class) {
-                $tabNames[1] = self::getTypeName();
+                $tabName = self::getTypeName();
             } else if ($item->getType() == NetworkEquipment::class) {
-                $tabNames[1] = self::getTypeName();
+                $tabName = self::getTypeName();
             }
         }
-        return $tabNames;
+        return $tabName;
     }
 
     /**

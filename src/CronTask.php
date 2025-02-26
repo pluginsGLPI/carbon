@@ -39,6 +39,8 @@ use GlpiPlugin\Carbon\DataSource\CarbonIntensityRTE;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensityElectricityMap;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensityInterface;
 use GlpiPlugin\Carbon\DataSource\Boaviztapi;
+use GlpiPlugin\Carbon\Impact\History\AssetInterface as HistoryAssetInterface;
+use GlpiPlugin\Carbon\Impact\Embodied\Boavizta\AssetInterface as EmbodiedAssetInterface;
 use GlpiPlugin\Carbon\Toolbox;
 
 class CronTask
@@ -47,7 +49,7 @@ class CronTask
      * Get description of an automatic action
      *
      * @param string $name
-     * @return void
+     * @return array
      */
     public static function cronInfo(string $name)
     {
@@ -91,9 +93,9 @@ class CronTask
         $usage_impacts = Toolbox::getUsageImpactClasses();
         $task->setVolume(0); // start with zero
         $remaining = $task->fields['param'];
-        $limit_per_type = floor(((int) $remaining) / count($usage_impacts));
+        $limit_per_type = (int) floor(($remaining) / count($usage_impacts));
         foreach ($usage_impacts as $usage_impact_type) {
-            /** @var AbstractAsset $usage_impact */
+            /** @var HistoryAssetInterface $usage_impact */
             $usage_impact = new $usage_impact_type();
             $usage_impact->setLimit($limit_per_type);
             $count = $usage_impact->evaluateItems();
@@ -116,9 +118,9 @@ class CronTask
         $embodied_impacts = Toolbox::getEmbodiedImpactClasses();
         $task->setVolume(0); // start with zero
         $remaining = $task->fields['param'];
-        $limit_per_type = floor(((int) $remaining) / count($embodied_impacts));
+        $limit_per_type = (int) floor(( $remaining) / count($embodied_impacts));
         foreach ($embodied_impacts as $embodied_impact_type) {
-            /** @var AbstractAsset $embodied_impact */
+            /** @var EmbodiedAssetInterface $embodied_impact */
             $embodied_impact = new $embodied_impact_type();
             $embodied_impact->setLimit($limit_per_type);
             $embodied_impact->setClient(new Boaviztapi(new RestApiClient()));
@@ -180,7 +182,7 @@ class CronTask
             return 0;
         }
 
-        $limit_per_zone = floor(((int) $remaining) / count($zones));
+        $limit_per_zone = (int) floor(($remaining) / count($zones));
         $count = 0;
         foreach ($zones as $zone) {
             $zone_name = $zone['name'];

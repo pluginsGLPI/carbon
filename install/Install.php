@@ -34,6 +34,7 @@
 namespace GlpiPlugin\Carbon;
 
 use Config;
+use DBmysql;
 use DirectoryIterator;
 use Migration;
 use Plugin;
@@ -70,6 +71,7 @@ class Install
      */
     public function install(array $args = []): bool
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $dbFile = plugin_carbon_getSchemaPath();
@@ -97,8 +99,8 @@ class Install
     /**
      * Run an upgrade of the plugin
      *
-     * @param  string $version rpevious version of the plugin
-     * @param  array  $args    arguments given in command line
+     * @param  string $from_version previous version of the plugin
+     * @param  array  $args         arguments given in command line
      * @return bool
      */
     public function upgrade(string $from_version, array $args = []): bool
@@ -109,7 +111,7 @@ class Install
             return false;
         }
 
-        $this->force_upgrade = is_array($args) && in_array('force-upgrade', $args);
+        $this->force_upgrade = in_array('force-upgrade', $args);
 
         ini_set("max_execution_time", "0");
         $migrations = $this->getMigrationsToDo($from_version);
@@ -131,7 +133,6 @@ class Install
      * Get migrations that have to be ran.
      *
      * @param string $current_version
-     * @param bool $force_latest
      *
      * @return array
      */

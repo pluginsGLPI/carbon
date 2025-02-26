@@ -53,7 +53,6 @@ class CollectCarbonIntensityCommand extends Command
     /** @var int ID of the data source being processed */
     private int $source_id;
 
-    private InputInterface $input;
     private OutputInterface $output;
 
     protected function configure()
@@ -65,7 +64,6 @@ class CollectCarbonIntensityCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->input = $input;
         $this->output = $output;
 
         $message = __("Creating data source name", 'carbon');

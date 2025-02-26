@@ -38,6 +38,7 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
+use DBmysql;
 use Entity;
 use Location;
 use QueryExpression;
@@ -101,7 +102,7 @@ class CarbonEmission extends CommonDBChild
             'id'                 => '5',
             'table'              => self::getTable(),
             'field'              => 'entities_id',
-            'name'               => sprintf('%s-%s', Entity::getTypeName(1), __('ID'))
+            'name'               => Entity::getTypeName(1)
         ];
 
         $tab[] = [
@@ -117,14 +118,14 @@ class CarbonEmission extends CommonDBChild
             'id'                 => SearchOptions::CARBON_EMISSION_DATE,
             'table'              => self::getTable(),
             'field'              => 'date',
-            'name'               => sprintf('Date')
+            'name'               => __('Date')
         ];
 
         $tab[] = [
             'id'                 => SearchOptions::CARBON_EMISSION_ENERGY_PER_DAY,
             'table'              => self::getTable(),
             'field'              => 'energy_per_day',
-            'name'               => sprintf('Energy', 'carbon'),
+            'name'               => __('Energy', 'carbon'),
             'unit'               => 'KWh',
         ];
 
@@ -132,7 +133,7 @@ class CarbonEmission extends CommonDBChild
             'id'                 => SearchOptions::CARBON_EMISSION_PER_DAY,
             'table'              => self::getTable(),
             'field'              => 'emission_per_day',
-            'name'               => sprintf('Emission', 'carbon'),
+            'name'               => __('Emission', 'carbon'),
             'unit'               => 'gCO<sub>2</sub>eq',
         ];
 
@@ -140,7 +141,7 @@ class CarbonEmission extends CommonDBChild
             'id'                 => SearchOptions::CARBON_EMISSION_ENERGY_QUALITY,
             'table'              => self::getTable(),
             'field'              => 'energy_quality',
-            'name'               => sprintf('Energy quality', 'carbon')
+            'name'               => __('Energy quality', 'carbon')
 
         ];
 
@@ -148,7 +149,7 @@ class CarbonEmission extends CommonDBChild
             'id'                 => SearchOptions::CARBON_EMISSION_EMISSION_QUALITY,
             'table'              => self::getTable(),
             'field'              => 'emission_quality',
-            'name'               => sprintf('Emission quality', 'carbon')
+            'name'               => __('Emission quality', 'carbon')
         ];
 
         return $tab;
@@ -160,12 +161,13 @@ class CarbonEmission extends CommonDBChild
      * where start is the 1st msising date and end is the last missing date
      *
      * @param integer $id
-     * @param DateTimeInterface $start
+     * @param DateTimeInterface|null $start
      * @param DateTimeInterface|null $stop
-     * @return DBmysqlIterator
+     * @return array
      */
-    public function findGaps(string $itemtype, int $id, DateTimeInterface $start, ?DateTimeInterface $stop = null): array
+    public function findGaps(string $itemtype, int $id, ?DateTimeInterface $start, ?DateTimeInterface $stop = null): array
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $tz = new DateTimeZone($DB->guessTimezone());

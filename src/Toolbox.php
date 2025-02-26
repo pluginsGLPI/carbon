@@ -36,6 +36,7 @@ namespace GlpiPlugin\Carbon;
 use CommonDBTM;
 use DateTime;
 use DateTimeImmutable;
+use DBmysql;
 use Infocom;
 use Location;
 
@@ -49,6 +50,7 @@ class Toolbox
      */
     public function getOldestAssetDate(array $crit = []): ?DateTimeImmutable
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $itemtypes = Config::getSupportedAssets();
@@ -116,6 +118,7 @@ class Toolbox
      */
     public function getLatestAssetDate(array $crit = []): ?DateTimeImmutable
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $itemtypes = Config::getSupportedAssets();
@@ -174,7 +177,7 @@ class Toolbox
     public function getDefaultCarbonIntensityDownloadDate(): DateTimeImmutable
     {
         $start_date = new DateTime('1 year ago');
-        $start_date->setDate($start_date->format('Y'), 1, 1);
+        $start_date->setDate((int) $start_date->format('Y'), 1, 1);
         $start_date->setTime(0, 0, 0);
         $start_date->modify('-1 month');
         return DateTimeImmutable::createFromMutable($start_date);
@@ -275,6 +278,8 @@ class Toolbox
 
         $multiple = 1000;
         $power = 0;
+        $first_multiple = reset($units);
+        $human_readable_unit = $first_multiple;
         foreach ($units as $human_readable_unit) {
             if ($average < $multiple) {
                 break;
@@ -331,7 +336,7 @@ class Toolbox
         }
 
         return [$base_namespace . '\\Computer'];
-        return $embodied_impact_types;
+        // return $embodied_impact_types;
     }
 
     /**
@@ -344,7 +349,7 @@ class Toolbox
     {
             $end_date = DateTime::createFromImmutable($date);
             $end_date->setTime(0, 0, 0, 0);
-            $end_date->setDate($end_date->format('Y'), $end_date->format('m'), 0); // Last day of previous month
+            $end_date->setDate((int) $end_date->format('Y'), (int) $end_date->format('m'), 0); // Last day of previous month
             $start_date = clone $end_date;
             $start_date->modify('-12 months + 1 day');
 
@@ -353,6 +358,7 @@ class Toolbox
 
     public static function isLocationExistForZone(string $name): bool
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $result = $DB->request([

@@ -36,7 +36,8 @@ namespace GlpiPlugin\Carbon;
 use CommonDropdown;
 use CommonDBTM;
 use CommonGLPI;
-use DBUtils;
+use DBmysql;
+use DbUtils;
 use Location;
 use Session;
 
@@ -85,7 +86,7 @@ class CarbonIntensityZone extends CommonDropdown
             switch ($item->getType()) {
                 case CarbonIntensitySource::class:
                     if ($_SESSION['glpishow_count_on_tabs']) {
-                        $nb = (new DBUtils())->countElementsInTable(
+                        $nb = (new DbUtils())->countElementsInTable(
                             CarbonIntensitySource_CarbonIntensityZone::getTable(),
                             [CarbonIntensitySource::getForeignKeyField() => $item->getID()]
                         );
@@ -106,6 +107,7 @@ class CarbonIntensityZone extends CommonDropdown
 
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
+        /** @var CommonDBTM $item  */
         switch ($item->getType()) {
             case CarbonIntensitySource::class:
                 CarbonIntensitySource_CarbonIntensityZone::showForSource($item);
@@ -160,11 +162,12 @@ class CarbonIntensityZone extends CommonDropdown
     /**
      * Get a zone by a location criteria
      *
-     * @param Location $item
+     * @param CommonDBTM $item
      * @return CarbonIntensityZone|null
      */
-    public static function getByLocation(Location $item): ?CarbonIntensityZone
+    public static function getByLocation(CommonDBTM $item): ?CarbonIntensityZone
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         if ($item->isNewItem()) {
@@ -209,6 +212,7 @@ class CarbonIntensityZone extends CommonDropdown
 
     public static function getByAsset(CommonDBTM $item): ?CarbonIntensityZone
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         if (!isset($item->fields[Location::getForeignKeyField()])) {

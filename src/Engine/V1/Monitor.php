@@ -36,6 +36,7 @@ namespace GlpiPlugin\Carbon\Engine\V1;
 use Computer as GlpiComputer;
 use Computer_Item;
 use DateTime;
+use DBmysql;
 use Monitor as GlpiMonitor;
 use MonitorType as GlpiMonitorType;
 use MonitorModel;
@@ -55,6 +56,7 @@ class Monitor extends AbstractSwitchable
 
     public function getUsageProfile(): ?ComputerUsageProfile
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $item = GlpiMonitor::getById($this->items_id);

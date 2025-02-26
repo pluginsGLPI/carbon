@@ -74,6 +74,7 @@ class Inventory implements EngineInterface
      */
     private static function isAsset(string $itemtype): bool
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
          return in_array($itemtype, $CFG_GLPI["asset_types"]);

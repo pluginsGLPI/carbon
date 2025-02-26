@@ -73,8 +73,9 @@ class Computer extends AbstractAsset
         ];
 
         if ($entity_restrict) {
+            /** @phpstan-ignore argument.type */
             $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($item_table, '', '', 'auto');
-            $request['WHERE'] += $entity_restrict;
+            $request['WHERE'] = $entity_restrict;
         }
 
         return $request;
@@ -105,7 +106,8 @@ class Computer extends AbstractAsset
         }
 
         $configuration = [];
-        $iterator = Item_Devices::getItemsAssociatedTo(GlpiComputer::class, $items_id);
+        // Yes, string expected here.
+        $iterator = Item_Devices::getItemsAssociatedTo(GlpiComputer::class, (string) $items_id);
         foreach ($iterator as $item_device) {
             switch ($item_device->getType()) {
                 case Item_DeviceProcessor::class:

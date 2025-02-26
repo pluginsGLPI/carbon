@@ -31,6 +31,9 @@
  * -------------------------------------------------------------------------
  */
 
+use DBmysql;
+
+/** @var DBmysql $DB */
 global $DB;
 
 use GlpiPlugin\Carbon\CarbonIntensitySource;

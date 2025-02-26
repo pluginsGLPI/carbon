@@ -54,7 +54,7 @@ interface EngineInterface
      * Returns the carbon emission for the specified day.
      *
      * @param DateTime $day the day
-     * @param CarbonIntensityZone $zone_id the zone where the asset is located at the given date
+     * @param CarbonIntensityZone $zone the zone where the asset is located at the given date
      *
      * @return TrackedFloat|null
      *

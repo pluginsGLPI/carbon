@@ -168,6 +168,7 @@ class Monitor extends AbstractAsset
         ];
 
         if ($entity_restrict) {
+            /** @phpstan-ignore argument.type */
             $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($item_table, '', '', 'auto');
             $request['WHERE'] += $entity_restrict;
         }
@@ -177,6 +178,7 @@ class Monitor extends AbstractAsset
 
     public static function getHistorizableDiagnosis(CommonDBTM $item): ?array
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $history = new self();

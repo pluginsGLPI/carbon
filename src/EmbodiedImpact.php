@@ -34,6 +34,7 @@
 namespace GlpiPlugin\Carbon;
 
 use CommonDBTM;
+use DBmysql;
 use DBmysqlIterator;
 use QuerySubQuery;
 
@@ -125,6 +126,7 @@ class EmbodiedImpact extends CommonDBTM
      */
     public static function getAssetsToCalculate(string $itemtype, array $crit = []): DBmysqlIterator
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         // Check $itemtype inherits from CommonDBTM

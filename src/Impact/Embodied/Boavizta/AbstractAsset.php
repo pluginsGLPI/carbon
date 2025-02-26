@@ -35,6 +35,7 @@
 namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta;
 
 use CommonDBTM;
+use DBmysql;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\DataSource\Boaviztapi;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
@@ -178,6 +179,7 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
      */
     public function evaluateItems(): int
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $itemtype = static::$itemtype;
@@ -230,7 +232,6 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
      */
     public function evaluateItem(int $id): int
     {
-        /** @var CommonDBTM $item */
         $itemtype = static::$itemtype;
         $item = $itemtype::getById($id);
         if ($item === false) {
@@ -246,14 +247,8 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
         /** @var AbstractTracked $value */
         foreach ($this->getImpacts($id) as $impact => $value) {
             $key = $key_map[$impact];
-            if ($value === null) {
-                continue;
-            }
             $input[$key] = $value->getValue();
             $input["{$key}_quality"] = $value->getLowestSource();
-        }
-        if (count($input) === 0) {
-            // No impact returned
         }
 
         $embodied_impact = new EmbodiedImpact();

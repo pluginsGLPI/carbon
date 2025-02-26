@@ -123,7 +123,6 @@ class CreateTestInventoryCommand extends Command
         ],
     ];
 
-    private InputInterface $input;
     private OutputInterface $output;
 
     protected function configure()
@@ -143,7 +142,6 @@ class CreateTestInventoryCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->input = $input;
         $this->output = $output;
 
         $message = __("Creating test inventory", 'carbon');
@@ -222,6 +220,7 @@ class CreateTestInventoryCommand extends Command
 
     private function createTestInventory(int $entity_id, array $inventory_data)
     {
+        /** @var Location $location */
         $location = $this->createItemIfNotExist(
             Location::class,
             [
@@ -235,8 +234,11 @@ class CreateTestInventoryCommand extends Command
         );
 
         foreach ($inventory_data as $type_name => $type_data) {
+            /** @var GlpiComputerType $computer_type */
             $computer_type = $this->getComputerType($type_name, $type_data['power']);
+            /** @var ComputerUsageProfile $usage_profile */
             $usage_profile = $this->createItemIfNotExist(ComputerUsageProfile::class, $type_data['usage_profile']);
+            /** @var GlpiComputerModel $model */
             $model = $this->createItemIfNotExist(GlpiComputerModel::class, $type_data['model']);
             for ($computer_count = 0; $computer_count < $type_data['count']; $computer_count++) {
                 $computer_name = $type_name . '-' . strval($computer_count);

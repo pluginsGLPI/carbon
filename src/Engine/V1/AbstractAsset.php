@@ -37,9 +37,10 @@ use CommonDBTM;
 use DateInterval;
 use DateTime;
 use DateTimeInterface;
+use DateTimeImmutable;
 use DBmysqlIterator;
 use DbUtils;
-use DbMysql;
+use DBmysql;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\DataTracking\TrackedInt;
@@ -77,13 +78,14 @@ abstract class AbstractAsset implements EngineInterface
     /**
      * get all carbon intensities during the day, between 2 hours boundaries
      *
-     * @param DateTimeInterface $start_time
+     * @param DateTimeImmutable $start_time
      * @param DateInterval $length
      * @param CarbonIntensityZone $zone
      * @return DBmysqlIterator
      */
-    protected function requestCarbonIntensitiesPerDay(DateTimeInterface $start_time, DateInterval $length, CarbonIntensityZone $zone): DBmysqlIterator
+    protected function requestCarbonIntensitiesPerDay(DateTimeImmutable $start_time, DateInterval $length, CarbonIntensityZone $zone): DBmysqlIterator
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         // Find start tine and end time taking into account that
@@ -127,6 +129,7 @@ abstract class AbstractAsset implements EngineInterface
      */
     public function getPower(): TrackedInt
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $dbUtils = new DbUtils();

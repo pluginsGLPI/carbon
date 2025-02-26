@@ -34,6 +34,7 @@
 namespace GlpiPlugin\Carbon;
 
 use Config as GlpiConfig;
+use CommonDBTM;
 use CommonGLPI;
 use Computer as GlpiComputer;
 use Monitor as GlpiMonitor;
@@ -51,13 +52,13 @@ class Config extends GlpiConfig
 
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
-        $tabNames = [];
+        $tabName = '';
         if (!$withtemplate) {
             if ($item->getType() == GlpiConfig::class) {
-                $tabNames[] = self::getTypeName();
+                $tabName = self::getTypeName();
             }
         }
-        return $tabNames;
+        return $tabName;
     }
 
     /**
@@ -88,6 +89,8 @@ class Config extends GlpiConfig
             'embodied_impact_engines' => Engine::getAvailableBackends(),
             'action'                  => (isset($options['plugin_config']) ? Config::getFormURL() : GlpiConfig::getFormURL()),
         ]);
+
+        return true;
     }
 
     /**

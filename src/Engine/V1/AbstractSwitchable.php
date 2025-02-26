@@ -35,6 +35,7 @@ namespace GlpiPlugin\Carbon\Engine\V1;
 
 use DateTime;
 use DateInterval;
+use DateTimeImmutable;
 use DateTimeInterface;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
@@ -105,19 +106,27 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
         // Assume that start and stop times are HH:ii:ss
         $seconds_start = explode(':', $usage_profile->fields['time_start']);
         $seconds_stop  = explode(':', $usage_profile->fields['time_stop']);
+        // Convert to integers
+        $seconds_start[0] = (int) $seconds_start[0];
+        $seconds_start[1] = (int) $seconds_start[1];
+        $seconds_start[2] = (int) $seconds_start[2];
+        $seconds_stop[0] = (int) $seconds_stop[0];
+        $seconds_stop[1] = (int) $seconds_stop[1];
+        $seconds_stop[2] = (int) $seconds_stop[2];
 
         $start_time = clone $day;
         $start_time->setTime($seconds_start[0], $seconds_start[1], $seconds_start[2]);
         $seconds_start = $seconds_start[0] * 3600 + $seconds_start[1] * 60 + $seconds_start[2];
         $seconds_stop = $seconds_stop[0] * 3600 + $seconds_stop[1] * 60 + $seconds_stop[2];
         $length = new DateInterval('PT' . ($seconds_stop - $seconds_start) . 'S');
+        $start_time = DateTimeImmutable::createFromMutable($start_time);
         return $this->computeEmissionPerDay($start_time, $power, $length, $zone);
     }
 
-    protected function computeEmissionPerDay(DateTimeInterface $start_time, TrackedInt $power, DateInterval $length, CarbonIntensityZone $zone): ?TrackedFloat
+    protected function computeEmissionPerDay(DateTimeImmutable $start_time, TrackedInt $power, DateInterval $length, CarbonIntensityZone $zone): ?TrackedFloat
     {
         if ($power->getValue() === 0) {
-            return 0;
+            return new TrackedFloat(0);
         }
 
         $iterator = $this->requestCarbonIntensitiesPerDay($start_time, $length, $zone);
@@ -151,7 +160,7 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
             // Calculate seconds to next hour
             $next_hour = clone $current_hour;
             $next_hour->add(new DateInterval('PT1H'));
-            $next_hour->setTime($next_hour->format('H'), 0, 0, 0);
+            $next_hour->setTime((int) $next_hour->format('H'), 0, 0, 0);
             $seconds = $next_hour->format('U') - $current_hour->format('U');
 
             if ($counted_seconds + $seconds > $total_seconds) {

@@ -31,8 +31,9 @@
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Carbon\IntensityZone;
+use GlpiPlugin\Carbon\CarbonIntensityZone;
 
+/** @var Migration $migration */
 $migration->updateDisplayPrefs(
     [
         CarbonIntensityZone::class => [

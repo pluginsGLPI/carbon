@@ -41,6 +41,7 @@ use Computer as GlpiComputer;
 use GlpiPlugin\Carbon\ComputerType;
 use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
+use DBmysql;
 use DbUtils;
 use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\EnvironmentalImpact;
@@ -153,6 +154,7 @@ class Computer extends AbstractAsset
         ];
 
         if ($entity_restrict) {
+            /** @phpstan-ignore argument.type */
             $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($item_table, '', '', 'auto');
             $request['WHERE'] += $entity_restrict;
         }
@@ -162,6 +164,7 @@ class Computer extends AbstractAsset
 
     public static function getHistorizableDiagnosis(CommonDBTM $item): ?array
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $history = new self();

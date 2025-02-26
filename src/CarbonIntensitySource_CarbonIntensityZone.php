@@ -37,6 +37,7 @@ use CommonDBRelation;
 use CommonGLPI;
 use CommonDBTM;
 use CronTask;
+use DBmysql;
 use GlpiPlugin\Carbon\Application\View\Extension\DataHelpersExtension;
 use Glpi\Application\View\TemplateRenderer;
 use Html;
@@ -100,6 +101,7 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
 
     public static function showForSource(CommonDBTM $item)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $item_id = $item->getID();
@@ -198,6 +200,7 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
 
     public static function showForZone(CommonDBTM $item)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $item_id = $item->getID();
@@ -298,6 +301,7 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
      */
     public function getFromDbBySourceAndZone(string $source_name, string $zone_name): ?string
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $zone_table = CarbonIntensityZone::getTable();

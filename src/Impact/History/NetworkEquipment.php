@@ -35,6 +35,7 @@
 namespace GlpiPlugin\Carbon\Impact\History;
 
 use CommonDBTM;
+use DBmysql;
 use DbUtils;
 use Glpi\Application\View\TemplateRenderer;
 use Infocom;
@@ -133,6 +134,7 @@ class NetworkEquipment extends AbstractAsset
         ];
 
         if ($entity_restrict) {
+            /** @phpstan-ignore argument.type */
             $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($item_table, '', '', 'auto');
             $request['WHERE'] += $entity_restrict;
         }
@@ -143,6 +145,7 @@ class NetworkEquipment extends AbstractAsset
 
     public static function getHistorizableDiagnosis(CommonDBTM $item): ?array
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $history = new self();

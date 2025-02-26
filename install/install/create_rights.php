@@ -32,7 +32,9 @@
  */
 
 use GlpiPlugin\Carbon\Report;
+use DBmysql;
 
+/** @var DBmysql $DB */
 global $DB;
 
 $profiles = $DB->request([

@@ -34,6 +34,7 @@
 namespace GlpiPlugin\Carbon\DataSource;
 
 use Config as GlpiConfig;
+use DBmysql;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
@@ -138,6 +139,7 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
 
     public function getZones(array $crit = []): array
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $source_table = CarbonIntensitySource::getTable();
@@ -243,8 +245,8 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
      */
     protected function sliceDateRangeByMonth(DateTimeImmutable $start, DateTimeImmutable $stop): \Generator
     {
-        $real_start = $start->setTime($start->format('H'), 0, 0, 0);
-        $real_stop = $stop->setTime($stop->format('H'), 0, 0, 0);
+        $real_start = $start->setTime((int) $start->format('H'), 0, 0, 0);
+        $real_stop = $stop->setTime((int) $stop->format('H'), 0, 0, 0);
         $slice = [
             'start' => null,
             'stop'  => null,
@@ -257,8 +259,8 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
         $current_date = clone $real_stop;
 
         // If stop date day is > 1 then return a slice to the begining of the same month
-        if ($real_stop->format('d') > 1 || $real_stop->format('H') > 0) {
-            $slice['start'] = $real_stop->setDate($stop->format('Y'), $real_stop->format('m'), 1);
+        if ((int) $real_stop->format('d') > 1 || (int) $real_stop->format('H') > 0) {
+            $slice['start'] = $real_stop->setDate((int) $stop->format('Y'), (int) $real_stop->format('m'), 1);
             $slice['start'] = $slice['start']->setTime(0, 0, 0, 0);
             if ($slice['start'] < $real_start) {
                 $slice['start'] = $real_start;
@@ -271,7 +273,7 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
         // Yield slices for each month ordered backwards
         while ($current_date > $real_start) {
             $slice['stop']  = $current_date;
-            $slice['start'] = $current_date->setDate($slice['stop']->format('Y'), $slice['stop']->format('m') - 1, 1);
+            $slice['start'] = $current_date->setDate((int) $slice['stop']->format('Y'), (int) $slice['stop']->format('m') - 1, 1);
             if ($slice['start'] < $real_start) {
                 $slice['start'] = $real_start;
             }
@@ -290,7 +292,7 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
     protected function sliceDateRangeByDay(DateTimeImmutable $start, DateTimeImmutable $stop)
     {
         $real_start = $start;
-        $real_stop = $stop->setTime($stop->format('H'), 0, 0);
+        $real_stop = $stop->setTime((int) $stop->format('H'), 0, 0);
 
         $current_date = DateTime::createFromImmutable($real_start);
         while ($current_date <= $real_stop) {

@@ -180,8 +180,6 @@ class Dashboard
 
         $data = array_merge($data, Provider::getSumEmissionsPerModel());
         return $data;
-
-        return Provider::getSumEmissionsPerModel();
     }
 
     /**
@@ -205,7 +203,7 @@ class Dashboard
      *   - string 'url': url to redirect when clicking on the slice
      *   - string 'label': name of the computer model
      */
-    public static function getTotalPowerPerModel()
+    public static function getTotalPowerPerModel(): array
     {
         return Provider::getSumPowerPerModel([ComputerModel::getTableField('power_consumption') => ['>', '0']]);
     }
