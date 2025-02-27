@@ -106,7 +106,6 @@ class Provider
         $carbonemissions_table = CarbonEmission::getTable();
 
         $sql_year_month = "DATE_FORMAT(`date`, '%Y-%m')";
-        /** @phpstan-ignore argument.type */ // 4th argument is a bool or the string 'auto'
         $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($carbonemissions_table, '', '', 'auto');
         $subrequest = [
             'SELECT'    => [
@@ -206,7 +205,6 @@ class Provider
         $glpicomputertypes_table = GlpiComputerType::getTable();
         $carbonemissions_table = CarbonEmission::getTable();
 
-        /** @phpstan-ignore argument.type */ // 4th argument is a bool or the string 'auto'
         $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($carbonemissions_table, '', '', 'auto');
         $request = [
             'SELECT'    => [
@@ -265,7 +263,6 @@ class Provider
         $glpiComputertypes_table = GlpiComputerType::getTable();
         $computertype_table = ComputerType::getTable();
 
-        /** @phpstan-ignore argument.type */ // 4th argument is a bool or the string 'auto'
         $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($computers_table, '', '', 'auto');
         $request = [
             'SELECT'    => [
@@ -524,7 +521,6 @@ class Provider
         $emissions_table = CarbonEmission::getTable();
 
         $dbUtils = new DbUtils();
-        /** @phpstan-ignore argument.type */ // 4th argument is a bool or the string 'auto'
         $entityRestrict = $dbUtils->getEntitiesRestrictCriteria($emissions_table, '', '', 'auto');
         $sql_year_month = "DATE_FORMAT(`date`, '%Y-%m')";
         $request = [

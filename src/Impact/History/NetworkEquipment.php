@@ -134,7 +134,6 @@ class NetworkEquipment extends AbstractAsset
         ];
 
         if ($entity_restrict) {
-            /** @phpstan-ignore argument.type */
             $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($item_table, '', '', 'auto');
             $request['WHERE'] += $entity_restrict;
         }
