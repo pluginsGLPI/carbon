@@ -34,10 +34,11 @@
 namespace GlpiPlugin\Carbon\Engine\V1;
 
 use Computer as GlpiComputer;
+use ComputerModel;
 use ComputerType as GlpiComputerType;
+use DBmysql;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\EnvironmentalImpact;
-use ComputerModel;
 use GlpiPlugin\Carbon\ComputerType;
 
 /**
@@ -53,6 +54,7 @@ class Computer extends AbstractSwitchable
 
     public function getUsageProfile(): ?ComputerUsageProfile
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $computers_table = GlpiComputer::getTable();

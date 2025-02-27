@@ -89,5 +89,7 @@ class Profile extends GlpiProfile
             Html::closeForm();
         }
         echo "</div>";
+
+        return true;
     }
 }

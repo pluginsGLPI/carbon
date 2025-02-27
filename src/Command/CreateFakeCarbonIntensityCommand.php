@@ -52,7 +52,6 @@ class CreateFakeCarbonIntensityCommand extends Command
     private int $source_id;
     private int $zone_id;
 
-    private InputInterface $input;
     private OutputInterface $output;
 
     protected function configure()
@@ -64,7 +63,6 @@ class CreateFakeCarbonIntensityCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->input = $input;
         $this->output = $output;
 
         $message = __("Creating data source name", 'carbon');
@@ -165,11 +163,11 @@ class CreateFakeCarbonIntensityCommand extends Command
         $hour = $date->format('H');
 
         if ($previous_intensity === null) {
-            $intensity = rand($intensity_per_hour[$hour]['min'], $intensity_per_hour[$hour]['max']);
+            $intensity = rand((int) $intensity_per_hour[$hour]['min'], (int) $intensity_per_hour[$hour]['max']);
         } else {
-            $intensity = rand($previous_intensity - $intensity_per_hour[$hour]['dec'], $previous_intensity + $intensity_per_hour[$hour]['inc']);
+            $intensity = rand((int) $previous_intensity - $intensity_per_hour[$hour]['dec'], (int) $previous_intensity + $intensity_per_hour[$hour]['inc']);
         }
-        $intensity = max($intensity_per_hour[$hour]['min'], $intensity);
+        $intensity = max((int) $intensity_per_hour[$hour]['min'], (int) $intensity);
         $intensity = min($intensity_per_hour[$hour]['max'], $intensity);
 
         return $intensity;

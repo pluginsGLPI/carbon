@@ -35,6 +35,7 @@
 namespace GlpiPlugin\Carbon\Impact\History;
 
 use CommonDBTM;
+use DBmysql;
 use DbUtils;
 use Glpi\Application\View\TemplateRenderer;
 use Infocom;
@@ -143,6 +144,7 @@ class NetworkEquipment extends AbstractAsset
 
     public static function getHistorizableDiagnosis(CommonDBTM $item): ?array
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $history = new self();

@@ -31,7 +31,11 @@
  * -------------------------------------------------------------------------
  */
 
+use DBmysql;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
+
+/** @var DBmysql $DB */
+global $DB;
 
 Plugin::loadLang('carbon');
 $usage_profiles = [

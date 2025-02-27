@@ -41,6 +41,10 @@ interface AssetInterface
 {
     public static function getEngine(CommonDBTM $item): EngineInterface;
 
+    public function setLimit(int $limit);
+
+    public function evaluateItems(): int;
+
     public static function showHistorizableDiagnosis(CommonDBTM $item);
 
     /**

@@ -33,6 +33,7 @@
 
 use Glpi\Plugin\Hooks;
 
+/** @var array $PLUGIN_HOOKS */
 global $PLUGIN_HOOKS;
 
 $PLUGIN_HOOKS[Hooks::SECURED_CONFIGS]['carbon'] = [

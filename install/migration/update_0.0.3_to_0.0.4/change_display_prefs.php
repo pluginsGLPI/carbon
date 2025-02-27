@@ -42,6 +42,7 @@ foreach ($itemtypes as $itemtype) {
         2223 => 128501,
     ];
     foreach ($map as $src => $dst) {
+        /** @var Migration $migration */
         $migration->changeSearchOption($itemtype, $src, $dst);
     }
 }

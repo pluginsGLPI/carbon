@@ -38,6 +38,7 @@ use ComputerModel;
 use ComputerType as GlpiComputerType;
 use DateTime;
 use DBmysqlIterator;
+use DBmysql;
 use DbUtils;
 use Glpi\Dashboard\Filter;
 use GlpiPlugin\Carbon\ComputerType;
@@ -46,7 +47,7 @@ use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
-use GlpiPlugin\Carbon\History\Computer as ComputerHistory;
+use GlpiPlugin\Carbon\Impact\History\Computer as ComputerHistory;
 use GlpiPlugin\Carbon\SearchOptions;
 use QueryExpression;
 use QuerySubQuery;
@@ -65,6 +66,7 @@ class Provider
      */
     public static function getSum(string $table, string $field, array $params = []): ?float
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $request = [
@@ -97,6 +99,7 @@ class Provider
      */
     public static function getSumEmissionsPerModel(array $where = [])
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $computermodels_table = ComputerModel::getTable();
@@ -145,7 +148,7 @@ class Provider
         ];
 
         if (!empty($where)) {
-            $filter_criteria = self::getFiltersCriteria(Computer::getTable(), $params['apply_filters'] ?? []);
+            $filter_criteria = self::getFiltersCriteria(Computer::getTable(), []);
             $request['WHERE'] = $request['WHERE'] + $filter_criteria;
         }
         $result = $DB->request($request);
@@ -196,6 +199,7 @@ class Provider
 
     public static function getSumEmissionsPerType(array $where = [])
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $glpicomputertypes_table = GlpiComputerType::getTable();
@@ -247,10 +251,11 @@ class Provider
      * Get the sum of power of all computers per model
      *
      * @param array $where
-     * @return void
+     * @return array
      */
     public static function getSumPowerPerModel(array $where = [])
     {
+        /** @var DBmysql $DB  */
         global $DB;
 
         $computers_table = Computer::getTable();
@@ -313,7 +318,7 @@ class Provider
      * environmental impact
      *
      * @param array $params
-     * @return integer|null : count of computers or null if an error occurred
+     * @return array : count of computers or null if an error occurred
      */
     public static function getUnhandledComputersCount(array $params = []): array
     {
@@ -330,7 +335,7 @@ class Provider
      * Count the computers having all required data to compute carbon intensity
      *
      * @param array $params
-     * @return integer|null
+     * @return array
      */
     public static function getHandledComputersCount(array $params = [], $handled = true): array
     {
@@ -373,9 +378,10 @@ class Provider
      */
     public static function getTotalPower(): ?string
     {
+        /** @var DBmysql $DB */
         global $DB;
 
-        $request = (new ComputerHistory())->getHistorizableQuery();
+        $request = (new ComputerHistory())->getEvaluableQuery();
         $request['SELECT'] = [
             'SUM' => ComputerType::getTableField('power_consumption') . ' AS total',
         ];
@@ -392,7 +398,7 @@ class Provider
     /**
      * Get total CO2 emissions for last month (all assets)
      *
-     * @return float|null
+     * @return string
      */
     public static function getTotalCarbonEmission(array $params = []): string
     {
@@ -406,6 +412,7 @@ class Provider
 
     public static function getCarbonIntensity(array $params): array
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $source = new CarbonIntensitySource();
@@ -424,8 +431,8 @@ class Provider
             // ],
             'FROM'  => CarbonIntensity::getTable(),
             'WHERE' => [
-                CarbonIntensitySource::getForeignKeyField('sources_id') => $source->getID(),
-                CarbonIntensityZone::getForeignKeyField('zones_id') => $zone->getID(),
+                CarbonIntensitySource::getForeignKeyField() => $source->getID(),
+                CarbonIntensityZone::getForeignKeyField() => $zone->getID(),
             ],
         ];
 
@@ -500,6 +507,7 @@ class Provider
      */
     public static function getCarbonEmissionPerMonth(array $params = [], $crit = []): array
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $default_params = [
@@ -535,7 +543,7 @@ class Provider
         // get last 12 months in format YYYY-MM
         $date = new DateTime();
         $date->setTime(0, 0, 0, 0);
-        $date->setDate($date->format('Y'), $date->format('m'), 1); // First day of current month
+        $date->setDate((int) $date->format('Y'), (int) $date->format('m'), 1); // First day of current month
         $date->modify('-12 months');
         $months = [];
         for ($i = 0; $i < 12; $i++) {

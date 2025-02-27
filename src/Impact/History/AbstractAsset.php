@@ -40,6 +40,7 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
+use DBmysql;
 use DbUtils;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 use GlpiPlugin\Carbon\CarbonEmission;
@@ -92,6 +93,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      */
     public function canHistorize(int $id): bool
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $request = $this->getEvaluableQuery();
@@ -114,6 +116,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      */
     public function evaluateItems(): int
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $itemtype = static::$itemtype;
@@ -148,9 +151,9 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      */
     public function evaluateItem(int $id, ?DateTime $start_date = null, ?DateTime $end_date = null): int
     {
+        /** @var DBmysql $DB */
         global $DB;
 
-        /** @var CommonDBTM $item */
         $itemtype = static::$itemtype;
         $item = $itemtype::getById($id);
         if ($item === false) {
@@ -264,7 +267,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      * Find the date where daily computation must start
      *
      * @param integer $id
-     * @return DateTime|null
+     * @return DateTimeImmutable|null
      */
     protected function getStartDate(int $id): ?DateTimeImmutable
     {
@@ -276,7 +279,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      * Find the most accurate date to determine the first use of an asset
      *
      * @param integer $id id of the asset to examinate
-     * @return DateTime|null
+     * @return DateTimeImmutable|null
      */
     protected function getInventoryIncomingDate(int $id): ?DateTimeImmutable
     {
@@ -310,9 +313,9 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      * Find the date where daily computation must stop
      *
      * @param integer $id
-     * @return DateTime|null
+     * @return DateTimeImmutable|null
      */
-    protected function getStopDate(int $id): ?DateTime
+    protected function getStopDate(int $id): ?DateTimeImmutable
     {
         return $this->getInventoryExitDate($id);
     }
@@ -371,6 +374,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      */
     public function resetHistory(int $items_id): bool
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         return $DB->delete(

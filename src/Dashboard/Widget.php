@@ -41,6 +41,7 @@ class Widget extends GlpiDashboardWidget
 {
     public static function WidgetTypes(): array
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         $types = [
@@ -207,7 +208,6 @@ class Widget extends GlpiDashboardWidget
         $class .= $p['area'] ? " area" : "";
         $class .= $p['multiple'] ? " multiple" : "";
         $class .= count($p['filters']) > 0 ? " filter-" . implode(' filter-', $p['filters']) : "";
-        $label_class = '';
         $categories  = json_encode($labels);
         $series      = json_encode($series);
         $yaxis       = json_encode($yaxis);
@@ -216,7 +216,6 @@ class Widget extends GlpiDashboardWidget
 
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/multiple-lines.html.twig', [
             'class'       => $class,
-            'label_class' => $label_class,
             'chart_id'    => $chart_id,
             'chart_type'  => $chart_type,
             'chart_title' => $chart_title,
@@ -237,145 +236,140 @@ class Widget extends GlpiDashboardWidget
         ]);
     }
 
-    /**
-     * Display a widget with a pie chart
-     *
-     * @param array $params contains these keys:
-     * - array  'data': represents the slices to display
-     *    - int    'number': number of the slice
-     *    - string 'url': url to redirect when clicking on the slice
-     *    - string 'label': title of the slice
-     * - string 'label': global title of the widget
-     * - string 'alt': tooltip
-     * - string 'color': hex color of the widget
-     * - string 'icon': font awesome class to display an icon side of the label
-     * - string 'id': unique dom identifier
-     * - bool   'use_gradient': gradient or generic palette
-     * - int    'limit': the number of slices
-     * - bool 'donut': do we want a "holed" pie
-     * - bool 'gauge': do we want an half pie
-     * - array  'filters': array of filter's id to apply classes on widget html
-     *
-     * @return string html of the widget
-     */
-    public static function pie(
-        array $params = []
-    ): string {
-        $default = [
-            'type'         => 'pie',
-            'data'         => [],
-            'label'        => '',
-            'alt'          => '',
-            'color'        => '',
-            'icon'         => '',
-            'donut'        => false,
-            'half'         => false,
-            'legend'       => false,
-            'use_gradient' => false,
-            'limit'        => 99999,
-            'filters'      => [],
-            'rand'         => mt_rand(),
-        ];
-        $p = array_merge($default, $params);
-        $p['cache_key'] = $p['cache_key'] ?? $p['rand'];
+    // /**
+    //  * Display a widget with a pie chart
+    //  *
+    //  * @param array $params contains these keys:
+    //  * - array  'data': represents the slices to display
+    //  *    - int    'number': number of the slice
+    //  *    - string 'url': url to redirect when clicking on the slice
+    //  *    - string 'label': title of the slice
+    //  * - string 'label': global title of the widget
+    //  * - string 'alt': tooltip
+    //  * - string 'color': hex color of the widget
+    //  * - string 'icon': font awesome class to display an icon side of the label
+    //  * - string 'id': unique dom identifier
+    //  * - bool   'use_gradient': gradient or generic palette
+    //  * - int    'limit': the number of slices
+    //  * - bool 'donut': do we want a "holed" pie
+    //  * - bool 'gauge': do we want an half pie
+    //  * - array  'filters': array of filter's id to apply classes on widget html
+    //  *
+    //  * @return string html of the widget
+    //  */
+    // public static function pie(
+    //     array $params = []
+    // ): string {
+    //     $default = [
+    //         'type'         => 'pie',
+    //         'data'         => [],
+    //         'label'        => '',
+    //         'alt'          => '',
+    //         'color'        => '',
+    //         'icon'         => '',
+    //         'donut'        => false,
+    //         'half'         => false,
+    //         'legend'       => false,
+    //         'use_gradient' => false,
+    //         'limit'        => 99999,
+    //         'filters'      => [],
+    //         'rand'         => mt_rand(),
+    //     ];
+    //     $p = array_merge($default, $params);
+    //     $p['cache_key'] = $p['cache_key'] ?? $p['rand'];
 
-        $chart_id = "chart-{$p['cache_key']}";
+    //     $chart_id = "chart-{$p['cache_key']}";
 
-        $nb_slices = min($p['limit'], count($p['series']));
-        array_splice($p['series'], $nb_slices);
-        array_splice($p['labels'], $nb_slices);
-        $nb_series = min($p['limit'], count($p['series']));
+    //     $nb_slices = min($p['limit'], count($p['series']));
+    //     array_splice($p['series'], $nb_slices);
+    //     array_splice($p['labels'], $nb_slices);
+    //     $nb_series = min($p['limit'], count($p['series']));
 
-        $options = ['pie' => [
-            'startAngle' => 0,
-            'endAngle'   => 360,
-            'offsetY'    => 0,
-        ]
-        ];
-        if ($p['donut']) {
-            $p['type'] = 'donut';
-        }
-        if ($p['half']) {
-            $options['pie'] = [
-                'startAngle' => -90,
-                'endAngle'   => 90,
-                'offsetY'    => 10,
-            ];
-        }
+    //     $options = ['pie' => [
+    //         'startAngle' => 0,
+    //         'endAngle'   => 360,
+    //         'offsetY'    => 0,
+    //     ]
+    //     ];
+    //     if ($p['donut']) {
+    //         $p['type'] = 'donut';
+    //     }
+    //     if ($p['half']) {
+    //         $options['pie'] = [
+    //             'startAngle' => -90,
+    //             'endAngle'   => 90,
+    //             'offsetY'    => 10,
+    //         ];
+    //     }
 
-        $nodata   = isset($p['data']['nodata']) && $p['data']['nodata'];
+    //     $nodata   = isset($p['data']['nodata']) && $p['data']['nodata'];
 
-        $fg_color      = Toolbox::getFgColor($p['color']);
-        $dark_bg_color = Toolbox::getFgColor($p['color'], 80);
-        $dark_fg_color = Toolbox::getFgColor($p['color'], 40);
+    //     $fg_color      = Toolbox::getFgColor($p['color']);
+    //     $dark_bg_color = Toolbox::getFgColor($p['color'], 80);
+    //     $dark_fg_color = Toolbox::getFgColor($p['color'], 40);
 
-        $palette_style = "";
-        if ($p['use_gradient']) {
-            $palette_style = self::getCssGradientPalette(
-                $p['color'],
-                $nb_series,
-                "#{$chart_id}"
-            );
-        }
+    //     $palette_style = "";
+    //     if ($p['use_gradient']) {
+    //         $palette_style = self::getCssGradientPalette(
+    //             $p['color'],
+    //             $nb_series,
+    //             "#{$chart_id}"
+    //         );
+    //     }
 
-        $label_class = '';
+    //     // Chart title
+    //     $chart_title = $p['label'];
 
-        // Chart title
-        $chart_title = $p['label'];
+    //     // legend
+    //     $show_legend = $p['legend'] ? true : false;
 
-        // legend
-        $show_legend = $p['legend'] ? true : false;
+    //     return TemplateRenderer::getInstance()->render('@carbon/dashboard/pie.html.twig', [
+    //         'no_data'       => $nodata ? 'true' : 'false',
+    //         'chart_type'    => $p['type'],
+    //         'plot_options'  => json_encode($options),
+    //         'chart_id'      => $chart_id,
+    //         'icon'          => $p['icon'],
+    //         'label_class'   => $p['label'],
+    //         'color'         => $p['color'],
+    //         'chart_title'   => $chart_title,
+    //         'show_legend'   => $show_legend,
+    //         'palette_style' => $palette_style,
+    //         'fg_color'      => $fg_color,
+    //         'dark_bg_color' => $dark_bg_color,
+    //         'dark_fg_color' => $dark_fg_color,
+    //         'series'        => json_encode($p['series']),
+    //         'labels'        => json_encode($p['labels']),
+    //     ]);
+    // }
 
-        return TemplateRenderer::getInstance()->render('@carbon/dashboard/pie.html.twig', [
-            'no_data'       => $nodata ? 'true' : 'false',
-            'chart_type'    => $p['type'],
-            'plot_options'  => json_encode($options),
-            'chart_id'      => $chart_id,
-            'label_class'   => $label_class,
-            'icon'          => $p['icon'],
-            'label_class'   => $p['label'],
-            'color'         => $p['color'],
-            'chart_title'   => $chart_title,
-            'show_legend'   => $show_legend,
-            'palette_style' => $palette_style,
-            'fg_color'      => $fg_color,
-            'dark_bg_color' => $dark_bg_color,
-            'dark_fg_color' => $dark_fg_color,
-            'series'        => json_encode($p['series']),
-            'labels'        => json_encode($p['labels']),
-        ]);
-    }
+    // public static function donut(
+    //     array $params = [],
+    //     array $labels = [],
+    //     array $series = []
+    // ): string {
+    //     return self::pie(
+    //         array_merge($params, ['donut' => true]),
+    //         $labels,
+    //         $series
+    //     );
+    // }
 
-    public static function donut(
-        array $params = [],
-        array $labels = [],
-        array $series = []
-    ): string {
-        return self::pie(
-            array_merge($params, ['donut' => true]),
-            $labels,
-            $series
-        );
-    }
+    // public static function halfDonut(
+    //     array $params = [],
+    //     array $labels = [],
+    //     array $series = []
+    // ): string {
+    //     return self::pie(
+    //         array_merge($params, ['donut' => true, 'half' => true]),
+    //         $labels,
+    //         $series
+    //     );
+    // }
 
-    public static function halfDonut(
-        array $params = [],
-        array $labels = [],
-        array $series = []
-    ): string {
-        return self::pie(
-            array_merge($params, ['donut' => true, 'half' => true]),
-            $labels,
-            $series
-        );
-    }
-
-    public static function DisplayGraphCarbonEmissionPerType(array $params = []): string
-    {
-        return self::halfDonut($params);
-
-        return TemplateRenderer::getInstance()->render('@carbon/components/graph-carbon-emission-per-model.html.twig');
-    }
+    // public static function DisplayGraphCarbonEmissionPerType(array $params = []): string
+    // {
+    //     return self::halfDonut($params);
+    // }
 
     public static function DisplayGraphCarbonEmissionPerMonth(): string
     {
@@ -391,7 +385,6 @@ class Widget extends GlpiDashboardWidget
     {
         return TemplateRenderer::getInstance()->render('@carbon/components/total-carbon-emission-card.html.twig');
     }
-
 
     public static function DisplayUnhandledComputers(): string
     {

@@ -38,6 +38,7 @@ use DateTime;
 use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
+use DBmysql;
 use DBmysqlIterator;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
@@ -137,11 +138,13 @@ class CarbonIntensity extends CommonDropdown
     /**
      * Get the last known date of carbon emissiosn
      *
-     * @param string $zone Zone to examinate
+     * @param string $zone_name   Zone to examinate
+     * @param string $source_name Source to examinate
      * @return DateTimeImmutable
      */
     public function getLastKnownDate(string $zone_name, string $source_name): ?DateTimeImmutable
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $intensity_table = CarbonIntensity::getTable();
@@ -181,11 +184,13 @@ class CarbonIntensity extends CommonDropdown
     /**
      * Get the first known date of carbon emissiosn
      *
-     * @param string $zone Zone to examinate
+     * @param string $zone_name Zone to examinate
+     * @param string $source_name Source to examinate
      * @return DateTimeImmutable
      */
     public function getFirstKnownDate(string $zone_name, string $source_name): ?DateTimeImmutable
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $intensity_table = CarbonIntensity::getTable();
@@ -225,7 +230,8 @@ class CarbonIntensity extends CommonDropdown
     /**
      * Download data for a single zone
      *
-     * @param string $zone zone name
+     * @param CarbonIntensityInterface $data_source
+     * @param string $zone_name zone name
      * @param integer $limit maximum count of items to process
      * @return integer count of item downloaded
      */
@@ -322,6 +328,7 @@ class CarbonIntensity extends CommonDropdown
      */
     public function save(string $zone_name, string $source_name, array $data): int
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $count = 0;
@@ -386,13 +393,15 @@ class CarbonIntensity extends CommonDropdown
     /**
      * Gets date intervals where data are missing
      *
-     * @param integer $id
-     * @param DateTimeInterface $start
+     * @param integer $source_id
+     * @param integer $zone_id
+     * @param DateTimeInterface|null $start
      * @param DateTimeInterface|null $stop
      * @return DBmysqlIterator
      */
-    public function findGaps(int $source_id, int $zone_id, DateTimeInterface $start, ?DateTimeInterface $stop = null): DBmysqlIterator
+    public function findGaps(int $source_id, int $zone_id, ?DateTimeInterface $start, ?DateTimeInterface $stop = null): DBmysqlIterator
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $table = self::getTable();

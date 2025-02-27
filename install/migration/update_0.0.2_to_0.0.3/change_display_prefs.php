@@ -31,6 +31,9 @@
  * -------------------------------------------------------------------------
  */
 
+/** @var DBmysql $DB */
+global $DB;
+
 $itemtype = 'GlpiPlugin\\Carbon\\CarbonIntensity';
 $map = [
     4 => 10401,
@@ -38,6 +41,7 @@ $map = [
     6 => 10403,
 ];
 foreach ($map as $src => $dst) {
+    /** @var Migration $migration  */
     $migration->changeSearchOption($itemtype, $src, $dst);
 }
 

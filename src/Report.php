@@ -106,6 +106,7 @@ class Report extends CommonDBTM
         $value = Provider::getTotalCarbonEmission($params);
 
         // Prepare date format
+        $date_format = 'Y F';
         switch ($_SESSION['glpidate_format'] ?? 0) {
             case 0:
                 $date_format = 'Y F';
@@ -139,6 +140,7 @@ class Report extends CommonDBTM
         $data = Provider::getCarbonEmissionPerMonth($params['args'], $crit);
 
         // Prepare date format
+        $date_format = 'Y F';
         switch ($_SESSION['glpidate_format'] ?? 0) {
             case 0:
                 $date_format = 'Y F';
@@ -225,16 +227,17 @@ class Report extends CommonDBTM
         // Force dates filter to 2 last complete months
         $end_date = new DateTime();
         $end_date->setTime(0, 0, 0, 0);
-        $end_date->setDate($end_date->format('Y'), $end_date->format('m'), 0); // Last day of previous month
+        $end_date->setDate((int) $end_date->format('Y'), (int) $end_date->format('m'), 0); // Last day of previous month
         $start_date = clone $end_date;
-        $start_date->setDate($end_date->format('Y'), $end_date->format('m'), 0);
-        $start_date->setDate($start_date->format('Y'), $start_date->format('m'), 1);
+        $start_date->setDate((int) $end_date->format('Y'), (int) $end_date->format('m'), 0);
+        $start_date->setDate((int) $start_date->format('Y'), (int) $start_date->format('m'), 1);
 
         $params['args']['apply_filters']['dates'][0] = $start_date->format('Y-m-d\TH:i:s.v\Z');
         $params['args']['apply_filters']['dates'][1] = $end_date->format('Y-m-d\TH:i:s.v\Z');
         $data = Provider::getCarbonEmissionPerMonth($params['args']);
 
         // Prepare date format
+        $date_format = 'Y F';
         switch ($_SESSION['glpidate_format'] ?? 0) {
             case 0:
                 $date_format = 'Y F';
@@ -252,7 +255,7 @@ class Report extends CommonDBTM
         return json_encode($data['data']);
     }
 
-    public static function getHandledComputersCount(array $params = []): string
+    public static function getHandledComputersCount(array $params = []): array
     {
         return Provider::getHandledComputersCount($params);
     }

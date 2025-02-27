@@ -81,6 +81,7 @@ function plugin_init_carbon()
 
 function plugin_carbon_setupHooks()
 {
+    /** @var array $PLUGIN_HOOKS */
     global $PLUGIN_HOOKS;
 
     $PLUGIN_HOOKS[Hooks::CSRF_COMPLIANT]['carbon'] = true;
@@ -165,6 +166,7 @@ function plugin_carbon_check_prerequisites()
 {
     $prerequisitesSuccess = true;
 
+    /** @phpstan-ignore if.alwaysFalse */
     if (version_compare(GLPI_VERSION, PLUGIN_CARBON_MIN_GLPI_VERSION, 'lt')) {
         echo "This plugin requires GLPI >= " . PLUGIN_CARBON_MIN_GLPI_VERSION . " and GLPI < " . PLUGIN_CARBON_MAX_GLPI_VERSION . "<br>";
         $prerequisitesSuccess = false;
@@ -202,6 +204,8 @@ function plugin_carbon_getSchemaPath(string $version = null): ?string
         $schemaPath = Plugin::getPhpDir('carbon') . "/install/mysql/plugin_carbon_{$version}_empty.sql";
     }
 
+    // Plugin::getPhpDir may return false
+    /** @phpstan-ignore identical.alwaysFalse */
     if ($schemaPath === false) {
         return null;
     }

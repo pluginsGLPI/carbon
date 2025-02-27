@@ -36,6 +36,7 @@ namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta;
 
 use CommonDBTM;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
+use GlpiPlugin\Carbon\DataSource\Boaviztapi;
 
 interface AssetInterface
 {
@@ -46,4 +47,8 @@ interface AssetInterface
     public static function getEngine(CommonDBTM $item): EngineInterface;
 
     public function setLimit(int $limit);
+
+    public function setClient(Boaviztapi $client);
+
+    public function evaluateItems(): int;
 }

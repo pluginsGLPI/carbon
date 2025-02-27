@@ -34,6 +34,7 @@
 namespace GlpiPlugin\Carbon;
 
 use CommonDBChild;
+use CommonDBTM;
 use CommonGLPI;
 use Session;
 use Glpi\Application\View\TemplateRenderer;
@@ -52,13 +53,13 @@ abstract class AbstractType extends CommonDBChild
 
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
-        $tabNames = [];
+        $tabName = '';
         if (!$withtemplate) {
             if ($item->getType() == static::$itemtype) {
-                $tabNames[1] = __('Carbon');
+                $tabName = __('Carbon');
             }
         }
-        return $tabNames;
+        return $tabName;
     }
 
     /**

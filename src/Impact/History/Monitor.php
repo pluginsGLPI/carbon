@@ -177,6 +177,7 @@ class Monitor extends AbstractAsset
 
     public static function getHistorizableDiagnosis(CommonDBTM $item): ?array
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $history = new self();

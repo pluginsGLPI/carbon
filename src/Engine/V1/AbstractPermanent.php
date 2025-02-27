@@ -34,6 +34,7 @@
 namespace GlpiPlugin\Carbon\Engine\V1;
 
 use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use DateInterval;
 use GlpiPlugin\Carbon\CarbonIntensityZone;
@@ -70,8 +71,9 @@ abstract class AbstractPermanent extends AbstractAsset implements EngineInterfac
         $start_time = clone $day;
         $start_time->setTime(0, 0, 0, 0);
         $length = new DateInterval('PT' . 86400 . 'S'); // 24h = 86400 seconds
-        $iterator = $this->requestCarbonIntensitiesPerDay($start_time, $length, $zone);
-        if ($iterator->count() != 24) {
+        $iterator = $this->requestCarbonIntensitiesPerDay(DateTimeImmutable::createFromMutable($start_time), $length, $zone);
+        $count = $iterator->count();
+        if ($count != 24) {
             trigger_error(sprintf(
                 'required count of carbon intensity %d samples not met. Got %d samples for date %s',
                 24,
@@ -82,15 +84,22 @@ abstract class AbstractPermanent extends AbstractAsset implements EngineInterfac
         }
 
         $total_emission = 0.0;
+        $quality = null;
         $energy_in_kwh = ($power->getValue()) / 1000.0;
+
         foreach ($iterator as $row) {
             $total_emission += $row['intensity'] * $energy_in_kwh;
+            if ($quality === null) {
+                $quality = $row['data_quality'];
+            } else {
+                $quality = min($row['data_quality'], $quality);
+            }
         }
 
         return new TrackedFloat(
             $total_emission,
             $power,
-            $row['data_quality']
+            $quality
         );
     }
 }

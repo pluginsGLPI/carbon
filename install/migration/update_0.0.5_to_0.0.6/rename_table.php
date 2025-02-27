@@ -34,12 +34,14 @@
  // Move data to new table
 $old_table = 'glpi_plugin_carbon_embeddedimpacts';
 $new_table = 'glpi_plugin_carbon_embodiedimpacts';
+/** @var Migration $migration */
 $migration->renameTable($old_table, $new_table);
 
 $old_itemtype = '\\GlpiPlugin\\Carbon\\EmbeddedImpact';
 $new_itemtype = '\\GlpiPlugin\\Carbon\\EmbodiedImpact';
 
 // Update display preferences
+/** @var DBmysql $DB */
 $DB->update(DisplayPreference::getTable(), [
     'itemtype' => $new_itemtype
 ], [
