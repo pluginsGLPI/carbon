@@ -43,6 +43,7 @@ use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
 use GlpiPlugin\Carbon\Zone;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
 {
@@ -172,8 +173,7 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
         return iterator_to_array($iterator);
     }
 
-
-    public function fullDownload(string $zone, DateTimeImmutable $start_date, DateTimeImmutable $stop_date, CarbonIntensity $intensity, int $limit = 0): int
+    public function fullDownload(string $zone, DateTimeImmutable $start_date, DateTimeImmutable $stop_date, CarbonIntensity $intensity, int $limit = 0, ?ProgressBar $progress_bar = null): int
     {
         $count = 0;
         $saved = 0;
@@ -199,6 +199,10 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
                 break;
             }
             $saved = $intensity->save($zone, $this->getSourceName(), $data[$zone]);
+            if ($progress_bar) {
+                $progress_bar->advance($saved);
+            }
+
             $count += abs($saved);
             if ($limit > 0 && $count >= $limit) {
                 return $saved > 0 ? $count : -$count;

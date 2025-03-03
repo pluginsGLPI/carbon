@@ -54,7 +54,8 @@ CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_carbonintensities` (
   `intensity`                               float        DEFAULT '0'   COMMENT 'gCO2eq/KWh',
   `data_quality`                            int unsigned NOT NULL DEFAULT '0' COMMENT 'DataTtacking\\AbstractTracked::DATA_QUALITY_* constants',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `unicity` (`date`, `plugin_carbon_carbonintensitysources_id`, `plugin_carbon_zones_id`)
+  UNIQUE KEY `unicity` (`date`, `plugin_carbon_carbonintensitysources_id`, `plugin_carbon_zones_id`),
+  INDEX `date` (`date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_zones` (

@@ -33,11 +33,12 @@
 
 namespace GlpiPlugin\Carbon\Command;
 
-use DateTime;
-use DateInterval;
-use DateTimeZone;
+use DateTimeImmutable;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
+use GlpiPlugin\Carbon\Zone;
+use GlpiPlugin\Carbon\DataSource\CarbonIntensityRTE;
+use GlpiPlugin\Carbon\DataSource\RestApiClient;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
@@ -69,65 +70,50 @@ class CollectCarbonIntensityCommand extends Command
         $message = __("Creating data source name", 'carbon');
         $output->writeln("<info>$message</info>");
 
-        $dataSource = new CarbonIntensitySource();
-        $source_name = 'eco2mix';
-        if (!$dataSource->getFromDBByCrit(['name' => $source_name])) {
-            $dataSource->add([
+        // Create source if not exists
+        $data_source = new CarbonIntensitySource();
+        $source_name = 'RTE';
+        if (!$data_source->getFromDBByCrit(['name' => $source_name])) {
+            $data_source->add([
                 'name' => $source_name,
             ]);
         }
-        $this->source_id = $dataSource->getID();
+        $this->source_id = $data_source->getID();
+
+        $zone_name = 'France';
+        $zone = new Zone();
+        $zone->getFromDBByCrit(['name' => $zone_name]);
+        if (!$zone->getID()) {
+            $message = __("Zone not found", 'carbon');
+            $output->writeln("<error>$message</error>");
+            return Command::FAILURE;
+        }
+        $carbon_intensity = new CarbonIntensity();
 
         $message = __("Reading eco2mix data...", 'carbon');
         $output->writeln("<info>$message</info>");
 
-        $start_date = new DateTime('now', new DateTimeZone('UTC'));
-        $start_date->sub(new DateInterval(DATE_MIN));
-        $last_known_date = $this->getLastRecordDate();
-        if ($last_known_date !== null) {
-            $start_date = max($start_date, $last_known_date);
-        }
-        $start_date->setTime(0, 0, 0);
+        $downloader = new CarbonIntensityRTE(new RestApiClient([]));
 
-        $this->getFromEco2mix($start_date);
+        $carbon_intensity->downloadOneZone($downloader, $zone_name, 0, new ProgressBar($this->output));
+
+        $start_date = $carbon_intensity->getDownloadStartDate($zone_name, $downloader);
+        $gaps = $carbon_intensity->findGaps($this->source_id, $zone->getID(), $start_date);
+        $not_downlaoded_hours = 0;
+        foreach ($gaps as $gap) {
+            $gap_start = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $gap['start']);
+            $gap_end = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $gap['end']);
+            $diff = $gap_start->diff($gap_end);
+            $not_downlaoded_hours += $diff->days * 24 + $diff->h;
+        }
+
+        // Show message if some hours were not downloaded
+        if ($not_downlaoded_hours > 0) {
+            $message = __("$not_downlaoded_hours hours were not downloaded", 'carbon');
+            $output->writeln("<info>$message</info>");
+        }
 
         return Command::SUCCESS;
-    }
-
-    protected function getFromEco2mix(DateTime $start_date)
-    {
-        $end_date = new DateTime('now', new DateTimeZone('UTC'));
-        $end_date->setTime(0, 0, 0);
-
-        // Initialize progress bar
-        $days = (int) $start_date->diff($end_date)->format('%a');
-        $progress_bar = new ProgressBar($this->output, $days);
-
-        // iterate day by day from $start_date to $end_date
-        $processing_date = clone $start_date;
-        while ($processing_date < $end_date) {
-            $date = $processing_date->format('d/m/Y');
-            $url = ECO2MIX_BASE_URL . '&dateDeb=' . $date . '&dateFin=' . $date . '&mode=NORM&_=1715936961077';
-
-            // Request data
-            $data = file_get_contents($url);
-            $intensities = $this->parseEco2mixData($data);
-
-            // Save data
-            $carbon_intensity = new CarbonIntensity();
-            foreach ($intensities as $date => $intensity) {
-                $carbon_intensity->add([
-                    'plugin_carbon_colletors_carbonintensitysources_id' => $this->source_id,
-                    'plugin_carbon_colletors_zones_id' => 1,
-                    'date'          => $date, // Eco2mix seems to provide datetime in
-                    'intensity'     => $intensity,
-                ]);
-            }
-
-            //increment date
-            $processing_date->add(new DateInterval('P1D'));
-            $progress_bar->advance();
-        }
     }
 
     /**
@@ -292,50 +278,4 @@ class CollectCarbonIntensityCommand extends Command
      * </mixtr>
      * </liste>
      */
-
-    /**
-     * Undocumented function
-     *
-     * @param string $data
-     * @return array
-     */
-    protected function parseEco2mixData(string $data): array
-    {
-        $intensities = [];
-        $xml = simplexml_load_string($data);
-        $date = new DateTime((string) $xml->mixtr['date'], new DateTimeZone('UTC'));
-        $values = $xml->mixtr->type;
-        // 4 samples per hour (total 96 samples per 24 day)
-        $intensity = 0;
-        foreach ($values->valeur as $value) {
-            // Calculate date from period
-            $period =  (int) $value['periode'];
-            if ($period % 4 === 0) {
-                $intensity = (float) $value;
-            } else {
-                $intensity += (float) $value;
-                if ($period % 4 === 3) {
-                    $date->setTime($period / 4, 0, 0);
-                    $intensities[$date->format('Y-m-d H:i:s')] = $intensity / 4;
-                }
-            }
-        }
-
-        return $intensities;
-    }
-
-    /**
-     * Retrieves the last record date based on the provided source ID.
-     *
-     */
-    protected function getLastRecordDate(): ?DateTime
-    {
-        $carbon_intensity = new CarbonIntensity();
-        $rows = $carbon_intensity->find(['plugin_carbon_colletors_carbonintensitysources_id' => $this->source_id], ['date DESC'], 1);
-        if (count($rows) === 0) {
-            return null;
-        }
-        $row = array_pop($rows);
-        return new DateTime($row['date'], new DateTimeZone('UTC'));
-    }
 }

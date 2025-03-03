@@ -46,6 +46,7 @@ use Config as GlpiConfig;
 use GLPIKey;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\Toolbox;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
 {
@@ -321,8 +322,9 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
         return $saved > 0 ? $count : -$count;
     }
 
-    public function fullDownload(string $zone, DateTimeImmutable $start_date, DateTimeImmutable $stop_date, CarbonIntensity $intensity, int $limit = 0): int
+    public function fullDownload(string $zone, DateTimeImmutable $start_date, DateTimeImmutable $stop_date, CarbonIntensity $intensity, int $limit = 0, ?ProgressBar $progress = null): int
     {
+        // TODO : implement progress bar
         // Disable full download because we miss documentation for PAST_URL endpoint
         $start_date = new DateTime('24 hours ago');
         $start_date->setTime((int) $start_date->format('H'), 0, 0);
