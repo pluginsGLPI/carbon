@@ -47,7 +47,7 @@ use GlpiPlugin\Carbon\EnvironmentalImpact;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use Entity;
 use GlpiPlugin\Carbon\CarbonEmission;
@@ -287,10 +287,10 @@ class CommonTestCase extends TestCase
             ]);
         }
 
-        $zone = new CarbonIntensityZone();
+        $zone = new Zone();
         $zone->getFromDBByCrit(['name' => $country]);
         if ($zone->isNewItem()) {
-            $zone = $this->getItem(CarbonIntensityZone::class, [
+            $zone = $this->getItem(Zone::class, [
                 'name' => $country,
                 'plugin_carbon_carbonintensitysources_id_historical' => $source->getID()
             ]);
@@ -304,7 +304,7 @@ class CommonTestCase extends TestCase
         while ($current_date < $end_date) {
             $crit = [
                 CarbonIntensitySource::getForeignKeyField()  => $source->getID(),
-                CarbonIntensityZone::getForeignKeyField() => $zone->getID(),
+                Zone::getForeignKeyField() => $zone->getID(),
                 'date' => $current_date->format('Y-m-d H:00:00'),
                 'intensity' => $intensity,
             ];

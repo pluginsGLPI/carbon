@@ -36,7 +36,7 @@ namespace GlpiPlugin\Carbon\Engine\V1;
 use DateTime;
 use Computer as GlpiComputer;
 use DbUtils;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\DataTracking\TrackedInt;
 use GlpiPlugin\Carbon\Tests\Engine\V1\EngineTestCase;
@@ -181,7 +181,7 @@ class Inventory implements EngineInterface
         return $energy->setValue($total_energy);
     }
 
-    public function getCarbonEmissionPerDay(DateTime $day, CarbonIntensityZone $zone): ?TrackedFloat
+    public function getCarbonEmissionPerDay(DateTime $day, Zone $zone): ?TrackedFloat
     {
         $total_emission = 0;
         $emission = new TrackedFloat();

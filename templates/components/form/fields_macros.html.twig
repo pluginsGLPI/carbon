@@ -51,3 +51,35 @@
    {% endset %}
    {{ fields.field(name, field, label, options) }}
 {% endmacro %}
+
+{% macro dropdownBoaviztaZone(name, value, label = '', options = {}) %}
+   {% import 'components/form/fields_macros.html.twig' as fields %}
+
+   {% if options.multiple %}
+      {# Needed for empty value as the input wont be sent in this case... we need something to know the input was displayed AND empty #}
+      {% set defined_input_name = "_#{name}_defined" %}
+      <input type="hidden" name="{{ defined_input_name }}" value="1"></input>
+
+      {# Multiple values will be set, input need to be an array #}
+      {% set name = "#{name}[]" %}
+   {% endif %}
+   {% set options = {'rand': random()}|merge(options) %}
+   {% if options.fields_template.isMandatoryField(name) %}
+      {% set options = {'specific_tags': {'required': true}}|merge(options) %}
+   {% endif %}
+
+   {% if options.disabled %}
+      {% set options = options|merge({specific_tags: {'disabled': 'disabled'}}) %}
+   {% endif %}
+
+   {% set field %}
+      {% do call('GlpiPlugin\\Carbon\\DataSource\\Boaviztapi::dropdownBoaviztaZone', [name, {
+         'value': value,
+         'rand': rand,
+         'width': '100%',
+      }|merge(options)]) %}
+   {% endset %}
+   {% if field|trim is not empty %}
+      {{ fields.field(name, field, label, options|merge({'id': 'dropdown_' ~ name ~ '_' ~ options.rand})) }}
+   {% endif %}
+{% endmacro %}

@@ -41,8 +41,8 @@ use DateTimeImmutable;
 use Toolbox as GlpiToolbox;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
+use GlpiPlugin\Carbon\Zone;
 
 abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
 {
@@ -144,11 +144,11 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
 
         $source_table = CarbonIntensitySource::getTable();
         $source_fk = CarbonIntensitySource::getForeignKeyField();
-        $zone_table = CarbonIntensityZone::getTable();
-        $zone_fk = CarbonIntensityZone::getForeignKeyField();
-        $source_zone_table = CarbonIntensitySource_CarbonIntensityZone::getTable();
+        $zone_table = Zone::getTable();
+        $zone_fk = Zone::getForeignKeyField();
+        $source_zone_table = CarbonIntensitySource_Zone::getTable();
         $iterator = $DB->request([
-            'SELECT' => CarbonIntensityZone::getTableField('name'),
+            'SELECT' => Zone::getTableField('name'),
             'FROM' => $zone_table,
             'INNER JOIN' => [
                 $source_zone_table => [
@@ -302,9 +302,9 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
         }
     }
 
-    protected function toggleZoneDownload(CarbonIntensityZone $zone, CarbonIntensitySource $source, ?bool $state): bool
+    protected function toggleZoneDownload(Zone $zone, CarbonIntensitySource $source, ?bool $state): bool
     {
-        $source_zone = new CarbonIntensitySource_CarbonIntensityZone();
+        $source_zone = new CarbonIntensitySource_Zone();
         $source_zone->getFromDBByCrit([
             $zone->getForeignKeyField() => $zone->getID(),
             $source->getForeignKeyField() => $source->getID(),

@@ -39,8 +39,8 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
+use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\Toolbox;
 
@@ -88,7 +88,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         }
         $source_id = $source->getID();
 
-        $zone = new CarbonIntensityZone();
+        $zone = new Zone();
         $input = [
             'name' => 'France',
         ];
@@ -105,10 +105,10 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
             $zone->update($input);
         }
 
-        $source_zone = new CarbonIntensitySource_CarbonIntensityZone();
+        $source_zone = new CarbonIntensitySource_Zone();
         $source_zone->add([
             CarbonIntensitySource::getForeignKeyField() => $source_id,
-            CarbonIntensityZone::getForeignKeyField() => $zone->getID(),
+            Zone::getForeignKeyField() => $zone->getID(),
             'is_download_enabled' => Toolbox::isLocationExistForZone($zone->fields['name']),
         ]);
         $this->setZoneSetupComplete();

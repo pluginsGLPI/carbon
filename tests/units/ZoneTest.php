@@ -31,14 +31,53 @@
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Carbon\CarbonIntensityZone;
+namespace GlpiPlugin\Carbon\Tests;
 
-include('../../../inc/includes.php');
+use Computer;
+use GlpiPlugin\Carbon\Zone;
+use Location;
 
-// Check if plugin is activated...
-if (!Plugin::isPluginActive('carbon')) {
-    Html::displayNotFoundError();
+class ZoneTest extends DbTestCase
+{
+    public function testGetByLocation()
+    {
+        $output = Zone::getByLocation(new Location());
+        $this->assertNull($output);
+
+        $this->getItem(Location::class);
+        $this->assertNull($output);
+
+        $location = $this->getItem(Location::class, [
+            'country' => 'foo'
+        ]);
+        $output = Zone::getByLocation($location);
+        $this->assertNull($output);
+
+        $zone = $this->getItem(Zone::class, [
+            'name' => 'foo'
+        ]);
+        $output = Zone::getByLocation($location);
+        $this->assertEquals($output->getID(), $zone->getID());
+    }
+
+    public function testGetByAsset()
+    {
+        $output = Zone::getByAsset(new Computer());
+        $this->assertNull($output);
+
+        $location = $this->getItem(Location::class, [
+            'country' => 'foo'
+        ]);
+        $computer = $this->getItem(Computer::class, [
+            'locations_id' => $location->getID(),
+        ]);
+        $output = Zone::getByAsset($computer);
+        $this->assertNull($output);
+
+        $zone = $this->getItem(Zone::class, [
+            'name' => 'foo'
+        ]);
+        $output = Zone::getByAsset($computer);
+        $this->assertEquals($output->getID(), $zone->getID());
+    }
 }
-
-$dropdown = new CarbonIntensityZone();
-include(GLPI_ROOT . "/front/dropdown.common.form.php");

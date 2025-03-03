@@ -90,7 +90,7 @@ class GlobalFixture
             $source_id = $iterator->current()['id'];
         }
 
-        $zone_table = 'glpi_plugin_carbon_carbonintensityzones';
+        $zone_table = 'glpi_plugin_carbon_zones';
         $fake_zone_name = 'Fake zone';
         $iterator = $DB->request([
             'SELECT' => ['id'],
@@ -108,19 +108,19 @@ class GlobalFixture
         } else {
             $zone_id = $iterator->current()['id'];
         }
-        $source_zone_table = 'glpi_plugin_carbon_carbonintensitysources_carbonintensityzones';
+        $source_zone_table = 'glpi_plugin_carbon_carbonintensitysources_zones';
         $iterator = $DB->request([
             'SELECT' => ['id'],
             'FROM' => $source_zone_table,
             'WHERE' => [
                 'plugin_carbon_carbonintensitysources_id' => $source_id,
-                'plugin_carbon_carbonintensityzones_id'   => $zone_id,
+                'plugin_carbon_zones_id'   => $zone_id,
             ],
         ]);
         if ($iterator->count() === 0) {
             $result = $DB->insert($source_zone_table, [
                 'plugin_carbon_carbonintensitysources_id' => $source_id,
-                'plugin_carbon_carbonintensityzones_id'   => $zone_id,
+                'plugin_carbon_zones_id'   => $zone_id,
                 'code'                                    => 'FZ',
             ]);
         }
@@ -136,7 +136,7 @@ class GlobalFixture
         while (($row = fgetcsv($handle, 256)) !== false) {
             $DB->insert($intensity_table, [
                 'plugin_carbon_carbonintensitysources_id' => $source_id,
-                'plugin_carbon_carbonintensityzones_id'   => $zone_id,
+                'plugin_carbon_zones_id'   => $zone_id,
                 'date' => $row[0],
                 'intensity' => $row[1],
             ]);

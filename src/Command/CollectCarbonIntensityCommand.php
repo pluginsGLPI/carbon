@@ -118,7 +118,7 @@ class CollectCarbonIntensityCommand extends Command
             foreach ($intensities as $date => $intensity) {
                 $carbon_intensity->add([
                     'plugin_carbon_colletors_carbonintensitysources_id' => $this->source_id,
-                    'plugin_carbon_colletors_carbonintensityzones_id' => 1,
+                    'plugin_carbon_colletors_zones_id' => 1,
                     'date'          => $date, // Eco2mix seems to provide datetime in
                     'intensity'     => $intensity,
                 ]);

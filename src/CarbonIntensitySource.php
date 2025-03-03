@@ -69,7 +69,7 @@ class CarbonIntensitySource extends CommonDropdown
     public function defineTabs($options = [])
     {
         $tabs = parent::defineTabs($options);
-        $this->addStandardTab(CarbonIntensityZone::class, $tabs, $options);
+        $this->addStandardTab(Zone::class, $tabs, $options);
         return $tabs;
     }
 
@@ -79,10 +79,10 @@ class CarbonIntensitySource extends CommonDropdown
             $nb = 0;
             /** @var CommonDBTM $item */
             switch ($item->getType()) {
-                case CarbonIntensityZone::class:
+                case Zone::class:
                     if ($_SESSION['glpishow_count_on_tabs']) {
                         $nb = (new DbUtils())->countElementsInTable(
-                            CarbonIntensitySource_CarbonIntensityZone::getTable(),
+                            CarbonIntensitySource_Zone::getTable(),
                             [self::getForeignKeyField() => $item->getID()]
                         );
                     }
@@ -97,8 +97,8 @@ class CarbonIntensitySource extends CommonDropdown
     {
         /** @var CommonDBTM $item */
         switch ($item->getType()) {
-            case CarbonIntensityZone::class:
-                CarbonIntensitySource_CarbonIntensityZone::showForZone($item);
+            case Zone::class:
+                CarbonIntensitySource_Zone::showForZone($item);
         }
 
         return true;

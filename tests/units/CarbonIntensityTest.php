@@ -38,7 +38,7 @@ use DateTime;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\DataSource\AbstractCarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensity;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 
 class CarbonIntensityTest extends DbTestCase

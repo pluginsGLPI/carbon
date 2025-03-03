@@ -42,20 +42,20 @@ use GlpiPlugin\Carbon\Application\View\Extension\DataHelpersExtension;
 use Glpi\Application\View\TemplateRenderer;
 use Html;
 
-class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
+class CarbonIntensitySource_Zone extends CommonDBRelation
 {
     public static $itemtype_1 = CarbonIntensitySource::class; // Type ref or field name (must start with itemtype)
     public static $items_id_1 = 'plugin_carbon_carbonintensitysources_id'; // Field name
     public static $checkItem_1_Rights = self::HAVE_SAME_RIGHT_ON_ITEM;
 
-    public static $itemtype_2 = CarbonIntensityZone::class; // Type ref or field name (must start with itemtype)
-    public static $items_id_2 = 'plugin_carbon_carbonintensityzones_id'; // Field name
+    public static $itemtype_2 = Zone::class; // Type ref or field name (must start with itemtype)
+    public static $items_id_2 = 'plugin_carbon_zones_id'; // Field name
     public static $checkItem_2_Rights = self::HAVE_SAME_RIGHT_ON_ITEM;
 
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         if ($item->getType() === CarbonIntensitySource::class) {
-            return self::createTabEntry(CarbonIntensityZone::getTypeName(), 0);
+            return self::createTabEntry(Zone::getTypeName(), 0);
         }
         return self::createTabEntry(CarbonIntensitySource::getTypeName(), 0);
     }
@@ -74,7 +74,7 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
 
         $tab[] = [
             'id'          => '6',
-            'table'       => CarbonIntensityZone::getTable(),
+            'table'       => Zone::getTable(),
             'field'       => 'name',
             'name'        => __('Zone name', 'carbon'),
             'datatype'    => 'dropdown',
@@ -112,7 +112,7 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
         $canedit = $item->canEdit($item_id);
 
         $source_table = CarbonIntensitySource::getTable();
-        $zone_table = CarbonIntensityZone::getTable();
+        $zone_table = Zone::getTable();
         $source_zone_table = self::getTable();
         $iterator = $DB->request([
             'SELECT' => [
@@ -130,7 +130,7 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
                 ],
                 $zone_table => [
                     'FKEY' => [
-                        $source_zone_table => 'plugin_carbon_carbonintensityzones_id',
+                        $source_zone_table => 'plugin_carbon_zones_id',
                         $zone_table => 'id',
                     ],
                 ],
@@ -211,7 +211,7 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
         $canedit = $item->canEdit($item_id);
 
         $source_table = CarbonIntensitySource::getTable();
-        $zone_table = CarbonIntensityZone::getTable();
+        $zone_table = Zone::getTable();
         $source_zone_table = self::getTable();
         $iterator = $DB->request([
             'SELECT' => [
@@ -228,13 +228,13 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
                 ],
                 $zone_table => [
                     'FKEY' => [
-                        $source_zone_table => 'plugin_carbon_carbonintensityzones_id',
+                        $source_zone_table => 'plugin_carbon_zones_id',
                         $zone_table => 'id',
                     ],
                 ],
             ],
             'WHERE' => [
-                CarbonIntensityZone::getTableField('id') => $item_id,
+                Zone::getTableField('id') => $item_id,
             ],
             'ORDER'     => ['name ASC'],
         ]);
@@ -304,11 +304,11 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
         /** @var DBmysql $DB */
         global $DB;
 
-        $zone_table = CarbonIntensityZone::getTable();
+        $zone_table = Zone::getTable();
         $source_table = CarbonIntensitySource::getTable();
         $source_zone_table = self::getTable();
         $request = [
-            'SELECT' => CarbonIntensitySource_CarbonIntensityZone::getTableField('code'),
+            'SELECT' => CarbonIntensitySource_Zone::getTableField('code'),
             'FROM'   => $source_zone_table,
             'INNER JOIN' => [
                 $source_table => [
@@ -320,13 +320,13 @@ class CarbonIntensitySource_CarbonIntensityZone extends CommonDBRelation
                 $zone_table => [
                     'ON' => [
                         $zone_table => 'id',
-                        $source_zone_table => CarbonIntensityZone::getForeignKeyField(),
+                        $source_zone_table => Zone::getForeignKeyField(),
                     ]
                 ]
             ],
             'WHERE' => [
                 CarbonIntensitySource::getTableField('name') => $source_name,
-                CarbonIntensityZone::getTableField('name') => $zone_name,
+                Zone::getTableField('name') => $zone_name,
             ],
             'LIMIT' => '1'
         ];

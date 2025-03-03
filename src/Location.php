@@ -1,0 +1,145 @@
+<?php
+
+/**
+ * -------------------------------------------------------------------------
+ * carbon plugin for GLPI
+ * -------------------------------------------------------------------------
+ *
+ * MIT License
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ * -------------------------------------------------------------------------
+ * @copyright Copyright (C) 2024 Teclib' and contributors.
+ * @license   MIT https://opensource.org/licenses/mit-license.php
+ * @link      https://github.com/pluginsGLPI/carbon
+ * -------------------------------------------------------------------------
+ */
+
+namespace GlpiPlugin\Carbon;
+
+use CommonDBChild;
+use CommonDBTM;
+use Location as GlpiLocation;
+use Glpi\Application\View\TemplateRenderer;
+
+/**
+ * Additional data for a location
+ */
+class Location extends CommonDBChild
+{
+   // From CommonDBRelation
+    public static $itemtype       = GlpiLocation::class;
+    public static $items_id       = 'locations_id';
+
+    public function showForm($ID, array $options = [])
+    {
+        $this->getFromDB($ID);
+        TemplateRenderer::getInstance()->display('@carbon/location.html.twig', [
+            'item' => $this,
+        ]);
+
+        return true;
+    }
+
+    public static function onGlpiLocationAdd(CommonDBTM $item)
+    {
+        self::enableCarbonIntensityDownload($item);
+        self::setBoaviztaZone($item);
+    }
+
+    public static function onGlpiLocationUpdate(CommonDBTM $item)
+    {
+        self::enableCarbonIntensityDownload($item);
+    }
+    public static function onGlpiLocationPreUpdate(CommonDBTM $item)
+    {
+
+        self::setBoaviztaZone($item);
+    }
+
+    /**
+     * Enable download of carbon intensity data for a location
+     *
+     * @return bool true if a zone download has been enabled
+     */
+    protected static function enableCarbonIntensityDownload(CommonDBTM $item): bool
+    {
+        $input = $item->fields;
+        if (!in_array('country', array_keys($input))) {
+            return false;
+        }
+        $zone = Zone::getByLocation($item);
+        if ($zone === null) {
+            return false;
+        }
+        $source_zone = new CarbonIntensitySource_Zone();
+        $source_zone->getFromDBByCrit([
+            $zone->getForeignKeyField() => $zone->fields['id'],
+            CarbonIntensitySource::getForeignKeyField() => $zone->fields['plugin_carbon_carbonintensitysources_id_historical'],
+        ]);
+        if ($source_zone->isNewItem()) {
+            return false;
+        }
+        return $source_zone->toggleZone(true);
+    }
+
+    /**
+     * Associate a zone for a location (added or updated), for Boavizta
+     *
+     * @param CommonDBTM $item
+     * @return bool true if a zone has been set
+     */
+    protected static function setBoaviztaZone(CommonDBTM $item): bool
+    {
+        if (!isset($item->input['_boavizta_zone'])) {
+            return false;
+        }
+
+        $location = new self();
+        $location->getFromDBByCrit([
+            'locations_id' => $item->getID(),
+        ]);
+
+        if ($location->isNewItem()) {
+            return false !== $location->add([
+                'locations_id' => $item->getID(),
+                'boavizta_zone' => $item->input['_boavizta_zone'],
+            ]);
+        }
+
+        return $location->update([
+            'id'            => $location->getID(),
+            'boavizta_zone' => $item->input['_boavizta_zone'],
+        ]);
+    }
+
+    public static function onGlpiLocationPrePurge(CommonDBTM $item): bool
+    {
+        $location = new self();
+        $location->getFromDBByCrit([
+            'locations_id' => $item->getID(),
+        ]);
+
+        if ($location->isNewItem()) {
+            return true;
+        }
+
+        return $location->delete($location->fields, true);
+    }
+}

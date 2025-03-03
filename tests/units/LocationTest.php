@@ -33,51 +33,44 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
-use Computer;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
-use Location;
+use GlpiPlugin\Carbon\Zone;
+use Location as GlpiLocation;
+use GlpiPlugin\Carbon\Location;
 
-class CarbonIntensityZoneTest extends DbTestCase
+class LocationTest extends DbTestCase
 {
-    public function testGetByLocation()
+    public function testOnGlpiLocationAdd()
     {
-        $output = CarbonIntensityZone::getByLocation(new Location());
-        $this->assertNull($output);
-
-        $this->getItem(Location::class);
-        $this->assertNull($output);
-
-        $location = $this->getItem(Location::class, [
-            'country' => 'foo'
+        $glpi_location = $this->getItem(GlpiLocation::class, [
+            '_boavizta_zone' => 'FRA'
         ]);
-        $output = CarbonIntensityZone::getByLocation($location);
-        $this->assertNull($output);
-
-        $zone = $this->getItem(CarbonIntensityZone::class, [
-            'name' => 'foo'
+        $location = new Location();
+        $location->getFromDBByCrit([
+            'locations_id' => $glpi_location->getID(),
         ]);
-        $output = CarbonIntensityZone::getByLocation($location);
-        $this->assertEquals($output->getID(), $zone->getID());
+        $this->assertFalse($location->isNewItem());
+        $this->assertEquals('FRA', $location->fields['boavizta_zone']);
     }
 
-    public function testGetByAsset()
+    public function testOnGlpiLocationPreUpdate()
     {
-        $output = CarbonIntensityZone::getByAsset(new Computer());
-        $this->assertNull($output);
+        $glpi_location = $this->getItem(GlpiLocation::class);
+        $location = new Location();
+        $location->getFromDBByCrit([
+            'locations_id' => $glpi_location->getID(),
+        ]);
+        $this->assertTrue($location->isNewItem());
 
-        $location = $this->getItem(Location::class, [
-            'country' => 'foo'
+        // Update the location
+        $glpi_location->update([
+            'id' => $glpi_location->getID(),
+            '_boavizta_zone' => 'FRA',
         ]);
-        $computer = $this->getItem(Computer::class, [
-            'locations_id' => $location->getID(),
+        $location = new Location();
+        $location->getFromDBByCrit([
+            'locations_id' => $glpi_location->getID(),
         ]);
-        $output = CarbonIntensityZone::getByAsset($computer);
-        $this->assertNull($output);
-
-        $zone = $this->getItem(CarbonIntensityZone::class, [
-            'name' => 'foo'
-        ]);
-        $output = CarbonIntensityZone::getByAsset($computer);
-        $this->assertEquals($output->getID(), $zone->getID());
+        $this->assertFalse($location->isNewItem());
+        $this->assertEquals('FRA', $location->fields['boavizta_zone']);
     }
 }

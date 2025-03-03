@@ -34,6 +34,7 @@
 namespace GlpiPlugin\Carbon\DataSource;
 
 use Config;
+use Dropdown;
 
 class Boaviztapi
 {
@@ -51,7 +52,7 @@ class Boaviztapi
         $this->base_url = $url;
     }
 
-    public function request(string $endpoint, array $options): array
+    public function post(string $endpoint, array $options = []): array
     {
         $options['headers'] = [
             'Accept'       => 'application/json',
@@ -62,5 +63,48 @@ class Boaviztapi
         }
 
         return $response;
+    }
+
+    public function get(string $endpoint, array $options = []): array
+    {
+        $options['headers'] = [
+            'Accept'       => 'application/json',
+        ];
+        $response = $this->client->request('GET', $this->base_url . '/v1/' . $endpoint, $options);
+        if (!$response) {
+            return [];
+        }
+
+        return $response;
+    }
+
+    /**
+     * Get zones from Boaviztapi
+     * countries or world regions woth a 3 letters code
+     *
+     * @return array
+     */
+    public function getZones(): array
+    {
+        $response = $this->get('utils/country_code');
+        ksort($response);
+        $response = array_flip($response);
+        return $response;
+    }
+
+    /**
+     * Show a dropdown of zones handleed by Boaviztapi
+     */
+    public static function dropdownBoaviztaZone(string $name, array $options)
+    {
+        $boaviztapi = new self(new RestApiClient());
+        try {
+            $zones = $boaviztapi->getZones();
+        } catch (\RuntimeException $e) {
+            trigger_error('Error while fetching Boaviztapi zones ' . $e->getMessage(), E_USER_WARNING);
+            echo 'Error while fetching Boaviztapi zones';
+            return;
+        }
+        Dropdown::showFromArray($name, $zones, $options);
     }
 }

@@ -31,7 +31,6 @@
  * -------------------------------------------------------------------------
  */
 
-use DBmysql;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 
 /** @var DBmysql $DB */

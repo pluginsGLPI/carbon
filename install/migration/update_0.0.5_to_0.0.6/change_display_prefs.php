@@ -33,10 +33,11 @@
 
 use GlpiPlugin\Carbon\CarbonIntensityZone;
 
+$itemtype = 'GlpiPlugin\\Carbon\\CarbonIntensityZone';
 /** @var Migration $migration */
 $migration->updateDisplayPrefs(
     [
-        CarbonIntensityZone::class => [
+        $itemtype => [
             2,
             3,
             128301,

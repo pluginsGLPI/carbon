@@ -41,7 +41,7 @@ use DateTimeInterface;
 use DBmysql;
 use DBmysqlIterator;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensityInterface;
 use QueryParam;
 use QuerySubQuery;
@@ -114,9 +114,9 @@ class CarbonIntensity extends CommonDropdown
 
         $tab[] = [
             'id'                 => SearchOptions::CARBON_INTENSITY_ZONE,
-            'table'              => CarbonIntensityZone::getTable(),
+            'table'              => Zone::getTable(),
             'field'              => 'name',
-            'name'               => CarbonIntensityZone::getTypeName(1),
+            'name'               => Zone::getTypeName(1),
             'massiveaction'      => false, // implicit field is id
             'datatype'           => 'dropdown',
         ];
@@ -149,7 +149,7 @@ class CarbonIntensity extends CommonDropdown
 
         $intensity_table = CarbonIntensity::getTable();
         $source_table = CarbonIntensitySource::getTable();
-        $zone_table   = CarbonIntensityZone::getTable();
+        $zone_table   = Zone::getTable();
 
         $result = $DB->request([
             'SELECT' => [$intensity_table => ['id', 'date']],
@@ -163,14 +163,14 @@ class CarbonIntensity extends CommonDropdown
                 ],
                 $zone_table => [
                     'FKEY' => [
-                        $intensity_table => 'plugin_carbon_carbonintensityzones_id',
+                        $intensity_table => 'plugin_carbon_zones_id',
                         $zone_table => 'id',
                     ]
                 ]
             ],
             'WHERE' => [
                 CarbonIntensitySource::getTableField('name') => $source_name,
-                CarbonIntensityZone::getTableField('name') => $zone_name
+                Zone::getTableField('name') => $zone_name
             ],
             'ORDER' => CarbonIntensity::getTableField('date') . ' DESC',
             'LIMIT' => '1'
@@ -195,7 +195,7 @@ class CarbonIntensity extends CommonDropdown
 
         $intensity_table = CarbonIntensity::getTable();
         $source_table = CarbonIntensitySource::getTable();
-        $zone_table   = CarbonIntensityZone::getTable();
+        $zone_table   = Zone::getTable();
 
         $result = $DB->request([
             'SELECT' => CarbonIntensity::getTableField('date'),
@@ -209,14 +209,14 @@ class CarbonIntensity extends CommonDropdown
                 ],
                 $zone_table => [
                     'FKEY' => [
-                        $intensity_table => 'plugin_carbon_carbonintensityzones_id',
+                        $intensity_table => 'plugin_carbon_zones_id',
                         $zone_table => 'id',
                     ]
                 ]
             ],
             'WHERE' => [
                 CarbonIntensitySource::getTableField('name') => $source_name,
-                CarbonIntensityZone::getTableField('name') => $zone_name
+                Zone::getTableField('name') => $zone_name
             ],
             'ORDER' => CarbonIntensity::getTableField('date') . ' ASC',
             'LIMIT' => '1'
@@ -244,7 +244,7 @@ class CarbonIntensity extends CommonDropdown
         // Check if there are gaps to fill
         $source = new CarbonIntensitySource();
         $source->getFromDBByCrit(['name' => $data_source->getSourceName()]);
-        $zone = new CarbonIntensityZone();
+        $zone = new Zone();
         $zone->getFromDBByCrit(['name' => $zone_name]);
         $gaps = $this->findGaps($source->getID(), $zone->getID(), $start_date);
         if (count($gaps) === 0) {
@@ -341,7 +341,7 @@ class CarbonIntensity extends CommonDropdown
             // trigger_error('Attempt to save carbon intensity with a source which is not in the database', E_USER_ERROR);
             // return 0;
         }
-        $zone = new CarbonIntensityZone();
+        $zone = new Zone();
         $zone->getFromDBByCrit([
             'name' => $zone_name,
         ]);
@@ -356,7 +356,7 @@ class CarbonIntensity extends CommonDropdown
             [
                 'date' => new QueryParam(),
                 CarbonIntensitySource::getForeignKeyField() => new QueryParam(),
-                CarbonIntensityZone::getForeignKeyField() => new QueryParam(),
+                Zone::getForeignKeyField() => new QueryParam(),
                 'intensity' => new QueryParam(),
                 'data_quality' => new QueryParam(),
             ],
@@ -439,7 +439,7 @@ class CarbonIntensity extends CommonDropdown
                 'FROM' => $table,
                 'WHERE' => [
                     CarbonIntensitySource::getForeignKeyField() => $source_id,
-                    CarbonIntensityZone::getForeignKeyField() => $zone_id,
+                    Zone::getForeignKeyField() => $zone_id,
                 ] + $boundaries
             ], 'rows'),
             'WHERE' => ['diff' => ['>', 3600]]

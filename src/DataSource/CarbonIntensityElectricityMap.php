@@ -40,8 +40,8 @@ use DateTimeZone;
 use DateTimeImmutable;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
-use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
+use GlpiPlugin\Carbon\Zone;
+use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
 use Config as GlpiConfig;
 use GLPIKey;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
@@ -103,7 +103,7 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
             $zone_input = [
                 'name' => $zone_spec['zoneName'],
             ];
-            $zone = new CarbonIntensityZone();
+            $zone = new Zone();
             if ($zone->getFromDbByCrit($zone_input) === false) {
                 if ($this->enableHistorical($zone_spec['zoneName'])) {
                     $zone_input['plugin_carbon_carbonintensitysources_id_historical'] = $source_id;
@@ -113,10 +113,10 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
                     continue;
                 }
             }
-            $source_zone = new CarbonIntensitySource_CarbonIntensityZone();
+            $source_zone = new CarbonIntensitySource_Zone();
             $source_zone->add([
                 CarbonIntensitySource::getForeignKeyField() => $source_id,
-                CarbonIntensityZone::getForeignKeyField() => $zone->getID(),
+                Zone::getForeignKeyField() => $zone->getID(),
                 'code' => $zone_key,
                 'is_download_enabled' => Toolbox::isLocationExistForZone($zone->fields['name']),
             ]);
@@ -182,7 +182,7 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
      */
     public function fetchDay(DateTimeImmutable $day, string $zone): array
     {
-        $source_zone = new CarbonIntensitySource_CarbonIntensityZone();
+        $source_zone = new CarbonIntensitySource_Zone();
         $zone_code = $source_zone->getFromDbBySourceAndZone($this->getSourceName(), $zone);
 
         if ($zone_code === null) {

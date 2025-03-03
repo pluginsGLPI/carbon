@@ -37,7 +37,7 @@ use DateTime;
 use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\DataTracking\TrackedInt;
@@ -93,7 +93,7 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
         );
     }
 
-    public function getCarbonEmissionPerDay(DateTimeInterface $day, CarbonIntensityZone $zone): ?TrackedFloat
+    public function getCarbonEmissionPerDay(DateTimeInterface $day, Zone $zone): ?TrackedFloat
     {
         $usage_profile = $this->getUsageProfile();
 
@@ -123,7 +123,7 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
         return $this->computeEmissionPerDay($start_time, $power, $length, $zone);
     }
 
-    protected function computeEmissionPerDay(DateTimeImmutable $start_time, TrackedInt $power, DateInterval $length, CarbonIntensityZone $zone): ?TrackedFloat
+    protected function computeEmissionPerDay(DateTimeImmutable $start_time, TrackedInt $power, DateInterval $length, Zone $zone): ?TrackedFloat
     {
         if ($power->getValue() === 0) {
             return new TrackedFloat(0);

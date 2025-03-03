@@ -41,7 +41,7 @@ use DateTimeImmutable;
 use DBmysqlIterator;
 use DbUtils;
 use DBmysql;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\DataTracking\TrackedInt;
 use QueryExpression;
@@ -80,10 +80,10 @@ abstract class AbstractAsset implements EngineInterface
      *
      * @param DateTimeImmutable $start_time
      * @param DateInterval $length
-     * @param CarbonIntensityZone $zone
+     * @param Zone $zone
      * @return DBmysqlIterator
      */
-    protected function requestCarbonIntensitiesPerDay(DateTimeImmutable $start_time, DateInterval $length, CarbonIntensityZone $zone): DBmysqlIterator
+    protected function requestCarbonIntensitiesPerDay(DateTimeImmutable $start_time, DateInterval $length, Zone $zone): DBmysqlIterator
     {
         /** @var DBmysql $DB */
         global $DB;
@@ -110,7 +110,7 @@ abstract class AbstractAsset implements EngineInterface
             'FROM' => $intensities_table,
             'WHERE' => [
                 'AND' => [
-                    CarbonIntensity::getTableField('plugin_carbon_carbonintensityzones_id') => $zone->getID(),
+                    CarbonIntensity::getTableField('plugin_carbon_zones_id') => $zone->getID(),
                     CarbonIntensity::getTableField('plugin_carbon_carbonintensitysources_id') => $zone->fields['plugin_carbon_carbonintensitysources_id_historical'],
                     [CarbonIntensity::getTableField('date') => ['>=', $start_date_s]],
                     [CarbonIntensity::getTableField('date') => ['<', $stop_date_s]],

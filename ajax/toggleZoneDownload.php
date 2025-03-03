@@ -32,7 +32,7 @@
  */
 
 use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
+use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
 
 include('../../../inc/includes.php');
 
@@ -53,7 +53,7 @@ if (!isset($_GET['id'])) {
     die();
 }
 
-$source_zone = new CarbonIntensitySource_CarbonIntensityZone();
+$source_zone = new CarbonIntensitySource_Zone();
 if (!$source_zone->getFromDB($_GET['id'])) {
     http_response_code(403);
     die();
