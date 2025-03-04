@@ -64,7 +64,7 @@ class GlobalFixture
             return;
         }
 
-        fwrite(STDOUT, sprintf(PHP_EOL . "Loading GLPI dataset version %s" . PHP_EOL, $version));
+        fwrite(STDOUT, sprintf(PHP_EOL . "Loading Carbon dataset version %s" . PHP_EOL, $version));
 
         // The following dataset contains data for France, then timezone must be Europe/Paris
         $DB->setTimezone('Europe/Paris');
