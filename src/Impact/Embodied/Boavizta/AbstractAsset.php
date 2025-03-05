@@ -244,7 +244,6 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
             AssetInterface::IMPACT_ADP => 'adp',
             AssetInterface::IMPACT_PE  => 'pe',
         ];
-        /** @var AbstractTracked $value */
         foreach ($this->getImpacts($id) as $impact => $value) {
             $key = $key_map[$impact];
             if ($value === null) {

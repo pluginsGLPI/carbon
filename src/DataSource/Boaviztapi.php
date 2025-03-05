@@ -34,6 +34,7 @@
 namespace GlpiPlugin\Carbon\DataSource;
 
 use Config;
+use DBmysql;
 use Dropdown;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
@@ -221,6 +222,7 @@ class Boaviztapi
             'ORDER'  => Zone::getTableField('name'),
         ]);
 
+        $zones = [];
         foreach ($result as $row) {
             $zones[$row['code']] = $row['name'];
         }
