@@ -35,21 +35,34 @@ namespace GlpiPlugin\Carbon\DataSource;
 
 use Config;
 use Dropdown;
+use GlpiPlugin\Carbon\CarbonIntensitySource;
+use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
+use GlpiPlugin\Carbon\Zone;
 
 class Boaviztapi
 {
     private RestApiClientInterface $client;
 
     private string $base_url;
+    private static string $source_name = 'Boaviztapi';
 
-    public function __construct(RestApiClientInterface $client)
+    public function __construct(RestApiClientInterface $client, string $url = '')
     {
         $this->client = $client;
-        $url = Config::getConfigurationValue('plugin:carbon', 'boaviztapi_base_url');
-        if (!is_string($url)) {
-            throw new \Exception('Invalid Boaviztapi base URL');
+        if (!empty($url)) {
+            $this->base_url = $url;
+        } else {
+            $url = Config::getConfigurationValue('plugin:carbon', 'boaviztapi_base_url');
+            if (!is_string($url)) {
+                throw new \Exception('Invalid Boaviztapi base URL');
+            }
+            $this->base_url = $url;
         }
-        $this->base_url = $url;
+    }
+
+    public function getSourceName(): string
+    {
+        return self::$source_name;
     }
 
     public function post(string $endpoint, array $options = []): array
@@ -79,6 +92,29 @@ class Boaviztapi
     }
 
     /**
+     * Create Boavizeta source if it does not exists
+     *
+     * @return boolean
+     */
+    public function createSource(): bool
+    {
+        $source_name = $this->getSourceName();
+        // create a source in CarbonIntensitySource
+        $source = new CarbonIntensitySource();
+        $source->getFromDBByCrit([
+            'name' => $source_name,
+        ]);
+        if ($source->isNewItem()) {
+            $id = $source->add([
+                'name' => $source_name,
+            ]);
+            return !$source->isNewID($id);
+        }
+
+        return true;
+    }
+
+    /**
      * Get zones from Boaviztapi
      * countries or world regions woth a 3 letters code
      *
@@ -93,18 +129,102 @@ class Boaviztapi
     }
 
     /**
+     * Save zones into database
+     *
+     * @param array $zones
+     * @return void
+     */
+    public function saveZones(array $zones): void
+    {
+        $source = new CarbonIntensitySource();
+        $source->getFromDBByCrit([
+            'name' => $this->getSourceName(),
+        ]);
+        if ($source->isNewItem()) {
+            return;
+        }
+
+        $source_id = $source->getID();
+        $zone = new Zone();
+        foreach ($zones as $code => $name) {
+            $zone_id = $zone->getFromDBByCrit([
+                'name' => $name,
+            ]);
+            if ($zone_id === false) {
+                $zone_id = $zone->add([
+                    'name' => $name,
+                ]);
+                if ($zone_id === false) {
+                    // Failed to add the zone
+                    continue;
+                }
+            } else {
+                $zone_id = $zone->getID();
+            }
+            $source_zone = new CarbonIntensitySource_Zone();
+            $source_zone_id = $source_zone->getFromDBByCrit([
+                'plugin_carbon_carbonintensitysources_id' => $source_id,
+                'plugin_carbon_zones_id' => $zone_id,
+            ]);
+            if ($source_zone_id === false) {
+                $source_zone_id = $source_zone->add([
+                    'plugin_carbon_carbonintensitysources_id' => $source_id,
+                    'plugin_carbon_zones_id' => $zone_id,
+                ]);
+                if ($source_zone_id === false) {
+                    continue;
+                }
+            } else {
+                $source_zone_id = $source_zone->getID();
+            }
+            $source_zone->update([
+                'id'   => $source_zone_id,
+                'code' => $code,
+            ]);
+        }
+    }
+
+    /**
      * Show a dropdown of zones handleed by Boaviztapi
      */
     public static function dropdownBoaviztaZone(string $name, array $options)
     {
-        $boaviztapi = new self(new RestApiClient());
-        try {
-            $zones = $boaviztapi->getZones();
-        } catch (\RuntimeException $e) {
-            trigger_error('Error while fetching Boaviztapi zones ' . $e->getMessage(), E_USER_WARNING);
-            echo 'Error while fetching Boaviztapi zones';
-            return;
+        /** @var DBmysql $DB */
+        global $DB;
+
+        $zone_table = Zone::getTable();
+        $source_table = CarbonIntensitySource::getTable();
+        $source_zone_table = CarbonIntensitySource_Zone::getTable();
+        $result = $DB->request([
+            'SELECT' => [
+                Zone::getTableField('name'),
+                CarbonIntensitySource_Zone::getTableField('code'),
+            ],
+            'FROM'   => Zone::getTable(),
+            'INNER JOIN' => [
+                $source_zone_table => [
+                    'FKEY' => [
+                        $zone_table => 'id',
+                        $source_zone_table => 'plugin_carbon_zones_id',
+                    ],
+                ],
+                $source_table => [
+                    'FKEY' => [
+                        $source_zone_table => 'plugin_carbon_carbonintensitysources_id',
+                        CarbonIntensitySource::getTable() => 'id',
+                    ],
+                ],
+            ],
+            'WHERE' => [
+                CarbonIntensitySource::getTableField('name') => self::$source_name,
+            ],
+            'ORDER'  => Zone::getTableField('name'),
+        ]);
+
+        foreach ($result as $row) {
+            $zones[$row['code']] = $row['name'];
         }
-        Dropdown::showFromArray($name, $zones, $options);
+
+        return Dropdown::showFromArray($name, $zones, $options);
     }
 }

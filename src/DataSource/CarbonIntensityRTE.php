@@ -52,7 +52,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
 
     private RestApiClientInterface $client;
 
-    public function __construct(RestApiClientInterface $client)
+    public function __construct(RestApiClientInterface $client, string $url = '')
     {
         $this->client = $client;
     }
