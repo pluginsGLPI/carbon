@@ -36,7 +36,7 @@ namespace GlpiPlugin\Carbon\Engine\V1\Tests;
 use Computer as GlpiComputer;
 use Computer_Item;
 use DateTime;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\Tests\Engine\V1\EngineTestCase;
 use Monitor as GlpiMonitor;
 use MonitorType as GlpiMonitorType;
@@ -149,7 +149,7 @@ class MonitorTest extends EngineTestCase
         $thursday = DateTime::createFromFormat('Y-m-d H:i:s', '1999-12-02 12:00:00');
         $intensity = 1;
         $this->createCarbonIntensityData($country, $this->getUniqueString(), $thursday, $intensity);
-        $zone = new CarbonIntensityZone();
+        $zone = new Zone();
         $zone->getFromDBByCrit(['name' => $country]);
 
         $usage_profile = [

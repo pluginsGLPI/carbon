@@ -46,7 +46,7 @@ use GlpiPlugin\Carbon\Toolbox;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\Impact\History\Computer as ComputerHistory;
 use GlpiPlugin\Carbon\SearchOptions;
 use QueryExpression;
@@ -416,7 +416,7 @@ class Provider
         global $DB;
 
         $source = new CarbonIntensitySource();
-        $zone = new CarbonIntensityZone();
+        $zone = new Zone();
         $source->getFromDBByCrit([
             'name' => 'RTE'
         ]);
@@ -432,7 +432,7 @@ class Provider
             'FROM'  => CarbonIntensity::getTable(),
             'WHERE' => [
                 CarbonIntensitySource::getForeignKeyField() => $source->getID(),
-                CarbonIntensityZone::getForeignKeyField() => $zone->getID(),
+                Zone::getForeignKeyField() => $zone->getID(),
             ],
         ];
 

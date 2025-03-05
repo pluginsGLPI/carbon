@@ -33,5 +33,5 @@ INSERT INTO `glpi_plugin_carbon_carbonintensitysources` (`id`, `name`) VALUES
     (2, 'ElectricityMap'),
     (1, 'RTE');
 
-INSERT INTO `glpi_plugin_carbon_carbonintensityzones` (`id`, `name`, `plugin_carbon_carbonintensitysources_id_historical`) VALUES
+INSERT INTO `glpi_plugin_carbon_zones` (`id`, `name`, `plugin_carbon_carbonintensitysources_id_historical`) VALUES
     (1, 'France', 1);

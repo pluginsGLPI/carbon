@@ -34,7 +34,7 @@
 namespace GlpiPlugin\Carbon\Engine\V1;
 
 use DateTime;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\DataTracking\TrackedInt;
 
@@ -54,7 +54,7 @@ interface EngineInterface
      * Returns the carbon emission for the specified day.
      *
      * @param DateTime $day the day
-     * @param CarbonIntensityZone $zone the zone where the asset is located at the given date
+     * @param Zone $zone the zone where the asset is located at the given date
      *
      * @return TrackedFloat|null
      *
@@ -63,7 +63,7 @@ interface EngineInterface
      *
      * Unit of returned value, if float, is grams of CO2
      */
-    public function getCarbonEmissionPerDay(DateTime $day, CarbonIntensityZone $zone): ?TrackedFloat;
+    public function getCarbonEmissionPerDay(DateTime $day, Zone $zone): ?TrackedFloat;
 
     /**
      * Returns the consumed energy for the specified day.

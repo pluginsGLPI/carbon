@@ -40,4 +40,4 @@ if (!Plugin::isPluginActive('carbon')) {
 }
 
 // Requires URL encoded backslashes or Html::redirect will double them
-Html::redirect(GlpiConfig::getFormURL() . '?forcetab=GlpiPlugin%5CCarbon%5CConfig$0');
+Html::redirect(GlpiConfig::getFormURL() . '?forcetab=GlpiPlugin%5CCarbon%5CConfig$1');

@@ -41,11 +41,12 @@ use DateTimeInterface;
 use DBmysql;
 use DBmysqlIterator;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensityInterface;
 use QueryParam;
 use QuerySubQuery;
 use QueryExpression;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 class CarbonIntensity extends CommonDropdown
 {
@@ -114,9 +115,9 @@ class CarbonIntensity extends CommonDropdown
 
         $tab[] = [
             'id'                 => SearchOptions::CARBON_INTENSITY_ZONE,
-            'table'              => CarbonIntensityZone::getTable(),
+            'table'              => Zone::getTable(),
             'field'              => 'name',
-            'name'               => CarbonIntensityZone::getTypeName(1),
+            'name'               => Zone::getTypeName(1),
             'massiveaction'      => false, // implicit field is id
             'datatype'           => 'dropdown',
         ];
@@ -149,7 +150,7 @@ class CarbonIntensity extends CommonDropdown
 
         $intensity_table = CarbonIntensity::getTable();
         $source_table = CarbonIntensitySource::getTable();
-        $zone_table   = CarbonIntensityZone::getTable();
+        $zone_table   = Zone::getTable();
 
         $result = $DB->request([
             'SELECT' => [$intensity_table => ['id', 'date']],
@@ -163,14 +164,14 @@ class CarbonIntensity extends CommonDropdown
                 ],
                 $zone_table => [
                     'FKEY' => [
-                        $intensity_table => 'plugin_carbon_carbonintensityzones_id',
+                        $intensity_table => 'plugin_carbon_zones_id',
                         $zone_table => 'id',
                     ]
                 ]
             ],
             'WHERE' => [
                 CarbonIntensitySource::getTableField('name') => $source_name,
-                CarbonIntensityZone::getTableField('name') => $zone_name
+                Zone::getTableField('name') => $zone_name
             ],
             'ORDER' => CarbonIntensity::getTableField('date') . ' DESC',
             'LIMIT' => '1'
@@ -195,7 +196,7 @@ class CarbonIntensity extends CommonDropdown
 
         $intensity_table = CarbonIntensity::getTable();
         $source_table = CarbonIntensitySource::getTable();
-        $zone_table   = CarbonIntensityZone::getTable();
+        $zone_table   = Zone::getTable();
 
         $result = $DB->request([
             'SELECT' => CarbonIntensity::getTableField('date'),
@@ -209,14 +210,14 @@ class CarbonIntensity extends CommonDropdown
                 ],
                 $zone_table => [
                     'FKEY' => [
-                        $intensity_table => 'plugin_carbon_carbonintensityzones_id',
+                        $intensity_table => 'plugin_carbon_zones_id',
                         $zone_table => 'id',
                     ]
                 ]
             ],
             'WHERE' => [
                 CarbonIntensitySource::getTableField('name') => $source_name,
-                CarbonIntensityZone::getTableField('name') => $zone_name
+                Zone::getTableField('name') => $zone_name
             ],
             'ORDER' => CarbonIntensity::getTableField('date') . ' ASC',
             'LIMIT' => '1'
@@ -233,9 +234,10 @@ class CarbonIntensity extends CommonDropdown
      * @param CarbonIntensityInterface $data_source
      * @param string $zone_name zone name
      * @param integer $limit maximum count of items to process
+     * @param ProgressBar $progress_bar progress bar to update (CLI mode only)
      * @return integer count of item downloaded
      */
-    public function downloadOneZone(CarbonIntensityInterface $data_source, string $zone_name, int $limit = 0): int
+    public function downloadOneZone(CarbonIntensityInterface $data_source, string $zone_name, int $limit = 0, ?ProgressBar $progress_bar = null): int
     {
         $start_date = $this->getDownloadStartDate($zone_name, $data_source);
 
@@ -244,7 +246,7 @@ class CarbonIntensity extends CommonDropdown
         // Check if there are gaps to fill
         $source = new CarbonIntensitySource();
         $source->getFromDBByCrit(['name' => $data_source->getSourceName()]);
-        $zone = new CarbonIntensityZone();
+        $zone = new Zone();
         $zone->getFromDBByCrit(['name' => $zone_name]);
         $gaps = $this->findGaps($source->getID(), $zone->getID(), $start_date);
         if (count($gaps) === 0) {
@@ -257,10 +259,23 @@ class CarbonIntensity extends CommonDropdown
                 'now'
             ), E_USER_WARNING);
         }
+
+        if ($progress_bar) {
+            $hours_to_download = 0;
+            // Count the total days to download
+            foreach ($gaps as $gap) {
+                $gap_start = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $gap['start']);
+                $gap_end = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $gap['end']);
+                $diff = $gap_start->diff($gap_end);
+                $hours_to_download += $diff->days * 24 + $diff->h;
+            }
+            $progress_bar->setMaxSteps($hours_to_download);
+        }
+
         foreach ($gaps as $gap) {
             $gap_start = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $gap['start']);
             $gap_end = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $gap['end']);
-            $count = $data_source->fullDownload($zone_name, $gap_start, $gap_end, $this, $limit);
+            $count = $data_source->fullDownload($zone_name, $gap_start, $gap_end, $this, $limit, $progress_bar);
             $total_count += $count;
             $limit -= $count;
             if ($total_count >= $limit) {
@@ -341,7 +356,7 @@ class CarbonIntensity extends CommonDropdown
             // trigger_error('Attempt to save carbon intensity with a source which is not in the database', E_USER_ERROR);
             // return 0;
         }
-        $zone = new CarbonIntensityZone();
+        $zone = new Zone();
         $zone->getFromDBByCrit([
             'name' => $zone_name,
         ]);
@@ -356,7 +371,7 @@ class CarbonIntensity extends CommonDropdown
             [
                 'date' => new QueryParam(),
                 CarbonIntensitySource::getForeignKeyField() => new QueryParam(),
-                CarbonIntensityZone::getForeignKeyField() => new QueryParam(),
+                Zone::getForeignKeyField() => new QueryParam(),
                 'intensity' => new QueryParam(),
                 'data_quality' => new QueryParam(),
             ],
@@ -393,59 +408,116 @@ class CarbonIntensity extends CommonDropdown
     /**
      * Gets date intervals where data are missing
      *
+     * @see https://bertwagner.com/posts/gaps-and-islands/
+     *
      * @param integer $source_id
      * @param integer $zone_id
-     * @param DateTimeInterface|null $start
+     * @param DateTimeInterface $start
      * @param DateTimeInterface|null $stop
-     * @return DBmysqlIterator
+     * @return array
      */
-    public function findGaps(int $source_id, int $zone_id, ?DateTimeInterface $start, ?DateTimeInterface $stop = null): DBmysqlIterator
+    public function findGaps(int $source_id, int $zone_id, DateTimeInterface $start, ?DateTimeInterface $stop = null): array
     {
         /** @var DBmysql $DB */
         global $DB;
 
+        // Get start date as unix timestamp
+        $start_timestamp = $start->format('U');
+        $start_timestamp = $start_timestamp - ($start_timestamp % 3600);
+        $boundaries[] = new QueryExpression('UNIX_TIMESTAMP(`date`) >= ' . $start_timestamp);
+
+        // get stop date as unix timestamp
+        if ($stop === null) {
+            // Assume stop date is yesterday at midnight
+            $stop = new DateTime();
+            $stop->setTime(0, 0, 0);
+            $stop->sub(new DateInterval('P1D'));
+        }
+        $stop_timestamp = $stop->format('U');
+        $stop_timestamp = $stop_timestamp - ($stop_timestamp % 3600);
+        $boundaries[] = new QueryExpression('UNIX_TIMESTAMP(`date`) <= ' . $stop_timestamp);
+
+        // prepare sub query to get start and end date of an atomic date range
+        // An atomic date range is set to 1 hour
+        // To reduce problems with DST, we use the unix timestamp of the date
         $table = self::getTable();
+        $atomic_ranges_subquery = new QuerySubQuery([
+            'SELECT' => [
+                new QueryExpression('UNIX_TIMESTAMP(`date`) as `start_date`'),
+                new QueryExpression("UNIX_TIMESTAMP(`date`) + 3600 as `end_date`"),
+            ],
+            'FROM'   => $table,
+            'WHERE'  => [
+                CarbonIntensitySource::getForeignKeyField() => $source_id,
+                Zone::getForeignKeyField() => $zone_id,
+            ] + $boundaries,
+        ], 'atomic_ranges');
 
-        // Build WHERE clause for boundaries
-        $boundaries = [];
-        if ($start !== null) {
-            $unix_start = $start->format('U');
-            $unix_start = $unix_start - ($unix_start % 3600);
-            $boundaries[] = new QueryExpression('UNIX_TIMESTAMP(`date`) >= ' . $unix_start);
-        }
-        if ($stop !== null) {
-            $unix_stop = $stop->format('U');
-            $unix_stop = $unix_stop - ($unix_stop % 3600);
-            $boundaries[] = new QueryExpression('UNIX_TIMESTAMP(`date`) <= ' . $unix_stop);
-        }
+        // For each atomic date range, find the end date of previous atomic date range
+        $groups_subquery = new QuerySubQuery([
+            'SELECT' => [
+                new QueryExpression('ROW_NUMBER() OVER (ORDER BY `start_date`, `end_date`) AS `row_number`'),
+                'start_date',
+                'end_date',
+                new QueryExpression('LAG(`end_date`, 1) OVER (ORDER BY `start_date`, `end_date`) AS `previous_end_date`')
+            ],
+            'FROM' => $atomic_ranges_subquery
+        ], 'groups');
 
-        $timestamp_1 = 'UNIX_TIMESTAMP(`date`)';
-        $timestamp_2 = 'LEAD(UNIX_TIMESTAMP(`date`), 1) OVER (ORDER BY UNIX_TIMESTAMP(`date`))';
-        $date_1      = '`date`';
-        $date_2      =  'LEAD(`date`, 1) OVER (ORDER BY `date`)';
+        // For each atomic date range, find if it is the start of an island
+        $islands_subquery = new QuerySubQuery([
+            'SELECT' => [
+                '*',
+                // new QueryExpression('CASE WHEN `groups`.`previous_end_date` >= `start_date` THEN 0 ELSE 1 END AS `is_island_start`'), // For debugging purpose
+                new QueryExpression('SUM(CASE WHEN `groups`.`previous_end_date` >= `start_date` THEN 0 ELSE 1 END) OVER (ORDER BY `groups`.`row_number`) AS `ìsland_id`')
+            ],
+            'FROM' => $groups_subquery
+        ], 'islands');
+
         $request = [
             'SELECT' => [
-                'start',
-                'end'
+                'MIN' => 'start_date as island_start_date',
+                'MAX' => 'end_date as island_end_date',
             ],
-            'FROM'  => new QuerySubQuery([
-                'SELECT' => [
-                    new QueryExpression("$timestamp_1 as `timestamp`"),
-                    new QueryExpression("$timestamp_2  AS `next_available_timestamp`"),
-                    new QueryExpression("$timestamp_2 - $timestamp_1 as `diff`"),
-                    new QueryExpression("$date_1 as `start`"),
-                    new QueryExpression("$date_2 as `end`"),
-                ],
-                'FROM' => $table,
-                'WHERE' => [
-                    CarbonIntensitySource::getForeignKeyField() => $source_id,
-                    CarbonIntensityZone::getForeignKeyField() => $zone_id,
-                ] + $boundaries
-            ], 'rows'),
-            'WHERE' => ['diff' => ['>', 3600]]
+            'FROM' => $islands_subquery,
+            'GROUPBY' => ['ìsland_id'],
+            'ORDER' => ['island_start_date']
         ];
-        $iterator = $DB->request($request);
 
-        return $iterator;
+        $result = $DB->request($request);
+        if ($result->count() === 0) {
+            // No island at all, the whole range is a gap
+            return [
+                [
+                    'start' => date('Y-m-d H:i:s', $start_timestamp),
+                    'end'   => date('Y-m-d H:i:s', $stop_timestamp),
+                ]
+            ];
+        }
+
+        // Find gaps from islands
+        $expected_start_date = $start_timestamp;
+        $gaps = [];
+        foreach ($result as $row) {
+            if ($expected_start_date < $row['island_start_date']) {
+                // The current island starts after the expected start date
+                // Then there is a gap
+                $gaps[] = [
+                    'start' => date('Y-m-d H:i:s', $expected_start_date),
+                    'end'   => date('Y-m-d H:i:s', $row['island_start_date']),
+                ];
+            }
+            $expected_start_date = $row['island_end_date'];
+        }
+        if ($expected_start_date < $stop_timestamp) {
+            // The last island ends before the stop date
+            // Then there is a gap
+            $gaps[] = [
+                'start' => date('Y-m-d H:i:s', $expected_start_date),
+                'end'   => date('Y-m-d H:i:s', $stop_timestamp),
+            ];
+        }
+
+        return $gaps;
     }
 }

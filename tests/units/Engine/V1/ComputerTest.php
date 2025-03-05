@@ -38,7 +38,7 @@ use Computer as GlpiComputer;
 use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
 use GlpiPlugin\Carbon\Engine\V1\Computer;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\Tests\Engine\V1\EngineTestCase;
 
@@ -156,7 +156,7 @@ class ComputerTest extends EngineTestCase
         $this->createCarbonIntensityData($country, self::TEST_CARBON_INTENSITY_SOURCE, $thursday, self::TEST_CARBON_INTENSITY_THURSDAY);
         $saturday = DateTime::createFromFormat('Y-m-d H:i:s', self::TEST_DATE_SATURDAY);
         $this->createCarbonIntensityData($country, self::TEST_CARBON_INTENSITY_SOURCE, $saturday, self::TEST_CARBON_INTENSITY_SATURDAY);
-        $zone = new CarbonIntensityZone();
+        $zone = new Zone();
         $zone->getFromDBByCrit(['name' => $country]);
 
         $laptop_glpi_computer = $this->createComputerUsageProfilePowerLocation(self::TEST_LAPTOP_USAGE_PROFILE, self::TEST_LAPTOP_POWER, $country);

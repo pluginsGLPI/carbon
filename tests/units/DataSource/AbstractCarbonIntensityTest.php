@@ -36,7 +36,7 @@ namespace GlpiPlugin\Carbon\DataSource\Tests;
 use DateTime;
 use DateTimeImmutable;
 use GlpiPlugin\Carbon\CarbonIntensity;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\DataSource\AbstractCarbonIntensity;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 
@@ -207,15 +207,15 @@ class AbstractCarbonIntensityTest extends DbTestCase
     //         $source = $this->getItem(CarbonIntensitySource::class, ['name' => 'test_source']);
     //     }
 
-    //     $zone = new CarbonIntensityZone();
+    //     $zone = new Zone();
     //     $zone->getFromDBByCrit(['name' => 'FR']);
     //     if ($zone->isNewItem()) {
-    //         $zone = $this->getItem(CarbonIntensityZone::class, ['name' => 'FR']);
+    //         $zone = $this->getItem(Zone::class, ['name' => 'FR']);
     //     }
-    //     $zone = new CarbonIntensityZone();
+    //     $zone = new Zone();
     //     $zone->getFromDBByCrit(['name' => 'DE']);
     //     if ($zone->isNewItem()) {
-    //         $zone = $this->getItem(CarbonIntensityZone::class, ['name' => 'DE']);
+    //         $zone = $this->getItem(Zone::class, ['name' => 'DE']);
     //     }
 
     //     $glpi_config = new GlpiConfig();
@@ -236,10 +236,10 @@ class AbstractCarbonIntensityTest extends DbTestCase
 
     public function testFullDownload()
     {
-        $zone = new CarbonIntensityZone();
+        $zone = new Zone();
         $zone->getFromDBByCrit(['name' => 'FR']);
         if ($zone->isNewItem()) {
-            $zone = $this->getItem(CarbonIntensityZone::class, ['name' => 'FR']);
+            $zone = $this->getItem(Zone::class, ['name' => 'FR']);
         }
         $intensity = $this->createStub(CarbonIntensity::class);
 
@@ -267,10 +267,10 @@ class AbstractCarbonIntensityTest extends DbTestCase
 
     public function testIncrementalDownload()
     {
-        $zone = new CarbonIntensityZone();
+        $zone = new Zone();
         $zone->getFromDBByCrit(['name' => 'FR']);
         if ($zone->isNewItem()) {
-            $zone = $this->getItem(CarbonIntensityZone::class, ['name' => 'FR']);
+            $zone = $this->getItem(Zone::class, ['name' => 'FR']);
         }
         $intensity = $this->createStub(CarbonIntensity::class);
 

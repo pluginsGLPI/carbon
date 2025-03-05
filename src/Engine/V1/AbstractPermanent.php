@@ -37,7 +37,7 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateInterval;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 
 abstract class AbstractPermanent extends AbstractAsset implements EngineInterface
@@ -64,7 +64,7 @@ abstract class AbstractPermanent extends AbstractAsset implements EngineInterfac
         );
     }
 
-    public function getCarbonEmissionPerDay(DateTimeInterface $day, CarbonIntensityZone $zone): ?TrackedFloat
+    public function getCarbonEmissionPerDay(DateTimeInterface $day, Zone $zone): ?TrackedFloat
     {
         $power = $this->getPower();
 

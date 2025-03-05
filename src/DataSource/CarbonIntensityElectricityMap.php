@@ -40,12 +40,13 @@ use DateTimeZone;
 use DateTimeImmutable;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
-use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
+use GlpiPlugin\Carbon\Zone;
+use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
 use Config as GlpiConfig;
 use GLPIKey;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\Toolbox;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
 {
@@ -103,7 +104,7 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
             $zone_input = [
                 'name' => $zone_spec['zoneName'],
             ];
-            $zone = new CarbonIntensityZone();
+            $zone = new Zone();
             if ($zone->getFromDbByCrit($zone_input) === false) {
                 if ($this->enableHistorical($zone_spec['zoneName'])) {
                     $zone_input['plugin_carbon_carbonintensitysources_id_historical'] = $source_id;
@@ -113,10 +114,10 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
                     continue;
                 }
             }
-            $source_zone = new CarbonIntensitySource_CarbonIntensityZone();
+            $source_zone = new CarbonIntensitySource_Zone();
             $source_zone->add([
                 CarbonIntensitySource::getForeignKeyField() => $source_id,
-                CarbonIntensityZone::getForeignKeyField() => $zone->getID(),
+                Zone::getForeignKeyField() => $zone->getID(),
                 'code' => $zone_key,
                 'is_download_enabled' => Toolbox::isLocationExistForZone($zone->fields['name']),
             ]);
@@ -182,7 +183,7 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
      */
     public function fetchDay(DateTimeImmutable $day, string $zone): array
     {
-        $source_zone = new CarbonIntensitySource_CarbonIntensityZone();
+        $source_zone = new CarbonIntensitySource_Zone();
         $zone_code = $source_zone->getFromDbBySourceAndZone($this->getSourceName(), $zone);
 
         if ($zone_code === null) {
@@ -321,8 +322,9 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
         return $saved > 0 ? $count : -$count;
     }
 
-    public function fullDownload(string $zone, DateTimeImmutable $start_date, DateTimeImmutable $stop_date, CarbonIntensity $intensity, int $limit = 0): int
+    public function fullDownload(string $zone, DateTimeImmutable $start_date, DateTimeImmutable $stop_date, CarbonIntensity $intensity, int $limit = 0, ?ProgressBar $progress = null): int
     {
+        // TODO : implement progress bar
         // Disable full download because we miss documentation for PAST_URL endpoint
         $start_date = new DateTime('24 hours ago');
         $start_date->setTime((int) $start_date->format('H'), 0, 0);

@@ -35,6 +35,7 @@ namespace GlpiPlugin\Carbon\DataSource;
 
 use DateTimeImmutable;
 use GlpiPlugin\Carbon\CarbonIntensity;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
  * The common interface for all classes implementing carbon intensity fetching from various sources.
@@ -162,9 +163,10 @@ interface CarbonIntensityInterface
      * @param DateTimeImmutable $stop_date date where the download must start
      * @param CarbonIntensity $intensity Instance used to update the database
      * @param integer $limit
+     * @param ProgressBar $progress progress bar to update during the download (CLI)
      * @return integer count of successfully saved items
      */
-    public function fullDownload(string $zone, DateTimeImmutable $start_date, DateTimeImmutable $stop_date, CarbonIntensity $intensity, int $limit = 0): int;
+    public function fullDownload(string $zone, DateTimeImmutable $start_date, DateTimeImmutable $stop_date, CarbonIntensity $intensity, int $limit = 0, ?ProgressBar $progress = null): int;
 
     /**
      * Download recent carbon intensity data day by day

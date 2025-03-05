@@ -44,7 +44,7 @@ use ProfileRight;
 use Glpi\System\Diagnostic\DatabaseSchemaIntegrityChecker;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\CronTask;
 use GlpiPlugin\Carbon\Report;
@@ -309,7 +309,7 @@ class PluginInstallTest extends CommonTestCase
         $preferences = $displayPreference->find(['itemtype' => CarbonIntensity::class, 'users_id' => 0]);
         $this->assertEquals(5, count($preferences));
 
-        $preferences = $displayPreference->find(['itemtype' => CarbonIntensityZone::class, 'users_id' => 0]);
+        $preferences = $displayPreference->find(['itemtype' => Zone::class, 'users_id' => 0]);
         $this->assertEquals(4, count($preferences));
     }
 

@@ -34,14 +34,14 @@
 namespace GlpiPlugin\Carbon\Tests;
 
 use Computer;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\Zone;
 use Location;
 
-class CarbonIntensityZoneTest extends DbTestCase
+class ZoneTest extends DbTestCase
 {
     public function testGetByLocation()
     {
-        $output = CarbonIntensityZone::getByLocation(new Location());
+        $output = Zone::getByLocation(new Location());
         $this->assertNull($output);
 
         $this->getItem(Location::class);
@@ -50,19 +50,19 @@ class CarbonIntensityZoneTest extends DbTestCase
         $location = $this->getItem(Location::class, [
             'country' => 'foo'
         ]);
-        $output = CarbonIntensityZone::getByLocation($location);
+        $output = Zone::getByLocation($location);
         $this->assertNull($output);
 
-        $zone = $this->getItem(CarbonIntensityZone::class, [
+        $zone = $this->getItem(Zone::class, [
             'name' => 'foo'
         ]);
-        $output = CarbonIntensityZone::getByLocation($location);
+        $output = Zone::getByLocation($location);
         $this->assertEquals($output->getID(), $zone->getID());
     }
 
     public function testGetByAsset()
     {
-        $output = CarbonIntensityZone::getByAsset(new Computer());
+        $output = Zone::getByAsset(new Computer());
         $this->assertNull($output);
 
         $location = $this->getItem(Location::class, [
@@ -71,13 +71,13 @@ class CarbonIntensityZoneTest extends DbTestCase
         $computer = $this->getItem(Computer::class, [
             'locations_id' => $location->getID(),
         ]);
-        $output = CarbonIntensityZone::getByAsset($computer);
+        $output = Zone::getByAsset($computer);
         $this->assertNull($output);
 
-        $zone = $this->getItem(CarbonIntensityZone::class, [
+        $zone = $this->getItem(Zone::class, [
             'name' => 'foo'
         ]);
-        $output = CarbonIntensityZone::getByAsset($computer);
+        $output = Zone::getByAsset($computer);
         $this->assertEquals($output->getID(), $zone->getID());
     }
 }

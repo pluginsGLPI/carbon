@@ -41,8 +41,9 @@ use DateTimeImmutable;
 use Toolbox as GlpiToolbox;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\CarbonIntensitySource_CarbonIntensityZone;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
+use GlpiPlugin\Carbon\Zone;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
 {
@@ -144,11 +145,11 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
 
         $source_table = CarbonIntensitySource::getTable();
         $source_fk = CarbonIntensitySource::getForeignKeyField();
-        $zone_table = CarbonIntensityZone::getTable();
-        $zone_fk = CarbonIntensityZone::getForeignKeyField();
-        $source_zone_table = CarbonIntensitySource_CarbonIntensityZone::getTable();
+        $zone_table = Zone::getTable();
+        $zone_fk = Zone::getForeignKeyField();
+        $source_zone_table = CarbonIntensitySource_Zone::getTable();
         $iterator = $DB->request([
-            'SELECT' => CarbonIntensityZone::getTableField('name'),
+            'SELECT' => Zone::getTableField('name'),
             'FROM' => $zone_table,
             'INNER JOIN' => [
                 $source_zone_table => [
@@ -172,8 +173,7 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
         return iterator_to_array($iterator);
     }
 
-
-    public function fullDownload(string $zone, DateTimeImmutable $start_date, DateTimeImmutable $stop_date, CarbonIntensity $intensity, int $limit = 0): int
+    public function fullDownload(string $zone, DateTimeImmutable $start_date, DateTimeImmutable $stop_date, CarbonIntensity $intensity, int $limit = 0, ?ProgressBar $progress_bar = null): int
     {
         $count = 0;
         $saved = 0;
@@ -199,6 +199,10 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
                 break;
             }
             $saved = $intensity->save($zone, $this->getSourceName(), $data[$zone]);
+            if ($progress_bar) {
+                $progress_bar->advance($saved);
+            }
+
             $count += abs($saved);
             if ($limit > 0 && $count >= $limit) {
                 return $saved > 0 ? $count : -$count;
@@ -302,9 +306,9 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
         }
     }
 
-    protected function toggleZoneDownload(CarbonIntensityZone $zone, CarbonIntensitySource $source, ?bool $state): bool
+    protected function toggleZoneDownload(Zone $zone, CarbonIntensitySource $source, ?bool $state): bool
     {
-        $source_zone = new CarbonIntensitySource_CarbonIntensityZone();
+        $source_zone = new CarbonIntensitySource_Zone();
         $source_zone->getFromDBByCrit([
             $zone->getForeignKeyField() => $zone->getID(),
             $source->getForeignKeyField() => $source->getID(),

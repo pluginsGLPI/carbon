@@ -37,9 +37,11 @@ use Glpi\Plugin\Hooks;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\EnvironmentalImpact;
+use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\Profile;
 use GlpiPlugin\Carbon\Report;
 use ComputerType as GlpiComputerType;
+use Location as GlpiLocation;
 use MonitorType as GlpiMonitorType;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
 use Profile as GlpiProfile;
@@ -108,8 +110,13 @@ function plugin_carbon_setupHooks()
         $PLUGIN_HOOKS[Hooks::ITEM_ADD]['carbon'][$itemtype] = 'plugin_carbon_hook_add_asset';
         $PLUGIN_HOOKS[Hooks::ITEM_UPDATE]['carbon'][$itemtype] = 'plugin_carbon_hook_update_asset';
     }
-    $PLUGIN_HOOKS[Hooks::ITEM_ADD]['carbon'][Location::class] = 'plugin_carbon_hook_add_location';
-    $PLUGIN_HOOKS[Hooks::ITEM_UPDATE]['carbon'][Location::class] = 'plugin_carbon_hook_update_location';
+    $PLUGIN_HOOKS[Hooks::POST_ITEM_FORM]['carbon'] = 'plugin_carbon_postItemForm';
+
+    // Actions taken on locations events
+    $PLUGIN_HOOKS[Hooks::ITEM_ADD]['carbon'][GlpiLocation::class] = [Location::class, 'onGlpiLocationAdd'];
+    $PLUGIN_HOOKS[Hooks::PRE_ITEM_UPDATE]['carbon'][GlpiLocation::class] = [Location::class, 'onGlpiLocationPreUpdate'];
+    $PLUGIN_HOOKS[Hooks::ITEM_UPDATE]['carbon'][GlpiLocation::class] = [Location::class, 'onGlpiLocationUpdate'];
+    $PLUGIN_HOOKS[Hooks::PRE_ITEM_PURGE]['carbon'][GlpiLocation::class] = [Location::class, 'onGlpiLocationPrePurge'];
 
     // Add ApexCharts.js library
     $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][] = 'dist/bundle.js';
@@ -164,6 +171,9 @@ function plugin_version_carbon()
  */
 function plugin_carbon_check_prerequisites()
 {
+    /** @var DBmysql $DB */
+    global $DB;
+
     $prerequisitesSuccess = true;
 
     /** @phpstan-ignore if.alwaysFalse */
@@ -177,15 +187,35 @@ function plugin_carbon_check_prerequisites()
         $prerequisitesSuccess = false;
     }
 
+    // TODO: enable when minimal requirement of GLPI match this plugin
+    // $db_version = $DB->getVersion();
+    // if (strpos($db_version, 'MariaDB') !== false) {
+    //     // MariaDB
+    //     // get numbers and dot only from version
+    //     $db_version_number = preg_replace('/[^0-9.]/', '', $db_version);
+    //     if (version_compare($db_version_number, '10.2', 'lt')) {
+    //         echo "This plugin requires MySQL >= 8.0 or MariaDB >= 10.2<br>";
+    //         $prerequisitesSuccess = false;
+    //     }
+    //     $prerequisitesSuccess = false;
+    // } else {
+    //     // MySQL
+    //     if (version_compare($db_version, '8.0', 'lt')) {
+    //         echo "This plugin requires MySQL >= 8.0 or MariaDB >= 10.2<br>";
+    //         $prerequisitesSuccess = false;
+    //     }
+    // }
+
     return $prerequisitesSuccess;
 }
 
 /**
  * Get the path to the empty SQL schema file
+ * @param string $version The version of the schema file to get
  *
  * @return string|null
  */
-function plugin_carbon_getSchemaPath(string $version = null): ?string
+function plugin_carbon_getSchemaPath(?string $version = null): ?string
 {
     $version = $version ?? PLUGIN_CARBON_VERSION;
 

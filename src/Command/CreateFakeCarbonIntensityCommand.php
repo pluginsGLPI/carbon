@@ -37,7 +37,7 @@ use DateTime;
 use DateInterval;
 use DateTimeZone;
 use GlpiPlugin\Carbon\CarbonIntensity;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -78,7 +78,7 @@ class CreateFakeCarbonIntensityCommand extends Command
 
         $message = __("Creating data zone name", 'carbon');
         $output->writeln("<info>$message</info>");
-        $zone = new CarbonIntensityZone();
+        $zone = new Zone();
         $zone_name = 'France';
         if (!$zone->getFromDBByCrit(['name' => $zone_name])) {
             $zone->add([
@@ -119,7 +119,7 @@ class CreateFakeCarbonIntensityCommand extends Command
             foreach ($intensities as $date => $intensity) {
                 $carbon_intensity->add([
                     'plugin_carbon_carbonintensitysources_id' => $this->source_id,
-                    'plugin_carbon_carbonintensityzones_id' => $this->zone_id,
+                    'plugin_carbon_zones_id' => $this->zone_id,
                     'date'          => $date, // Eco2mix seems to provide datetime in
                     'intensity'     => $intensity,
                 ]);

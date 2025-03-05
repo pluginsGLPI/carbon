@@ -44,7 +44,7 @@ use Session;
 /**
  * Usage profile of a computer
  */
-class CarbonIntensityZone extends CommonDropdown
+class Zone extends CommonDropdown
 {
     public static function getTypeName($nb = 0)
     {
@@ -87,7 +87,7 @@ class CarbonIntensityZone extends CommonDropdown
                 case CarbonIntensitySource::class:
                     if ($_SESSION['glpishow_count_on_tabs']) {
                         $nb = (new DbUtils())->countElementsInTable(
-                            CarbonIntensitySource_CarbonIntensityZone::getTable(),
+                            CarbonIntensitySource_Zone::getTable(),
                             [CarbonIntensitySource::getForeignKeyField() => $item->getID()]
                         );
                     }
@@ -110,7 +110,7 @@ class CarbonIntensityZone extends CommonDropdown
         /** @var CommonDBTM $item  */
         switch ($item->getType()) {
             case CarbonIntensitySource::class:
-                CarbonIntensitySource_CarbonIntensityZone::showForSource($item);
+                CarbonIntensitySource_Zone::showForSource($item);
         }
 
         return true;
@@ -140,7 +140,7 @@ class CarbonIntensityZone extends CommonDropdown
             'datatype'      => 'dropdown',
             'joinparams'         => [
                 'beforejoin'    => [
-                    'table'         => CarbonIntensitySource_CarbonIntensityZone::getTable(),
+                    'table'         => CarbonIntensitySource_Zone::getTable(),
                     'joinparams'    => [
                         'jointype'      => 'child',
                     ],
@@ -150,7 +150,7 @@ class CarbonIntensityZone extends CommonDropdown
 
         $tab[] = [
             'id'            => SearchOptions::HISTORICAL_DATA_DL_ENABLED,
-            'table'         => CarbonIntensitySource_CarbonIntensityZone::getTable(),
+            'table'         => CarbonIntensitySource_Zone::getTable(),
             'field'         => 'is_download_enabled',
             'name'          => __('Download enabled', 'carbon'),
             'datatype'      => 'bool',
@@ -163,9 +163,9 @@ class CarbonIntensityZone extends CommonDropdown
      * Get a zone by a location criteria
      *
      * @param CommonDBTM $item
-     * @return CarbonIntensityZone|null
+     * @return Zone|null
      */
-    public static function getByLocation(CommonDBTM $item): ?CarbonIntensityZone
+    public static function getByLocation(CommonDBTM $item): ?Zone
     {
         /** @var DBmysql $DB */
         global $DB;
@@ -180,9 +180,9 @@ class CarbonIntensityZone extends CommonDropdown
 
         // TODO: support translations
         $location_table = Location::getTable();
-        $zone_table = CarbonIntensityZone::getTable();
+        $zone_table = Zone::getTable();
         $iterator = $DB->request([
-            'SELECT' => CarbonIntensityZone::getTableField('id'),
+            'SELECT' => Zone::getTableField('id'),
             'FROM'   => $zone_table,
             'INNER JOIN' => [
                 $location_table => [
@@ -202,7 +202,7 @@ class CarbonIntensityZone extends CommonDropdown
         }
 
         $zone_id = $iterator->current()['id'];
-        $zone = CarbonIntensityZone::getById($zone_id);
+        $zone = Zone::getById($zone_id);
         if ($zone === false) {
             return null;
         }
@@ -210,7 +210,7 @@ class CarbonIntensityZone extends CommonDropdown
         return $zone;
     }
 
-    public static function getByAsset(CommonDBTM $item): ?CarbonIntensityZone
+    public static function getByAsset(CommonDBTM $item): ?Zone
     {
         /** @var DBmysql $DB */
         global $DB;
@@ -225,10 +225,10 @@ class CarbonIntensityZone extends CommonDropdown
 
         // TODO: support translations
         $location_table = Location::getTable();
-        $zone_table = CarbonIntensityZone::getTable();
+        $zone_table = Zone::getTable();
         $item_table = $item::getTable();
         $iterator = $DB->request([
-            'SELECT' => CarbonIntensityZone::getTableField('id'),
+            'SELECT' => Zone::getTableField('id'),
             'FROM'   => $zone_table,
             'INNER JOIN' => [
                 $location_table => [
@@ -255,7 +255,7 @@ class CarbonIntensityZone extends CommonDropdown
         }
 
         $zone_id = $iterator->current()['id'];
-        $zone = CarbonIntensityZone::getById($zone_id);
+        $zone = Zone::getById($zone_id);
         if ($zone === false) {
             return null;
         }

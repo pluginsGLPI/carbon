@@ -36,7 +36,7 @@ namespace GlpiPlugin\Carbon\Tests;
 use Computer;
 use DateTime;
 use DateTimeImmutable;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\Toolbox;
 use Infocom;
@@ -134,7 +134,7 @@ class ToolboxTest extends DbTestCase
         $output = Toolbox::isLocationExistForZone('foo');
         $this->assertFalse($output);
 
-        $this->getItem(CarbonIntensityZone::class, [
+        $this->getItem(Zone::class, [
             'name' => 'foo',
         ]);
         $this->getItem(Location::class, [

@@ -2,10 +2,10 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 # Translators:
 # Kaya Zeren <kayazeren@gmail.com>, 2022
-# 
+#
 #, fuzzy
 msgid ""
 msgstr ""
@@ -31,13 +31,13 @@ msgstr ""
 msgid "GLPI Carbon"
 msgstr ""
 
-#: src/CarbonIntensityZone.php:50
+#: src/Zone.php:50
 msgid "Carbon intensity zone"
 msgid_plural "Carbon intensity zones"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/CarbonIntensityZone.php:122 src/CarbonIntensityZone.php:137
+#: src/Zone.php:122 src/Zone.php:137
 msgid "Data source for historical calculation"
 msgstr ""
 
@@ -390,33 +390,33 @@ msgstr ""
 msgid "Sunday"
 msgstr ""
 
-#: src/CarbonIntensitySource_CarbonIntensityZone.php:124
-#: src/CarbonIntensitySource_CarbonIntensityZone.php:219 entrée standard:40
+#: src/CarbonIntensitySource_Zone.php:124
+#: src/CarbonIntensitySource_Zone.php:219 entrée standard:40
 msgid "Name"
 msgstr ""
 
-#: src/CarbonIntensitySource_CarbonIntensityZone.php:125
+#: src/CarbonIntensitySource_Zone.php:125
 msgid "Download enabled"
 msgstr ""
 
-#: src/CarbonIntensitySource_CarbonIntensityZone.php:126
+#: src/CarbonIntensitySource_Zone.php:126
 msgid "Source for historical"
 msgstr ""
 
-#: src/CarbonIntensitySource_CarbonIntensityZone.php:132
-#: src/CarbonIntensitySource_CarbonIntensityZone.php:225
+#: src/CarbonIntensitySource_Zone.php:132
+#: src/CarbonIntensitySource_Zone.php:225
 msgid "Total"
 msgstr ""
 
-#: src/CarbonIntensitySource_CarbonIntensityZone.php:284 entrée standard:189
+#: src/CarbonIntensitySource_Zone.php:284 entrée standard:189
 msgid "No"
 msgstr ""
 
-#: src/CarbonIntensitySource_CarbonIntensityZone.php:284 entrée standard:186
+#: src/CarbonIntensitySource_Zone.php:284 entrée standard:186
 msgid "Yes"
 msgstr ""
 
-#: src/CarbonIntensitySource_CarbonIntensityZone.php:285
+#: src/CarbonIntensitySource_Zone.php:285
 msgid "Enable / Disable"
 msgstr ""
 

@@ -42,7 +42,7 @@ use DateTimeInterface;
 use DateTimeZone;
 use DBmysql;
 use DbUtils;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
@@ -326,17 +326,17 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      *
      * @param integer $items_id
      * @param DateTime $date Date for which the zone must be found
-     * @return CarbonIntensityZone|null
+     * @return Zone|null
      */
-    protected function getZone(int $items_id, DateTime $date = null): ?CarbonIntensityZone
+    protected function getZone(int $items_id, DateTime $date = null): ?Zone
     {
         // TODO: use date to find where was the asset at the given date
         if ($date === null) {
             $item_table = (new DbUtils())->getTableForItemType(static::$itemtype);
             $location_table = Location::getTable();
-            $zone_table = CarbonIntensityZone::getTable();
+            $zone_table = Zone::getTable();
 
-            $zone = new CarbonIntensityZone();
+            $zone = new Zone();
             $found = $zone->getFromDBByRequest([
                 'INNER JOIN' => [
                     $location_table => [

@@ -35,10 +35,11 @@ namespace GlpiPlugin\Carbon\Tests;
 
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\CarbonIntensity;
-use GlpiPlugin\Carbon\CarbonIntensityZone;
+use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\EmbodiedImpact;
 use GlpiPlugin\Carbon\EnvironmentalImpact;
+use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
 use RecursiveIteratorIterator;
@@ -67,14 +68,15 @@ class SearchOptionTest extends CommonTestCase
             'pe_quality',
         ],
         NetworkEquipmentType::class => [],
+        Location::class => [],
     ];
 
     private array $mapping = [
         CarbonIntensity::class => [
             'plugin_carbon_carbonintensitysources_id' => 'name',
-            'plugin_carbon_carbonintensityzones_id'   => 'name',
+            'plugin_carbon_zones_id'   => 'name',
         ],
-        CarbonIntensityZone::class => [
+        Zone::class => [
             'plugin_carbon_carbonintensitysources_id_historical' => 'name',
         ]
     ];

@@ -149,7 +149,7 @@ class Computer extends AbstractAsset
         ];
 
         try {
-            $response = $this->client->request('server', [
+            $response = $this->client->post('server', [
                 'json' => $this->hardware,
             ]);
         } catch (\RuntimeException $e) {
