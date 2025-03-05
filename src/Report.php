@@ -141,6 +141,7 @@ class Report extends CommonDBTM
         $value = Provider::getTotalEmbodiedGwp($params);
 
         // Prepare date format
+        $date_format = 'Y F';
         switch ($_SESSION['glpidate_format'] ?? 0) {
             case 0:
                 $date_format = 'Y F';

@@ -35,6 +35,7 @@ namespace GlpiPlugin\Carbon;
 
 use Computer;
 use CommonDBChild;
+use CommonDBTM;
 use CommonGLPI;
 use Glpi\Application\View\TemplateRenderer;
 use Monitor;
@@ -176,7 +177,7 @@ class EnvironmentalImpact extends CommonDBChild
         return $tab;
     }
 
-    public static function showCharts(CommonGLPI $item)
+    public static function showCharts(CommonDBTM $item)
     {
         $embodied_impact = new EmbodiedImpact();
         $embodied_impact->getFromDBByCrit([
