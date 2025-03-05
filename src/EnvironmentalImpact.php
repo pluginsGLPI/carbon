@@ -178,8 +178,15 @@ class EnvironmentalImpact extends CommonDBChild
 
     public static function showCharts(CommonGLPI $item)
     {
+        $embodied_impact = new EmbodiedImpact();
+        $embodied_impact->getFromDBByCrit([
+            'itemtype' => $item->getType(),
+            'items_id' => $item->getID(),
+        ]);
+
         TemplateRenderer::getInstance()->display('@carbon/environmentalimpact-item.html.twig', [
             'item' => $item,
+            'embodied_impact' => $embodied_impact,
         ]);
     }
 }

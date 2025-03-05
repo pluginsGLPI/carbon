@@ -42,6 +42,7 @@ use DBmysql;
 use DbUtils;
 use Glpi\Dashboard\Filter;
 use GlpiPlugin\Carbon\ComputerType;
+use GlpiPlugin\Carbon\EmbodiedImpact;
 use GlpiPlugin\Carbon\Toolbox;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\CarbonIntensity;
@@ -661,5 +662,63 @@ class Provider
         }
 
         return $criteria;
+    }
+
+    public static function getTotalEmbodiedGwp(array $params = []): array
+    {
+        $value = self::getSum(EmbodiedImpact::getTable(), 'gwp', $params);
+        if ($value === null) {
+            $value = 'N/A';
+        } else {
+            $value = Toolbox::getWeight($value) . __('CO₂eq', 'carbon');
+        }
+
+        $params['label'] = __('', 'carbon');
+        $params['icon'] = 'fa-solid fa-temperature-arrow-up';
+
+        return [
+            'number'     => $value,
+            'label'      => $params['label'],
+            'icon'       => $params['icon'],
+        ];
+    }
+
+    public static function getTotalPrimaryEnergyConsumed(array $params = []): array
+    {
+        $value = self::getSum(EmbodiedImpact::getTable(), 'pe', $params);
+        if ($value === null) {
+            $value = 'N/A';
+        } else {
+            // Convert into Watt.hour
+            $value = Toolbox::getWeight($value / 3600) . __('h', 'carbon');
+        }
+
+        $params['label'] = __('', 'carbon');
+        $params['icon'] = 'fa-solid fa-fire-flame-simple';
+
+        return [
+            'number'     => $value,
+            'label'      => $params['label'],
+            'icon'       => $params['icon'],
+        ];
+    }
+
+    public static function getTotalEmbodiedAdp(array $params = []): array
+    {
+        $value = self::getSum(EmbodiedImpact::getTable(), 'adp', $params);
+        if ($value === null) {
+            $value = 'N/A';
+        } else {
+            $value = Toolbox::getWeight($value) . __('Sbeq', 'carbon');
+        }
+
+        $params['label'] = __('', 'carbon');
+        $params['icon'] = '';
+
+        return [
+            'number'     => $value,
+            'label'      => $params['label'],
+            'icon'       => $params['icon'],
+        ];
     }
 }

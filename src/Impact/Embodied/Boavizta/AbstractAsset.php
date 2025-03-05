@@ -131,7 +131,7 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
     {
         switch ($type) {
             case AssetInterface::IMPACT_GWP:
-                return $short ? 'gCO2eq' : __('grams of Carbon dioxyde equivalent', 'carbon');
+                return $short ? 'gCO2eq' : __('grams of carbon dioxyde equivalent', 'carbon');
             case AssetInterface::IMPACT_ADP:
                 return $short ? 'gSbeq' : __('grams of antimony equivalent', 'carbon');
             case AssetInterface::IMPACT_PE:
@@ -247,6 +247,11 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
         /** @var AbstractTracked $value */
         foreach ($this->getImpacts($id) as $impact => $value) {
             $key = $key_map[$impact];
+            if ($value === null) {
+                $input[$key] = null;
+                $input["{$key}_quality"] = AbstractTracked::DATA_QUALITY_UNSPECIFIED;
+                continue;
+            }
             $input[$key] = $value->getValue();
             $input["{$key}_quality"] = $value->getLowestSource();
         }

@@ -215,7 +215,7 @@ class Toolbox
         }
 
        //TRANS: %1$s is a number maybe float or string and %2$s the unit
-        return sprintf(__('%1$s %2$s'), round($weight, 2), $human_readable_unit);
+        return sprintf(__('%1$s&nbsp;%2$s'), round($weight, 2), $human_readable_unit);
     }
 
         /**
@@ -248,7 +248,7 @@ class Toolbox
         }
 
        //TRANS: %1$s is a number maybe float or string and %2$s the unit
-        return sprintf(__('%1$s %2$s'), round($p, 2), $human_readable_unit);
+        return sprintf(__('%1$s&nbsp;%2$s'), round($p, 2), $human_readable_unit);
     }
 
     /**

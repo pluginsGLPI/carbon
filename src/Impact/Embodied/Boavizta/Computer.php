@@ -158,31 +158,37 @@ class Computer extends AbstractAsset
         }
 
         // Normalize estimations
-        $this->gwp = new TrackedFloat(
-            $response['impacts']['gwp']['embedded']['value'],
-            null,
-            TrackedFloat::DATA_QUALITY_ESTIMATED
-        );
-        if ($response['impacts']['gwp']['unit'] === 'kgCO2eq') {
-            $this->gwp->setValue($this->gwp->getValue() * 1000);
+        if (isset($response['impacts']['gwp']['embedded']['value'])) {
+            $this->gwp = new TrackedFloat(
+                $response['impacts']['gwp']['embedded']['value'],
+                null,
+                TrackedFloat::DATA_QUALITY_ESTIMATED
+            );
+            if ($response['impacts']['gwp']['unit'] === 'kgCO2eq') {
+                $this->gwp->setValue($this->gwp->getValue() * 1000);
+            }
         }
 
-        $this->adp = new TrackedFloat(
-            $response['impacts']['adp']['embedded']['value'],
-            null,
-            TrackedFloat::DATA_QUALITY_ESTIMATED
-        );
-        if ($response['impacts']['adp']['unit'] === 'kgSbeq') {
-            $this->adp->setValue($this->adp->getValue() * 1000);
+        if (isset($response['impacts']['adp']['embedded']['value'])) {
+            $this->adp = new TrackedFloat(
+                $response['impacts']['adp']['embedded']['value'],
+                null,
+                TrackedFloat::DATA_QUALITY_ESTIMATED
+            );
+            if ($response['impacts']['adp']['unit'] === 'kgSbeq') {
+                $this->adp->setValue($this->adp->getValue() * 1000);
+            }
         }
 
-        $this->pe = new TrackedFloat(
-            $response['impacts']['pe']['embedded']['value'],
-            null,
-            TrackedFloat::DATA_QUALITY_ESTIMATED
-        );
-        if ($response['impacts']['pe']['unit'] === 'MJ') {
-            $this->pe->setValue($this->pe->getValue() * 1000000);
+        if (isset($response['impacts']['pe']['embedded']['value'])) {
+            $this->pe = new TrackedFloat(
+                $response['impacts']['pe']['embedded']['value'],
+                null,
+                TrackedFloat::DATA_QUALITY_ESTIMATED
+            );
+            if ($response['impacts']['pe']['unit'] === 'MJ') {
+                $this->pe->setValue($this->pe->getValue() * 1000000);
+            }
         }
 
         // Update last analyzed item id

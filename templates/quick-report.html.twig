@@ -65,36 +65,40 @@
                     %}
                   </div>
                 </div>
+                <div class = "col-sm-6 col-lg-3" id="responsiveClassElement4">
+                  <div class="card card-height" id="cardElement4">
+                    {% include '@carbon/components/total-embodied-emission-card.html.twig' %}
+                  </div>
+                </div>
 
                 {% include '@carbon/components/information-video-card.html.twig' %}
                 <!-- Row for score cards -->
-            </div>
-        </div>
-                <div class="col-12">
-                    <div class="row row-cards pb-3 align-items-center">
-                      <div class="col-sm-6 col-lg-6">
-                        <div class="card">
-                          {% include '@carbon/components/graph-carbon-emission-per-model.html.twig' %}
-                        </div>
-                      </div>
-                      <!-- Information block -->
-                      {% include '@carbon/components/information-block.html.twig' %}
-                      <!-- Information block -->
-                    </div>
-                </div>
-
-                <!-- Bar graph -->
-                <div class="col-12">
-                  <div class="row row-cards">
-                    <div class="col-sm-6 col-lg-12">
+                  </div>
+              </div>
+              <div class="col-12">
+                  <div class="row row-cards pb-3 align-items-center">
+                    <div class="col-sm-6 col-lg-6">
                       <div class="card">
-                        {% include '@carbon/components/graph-carbon-emission-per-month.html.twig' %}
+                        {% include '@carbon/components/graph-carbon-emission-per-model.html.twig' %}
                       </div>
+                    </div>
+                    <!-- Information block -->
+                    {% include '@carbon/components/information-block.html.twig' %}
+                    <!-- Information block -->
+                  </div>
+              </div>
+
+              <!-- Bar graph -->
+              <div class="col-12">
+                <div class="row row-cards">
+                  <div class="col-sm-6 col-lg-12">
+                    <div class="card">
+                      {% include '@carbon/components/graph-carbon-emission-per-month.html.twig' %}
                     </div>
                   </div>
                 </div>
-                <!-- Bar graph -->
-
+              </div>
+              <!-- Bar graph -->
             </div>
         </div>
         <!-- Footer -->

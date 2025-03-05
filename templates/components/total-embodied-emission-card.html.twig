@@ -1,0 +1,56 @@
+{#
+ # -------------------------------------------------------------------------
+ # carbon plugin for GLPI
+ # -------------------------------------------------------------------------
+ #
+ # MIT License
+ #
+ # Permission is hereby granted, free of charge, to any person obtaining a copy
+ # of this software and associated documentation files (the "Software"), to deal
+ # in the Software without restriction, including without limitation the rights
+ # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ # copies of the Software, and to permit persons to whom the Software is
+ # furnished to do so, subject to the following conditions:
+ #
+ # The above copyright notice and this permission notice shall be included in all
+ # copies or substantial portions of the Software.
+ #
+ # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ # SOFTWARE.
+ # -------------------------------------------------------------------------
+ # @copyright Copyright (C) 2024 Teclib' and contributors.
+ # @license   MIT https://opensource.org/licenses/mit-license.php
+ # @link      https://github.com/pluginsGLPI/carbon
+ # -------------------------------------------------------------------------
+ #}
+
+<div class="card-body carbon-emission-card" style="height: 100%">
+    <div class="row align-items-center">
+        <div class="col-auto" id="embodiedCarbonEmissionIconElement">
+            <span><img src="{{ get_plugin_web_dir('carbon') }}/dist/images/carbon_emission_icon_darkgreen.png"></img></span>
+        </div>
+        <div class="col">
+            <div class="subheader">{{ __('Total Embodied Carbon Emission', 'carbon') }}</div>
+            <div class="subheader">&nbsp;</div>
+        </div>
+        <div class="my-3 nb-carbon-emission-size text-center" id="embodiedCarbonEmission"><i class="fas fa-spinner fa-spin"></i></div>
+    </div>
+</div>
+
+{% block scripts %}
+    <script>
+        $(document).ready(function() {
+            fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/totalEmbodiedCarbonEmission.php").then(response => {
+                return response.text();
+            }).then(data => {
+                let totalCarbonEmission = data;
+                document.getElementById('embodiedCarbonEmission').innerHTML = totalCarbonEmission;
+            });
+        });
+    </script>
+{% endblock %}
