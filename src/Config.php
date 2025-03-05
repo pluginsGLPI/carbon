@@ -103,7 +103,6 @@ class Config extends GlpiConfig
     {
         $protected_fields = [
             'electricitymap_api_key',
-            'co2signal_api_key'
         ];
         foreach ($protected_fields as $field) {
             if (isset($input[$field]) && empty($input[$field])) {
