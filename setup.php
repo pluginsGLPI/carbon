@@ -211,10 +211,11 @@ function plugin_carbon_check_prerequisites()
 
 /**
  * Get the path to the empty SQL schema file
+ * @param string $version The version of the schema file to get
  *
  * @return string|null
  */
-function plugin_carbon_getSchemaPath(string $version = null): ?string
+function plugin_carbon_getSchemaPath(?string $version = null): ?string
 {
     $version = $version ?? PLUGIN_CARBON_VERSION;
 
