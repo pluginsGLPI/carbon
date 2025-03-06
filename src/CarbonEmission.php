@@ -34,6 +34,7 @@
 namespace GlpiPlugin\Carbon;
 
 use CommonDBChild;
+use DateInterval;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -167,113 +168,11 @@ class CarbonEmission extends CommonDBChild
      */
     public function findGaps(string $itemtype, int $id, ?DateTimeInterface $start, ?DateTimeInterface $stop = null): array
     {
-        /** @var DBmysql $DB */
-        global $DB;
-
-        $tz = new DateTimeZone($DB->guessTimezone());
-        $table = CarbonEmission::getTable();
-
-        // Build WHERE clause for boundaries
-        $boundaries = [];
-        if ($start !== null) {
-            $unix_start = $start->format('U');
-            $unix_start = $unix_start - ($unix_start % (3600 * 24));
-            $boundaries[] = new QueryExpression('UNIX_TIMESTAMP(`date`) >= ' . $unix_start);
-        }
-        if ($stop !== null) {
-            $unix_stop = $stop->format('U');
-            $unix_stop = $unix_stop - ($unix_stop % (3600 * 24) );
-            $boundaries[] = new QueryExpression('UNIX_TIMESTAMP(`date`) <= ' . $unix_stop);
-        }
-
-        $gaps = [];
-        if ($start !== null) {
-            // Find the first calculated date
-            $first_calculated = $DB->request([
-                'SELECT' => [
-                    'date',
-                ],
-                'FROM' => $table,
-                'WHERE' => [
-                    'itemtype' => $itemtype,
-                    'items_id' => $id,
-                ] + $boundaries,
-                'ORDER' => ['date ASC'],
-                'LIMIT' => 1,
-            ])->current();
-            if ($first_calculated === null) {
-                return [
-                    [
-                        'start' => $start,
-                        'end'   => ($stop ?? new DateTime('now', $tz)),
-                    ]
-                ];
-            }
-            $first_gap_end = (new DateTime($first_calculated['date']))->modify(('-1 day'));
-            // Check if requested interval starts before the first calculated date
-            if ($first_gap_end > $start) {
-                $gaps[] = [
-                    'start' => $start->format('U'),
-                    'end'   => $first_gap_end->format('U'),
-                ];
-            }
-        }
-
-        $date_1 = 'UNIX_TIMESTAMP(`date`)';
-        $date_2 = 'LEAD(UNIX_TIMESTAMP(`date`), 1) OVER (ORDER BY UNIX_TIMESTAMP(`date`))';
-        $request = [
-            'SELECT' => [
-                new QueryExpression('date + 86400 as start'), // 1st missing day
-                new QueryExpression('next_available_date - 86400 as end'), // last missing day
-            ],
-            'FROM'  => new QuerySubQuery([
-                'SELECT' => [
-                    new QueryExpression("$date_1 as `date`"),
-                    new QueryExpression("$date_2  AS `next_available_date`"),
-                    new QueryExpression("$date_2 - $date_1 as `diff`"),
-                ],
-                'FROM' => $table,
-                'WHERE' => [
-                    'itemtype' => $itemtype,
-                    'items_id' => $id,
-                ] + $boundaries
-            ], 'rows'),
-            'WHERE' => ['diff' => ['>', 86400 + 3600]] // 1 day + 1 hour to ignore DST changes
+        $criteria = [
+            'itemtype' => $itemtype,
+            'items_id' => $id,
         ];
-
-        $iterator = $DB->request($request);
-        $gaps = array_merge($gaps, iterator_to_array($iterator));
-
-        if ($stop !== null) {
-            // Find the last calculated date
-            $last_calculated = $DB->request([
-                'SELECT' => [
-                    'date',
-                ],
-                'FROM' => $table,
-                'WHERE' => [
-                    'itemtype' => $itemtype,
-                    'items_id' => $id,
-                ] + $boundaries,
-                'ORDER' => ['date DESC'],
-                'LIMIT' => 1,
-            ])->current();
-            $last_gap_start = (new DateTime($last_calculated['date'], $tz))->modify('+1 day');
-            // Check if requested interval ends after the last calculated date
-            if ($last_gap_start < $stop) {
-                $gaps[] = [
-                    'start' => $last_gap_start->format('U'),
-                    'end'   => $stop->format('U'),
-                ];
-            }
-        }
-
-        // Convert unix timetamps to DateTime with current timezone
-        foreach ($gaps as &$gap) {
-            $gap['start'] = (new DateTimeImmutable())->setTimezone($tz)->setTimestamp($gap['start']);
-            $gap['end'] = (new DateTimeImmutable())->setTimezone($tz)->setTimestamp($gap['end']);
-        }
-
-        return $gaps;
+        $interval = new DateInterval('P1D');
+        return Toolbox::findTemporalGapsInTable(self::getTable(), $start, $interval, $stop, $criteria);
     }
 }

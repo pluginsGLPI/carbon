@@ -195,8 +195,8 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
             // $date_cursor->setTime(0, 0, 0, 0);
             // $end_date = DateTime::createFromFormat('U', $gap['end']);
             // $end_date->setTimezone(new DateTimeZone($timezone));
-            $date_cursor = $gap['start']->setTime(0, 0, 0, 0);
-            $end_date = $gap['end']->setTime(0, 0, 0, 0);
+            $date_cursor = DateTime::createFromFormat('Y-m-d H:i:s', $gap['start'])->setTime(0, 0, 0, 0);
+            $end_date    = DateTime::createFromFormat('Y-m-d H:i:s', $gap['end'])->setTime(0, 0, 0, 0);
             while ($date_cursor < $end_date) {
                 $success = $this->evaluateItemPerDay($item, $engine, $date_cursor);
                 if ($success) {
@@ -394,12 +394,22 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      */
     public function calculateImpact(int $items_id): bool
     {
-        $calculated = $this->evaluateItem($items_id);
-        if ($calculated === 0) {
+        try {
+            $calculated = $this->evaluateItem($items_id);
+        } catch (\Exception $e) {
+            trigger_error($e->getMessage(), E_USER_ERROR);
             Session::addMessageAfterRedirect(
-                sprintf(__('Failed to calculate usage impact', 'carbon'), $calculated),
+                sprintf(__('Error while calculating impact', 'carbon')),
+                false,
+                ERROR
             );
             return false;
+        }
+        if ($calculated === 0) {
+            Session::addMessageAfterRedirect(
+                sprintf(__('Nothing to calculate', 'carbon'), $calculated),
+            );
+            return true;
         }
 
         Session::addMessageAfterRedirect(
