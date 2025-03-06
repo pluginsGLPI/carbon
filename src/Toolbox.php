@@ -376,6 +376,7 @@ class Toolbox
 
     /**
      * Gets date intervals where data are missing in a table
+     * To use with Mysql 8.0+ or MariaDB 10.2+
      *
      * @see https://bertwagner.com/posts/gaps-and-islands/
      *

@@ -312,8 +312,6 @@ class ProviderTest extends DbTestCase
 
     public function testGetCarbonEmissionPerMonth()
     {
-        global $DB;
-
         $country = $this->getUniqueString();
         $source  = $this->getUniqueString();
         $usage_profile = [
@@ -341,7 +339,26 @@ class ProviderTest extends DbTestCase
         // $this->createCarbonIntensityData($country, $source, $start_date, 1, $duration);
         // $this->createCarbonEmissionData($computer_1, $start_date, new DateInterval($duration), 1, 2);
         $history = new HistoryComputer();
-        $history->evaluateItem($computer_1->getID(), new DateTime('2024-02-01'), new DateTime('2024-05-31'));
+        // $history->evaluateItem($computer_1->getID(), new DateTime('2024-02-01'), new DateTime('2024-05-31'));
+        $date_cursor = new DateTime('2024-02-01');
+        $end_date = new DateTime('2024-05-31');
+        $emission = new CarbonEmission();
+        while ($date_cursor <= $end_date) {
+            $emission->add([
+                'itemtype'         => $computer_1->getType(),
+                'items_id'         => $computer_1->getID(),
+                'entities_id'      => $computer_1->fields['entities_id'],
+                'types_id'         => $computer_1->fields['computertypes_id'],
+                'models_id'        => $computer_1->fields['computermodels_id'],
+                'locations_id'     => $computer_1->fields['locations_id'],
+                'energy_per_day'   => 1,
+                'emission_per_day' => 20,
+                'date'             => $date_cursor->format('Y-m-d 00:00:00'),
+                'energy_quality'   => 1,
+                'emission_quality' => 1,
+            ]);
+            $date_cursor->add(new DateInterval('P1D'));
+        }
         $output = Provider::getCarbonEmissionPerMonth([
             'label' => '',
             'icon' => '',

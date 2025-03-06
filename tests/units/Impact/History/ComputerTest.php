@@ -34,6 +34,7 @@
 namespace GlpiPlugin\Carbon\Impact\History\Tests;
 
 use Computer as GlpiComputer;
+use DateInterval;
 use GlpiPlugin\Carbon\Impact\History\Computer;
 use GlpiPlugin\Carbon\Tests\Impact\History\CommonAsset;
 use Location;
@@ -63,6 +64,22 @@ class ComputerTest extends CommonAsset
 
     public function testEvaluateItem()
     {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        // Check DBMS version as this tests does not works on minimal DBMS requirement of GLPI 10.0
+        $db_version_full = $DB->getVersion();
+        // Isolate version number
+        $db_version = preg_replace('/[^0-9.]/', '', $db_version_full);
+        // Check if is MariaDB
+        $min_version = '8.0';
+        if (strpos($db_version_full, 'MariaDB') !== false) {
+            $min_version = '10.2';
+        }
+        if (version_compare($db_version, $min_version, '<') || version_compare($db_version, $min_version, '<')) {
+            $this->markTestSkipped('Test requires MySQL 8.0 or MariaDB 10.2');
+        }
+
         $this->login('glpi', 'glpi');
         $entities_id = $this->isolateInEntity('glpi', 'glpi');
 
