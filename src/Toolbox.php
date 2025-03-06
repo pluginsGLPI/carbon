@@ -354,7 +354,7 @@ class Toolbox
             $end_date->setTime(0, 0, 0, 0);
             $end_date->setDate((int) $end_date->format('Y'), (int) $end_date->format('m'), 0); // Last day of previous month
             $start_date = clone $end_date;
-            $start_date->modify('-12 months + 1 day');
+            $start_date->setDate((int) $end_date->format('Y') - 1, (int) $end_date->format('m') + 1, 1);
 
         return [$start_date, $end_date];
     }
@@ -385,7 +385,7 @@ class Toolbox
      * @param DateTimeInterface|null $stop stop date to search
      * @return array                       list of gaps
      */
-    public static function findTemporalGapsInTable(string $table, DateTimeInterface $start, DateInterval $interval, ?DateTimeInterface $stop = null,  array $criteria = [])
+    public static function findTemporalGapsInTable(string $table, DateTimeInterface $start, DateInterval $interval, ?DateTimeInterface $stop = null, array $criteria = [])
     {
         /** @var DBmysql $DB */
         global $DB;
