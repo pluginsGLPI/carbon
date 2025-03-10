@@ -91,7 +91,7 @@ class Engine extends CommonGLPI
         $embodied_impact_namespace = explode('\\', get_class($engine));
         switch (array_slice($embodied_impact_namespace, -2, 1)[0]) {
             case 'Boavizta':
-                /** @var GlpiPlugin\Carbon\Impact\Embodied\Boavizta\AssetInterface $engine  */
+                /** @var Boavizta\AbstractAsset $engine  */
                 $engine->setClient(new Boaviztapi(new RestApiClient()));
         }
 

@@ -35,6 +35,7 @@ namespace GlpiPlugin\Carbon;
 
 use CommonDBTM;
 use ComputerType as GlpiComputerType;
+use Dropdown;
 use Html;
 use MassiveAction;
 
@@ -42,6 +43,24 @@ class ComputerType extends AbstractType
 {
     public static $itemtype = GlpiComputerType::class;
     public static $items_id = 'computertypes_id';
+
+    const TYPE_UNDEFINED  = 0;
+    const TYPE_DESKTOP    = 1;
+    const TYPE_SERVER     = 2;
+    const TYPE_LAPTOP     = 3;
+    const TYPE_TABLET     = 4;
+    const TYPE_SMARTPHONE = 5;
+
+    public static function getTypes(): array
+    {
+        return [
+            self::TYPE_DESKTOP    => __('Computer'),
+            self::TYPE_SERVER     => __('Server'),
+            self::TYPE_LAPTOP     => __('Laptop'),
+            self::TYPE_TABLET     => __('Tablet'),
+            self::TYPE_SMARTPHONE => __('Smartphone'),
+        ];
+    }
 
     public static function showMassiveActionsSubForm(MassiveAction $ma)
     {
@@ -74,6 +93,13 @@ class ComputerType extends AbstractType
         }
     }
 
+    /**
+     * Update the power consumption associated to a computer type
+     *
+     * @param CommonDBTM $item Computer to update
+     * @param integer $power pwoer consumption to set
+     * @return bool
+     */
     public static function updatePowerConsumption(CommonDBTM $item, int $power)
     {
         $computer_type = new ComputerType();
@@ -93,5 +119,19 @@ class ComputerType extends AbstractType
                 'power_consumption' => $power,
             ]);
         }
+    }
+
+    /**
+     * Show or return HTML code displaying a dropdown of computer types
+     * @see constants TYPE_*
+     *
+     * @param string $name
+     * @param array $options
+     * @return integer|string
+     */
+    public static function dropdownType(string $name, array $options = [])
+    {
+        $items = self::getTypes();
+        return Dropdown::showFromArray($name, $items, $options);
     }
 }

@@ -37,6 +37,9 @@ namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta;
 use CommonDBTM;
 use Computer as GlpiComputer;
 use DeviceProcessor;
+use GlpiPlugin\Carbon\ComputerType;
+use ComputerType as GlpiComputerType;
+use DBmysql;
 use Item_DeviceMemory;
 use Item_DeviceProcessor;
 use Item_Devices;
@@ -44,14 +47,17 @@ use Item_Disk;
 
 class Computer extends AbstractAsset
 {
-    protected static string $itemtype       = GlpiComputer::class;
+    protected static string $itemtype = GlpiComputer::class;
 
-    protected static string $endpoint       = 'server';
+    protected string $endpoint        = 'server';
 
     protected function doEvaluation(CommonDBTM $item): ?array
     {
         // TODO: determine if the computer is a server, a computer, a laptop, a tablet...
         // then adapt $this->endpoint depending on the result
+
+        $type = $this->getType($item);
+        $this->endpoint = $this->getEndpoint($type);
 
         // Ask for embodied impact only
         $configuration = $this->analyzeHardware($item);
@@ -68,6 +74,66 @@ class Computer extends AbstractAsset
         $embodied_impacts = $this->parseResponse($response);
 
         return $embodied_impacts;
+    }
+
+    protected function getType(CommonDBTM $item): int
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        $computer_table = GlpiComputer::getTable();
+        $computer_type_table = ComputerType::getTable();
+        $glpi_computer_type_table = GlpiComputerType::getTable();
+        $result = $DB->request([
+            'SELECT'     => ComputerType::getTableField('type'),
+            'FROM'       => $computer_type_table,
+            'INNER JOIN' => [
+                $glpi_computer_type_table => [
+                    'FKEY' => [
+                        $computer_type_table => 'computertypes_id',
+                        $glpi_computer_type_table => 'id',
+                    ]
+                ],
+                $computer_table => [
+                    'FKEY' => [
+                        $glpi_computer_type_table => 'id',
+                        $computer_table           => 'computertypes_id'
+                    ],
+                ],
+            ],
+            'WHERE' => [
+                GlpiComputer::getTableField('id') => $item->getID(),
+            ]
+        ]);
+        $row_count = $result->count();
+        if ($row_count === 0) {
+            return ComputerType::TYPE_UNDEFINED;
+        } elseif ($result->count() > 1) {
+            trigger_error(sprintf('SQL query shall return 1 row, got %d', $row_count), WARNING);
+        }
+
+        return $result->current()['type'];
+    }
+
+    /**
+     * Get the endpoint to use for the given type
+     */
+    protected function getEndpoint(int $type)
+    {
+        switch ($type) {
+            case ComputerType::TYPE_SERVER:
+                return 'server';
+            case ComputerType::TYPE_LAPTOP:
+                return 'terminal/laptop';
+            case ComputerType::TYPE_TABLET:
+                return 'terminal/tablet';
+            case ComputerType::TYPE_SMARTPHONE:
+                return 'terminal/smartphone';
+        }
+
+        // ComputerType::TYPE_UNDEFINED
+        // ComputerType::TYPE_DESKTOP
+        return 'terminal/desktop';
     }
 
     protected function analyzeHardware(CommonDBTM $item): array

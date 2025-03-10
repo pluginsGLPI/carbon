@@ -44,7 +44,7 @@ use GlpiPlugin\Carbon\Impact\Embodied\EmbodiedImpactInterface;
 abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInterface
 {
     /** @var string Endpoint to query for the itemtype, to be filled in child class */
-    protected static string $endpoint       = '';
+    protected string $endpoint       = '';
 
     /** @var array $hardware hardware description for the request */
     protected array $hardware = [];
@@ -85,7 +85,7 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
     protected function query($description): array
     {
         try {
-            $response = $this->client->post(static::$endpoint, [
+            $response = $this->client->post($this->endpoint, [
                 'json' => $description,
             ]);
         } catch (\RuntimeException $e) {

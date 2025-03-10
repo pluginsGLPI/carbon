@@ -87,6 +87,7 @@ CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_computertypes` (
   `id`                int unsigned NOT NULL AUTO_INCREMENT,
   `computertypes_id`  int unsigned NOT NULL DEFAULT '0',
   `power_consumption` int          DEFAULT '0',
+  `type`              int          NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `unicity` (`computertypes_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
