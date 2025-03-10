@@ -34,6 +34,9 @@
 namespace GlpiPlugin\Carbon\Impact\Embodied;
 
 use CommonGLPI;
+use GlpiPlugin\Carbon\Config;
+use GlpiPlugin\Carbon\DataSource\Boaviztapi;
+use GlpiPlugin\Carbon\DataSource\RestApiClient;
 
 class Engine extends CommonGLPI
 {
@@ -45,5 +48,53 @@ class Engine extends CommonGLPI
             // 'NumEcoVal' => __('NumEcoVal', 'carbon'),
             // 'Resilio' => __('Resilio', 'carbon'),
         ];
+    }
+
+    /**
+     * Get an instance of the engine to calculate imapcts for the given itemtype
+     *
+     * Returns null if no engine found
+     *
+     * @param string $itemtype itemtype of assets to analyze
+     * @return EmbodiedImpactInterface|null an instance if an embodied impact calculation object or null on error
+     */
+    public static function getEngineFromItemtype(string $itemtype): ?EmbodiedImpactInterface
+    {
+        $embodied_impact_namespace = Config::getEmbodiedImpactEngine();
+        $embodied_impact_class = $embodied_impact_namespace . '\\' . $itemtype;
+        if (!class_exists($embodied_impact_class) || !is_subclass_of($embodied_impact_class, AbstractEmbodiedImpact::class)) {
+            return null;
+        }
+
+        $embodied_impact = new $embodied_impact_class();
+        return self::configureEngine($embodied_impact);
+    }
+
+    public static function getEngine(string $engine_class): ?EmbodiedImpactInterface
+    {
+        if (!is_subclass_of($engine_class, EmbodiedImpactInterface::class)) {
+            return null;
+        }
+        $embodied_impact = new $engine_class();
+
+        return self::configureEngine($embodied_impact);
+    }
+
+    /**
+     * Configure the engine depending on its specificities
+     *
+     * @param EmbodiedImpactInterface $engine the engine to configure
+     * @return EmbodiedImpactInterface the configured engine
+     */
+    protected static function configureEngine(EmbodiedImpactInterface $engine): EmbodiedImpactInterface
+    {
+        $embodied_impact_namespace = explode('\\', get_class($engine));
+        switch (array_slice($embodied_impact_namespace, -2, 1)[0]) {
+            case 'Boavizta':
+                /** @var GlpiPlugin\Carbon\Impact\Embodied\Boavizta\AssetInterface $engine  */
+                $engine->setClient(new Boaviztapi(new RestApiClient()));
+        }
+
+        return $engine;
     }
 }

@@ -36,77 +36,45 @@ namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta;
 
 use CommonDBTM;
 use Computer as GlpiComputer;
-use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
-use GlpiPlugin\Carbon\Engine\V1\Computer as EngineComputer;
-use DbUtils;
 use DeviceProcessor;
-use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use Item_DeviceMemory;
 use Item_DeviceProcessor;
 use Item_Devices;
 use Item_Disk;
-use Toolbox;
 
 class Computer extends AbstractAsset
 {
     protected static string $itemtype       = GlpiComputer::class;
 
-    public static function getEngine(CommonDBTM $item): EngineInterface
-    {
-        return new EngineComputer($item->getID());
-    }
+    protected static string $endpoint       = 'server';
 
-    public function setLimit(int $limit)
+    protected function doEvaluation(CommonDBTM $item): ?array
     {
-        $this->limit = $limit;
-    }
+        // TODO: determine if the computer is a server, a computer, a laptop, a tablet...
+        // then adapt $this->endpoint depending on the result
 
-    public function getEvaluableQuery(bool $entity_restrict = true): array
-    {
-        $item_table = self::$itemtype::getTable();
-
-        $request = [
-            'SELECT' => [
-                self::$itemtype::getTableField('id'),
+        // Ask for embodied impact only
+        $configuration = $this->analyzeHardware($item);
+        if (count($configuration) === 0) {
+            return null;
+        }
+        $description = [
+            'configuration' => $configuration,
+            'usage' => [
+                'avg_power' => 0
             ],
-            'FROM' => $item_table,
         ];
+        $response = $this->query($description);
+        $embodied_impacts = $this->parseResponse($response);
 
-        if ($entity_restrict) {
-            $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($item_table, '', '', 'auto');
-            $request['WHERE'] = $entity_restrict;
-        }
-
-        return $request;
+        return $embodied_impacts;
     }
 
-    public function calculateGwp(int $items_id): ?TrackedFloat
+    protected function analyzeHardware(CommonDBTM $item): array
     {
-        $this->analyzeHardware($items_id);
-        return $this->gwp;
-    }
-
-    public function calculateAdp(int $items_id): ?TrackedFloat
-    {
-        $this->analyzeHardware($items_id);
-        return $this->adp;
-    }
-
-    public function calculatePe(int $items_id): ?TrackedFloat
-    {
-        $this->analyzeHardware($items_id);
-        return $this->pe;
-    }
-
-    protected function analyzeHardware(int $items_id)
-    {
-        if ($this->hardware_analyzed === $items_id) {
-            return;
-        }
-
         $configuration = [];
         // Yes, string expected here.
-        $iterator = Item_Devices::getItemsAssociatedTo(GlpiComputer::class, (string) $items_id);
+        $iterator = Item_Devices::getItemsAssociatedTo($item->getType(), (string) $item->getID());
         foreach ($iterator as $item_device) {
             switch ($item_device->getType()) {
                 case Item_DeviceProcessor::class:
@@ -142,56 +110,6 @@ class Computer extends AbstractAsset
             }
         }
 
-        // Disable usage
-        $this->hardware['configuration'] = $configuration;
-        $this->hardware['usage'] = [
-            'avg_power' => 0
-        ];
-
-        try {
-            $response = $this->client->post('server', [
-                'json' => $this->hardware,
-            ]);
-        } catch (\RuntimeException $e) {
-            trigger_error($e->getMessage(), E_USER_WARNING);
-            return;
-        }
-
-        // Normalize estimations
-        if (isset($response['impacts']['gwp']['embedded']['value'])) {
-            $this->gwp = new TrackedFloat(
-                $response['impacts']['gwp']['embedded']['value'],
-                null,
-                TrackedFloat::DATA_QUALITY_ESTIMATED
-            );
-            if ($response['impacts']['gwp']['unit'] === 'kgCO2eq') {
-                $this->gwp->setValue($this->gwp->getValue() * 1000);
-            }
-        }
-
-        if (isset($response['impacts']['adp']['embedded']['value'])) {
-            $this->adp = new TrackedFloat(
-                $response['impacts']['adp']['embedded']['value'],
-                null,
-                TrackedFloat::DATA_QUALITY_ESTIMATED
-            );
-            if ($response['impacts']['adp']['unit'] === 'kgSbeq') {
-                $this->adp->setValue($this->adp->getValue() * 1000);
-            }
-        }
-
-        if (isset($response['impacts']['pe']['embedded']['value'])) {
-            $this->pe = new TrackedFloat(
-                $response['impacts']['pe']['embedded']['value'],
-                null,
-                TrackedFloat::DATA_QUALITY_ESTIMATED
-            );
-            if ($response['impacts']['pe']['unit'] === 'MJ') {
-                $this->pe->setValue($this->pe->getValue() * 1000000);
-            }
-        }
-
-        // Update last analyzed item id
-        $this->hardware_analyzed = $items_id;
+        return $configuration;
     }
 }

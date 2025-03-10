@@ -134,6 +134,7 @@ class EnvironmentalImpact extends CommonDBChild
         TemplateRenderer::getInstance()->display('@carbon/environmentalimpact.html.twig', [
             'params'   => $options,
             'item'     => $this,
+            'itemtype' => Computer::class,
         ]);
     }
 

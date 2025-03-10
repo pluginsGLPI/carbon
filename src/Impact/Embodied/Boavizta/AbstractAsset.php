@@ -35,66 +35,32 @@
 namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta;
 
 use CommonDBTM;
-use DBmysql;
-use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\DataSource\Boaviztapi;
-use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\EmbodiedImpact;
 use GlpiPlugin\Carbon\Impact\Embodied\AbstractEmbodiedImpact;
-use Session;
-use Toolbox as GlpiToolbox;
+use GlpiPlugin\Carbon\Impact\Embodied\EmbodiedImpactInterface;
 
 abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInterface
 {
-    protected static string $itemtype = '';
-
-    /**
-     * @var int|null $hardware_analyzed id of the analyzed asset
-     *
-     * Used to avoid repeated requests to the backend for a single item
-    */
-    protected ?int $hardware_analyzed = null;
+    /** @var string Endpoint to query for the itemtype, to be filled in child class */
+    protected static string $endpoint       = '';
 
     /** @var array $hardware hardware description for the request */
     protected array $hardware = [];
 
-    /** @var int $limit maximum number of entries to build */
-    protected int $limit = 0;
-
-    protected bool $limit_reached = false;
-
-    protected ?TrackedFloat $gwp = null;
-
-    protected ?TrackedFloat $adp = null;
-
-    protected ?TrackedFloat $pe = null;
-
+    /** @var Boaviztapi instance of the HTTP client */
     protected ?Boaviztapi $client = null;
 
-    abstract public function getEvaluableQuery(bool $entity_restrict = true): array;
-
-    abstract public static function getEngine(CommonDBTM $item): EngineInterface;
+    // abstract public static function getEngine(CommonDBTM $item): EngineInterface;
 
     /**
-     * Analyze the hardware of  the asset to prepare the request to the assment backend
+     * Analyze the hardware of the asset to prepare the request to the backend
+     * @param CommonDBTM $item asset to analyze
      *
      * @return void
      */
-    abstract protected function analyzeHardware(int $items_id);
-
-    abstract public function calculateGwp(int $items_id): ?TrackedFloat;
-
-    abstract public function calculateAdp(int $items_id): ?TrackedFloat;
-
-    abstract public function calculatePe(int $items_id): ?TrackedFloat;
-
-    public function __construct()
-    {
-        $this->gwp = null;
-        $this->adp = null;
-        $this->pe = null;
-    }
+    abstract protected function analyzeHardware(CommonDBTM $item);
 
     /**
      * Set the REST API client to use for requests
@@ -107,17 +73,6 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
         $this->client = $client;
     }
 
-    public function getItemtype(): string
-    {
-        return static::$itemtype;
-    }
-
-    /**
-     * Delete all calculated embodied impact for an asset
-     *
-     * @param integer $items_id
-     * @return boolean
-     */
     public function resetImpact(int $items_id): bool
     {
         $embodied_impact = new EmbodiedImpact();
@@ -127,208 +82,101 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
         ]);
     }
 
-    final public function getUnit(int $type, bool $short = true): ?string
+    protected function query($description): array
     {
-        switch ($type) {
-            case AssetInterface::IMPACT_GWP:
-                return $short ? 'gCO2eq' : __('grams of carbon dioxyde equivalent', 'carbon');
-            case AssetInterface::IMPACT_ADP:
-                return $short ? 'gSbeq' : __('grams of antimony equivalent', 'carbon');
-            case AssetInterface::IMPACT_PE:
-                return $short ? 'J' : __('joules', 'carbon');
+        try {
+            $response = $this->client->post(static::$endpoint, [
+                'json' => $description,
+            ]);
+        } catch (\RuntimeException $e) {
+            trigger_error($e->getMessage(), E_USER_WARNING);
+            throw $e;
         }
 
-        return null;
+        return $response;
     }
 
     /**
-     * Get all impacts of the asset
+     * Read the response to find the impacts provided by Boaviztapi
      *
-     * @return \Generator
+     * @return array
      */
-    final public function getImpacts(int $id): \Generator
+    protected function parseResponse(array $response): array
     {
-        foreach ($this->getImpactTypes() as $type) {
-            yield $type => $this->getImpact($type, $id);
-        }
-    }
-
-    final public function getImpact(int $type, int $id): ?AbstractTracked
-    {
-        switch ($type) {
-            case AssetInterface::IMPACT_GWP:
-                return $this->getGwp($id);
-            case AssetInterface::IMPACT_ADP:
-                return $this->getAdp($id);
-            case AssetInterface::IMPACT_PE:
-                return $this->getPe($id);
-        }
-
-        return null;
-    }
-
-    public function setLimit(int $limit)
-    {
-        $this->limit = $limit;
-    }
-
-    /**
-     * Start the historization of all items
-     *
-     * @return int count of entries generated
-     */
-    public function evaluateItems(): int
-    {
-        /** @var DBmysql $DB */
-        global $DB;
-
-        $itemtype = static::$itemtype;
-        if ($itemtype === '') {
-            throw new \LogicException('Itemtype not set');
-        }
-        if (!is_subclass_of($itemtype, CommonDBTM::class)) {
-            throw new \LogicException('Itemtype does not inherits from ' . CommonDBTM::class);
-        }
-
-        $count = 0;
-
-        /**
-         * Huge quantity of SQL queries will be executed
-         * We NEED to check memory usage to avoid running out of memory
-         * @see DbMysql::doQuery()
-         */
-        $memory_limit = GlpiToolbox::getMemoryLimit() - 8 * 1024 * 1024;
-        if ($memory_limit < 0) {
-            // May happen in test seems that ini_get("memory_limits") returns
-            // enpty string in PHPUnit environment
-            $memory_limit = null;
-        }
-
-        $iterator = $DB->request($this->getEvaluableQuery(false));
-        foreach ($iterator as $row) {
-            $count += $this->evaluateItem($row['id']);
-            if ($this->limit !== 0 && $count >= $this->limit) {
-                $this->limit_reached = true;
-                break;
-            }
-            if ($memory_limit && $memory_limit < memory_get_usage()) {
-                // 8 MB memory left, emergency exit
-                $this->limit_reached = true;
-                break;
-            }
-            if ($this->limit_reached) {
-                break;
-            }
-        }
-
-        return $count;
-    }
-
-    /**
-     * Evaluate all impacts of the asset
-     *
-     * @param integer $id
-     * @return integer count of asserts evaluated
-     */
-    public function evaluateItem(int $id): int
-    {
-        $itemtype = static::$itemtype;
-        $item = $itemtype::getById($id);
-        if ($item === false) {
-            return 0;
-        }
-
-        $input = [];
-        $key_map = [
-            AssetInterface::IMPACT_GWP => 'gwp',
-            AssetInterface::IMPACT_ADP => 'adp',
-            AssetInterface::IMPACT_PE  => 'pe',
-        ];
-        foreach ($this->getImpacts($id) as $impact => $value) {
-            $key = $key_map[$impact];
-            if ($value === null) {
-                $input[$key] = null;
-                $input["{$key}_quality"] = AbstractTracked::DATA_QUALITY_UNSPECIFIED;
+        $impacts = [];
+        foreach ($response['impacts'] as $type => $impact) {
+            if (!in_array($type, $this->getImpactTypes())) {
+                trigger_error(sprintf('Unsupported impact type %s in class %s', $type, __CLASS__));
                 continue;
             }
-            $input[$key] = $value->getValue();
-            $input["{$key}_quality"] = $value->getLowestSource();
-        }
 
-        $embodied_impact = new EmbodiedImpact();
-        $input_item = [
-            'itemtype' => static::getItemtype(),
-            'items_id' => $id,
-        ];
-        $embodied_impact->getFromDBByCrit($input_item);
-        if ($embodied_impact->isNewItem()) {
-            $input = array_merge($input, $input_item);
-            if ($embodied_impact->add($input) === false) {
-                return 0;
+            switch ($type) {
+                case 'gwp':
+                    $impacts[EmbodiedImpactInterface::IMPACT_GWP] = $this->parseGwp($response['impacts']['gwp']);
+                    break;
+                case 'adp':
+                    $impacts[EmbodiedImpactInterface::IMPACT_ADP] = $this->parseAdp($response['impacts']['adp']);
+                    break;
+                case 'pe':
+                    $impacts[EmbodiedImpactInterface::IMPACT_PE] = $this->parsePe($response['impacts']['pe']);
+                    break;
             }
-
-            return 1;
         }
 
-        $input = array_merge($input, ['id' => $embodied_impact->getID()]);
-        if ($embodied_impact->update($input) === false) {
-            return 0;
-        }
-
-        return 1;
+        return $impacts;
     }
 
-    /**
-     * Calculate embodied impact for an item
-     *
-     * requres prior call to setClient()
-     *
-     * @param integer $items_id
-     * @return boolean
-     */
-    public function calculateImpact(int $items_id): bool
+    protected function parseGwp(array $impact): ?TrackedFloat
     {
-        $calculated = $this->evaluateItem($items_id);
-        if ($calculated === 0) {
-            Session::addMessageAfterRedirect(
-                sprintf(__('Failed to calculate embodied impact', 'carbon'), $calculated),
-            );
-            return false;
+        if ($impact['embedded'] === 'not implemented') {
+            return null;
         }
 
-        Session::addMessageAfterRedirect(
-            sprintf(__('Embodied impact sucessfully evaluated', 'carbon'), $calculated),
+        $value = new TrackedFloat(
+            $impact['embedded']['value'],
+            null,
+            TrackedFloat::DATA_QUALITY_ESTIMATED
         );
-        return true;
+        if ($impact['unit'] === 'kgCO2eq') {
+            $value->setValue($value->getValue() * 1000);
+        }
+
+        return $value;
     }
 
-    protected function evaluateItemPerImpact(CommonDBTM $item, EngineInterface $engine, int $impact): bool
+    protected function parseAdp(array $impact): ?TrackedFloat
     {
-        return true;
+        if ($impact['embedded'] === 'not implemented') {
+            return null;
+        }
+
+        $value = new TrackedFloat(
+            $impact['embedded']['value'],
+            null,
+            TrackedFloat::DATA_QUALITY_ESTIMATED
+        );
+        if ($impact['unit'] === 'kgSbeq') {
+            $value->setValue($value->getValue() * 1000);
+        }
+
+        return $value;
     }
 
-
-    public function getImpactTypes(): array
+    protected function parsePe(array $impact): ?TrackedFloat
     {
-        return [
-            AssetInterface::IMPACT_GWP,
-            AssetInterface::IMPACT_ADP,
-            AssetInterface::IMPACT_PE,
-        ];
-    }
+        if ($impact['embedded'] === 'not implemented') {
+            return null;
+        }
 
-    final public function getGwp(int $items_id): ?TrackedFloat
-    {
-        return $this->calculateGwp($items_id);
-    }
+        $value = new TrackedFloat(
+            $impact['embedded']['value'],
+            null,
+            TrackedFloat::DATA_QUALITY_ESTIMATED
+        );
+        if ($impact['unit'] === 'MJ') {
+            $value->setValue($value->getValue() * (1000 ** 2));
+        }
 
-    final public function getAdp(int $items_id): ?TrackedFloat
-    {
-        return $this->calculateAdp($items_id);
-    }
-
-    final public function getPe(int $items_id): ?TrackedFloat
-    {
-        return $this->calculatePe($items_id);
+        return $value;
     }
 }

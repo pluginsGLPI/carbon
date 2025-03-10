@@ -32,20 +32,61 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta;
+namespace GlpiPlugin\Carbon\Impact\Embodied;
 
 use CommonDBTM;
-use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
-use GlpiPlugin\Carbon\DataSource\Boaviztapi;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
+use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 
-interface AssetInterface
+interface EmbodiedImpactInterface
 {
+    const IMPACT_GWP = 0; // Global warming potential
+    const IMPACT_ADP = 1; // Abiotic Depletion Potential
+    const IMPACT_PE  = 2; // Primary Energy
+
     /**
-     * Set the API client to use for HTTP requests
+     * Get an instance of the impact calculation engine for the itemtype of the analyzed object
      *
-     * @param Boaviztapi $client
+     * @param CommonDBTM $item
+     * @return EngineInterface
+     */
+    // public static function getEngine(CommonDBTM $item): EngineInterface;
+
+    /**
+     * Get  the itemtype of the asset handled by this class
+     *
+     * @return string
+     */
+    public static function getItemtype(): string;
+
+    /**
+     * Set the maximum count of items to calculate with evaluateItems()
+     *
+     * @param integer $limit
      * @return void
      */
-    public function setClient(Boaviztapi $client);
+    public function setLimit(int $limit);
+
+    /**
+     * Get query to find items we can evaluate
+     *
+     * @param boolean $entity_restrict
+     * @return array
+     */
+    public function getEvaluableQuery(bool $entity_restrict = true, bool $recalculate = false): array;
+
+    /**
+     * Start the evaluation of all items
+     *
+     * @return int count of entries generated
+     */
+    public function evaluateItems(): int;
+
+    /**
+     * Evaluate all impacts of the asset
+     *
+     * @param integer $id
+     * @return integer count of asserts evaluated
+     */
+    public function evaluateItem(int $id): int;
 }
