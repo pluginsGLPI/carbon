@@ -26,26 +26,23 @@
  * SOFTWARE.
  * -------------------------------------------------------------------------
  * @copyright Copyright (C) 2024 Teclib' and contributors.
- * @copyright Copyright (C) 2024 by the carbon plugin team.
  * @license   MIT https://opensource.org/licenses/mit-license.php
  * @link      https://github.com/pluginsGLPI/carbon
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta;
+$table = 'glpi_plugin_carbon_computertypes';
+/** @var Migration $migration */
+$migration->addField($table, 'type', 'integer', ['after' => 'power_consumption']);
 
-use CommonDBTM;
-use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
-use GlpiPlugin\Carbon\DataSource\Boaviztapi;
-use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
+$table = 'glpi_plugin_carbon_embodiedimpacts';
+/** @var Migration $migration */
+$migration->addField($table, 'engine', 'string', ['after' => 'items_id']);
+$migration->addField($table, 'engine_version', 'string', ['after' => 'engine']);
+$migration->addField($table, 'date_mod', 'timestamp', ['after' => 'engine_version']);
 
-interface AssetInterface
-{
-    /**
-     * Set the API client to use for HTTP requests
-     *
-     * @param Boaviztapi $client
-     * @return void
-     */
-    public function setClient(Boaviztapi $client);
-}
+$table = 'glpi_plugin_carbon_carbonemissions';
+/** @var Migration $migration */
+$migration->addField($table, 'engine', 'string', ['after' => 'items_id']);
+$migration->addField($table, 'engine_version', 'string', ['after' => 'engine']);
+$migration->addField($table, 'date_mod', 'timestamp', ['after' => 'engine_version']);

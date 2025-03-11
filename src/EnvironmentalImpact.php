@@ -35,6 +35,7 @@ namespace GlpiPlugin\Carbon;
 
 use Computer;
 use CommonDBChild;
+use CommonDBTM;
 use CommonGLPI;
 use Glpi\Application\View\TemplateRenderer;
 use Monitor;
@@ -133,6 +134,7 @@ class EnvironmentalImpact extends CommonDBChild
         TemplateRenderer::getInstance()->display('@carbon/environmentalimpact.html.twig', [
             'params'   => $options,
             'item'     => $this,
+            'itemtype' => Computer::class,
         ]);
     }
 
@@ -176,10 +178,17 @@ class EnvironmentalImpact extends CommonDBChild
         return $tab;
     }
 
-    public static function showCharts(CommonGLPI $item)
+    public static function showCharts(CommonDBTM $item)
     {
+        $embodied_impact = new EmbodiedImpact();
+        $embodied_impact->getFromDBByCrit([
+            'itemtype' => $item->getType(),
+            'items_id' => $item->getID(),
+        ]);
+
         TemplateRenderer::getInstance()->display('@carbon/environmentalimpact-item.html.twig', [
             'item' => $item,
+            'embodied_impact' => $embodied_impact,
         ]);
     }
 }

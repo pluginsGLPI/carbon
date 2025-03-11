@@ -93,6 +93,18 @@
     'fas fa-chart-pie'
 ) }}
 
+{% if embodied_impact.fields.gwp is not null %}
+  <div class="h1 mb-3">{{ embodied_impact.fields.gwp }} gCO<sub>2</sub>eq</div>
+{% endif %}
+
+{% if embodied_impact.fields.adp is not null %}
+  <div class="h1 mb-3">{{ embodied_impact.fields.adp }} gSbeq</div>
+{% endif %}
+
+{% if embodied_impact.fields.pe is not null %}
+  <div class="h1 mb-3">{{ embodied_impact.fields.pe }} J</div>
+{% endif %}
+
 <div class="card-body" id="cardBodyBorder1">
     <div class="subheader">{{ __('Embodied impact', 'carbon') }}</div>
     <div>

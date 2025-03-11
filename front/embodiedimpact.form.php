@@ -33,11 +33,9 @@
 
 use Glpi\Event;
 use GlpiPlugin\Carbon\Config;
-use GlpiPlugin\Carbon\DataSource\Boaviztapi;
-use GlpiPlugin\Carbon\DataSource\RestApiClient;
 use GlpiPlugin\Carbon\EmbodiedImpact;
 use GlpiPlugin\Carbon\Impact\Embodied\AbstractEmbodiedImpact;
-use GlpiPlugin\Carbon\Impact\Embodied\Boavizta\AbstractAsset;
+use GlpiPlugin\Carbon\Impact\Embodied\Engine;
 
 include('../../../inc/includes.php');
 
@@ -98,30 +96,21 @@ if (isset($_POST['update'])) {
         Html::back();
     }
 
-    if (!EmbodiedImpact::canUpdate()) {
-        Session::addMessageAfterRedirect(__('Update denied.', 'carbon'), false, ERROR);
+    $embodied_impact = Engine::getEngineFromItemtype($_POST['itemtype']);
+    if ($embodied_impact === null) {
+        Session::addMessageAfterRedirect(__('Unable to find calculation engine for this asset.', 'carbon'), false, ERROR);
         Html::back();
     }
 
-    $embodied_impact_namespace = Config::getEmbodiedImpactEngine();
-    $embodied_impact_class = $embodied_impact_namespace . '\\' . (string) $_POST['itemtype'];
-    if (!class_exists($embodied_impact_class) || !is_subclass_of($embodied_impact_class, AbstractEmbodiedImpact::class)) {
-        Session::addMessageAfterRedirect(__('Bad arguments.', 'carbon'), false, ERROR);
-        Html::back();
-    }
-
-    /** @var AbstractAsset $embodied_impact */
-    $embodied_impact = new $embodied_impact_class();
-    $itemtype = $embodied_impact->getItemtype();
+    $itemtype = $embodied_impact::getItemtype();
     $item = new $itemtype();
     $item->getFromDB($_POST['items_id']);
-    if (!$item->canUpdate()) {
+    if (!$item->canUpdate() || !EmbodiedImpact::canUpdate()) {
         Session::addMessageAfterRedirect(__('Update denied.', 'carbon'), false, ERROR);
         Html::back();
     }
 
-    $embodied_impact->setClient(new Boaviztapi(new RestApiClient()));
-    if (!$embodied_impact->calculateImpact($_POST['items_id'])) {
+    if (!$embodied_impact->evaluateItem($_POST['items_id'])) {
         Session::addMessageAfterRedirect(__('Update failed.', 'carbon'), false, ERROR);
     }
 }

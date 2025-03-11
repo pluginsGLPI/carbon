@@ -38,7 +38,7 @@ use GlpiPlugin\Carbon\DataSource\RestApiClient;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensityRTE;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensityElectricityMap;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensityInterface;
-use GlpiPlugin\Carbon\DataSource\Boaviztapi;
+use GlpiPlugin\Carbon\Impact\Embodied\Engine;
 use GlpiPlugin\Carbon\Impact\History\AssetInterface as HistoryAssetInterface;
 use GlpiPlugin\Carbon\Impact\Embodied\Boavizta\AssetInterface as EmbodiedAssetInterface;
 use GlpiPlugin\Carbon\Toolbox;
@@ -120,10 +120,8 @@ class CronTask
         $remaining = $task->fields['param'];
         $limit_per_type = (int) floor(( $remaining) / count($embodied_impacts));
         foreach ($embodied_impacts as $embodied_impact_type) {
-            /** @var EmbodiedAssetInterface $embodied_impact */
-            $embodied_impact = new $embodied_impact_type();
+            $embodied_impact = Engine::getEngine($embodied_impact_type);
             $embodied_impact->setLimit($limit_per_type);
-            $embodied_impact->setClient(new Boaviztapi(new RestApiClient()));
             $count = $embodied_impact->evaluateItems();
             $task->addVolume($count);
         }

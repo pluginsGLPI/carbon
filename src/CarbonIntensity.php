@@ -408,8 +408,6 @@ class CarbonIntensity extends CommonDropdown
     /**
      * Gets date intervals where data are missing
      *
-     * @see https://bertwagner.com/posts/gaps-and-islands/
-     *
      * @param integer $source_id
      * @param integer $zone_id
      * @param DateTimeInterface $start
@@ -418,106 +416,11 @@ class CarbonIntensity extends CommonDropdown
      */
     public function findGaps(int $source_id, int $zone_id, DateTimeInterface $start, ?DateTimeInterface $stop = null): array
     {
-        /** @var DBmysql $DB */
-        global $DB;
-
-        // Get start date as unix timestamp
-        $start_timestamp = $start->format('U');
-        $start_timestamp = $start_timestamp - ($start_timestamp % 3600);
-        $boundaries[] = new QueryExpression('UNIX_TIMESTAMP(`date`) >= ' . $start_timestamp);
-
-        // get stop date as unix timestamp
-        if ($stop === null) {
-            // Assume stop date is yesterday at midnight
-            $stop = new DateTime();
-            $stop->setTime(0, 0, 0);
-            $stop->sub(new DateInterval('P1D'));
-        }
-        $stop_timestamp = $stop->format('U');
-        $stop_timestamp = $stop_timestamp - ($stop_timestamp % 3600);
-        $boundaries[] = new QueryExpression('UNIX_TIMESTAMP(`date`) <= ' . $stop_timestamp);
-
-        // prepare sub query to get start and end date of an atomic date range
-        // An atomic date range is set to 1 hour
-        // To reduce problems with DST, we use the unix timestamp of the date
-        $table = self::getTable();
-        $atomic_ranges_subquery = new QuerySubQuery([
-            'SELECT' => [
-                new QueryExpression('UNIX_TIMESTAMP(`date`) as `start_date`'),
-                new QueryExpression("UNIX_TIMESTAMP(`date`) + 3600 as `end_date`"),
-            ],
-            'FROM'   => $table,
-            'WHERE'  => [
-                CarbonIntensitySource::getForeignKeyField() => $source_id,
-                Zone::getForeignKeyField() => $zone_id,
-            ] + $boundaries,
-        ], 'atomic_ranges');
-
-        // For each atomic date range, find the end date of previous atomic date range
-        $groups_subquery = new QuerySubQuery([
-            'SELECT' => [
-                new QueryExpression('ROW_NUMBER() OVER (ORDER BY `start_date`, `end_date`) AS `row_number`'),
-                'start_date',
-                'end_date',
-                new QueryExpression('LAG(`end_date`, 1) OVER (ORDER BY `start_date`, `end_date`) AS `previous_end_date`')
-            ],
-            'FROM' => $atomic_ranges_subquery
-        ], 'groups');
-
-        // For each atomic date range, find if it is the start of an island
-        $islands_subquery = new QuerySubQuery([
-            'SELECT' => [
-                '*',
-                // new QueryExpression('CASE WHEN `groups`.`previous_end_date` >= `start_date` THEN 0 ELSE 1 END AS `is_island_start`'), // For debugging purpose
-                new QueryExpression('SUM(CASE WHEN `groups`.`previous_end_date` >= `start_date` THEN 0 ELSE 1 END) OVER (ORDER BY `groups`.`row_number`) AS `ìsland_id`')
-            ],
-            'FROM' => $groups_subquery
-        ], 'islands');
-
-        $request = [
-            'SELECT' => [
-                'MIN' => 'start_date as island_start_date',
-                'MAX' => 'end_date as island_end_date',
-            ],
-            'FROM' => $islands_subquery,
-            'GROUPBY' => ['ìsland_id'],
-            'ORDER' => ['island_start_date']
+        $criteria = [
+            CarbonIntensitySource::getForeignKeyField() => $source_id,
+            Zone::getForeignKeyField() => $zone_id,
         ];
-
-        $result = $DB->request($request);
-        if ($result->count() === 0) {
-            // No island at all, the whole range is a gap
-            return [
-                [
-                    'start' => date('Y-m-d H:i:s', $start_timestamp),
-                    'end'   => date('Y-m-d H:i:s', $stop_timestamp),
-                ]
-            ];
-        }
-
-        // Find gaps from islands
-        $expected_start_date = $start_timestamp;
-        $gaps = [];
-        foreach ($result as $row) {
-            if ($expected_start_date < $row['island_start_date']) {
-                // The current island starts after the expected start date
-                // Then there is a gap
-                $gaps[] = [
-                    'start' => date('Y-m-d H:i:s', $expected_start_date),
-                    'end'   => date('Y-m-d H:i:s', $row['island_start_date']),
-                ];
-            }
-            $expected_start_date = $row['island_end_date'];
-        }
-        if ($expected_start_date < $stop_timestamp) {
-            // The last island ends before the stop date
-            // Then there is a gap
-            $gaps[] = [
-                'start' => date('Y-m-d H:i:s', $expected_start_date),
-                'end'   => date('Y-m-d H:i:s', $stop_timestamp),
-            ];
-        }
-
-        return $gaps;
+        $interval = new DateInterval('PT1H');
+        return Toolbox::findTemporalGapsInTable(self::getTable(), $start, $interval, $stop, $criteria);
     }
 }

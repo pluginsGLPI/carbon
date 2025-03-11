@@ -101,13 +101,33 @@ class Config extends GlpiConfig
      */
     public static function configUpdate(array $input): array
     {
+        // Prevent erasing protected fields
+        // When set but empty, don't update them
         $protected_fields = [
             'electricitymap_api_key',
-            'co2signal_api_key'
         ];
         foreach ($protected_fields as $field) {
             if (isset($input[$field]) && empty($input[$field])) {
                 unset($input[$field]);
+            }
+        }
+
+        //Test Boavizta URL by acquiring zones
+        if (isset($input['boaviztapi_base_url'])) {
+            $boavizta = new DataSource\Boaviztapi(new DataSource\RestApiClient(), $input['boaviztapi_base_url']);
+            $zones = [];
+            try {
+                $zones = $boavizta->getZones();
+            } catch (\Exception $e) {
+                unset($input['boaviztapi_base_url']);
+                Session::addMessageAfterRedirect(__('Invalid Boavizta API URL', 'carbon'), false, ERROR);
+            }
+            if (count($zones) > 0) {
+                // Create the source if it does not exists already
+                if ($boavizta->createSource()) {
+                    // Save zones into database
+                    $boavizta->saveZones($zones);
+                }
             }
         }
 

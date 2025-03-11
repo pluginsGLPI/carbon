@@ -114,6 +114,28 @@ class EmbodiedImpact extends CommonDBTM
             'datatype'           => 'number',
             'unit'               => 'J',
         ];
+
+        $tab[] = [
+            'id'                 => SearchOptions::CARBON_EMISSION_CALC_DATE,
+            'table'              => self::getTable(),
+            'field'              => 'date_mod',
+            'name'               => __('Date of evaluation', 'carbon')
+        ];
+
+        $tab[] = [
+            'id'                 => SearchOptions::CARBON_EMISSION_ENGINE,
+            'table'              => self::getTable(),
+            'field'              => 'engine',
+            'name'               => __('Engine', 'carbon')
+        ];
+
+        $tab[] = [
+            'id'                 => SearchOptions::CARBON_EMISSION_ENGINE_VER,
+            'table'              => self::getTable(),
+            'field'              => 'engine_version',
+            'name'               => __('Engine version', 'carbon')
+        ];
+
         return $tab;
     }
 

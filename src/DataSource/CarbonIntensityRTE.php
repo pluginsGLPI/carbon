@@ -46,15 +46,22 @@ use GlpiPlugin\Carbon\Toolbox;
 
 class CarbonIntensityRTE extends AbstractCarbonIntensity
 {
-    const RECORDS_URL = 'https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/eco2mix-national-tr/records';
-    const EXPORT_URL_TO_2023  = 'https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/eco2mix-national-tr/exports/json';
-    const EXPORT_URL_TO_2012  = 'https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/eco2mix-national-cons-def/exports/json';
+    const RECORDS_URL =         '/eco2mix-national-tr/records';
+    const EXPORT_URL_TO_2023  = '/eco2mix-national-tr/exports/json';
+    const EXPORT_URL_TO_2012  = '/eco2mix-national-cons-def/exports/json';
 
     private RestApiClientInterface $client;
 
-    public function __construct(RestApiClientInterface $client)
+    private string $base_url;
+
+    public function __construct(RestApiClientInterface $client, string $url = '')
     {
         $this->client = $client;
+
+        $this->base_url = 'https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets';
+        if (!empty($url)) {
+            $this->base_url = $url;
+        }
     }
 
     public function getSourceName(): string
@@ -147,7 +154,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
             'timezone' => $timezone,
         ];
 
-        $response = $this->client->request('GET', self::RECORDS_URL, ['timeout' => 8, 'query' => $params]);
+        $response = $this->client->request('GET', $this->base_url . self::RECORDS_URL, ['timeout' => 8, 'query' => $params]);
         if (!$response) {
             return [];
         }
@@ -205,10 +212,10 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         ];
         if ($stop < DateTime::createFromFormat(DateTimeInterface::ATOM, '2023-02-01T00:00:00+00:00')) {
             $step = 15;
-            $url = self::EXPORT_URL_TO_2012;
+            $url = $this->base_url . self::EXPORT_URL_TO_2012;
         } else {
             $step = 15;
-            $url = self::EXPORT_URL_TO_2023;
+            $url = $this->base_url . self::EXPORT_URL_TO_2023;
         }
         $response = $this->client->request('GET', $url, ['timeout' => 8, 'query' => $params]);
         if (!$response) {

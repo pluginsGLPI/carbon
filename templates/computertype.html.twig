@@ -31,10 +31,20 @@
 
 {% extends "generic_show_form.html.twig" %}
 {% import "components/form/fields_macros.html.twig" as fields %}
+{% import "@carbon/components/form/fields_macros.html.twig" as carbonFields %}
 
 {% block form_fields %}
     {{ fields.smallTitle(__('This power value is used as default when the power of a computer model is unknown', 'carbon')) }}
     {{ fields.numberField('power_consumption', item.fields['power_consumption'], _n('Power', 'Powers', 1, 'carbon'), {
         min: 0
     }) }}
+
+    {{ carbonFields.dropdownComputerType(
+        'type',
+        item.fields['type'],
+        __('Type', 'carbon'),
+        {
+            display_emptychoice: true
+        }
+    ) }}
 {% endblock %}

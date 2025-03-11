@@ -91,7 +91,6 @@ function plugin_carbon_setupHooks()
     // Secured config
     $PLUGIN_HOOKS[Hooks::SECURED_CONFIGS]['carbon'] = [
         'electricitymap_api_key',
-        'co2signal_api_key'
     ];
 
     // add new cards to the dashboard

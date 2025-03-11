@@ -127,6 +127,14 @@ class ToolboxTest extends DbTestCase
             new DateTime('2023-03-31 00:00:00'),
         ];
         $this->assertEquals($expected, $output);
+
+        // Test leap year case (2024 is a leap year)
+        $output = $instance->yearToLastMonth(new DateTimeImmutable('2025-03-06 12:43:34'));
+        $expected = [
+            new DateTime('2024-03-01 00:00:00'),
+            new DateTime('2025-02-28 00:00:00'),
+        ];
+        $this->assertEquals($expected, $output);
     }
 
     public function testIsLocationExistsForZone()

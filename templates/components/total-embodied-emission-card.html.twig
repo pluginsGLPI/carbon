@@ -29,22 +29,28 @@
  # -------------------------------------------------------------------------
  #}
 
-{% extends "generic_show_form.html.twig" %}
-{% import "components/form/fields_macros.html.twig" as fields %}
+<div class="card-body carbon-emission-card" style="height: 100%">
+    <div class="row align-items-center">
+        <div class="col-auto" id="embodiedCarbonEmissionIconElement">
+            <span><img src="{{ get_plugin_web_dir('carbon') }}/dist/images/carbon_emission_icon_darkgreen.png"></img></span>
+        </div>
+        <div class="col">
+            <div class="subheader">{{ __('Total Embodied Carbon Emission', 'carbon') }}</div>
+            <div class="subheader">&nbsp;</div>
+        </div>
+        <div class="my-3 nb-carbon-emission-size text-center" id="embodiedCarbonEmission"><i class="fas fa-spinner fa-spin"></i></div>
+    </div>
+</div>
 
-{% block form_fields %}
-    {% if itemtype == 'Computer' %}
-        {{ fields.largeTitle(
-            __('Asset usage', 'carbon'),
-            'fas fa-calendar-days'
-        ) }}
-
-        {{ fields.smallTitle(__('Usage information', 'carbon')) }}
-        {{ fields.dropdownField(
-            '\\GlpiPlugin\\Carbon\\ComputerUsageProfile',
-            'plugin_carbon_computerusageprofiles_id',
-            item.fields['plugin_carbon_computerusageprofiles_id'],
-            _n('Usage profile', 'Usage profiles', 1, 'carbon'))
-        }}
-    {% endif %}
+{% block scripts %}
+    <script>
+        $(document).ready(function() {
+            fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/totalEmbodiedCarbonEmission.php").then(response => {
+                return response.text();
+            }).then(data => {
+                let totalCarbonEmission = data;
+                document.getElementById('embodiedCarbonEmission').innerHTML = totalCarbonEmission;
+            });
+        });
+    </script>
 {% endblock %}

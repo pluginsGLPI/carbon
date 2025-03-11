@@ -50,15 +50,22 @@ use Symfony\Component\Console\Helper\ProgressBar;
 
 class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
 {
-    const HISTORY_URL = 'https://api.electricitymap.org/v3/carbon-intensity/history';
-    const PAST_URL    = 'https://api.electricitymap.org/v3/carbon-intensity/past-range';
-    const ZONES_URL    = 'https://api.electricitymap.org/v3/zones'; // Do not send API token
+    const HISTORY_URL = '/carbon-intensity/history';
+    const PAST_URL    = '/carbon-intensity/past-range';
+    const ZONES_URL   = '/zones'; // Do not send API token
 
     private RestApiClientInterface $client;
 
-    public function __construct(RestApiClientInterface $client)
+    private string $base_url;
+
+    public function __construct(RestApiClientInterface $client, string $url = '')
     {
         $this->client = $client;
+
+        $this->base_url = 'https://api.electricitymap.org/v3';
+        if (!empty($url)) {
+            $this->base_url = $url;
+        }
     }
 
     public function getSourceName(): string
@@ -157,7 +164,7 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
 
     protected function downloadZones(): array
     {
-        $response = $this->client->request('GET', self::ZONES_URL, []);
+        $response = $this->client->request('GET', $this->base_url . self::ZONES_URL, []);
         if (!$response) {
             return [];
         }
@@ -201,7 +208,7 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
             'query' => $params
         ];
 
-        $response = $this->client->request('GET', self::HISTORY_URL, $options);
+        $response = $this->client->request('GET', $this->base_url . self::HISTORY_URL, $options);
         if (!$response) {
             return [];
         }
@@ -253,7 +260,7 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
             'zone' => $zone,
         ];
 
-        $response = $this->client->request('GET', self::PAST_URL, ['query' => $params]);
+        $response = $this->client->request('GET', $this->base_url . self::PAST_URL, ['query' => $params]);
         if (!$response) {
             return [];
         }

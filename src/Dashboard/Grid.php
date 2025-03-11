@@ -112,7 +112,28 @@ class Grid
     //             'group'        => __("Carbon", "carbon"),
     //             'label'        => __("Monthly carbon emission", 'carbon'),
     //         ],
-    //     ];
+    //            'group'        => __("Carbon", "carbon"),
+    //            'label'        => __("Monthly carbon emission", 'carbon'),
+    //        ],
+    //        'plugin_carbon_card_total_embodied_gwp_impact' => [
+    //            'widgettype'   => ['bigNumber'],
+    //            'group'        => __("Carbon", "carbon"),
+    //            'label'        => __("Total embodied global warming potential", 'carbon'),
+    //            'provider'     => Provider::class . "::getTotalEmbodiedGwp",
+    //        ],
+    //        'plugin_carbon_card_total_embodied_pe_impact' => [
+    //            'widgettype'   => ['bigNumber'],
+    //            'group'        => __("Carbon", "carbon"),
+    //            'label'        => __("Total embodied primary energy consumed", 'carbon'),
+    //            'provider'     => Provider::class . "::getTotalPrimaryEnergyConsumed",
+    //        ],
+    //        'plugin_carbon_card_total_embodied_adp_impact' => [
+    //            'widgettype'   => ['bigNumber'],
+    //            'group'        => __("Carbon", "carbon"),
+    //            'label'        => __("Total embodied abiotic depletion potential", 'carbon'),
+    //            'provider'     => Provider::class . "::getTotalEmbodiedAdp",
+    //        ],
+    //    ];
 
     //     return array_merge($cards, $new_cards);
     }

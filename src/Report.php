@@ -127,6 +127,41 @@ class Report extends CommonDBTM
         return json_encode($response);
     }
 
+    public static function getTotalEmbodiedCarbonEmission(array $params = []): array
+    {
+        if (!isset($params['args']['apply_filters']['dates'][0]) || !isset($params['args']['apply_filters']['dates'][1])) {
+            list($start_date, $end_date) = (new Toolbox())->yearToLastMonth(new DateTimeImmutable('now'));
+            $params['args']['apply_filters']['dates'][0] = $start_date->format('Y-m-d\TH:i:s.v\Z');
+            $params['args']['apply_filters']['dates'][1] = $end_date->format('Y-m-d\TH:i:s.v\Z');
+        } else {
+            $start_date = DateTime::createFromFormat('Y-m-d\TH:i:s.v\Z', $params['args']['apply_filters'][0]);
+            $end_date   = DateTime::createFromFormat('Y-m-d\TH:i:s.v\Z', $params['args']['apply_filters'][1]);
+        }
+
+        $value = Provider::getTotalEmbodiedGwp($params);
+
+        // Prepare date format
+        $date_format = 'Y F';
+        switch ($_SESSION['glpidate_format'] ?? 0) {
+            case 0:
+                $date_format = 'Y F';
+                break;
+            case 1:
+            case 2:
+                $date_format = 'F Y';
+                break;
+        }
+        $response = [
+            'value'    => $value['number'],
+            'date_interval' => [
+                $start_date->format($date_format),
+                $end_date->format($date_format),
+            ],
+        ];
+
+        return $response;
+    }
+
     public static function getCarbonEmissionPerMonth(array $params = [], array $crit = []): string
     {
         if (!isset($params['args']['apply_filters']['dates'][0]) || !isset($params['args']['apply_filters']['dates'][1])) {

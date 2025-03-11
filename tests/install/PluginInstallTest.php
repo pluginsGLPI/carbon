@@ -159,6 +159,7 @@ class PluginInstallTest extends CommonTestCase
             $ignore_unsigned_keys_migration
         );
 
+        $message = '';
         try {
             $differences = $checker->checkCompleteSchema($schemaFile, true, 'plugin:carbon');
         } catch (\Throwable $e) {
@@ -185,9 +186,12 @@ class PluginInstallTest extends CommonTestCase
                         $message = sprintf(__('Unknown table "%s" has been found in database.'), $table_name);
                         break;
                 }
-                echo $message . PHP_EOL;
-                echo $difference['diff'] . PHP_EOL;
+                // echo $message . PHP_EOL;
+                // echo $difference['diff'] . PHP_EOL;
+                $message .= $message . PHP_EOL . $difference['diff'] . PHP_EOL;
             }
+
+            $this->fail($message);
             return false;
         }
 
