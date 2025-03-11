@@ -39,8 +39,7 @@ use DbUtils;
 use CommonDBTM;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\EmbodiedImpact;
-use InvalidArgumentException;
-use Session;
+use GlpiPlugin\Carbon\Impact\Type;
 use Toolbox as GlpiToolbox;
 
 abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
@@ -65,18 +64,9 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
 
     public function __construct()
     {
-        foreach (array_flip($this->getImpactTypes()) as $type) {
+        foreach (array_flip(Type::getImpactTypes()) as $type) {
             $this->impacts[$type] = null;
         }
-    }
-
-    public function getImpactTypes(): array
-    {
-        return [
-            EmbodiedImpactInterface::IMPACT_GWP => 'gwp',
-            EmbodiedImpactInterface::IMPACT_ADP => 'adp',
-            EmbodiedImpactInterface::IMPACT_PE  => 'pe',
-        ];
     }
 
     /**
@@ -89,11 +79,11 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
     final public function getUnit(int $type, bool $short = true): ?string
     {
         switch ($type) {
-            case EmbodiedImpactInterface::IMPACT_GWP:
+            case Type::IMPACT_GWP:
                 return $short ? 'gCO2eq' : __('grams of carbon dioxyde equivalent', 'carbon');
-            case EmbodiedImpactInterface::IMPACT_ADP:
+            case Type::IMPACT_ADP:
                 return $short ? 'gSbeq' : __('grams of antimony equivalent', 'carbon');
-            case EmbodiedImpactInterface::IMPACT_PE:
+            case Type::IMPACT_PE:
                 return $short ? 'J' : __('joules', 'carbon');
         }
 
@@ -193,7 +183,7 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         ];
         $embodied_impact = new EmbodiedImpact();
         $embodied_impact->getFromDBByCrit($input);
-        $impact_types = $this->getImpactTypes();
+        $impact_types = Type::getImpactTypes();
 
         $input['engine'] = $this->engine;
         $input['engine_version'] = $this->engine_version;

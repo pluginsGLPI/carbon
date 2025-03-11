@@ -35,9 +35,7 @@
 namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta;
 
 use CommonDBTM;
-use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\DataSource\Boaviztapi;
-use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 
 interface AssetInterface
 {

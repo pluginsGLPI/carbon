@@ -37,7 +37,7 @@ namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta;
 use CommonDBTM;
 use GlpiPlugin\Carbon\DataSource\Boaviztapi;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
-use GlpiPlugin\Carbon\EmbodiedImpact;
+use GlpiPlugin\Carbon\Impact\Type;
 use GlpiPlugin\Carbon\Impact\Embodied\AbstractEmbodiedImpact;
 use GlpiPlugin\Carbon\Impact\Embodied\EmbodiedImpactInterface;
 
@@ -124,20 +124,20 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
     {
         $impacts = [];
         foreach ($response['impacts'] as $type => $impact) {
-            if (!in_array($type, $this->getImpactTypes())) {
+            if (!in_array($type, Type::getImpactTypes())) {
                 trigger_error(sprintf('Unsupported impact type %s in class %s', $type, __CLASS__));
                 continue;
             }
 
             switch ($type) {
                 case 'gwp':
-                    $impacts[EmbodiedImpactInterface::IMPACT_GWP] = $this->parseGwp($response['impacts']['gwp']);
+                    $impacts[Type::IMPACT_GWP] = $this->parseGwp($response['impacts']['gwp']);
                     break;
                 case 'adp':
-                    $impacts[EmbodiedImpactInterface::IMPACT_ADP] = $this->parseAdp($response['impacts']['adp']);
+                    $impacts[Type::IMPACT_ADP] = $this->parseAdp($response['impacts']['adp']);
                     break;
                 case 'pe':
-                    $impacts[EmbodiedImpactInterface::IMPACT_PE] = $this->parsePe($response['impacts']['pe']);
+                    $impacts[Type::IMPACT_PE] = $this->parsePe($response['impacts']['pe']);
                     break;
             }
         }

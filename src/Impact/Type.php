@@ -32,56 +32,20 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\Impact\Embodied;
+namespace GlpiPlugin\Carbon\Impact;
 
-use CommonDBTM;
-use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
-
-interface EmbodiedImpactInterface
+class Type
 {
-    /**
-     * Get an instance of the impact calculation engine for the itemtype of the analyzed object
-     *
-     * @param CommonDBTM $item
-     * @return EngineInterface
-     */
-    // public static function getEngine(CommonDBTM $item): EngineInterface;
+    const IMPACT_GWP = 0; // Global warming potential
+    const IMPACT_ADP = 1; // Abiotic Depletion Potential
+    const IMPACT_PE  = 2; // Primary Energy
 
-    /**
-     * Get  the itemtype of the asset handled by this class
-     *
-     * @return string
-     */
-    public static function getItemtype(): string;
-
-    /**
-     * Set the maximum count of items to calculate with evaluateItems()
-     *
-     * @param integer $limit
-     * @return void
-     */
-    public function setLimit(int $limit);
-
-    /**
-     * Get query to find items we can evaluate
-     *
-     * @param boolean $entity_restrict
-     * @return array
-     */
-    public function getEvaluableQuery(bool $entity_restrict = true, bool $recalculate = false): array;
-
-    /**
-     * Start the evaluation of all items
-     *
-     * @return int count of successfully evaluated assets
-     */
-    public function evaluateItems(): int;
-
-    /**
-     * Evaluate all impacts of the asset
-     *
-     * @param integer $id
-     * @return bool true if success, false otherwise
-     */
-    public function evaluateItem(int $id): bool;
+    public static function getImpactTypes(): array
+    {
+        return [
+            self::IMPACT_GWP => 'gwp',
+            self::IMPACT_ADP => 'adp',
+            self::IMPACT_PE  => 'pe',
+        ];
+    }
 }
