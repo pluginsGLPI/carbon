@@ -54,6 +54,12 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
     /** @var bool Is limit reached when evaluating a batch of assets ? */
     protected bool $limit_reached = false;
 
+    /** @var string $engine Name of the calculation engine */
+    protected string $engine = 'undefined';
+
+    /** @var string $engine_version Version of the calculation engine */
+    protected string $engine_version = 'unknown';
+
     /** @var array of TrackedFloat */
     protected array $impacts = [];
 
@@ -117,8 +123,6 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
             throw new \LogicException('Itemtype does not inherits from ' . CommonDBTM::class);
         }
 
-        $count = 0;
-
         /**
          * Huge quantity of SQL queries will be executed
          * We NEED to check memory usage to avoid running out of memory
@@ -131,10 +135,17 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
             $memory_limit = null;
         }
 
+        /** @var int $attempts_count count of evaluation attempts */
+        $attempts_count = 0;
+        /** @var int $count count of successfully evaluated assets */
+        $count = 0;
         $iterator = $DB->request($this->getEvaluableQuery(false));
         foreach ($iterator as $row) {
-            $count += $this->evaluateItem($row['id']);
-            if ($this->limit !== 0 && $count >= $this->limit) {
+            if ($this->evaluateItem($row['id'])) {
+                $count++;
+            }
+            $attempts_count++;
+            if ($this->limit !== 0 && $attempts_count >= $this->limit) {
                 $this->limit_reached = true;
                 break;
             }
@@ -151,22 +162,28 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         return $count;
     }
 
-    public function evaluateItem(int $id): int
+    /**
+     * Evaluate and save tne environmental impact of an asset.
+     *
+     * @param integer $id
+     * @return bool true if sucess, false otherwise
+     */
+    public function evaluateItem(int $id): bool
     {
         $itemtype = static::$itemtype;
         $item = $itemtype::getById($id);
         if ($item === false) {
-            return 0;
+            return false;
         }
         try {
             $impacts = $this->doEvaluation($item);
         } catch (\RuntimeException $e) {
-            return 0;
+            return false;
         }
 
         if ($impacts === null) {
             // Nothing calculated
-            return 0;
+            return false;
         }
 
         // Find an existing row, if any
@@ -177,6 +194,9 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         $embodied_impact = new EmbodiedImpact();
         $embodied_impact->getFromDBByCrit($input);
         $impact_types = $this->getImpactTypes();
+
+        $input['engine'] = $this->engine;
+        $input['engine_version'] = $this->engine_version;
 
         // Prepare inputs for add or update
         foreach ($impacts as $type => $value) {
@@ -194,16 +214,16 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         // Add or update the impact for the asset
         if ($embodied_impact->isNewItem()) {
             if ($embodied_impact->add($input) !== false) {
-                return 1;
+                return true;
             }
         } else {
             unset($input['itemtype'], $input['items_id']); // prevent updating these columns
             if ($embodied_impact->update(['id' => $embodied_impact->getID()] + $input)) {
-                return 1;
+                return true;
             }
         }
 
-        return 0;
+        return false;
     }
 
     public function getEvaluableQuery(bool $entity_restrict = true, bool $recalculate = false): array
@@ -246,5 +266,11 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         return $request;
     }
 
-    abstract protected function doEvaluation(CommonDBTM $item);
+    /**
+     * Do the environmental impact evaluation of an asset
+     *
+     * @param CommonDBTM $item
+     * @return ?array
+     */
+    abstract protected function doEvaluation(CommonDBTM $item): ?array;
 }

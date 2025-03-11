@@ -43,6 +43,12 @@ use GlpiPlugin\Carbon\Impact\Embodied\EmbodiedImpactInterface;
 
 abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInterface
 {
+    /** @var string $engine Name of the calculation engine */
+    protected string $engine = 'Boavizta';
+
+    /** @var string $engine_version Version of the calculation engine */
+    protected string $engine_version = 'unknown';
+
     /** @var string Endpoint to query for the itemtype, to be filled in child class */
     protected string $endpoint       = '';
 
@@ -71,16 +77,29 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
     public function setClient(Boaviztapi $client)
     {
         $this->client = $client;
+        $this->engine_version = $this->getVersion();
     }
 
-    public function resetImpact(int $items_id): bool
+    protected function getVersion(): string
     {
-        $embodied_impact = new EmbodiedImpact();
-        return $embodied_impact->deleteByCriteria([
-            'itemtype' => static::getItemtype(),
-            'items_id' => $items_id
-        ]);
+        try {
+            $response = $this->client->get('utils/version');
+        } catch (\RuntimeException $e) {
+            trigger_error($e->getMessage(), E_USER_WARNING);
+            throw $e;
+        }
+
+        return $response[0];
     }
+
+    // public function resetImpact(int $items_id): bool
+    // {
+    //     $embodied_impact = new EmbodiedImpact();
+    //     return $embodied_impact->deleteByCriteria([
+    //         'itemtype' => static::getItemtype(),
+    //         'items_id' => $items_id
+    //     ]);
+    // }
 
     protected function query($description): array
     {

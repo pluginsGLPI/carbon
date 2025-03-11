@@ -78,7 +78,7 @@ interface EmbodiedImpactInterface
     /**
      * Start the evaluation of all items
      *
-     * @return int count of entries generated
+     * @return int count of successfully evaluated assets
      */
     public function evaluateItems(): int;
 
@@ -86,7 +86,7 @@ interface EmbodiedImpactInterface
      * Evaluate all impacts of the asset
      *
      * @param integer $id
-     * @return integer count of asserts evaluated
+     * @return bool true if success, false otherwise
      */
-    public function evaluateItem(int $id): int;
+    public function evaluateItem(int $id): bool;
 }

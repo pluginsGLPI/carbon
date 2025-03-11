@@ -70,6 +70,12 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     /** @var bool tells if the batch evaluation must stop */
     protected bool $limit_reached = false;
 
+    /** @var string $engine Name of the calculation engine */
+    protected string $engine = 'GLPI Carbon';
+
+    /** @var string $engine_version Version of the calculation engine */
+    protected string $engine_version = PLUGIN_CARBON_VERSION;
+
     /**
      * Get request in Query builder format to find evaluable items
      *
@@ -249,6 +255,8 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         $id = $entry->add([
             'itemtype'          => $item->getType(),
             'items_id'          => $item_id,
+            'engine'            => $this->engine,
+            'engine_version'    => $this->engine_version,
             'entities_id'       => $item->fields['entities_id'],
             'types_id'          => $item->fields[$type_fk],
             'models_id'         => $item->fields[$model_fk],

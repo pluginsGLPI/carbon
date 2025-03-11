@@ -89,7 +89,7 @@ class Boaviztapi
             return [];
         }
 
-        return $response;
+        return is_array($response) ? $response : [$response];
     }
 
     /**

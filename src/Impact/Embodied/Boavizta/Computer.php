@@ -76,6 +76,11 @@ class Computer extends AbstractAsset
         return $embodied_impacts;
     }
 
+    /**
+     * Get the type of the computer
+     * @param CommonDBTM $item
+     * @return int The type of the computer
+     */
     protected function getType(CommonDBTM $item): int
     {
         /** @var DBmysql $DB */
