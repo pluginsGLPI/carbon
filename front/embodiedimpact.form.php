@@ -87,7 +87,7 @@ if (isset($_POST['update'])) {
         Html::back();
     }
 
-    if (!$embodied_impact->resetImpact($_POST['items_id'])) {
+    if (!$embodied_impact->resetForItem($_POST['items_id'])) {
         Session::addMessageAfterRedirect(__('Reset failed.', 'carbon'), false, ERROR);
     }
 } else if (isset($_POST['calculate'])) {

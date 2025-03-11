@@ -38,9 +38,9 @@ use GlpiPlugin\Carbon\DataSource\RestApiClient;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensityRTE;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensityElectricityMap;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensityInterface;
-use GlpiPlugin\Carbon\Impact\Embodied\Engine;
-use GlpiPlugin\Carbon\Impact\History\AssetInterface as HistoryAssetInterface;
-use GlpiPlugin\Carbon\Impact\Embodied\Boavizta\AssetInterface as EmbodiedAssetInterface;
+use GlpiPlugin\Carbon\Impact\Embodied\Engine as EmbodiedEngine;
+use GlpiPlugin\Carbon\Impact\Usage\UsageImpactInterface as UsageImpactInterface;
+use GlpiPlugin\Carbon\Impact\Usage\Engine as UsageEngine;
 use GlpiPlugin\Carbon\Toolbox;
 
 class CronTask
@@ -88,15 +88,29 @@ class CronTask
      */
     public static function cronUsageImpact(GlpiCronTask $task): int
     {
-        $count = 0;
-
-        $usage_impacts = Toolbox::getUsageImpactClasses();
         $task->setVolume(0); // start with zero
+
+        $usage_impacts = Toolbox::getGwpUsageImpactClasses();
         $remaining = $task->fields['param'];
         $limit_per_type = (int) floor(($remaining) / count($usage_impacts));
+        // Half of job for GWP, the other half for other impacts
+        $limit_per_type = max(1, floor($limit_per_type / 2));
+
+        // Calculate GWP
+        $count = 0;
         foreach ($usage_impacts as $usage_impact_type) {
-            /** @var HistoryAssetInterface $usage_impact */
+            /** @var UsageImpactInterface $usage_impact */
             $usage_impact = new $usage_impact_type();
+            $usage_impact->setLimit($limit_per_type);
+            $count = $usage_impact->evaluateItems();
+            $task->addVolume($count);
+        }
+
+        // Calculate other impacts
+        $usage_impacts = Toolbox::getUsageImpactClasses();
+        foreach ($usage_impacts as $usage_impact_type) {
+            /** @var UsageImpactInterface $usage_impact */
+            $usage_impact = UsageEngine::getEngine($usage_impact_type);
             $usage_impact->setLimit($limit_per_type);
             $count = $usage_impact->evaluateItems();
             $task->addVolume($count);
@@ -118,9 +132,9 @@ class CronTask
         $embodied_impacts = Toolbox::getEmbodiedImpactClasses();
         $task->setVolume(0); // start with zero
         $remaining = $task->fields['param'];
-        $limit_per_type = (int) floor(( $remaining) / count($embodied_impacts));
+        $limit_per_type = max(1, floor(($remaining) / count($embodied_impacts)));
         foreach ($embodied_impacts as $embodied_impact_type) {
-            $embodied_impact = Engine::getEngine($embodied_impact_type);
+            $embodied_impact = EmbodiedEngine::getEngine($embodied_impact_type);
             $embodied_impact->setLimit($limit_per_type);
             $count = $embodied_impact->evaluateItems();
             $task->addVolume($count);
@@ -180,7 +194,7 @@ class CronTask
             return 0;
         }
 
-        $limit_per_zone = (int) floor(($remaining) / count($zones));
+        $limit_per_zone = max(1, floor(($remaining) / count($zones)));
         $count = 0;
         foreach ($zones as $zone) {
             $zone_name = $zone['name'];

@@ -84,10 +84,10 @@ class Config extends GlpiConfig
         $canedit        = Session::haveRight(Config::$rightname, UPDATE);
 
         TemplateRenderer::getInstance()->display('@carbon/config.html.twig', [
-            'can_edit'                => $canedit,
-            'current_config'          => $current_config,
-            'embodied_impact_engines' => Engine::getAvailableBackends(),
-            'action'                  => (isset($options['plugin_config']) ? Config::getFormURL() : GlpiConfig::getFormURL()),
+            'can_edit'       => $canedit,
+            'current_config' => $current_config,
+            'impact_engines' => Engine::getAvailableBackends(),
+            'action'         => (isset($options['plugin_config']) ? Config::getFormURL() : GlpiConfig::getFormURL()),
         ]);
 
         return true;
@@ -151,19 +151,53 @@ class Config extends GlpiConfig
     }
 
     /**
-     * Get the namespace of the embodied active impact engine
+     * Get the namespace of the active embodied impact engine
      *
      * @return string
      */
     public static function getEmbodiedImpactEngine(): string
     {
         $default_engine = 'Boavizta';
-        $engine = GlpiConfig::getConfigurationValue('plugin:carbon', 'embodied_impact_engines');
+        $engine = GlpiConfig::getConfigurationValue('plugin:carbon', 'impact_engines');
         if ($engine === null || $engine === '') {
-            GlpiConfig::setConfigurationValues('plugin:carbon', ['embodied_impact_engines' => $default_engine]);
+            GlpiConfig::setConfigurationValues('plugin:carbon', ['impact_engines' => $default_engine]);
             $engine = $default_engine;
         }
 
         return __NAMESPACE__ . '\\Impact\\Embodied\\' . $engine;
+    }
+
+    /**
+     * Get the namespace of the active usage impact engine
+     *
+     * @return string
+     */
+    public static function getUsageImpactEngine(): string
+    {
+        $default_engine = 'Boavizta';
+        $engine = GlpiConfig::getConfigurationValue('plugin:carbon', 'impact_engines');
+        if ($engine === null || $engine === '') {
+            GlpiConfig::setConfigurationValues('plugin:carbon', ['impact_engines' => $default_engine]);
+            $engine = $default_engine;
+        }
+
+        return __NAMESPACE__ . '\\Impact\\Usage\\' . $engine;
+    }
+
+    /**
+     * Get the namespace of the active usage impact engine
+     *
+     * @return string
+     */
+    public static function getGwpUsageImpactEngine(): string
+    {
+        $default_engine = 'Boavizta';
+        $engine = GlpiConfig::getConfigurationValue('plugin:carbon', 'impact_engines');
+        if ($engine === null || $engine === '') {
+            GlpiConfig::setConfigurationValues('plugin:carbon', ['impact_engines' => $default_engine]);
+            $engine = $default_engine;
+        }
+
+        return __NAMESPACE__ . '\\Impact\\History\\' . $engine;
     }
 }

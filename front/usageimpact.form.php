@@ -34,6 +34,8 @@
 use Glpi\Event;
 use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\Impact\History\AbstractAsset;
+use GlpiPlugin\Carbon\Impact\Usage\Engine;
+use GlpiPlugin\Carbon\UsageImpact;
 
 include('../../../inc/includes.php');
 
@@ -69,15 +71,15 @@ if (isset($_POST['update'])) {
         Html::back();
     }
 
-    $usage_impact_class = '\\GlpiPlugin\\Carbon\\Impact\\History\\' . (string) $_POST['itemtype'];
-    if (!class_exists($usage_impact_class) || !is_subclass_of($usage_impact_class, AbstractAsset::class)) {
+    $gwp_impact_class = '\\GlpiPlugin\\Carbon\\Impact\\History\\' . (string) $_POST['itemtype'];
+    if (!class_exists($gwp_impact_class) || !is_subclass_of($gwp_impact_class, AbstractAsset::class)) {
         Session::addMessageAfterRedirect(__('Bad arguments.', 'carbon'), false, ERROR);
         Html::back();
     }
 
     /** @var AbstractAsset $history */
-    $usage_impact = new $usage_impact_class();
-    $itemtype = $usage_impact->getItemtype();
+    $gwp_impact = new $gwp_impact_class();
+    $itemtype = $gwp_impact->getItemtype();
     $item = new $itemtype();
     $item->getFromDB($_POST['items_id']);
     if (!$item->canUpdate()) {
@@ -85,8 +87,13 @@ if (isset($_POST['update'])) {
         Html::back();
     }
 
-    if (!$usage_impact->resetHistory($_POST['items_id'])) {
+    if (!$gwp_impact->resetForItem($_POST['items_id'])) {
         Session::addMessageAfterRedirect(__('Reset failed.', 'carbon'), false, ERROR);
+    }
+
+    $usage_impact = new UsageImpact();
+    if (!$usage_impact->deleteByCriteria(['itemtype' => $itemtype, 'items_id' => $_POST['items_id']])) {
+        Session::addMessageAfterRedirect(__('Update of usage impact failed.', 'carbon'), false, ERROR);
     }
 } else if (isset($_POST['calculate'])) {
     if (!isset($_POST['itemtype']) || !isset($_POST['items_id'])) {
@@ -99,15 +106,15 @@ if (isset($_POST['update'])) {
         Html::back();
     }
 
-    $usage_impact_class = '\\GlpiPlugin\\Carbon\\Impact\\History\\' . (string) $_POST['itemtype'];
-    if (!class_exists($usage_impact_class) || !is_subclass_of($usage_impact_class, AbstractAsset::class)) {
+    $gwp_impact_class = '\\GlpiPlugin\\Carbon\\Impact\\History\\' . (string) $_POST['itemtype'];
+    if (!class_exists($gwp_impact_class) || !is_subclass_of($gwp_impact_class, AbstractAsset::class)) {
         Session::addMessageAfterRedirect(__('Bad arguments.', 'carbon'), false, ERROR);
         Html::back();
     }
 
-    /** @var AbstractAsset $usage_impact */
-    $usage_impact = new $usage_impact_class();
-    $itemtype = $usage_impact->getItemtype();
+    /** @var AbstractAsset $gwp_impact */
+    $gwp_impact = new $gwp_impact_class();
+    $itemtype = $gwp_impact->getItemtype();
     $item = new $itemtype();
     $item->getFromDB($_POST['items_id']);
     if (!$item->canUpdate()) {
@@ -115,13 +122,23 @@ if (isset($_POST['update'])) {
         Html::back();
     }
 
-    if (!$usage_impact->canHistorize($_POST['items_id'])) {
+    if (!$gwp_impact->canHistorize($_POST['items_id'])) {
         Session::addMessageAfterRedirect(__('Missing data prevents historization of this asset.', 'carbon'), false, ERROR);
+        // Html::back();
+    } else {
+        if (!$gwp_impact->calculateImpact($_POST['items_id'])) {
+            Session::addMessageAfterRedirect(__('Update of global warming potential failed.', 'carbon'), false, ERROR);
+        }
+    }
+
+    $usage_impact = Engine::getEngineFromItemtype($_POST['itemtype']);
+    if ($usage_impact === null) {
+        Session::addMessageAfterRedirect(__('Unable to find calculation engine for this asset.', 'carbon'), false, ERROR);
         Html::back();
     }
 
-    if (!$usage_impact->calculateImpact($_POST['items_id'])) {
-        Session::addMessageAfterRedirect(__('Update failed.', 'carbon'), false, ERROR);
+    if (!$usage_impact->evaluateItem($_POST['items_id'])) {
+        Session::addMessageAfterRedirect(__('Update of usage impact failed.', 'carbon'), false, ERROR);
     }
 }
 

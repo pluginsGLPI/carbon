@@ -64,7 +64,7 @@ class Monitor extends AbstractAsset
         return new EngineMonitor($item->getID());
     }
 
-    public function getEvaluableQuery(bool $entity_restrict = true): array
+    public function getEvaluableQuery(array $crit = [], bool $entity_restrict = true): array
     {
         // Monitors must be attached to a computer to be used
         // then lets create the query based on the equivalent request for computers
@@ -165,7 +165,7 @@ class Monitor extends AbstractAsset
                     ],
                 ],
             ],
-        ];
+        ] + $crit;
 
         if ($entity_restrict) {
             $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($item_table, '', '', 'auto');

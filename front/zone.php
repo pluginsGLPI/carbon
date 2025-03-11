@@ -31,18 +31,14 @@
  * -------------------------------------------------------------------------
  */
 
-$table = 'glpi_plugin_carbon_computertypes';
-/** @var Migration $migration */
-$migration->addField($table, 'category', 'integer', ['after' => 'power_consumption']);
+use GlpiPlugin\Carbon\Zone;
 
-$table = 'glpi_plugin_carbon_embodiedimpacts';
-/** @var Migration $migration */
-$migration->addField($table, 'engine', 'string', ['after' => 'items_id']);
-$migration->addField($table, 'engine_version', 'string', ['after' => 'engine']);
-$migration->addField($table, 'date_mod', 'timestamp', ['after' => 'engine_version']);
+include('../../../inc/includes.php');
 
-$table = 'glpi_plugin_carbon_carbonemissions';
-/** @var Migration $migration */
-$migration->addField($table, 'engine', 'string', ['after' => 'items_id']);
-$migration->addField($table, 'engine_version', 'string', ['after' => 'engine']);
-$migration->addField($table, 'date_mod', 'timestamp', ['after' => 'engine_version']);
+// Check if plugin is activated
+if (!Plugin::isPluginActive('carbon')) {
+    Html::displayNotFoundError();
+}
+
+$dropdown = new Zone();
+include(GLPI_ROOT . "/front/dropdown.common.php");

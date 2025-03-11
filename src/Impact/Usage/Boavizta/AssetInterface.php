@@ -26,23 +26,23 @@
  * SOFTWARE.
  * -------------------------------------------------------------------------
  * @copyright Copyright (C) 2024 Teclib' and contributors.
+ * @copyright Copyright (C) 2024 by the carbon plugin team.
  * @license   MIT https://opensource.org/licenses/mit-license.php
  * @link      https://github.com/pluginsGLPI/carbon
  * -------------------------------------------------------------------------
  */
 
-$table = 'glpi_plugin_carbon_computertypes';
-/** @var Migration $migration */
-$migration->addField($table, 'category', 'integer', ['after' => 'power_consumption']);
+namespace GlpiPlugin\Carbon\Impact\Usage\Boavizta;
 
-$table = 'glpi_plugin_carbon_embodiedimpacts';
-/** @var Migration $migration */
-$migration->addField($table, 'engine', 'string', ['after' => 'items_id']);
-$migration->addField($table, 'engine_version', 'string', ['after' => 'engine']);
-$migration->addField($table, 'date_mod', 'timestamp', ['after' => 'engine_version']);
+use GlpiPlugin\Carbon\DataSource\Boaviztapi;
 
-$table = 'glpi_plugin_carbon_carbonemissions';
-/** @var Migration $migration */
-$migration->addField($table, 'engine', 'string', ['after' => 'items_id']);
-$migration->addField($table, 'engine_version', 'string', ['after' => 'engine']);
-$migration->addField($table, 'date_mod', 'timestamp', ['after' => 'engine_version']);
+interface AssetInterface
+{
+    /**
+     * Set the API client to use for HTTP requests
+     *
+     * @param Boaviztapi $client
+     * @return void
+     */
+    public function setClient(Boaviztapi $client);
+}

@@ -47,7 +47,7 @@ use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Toolbox;
-use Location;
+use Location as GlpiLocation;
 use LogicException;
 use Session;
 use Toolbox as GlpiToolbox;
@@ -79,10 +79,11 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     /**
      * Get request in Query builder format to find evaluable items
      *
+     * @param array $crit
      * @param boolean $entity_restrict
      * @return array
      */
-    abstract public function getEvaluableQuery(bool $entity_restrict = true): array;
+    abstract public function getEvaluableQuery(array $crit = [], bool $entity_restrict = true): array;
 
     abstract public static function getEngine(CommonDBTM $item): EngineInterface;
 
@@ -135,7 +136,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
 
         $count = 0;
 
-        $iterator = $DB->request($this->getEvaluableQuery(false));
+        $iterator = $DB->request($this->getEvaluableQuery([], false));
         foreach ($iterator as $row) {
             $count += $this->evaluateItem($row['id']);
             if ($this->limit_reached) {
@@ -341,7 +342,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         // TODO: use date to find where was the asset at the given date
         if ($date === null) {
             $item_table = (new DbUtils())->getTableForItemType(static::$itemtype);
-            $location_table = Location::getTable();
+            $location_table = GlpiLocation::getTable();
             $zone_table = Zone::getTable();
 
             $zone = new Zone();
@@ -355,7 +356,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
                     ],
                     $item_table => [
                         'FKEY' => [
-                            $item_table => Location::getForeignKeyField(),
+                            $item_table => GlpiLocation::getForeignKeyField(),
                             $location_table => 'id',
                         ],
                     ]
@@ -380,11 +381,12 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      * @param integer $items_id
      * @return boolean
      */
-    public function resetHistory(int $items_id): bool
+    public function resetForItem(int $items_id): bool
     {
         /** @var DBmysql $DB */
         global $DB;
 
+        // fast remove, do not use CommonDBTM::delete()
         return $DB->delete(
             CarbonEmission::getTable(),
             [

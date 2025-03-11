@@ -60,7 +60,7 @@ class Computer extends AbstractAsset
         return new EngineComputer($item->getID());
     }
 
-    public function getEvaluableQuery(bool $entity_restrict = true): array
+    public function getEvaluableQuery(array $crit = [], bool $entity_restrict = true): array
     {
         $item_table = self::$itemtype::getTable();
         $item_model_table = self::$model_itemtype::getTable();
@@ -144,8 +144,7 @@ class Computer extends AbstractAsset
                             ComputerType::getTableField('power_consumption') => ['>', 0],
                             self::$model_itemtype::getTableField('power_consumption') => ['>', 0],
                         ],
-                    ],
-                    [
+                    ], [
                         'OR' => [
                             ['NOT' => [Infocom::getTableField('use_date') => null]],
                             ['NOT' => [Infocom::getTableField('delivery_date') => null]],
@@ -155,7 +154,7 @@ class Computer extends AbstractAsset
                         ]
                     ]
                 ],
-            ]
+            ] + $crit
         ];
 
         if ($entity_restrict) {
@@ -184,6 +183,7 @@ class Computer extends AbstractAsset
             GlpiComputerType::getTableField('id as type_id'),
             ComputerType::getTableField('id as plugin_carbon_type_id'),
             ComputerType::getTableField('power_consumption  as type_power_consumption'),
+            ComputerType::getTableField('category'),
             UsageInfo::getTableField('plugin_carbon_computerusageprofiles_id'),
             Infocom::getTableField('use_date'),
             Infocom::getTableField('delivery_date'),
@@ -218,6 +218,7 @@ class Computer extends AbstractAsset
         $status['has_type'] = ($data['type_id'] !== 0);
         $status['has_type_power_consumption'] = (($data['type_power_consumption'] ?? 0) !== 0);
         $status['has_usage_profile'] = ($data['plugin_carbon_computerusageprofiles_id'] !== 0);
+        $status['has_category'] = (($data['type'] ?? 0) !== ComputerType::CATEGORY_UNDEFINED);
 
         $item_oldest_date = $data['use_date']
             ?? $data['delivery_date']

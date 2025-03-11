@@ -65,10 +65,11 @@ interface EmbodiedImpactInterface
     /**
      * Get query to find items we can evaluate
      *
+     * @param array $crit
      * @param boolean $entity_restrict
      * @return array
      */
-    public function getEvaluableQuery(bool $entity_restrict = true, bool $recalculate = false): array;
+    public function getEvaluableQuery(array $crit = [], bool $entity_restrict = true): array;
 
     /**
      * Start the evaluation of all items

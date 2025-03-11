@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_computertypes` (
   `id`                int unsigned NOT NULL AUTO_INCREMENT,
   `computertypes_id`  int unsigned NOT NULL DEFAULT '0',
   `power_consumption` int          DEFAULT '0',
-  `type`              int          NOT NULL DEFAULT '0',
+  `category`          int          NOT NULL DEFAULT '0' COMMENT 'ComputerType::CATEGORY_* constants',
   PRIMARY KEY (`id`),
   UNIQUE KEY `unicity` (`computertypes_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -165,6 +165,23 @@ CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_usageinfos` (
   `items_id`                               int unsigned NOT NULL DEFAULT '0',
   `plugin_carbon_computerusageprofiles_id` int unsigned NOT NULL DEFAULT '0',
   `planned_lifespan`                       int unsigned NOT NULL DEFAULT '0' COMMENT '(unit months)',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unicity` (`itemtype`, `items_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_usageimpacts` (
+  `id`             int          unsigned NOT NULL AUTO_INCREMENT,
+  `itemtype`       varchar(255) DEFAULT NULL,
+  `items_id`       int          unsigned NOT NULL DEFAULT '0',
+  `engine`         varchar(255) DEFAULT NULL,
+  `engine_version` varchar(255) DEFAULT NULL,
+  `date_mod`       timestamp    NULL DEFAULT NULL,
+  `gwp`            float        unsigned DEFAULT '0' COMMENT '(unit gCO2eq) Global warming potential',
+  `gwp_quality`    int          unsigned NOT NULL DEFAULT '0' COMMENT 'DataTtacking\\AbstractTracked::DATA_QUALITY_* constants',
+  `adp`            float        unsigned DEFAULT '0' COMMENT '(unit gSbeq) Abiotic depletion potential',
+  `adp_quality`    int          unsigned NOT NULL DEFAULT '0' COMMENT 'DataTtacking\\AbstractTracked::DATA_QUALITY_* constants',
+  `pe`             float        unsigned DEFAULT '0' COMMENT '(unit J) Primary energy',
+  `pe_quality`     int          unsigned NOT NULL DEFAULT '0' COMMENT 'DataTtacking\\AbstractTracked::DATA_QUALITY_* constants',
   PRIMARY KEY (`id`),
   UNIQUE KEY `unicity` (`itemtype`, `items_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
