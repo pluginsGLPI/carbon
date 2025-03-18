@@ -71,7 +71,11 @@
                   </div>
                 </div>
 
-                {% include '@carbon/components/information-video-card.html.twig' %}
+                <div class="col-sm-6 col-lg-3">
+                  <div class="card card-height">
+                    {% include '@carbon/components/information-video-card.html.twig' %}
+                  </div>
+                </div>
                 <!-- Row for score cards -->
                   </div>
               </div>
@@ -102,11 +106,12 @@
             </div>
         </div>
         <!-- Footer -->
-          <div class="container-fluid mt-3 footer-height d-flex justify-content-center">
-              <img src="../dist/images/illustration-footer.png" class="py-1 illustration-footer" alt="GLPI Carbon footer" />
-          </div>
     </div>
     {% endblock %}
+
+  <footer class="container-fluid mt-3 footer-height d-flex justify-content-center">
+      <img src="../dist/images/illustration-footer.png" class="py-1 illustration-footer" alt="GLPI Carbon footer" />
+  </footer>
 </div>
 
 {% block scripts %}

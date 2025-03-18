@@ -33,8 +33,10 @@
 
 namespace GlpiPlugin\Carbon\Dashboard;
 
+use Html;
 use Glpi\Application\View\TemplateRenderer;
 use Glpi\Dashboard\Widget as GlpiDashboardWidget;
+use GlpiPlugin\Carbon\Report;
 use Toolbox;
 
 class Widget extends GlpiDashboardWidget
@@ -45,44 +47,63 @@ class Widget extends GlpiDashboardWidget
         global $CFG_GLPI;
 
         $types = [
-            'graphpertype' => [
-                'label'    => __('Carbon Emission Per Type', 'carbon'),
-                'function' => 'GlpiPlugin\\Carbon\\Dashboard\\Widget::DisplayGraphCarbonEmissionPerType',
-                'limit'    => true,
-                'width'    => 12,
-                'height'   => 10,
-            ],
-            'graphpermonth' => [
-                'label'    => __('Carbon Emission Per Month', 'carbon'),
-                'function' => 'GlpiPlugin\\Carbon\\Dashboard\\Widget::DisplayGraphCarbonEmissionPerMonth',
-                'width'    => 16,
-                'height'   => 12,
-            ],
-            'totalcarbonemission' => [
+            // Total carbon emission year to last complete month
+            'totalcarbonemission_ytd' => [
                 'label'    => __('Total Carbon Emission', 'carbon'),
                 'function' => 'GlpiPlugin\\Carbon\\Dashboard\\Widget::DisplayTotalCarbonEmission',
-                'width'    => 5,
-                'height'   => 4,
+                'width'    => 6,
+                'height'   => 3,
             ],
-            'monthlycarbonemission' => [
+            'totalcarbonemission_two_last_months' => [
                 'label'    => __('Monthly Carbon Emission', 'carbon'),
                 'function' => 'GlpiPlugin\\Carbon\\Dashboard\\Widget::DisplayMonthlyCarbonEmission',
-                'width'    => 5,
-                'height'   => 4,
+                'width'    => 6,
+                'height'   => 3,
             ],
+            'information_video' => [
+                'label'    => __('Environmental impact information video', 'carbon'),
+                'function' => 'GlpiPlugin\\Carbon\\Dashboard\\Widget::DisplayInformation',
+                'width'    => 6,
+                'height'   => 3,
+            ],
+            // 'graphpertype' => [
+            //     'label'    => __('Carbon Emission Per Type', 'carbon'),
+            //     'function' => 'GlpiPlugin\\Carbon\\Dashboard\\Widget::DisplayGraphCarbonEmissionPerType',
+            //     'limit'    => true,
+            //     'width'    => 12,
+            //     'height'   => 10,
+            // ],
+            // 'graphpermonth' => [
+            //     'label'    => __('Carbon Emission Per Month', 'carbon'),
+            //     'function' => 'GlpiPlugin\\Carbon\\Dashboard\\Widget::DisplayGraphCarbonEmissionPerMonth',
+            //     'width'    => 16,
+            //     'height'   => 12,
+            // ],
+            // 'totalcarbonemission' => [
+            //     'label'    => __('Total Carbon Emission', 'carbon'),
+            //     'function' => 'GlpiPlugin\\Carbon\\Dashboard\\Widget::DisplayTotalCarbonEmission',
+            //     'width'    => 5,
+            //     'height'   => 4,
+            // ],
+            // 'monthlycarbonemission' => [
+            //     'label'    => __('Monthly Carbon Emission', 'carbon'),
+            //     'function' => 'GlpiPlugin\\Carbon\\Dashboard\\Widget::DisplayMonthlyCarbonEmission',
+            //     'width'    => 5,
+            //     'height'   => 4,
+            // ],
             'unhandledcomputers' => [
                 'label'    => __('Unhandled Computers', 'carbon'),
                 'function' => 'GlpiPlugin\\Carbon\\Dashboard\\Widget::DisplayUnhandledComputers',
                 'width'    => 5,
                 'height'   => 4,
             ],
-            'apex_lines' => [
-                'label'    => __('Multiple lines', 'carbon'),
-                'function' => 'GlpiPlugin\\Carbon\\Dashboard\\Widget::multipleLines',
-                'image'    => $CFG_GLPI['root_doc'] . '/pics/charts/line.png',
-                'width'    => 5,
-                'height'   => 4,
-            ]
+            // 'apex_lines' => [
+            //     'label'    => __('Multiple lines', 'carbon'),
+            //     'function' => 'GlpiPlugin\\Carbon\\Dashboard\\Widget::multipleLines',
+            //     'image'    => $CFG_GLPI['root_doc'] . '/pics/charts/line.png',
+            //     'width'    => 5,
+            //     'height'   => 4,
+            // ]
         ];
 
         return $types;
@@ -378,20 +399,52 @@ class Widget extends GlpiDashboardWidget
 
     public static function DisplayMonthlyCarbonEmission(): string
     {
-        return TemplateRenderer::getInstance()->render('@carbon/components/monthly-carbon-emission-card.html.twig');
+        $last_month = Report::getCarbonEmissionLastMonth();
+        $last_month_emissions = 0;
+        if (count($last_month['series'][0]['data']) > 0) {
+            $last_month_emissions = array_pop($last_month['series'][0]['data'])['y'];
+        }
+        $penultimate_month_emissions = 0;
+        if (count($last_month['series'][0]['data']) > 0) {
+            $penultimate_month_emissions = array_pop($last_month['series'][0]['data'])['y'];
+            $percentage_change = (($last_month_emissions - $penultimate_month_emissions) / $last_month_emissions) * 100;
+            $comparison_text = '= 0.00 %';
+            if ($percentage_change > 0) {
+                $comparison_text = '↑ ' . Html::formatNumber(abs($percentage_change)) . ' %';
+            } else if ($percentage_change < 0) {
+                $comparison_text = '↓ ' . Html::formatNumber(abs($percentage_change)) . ' %';
+            }
+        }
+        $last_month_emissions .=  ' ' . $last_month['series'][0]['unit'];
+        $penultimate_month_emissions .=  ' ' . $last_month['series'][0]['unit'];
+        return TemplateRenderer::getInstance()->render('@carbon/components/monthly-carbon-emission-card.html.twig', [
+            'last_month_emissions' => $last_month_emissions,
+            'last_month' => $last_month['date_interval'][1],
+            'penultimate_month_emissions' => $penultimate_month_emissions,
+            'penultimate_month' => $last_month['date_interval'][0],
+            'variation' => $comparison_text,
+        ]);
     }
 
     public static function DisplayTotalCarbonEmission(): string
     {
-        return TemplateRenderer::getInstance()->render('@carbon/components/total-carbon-emission-card.html.twig');
+        $total_carbon_emission = Report::getTotalCarbonEmission();
+        return TemplateRenderer::getInstance()->render('@carbon/components/total-carbon-emission-card.html.twig', [
+            'total_carbon_emission' => $total_carbon_emission,
+        ]);
     }
 
     public static function DisplayUnhandledComputers(): string
     {
-        // $params = [
-        //     'handled' => Provider::getHandledComputersCount(),
-        //     'unhandled' => Provider::getUnhandledComputersCount(),
-        // ];
-        return TemplateRenderer::getInstance()->render('@carbon/components/unhandled-computers-card.html.twig');
+        $params = [
+            'handled' => Provider::getHandledComputersCount(),
+            'unhandled' => Provider::getUnhandledComputersCount(),
+        ];
+        return TemplateRenderer::getInstance()->render('@carbon/components/unhandled-computers-card.html.twig', $params);
+    }
+
+    public static function DisplayInformation(): string
+    {
+        return TemplateRenderer::getInstance()->render('@carbon/components/information-video-card.html.twig');
     }
 }

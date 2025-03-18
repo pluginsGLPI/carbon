@@ -44,8 +44,29 @@ class Grid
             $cards = [];
         }
 
-        return $cards;
-
+    // return $cards;
+    $new_cards = [
+        'totalcarbonemission_ytd' => [
+            'widgettype'   => ['totalcarbonemission_ytd'],
+            'group'        => __("Carbon", "carbon"),
+            'label'        => __("Total carbon emission", 'carbon'),
+        ],
+        'totalcarbonemission_two_last_months' => [
+            'widgettype'   => ['totalcarbonemission_two_last_months'],
+            'group'        => __("Carbon", "carbon"),
+            'label'        => __("Monthly carbon emission", 'carbon'),
+        ],
+        'unhandledcomputers' => [
+            'widgettype'   => ['unhandledcomputers'],
+            'group'        => __("Carbon", "carbon"),
+            'label'        => __("Unhandled computers", 'carbon'),
+        ],
+        'information_video' => [
+            'widgettype'   => ['information_video'],
+            'group'        => __("Carbon", "carbon"),
+            'label'        => __("Environmental impact information video", 'carbon'),
+        ],
+    ];
     //     $new_cards = [
     //         'plugin_carbon_card_incomplete_computers' => [
     //             'widgettype'   => ["bigNumber"],
@@ -135,6 +156,6 @@ class Grid
     //        ],
     //    ];
 
-    //     return array_merge($cards, $new_cards);
+        return array_merge($cards, $new_cards);
     }
 }
