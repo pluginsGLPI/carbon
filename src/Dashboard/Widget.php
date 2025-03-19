@@ -43,67 +43,89 @@ class Widget extends GlpiDashboardWidget
 {
     public static function WidgetTypes(): array
     {
-        /** @var array $CFG_GLPI */
-        global $CFG_GLPI;
-
         $types = [
             // Total carbon emission year to last complete month
             'totalcarbonemission_ytd' => [
                 'label'    => __('Total Carbon Emission', 'carbon'),
-                'function' => 'GlpiPlugin\\Carbon\\Dashboard\\Widget::DisplayTotalCarbonEmission',
+                'function' => self::class . '::DisplayTotalCarbonEmissionYearToDate',
                 'width'    => 6,
                 'height'   => 3,
             ],
             'totalcarbonemission_two_last_months' => [
                 'label'    => __('Monthly Carbon Emission', 'carbon'),
-                'function' => 'GlpiPlugin\\Carbon\\Dashboard\\Widget::DisplayMonthlyCarbonEmission',
+                'function' => self::class . '::DisplayMonthlyCarbonEmission',
                 'width'    => 6,
                 'height'   => 3,
             ],
             'information_video' => [
                 'label'    => __('Environmental impact information video', 'carbon'),
-                'function' => 'GlpiPlugin\\Carbon\\Dashboard\\Widget::DisplayInformation',
+                'function' => self::class . '::DisplayInformationVideo',
                 'width'    => 6,
                 'height'   => 3,
             ],
+            'methodology_information' => [
+                'label'    => __('Methodology information', 'carbon'),
+                'function' => self::class . '::DisplayInformationMethodology',
+                'width'    => 6,
+                'height'   => 3,
+            ],
+            'most_gwp_impacting_computer_models' => [
+                'label'    => __('Biggest monthly averaged carbon emission per model', 'carbon'),
+                'function' => self::class . '::DisplayGraphCarbonEmissionPerModel',
+                'width'    => 6,
+                'height'   => 3,
+            ],
+            'usage_gwp_monthly' => [
+                'label'    => __('Carbon Emission Per month', 'carbon'),
+                'function' => self::class . '::DisplayGraphCarbonEmissionPerMonth',
+                'width'    => 16,
+                'height'   => 12,
+            ],
+            // 'usage_gwp_per_model' => [
+            //     'label'    => __('Carbon Emission Per model', 'carbon'),
+            //     'function' => self::class . '::DisplayGraphCarbonEmissionPerModel',
+            //     'width'    => 16,
+            //     'height'   => 12,
+            // ],
+            'unhandledcomputers' => [
+                'label'    => __('Unhandled Computers', 'carbon'),
+                'function' => self::class . '::DisplayUnhandledComputers',
+                'width'    => 5,
+                'height'   => 4,
+            ],
             // 'graphpertype' => [
             //     'label'    => __('Carbon Emission Per Type', 'carbon'),
-            //     'function' => 'GlpiPlugin\\Carbon\\Dashboard\\Widget::DisplayGraphCarbonEmissionPerType',
+            //     'function' => self::class . '::DisplayGraphCarbonEmissionPerType',
             //     'limit'    => true,
             //     'width'    => 12,
             //     'height'   => 10,
             // ],
-            // 'graphpermonth' => [
-            //     'label'    => __('Carbon Emission Per Month', 'carbon'),
-            //     'function' => 'GlpiPlugin\\Carbon\\Dashboard\\Widget::DisplayGraphCarbonEmissionPerMonth',
-            //     'width'    => 16,
-            //     'height'   => 12,
-            // ],
             // 'totalcarbonemission' => [
             //     'label'    => __('Total Carbon Emission', 'carbon'),
-            //     'function' => 'GlpiPlugin\\Carbon\\Dashboard\\Widget::DisplayTotalCarbonEmission',
+            //     'function' => self::class . '::DisplayTotalCarbonEmission',
             //     'width'    => 5,
             //     'height'   => 4,
             // ],
             // 'monthlycarbonemission' => [
             //     'label'    => __('Monthly Carbon Emission', 'carbon'),
-            //     'function' => 'GlpiPlugin\\Carbon\\Dashboard\\Widget::DisplayMonthlyCarbonEmission',
+            //     'function' => self::class . '::DisplayMonthlyCarbonEmission',
             //     'width'    => 5,
             //     'height'   => 4,
             // ],
-            'unhandledcomputers' => [
-                'label'    => __('Unhandled Computers', 'carbon'),
-                'function' => 'GlpiPlugin\\Carbon\\Dashboard\\Widget::DisplayUnhandledComputers',
-                'width'    => 5,
-                'height'   => 4,
-            ],
             // 'apex_lines' => [
             //     'label'    => __('Multiple lines', 'carbon'),
-            //     'function' => 'GlpiPlugin\\Carbon\\Dashboard\\Widget::multipleLines',
+            //     'function' => self::class . '::multipleLines',
             //     'image'    => $CFG_GLPI['root_doc'] . '/pics/charts/line.png',
             //     'width'    => 5,
             //     'height'   => 4,
             // ]
+            // 'apex_pie' => [
+            //     'label'    => __('Pie', 'carbon'),
+            //     'function' => self::class . '::apex_pie',
+            //     'image'    => $CFG_GLPI['root_doc'] . '/pics/charts/line.png',
+            //     'width'    => 5,
+            //     'height'   => 4,
+            // ],
         ];
 
         return $types;
@@ -392,19 +414,71 @@ class Widget extends GlpiDashboardWidget
     //     return self::halfDonut($params);
     // }
 
-    public static function DisplayGraphCarbonEmissionPerMonth(): string
+    public static function DisplayGraphCarbonEmissionPerMonth(array $params = []): string
     {
-        return TemplateRenderer::getInstance()->render('@carbon/components/graph-carbon-emission-per-month.html.twig');
+        $default = [
+            'url'     => '',
+            'label'   => '',
+            'alt'     => '',
+            'color'   => '',
+            'icon'    => '',
+            'id'      => 'plugin_carbon_unhandled_computers_' . mt_rand(),
+            'filters' => [], // TODO: Not implemented yet (is this useful ?)
+        ];
+        $p = array_merge($default, $params);
+
+        return TemplateRenderer::getInstance()->render('@carbon/components/graph-carbon-emission-per-month.html.twig', [
+            'id' => $p['id'],
+            'color' => $p['color'],
+            'fg_color' => Toolbox::getFgColor($p['color']),
+            'fg_hover_color' => Toolbox::getFgColor($p['color'], 15),
+            'fg_hover_border' => Toolbox::getFgColor($p['color'], 30),
+        ]);
     }
 
-    public static function DisplayMonthlyCarbonEmission(): string
+    public static function DisplayGraphCarbonEmissionPerModel(array $params = []): string
     {
+        $default = [
+            'url'     => '',
+            'label'   => '',
+            'alt'     => '',
+            'color'   => '',
+            'icon'    => '',
+            'id'      => 'plugin_carbon_unhandled_computers_' . mt_rand(),
+            'filters' => [], // TODO: Not implemented yet (is this useful ?)
+        ];
+        $p = array_merge($default, $params);
+
+        return TemplateRenderer::getInstance()->render('@carbon/components/graph-carbon-emission-per-model.html.twig', [
+            'id' => $p['id'],
+            'color' => $p['color'],
+            'fg_color' => Toolbox::getFgColor($p['color']),
+            'fg_hover_color' => Toolbox::getFgColor($p['color'], 15),
+            'fg_hover_border' => Toolbox::getFgColor($p['color'], 30),
+        ]);
+    }
+
+    public static function DisplayMonthlyCarbonEmission(array $params = []): string
+    {
+        $default = [
+            'number'  => 0,
+            'url'     => '',
+            'label'   => '',
+            'alt'     => '',
+            'color'   => '',
+            'icon'    => '',
+            'id'      => 'plugin_carbon_last_2_months_carbon_emission_' . mt_rand(),
+            'filters' => [], // TODO: Not implemented yet (is this useful ?)
+        ];
+        $p = array_merge($default, $params);
+
         $last_month = Report::getCarbonEmissionLastMonth();
         $last_month_emissions = 0;
         if (count($last_month['series'][0]['data']) > 0) {
             $last_month_emissions = array_pop($last_month['series'][0]['data'])['y'];
         }
         $penultimate_month_emissions = 0;
+        $comparison_text = '';
         if (count($last_month['series'][0]['data']) > 0) {
             $penultimate_month_emissions = array_pop($last_month['series'][0]['data'])['y'];
             $percentage_change = (($last_month_emissions - $penultimate_month_emissions) / $last_month_emissions) * 100;
@@ -418,6 +492,11 @@ class Widget extends GlpiDashboardWidget
         $last_month_emissions .=  ' ' . $last_month['series'][0]['unit'];
         $penultimate_month_emissions .=  ' ' . $last_month['series'][0]['unit'];
         return TemplateRenderer::getInstance()->render('@carbon/components/monthly-carbon-emission-card.html.twig', [
+            'id' => $p['id'],
+            'color' => $p['color'],
+            'fg_color' => Toolbox::getFgColor($p['color']),
+            'fg_hover_color' => Toolbox::getFgColor($p['color'], 15),
+            'fg_hover_border' => Toolbox::getFgColor($p['color'], 30),
             'last_month_emissions' => $last_month_emissions,
             'last_month' => $last_month['date_interval'][1],
             'penultimate_month_emissions' => $penultimate_month_emissions,
@@ -426,25 +505,105 @@ class Widget extends GlpiDashboardWidget
         ]);
     }
 
-    public static function DisplayTotalCarbonEmission(): string
+    /**
+     * display a big number widget with the total carbon emission
+     *
+     * @param array $params
+     * @return string html of the widget
+     */
+    public static function DisplayTotalCarbonEmissionYearToDate(array $params = []): string
     {
-        $total_carbon_emission = Report::getTotalCarbonEmission();
+        $default = [
+            'number'  => 0,
+            'url'     => '',
+            'label'   => '',
+            'alt'     => '',
+            'color'   => '',
+            'icon'    => '',
+            'id'      => 'plugin_carbon_total_carbon_emission_ytd_' . mt_rand(),
+            'filters' => [], // TODO: Not implemented yet (is this useful ?)
+        ];
+        $p = array_merge($default, $params);
+
+        $p['number'] = Report::getTotalCarbonEmission();
         return TemplateRenderer::getInstance()->render('@carbon/components/total-carbon-emission-card.html.twig', [
-            'total_carbon_emission' => $total_carbon_emission,
+            'id' => $p['id'],
+            'color' => $p['color'],
+            'fg_color' => Toolbox::getFgColor($p['color']),
+            'fg_hover_color' => Toolbox::getFgColor($p['color'], 15),
+            'fg_hover_border' => Toolbox::getFgColor($p['color'], 30),
+            'number' => $p['number']['value'],
+            'date_interval' => $p['number']['date_interval'],
         ]);
     }
 
-    public static function DisplayUnhandledComputers(): string
+    public static function DisplayUnhandledComputers(array $params = []): string
     {
-        $params = [
-            'handled' => Provider::getHandledComputersCount(),
-            'unhandled' => Provider::getUnhandledComputersCount(),
+        $default = [
+            'url'     => '',
+            'label'   => '',
+            'alt'     => '',
+            'color'   => '',
+            'icon'    => '',
+            'id'      => 'plugin_carbon_unhandled_computers_' . mt_rand(),
+            'filters' => [], // TODO: Not implemented yet (is this useful ?)
         ];
-        return TemplateRenderer::getInstance()->render('@carbon/components/unhandled-computers-card.html.twig', $params);
+        $p = array_merge($default, $params);
+
+        $p['handled'] = Provider::getHandledComputersCount();
+        $p['unhandled'] = Provider::getUnhandledComputersCount();
+        return TemplateRenderer::getInstance()->render('@carbon/components/unhandled-computers-card.html.twig', [
+            'id' => $p['id'],
+            'color' => $p['color'],
+            'fg_color' => Toolbox::getFgColor($p['color']),
+            'fg_hover_color' => Toolbox::getFgColor($p['color'], 15),
+            'fg_hover_border' => Toolbox::getFgColor($p['color'], 30),
+            'handled' => $p['handled'],
+            'unhandled' => $p['unhandled'],
+        ]);
     }
 
-    public static function DisplayInformation(): string
+    public static function DisplayInformationVideo(array $params = []): string
     {
-        return TemplateRenderer::getInstance()->render('@carbon/components/information-video-card.html.twig');
+        $default = [
+            'url'     => '',
+            'label'   => '',
+            'alt'     => '',
+            'color'   => '',
+            'icon'    => '',
+            'id'      => 'plugin_carbon_information_video_' . mt_rand(),
+            'filters' => [], // TODO: Not implemented yet (is this useful ?)
+        ];
+        $p = array_merge($default, $params);
+
+        return TemplateRenderer::getInstance()->render('@carbon/components/information-video-card.html.twig', [
+            'id' => $p['id'],
+            'color' => $p['color'],
+            'fg_color' => Toolbox::getFgColor($p['color']),
+            'fg_hover_color' => Toolbox::getFgColor($p['color'], 15),
+            'fg_hover_border' => Toolbox::getFgColor($p['color'], 30),
+        ]);
+    }
+
+    public static function DisplayInformationMethodology(array $params = []): string
+    {
+        $default = [
+            'url'     => '',
+            'label'   => '',
+            'alt'     => '',
+            'color'   => '',
+            'icon'    => '',
+            'id'      => 'plugin_carbon_information_methodology_' . mt_rand(),
+            'filters' => [], // TODO: Not implemented yet (is this useful ?)
+        ];
+        $p = array_merge($default, $params);
+
+        return TemplateRenderer::getInstance()->render('@carbon/components/information-block.html.twig', [
+            'id' => $p['id'],
+            'color' => $p['color'],
+            'fg_color' => Toolbox::getFgColor($p['color']),
+            'fg_hover_color' => Toolbox::getFgColor($p['color'], 15),
+            'fg_hover_border' => Toolbox::getFgColor($p['color'], 30),
+        ]);
     }
 }

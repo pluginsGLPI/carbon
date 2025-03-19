@@ -33,84 +33,25 @@
     <!-- Header with background image -->
     <header class="page-header header-height illustration container-fluid">
         <div class="container-fluid">
-        <img src="../dist/images/illustration_bridge.png" class="illustration-header" alt="GLPI Carbon header" />
+        <img src="{{ get_plugin_web_dir('carbon') }}/dist/images/illustration_bridge.png" class="illustration-header" alt="GLPI Carbon header" />
             <h1 class="page-title title-color title-position">{{ __('GLPI Carbon', 'carbon') }}</h1>
         </div>
     </header>
+    <style>
+      /*  Hide dashboard toolbar to disable edit mode */
+      .dashboard-card .toolbar {
+        display: none;
+      }
+    </style>
 
     {% block body %}
     <div class="page-body">
-        <div class="container-fluid px-0">
-            <div class="row row-cards pb-3">
-                <!-- Row for score cards -->
-                <div class = "col-sm-6 col-lg-3" id="responsiveClassElement1">
-                  <div class="card card-height" id="cardElement1">
-                    {% include '@carbon/components/total-carbon-emission-card.html.twig' %}
-                  </div>
-                </div>
-
-                <div class="col-sm-6 col-lg-3" id="responsiveClassElement2">
-                  <div class="card card-height" id="cardElement2">
-                    {% include '@carbon/components/monthly-carbon-emission-card.html.twig' %}
-                  </div>
-                </div>
-
-                <div class="col-sm-6 col-lg-3" id="responsiveClassElement3">
-                  <div class="card card-sm card-height" id="cardElement3">
-                    {% include '@carbon/components/unhandled-computers-card.html.twig'
-                      with {
-                        'handled': handled,
-                        'unhandled': unhandled
-                      }
-                    %}
-                  </div>
-                </div>
-                <div class = "col-sm-6 col-lg-3" id="responsiveClassElement4">
-                  <div class="card card-height" id="cardElement4">
-                    {% include '@carbon/components/total-embodied-emission-card.html.twig' %}
-                  </div>
-                </div>
-
-                <div class="col-sm-6 col-lg-3">
-                  <div class="card card-height">
-                    {% include '@carbon/components/information-video-card.html.twig' %}
-                  </div>
-                </div>
-                <!-- Row for score cards -->
-                  </div>
-              </div>
-              <div class="col-12">
-                  <div class="row row-cards pb-3 align-items-center">
-                    <div class="col-sm-6 col-lg-6">
-                      <div class="card">
-                        {% include '@carbon/components/graph-carbon-emission-per-model.html.twig' %}
-                      </div>
-                    </div>
-                    <!-- Information block -->
-                    {% include '@carbon/components/information-block.html.twig' %}
-                    <!-- Information block -->
-                  </div>
-              </div>
-
-              <!-- Bar graph -->
-              <div class="col-12">
-                <div class="row row-cards">
-                  <div class="col-sm-6 col-lg-12">
-                    <div class="card">
-                      {% include '@carbon/components/graph-carbon-emission-per-month.html.twig' %}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- Bar graph -->
-            </div>
-        </div>
-        <!-- Footer -->
+      {{ dashboard|raw }}
     </div>
     {% endblock %}
 
   <footer class="container-fluid mt-3 footer-height d-flex justify-content-center">
-      <img src="../dist/images/illustration-footer.png" class="py-1 illustration-footer" alt="GLPI Carbon footer" />
+      <img src="{{ get_plugin_web_dir('carbon') }}/dist/images/illustration-footer.png" class="py-1 illustration-footer" alt="GLPI Carbon footer" />
   </footer>
 </div>
 
@@ -241,15 +182,13 @@
 
         // Fetch data with Ajax
 
-        {# fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/totalPowerConsumption.php").then(response => {
-            console.log(response);
-            return response.json();
-        }).then(data => {
-            let totalPowerConsumption = data;
-            document.getElementById('powerConsumption').textContent = totalPowerConsumption;
-        }); #}
-
-
+        // {# fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/totalPowerConsumption.php").then(response => {
+        //     console.log(response);
+        //     return response.json();
+        // }).then(data => {
+        //     let totalPowerConsumption = data;
+        //     document.getElementById('powerConsumption').textContent = totalPowerConsumption;
+        // }); #}
         });
 </script>
 {% endblock %}

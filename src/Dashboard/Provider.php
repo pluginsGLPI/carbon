@@ -37,7 +37,6 @@ use Computer;
 use ComputerModel;
 use ComputerType as GlpiComputerType;
 use DateTime;
-use DBmysqlIterator;
 use DBmysql;
 use DbUtils;
 use Glpi\Dashboard\Filter;
@@ -336,9 +335,10 @@ class Provider
      * Count the computers having all required data to compute carbon intensity
      *
      * @param array $params
+     * @param bool  $handled : true if we want to count handled computers, false to count unhandled computers
      * @return array
      */
-    public static function getHandledComputersCount(array $params = [], $handled = true): array
+    public static function getHandledComputersCount(array $params = [], bool $handled = true): array
     {
         $default_params = [
             'label' => __("plugin carbon - handled computers", 'carbon'),
@@ -375,12 +375,19 @@ class Provider
     /**
      * Get total power of assets having all required data to compute carbon intensity
      *
-     * @return string|null
+     * @param array $params
+     * @return array
      */
-    public static function getTotalPower(): ?string
+    public static function getTotalPower(array $params = []): array
     {
         /** @var DBmysql $DB */
         global $DB;
+
+        $default_params = [
+            'label' => __("plugin carbon - Total power consumption", 'carbon'),
+            'icon'  => "fa-solid fa-plug",
+        ];
+        $params = array_merge($default_params, $params);
 
         $request = (new ComputerHistory())->getEvaluableQuery();
         $request['SELECT'] = [
@@ -389,26 +396,44 @@ class Provider
 
         $result = $DB->request($request);
 
+        $total_power = 'N/A';
         if ($result->numrows() == 1) {
-            return Toolbox::getPower($result->current()['total'] ?? 0);
+            $total_power = Toolbox::getPower($result->current()['total'] ?? 0);
         }
 
-        return null;
+        return [
+            'number' => $total_power,
+            'label'  => $params['label'],
+            'icon'   => $params['icon'],
+        ];
     }
 
     /**
      * Get total CO2 emissions for last month (all assets)
      *
-     * @return string
+     * @param array $params
+     * @return array
      */
-    public static function getTotalCarbonEmission(array $params = []): string
+    public static function getTotalCarbonEmission(array $params = []): array
     {
-        $value = self::getSum(CarbonEmission::getTable(), 'emission_per_day', $params);
-        if ($value === null) {
-            return 'N/A';
+        $default_params = [
+            'label' => __("plugin carbon - Total carbon emission", 'carbon'),
+            'icon'  => "fa-solid fa-temperature-arrow-up",
+        ];
+        $params = array_merge($default_params, $params);
+
+        $gwp = self::getSum(CarbonEmission::getTable(), 'emission_per_day', $params);
+        if ($gwp === null) {
+            $gwp = 'N/A';
+        } else {
+            $gwp = Toolbox::getWeight($gwp) . __('CO₂eq', 'carbon');
         }
 
-        return Toolbox::getWeight($value) . __('CO₂eq', 'carbon');
+        return [
+            'number' => $gwp,
+            'label'  => $params['label'],
+            'icon'   => $params['icon'],
+        ];
     }
 
     public static function getCarbonIntensity(array $params): array
@@ -690,7 +715,7 @@ class Provider
             $value = 'N/A';
         } else {
             // Convert into Watt.hour
-            $value = Toolbox::getWeight($value / 3600) . __('h', 'carbon');
+            $value = Toolbox::getWeight($value / 3600) . __('J', 'carbon');
         }
 
         $params['label'] = __('', 'carbon');

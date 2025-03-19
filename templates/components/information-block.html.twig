@@ -28,34 +28,53 @@
  # @link      https://github.com/pluginsGLPI/carbon
  # -------------------------------------------------------------------------
  #}
+<style>
+    #{{ id }} {
+        background-color: {{ color }};
+        color: {{ fg_color }};
+    }
 
-<div class="col-sm-6 col-lg-6">
-    <div class="card">
-        <div class="card-header">
-            <div class="row">
-                <div class="col-auto fw-bold">
-                    <span><svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9" /><line x1="12" y1="8" x2="12.01" y2="8" /><polyline points="11 12 12 12 12 16 13 16" /></svg></span>
-                </div>
-                <div class="col">
-                    <h3 class="card-title">{{ __('Information', 'carbon') }}</h3>
-                </div>
+    #{{ id }}:hover {
+        background-color: {{ fg_hover_color }};
+        border: 1px solid {{ fg_hover_border }};
+    }
+
+    .theme-dark #{{ id }} {
+    background-color: {{ fg_color }};
+    color: {{ color }};
+    }
+
+    .theme-dark #{{ id }}:hover {
+        background-color: {{ fg_hover_color }};
+        color: {{ fg_color }};
+        border: 1px solid {{ fg_hover_border }};
+    }
+</style>
+<div class="card" id="{{ id }}">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-auto fw-bold">
+                <span><svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9" /><line x1="12" y1="8" x2="12.01" y2="8" /><polyline points="11 12 12 12 12 16 13 16" /></svg></span>
+            </div>
+            <div class="col">
+                <h3 class="card-title">{{ __('Information', 'carbon') }}</h3>
             </div>
         </div>
-        <div class="card-body">
-            <div class="row align-items-center">
-                <div class="col-auto">
-                    <span><img src="../dist/images/ecology-icon-light.png" /></span>
-                </div>
-                <div class="col">
-                    <p class="m-0 pt-3 pb-3">{{ __('Our data is sourced from reliable sources and is meticulously calculated using industry-standard methodologies. We utilize accurate measurement tools and algorithms to ensure the precision and reliability of our environmental metrics.','carbon') }}</p>
-                    <p class="m-0 pb-4 pt-3">{{ __('As we move towards a greener future, businesses will soon be required to report energy usage and carbon emissions. By 2025, many areas will enforce these regulations. Adopting these practices now ensures compliance and helps combat climate change.','carbon') }}</p>
-                </div>
+    </div>
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-auto">
+                <span><img src="{{ get_plugin_web_dir('carbon') }}/dist/images/ecology-icon-light.png" /></span>
             </div>
-            <div class="row">
-                <h4 class="pt-3">{{ __('Did you know ?','carbon') }}</h4>
-                <p class="m-0 pb-2">{{ __('1 gram of CO₂ is equivalent to the CO₂ emitted when you drive a car for about 20 meters.','carbon') }}</p>
+            <div class="col">
+                <p class="m-0 pt-3 pb-3">{{ __('Our data is sourced from reliable sources and is meticulously calculated using industry-standard methodologies. We utilize accurate measurement tools and algorithms to ensure the precision and reliability of our environmental metrics.','carbon') }}</p>
+                <p class="m-0 pb-4 pt-3">{{ __('As we move towards a greener future, businesses will soon be required to report energy usage and carbon emissions. By 2025, many areas will enforce these regulations. Adopting these practices now ensures compliance and helps combat climate change.','carbon') }}</p>
             </div>
-            </div>
+        </div>
+        <div class="row">
+            <h4 class="pt-3">{{ __('Did you know ?','carbon') }}</h4>
+            <p class="m-0 pb-2">{{ __('1 gram of CO₂ is equivalent to the CO₂ emitted when you drive a car for about 20 meters.','carbon') }}</p>
+        </div>
         </div>
     </div>
 </div>

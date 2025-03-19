@@ -28,18 +28,42 @@
  # @link      https://github.com/pluginsGLPI/carbon
  # -------------------------------------------------------------------------
  #}
+<style>
+    #{{ id }} {
+        background-color: {{ color }};
+        color: {{ fg_color }};
+    }
 
-<div class="card-body monthly-emission-card" style="height: 100%">
-  <div class="row align-items-center">
-    <div class="col-auto">
-      <span><img src="{{ get_plugin_web_dir('carbon') }}/dist/images/icon-co2-calendar-green.png" class="icon-size" /></span>
+    #{{ id }}:hover {
+        background-color: {{ fg_hover_color }};
+        border: 1px solid {{ fg_hover_border }};
+    }
+
+    .theme-dark #{{ id }} {
+    background-color: {{ fg_color }};
+    color: {{ color }};
+    }
+
+    .theme-dark #{{ id }}:hover {
+        background-color: {{ fg_hover_color }};
+        color: {{ fg_color }};
+        border: 1px solid {{ fg_hover_border }};
+    }
+</style>
+<div class="card" id="{{ id }}">
+    <div class="card-body" style="height: 100%">
+        <div class="row align-items-center">
+            <div class="col-auto">
+                <span><img src="{{ get_plugin_web_dir('carbon') }}/dist/images/icon-co2-calendar-green.png" class="icon-size" /></span>
+            </div>
+            <div class="col">
+                <div class="subheader">{{ __('Monthly carbon emission', 'carbon') }}</div>
+                <div class="subheader" id="monthlyMonth">{{ last_month }}</div>
+                <div class="my-3 nb-monthly-carbon-emission" id="monthlyEmission">{{ last_month_emissions }}</div>
+                <p class="m-0 percent-color" id="monthlyComparison">{{ variation }}</p>
+                <div class="subheader">{{ __('Compared to last month', 'carbon') }}</div>
+            </div>
+        </div>
     </div>
-    <div class="col">
-      <div class="subheader text-white">{{ __('Monthly carbon emission', 'carbon') }}</div>
-      <div class="subheader text-white" id="monthlyMonth">{{ last_month }}</div>
-      <div class="my-3 text-white nb-monthly-carbon-emission" id="monthlyEmission">{{ last_month_emissions }}</div>
-      <p class="m-0 percent-color" id="monthlyComparison">{{ variation }}</p>
-      <div class="subheader text-white">{{ __('Compared to last month', 'carbon') }}</div>
-    </div>
-  </div>
 </div>
+percent-color

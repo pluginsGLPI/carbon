@@ -28,20 +28,42 @@
  # @link      https://github.com/pluginsGLPI/carbon
  # -------------------------------------------------------------------------
  #}
+<style>
+    #{{ id }} {
+        background-color: {{ color }};
+        color: {{ fg_color }};
+    }
 
-<div id="carbonEmissionPerModelChart" class="card-body card-max-height">
-  <div class="subheader">{{ __('Biggest monthly averaged carbon emission per model', 'carbon') }}</div>
-  <div class="h1 mb-3" id="carbonEmissionPerModel"></div>
-  <div class="chart-lg"></div>
+    #{{ id }}:hover {
+        background-color: {{ fg_hover_color }};
+        border: 1px solid {{ fg_hover_border }};
+    }
+
+    .theme-dark #{{ id }} {
+    background-color: {{ fg_color }};
+    color: {{ color }};
+    }
+
+    .theme-dark #{{ id }}:hover {
+        background-color: {{ fg_hover_color }};
+        color: {{ fg_color }};
+        border: 1px solid {{ fg_hover_border }};
+    }
+</style>
+<div class="card" id="{{ id }}">
+   <div id="carbonEmissionPerModelChart" class="card-body card-max-height">
+   <div class="subheader">{{ __('Biggest monthly averaged carbon emission per model', 'carbon') }}</div>
+   <div class="h1 mb-3" id="carbonEmissionPerModel"></div>
+   <div class="chart-lg"></div>
+   </div>
 </div>
-
 
 {% block scripts %}
 <script>
 	$(document).ready(function () {
       var carbonColorPalette = ['#146151', '#FEEC5C', '#BBDA50', '#F78343', '#97989C' ];
 
-      var carbonEmissionPerTypeOptions = {
+      var carbonEmissionPerModelOptions = {
          series: [],
          labels: [],
          noData: {
@@ -85,7 +107,7 @@
          }]
       };
 
-      var carbonEmissionPerModelChart = new ApexCharts(document.querySelector("#carbonEmissionPerModelChart .chart-lg"), carbonEmissionPerTypeOptions);
+      var carbonEmissionPerModelChart = new ApexCharts(document.querySelector("#carbonEmissionPerModelChart .chart-lg"), carbonEmissionPerModelOptions);
       carbonEmissionPerModelChart.render();
 
       // Carbon emission per type

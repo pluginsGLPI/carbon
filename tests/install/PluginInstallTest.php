@@ -37,11 +37,14 @@ use Session;
 use Config;
 use CronTask as GLPICronTask;
 use DbUtils;
+use Glpi\Dashboard\Dashboard;
 use DisplayPreference;
 use GLPIKey;
 use Plugin;
 use Profile;
 use ProfileRight;
+use Glpi\Dashboard\Item;
+use Glpi\Dashboard\Right;
 use Glpi\System\Diagnostic\DatabaseSchemaIntegrityChecker;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
@@ -120,7 +123,7 @@ class PluginInstallTest extends CommonTestCase
 
         $this->checkConfig();
         $this->checkAutomaticAction();
-        // $this->checkDashboard();
+        $this->checkDashboard();
         $this->checkRights();
         $this->checkInitialDataSources();
         $this->checkInitialZones();
@@ -419,5 +422,48 @@ class PluginInstallTest extends CommonTestCase
         $usage_profile = new ComputerUsageProfile();
         $rows = $usage_profile->find();
         $this->assertEquals(2, count($rows));
+    }
+
+
+    public function checkDashboard()
+    {
+        // Check the dashboard exists
+        $dashboard = new Dashboard();
+        $dashboard->getFromDB('plugin_carbon_board');
+        $this->assertFalse($dashboard->isNewItem());
+
+        // Check rights on the dashboard
+        $right = new Right();
+        $profile = new Profile();
+        $profiles = $profile->find();
+        $profile_itemtype = Profile::getType();
+        foreach ($profiles as $profile) {
+            $profile_right = new ProfileRight();
+            $profile_right->getFromDBByCrit([
+                'profiles_id' => $profile['id'],
+                'name'        => 'config',
+            ]);
+            if ($profile_right->isNewItem()) {
+                continue;
+            }
+
+            $rows = $right->find([
+                'dashboards_dashboards_id' => $dashboard->fields['id'],
+                'itemtype'                 => $profile_itemtype,
+                'items_id'                 => $profile['id']
+            ]);
+            if (($profile_right->fields['rights'] && READ + UPDATE) != READ + UPDATE) {
+                $this->assertCount(0, $rows);
+            } else {
+                $this->assertCount(1, $rows);
+            }
+        }
+
+        // Check there is widgets in the dashboard
+        $dashboardItem = new Item();
+        $rows = $dashboardItem->find([
+            'dashboards_dashboards_id' => $dashboard->fields['id'],
+        ]);
+        $this->assertCount(7, $rows);
     }
 }

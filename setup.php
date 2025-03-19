@@ -79,8 +79,13 @@ define('PLUGIN_CARBON_TYPES', [
  */
 function plugin_init_carbon()
 {
+    /** @var array $CFG_GLPI */
+    global $CFG_GLPI;
+
     plugin_carbon_setupHooks();
     plugin_carbon_registerClasses();
+
+    $CFG_GLPI['javascript']['tools'][strtolower(Report::class)] = ['dashboard'];
 }
 
 function plugin_carbon_setupHooks()

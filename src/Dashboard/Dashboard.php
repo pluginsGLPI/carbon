@@ -53,27 +53,6 @@ class Dashboard
         ];
     }
 
-    public static function cardUnhandledComputersCountProvider(array $params = [])
-    {
-        return self::cardNumberProvider($params, "unhandled computers", self::getUnhandledComputersCount($params));
-    }
-
-    public static function cardHandledComputersCountProvider(array $params = [])
-    {
-        return self::cardNumberProvider($params, "handled computers", self::getHandledComputersCount($params));
-    }
-
-    public static function cardTotalPowerProvider(array $params = [])
-    {
-        // GLPI dashboard
-        return self::cardNumberProvider($params, "total power", Provider::getTotalPower());
-    }
-
-    public static function cardTotalCarbonEmissionProvider(array $params = [])
-    {
-        return self::cardNumberProvider($params, "total carbon emission", Provider::getTotalCarbonEmission());
-    }
-
     public static function cardDataProvider(array $params = [], string $label = "", array $data = [])
     {
         $default_params = [
@@ -136,7 +115,7 @@ class Dashboard
     public static function getTotalCarbonEmissionPerModel(array $params = [])
     {
         $default_params = [
-            'label' => __('Carbon Emission per model', 'carbon'),
+            'label' => __('Carbon emissions per model', 'carbon'),
             'icon'  => "fas fa-computer",
             'color' => '#ea9999',
         ];

@@ -86,47 +86,12 @@ class Report extends CommonDBTM
 
     public static function showInstantReport(): void
     {
-        // $carbon_emission_per_month = Provider::getCarbonEmissionPerMonth();
-
         ob_start();
-        $dashboard = new DashboardGrid('plugin_carbon_board', 33, 0, 'mini_core');
+        $dashboard = new DashboardGrid('plugin_carbon_board', 24, 16, 'mini_core');
+        $dashboard->show(true);
         $dashboard_html = ob_get_clean();
-
-        $total_carbon_emission = Report::getTotalCarbonEmission();
-
-        // TODO: the following block duplicates code in Widget::DisplayMonthlyCarbonEmission()
-        {
-            $last_month = Report::getCarbonEmissionLastMonth();
-            $last_month_emissions = 0;
-            if (count($last_month['series'][0]['data']) > 0) {
-                $last_month_emissions = array_pop($last_month['series'][0]['data'])['y'];
-            }
-            $penultimate_month_emissions = 0;
-            if (count($last_month['series'][0]['data']) > 0) {
-                $penultimate_month_emissions = array_pop($last_month['series'][0]['data'])['y'];
-                $percentage_change = (($last_month_emissions - $penultimate_month_emissions) / $last_month_emissions) * 100;
-                $comparison_text = '= 0.00 %';
-                if ($percentage_change > 0) {
-                    $comparison_text = '↑ ' . Html::formatNumber(abs($percentage_change));
-                } else if ($percentage_change < 0) {
-                    $comparison_text = '↓ ';
-                }
-            }
-            $last_month_emissions .=  ' ' . $last_month['series'][0]['unit'];
-            $penultimate_month_emissions .=  ' ' . $last_month['series'][0]['unit'];
-        }
-
         TemplateRenderer::getInstance()->display('@carbon/quick-report.html.twig', [
-            'total_carbon_emission' => $total_carbon_emission,
-            'last_month_emissions' => $last_month_emissions,
-            'last_month' => $last_month['date_interval'][1],
-            'penultimate_month_emissions' => $penultimate_month_emissions,
-            'penultimate_month' => $last_month['date_interval'][0],
-            'variation' => $comparison_text,
-            // following has to be deleted
             'dashboard' => $dashboard_html,
-            'handled'   => Provider::getHandledComputersCount(),
-            'unhandled' => Provider::getUnhandledComputersCount(),
         ]);
     }
 
@@ -141,7 +106,7 @@ class Report extends CommonDBTM
             $end_date   = DateTime::createFromFormat('Y-m-d\TH:i:s.v\Z', $params['args']['apply_filters'][1]);
         }
 
-        $value = Provider::getTotalCarbonEmission($params);
+        $value = Provider::getTotalCarbonEmission($params)['number'];
 
         // Prepare date format
         $date_format = 'Y F';

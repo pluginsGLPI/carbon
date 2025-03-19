@@ -28,24 +28,47 @@
  # @link      https://github.com/pluginsGLPI/carbon
  # -------------------------------------------------------------------------
  #}
+<style>
+    #{{ id }} {
+        background-color: {{ color }};
+        color: {{ fg_color }};
+    }
 
-<div class="card-body" id="cardBodyBorder">
-  <div class="row align-items-center">
-    <div class="col-auto">
-      <span><img src="{{ get_plugin_web_dir('carbon') }}/dist/images/device_icon_black.png" /></span>
-    </div>
-    <div class="col" style="text-align: left">
-      <div class="font-weight-medium">{{ __('Warning', 'carbon') }}</div>
-      <div class="text-secondary"><a id="unhandledComputers" href="{{ unhandled.url }}">{{ unhandled.number }} unhandled computers</a></div>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col align-items-center">
-      {% set totalComputers = handled.number + unhandled.number %}
-      {% set ratio = 100 * unhandled.number / totalComputers %}
-      <div class="text-secondary p-3">
-        {{ __("It represents %s percent of your parc that contains %s computers.", "carbon")|format(ratio|round(2, 'common'), totalComputers) }}
+    #{{ id }}:hover {
+        background-color: {{ fg_hover_color }};
+        border: 1px solid {{ fg_hover_border }};
+    }
+
+    .theme-dark #{{ id }} {
+    background-color: {{ fg_color }};
+    color: {{ color }};
+    }
+
+    .theme-dark #{{ id }}:hover {
+        background-color: {{ fg_hover_color }};
+        color: {{ fg_color }};
+        border: 1px solid {{ fg_hover_border }};
+    }
+</style>
+<div class="card" id="{{ id }}">
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-auto">
+                <span><img src="{{ get_plugin_web_dir('carbon') }}/dist/images/device_icon_black.png" /></span>
+            </div>
+            <div class="col" style="text-align: left">
+                <div class="font-weight-medium">{{ __('Warning', 'carbon') }}</div>
+                <div class="text-secondary"><a id="unhandledComputers" href="{{ unhandled.url }}">{{ unhandled.number }} unhandled computers</a></div>
+            </div>
+            <div class="row">
+                <div class="col align-items-center">
+                    {% set totalComputers = handled.number + unhandled.number %}
+                    {% set ratio = 100 * unhandled.number / totalComputers %}
+                    <div class="text-secondary p-3">
+                        {{ __("It represents %s percent of your parc that contains %s computers.", "carbon")|format(ratio|round(2, 'common'), totalComputers) }}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-  </div>
 </div>

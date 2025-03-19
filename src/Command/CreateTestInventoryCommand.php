@@ -158,7 +158,7 @@ class CreateTestInventoryCommand extends Command
         return Command::SUCCESS;
     }
 
-    private function createItemIfNotExist(string $item_type, array $crit, array $input = null): CommonDBTM
+    private function createItemIfNotExist(string $item_type, array $crit, ?array $input = null): CommonDBTM
     {
         $item = new $item_type();
 
