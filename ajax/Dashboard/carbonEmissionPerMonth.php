@@ -32,7 +32,7 @@
  */
 
 use Report as GlpiReport;
-use GlpiPlugin\Carbon\Report;
+use GlpiPlugin\Carbon\Dashboard\Provider;
 
 include('../../../../inc/includes.php');
 
@@ -50,6 +50,6 @@ if (!GlpiReport::canView()) {
 
 header("Content-Type: text/html; charset=UTF-8");
 
-$res = Report::getCarbonEmissionPerMonth($_GET);
+$res = Provider::getUsageCarbonEmissionPerMonth($_GET);
 
-echo $res;
+// echo json_encode($res);

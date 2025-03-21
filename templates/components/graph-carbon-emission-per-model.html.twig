@@ -40,8 +40,8 @@
     }
 
     .theme-dark #{{ id }} {
-    background-color: {{ fg_color }};
-    color: {{ color }};
+        background-color: {{ fg_color }};
+        color: {{ color }};
     }
 
     .theme-dark #{{ id }}:hover {
@@ -51,77 +51,18 @@
     }
 </style>
 <div class="card" id="{{ id }}">
-   <div id="carbonEmissionPerModelChart" class="card-body card-max-height">
-   <div class="subheader">{{ __('Biggest monthly averaged carbon emission per model', 'carbon') }}</div>
-   <div class="h1 mb-3" id="carbonEmissionPerModel"></div>
-   <div class="chart-lg"></div>
-   </div>
+    <div id="carbonEmissionPerModelChart" class="card-body card-max-height">
+    <div class="subheader">{{ __('Biggest monthly averaged carbon emission per model', 'carbon') }}</div>
+    <div class="h1 mb-3" id="carbonEmissionPerModel"></div>
+    <div class="chart-lg"></div>
+    </div>
 </div>
 
 {% block scripts %}
 <script>
 	$(document).ready(function () {
-      var carbonColorPalette = ['#146151', '#FEEC5C', '#BBDA50', '#F78343', '#97989C' ];
-
-      var carbonEmissionPerModelOptions = {
-         series: [],
-         labels: [],
-         noData: {
-            text: i18n.textdomain('carbon').__('Loading...', 'carbon'),
-            align: 'center',
-            verticalAlign: 'middle',
-            offsetX: 0,
-            offsetY: 0,
-            style: {
-               // color: undefined,
-               fontSize: '14px',
-               // fontFamily: undefined
-            }
-         },
-         colors: carbonColorPalette,
-         chart: {
-            type: 'donut',
-         },
-         plotOptions: {
-            pie: {
-               startAngle: -90,
-               endAngle: 90,
-               offsetY: 10
-            }
-         },
-         grid: {
-            padding: {
-               bottom: -80
-            }
-         },
-         responsive: [{
-            breakpoint: 480,
-            options: {
-               chart: {
-                  width: 200
-               },
-               legend: {
-                  position: 'bottom'
-               }
-            }
-         }]
-      };
-
-      var carbonEmissionPerModelChart = new ApexCharts(document.querySelector("#carbonEmissionPerModelChart .chart-lg"), carbonEmissionPerModelOptions);
+      var carbonEmissionPerModelChart = new ApexCharts(document.querySelector("#carbonEmissionPerModelChart .chart-lg"), {{ data|json_encode(constant('JSON_PRETTY_PRINT'))|raw }});
       carbonEmissionPerModelChart.render();
-
-      // Carbon emission per type
-      fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/totalCarbonEmissionPerModel.php").then(response => {
-         return response.json();
-      }).then(data => {
-         data.chart.events = {
-            legendClick: function(chartContext, seriesIndex, opts) {
-               window.location.href = data.url[seriesIndex];
-            }
-         };
-         document.querySelector("#carbonEmissionPerModelChart .subheader").innerText += ' (' + data.unit + ')';
-         carbonEmissionPerModelChart.updateOptions(data, true, true);
-      });
    });
 </script>
 {% endblock %}

@@ -71,22 +71,16 @@ class Widget extends GlpiDashboardWidget
             ],
             'most_gwp_impacting_computer_models' => [
                 'label'    => __('Biggest monthly averaged carbon emission per model', 'carbon'),
-                'function' => self::class . '::DisplayGraphCarbonEmissionPerModel',
+                'function' => self::class . '::DisplayGraphUsageCarbonEmissionPerModel',
                 'width'    => 6,
                 'height'   => 3,
             ],
             'usage_gwp_monthly' => [
                 'label'    => __('Carbon Emission Per month', 'carbon'),
-                'function' => self::class . '::DisplayGraphCarbonEmissionPerMonth',
+                'function' => self::class . '::DisplayGraphUsageCarbonEmissionPerMonth',
                 'width'    => 16,
                 'height'   => 12,
             ],
-            // 'usage_gwp_per_model' => [
-            //     'label'    => __('Carbon Emission Per model', 'carbon'),
-            //     'function' => self::class . '::DisplayGraphCarbonEmissionPerModel',
-            //     'width'    => 16,
-            //     'height'   => 12,
-            // ],
             'unhandledcomputers' => [
                 'label'    => __('Unhandled Computers', 'carbon'),
                 'function' => self::class . '::DisplayUnhandledComputers',
@@ -414,7 +408,7 @@ class Widget extends GlpiDashboardWidget
     //     return self::halfDonut($params);
     // }
 
-    public static function DisplayGraphCarbonEmissionPerMonth(array $params = []): string
+    public static function DisplayGraphUsageCarbonEmissionPerMonth(array $params = []): string
     {
         $default = [
             'url'     => '',
@@ -426,6 +420,74 @@ class Widget extends GlpiDashboardWidget
             'filters' => [], // TODO: Not implemented yet (is this useful ?)
         ];
         $p = array_merge($default, $params);
+
+        $apex_data = [
+            'chart' => [
+                'type' => 'line',
+                'height' => 350,
+            ],
+            'colors' => ['#BBDA50', '#A00'],
+            // 'title' => [
+                // 'text' => __('Consumed energy and carbon emission', 'carbon'),
+            // ],
+            'plotOptions' => [
+                'bar' => [
+                    'horizontal' => false,
+                    'columnWidth' => '55%',
+                    'endingShape' => 'rounded'
+                ],
+            ],
+            'dataLabels' => [
+                'enabled' => false,
+                'enabledOnSeries' => [0, 1],
+                'style' => [
+                    'colors' => ['#145161', '#800'],
+                ],
+            ],
+            'labels' => [],
+            'stroke' => [
+                'width' => [0, 4],
+                'curve' => 'smooth'
+            ],
+            'series' => [
+                [
+                    'name' =>  __('Carbon emission', 'carbon'),
+                    'type' => 'bar',
+                    'data' => []
+                ],
+                [
+                    'name' => __('Consumed energy', 'carbon'),
+                    'type' => 'line',
+                    'data' => []
+                ],
+            ],
+            'xaxis' => [
+                'categories' => []
+            ],
+            'yaxis' => [
+                [
+                    'title' => ['text' => __('Carbon emission', 'carbon')],
+                ], [
+                    'opposite' => true,
+                    'title' => ['text' => __('Consumed energy', 'carbon')],
+                ]
+            ],
+            'markers' => [
+                'size' => [3, 3],
+            ],
+            'tooltip' => [
+                'enabled' => true,
+            ],
+        ];
+        $data = Provider::getUsageCarbonEmissionPerMonth();
+        foreach ($data['series'] as $key => $serie) {
+            $apex_data['series'][$key]['name'] = $serie['name'];
+            $apex_data['series'][$key]['data'] = $serie['data'];
+            $apex_data['series'][$key]['type'] = $serie['type'];
+        }
+        // $apex_data['series'] = $data['data']['series'];
+        $apex_data['labels'] = $data['labels'];
+        $apex_data['xaxis']['categories'] = $data['labels'];
 
         return TemplateRenderer::getInstance()->render('@carbon/components/graph-carbon-emission-per-month.html.twig', [
             'id' => $p['id'],
@@ -433,10 +495,11 @@ class Widget extends GlpiDashboardWidget
             'fg_color' => Toolbox::getFgColor($p['color']),
             'fg_hover_color' => Toolbox::getFgColor($p['color'], 15),
             'fg_hover_border' => Toolbox::getFgColor($p['color'], 30),
+            'data' => $apex_data,
         ]);
     }
 
-    public static function DisplayGraphCarbonEmissionPerModel(array $params = []): string
+    public static function DisplayGraphUsageCarbonEmissionPerModel(array $params = []): string
     {
         $default = [
             'url'     => '',
@@ -449,12 +512,50 @@ class Widget extends GlpiDashboardWidget
         ];
         $p = array_merge($default, $params);
 
+        $data = [
+            'colors' => ['#146151', '#FEEC5C', '#BBDA50', '#F78343', '#97989C'],
+            'chart' => [
+                'type' => 'donut',
+            ],
+            'plotOptions' => [
+                'pie' => [
+                    'startAngle' => -90,
+                    'endAngle' => 90,
+                    'offsetY' => 10
+                ]
+            ],
+            'grid' => [
+                'padding' => [
+                    'bottom' => -80
+                ]
+            ],
+            'responsive' => [[
+                'breakpoint' => 480,
+                'options' => [
+                    'chart' => [
+                        'width' => 200
+                    ],
+                    'legend' => [
+                        'position' => 'bottom'
+                    ]
+                ]
+            ]
+            ],
+            'subtitle' => [
+                'style' => []
+            ],
+            'series' => [],
+            'labels' => [],
+        ];
+        $data = array_merge($data, Provider::getSumUsageEmissionsPerModel());
+
         return TemplateRenderer::getInstance()->render('@carbon/components/graph-carbon-emission-per-model.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
             'fg_color' => Toolbox::getFgColor($p['color']),
             'fg_hover_color' => Toolbox::getFgColor($p['color'], 15),
             'fg_hover_border' => Toolbox::getFgColor($p['color'], 30),
+            'data' => $data,
         ]);
     }
 

@@ -37,6 +37,7 @@ use Computer;
 use ComputerModel;
 use ComputerType as GlpiComputerType;
 use DateTime;
+use DateTimeImmutable;
 use DBmysql;
 use DbUtils;
 use Glpi\Dashboard\Filter;
@@ -97,7 +98,7 @@ class Provider
      *   - string 'url': url to redirect when clicking on the slice
      *   - string 'label': name of the computer model
      */
-    public static function getSumEmissionsPerModel(array $where = [])
+    public static function getSumUsageEmissionsPerModel(array $where = [])
     {
         /** @var DBmysql $DB */
         global $DB;
@@ -745,5 +746,151 @@ class Provider
             'label'      => $params['label'],
             'icon'       => $params['icon'],
         ];
+    }
+
+    public static function getUsageCarbonEmissionPerMonth(array $params = [], array $crit = []): array
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        $default_params = [
+            'icon'  => "fas fa-computer",
+            'label' => '',
+            // 'color' => '#ea9999',
+            'apply_filters' => [],
+        ];
+        $params = array_merge($default_params, $params);
+
+        if (!isset($params['args']['apply_filters']['dates'][0]) || !isset($params['args']['apply_filters']['dates'][1])) {
+            list($start_date, $end_date) = (new Toolbox())->yearToLastMonth(new DateTimeImmutable('now'));
+            $params['args']['apply_filters']['dates'][0] = $start_date->format('Y-m-d\TH:i:s.v\Z');
+            $params['args']['apply_filters']['dates'][1] = $end_date->format('Y-m-d\TH:i:s.v\Z');
+        } else {
+            $start_date = DateTime::createFromFormat('Y-m-d\TH:i:s.v\Z', $params['args']['apply_filters'][0]);
+            $end_date   = DateTime::createFromFormat('Y-m-d\TH:i:s.v\Z', $params['args']['apply_filters'][1]);
+        }
+
+        $crit[] = [
+            'AND' => [
+                ['date' => ['>=', $start_date->format('Y-m-d')]],
+                ['date' => ['<=', $end_date->format('Y-m-d')]],
+            ]
+        ];
+
+        $emissions_table = CarbonEmission::getTable();
+
+        $dbUtils = new DbUtils();
+        $entityRestrict = $dbUtils->getEntitiesRestrictCriteria($emissions_table, '', '', 'auto');
+        $sql_year_month = "DATE_FORMAT(`date`, '%Y-%m')";
+        $request = [
+            'SELECT'    => [
+                'SUM' => [
+                    CarbonEmission::getTableField('emission_per_day') . ' AS total_emission_per_month',
+                    CarbonEmission::getTableField('energy_per_day') . ' AS total_energy_per_month'
+                ],
+                new QueryExpression("$sql_year_month as `date`")
+            ],
+            'FROM'    => $emissions_table,
+            'GROUPBY' => new QueryExpression($sql_year_month),
+            'ORDER'   => new QueryExpression($sql_year_month),
+            'WHERE'   => $entityRestrict + $crit,
+        ];
+        $filter = self::getFiltersCriteria($emissions_table, $params['apply_filters']);
+        $request = array_merge_recursive($request, $filter);
+        $result = $DB->request($request);
+
+        $data = [
+            'series' => [
+                0 => [
+                    'data' => []
+                ],
+                1 => [
+                    'data' => []
+                ],
+            ],
+        ];
+
+        // Prepare date format
+        $date_format = 'Y F';
+        switch ($_SESSION['glpidate_format'] ?? 0) {
+            case 0:
+                $date_format = 'Y-m';
+                break;
+            case 1:
+            case 2:
+                $date_format = 'm-Y';
+                break;
+        }
+
+        foreach ($result as $row) {
+            $date = new DateTime($row['date']);
+            $date_formatted = $date->format($date_format);
+            $data['xaxis']['categories'][] = $date_formatted;
+            $data['series'][0]['data'][] = [
+                'x' => $date_formatted,
+                'y' => $row['total_emission_per_month'],
+            ];
+            $data['series'][1]['data'][] = [
+                'x' => $date_formatted,
+                'y' => $row['total_energy_per_month'],
+            ];
+            $data['labels'][] = $date_formatted;
+        }
+
+        // Scale carbon emission
+        $units = [
+            __('g', 'carbon'),
+            __('Kg', 'carbon'),
+            __('t', 'carbon'),
+            __('Kt', 'carbon'),
+            __('Mt', 'carbon'),
+            __('Gt', 'carbon'),
+            __('Tt', 'carbon'),
+            __('Pt', 'carbon'),
+            __('Et', 'carbon'),
+            __('Zt', 'carbon'),
+            __('Yt', 'carbon'),
+        ];
+        $scaled = Toolbox::scaleSerie($data['series'][0]['data'], $units);
+        $data['series'][0]['name'] =  __('Carbon emission', 'carbon') . ' (' . $scaled['unit'] . __('CO₂eq', 'carbon') . ')';
+        $data['series'][0]['data'] = $scaled['serie'];
+        $data['series'][0]['unit'] = $scaled['unit'] . __('CO₂eq', 'carbon'); // Not supported by apex charts
+        $data['series'][0]['type'] = 'bar';
+
+        // Scale energy consumption
+        $units = [
+            __('KWh', 'carbon'),
+            __('MWh', 'carbon'),
+            __('GWh', 'carbon'),
+            __('TWh', 'carbon'),
+            __('PWh', 'carbon'),
+            __('EWh', 'carbon'),
+            __('ZWh', 'carbon'),
+            __('YWh', 'carbon'),
+        ];
+        $scaled = Toolbox::scaleSerie($data['series'][1]['data'], $units);
+        $data['series'][1]['name'] = __('Consumed energy', 'carbon') . ' (' . $scaled['unit'] . ')';
+        $data['series'][1]['data'] = $scaled['serie'];
+        $data['series'][1]['unit'] = $scaled['unit']; // Not supported by apex charts
+        $data['series'][1]['type'] = 'line';
+
+        // $data = self::getCarbonEmissionPerMonth($params['args'], $crit);
+
+        // Prepare date format
+        $date_format = 'Y F';
+        switch ($_SESSION['glpidate_format'] ?? 0) {
+            case 0:
+                $date_format = 'Y F';
+                break;
+            case 1:
+            case 2:
+                $date_format = 'F Y';
+                break;
+        }
+        $data['date_interval'] = [
+            $start_date->format($date_format),
+            $end_date->format($date_format),
+        ];
+        return $data;
     }
 }

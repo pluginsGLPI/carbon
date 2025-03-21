@@ -40,8 +40,8 @@
     }
 
     .theme-dark #{{ id }} {
-    background-color: {{ fg_color }};
-    color: {{ color }};
+      background-color: {{ fg_color }};
+      color: {{ color }};
     }
 
     .theme-dark #{{ id }}:hover {
@@ -61,45 +61,14 @@
 {% block scripts %}
 <script>
   $(document).ready(function () {
-
     var currentUrl = window.location.href;
 
     if (currentUrl.includes('dashboard')) {
       document.getElementById('cardBodyBorder1').classList.add('border', 'border-2');
     }
 
-    var carbonEmissionPerMonthOptions = {
-      chart: {
-        type: 'bar',
-        height: 350,
-      },
-      colors: ['#BBDA50', '#A00'],
-      series : [],
-      plotOptions: {
-        bar: {
-          horizontal: false,
-          columnWidth: '55%',
-          endingShape: 'rounded'
-        },
-      },
-      dataLabels: {
-          style: {
-            colors: ['#145161', '#800'],
-          },
-      },
-      xaxis: {
-        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-      },
-    };
-
-    var carbonEmissionPerMonthChart = new ApexCharts(document.querySelector("#carbonEmissionPerMonthChart"), carbonEmissionPerMonthOptions);
+    var carbonEmissionPerMonthChart = new ApexCharts(document.querySelector("#carbonEmissionPerMonthChart"), {{ data|json_encode(constant('JSON_PRETTY_PRINT'))|raw }});
     carbonEmissionPerMonthChart.render();
-
-    fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/carbonEmissionPerMonth.php").then(response => {
-        return response.json();
-    }).then(data => {
-      carbonEmissionPerMonthChart.updateOptions(data);
-    });
   });
 </script>
 {% endblock %}
