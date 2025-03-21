@@ -31,6 +31,7 @@
  * -------------------------------------------------------------------------
  */
 
+use Glpi\Dashboard\Right as GlpiDashboardRight;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Install;
@@ -50,7 +51,10 @@ use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
 use GlpiPlugin\Carbon\SearchOptions;
+use GlpiPlugin\Carbon\Toolbox;
 use Location as GlpiLocation;
+use Profile as GlpiProfile;
+use Toolbox as GlpiToolbox;
 
 /**
  * Plugin install process
@@ -70,7 +74,7 @@ function plugin_carbon_install(array $args = []): bool
         try {
             return $install->install($args);
         } catch (\Exception $e) {
-            $backtrace = Toolbox::backtrace('');
+            $backtrace = GlpiToolbox::backtrace('');
             trigger_error($e->getMessage() . PHP_EOL . $backtrace, E_USER_WARNING);
             return false;
         }
@@ -78,7 +82,7 @@ function plugin_carbon_install(array $args = []): bool
         try {
             return $install->upgrade($version, $args);
         } catch (\Exception $e) {
-            $backtrace = Toolbox::backtrace('');
+            $backtrace = GlpiToolbox::backtrace('');
             trigger_error($e->getMessage() . PHP_EOL . $backtrace, E_USER_WARNING);
             return false;
         }
@@ -100,7 +104,7 @@ function plugin_carbon_uninstall(): bool
     try {
         $uninstall->uninstall();
     } catch (\Exception $e) {
-        $backtrace = Toolbox::backtrace('');
+        $backtrace = GlpiToolbox::backtrace('');
         trigger_error($e->getMessage() . PHP_EOL . $backtrace, E_USER_WARNING);
         return false;
     }
@@ -476,4 +480,48 @@ function plugin_carbon_MassiveActions($itemtype)
     }
 
     return [];
+}
+
+function plugin_carbon_profileAdd(CommonDBTM $item)
+{
+    if (!isset($item->input['_carbon:report']['1_0'])) {
+        // Access to reporting not affected
+        return;
+    }
+    if (($dashboard_id = Toolbox::getDashboardId()) === null) {
+        // Dashboard of the plugin notfound (should not happen)
+        return;
+    }
+
+    $dashboard_right = new GlpiDashboardRight();
+
+    $grant_access = ($item->input['_carbon:report']['1_0'] == 1);
+    $dashboard_right->getFromDBByCrit([
+        'itemtype' => GlpiProfile::class,
+        'items_id' => $item->getID(),
+        'dashboards_dashboards_id' => $dashboard_id,
+    ]);
+    if ($grant_access) {
+        // Create right for profile if not exists
+        if ($dashboard_right->isNewItem()) {
+            $dashboard_right->add([
+                'itemtype' => GlpiProfile::class,
+                'items_id' => $item->getID(),
+                'dashboards_dashboards_id' => $dashboard_id,
+            ]);
+        }
+        return;
+    }
+
+    // delete right if exists
+    if (!$dashboard_right->isNewItem()) {
+        $dashboard_right->delete([
+            'id' => $dashboard_right->getID(),
+        ]);
+    }
+}
+
+function plugin_carbon_profileUpdate(CommonDBTM $item)
+{
+    plugin_carbon_profileAdd($item);
 }

@@ -123,6 +123,9 @@ function plugin_carbon_setupHooks()
     $PLUGIN_HOOKS[Hooks::PRE_ITEM_UPDATE]['carbon'][GlpiLocation::class] = [Location::class, 'onGlpiLocationPreUpdate'];
     $PLUGIN_HOOKS[Hooks::ITEM_UPDATE]['carbon'][GlpiLocation::class] = [Location::class, 'onGlpiLocationUpdate'];
     $PLUGIN_HOOKS[Hooks::PRE_ITEM_PURGE]['carbon'][GlpiLocation::class] = [Location::class, 'onGlpiLocationPrePurge'];
+    // Updating profile rights impacts data for itemtype ProfileRight, then we must use PRE_ITEM_* hooks
+    $PLUGIN_HOOKS[Hooks::PRE_ITEM_UPDATE]['carbon'][GlpiProfile::class] = 'plugin_carbon_profileUpdate';
+    $PLUGIN_HOOKS[Hooks::PRE_ITEM_ADD]['carbon'][GlpiProfile::class] = 'plugin_carbon_profileAdd';
 
     // Add ApexCharts.js library
     $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][] = 'dist/bundle.js';

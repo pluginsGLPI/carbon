@@ -38,6 +38,7 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DBmysql;
+use Glpi\Dashboard\Dashboard as GlpiDashboard;
 use Infocom;
 use Location;
 use QueryExpression;
@@ -520,5 +521,17 @@ class Toolbox
         }
 
         return $gaps;
+    }
+
+    public static function getDashboardId(): ?int
+    {
+        $dashboard = new GlpiDashboard();
+        $dashboard_key = 'plugin_carbon_board';
+        /** @phpstan-ignore argument.type */
+        if ($dashboard->getFromDB($dashboard_key) === false) {
+            return null;
+        }
+
+        return $dashboard->fields['id']; // do not use getID()
     }
 }

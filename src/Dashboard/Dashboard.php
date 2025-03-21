@@ -75,11 +75,6 @@ class Dashboard
         return self::cardDataProvider($params, "total power per model", self::getTotalPowerPerModel());
     }
 
-    public static function cardTotalCarbonEmissionPerModelProvider(array $params = [])
-    {
-        return self::cardDataProvider($params, "total carbon emission per model", self::getTotalCarbonEmissionPerModel());
-    }
-
     public static function getUnhandledComputersCount(array $params = [])
     {
         $unit = ''; // This is a count, no unit
