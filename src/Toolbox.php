@@ -222,7 +222,7 @@ class Toolbox
         return sprintf(__('%1$s&nbsp;%2$s'), round($weight, 2), $human_readable_unit);
     }
 
-        /**
+    /**
      * Format a power passing a power in grams
      *
      * @param float $p  Power in Watt

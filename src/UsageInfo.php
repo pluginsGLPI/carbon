@@ -38,6 +38,7 @@ use CommonDBChild;
 use CommonDBTM;
 use CommonGLPI;
 use Glpi\Application\View\TemplateRenderer;
+use GlpiPlugin\Carbon\Dashboard\Widget;
 use Monitor;
 use NetworkEquipment;
 use Plugin;
@@ -192,6 +193,10 @@ class UsageInfo extends CommonDBChild
             'asset'           => $asset,
             'embodied_impact' => $embodied_impact,
             'usage_impact'    => $usage_impact,
+            'usage_carbon_emission_graph' => Widget::DisplayGraphUsageCarbonEmissionPerMonth([], [
+                'itemtype' => $asset->getType(),
+                'items_id' => $asset->getID(),
+            ]),
         ]);
     }
 }

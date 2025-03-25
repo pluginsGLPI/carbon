@@ -311,7 +311,7 @@ class ProviderTest extends DbTestCase
         $this->assertEquals($expected, $output);
     }
 
-    public function testGetCarbonEmissionPerMonth()
+    public function testGetUsageCarbonEmissionPerMonth()
     {
         $country = $this->getUniqueString();
         $source  = $this->getUniqueString();
@@ -360,7 +360,7 @@ class ProviderTest extends DbTestCase
             ]);
             $date_cursor->add(new DateInterval('P1D'));
         }
-        $output = Provider::getCarbonEmissionPerMonth([
+        $output = Provider::getUsageCarbonEmissionPerMonth([
             'label' => '',
             'icon' => '',
         ], [

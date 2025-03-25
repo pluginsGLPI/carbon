@@ -408,15 +408,15 @@ class Widget extends GlpiDashboardWidget
     //     return self::halfDonut($params);
     // }
 
-    public static function DisplayGraphUsageCarbonEmissionPerMonth(array $params = []): string
+    public static function DisplayGraphUsageCarbonEmissionPerMonth(array $params = [], array $crit = []): string
     {
         $default = [
             'url'     => '',
             'label'   => '',
             'alt'     => '',
-            'color'   => '',
+            'color'   => '#FFFFFF',
             'icon'    => '',
-            'id'      => 'plugin_carbon_unhandled_computers_' . mt_rand(),
+            'id'      => 'plugin_carbon_usage_carbon_emissions_' . mt_rand(),
             'filters' => [], // TODO: Not implemented yet (is this useful ?)
         ];
         $p = array_merge($default, $params);
@@ -479,7 +479,7 @@ class Widget extends GlpiDashboardWidget
                 'enabled' => true,
             ],
         ];
-        $data = Provider::getUsageCarbonEmissionPerMonth();
+        $data = Provider::getUsageCarbonEmissionPerMonth($params, $crit);
         foreach ($data['series'] as $key => $serie) {
             $apex_data['series'][$key]['name'] = $serie['name'];
             $apex_data['series'][$key]['data'] = $serie['data'];
@@ -507,7 +507,7 @@ class Widget extends GlpiDashboardWidget
             'alt'     => '',
             'color'   => '',
             'icon'    => '',
-            'id'      => 'plugin_carbon_unhandled_computers_' . mt_rand(),
+            'id'      => 'plugin_usage_carbon_emissions_per_model_' . mt_rand(),
             'filters' => [], // TODO: Not implemented yet (is this useful ?)
         ];
         $p = array_merge($default, $params);

@@ -177,29 +177,8 @@ class Report extends CommonDBTM
 
         $params['args']['apply_filters']['dates'][0] = $start_date->format('Y-m-d\TH:i:s.v\Z');
         $params['args']['apply_filters']['dates'][1] = $end_date->format('Y-m-d\TH:i:s.v\Z');
-        $data = Provider::getCarbonEmissionPerMonth($params['args']);
+        $data = Provider::getUsageCarbonEmissionPerMonth($params);
 
-        // Prepare date format
-        $date_format = 'Y F';
-        switch ($_SESSION['glpidate_format'] ?? 0) {
-            case 0:
-                $date_format = 'Y F';
-                break;
-            case 1:
-            case 2:
-                $date_format = 'F Y';
-                break;
-        }
-        $data['data']['date_interval'] = [
-            $start_date->format($date_format),
-            $end_date->format($date_format),
-        ];
-
-        return $data['data'];
-    }
-
-    public static function getHandledComputersCount(array $params = []): array
-    {
-        return Provider::getHandledComputersCount($params);
+        return $data;
     }
 }

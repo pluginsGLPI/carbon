@@ -38,67 +38,6 @@ use GlpiPlugin\Carbon\Toolbox;
 
 class Dashboard
 {
-    public static function cardNumberProvider(array $params = [], string $label = "", string $number = "")
-    {
-        $default_params = [
-            'label' => "plugin carbon - $label",
-            'icon'  => "fas fa-computer",
-        ];
-        $params = array_merge($default_params, $params);
-
-        return [
-            'number' => $number,
-            'label'  => $params['label'],
-            'icon'  => $params['icon'],
-        ];
-    }
-
-    public static function cardDataProvider(array $params = [], string $label = "", array $data = [])
-    {
-        $default_params = [
-            'label' => "plugin carbon - $label",
-            'icon'  => "fas fa-computer",
-            'color' => '#ea9999',
-        ];
-        $params = array_merge($default_params, $params);
-
-        return [
-            'data' => $data,
-            'label'  => $params['label'],
-            'icon'  => $params['icon'],
-            'color' => $params['color'],
-        ];
-    }
-
-    public static function cardTotalPowerPerModelProvider(array $params = [])
-    {
-        return self::cardDataProvider($params, "total power per model", self::getTotalPowerPerModel());
-    }
-
-    public static function getUnhandledComputersCount(array $params = [])
-    {
-        $unit = ''; // This is a count, no unit
-
-        $total = Provider::getUnhandledComputersCount($params);
-        if ($total['number'] === null) {
-            return 'N/A';
-        }
-
-        return strval($total['number']) . " $unit";
-    }
-
-    public static function getHandledComputersCount(array $params = [])
-    {
-        $unit = ''; // This is a count, no unit
-
-        $total = Provider::getHandledComputersCount($params);
-        if ($total['number'] === null) {
-            return 'N/A';
-        }
-
-        return strval($total['number']) . " $unit";
-    }
-
     /**
      * Returns total carbon emission per computer type.
      *
@@ -123,23 +62,6 @@ class Dashboard
     public static function getTotalPowerPerModel(): array
     {
         return Provider::getSumPowerPerModel([ComputerModel::getTableField('power_consumption') => ['>', '0']]);
-    }
-
-    public static function cardCarbonEmissionPerMonthProvider(array $params = [])
-    {
-        $default_params = [
-            'icon'  => "fas fa-computer",
-            'color' => '#ea9999',
-        ];
-        $params = array_merge($default_params, $params);
-
-        $data = Provider::getCarbonEmissionPerMonth($params);
-
-        return [
-            'data'  => $data,
-            'label' => $params['label'],
-            'icon'  => $params['icon'],
-        ];
     }
 
     public static function cardCarbonintensityProvider(array $params = [])
