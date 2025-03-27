@@ -159,6 +159,7 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
             'field'        => 'power_consumption',
             'name'         => __('Power consumption', 'carbon'),
             'datatype'     => 'number',
+            'massiveaction' => false,
             'min'          => 0,
             'max'          => 10000,
             'unit'         => 'W',
@@ -461,7 +462,15 @@ function plugin_carbon_MassiveActions($itemtype)
             ];
         case GlpiComputerType::class:
             return [
-                ComputerType::class . MassiveAction::CLASS_ACTION_SEPARATOR . 'MassUpdatePower' => __('Update power consumption', 'carbon'),
+                ComputerType::class . MassiveAction::CLASS_ACTION_SEPARATOR . 'MassUpdatePower' => __('Update type power consumption', 'carbon'),
+            ];
+        case GlpiMonitorType::class:
+            return [
+                MonitorType::class . MassiveAction::CLASS_ACTION_SEPARATOR . 'MassUpdatePower' => __('Update type power consumption', 'carbon'),
+            ];
+        case GlpiNetworkEquipmentType::class:
+            return [
+                NetworkEquipmentType::class . MassiveAction::CLASS_ACTION_SEPARATOR . 'MassUpdatePower' => __('Update type power consumption', 'carbon'),
             ];
     }
 
