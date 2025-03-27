@@ -32,7 +32,7 @@
  */
 
 use Glpi\Event;
-use GlpiPlugin\Carbon\EnvironmentalImpact;
+use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\Impact\History\AbstractAsset;
 
 include('../../../inc/includes.php');
@@ -42,16 +42,16 @@ if (!Plugin::isPluginActive('carbon')) {
     Html::displayNotFoundError();
 }
 
-Session::checkRight(EnvironmentalImpact::$rightname, READ);
+Session::checkRight(UsageInfo::$rightname, READ);
 
-$environmental_impact = new EnvironmentalImpact();
+$usage_info = new UsageInfo();
 
 if (isset($_POST['update'])) {
-    $environmental_impact->check($_POST['id'], UPDATE);
-    $environmental_impact->update($_POST);
+    $usage_info->check($_POST['id'], UPDATE);
+    $usage_info->update($_POST);
     Event::log(
         $_POST['id'],
-        'computers',
+        strtolower($usage_info->fields['itemtype']),
         4,
         'inventory',
         //TRANS: %s is the user login
@@ -64,7 +64,7 @@ if (isset($_POST['update'])) {
         Html::back();
     }
 
-    if (!EnvironmentalImpact::canPurge()) {
+    if (!UsageInfo::canPurge()) {
         Session::addMessageAfterRedirect(__('Reset denied.', 'carbon'), false, ERROR);
         Html::back();
     }
@@ -94,7 +94,7 @@ if (isset($_POST['update'])) {
         Html::back();
     }
 
-    if (!EnvironmentalImpact::canUpdate()) {
+    if (!UsageInfo::canUpdate()) {
         Session::addMessageAfterRedirect(__('Update denied.', 'carbon'), false, ERROR);
         Html::back();
     }

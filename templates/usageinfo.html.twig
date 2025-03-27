@@ -33,7 +33,7 @@
 {% import "components/form/fields_macros.html.twig" as fields %}
 
 {% block form_fields %}
-    {% if itemtype == 'Computer' %}
+    {% if item.fields['itemtype'] == 'Computer' %}
         {{ fields.largeTitle(
             __('Asset usage', 'carbon'),
             'fas fa-calendar-days'
@@ -47,4 +47,15 @@
             _n('Usage profile', 'Usage profiles', 1, 'carbon'))
         }}
     {% endif %}
+
+
+    {{ fields.numberField(
+        'planned_lifespan',
+        item.fields['planned_lifespan'],
+        __('Planned lifespan (in months)', 'carbon'),
+        {
+            display_emptychoice: true,
+            min: 0,
+        })
+    }}
 {% endblock %}

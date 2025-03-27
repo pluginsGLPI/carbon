@@ -80,3 +80,15 @@ $migration->dropKey($new_table, 'unicity');
 $migration->changeField($new_table, 'plugin_carbon_carbonintensityzones_id', 'plugin_carbon_zones_id', "int unsigned NOT NULL DEFAULT '0'");
 $migration->migrationOneTable($new_table);
 $migration->addKey($new_table, ['plugin_carbon_carbonintensitysources_id', 'plugin_carbon_zones_id'], 'unicity', 'UNIQUE');
+
+$old_table = 'glpi_plugin_carbon_environmentalimpacts';
+$new_table = 'glpi_plugin_carbon_usageinfos';
+$migration->renameTable($old_table, $new_table);
+$migration->changeField($new_table, 'computers_id', 'items_id', "int unsigned NOT NULL DEFAULT '0'");
+// The update option forces the tabe to be updated now
+$migration->addField($new_table, 'itemtype', 'string', ['after' => 'id', 'update' => "'Computer'"]);
+$migration->addField($new_table, 'planned_lifespan', "int unsigned NOT NULL DEFAULT '0'", ['after' => 'plugin_carbon_computerusageprofiles_id']);
+$migration->dropKey($new_table, 'unicity');
+// Must apply changes now re-add the key
+$migration->migrationOneTable($new_table);
+$migration->addKey($new_table, ['itemtype', 'items_id'], 'unicity', 'UNIQUE');

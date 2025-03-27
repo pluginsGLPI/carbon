@@ -36,11 +36,13 @@ use GlpiPlugin\Carbon\Dashboard\Widget;
 use Glpi\Plugin\Hooks;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\Config;
-use GlpiPlugin\Carbon\EnvironmentalImpact;
+use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\Location;
+use GlpiPlugin\Carbon\Infocom;
 use GlpiPlugin\Carbon\Profile;
 use GlpiPlugin\Carbon\Report;
 use ComputerType as GlpiComputerType;
+use Infocom as GlpiInfocom;
 use Location as GlpiLocation;
 use MonitorType as GlpiMonitorType;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
@@ -133,11 +135,12 @@ function plugin_carbon_registerClasses()
     Plugin::registerClass(Config::class, ['addtabon' => GlpiConfig::class]);
     Plugin::registerClass(Profile::class, ['addtabon' => GlpiProfile::class]);
     Plugin::registerClass(ComputerType::class, ['addtabon' => GlpiComputerType::class]);
-    Plugin::registerClass(EnvironmentalImpact::class, ['addtabon' => Computer::class]);
-    Plugin::registerClass(EnvironmentalImpact::class, ['addtabon' => Monitor::class]);
-    Plugin::registerClass(EnvironmentalImpact::class, ['addtabon' => NetworkEquipment::class]);
     Plugin::registerClass(MonitorType::class, ['addtabon' => GlpiMonitorType::class]);
     Plugin::registerClass(NetworkEquipmentType::class, ['addtabon' => GlpiNetworkEquipmentType::class]);
+    // TODO: use a loop with PLUGIN_CARBON_TYPES instead
+    Plugin::registerClass(UsageInfo::class, ['addtabon' => Computer::class]);
+    Plugin::registerClass(UsageInfo::class, ['addtabon' => Monitor::class]);
+    Plugin::registerClass(UsageInfo::class, ['addtabon' => NetworkEquipment::class]);
 }
 
 /**

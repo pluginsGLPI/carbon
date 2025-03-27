@@ -67,9 +67,9 @@ class Location extends CommonDBChild
     {
         self::enableCarbonIntensityDownload($item);
     }
+
     public static function onGlpiLocationPreUpdate(CommonDBTM $item)
     {
-
         self::setBoaviztaZone($item);
     }
 

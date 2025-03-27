@@ -45,7 +45,7 @@ use Infocom;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
-use GlpiPlugin\Carbon\EnvironmentalImpact;
+use GlpiPlugin\Carbon\UsageInfo;
 
 /**
  * @covers \GlpiPlugin\Carbon\Impact\History\Computer
@@ -110,9 +110,10 @@ class ComputerTest extends CommonAsset
             'day_6'        => '0',
             'day_7'        => '0',
         ]);
-        $impact = $this->getItem(EnvironmentalImpact::class, [
+        $impact = $this->getItem(UsageInfo::class, [
             $usage_profile->getForeignKeyField() => $usage_profile->getID(),
-            'computers_id' => $asset->getID(),
+            'itemtype' => $asset->getType(),
+            'items_id' => $asset->getID(),
         ]);
 
         $history = new Computer();
@@ -219,9 +220,10 @@ class ComputerTest extends CommonAsset
         // Add a usage profile
         $usage_profile = $this->getItem(ComputerUsageProfile::class);
         $this->assertFalse($history->canHistorize($id));
-        $impact = $this->getItem(EnvironmentalImpact::class, [
+        $impact = $this->getItem(UsageInfo::class, [
             $usage_profile->getForeignKeyField() => $usage_profile->getID(),
-            'computers_id' => $id,
+            'itemtype' => $computer->getType(),
+            'items_id' => $id,
         ]);
         $this->assertFalse($history->canHistorize($id));
 

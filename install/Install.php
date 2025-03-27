@@ -41,9 +41,26 @@ use Plugin;
 
 class Install
 {
+    /**
+     * GLPI Migration instance
+     *
+     * @var Migration
+     */
     private Migration $migration;
 
+    /**
+     * Force upgrade from the previous version to the currrent one
+     *
+     * @var boolean
+     */
     private bool $force_upgrade = false;
+
+    /**
+     * Oldest version that can be upgraded
+     *
+     * @var string
+     */
+    private const OLDEST_UPGRADABLE_VERSION = '0.0.0';
 
     public function __construct(Migration $migration)
     {
@@ -105,8 +122,8 @@ class Install
      */
     public function upgrade(string $from_version, array $args = []): bool
     {
-        $oldest_upgradable_version = '0.0.0';
-        if (version_compare($from_version, '0.0.0', 'lt')) {
+        $oldest_upgradable_version = self::OLDEST_UPGRADABLE_VERSION;
+        if (version_compare($from_version, $oldest_upgradable_version, 'lt')) {
             $this->migration->displayError("Upgrade is not supported before $oldest_upgradable_version!");
             return false;
         }

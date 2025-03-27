@@ -35,7 +35,7 @@ use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Install;
 use GlpiPlugin\Carbon\Uninstall;
-use GlpiPlugin\Carbon\EnvironmentalImpact;
+use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\Zone;
 use ComputerType as GlpiComputerType;
@@ -120,26 +120,16 @@ function plugin_carbon_getDropdown()
 
 function plugin_carbon_postShowTab(array $param)
 {
-    switch ($param['item']::getType()) {
-        case Computer::class:
-            if ($param['options']['itemtype'] == EnvironmentalImpact::class) {
-                ComputerHistory::showHistorizableDiagnosis($param['item']);
-                EnvironmentalImpact::showCharts($param['item']);
-            }
-            break;
-        case Monitor::class:
-            if ($param['options']['itemtype'] == EnvironmentalImpact::class) {
-                MonitorHistory::showHistorizableDiagnosis($param['item']);
-                EnvironmentalImpact::showCharts($param['item']);
-            }
-            break;
-        case NetworkEquipment::class:
-            if ($param['options']['itemtype'] == EnvironmentalImpact::class) {
-                NetworkEquipmentHistory::showHistorizableDiagnosis($param['item']);
-                EnvironmentalImpact::showCharts($param['item']);
-            }
-            break;
+    if ($param['options']['itemtype'] !== UsageInfo::class) {
+        return;
     }
+    $asset_itemtype = $param['item']::getType();
+    if (!in_array($asset_itemtype, PLUGIN_CARBON_TYPES)) {
+        return;
+    }
+
+    ComputerHistory::showHistorizableDiagnosis($param['item']);
+    UsageInfo::showCharts($param['item']);
 }
 
 /**
@@ -169,6 +159,7 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
             'field'        => 'power_consumption',
             'name'         => __('Power consumption', 'carbon'),
             'datatype'     => 'number',
+            'massiveaction' => false,
             'min'          => 0,
             'max'          => 10000,
             'unit'         => 'W',
@@ -197,7 +188,7 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
             'joinparams' => [
                 'jointype' => 'empty',
                 'beforejoin' => [
-                    'table'    => EnvironmentalImpact::getTable(),
+                    'table'    => UsageInfo::getTable(),
                     'joinparams' => [
                         'jointype' => 'child',
                     ]
@@ -209,7 +200,7 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
         AND `glpi_computers_id_e1f6cdb2d63e8a0252da5d4cb339a927`.`is_template` = 0
         AND NOT `glpi_locations`.`country`  = ''
         AND NOT `glpi_locations`.`country` IS NULL
-        AND `glpi_plugin_carbon_computerusageprofiles_0c9cc3f1bd96f0f64dd5e8e36ff34149`.`id` > 0
+        AND `glpi_plugin_carbon_computerusageprofiles_09f8403aa14af64cd70f350288a0331b`.`id` > 0
         AND (
             `glpi_plugin_carbon_computertypes_a643ab3ffd70abf99533ed214da87d60`.`power_consumption` > 0
             OR `glpi_computermodels`.`power_consumption` > 0
@@ -258,9 +249,9 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
                             'jointype' => 'empty',
                             'nolink'   => true,
                             'beforejoin' => [
-                                'table' => EnvironmentalImpact::getTable(),
+                                'table' => UsageInfo::getTable(),
                                 'joinparams' => [
-                                    'jointype' => 'child',
+                                    'jointype' => 'itemtype_item',
                                 ]
                             ]
                         ]
@@ -398,14 +389,13 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
 function plugin_carbon_postItemForm(array $params)
 {
     switch ($params['item']->getType()) {
-        default:
-            return;
         case GlpiLocation::class:
             $location = new Location();
             $location->getFromDBByCrit([
                 GlpiLocation::getForeignKeyField() => $params['item']->getID(),
             ]);
             $location->showForm($location->getID());
+            break;
     }
 }
 
@@ -472,7 +462,15 @@ function plugin_carbon_MassiveActions($itemtype)
             ];
         case GlpiComputerType::class:
             return [
-                ComputerType::class . MassiveAction::CLASS_ACTION_SEPARATOR . 'MassUpdatePower' => __('Update power consumption', 'carbon'),
+                ComputerType::class . MassiveAction::CLASS_ACTION_SEPARATOR . 'MassUpdatePower' => __('Update type power consumption', 'carbon'),
+            ];
+        case GlpiMonitorType::class:
+            return [
+                MonitorType::class . MassiveAction::CLASS_ACTION_SEPARATOR . 'MassUpdatePower' => __('Update type power consumption', 'carbon'),
+            ];
+        case GlpiNetworkEquipmentType::class:
+            return [
+                NetworkEquipmentType::class . MassiveAction::CLASS_ACTION_SEPARATOR . 'MassUpdatePower' => __('Update type power consumption', 'carbon'),
             ];
     }
 

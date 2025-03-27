@@ -44,7 +44,7 @@ use ComputerType as GlpiComputerType;
 use DBmysql;
 use DbUtils;
 use Glpi\Application\View\TemplateRenderer;
-use GlpiPlugin\Carbon\EnvironmentalImpact;
+use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use Infocom;
 use Location;
@@ -67,7 +67,7 @@ class Computer extends AbstractAsset
         $glpi_computertypes_table = GlpiComputerType::getTable();
         $computertypes_table = ComputerType::getTable();
         $location_table = Location::getTable();
-        $environmentalimpact_table = EnvironmentalImpact::getTable();
+        $usage_table = UsageInfo::getTable();
         $computerUsageProfile_table = ComputerUsageProfile::getTable();
         $infocom_table = Infocom::getTable();
 
@@ -83,15 +83,20 @@ class Computer extends AbstractAsset
                         $location_table => 'id',
                     ]
                 ],
-                $environmentalimpact_table => [
+                $usage_table => [
                     'FKEY'   => [
                         $item_table  => 'id',
-                        $environmentalimpact_table => 'computers_id',
+                        $usage_table => 'items_id',
+                        [
+                            'AND' => [
+                                UsageInfo::getTableField('itemtype') => GlpiComputer::class,
+                            ]
+                        ]
                     ]
                 ],
                 $computerUsageProfile_table => [
                     'FKEY'   => [
-                        $environmentalimpact_table  => 'plugin_carbon_computerusageprofiles_id',
+                        $usage_table  => 'plugin_carbon_computerusageprofiles_id',
                         $computerUsageProfile_table => 'id',
                     ]
                 ],
@@ -179,7 +184,7 @@ class Computer extends AbstractAsset
             GlpiComputerType::getTableField('id as type_id'),
             ComputerType::getTableField('id as plugin_carbon_type_id'),
             ComputerType::getTableField('power_consumption  as type_power_consumption'),
-            EnvironmentalImpact::getTableField('plugin_carbon_computerusageprofiles_id'),
+            UsageInfo::getTableField('plugin_carbon_computerusageprofiles_id'),
             Infocom::getTableField('use_date'),
             Infocom::getTableField('delivery_date'),
             Infocom::getTableField('buy_date'),

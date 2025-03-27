@@ -45,17 +45,14 @@ use Plugin;
 /**
  * Relation between a computer and a usage profile
  */
-class EnvironmentalImpact extends CommonDBChild
+class UsageInfo extends CommonDBChild
 {
-    public static $itemtype = Computer::class;
-    public static $items_id = 'computers_id';
-
-    // Use core computer right
-    public static $rightname = 'computer';
+    public static $itemtype = 'itemtype';
+    public static $items_id = 'items_id';
 
     public static function getTypeName($nb = 0)
     {
-        return __('Environnemental impact', 'Carbon');
+        return __('Usage informations', 'Carbon');
     }
 
     public static function getIcon()
@@ -67,11 +64,7 @@ class EnvironmentalImpact extends CommonDBChild
     {
         $tabName = '';
         if (!$withtemplate) {
-            if ($item->getType() == Computer::class) {
-                $tabName = self::getTypeName();
-            } else if ($item->getType() == Monitor::class) {
-                $tabName = self::getTypeName();
-            } else if ($item->getType() == NetworkEquipment::class) {
+            if (in_array($item->getType(), PLUGIN_CARBON_TYPES)) {
                 $tabName = self::getTypeName();
             }
         }
@@ -88,26 +81,25 @@ class EnvironmentalImpact extends CommonDBChild
      */
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
-        /** @var Computer $item */
-        if ($item->getType() == Computer::class) {
-            $environnementalImpact = new self();
-            $environnementalImpact->getFromDBByCrit([$item->getForeignKeyField() => $item->getID()]);
-            if ($environnementalImpact->isNewItem()) {
-                $environnementalImpact->add(
+        /** @var CommonDBTM $item */
+        $asset_itemtype  = $item->getType();
+        if (in_array($asset_itemtype, PLUGIN_CARBON_TYPES)) {
+            $usage_info = new self();
+            $usage_info->getFromDBByCrit([
+                'itemtype' => $item->getType(),
+                'items_id' => $item->getID()
+            ]);
+            if ($usage_info->isNewItem()) {
+                $usage_info->add(
                     [
-                        $item->getForeignKeyField() => $item->getID()
+                        'itemtype' => $item->getType(),
+                        'items_id' => $item->getID()
                     ],
                     [],
                     false
                 );
             }
-            $environnementalImpact->showForComputer($environnementalImpact->getID());
-        } else if ($item->getType() == Monitor::class) {
-            $environnementalImpact = new self();
-            $environnementalImpact->showForMonitor(0);
-        } else if ($item->getType() == NetworkEquipment::class) {
-            $environnementalImpact = new self();
-            $environnementalImpact->showForNetworkEquipment(0);
+            $usage_info->showForItem($usage_info->getID());
         }
     }
 
@@ -120,7 +112,7 @@ class EnvironmentalImpact extends CommonDBChild
         }
     }
 
-    public function showForComputer($ID, $withtemplate = '')
+    public function showForItem($ID, $withtemplate = '')
     {
         // TODO: Design a rights system for the whole plugin
         $canedit = self::canUpdate();
@@ -131,25 +123,10 @@ class EnvironmentalImpact extends CommonDBChild
             'target'   => Plugin::getWebDir('carbon') . '/front/usageimpact.form.php',
         ];
         $this->initForm($this->getID(), $options);
-        TemplateRenderer::getInstance()->display('@carbon/environmentalimpact.html.twig', [
+        TemplateRenderer::getInstance()->display('@carbon/usageinfo.html.twig', [
             'params'   => $options,
             'item'     => $this,
-            'itemtype' => Computer::class,
         ]);
-    }
-
-    public function showForMonitor($ID, $withtemplate = '')
-    {
-        // Empty as there is no usage profile for monitor at the moment
-        // this method is needed to trigger Hooks::POST_SHOW_TAB in GLPI
-        // and show historization status
-    }
-
-    public function showForNetworkEquipment($ID, $withtemplate = '')
-    {
-        // Empty as there is no usage profile for Network equipment at the moment
-        // this method is needed to trigger Hooks::POST_SHOW_TAB in GLPI
-        // and show historization status
     }
 
     public function rawSearchOptions()
@@ -158,16 +135,7 @@ class EnvironmentalImpact extends CommonDBChild
         $my_table = self::getTable();
 
         $tab[] = [
-            'id'                 => SearchOptions::ENVIRONMENTAL_IMPACT_COMPUTER_TYPE,
-            'table'              => $my_table,
-            'field'              => Computer::getForeignKeyField(),
-            'name'               => Computer::getTypeName(1),
-            'datatype'           => 'linkfield',
-            'nodisplay'          => true,
-        ];
-
-        $tab[] = [
-            'id'                 => SearchOptions::ENVIRONMENTAL_IMPACT_COMPUTER_USAGE_PROFILE,
+            'id'                 => SearchOptions::USAGE_INFO_COMPUTER_USAGE_PROFILE,
             'table'              => $my_table,
             'field'              => ComputerUsageProfile::getForeignKeyField(),
             'name'               => ComputerUsageProfile::getTypeName(1),
