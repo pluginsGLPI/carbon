@@ -42,7 +42,7 @@ use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Dashboard\Provider;
-use GlpiPlugin\Carbon\EnvironmentalImpact;
+use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\Impact\History\Computer as HistoryComputer;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use Infocom;
@@ -151,8 +151,9 @@ class ProviderTest extends DbTestCase
         $computers = $this->getItems($computers_definition);
         $total_count += count($computers[Computer::class]);
         foreach ($computers[Computer::class] as $computers_id => $computer) {
-            $impact = $this->getItem(EnvironmentalImpact::class, [
-                'computers_id' => $computers_id,
+            $impact = $this->getItem(UsageInfo::class, [
+                'itemtype' => Computer::class,
+                'items_id' => $computers_id,
                 'plugin_carbon_computerusageprofiles_id' => $usage_profile->getID(),
             ]);
         }

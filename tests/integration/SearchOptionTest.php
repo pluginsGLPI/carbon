@@ -38,7 +38,7 @@ use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\EmbodiedImpact;
-use GlpiPlugin\Carbon\EnvironmentalImpact;
+use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
@@ -58,7 +58,7 @@ class SearchOptionTest extends CommonTestCase
         ],
         ComputerType::class => [],
         MonitorType::class => [],
-        EnvironmentalImpact::class => [],
+        UsageInfo::class => [],
         CarbonIntensity::class => [
             'data_quality'
         ],

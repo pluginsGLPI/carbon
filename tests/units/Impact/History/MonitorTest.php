@@ -49,7 +49,7 @@ use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\MonitorType;
-use GlpiPlugin\Carbon\EnvironmentalImpact;
+use GlpiPlugin\Carbon\UsageInfo;
 
 /**
  * @covers \GlpiPlugin\Carbon\Impact\History\NetworkEquipment
@@ -115,9 +115,10 @@ class MonitorTest extends CommonAsset
             'day_6'        => '0',
             'day_7'        => '0',
         ]);
-        $impact = $this->getItem(EnvironmentalImpact::class, [
+        $impact = $this->getItem(UsageInfo::class, [
             $usage_profile->getForeignKeyField() => $usage_profile->getID(),
-            'computers_id' => $computer->getID(),
+            'itemtype' => $computer->getType(),
+            'items_id' => $computer->getID(),
         ]);
 
         $model = $this->getItem(MonitorModel::class, ['power_consumption' => $model_power]);
@@ -250,9 +251,10 @@ class MonitorTest extends CommonAsset
         // Add a usage profile
         $usage_profile = $this->getItem(ComputerUsageProfile::class);
         $this->assertFalse($history->canHistorize($id));
-        $impact = $this->getItem(EnvironmentalImpact::class, [
+        $impact = $this->getItem(UsageInfo::class, [
             $usage_profile->getForeignKeyField() => $usage_profile->getID(),
-            'computers_id' => $computer->getID(),
+            'itemtype' => $computer->getType(),
+            'items_id' => $computer->getID(),
         ]);
         $this->assertFalse($history->canHistorize($id));
 

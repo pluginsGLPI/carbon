@@ -42,7 +42,7 @@ use Monitor as GlpiMonitor;
 use MonitorType as GlpiMonitorType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Engine\V1\Monitor;
-use GlpiPlugin\Carbon\EnvironmentalImpact;
+use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use MonitorModel;
@@ -65,8 +65,9 @@ class MonitorTest extends EngineTestCase
     {
         $computer = $this->getItem(GlpiComputer::class);
         $profile  = $this->getItem(ComputerUsageProfile::class);
-        $impact   = $this->getItem(EnvironmentalImpact::class, [
-            'computers_id' => $computer->getID(),
+        $impact   = $this->getItem(UsageInfo::class, [
+            'itemtype' => GlpiComputer::class,
+            'items_id' => $computer->getID(),
             'plugin_carbon_computerusageprofiles_id' => $profile->getID(),
         ]);
         $monitor = $this->getItem(GlpiMonitor::class);
