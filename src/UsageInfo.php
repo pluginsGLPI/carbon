@@ -135,16 +135,7 @@ class UsageInfo extends CommonDBChild
         $my_table = self::getTable();
 
         $tab[] = [
-            'id'                 => SearchOptions::ENVIRONMENTAL_IMPACT_COMPUTER_TYPE,
-            'table'              => $my_table,
-            'field'              => Computer::getForeignKeyField(),
-            'name'               => Computer::getTypeName(1),
-            'datatype'           => 'linkfield',
-            'nodisplay'          => true,
-        ];
-
-        $tab[] = [
-            'id'                 => SearchOptions::ENVIRONMENTAL_IMPACT_COMPUTER_USAGE_PROFILE,
+            'id'                 => SearchOptions::USAGE_INFO_COMPUTER_USAGE_PROFILE,
             'table'              => $my_table,
             'field'              => ComputerUsageProfile::getForeignKeyField(),
             'name'               => ComputerUsageProfile::getTypeName(1),
