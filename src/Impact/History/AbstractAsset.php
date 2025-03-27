@@ -333,10 +333,10 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      * Location's country must match a zone name
      *
      * @param integer $items_id
-     * @param DateTime $date Date for which the zone must be found
+     * @param null|DateTime $date Date for which the zone must be found
      * @return Zone|null
      */
-    protected function getZone(int $items_id, DateTime $date = null): ?Zone
+    protected function getZone(int $items_id, ?DateTime $date = null): ?Zone
     {
         // TODO: use date to find where was the asset at the given date
         if ($date === null) {
