@@ -54,15 +54,15 @@
 
 <div class="card-body" id="cardBodyBorder1">
   {% if embodied_impact.fields.gwp is not null %}
-    <div class="h1 mb-3">{{ embodied_impact.fields.gwp }} gCO<sub>2</sub>eq</div>
+    <div class="h1 mb-3">{{ embodied_impact.getHumanReadableImpact('gwp')|raw }}</div>
   {% endif %}
 
   {% if embodied_impact.fields.adp is not null %}
-    <div class="h1 mb-3">{{ embodied_impact.fields.adp }} gSbeq</div>
+    <div class="h1 mb-3">{{ embodied_impact.getHumanReadableImpact('adp')|raw }}</div>
   {% endif %}
 
   {% if embodied_impact.fields.pe is not null %}
-    <div class="h1 mb-3">{{ embodied_impact.fields.pe }} J</div>
+    <div class="h1 mb-3">{{ embodied_impact.getHumanReadableImpact('pe')|raw }}</div>
   {% endif %}
 
   <div>
