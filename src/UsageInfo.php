@@ -50,6 +50,8 @@ class UsageInfo extends CommonDBChild
     public static $itemtype = 'itemtype';
     public static $items_id = 'items_id';
 
+    public static $rightname = 'carbon:report';
+
     public static function getTypeName($nb = 0)
     {
         return __('Usage informations', 'Carbon');
@@ -60,12 +62,31 @@ class UsageInfo extends CommonDBChild
         return 'fa-solid fa-solar-panel';
     }
 
+    public function canPurgeItem()
+    {
+        if ($this->isNewItem()) {
+            return false;
+        }
+
+        $itemtype = $this->fields['itemtype'];
+        // Check that itemtype inherits from CommonDBTM
+        if (!is_subclass_of($itemtype, CommonDBTM::class)) {
+            return false;
+        }
+        $item = new $itemtype();
+        if (!$item->getFromDB($this->fields['items_id'])) {
+            return false;
+        }
+
+        return $item->canDelete();
+    }
+
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         $tabName = '';
         if (!$withtemplate) {
             if (in_array($item->getType(), PLUGIN_CARBON_TYPES)) {
-                $tabName = self::getTypeName();
+                $tabName = __('Environmental impact', 'carbon');
             }
         }
         return $tabName;
@@ -146,22 +167,29 @@ class UsageInfo extends CommonDBChild
         return $tab;
     }
 
-    public static function showCharts(CommonDBTM $item)
+    public static function showCharts(CommonDBTM $asset)
     {
         $embodied_impact = new EmbodiedImpact();
         $embodied_impact->getFromDBByCrit([
-            'itemtype' => $item->getType(),
-            'items_id' => $item->getID(),
+            'itemtype' => $asset->getType(),
+            'items_id' => $asset->getID(),
         ]);
 
         $usage_impact = new UsageImpact();
         $usage_impact->getFromDBByCrit([
-            'itemtype' => $item->getType(),
-            'items_id' => $item->getID(),
+            'itemtype' => $asset->getType(),
+            'items_id' => $asset->getID(),
+        ]);
+
+        $usage_info = new self();
+        $usage_info->getFromDBByCrit([
+            'itemtype' => $asset->getType(),
+            'items_id' => $asset->getID(),
         ]);
 
         TemplateRenderer::getInstance()->display('@carbon/environmentalimpact-item.html.twig', [
-            'item' => $item,
+            'usage_info'      => $usage_info,
+            'asset'           => $asset,
             'embodied_impact' => $embodied_impact,
             'usage_impact'    => $usage_impact,
         ]);

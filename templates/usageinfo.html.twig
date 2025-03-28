@@ -33,13 +33,13 @@
 {% import "components/form/fields_macros.html.twig" as fields %}
 
 {% block form_fields %}
-    {% if item.fields['itemtype'] == 'Computer' %}
-        {{ fields.largeTitle(
-            __('Asset usage', 'carbon'),
-            'fas fa-calendar-days'
-        ) }}
+    {{ fields.largeTitle(
+        __('Asset usage', 'carbon'),
+        'fas fa-calendar-days'
+    ) }}
 
-        {{ fields.smallTitle(__('Usage information', 'carbon')) }}
+    {% if item.fields['itemtype'] == 'Computer' %}
+
         {{ fields.dropdownField(
             '\\GlpiPlugin\\Carbon\\ComputerUsageProfile',
             'plugin_carbon_computerusageprofiles_id',

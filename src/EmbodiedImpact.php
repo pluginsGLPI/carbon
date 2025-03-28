@@ -45,8 +45,7 @@ use QuerySubQuery;
  */
 class EmbodiedImpact extends CommonDBTM
 {
-    // Use core computer right
-    public static $rightname = 'computer';
+    public static $rightname = 'carbon:report';
 
     public function canEdit($ID)
     {

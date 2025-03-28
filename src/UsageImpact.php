@@ -44,6 +44,8 @@ class UsageImpact extends CommonDBChild
     public static $itemtype = 'itemtype';
     public static $items_id = 'items_id';
 
+    public static $rightname = 'carbon:report';
+
     public static function getTypeName($nb = 0)
     {
         return _n("Usage impact", "Usage impacts", $nb, 'carbon');

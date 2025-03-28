@@ -46,14 +46,14 @@ if (!Plugin::isPluginActive('carbon')) {
 
 Session::checkRight(EmbodiedImpact::$rightname, READ);
 
-$environmental_impact = new EmbodiedImpact();
+$embodied_impact = new EmbodiedImpact();
 
 if (isset($_POST['update'])) {
-    $environmental_impact->check($_POST['id'], UPDATE);
-    $environmental_impact->update($_POST);
+    $embodied_impact->check($_POST['id'], UPDATE);
+    $embodied_impact->update($_POST);
     Event::log(
         $_POST['id'],
-        'computers',
+        strtolower($embodied_impact->fields['itemtype']),
         4,
         'inventory',
         //TRANS: %s is the user login
@@ -61,7 +61,7 @@ if (isset($_POST['update'])) {
     );
     Html::back();
 } else if (isset($_POST['reset'])) {
-    if (!isset($_POST['itemtype']) || !isset($_POST['items_id'])) {
+    if (!isset($_POST['id'])) {
         Session::addMessageAfterRedirect(__('Missing arguments in request.', 'carbon'), false, ERROR);
         Html::back();
     }
@@ -70,24 +70,17 @@ if (isset($_POST['update'])) {
         Session::addMessageAfterRedirect(__('Reset denied.', 'carbon'), false, ERROR);
         Html::back();
     }
+    $embodied_impact->check($_POST['id'], PURGE);
 
-    $embodied_impact_namespace = Config::getEmbodiedImpactEngine();
-    $embodied_impact_class = $embodied_impact_namespace . '\\' . (string) $_POST['itemtype'];
-    if (!class_exists($embodied_impact_class) || !is_subclass_of($embodied_impact_class, AbstractEmbodiedImpact::class)) {
-        Session::addMessageAfterRedirect(__('Bad arguments.', 'carbon'), false, ERROR);
-        Html::back();
-    }
-
-    $embodied_impact = new $embodied_impact_class();
-    $itemtype = $embodied_impact->getItemtype();
+    $itemtype = $embodied_impact->fields['itemtype'];
     $item = new $itemtype();
-    $item->getFromDB($_POST['items_id']);
-    if (!$item->canUpdate()) {
+    $item->getFromDB($embodied_impact->fields['items_id']);
+    if (!$item->canUpdateItem()) {
         Session::addMessageAfterRedirect(__('Reset denied.', 'carbon'), false, ERROR);
         Html::back();
     }
 
-    if (!$embodied_impact->resetForItem($_POST['items_id'])) {
+    if (!$embodied_impact->delete($embodied_impact->fields)) {
         Session::addMessageAfterRedirect(__('Reset failed.', 'carbon'), false, ERROR);
     }
 } else if (isset($_POST['calculate'])) {
@@ -104,11 +97,7 @@ if (isset($_POST['update'])) {
 
     $itemtype = $embodied_impact::getItemtype();
     $item = new $itemtype();
-    $item->getFromDB($_POST['items_id']);
-    if (!$item->canUpdate() || !EmbodiedImpact::canUpdate()) {
-        Session::addMessageAfterRedirect(__('Update denied.', 'carbon'), false, ERROR);
-        Html::back();
-    }
+    $item->check($_POST['items_id'], UPDATE);
 
     if (!$embodied_impact->evaluateItem($_POST['items_id'])) {
         Session::addMessageAfterRedirect(__('Update failed.', 'carbon'), false, ERROR);

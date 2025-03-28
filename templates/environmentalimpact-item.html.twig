@@ -54,9 +54,11 @@
   {% endif %}
 
   <div>
-    {% set reset_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', reset: '', itemtype: '" ~ item.getType() ~ "', items_id: '" ~ item.getID() ~ "'}" %}
-    <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/usageimpact.form.php' }}', {{ reset_args }})">{{ __('Reset data', 'carbon') }}</a>
-    {% set calculate_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', calculate: '', itemtype: '" ~ item.getType() ~ "', items_id: '" ~ item.getID() ~ "'}" %}
+    {% if not usage_impact.isNewItem() %}
+      {% set reset_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', reset: '', id: '" ~ usage_impact.getID() ~ "'}" %}
+      <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/usageimpact.form.php' }}', {{ reset_args }})">{{ __('Reset data', 'carbon') }}</a>
+    {% endif %}
+    {% set calculate_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', calculate: '', itemtype: '" ~ asset.getType() ~ "', items_id: '" ~ asset.getID() ~ "'}" %}
     <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/usageimpact.form.php' }}', {{ calculate_args }})">{{ __('Calculate data', 'carbon') }}</a>
   </div>
 </div>
@@ -90,8 +92,8 @@
     var carbonEmissionPerMonthChart = new ApexCharts(document.querySelector("#carbonEmissionPerMonthChart"), carbonEmissionPerMonthOptions);
     carbonEmissionPerMonthChart.render();
 
-    var itemtype = '{{ item.getType() }}';
-    var items_id = {{ item.getID() }};
+    var itemtype = '{{ asset.getType() }}';
+    var items_id = {{ asset.getID() }};
 
     fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/carbonEmissionPerMonthForItem.php?itemtype=" + itemtype + "&items_id=" + items_id).then(response => {
         return response.json();
@@ -121,9 +123,10 @@
 
   <div class="subheader">{{ __('Embodied impact', 'carbon') }}</div>
   <div>
-    {% set reset_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', reset: '', itemtype: '" ~ item.getType() ~ "', items_id: '" ~ item.getID() ~ "'}" %}
-    <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/embodiedimpact.form.php' }}', {{ reset_args }})">{{ __('Reset data', 'carbon') }}</a>
-    {% set calculate_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', calculate: '', itemtype: '" ~ item.getType() ~ "', items_id: '" ~ item.getID() ~ "'}" %}
+    {% if not embodied_impact.isNewItem() %}
+      {% set reset_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', reset: '', id: '" ~ embodied_impact.getID() ~ "'}" %}
+      <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/embodiedimpact.form.php' }}', {{ reset_args }})">{{ __('Reset data', 'carbon') }}</a>
+    {% endif %}    {% set calculate_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', calculate: '', itemtype: '" ~ asset.getType() ~ "', items_id: '" ~ asset.getID() ~ "'}" %}
     <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/embodiedimpact.form.php' }}', {{ calculate_args }})">{{ __('Calculate data', 'carbon') }}</a>
   </div>
 </div>
