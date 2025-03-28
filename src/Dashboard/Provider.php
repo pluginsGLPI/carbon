@@ -689,6 +689,7 @@ class Provider
                     'data' => []
                 ],
             ],
+            'labels' => [],
         ];
 
         // Prepare date format
@@ -761,6 +762,7 @@ class Provider
             $start_date->format($date_format),
             $end_date->format($date_format),
         ];
+
         return $data;
     }
 }
