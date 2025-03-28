@@ -50,6 +50,7 @@ use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\Impact\History\Computer as ComputerHistory;
 use GlpiPlugin\Carbon\SearchOptions;
+use Monitor;
 use QueryExpression;
 use QuerySubQuery;
 use Search;
@@ -365,6 +366,65 @@ class Provider
 
         $count = $search_data['data']['totalcount'] ?? null;
         $url = Computer::getSearchURL() . '?' . GlpiToolbox::append_params($search_criteria);
+        return [
+            'number' => $count,
+            'url'    => $url,
+            'label'  => $params['label'],
+            'icon'   => $params['icon'],
+        ];
+    }
+
+    /**
+     * Counts the monitors which are missing data to compute their
+     * environmental impact
+     *
+     * @param array $params
+     * @return array : count of monitors or null if an error occurred
+     */
+    public static function getUnhandledMonitorsCount(array $params = []): array
+    {
+        $default_params = [
+            'label' => __("plugin carbon - unhandled monitor", 'carbon'),
+            'icon'  => "fas fa-desktop",
+        ];
+        $params = array_merge($default_params, $params);
+
+        return self::getHandledMonitorsCount($params, false);
+    }
+
+    /**
+     * Count the monitors having all required data to compute carbon intensity
+     *
+     * @param array $params
+     * @param bool  $handled : true if we want to count handled monitors, false to count unhandled monitors
+     * @return array
+     */
+    public static function getHandledMonitorsCount(array $params = [], bool $handled = true): array
+    {
+        $default_params = [
+            'label' => __("plugin carbon - handled monitors", 'carbon'),
+            'icon'  => "fas fa-desktop",
+        ];
+        $params = array_merge($default_params, $params);
+
+        $search_criteria = [
+            'criteria' => [
+                [
+                    'field'      => SearchOptions::IS_HISTORIZABLE,
+                    'searchtype' => 'equals',
+                    'value'      => $handled ? 1 : 0
+                ],
+            ],
+            'reset'    => 'reset'
+        ];
+        // Exploit defaultWhere to inject WHERE criterias from dashboard filters
+        $filter_criteria = self::getFiltersCriteria(Monitor::getTable(), $params['apply_filters'] ?? []);
+        $search_data = Search::prepareDatasForSearch(Monitor::class, $search_criteria);
+        Search::constructSQL($search_data);
+        Search::constructData($search_data, true);
+
+        $count = $search_data['data']['totalcount'] ?? null;
+        $url = Monitor::getSearchURL() . '?' . GlpiToolbox::append_params($search_criteria);
         return [
             'number' => $count,
             'url'    => $url,

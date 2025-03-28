@@ -35,6 +35,7 @@ namespace GlpiPlugin\Carbon\Dashboard;
 
 use Computer;
 use Glpi\Dashboard\Filter;
+use Monitor;
 
 class Grid
 {
@@ -46,7 +47,6 @@ class Grid
 
         $new_cards = [
             // Data completeness diagnosis
-
             'plugin_carbon_complete_computers' => [
                 'widgettype'   => ['bigNumber'],
                 'group'        => __('Carbon', 'carbon'),
@@ -61,7 +61,20 @@ class Grid
                 'provider'     => Provider::class . '::getUnhandledComputersCount',
                 'filter'       => Filter::getAppliableFilters(Computer::getTable()),
             ],
-
+            'plugin_carbon_complete_computers' => [
+                'widgettype'   => ['bigNumber'],
+                'group'        => __('Carbon', 'carbon'),
+                'label'        => __('Handled monitors', 'carbon'),
+                'provider'     => Provider::class . '::getHandledMonitorsCount',
+                'filter'       => Filter::getAppliableFilters(Monitor::getTable()),
+            ],
+            'plugin_carbon_incomplete_computers' => [
+                'widgettype'   => ['bigNumber'],
+                'group'        => __('Carbon', 'carbon'),
+                'label'        => __('Unhandled monitors', 'carbon'),
+                'provider'     => Provider::class . '::getUnhandledMonitorsCount',
+                'filter'       => Filter::getAppliableFilters(Monitor::getTable()),
+            ],
             // TODO : Data completeness diagnosis for other assets (Monitors, ...)
 
             // Usage impact
