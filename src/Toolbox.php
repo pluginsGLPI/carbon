@@ -255,6 +255,39 @@ class Toolbox
         return sprintf(__('%1$s&nbsp;%2$s'), round($p, 2), $human_readable_unit);
     }
 
+        /**
+     * Format a power passing a power in grams
+     *
+     * @param float $p  Power in Watt
+     *
+     * @return string  formatted power
+     **/
+    public static function getEnergy(float $p): string
+    {
+       //TRANS: list of unit (W for watt)
+        $units = [
+            __('Wh', 'carbon'),
+            __('KWh', 'carbon'),
+            __('MWh', 'carbon'),
+            __('GWh', 'carbon'),
+            __('TWh', 'carbon'),
+            __('PWh', 'carbon'),
+            __('EWh', 'carbon'),
+            __('ZWh', 'carbon'),
+            __('YWh', 'carbon'),
+        ];
+        $multiple = 1000;
+        foreach ($units as $human_readable_unit) {
+            if ($p < $multiple) {
+                break;
+            }
+            $p = $p / $multiple;
+        }
+
+       //TRANS: %1$s is a number maybe float or string and %2$s the unit
+        return sprintf(__('%1$s&nbsp;%2$s'), round($p, 2), $human_readable_unit);
+    }
+
     /**
      * Find the best multiplier to normalize a values of a serie
      *

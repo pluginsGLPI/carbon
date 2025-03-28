@@ -220,7 +220,7 @@ class EmbodiedImpact extends CommonDBTM
             case 'adp':
                 return Toolbox::getWeight($this->fields[$field]) . 'Sbeq';
             case 'pe':
-                return Toolbox::getPower($this->fields[$field] / 3600) . 'h'; // Convert J into Wh
+                return Toolbox::getEnergy($this->fields[$field] / 3600); // Convert J into Wh
         }
 
         return '';

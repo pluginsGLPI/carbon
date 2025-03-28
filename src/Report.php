@@ -106,7 +106,7 @@ class Report extends CommonDBTM
             $end_date   = DateTime::createFromFormat('Y-m-d\TH:i:s.v\Z', $params['args']['apply_filters'][1]);
         }
 
-        $value = Provider::getTotalCarbonEmission($params)['number'];
+        $value = Provider::getTotalUsageCarbonEmission($params)['number'];
 
         // Prepare date format
         $date_format = 'Y F';

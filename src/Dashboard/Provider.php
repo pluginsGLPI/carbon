@@ -64,9 +64,10 @@ class Provider
      * @param string $table table to read
      * @param string $field table field to use for the sum
      * @param array $params additional parameters (filters)
+     * @param array $crit   additional criteria
      * @return ?float
      */
-    public static function getSum(string $table, string $field, array $params = []): ?float
+    public static function getSum(string $table, string $field, array $params = [], array $crit = []): ?float
     {
         /** @var DBmysql $DB */
         global $DB;
@@ -76,6 +77,7 @@ class Provider
                 'SUM' => "$field AS total"
             ],
             'FROM'      => $table,
+            'WHERE'     => $crit,
         ];
 
         $request = array_merge_recursive(
@@ -439,28 +441,64 @@ class Provider
      * @param array $params
      * @return array
      */
-    public static function getTotalPower(array $params = []): array
+    public static function getTotalUsagePower(array $params = []): array
     {
         /** @var DBmysql $DB */
         global $DB;
 
         $default_params = [
-            'label' => __("plugin carbon - Total power consumption", 'carbon'),
+            'label' => __("plugin carbon - Total usage power consumption", 'carbon'),
             'icon'  => "fa-solid fa-plug",
         ];
         $params = array_merge($default_params, $params);
 
-        $request = (new ComputerHistory())->getEvaluableQuery();
-        $request['SELECT'] = [
-            'SUM' => ComputerType::getTableField('power_consumption') . ' AS total',
-        ];
-
-        $result = $DB->request($request);
-
-        $total_power = 'N/A';
-        if ($result->numrows() == 1) {
-            $total_power = Toolbox::getPower($result->current()['total'] ?? 0);
+        $total_power = 0;
+        $types_computed = 0;
+        foreach (PLUGIN_CARBON_TYPES as $itemtype) {
+            $type_history = 'GlpiPlugin\\Carbon\\Impact\\History\\' . $itemtype;
+            if (!class_exists($type_history)) {
+                trigger_error(
+                    sprintf(
+                        "Class %s does not exist; unable to compute total usage power consumption for itemtype %s",
+                        $type_history,
+                        $itemtype
+                    ),
+                    E_USER_WARNING
+                );
+                continue;
+            }
+            $itemtype_type = 'GlpiPlugin\\Carbon\\' . $itemtype . 'Type';
+            $itemtype_model = $itemtype . 'Model';
+            $model_power_field =  DBMysql::quoteName($itemtype_model::getTableField('power_consumption'));
+            $type_power_field = DBMysql::quoteName($itemtype_type::getTableField('power_consumption'));
+            $request = (new $type_history())->getEvaluableQuery();
+            // If a value is set in a model, it cannut be  reset to NULL, then let's consoder 0 as NULL
+            // and coalesce model, power and 0 to implement precedence
+            $sum_coalesce = new QueryExpression(
+                'SUM(COALESCE('
+                    . 'IF(' . $model_power_field . ' > 0, ' . $model_power_field . ', NULL),'
+                    . 'IF(' . $type_power_field  . ' > 0, ' . $type_power_field  . ', NULL),'
+                    . '0'
+                . ')) AS total'
+            );
+            $request['SELECT'] = [
+                $sum_coalesce,
+            ];
+            $result = $DB->request($request);
+            if ($result->numrows() != 1) {
+                continue;
+            }
+            $total_power += ($result->current()['total'] ?? 0);
+            $types_computed++;
         }
+        if ($types_computed == 0) {
+            return [
+                'number' => 'N/A',
+                'label'  => $params['label'],
+                'icon'   => $params['icon'],
+            ];
+        }
+        $total_power = Toolbox::getPower($total_power);
 
         return [
             'number' => $total_power,
@@ -470,20 +508,23 @@ class Provider
     }
 
     /**
-     * Get total CO2 emissions for last month (all assets)
+     * Get total usage CO2 emissions for last month (all assets)
      *
      * @param array $params
      * @return array
      */
-    public static function getTotalCarbonEmission(array $params = []): array
+    public static function getTotalUsageCarbonEmission(array $params = []): array
     {
         $default_params = [
             'label' => __("plugin carbon - Total carbon emission", 'carbon'),
             'icon'  => "fa-solid fa-temperature-arrow-up",
         ];
         $params = array_merge($default_params, $params);
+        $crit = [
+            'itemtype' => PLUGIN_CARBON_TYPES,
+        ];
 
-        $gwp = self::getSum(CarbonEmission::getTable(), 'emission_per_day', $params);
+        $gwp = self::getSum(CarbonEmission::getTable(), 'emission_per_day', $params, $crit);
         if ($gwp === null) {
             $gwp = 'N/A';
         } else {
@@ -626,7 +667,10 @@ class Provider
 
     public static function getTotalEmbodiedGwp(array $params = []): array
     {
-        $value = self::getSum(EmbodiedImpact::getTable(), 'gwp', $params);
+        $crit = [
+            'itemtype' => PLUGIN_CARBON_TYPES,
+        ];
+        $value = self::getSum(EmbodiedImpact::getTable(), 'gwp', $params, $crit);
         if ($value === null) {
             $value = 'N/A';
         } else {
@@ -645,12 +689,15 @@ class Provider
 
     public static function getTotalPrimaryEnergyConsumed(array $params = []): array
     {
-        $value = self::getSum(EmbodiedImpact::getTable(), 'pe', $params);
+        $crit = [
+            'itemtype' => PLUGIN_CARBON_TYPES,
+        ];
+        $value = self::getSum(EmbodiedImpact::getTable(), 'pe', $params, $crit);
         if ($value === null) {
             $value = 'N/A';
         } else {
             // Convert into Watt.hour
-            $value = Toolbox::getPower($value / 3600) . __('', 'carbon');
+            $value = Toolbox::getEnergy($value / 3600);
         }
 
         $params['label'] = __('Total embodied primary energy', 'carbon');
@@ -665,7 +712,10 @@ class Provider
 
     public static function getTotalEmbodiedAdp(array $params = []): array
     {
-        $value = self::getSum(EmbodiedImpact::getTable(), 'adp', $params);
+        $crit = [
+            'itemtype' => PLUGIN_CARBON_TYPES,
+        ];
+        $value = self::getSum(EmbodiedImpact::getTable(), 'adp', $params, $crit);
         if ($value === null) {
             $value = 'N/A';
         } else {

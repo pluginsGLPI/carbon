@@ -45,51 +45,60 @@ class Grid
             $cards = [];
         }
 
-        $new_cards = [
-            // Data completeness diagnosis
-            'plugin_carbon_complete_computers' => [
-                'widgettype'   => ['bigNumber'],
-                'group'        => __('Carbon', 'carbon'),
-                'label'        => __('Handled computers', 'carbon'),
-                'provider'     => Provider::class . '::getHandledComputersCount',
-                'filter'       => Filter::getAppliableFilters(Computer::getTable()),
-            ],
-            'plugin_carbon_incomplete_computers' => [
-                'widgettype'   => ['bigNumber'],
-                'group'        => __('Carbon', 'carbon'),
-                'label'        => __('Unhandled computers', 'carbon'),
-                'provider'     => Provider::class . '::getUnhandledComputersCount',
-                'filter'       => Filter::getAppliableFilters(Computer::getTable()),
-            ],
-            'plugin_carbon_complete_computers' => [
-                'widgettype'   => ['bigNumber'],
-                'group'        => __('Carbon', 'carbon'),
-                'label'        => __('Handled monitors', 'carbon'),
-                'provider'     => Provider::class . '::getHandledMonitorsCount',
-                'filter'       => Filter::getAppliableFilters(Monitor::getTable()),
-            ],
-            'plugin_carbon_incomplete_computers' => [
-                'widgettype'   => ['bigNumber'],
-                'group'        => __('Carbon', 'carbon'),
-                'label'        => __('Unhandled monitors', 'carbon'),
-                'provider'     => Provider::class . '::getUnhandledMonitorsCount',
-                'filter'       => Filter::getAppliableFilters(Monitor::getTable()),
-            ],
-            // TODO : Data completeness diagnosis for other assets (Monitors, ...)
+        $new_cards = [];
+        if (in_array(Computer::class, PLUGIN_CARBON_TYPES)) {
+            $new_cards += [
+                // Data completeness diagnosis
+                'plugin_carbon_complete_computers' => [
+                    'widgettype'   => ['bigNumber'],
+                    'group'        => __('Carbon', 'carbon'),
+                    'label'        => __('Handled computers', 'carbon'),
+                    'provider'     => Provider::class . '::getHandledComputersCount',
+                    'filter'       => Filter::getAppliableFilters(Computer::getTable()),
+                ],
+                'plugin_carbon_incomplete_computers' => [
+                    'widgettype'   => ['bigNumber'],
+                    'group'        => __('Carbon', 'carbon'),
+                    'label'        => __('Unhandled computers', 'carbon'),
+                    'provider'     => Provider::class . '::getUnhandledComputersCount',
+                    'filter'       => Filter::getAppliableFilters(Computer::getTable()),
+                ],
+            ];
+        }
 
-            // Usage impact
+        if (in_array(Computer::class, PLUGIN_CARBON_TYPES)) {
+            $new_cards += [
+                'plugin_carbon_complete_monitors' => [
+                    'widgettype'   => ['bigNumber'],
+                    'group'        => __('Carbon', 'carbon'),
+                    'label'        => __('Handled monitors', 'carbon'),
+                    'provider'     => Provider::class . '::getHandledMonitorsCount',
+                    'filter'       => Filter::getAppliableFilters(Monitor::getTable()),
+                ],
+                'plugin_carbon_incomplete_monitors' => [
+                    'widgettype'   => ['bigNumber'],
+                    'group'        => __('Carbon', 'carbon'),
+                    'label'        => __('Unhandled monitors', 'carbon'),
+                    'provider'     => Provider::class . '::getUnhandledMonitorsCount',
+                    'filter'       => Filter::getAppliableFilters(Monitor::getTable()),
+                ],
+            ];
+        }
+        // TODO : Data completeness diagnosis for other assets (Net equipment, ...)
 
+        // Usage impact
+        $new_cards += [
             'plugin_carbon_total_power' => [
                 'widgettype'   => ['bigNumber'],
                 'group'        => __('Carbon', 'carbon'),
-                'label'        => __('Total power consumption', 'carbon'),
-                'provider'     => Provider::class . '::getTotalPower',
+                'label'        => __('Total usage power consumption', 'carbon'),
+                'provider'     => Provider::class . '::getTotalUsagePower',
             ],
             'plugin_carbon_total_carbon_emission' => [
                 'widgettype'   => ['bigNumber'],
                 'group'        => __('Carbon', 'carbon'),
                 'label'        => __('Total usage carbon emission', 'carbon'),
-                'provider'     => Provider::class . '::getTotalCarbonEmission',
+                'provider'     => Provider::class . '::getTotalUsageCarbonEmission',
             ],
 
             // Embodied impact
