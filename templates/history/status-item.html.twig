@@ -128,6 +128,14 @@
                             {{ fields.field('', field, __('The asset has a type', 'carbon')) }}
                         {% endif %}
 
+                        {% if status.has_category is defined %}
+                            {% set field = warning_field %}
+                            {% if status.has_category %}
+                                {% set field = ok_field %}
+                            {% endif %}
+                            {{ fields.field('', field, __('The asset has a category', 'carbon')) }}
+                        {% endif %}
+
                         {% if status.has_type_power_consumption is defined %}
                             {% set field = nok_field %}
                             {% if status.has_model_power_consumption is defined %}

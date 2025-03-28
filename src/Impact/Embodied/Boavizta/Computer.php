@@ -71,9 +71,9 @@ class Computer extends AbstractAsset
             ],
         ];
         $response = $this->query($description);
-        $embodied_impacts = $this->parseResponse($response);
+        $impacts = $this->parseResponse($response);
 
-        return $embodied_impacts;
+        return $impacts;
     }
 
     /**
@@ -89,9 +89,8 @@ class Computer extends AbstractAsset
         $computer_table = GlpiComputer::getTable();
         $computer_type_table = ComputerType::getTable();
         $glpi_computer_type_table = GlpiComputerType::getTable();
-        $result = $DB->request([
-            'SELECT'     => ComputerType::getTableField('type'),
-            'FROM'       => $computer_type_table,
+        $computer_type = new ComputerType();
+        $found = $computer_type->getFromDBByRequest([
             'INNER JOIN' => [
                 $glpi_computer_type_table => [
                     'FKEY' => [
@@ -110,14 +109,11 @@ class Computer extends AbstractAsset
                 GlpiComputer::getTableField('id') => $item->getID(),
             ]
         ]);
-        $row_count = $result->count();
-        if ($row_count === 0) {
-            return ComputerType::TYPE_UNDEFINED;
-        } elseif ($result->count() > 1) {
-            trigger_error(sprintf('SQL query shall return 1 row, got %d', $row_count), WARNING);
+        if ($found === false) {
+            return ComputerType::CATEGORY_UNDEFINED;
         }
 
-        return $result->current()['type'];
+        return $computer_type->fields['category'];
     }
 
     /**
@@ -126,18 +122,18 @@ class Computer extends AbstractAsset
     protected function getEndpoint(int $type)
     {
         switch ($type) {
-            case ComputerType::TYPE_SERVER:
+            case ComputerType::CATEGORY_SERVER:
                 return 'server';
-            case ComputerType::TYPE_LAPTOP:
+            case ComputerType::CATEGORY_LAPTOP:
                 return 'terminal/laptop';
-            case ComputerType::TYPE_TABLET:
+            case ComputerType::CATEGORY_TABLET:
                 return 'terminal/tablet';
-            case ComputerType::TYPE_SMARTPHONE:
+            case ComputerType::CATEGORY_SMARTPHONE:
                 return 'terminal/smartphone';
         }
 
-        // ComputerType::TYPE_UNDEFINED
-        // ComputerType::TYPE_DESKTOP
+        // ComputerType::CATEGORY_UNDEFINED
+        // ComputerType::CATEGORY_DESKTOP
         return 'terminal/desktop';
     }
 

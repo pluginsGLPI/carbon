@@ -303,23 +303,50 @@ class Toolbox
     }
 
     /**
-     * Get asset class names for energy consumption impact
+     * Get asset class names for energy and GWP consumption impact
+     *
+     * @return array
+     */
+    public static function getGwpUsageImpactClasses(): array
+    {
+        $base_namespace = __NAMESPACE__ . '\\Impact\\History';
+        $types = [];
+        foreach (PLUGIN_CARBON_TYPES as $itemtype) {
+            $type = implode('\\', [
+                $base_namespace,
+                $itemtype
+            ]);
+            if (!class_exists($type)) {
+                continue;
+            }
+            $types[] = $type;
+        }
+
+        return $types;
+    }
+
+    /**
+     * Get asset class names for non-GWP impacts
      *
      * @return array
      */
     public static function getUsageImpactClasses(): array
     {
-        $base_namespace = __NAMESPACE__ . '\\Impact\\History';
-        $history_types = [];
+        $base_namespace = __NAMESPACE__ . '\\Impact\\Usage';
+        $base_namespace = Config::getUsageImpactEngine();
+        $types = [];
         foreach (PLUGIN_CARBON_TYPES as $itemtype) {
-            $history_type = [
+            $type = implode('\\', [
                 $base_namespace,
                 $itemtype
-            ];
-            $history_types[] = implode('\\', $history_type);
+            ]);
+            if (!class_exists($type)) {
+                continue;
+            }
+            $types[] = $type;
         }
 
-        return $history_types;
+        return $types;
     }
 
     /**
@@ -332,14 +359,17 @@ class Toolbox
         $base_namespace = Config::getEmbodiedImpactEngine();
         $embodied_impact_types = [];
         foreach (PLUGIN_CARBON_TYPES as $itemtype) {
-            $embodied_impact_types[] = implode('\\', [
+            $history_type = implode('\\', [
                 $base_namespace,
                 $itemtype
             ]);
+            if (!class_exists($history_type)) {
+                continue;
+            }
+            $embodied_impact_types[] = $history_type;
         }
 
-        return [$base_namespace . '\\Computer'];
-        // return $embodied_impact_types;
+        return $embodied_impact_types;
     }
 
     /**

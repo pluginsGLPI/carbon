@@ -35,7 +35,7 @@
 $value = Config::getConfigurationValue('plugin:carbon', 'embedded_impact_engine');
 if ($value !== null) {
     Config::setConfigurationValues('plugin:carbon', [
-        'embodied_impact_engine' => $value,
+        'impact_engine' => $value,
     ]);
 }
 $config = new Config();

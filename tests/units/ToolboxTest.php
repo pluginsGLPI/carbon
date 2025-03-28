@@ -152,14 +152,25 @@ class ToolboxTest extends DbTestCase
         $this->assertTrue($output);
     }
 
-    public function testGetUsageImpactClasses()
+    public function testGetGwpUsageImpactClasses()
     {
-        $output = Toolbox::getUsageImpactClasses();
+        $output = Toolbox::getGwpUsageImpactClasses();
         $this->assertIsArray($output);
         $this->assertEquals([
             'GlpiPlugin\\Carbon\\Impact\\History\\Computer',
             'GlpiPlugin\\Carbon\\Impact\\History\\Monitor',
             'GlpiPlugin\\Carbon\\Impact\\History\\NetworkEquipment',
+        ], $output);
+    }
+
+    public function testGetUsageImpactClasses()
+    {
+        $output = Toolbox::getUsageImpactClasses();
+        $this->assertIsArray($output);
+        $this->assertEquals([
+            'GlpiPlugin\\Carbon\\Impact\\Usage\\Boavizta\\Computer',
+            'GlpiPlugin\\Carbon\\Impact\\Usage\\Boavizta\\Monitor',
+            // 'GlpiPlugin\\Carbon\\Impact\\Usage\\Boavizta\\NetworkEquipment',
         ], $output);
     }
 
@@ -170,7 +181,7 @@ class ToolboxTest extends DbTestCase
         // TODO: implement the 2 commented out classes
         $this->assertEquals([
             'GlpiPlugin\\Carbon\\Impact\\Embodied\\Boavizta\\Computer',
-            // 'GlpiPlugin\\Carbon\\Impact\\Embodied\\Boavizta\\Monitor',
+            'GlpiPlugin\\Carbon\\Impact\\Embodied\\Boavizta\\Monitor',
             // 'GlpiPlugin\\Carbon\\Impact\\Embodied\\Boavizta\\NetworkEquipment',
         ], $output);
     }

@@ -35,15 +35,10 @@
 namespace GlpiPlugin\Carbon\Impact\Embodied;
 
 use CommonDBTM;
-use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 
 interface EmbodiedImpactInterface
 {
-    const IMPACT_GWP = 0; // Global warming potential
-    const IMPACT_ADP = 1; // Abiotic Depletion Potential
-    const IMPACT_PE  = 2; // Primary Energy
-
     /**
      * Get an instance of the impact calculation engine for the itemtype of the analyzed object
      *
@@ -70,10 +65,11 @@ interface EmbodiedImpactInterface
     /**
      * Get query to find items we can evaluate
      *
+     * @param array $crit
      * @param boolean $entity_restrict
      * @return array
      */
-    public function getEvaluableQuery(bool $entity_restrict = true, bool $recalculate = false): array;
+    public function getEvaluableQuery(array $crit = [], bool $entity_restrict = true): array;
 
     /**
      * Start the evaluation of all items

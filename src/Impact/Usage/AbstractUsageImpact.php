@@ -32,18 +32,18 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\Impact\Embodied;
+namespace GlpiPlugin\Carbon\Impact\Usage;
 
 use DBmysql;
 use DbUtils;
 use CommonDBTM;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
-use GlpiPlugin\Carbon\EmbodiedImpact;
-use GlpiPlugin\Carbon\Impact\Type;
 use GlpiPlugin\Carbon\UsageImpact;
+use GlpiPlugin\Carbon\Impact\Type;
+use Location as GlpiLocation;
 use Toolbox as GlpiToolbox;
 
-abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
+abstract class AbstractUsageImpact implements UsageImpactInterface
 {
     /** @var string Handled itemtype */
     protected static string $itemtype = '';
@@ -130,7 +130,7 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         $attempts_count = 0;
         /** @var int $count count of successfully evaluated assets */
         $count = 0;
-        $iterator = $DB->request($this->getEvaluableQuery([], false));
+        $iterator = $DB->request($this->getEvaluableQuery());
         foreach ($iterator as $row) {
             if ($this->evaluateItem($row['id'])) {
                 $count++;
@@ -153,12 +153,6 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         return $count;
     }
 
-    /**
-     * Evaluate and save tne environmental impact of an asset.
-     *
-     * @param integer $id
-     * @return bool true if sucess, false otherwise
-     */
     public function evaluateItem(int $id): bool
     {
         $itemtype = static::$itemtype;
@@ -166,6 +160,7 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         if ($item === false) {
             return false;
         }
+
         try {
             $impacts = $this->doEvaluation($item);
         } catch (\RuntimeException $e) {
@@ -182,8 +177,8 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
             'itemtype' => $itemtype,
             'items_id' => $id,
         ];
-        $embodied_impact = new EmbodiedImpact();
-        $embodied_impact->getFromDBByCrit($input);
+        $usage_impact = new UsageImpact();
+        $usage_impact->getFromDBByCrit($input);
         $impact_types = Type::getImpactTypes();
 
         $input['engine'] = $this->engine;
@@ -203,13 +198,13 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         }
 
         // Add or update the impact for the asset
-        if ($embodied_impact->isNewItem()) {
-            if ($embodied_impact->add($input) !== false) {
+        if ($usage_impact->isNewItem()) {
+            if ($usage_impact->add($input) !== false) {
                 return true;
             }
         } else {
             unset($input['itemtype'], $input['items_id']); // prevent updating these columns
-            if ($embodied_impact->update(['id' => $embodied_impact->getID()] + $input)) {
+            if ($usage_impact->update(['id' => $usage_impact->getID()] + $input)) {
                 return true;
             }
         }
@@ -221,11 +216,12 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
     {
         $itemtype = static::$itemtype;
         $item_table = $itemtype::getTable();
-        $embodied_impact_table = EmbodiedImpact::getTable();
+        $glpi_location_table = GlpiLocation::getTable();
+        $usage_impact_table = UsageImpact::getTable();
 
         // $where = [];
         // if (!$recalculate) {
-        //     $where = [EmbodiedImpact::getTableField('id') => null];
+        //     $where = [UsageImpact::getTableField('id') => null];
         // }
 
         $request = [
@@ -234,19 +230,27 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
             ],
             'FROM' => $item_table,
             'LEFT JOIN' => [
-                $embodied_impact_table => [
+                $usage_impact_table => [
                     'FKEY' => [
-                        $embodied_impact_table => 'items_id',
+                        $usage_impact_table => 'items_id',
                         $item_table            => 'id',
                         ['AND' =>
                             [
-                                EmbodiedImpact::getTableField('itemtype') => $itemtype,
+                                UsageImpact::getTableField('itemtype') => $itemtype,
                             ]
                         ],
                     ],
                 ],
+                $glpi_location_table => [
+                    'FKEY' => [
+                        $glpi_location_table => 'id',
+                        $item_table => 'locations_id',
+                    ]
+                ],
             ],
-            'WHERE' => $crit,
+            'WHERE' => [
+                ['NOT' => [GlpiLocation::getTableField('id') => null]],
+            ] + $crit,
         ];
 
         if ($entity_restrict) {
@@ -264,19 +268,4 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
      * @return ?array
      */
     abstract protected function doEvaluation(CommonDBTM $item): ?array;
-
-    /**
-     * Delete all calculated usage impact for an asset
-     *
-     * @param integer $items_id
-     * @return boolean
-     */
-    public function resetForItem(int $items_id): bool
-    {
-        $usage_impact = new EmbodiedImpact();
-        return $usage_impact->deleteByCriteria([
-            'itemtype' => static::getItemtype(),
-            'items_id' => $items_id
-        ]);
-    }
 }

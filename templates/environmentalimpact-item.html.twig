@@ -32,20 +32,33 @@
 {% import 'components/form/fields_macros.html.twig' as fields %}
 
 {{ fields.largeTitle(
-    __('Report', 'carbon'),
+    __('Usage', 'carbon'),
     'fas fa-chart-pie'
 ) }}
 
 <div class="card-body" id="cardBodyBorder1">
-    <div class="subheader">{{ __('Carbon Emission per Month', 'carbon') }}</div>
-    <div class="h1 mb-3" id="carbonEmissionPerMonth"></div>
-    <div id="carbonEmissionPerMonthChart" class="chart-lg"></div>
-    <div>
-      {% set reset_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', reset: '', itemtype: '" ~ item.getType() ~ "', items_id: '" ~ item.getID() ~ "'}" %}
-      <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/usageimpact.form.php' }}', {{ reset_args }})">{{ __('Reset data', 'carbon') }}</a>
-      {% set calculate_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', calculate: '', itemtype: '" ~ item.getType() ~ "', items_id: '" ~ item.getID() ~ "'}" %}
-      <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/usageimpact.form.php' }}', {{ calculate_args }})">{{ __('Calculate data', 'carbon') }}</a>
-    </div>
+  <div class="subheader">{{ __('Carbon Emission per Month', 'carbon') }}</div>
+  <div class="h1 mb-3" id="carbonEmissionPerMonth"></div>
+  <div id="carbonEmissionPerMonthChart" class="chart-lg"></div>
+
+  {% if usage_impact.fields.gwp is not null %}
+    <div class="h1 mb-3">{{ usage_impact.fields.gwp }} gCO<sub>2</sub>eq</div>
+  {% endif %}
+
+  {% if usage_impact.fields.adp is not null %}
+    <div class="h1 mb-3">{{ usage_impact.fields.adp }} gSbeq</div>
+  {% endif %}
+
+  {% if usage_impact.fields.pe is not null %}
+    <div class="h1 mb-3">{{ usage_impact.fields.pe }} J</div>
+  {% endif %}
+
+  <div>
+    {% set reset_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', reset: '', itemtype: '" ~ item.getType() ~ "', items_id: '" ~ item.getID() ~ "'}" %}
+    <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/usageimpact.form.php' }}', {{ reset_args }})">{{ __('Reset data', 'carbon') }}</a>
+    {% set calculate_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', calculate: '', itemtype: '" ~ item.getType() ~ "', items_id: '" ~ item.getID() ~ "'}" %}
+    <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/usageimpact.form.php' }}', {{ calculate_args }})">{{ __('Calculate data', 'carbon') }}</a>
+  </div>
 </div>
 
 <script type="text/javascript">
@@ -93,24 +106,24 @@
     'fas fa-chart-pie'
 ) }}
 
-{% if embodied_impact.fields.gwp is not null %}
-  <div class="h1 mb-3">{{ embodied_impact.fields.gwp }} gCO<sub>2</sub>eq</div>
-{% endif %}
-
-{% if embodied_impact.fields.adp is not null %}
-  <div class="h1 mb-3">{{ embodied_impact.fields.adp }} gSbeq</div>
-{% endif %}
-
-{% if embodied_impact.fields.pe is not null %}
-  <div class="h1 mb-3">{{ embodied_impact.fields.pe }} J</div>
-{% endif %}
-
 <div class="card-body" id="cardBodyBorder1">
-    <div class="subheader">{{ __('Embodied impact', 'carbon') }}</div>
-    <div>
-      {% set reset_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', reset: '', itemtype: '" ~ item.getType() ~ "', items_id: '" ~ item.getID() ~ "'}" %}
-      <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/embodiedimpact.form.php' }}', {{ reset_args }})">{{ __('Reset data', 'carbon') }}</a>
-      {% set calculate_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', calculate: '', itemtype: '" ~ item.getType() ~ "', items_id: '" ~ item.getID() ~ "'}" %}
-      <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/embodiedimpact.form.php' }}', {{ calculate_args }})">{{ __('Calculate data', 'carbon') }}</a>
-    </div>
+  {% if embodied_impact.fields.gwp is not null %}
+    <div class="h1 mb-3">{{ embodied_impact.fields.gwp }} gCO<sub>2</sub>eq</div>
+  {% endif %}
+
+  {% if embodied_impact.fields.adp is not null %}
+    <div class="h1 mb-3">{{ embodied_impact.fields.adp }} gSbeq</div>
+  {% endif %}
+
+  {% if embodied_impact.fields.pe is not null %}
+    <div class="h1 mb-3">{{ embodied_impact.fields.pe }} J</div>
+  {% endif %}
+
+  <div class="subheader">{{ __('Embodied impact', 'carbon') }}</div>
+  <div>
+    {% set reset_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', reset: '', itemtype: '" ~ item.getType() ~ "', items_id: '" ~ item.getID() ~ "'}" %}
+    <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/embodiedimpact.form.php' }}', {{ reset_args }})">{{ __('Reset data', 'carbon') }}</a>
+    {% set calculate_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', calculate: '', itemtype: '" ~ item.getType() ~ "', items_id: '" ~ item.getID() ~ "'}" %}
+    <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/embodiedimpact.form.php' }}', {{ calculate_args }})">{{ __('Calculate data', 'carbon') }}</a>
+  </div>
 </div>

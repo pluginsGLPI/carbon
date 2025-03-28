@@ -32,16 +32,26 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta;
+namespace GlpiPlugin\Carbon\Impact\Usage\Boavizta;
 
 use CommonDBTM;
+use DateTime;
+use DbUtils;
 use GlpiPlugin\Carbon\DataSource\Boaviztapi;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
+use GlpiPlugin\Carbon\Impact\Usage\AbstractUsageImpact;
 use GlpiPlugin\Carbon\Impact\Type;
-use GlpiPlugin\Carbon\Impact\Embodied\AbstractEmbodiedImpact;
+use GlpiPlugin\Carbon\Location;
+use GlpiPlugin\Carbon\Zone;
+use Location as GlpiLocation;
+use QueryExpression;
 
-abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInterface
+abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterface
 {
+    protected static string $itemtype = '';
+    protected static string $type_itemtype  = '';
+    protected static string $model_itemtype = '';
+
     /** @var string $engine Name of the calculation engine */
     protected string $engine = 'Boavizta';
 
@@ -66,6 +76,14 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
      * @return void
      */
     abstract protected function analyzeHardware(CommonDBTM $item);
+
+    /**
+     * Get the average power of the asset from the best source available (model or type)
+     *
+     * @param int $id ID of the asset (itemtype determined from the class
+     * @return null|int average power in Watt
+     */
+    abstract protected function getAveragePower(int $id): ?int;
 
     /**
      * Set the REST API client to use for requests
@@ -121,7 +139,9 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
 
             switch ($type) {
                 case 'gwp':
-                    $impacts[Type::IMPACT_GWP] = $this->parseGwp($response['impacts']['gwp']);
+                    // Disabled as Carbon calculates itself carbon emissions
+                    // $impacts[Type::IMPACT_GWP] = $this->parseGwp($response['impacts']['gwp']);
+                    $impacts[Type::IMPACT_GWP] = null;
                     break;
                 case 'adp':
                     $impacts[Type::IMPACT_ADP] = $this->parseAdp($response['impacts']['adp']);
@@ -137,12 +157,12 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
 
     protected function parseGwp(array $impact): ?TrackedFloat
     {
-        if ($impact['embedded'] === 'not implemented') {
+        if ($impact['use'] === 'not implemented') {
             return null;
         }
 
         $value = new TrackedFloat(
-            $impact['embedded']['value'],
+            $impact['use']['value'],
             null,
             TrackedFloat::DATA_QUALITY_ESTIMATED
         );
@@ -155,12 +175,12 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
 
     protected function parseAdp(array $impact): ?TrackedFloat
     {
-        if ($impact['embedded'] === 'not implemented') {
+        if ($impact['use'] === 'not implemented') {
             return null;
         }
 
         $value = new TrackedFloat(
-            $impact['embedded']['value'],
+            $impact['use']['value'],
             null,
             TrackedFloat::DATA_QUALITY_ESTIMATED
         );
@@ -173,12 +193,12 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
 
     protected function parsePe(array $impact): ?TrackedFloat
     {
-        if ($impact['embedded'] === 'not implemented') {
+        if ($impact['use'] === 'not implemented') {
             return null;
         }
 
         $value = new TrackedFloat(
-            $impact['embedded']['value'],
+            $impact['use']['value'],
             null,
             TrackedFloat::DATA_QUALITY_ESTIMATED
         );
@@ -187,5 +207,45 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
         }
 
         return $value;
+    }
+
+    /**
+     * Get the zone code the asset belongs to
+     * Location's country must match a zone name
+     *
+     * @param  CommonDBTM $item
+     * @param  DateTime $date Date for which the zone must be found
+     * @return string|null
+     */
+    protected function getZoneCode(CommonDBTM $item, ?DateTime $date = null): ?string
+    {
+        // TODO: use date to find where was the asset at the given date
+        if ($date === null) {
+            $item_table = (new DbUtils())->getTableForItemType(static::$itemtype);
+            $glpi_location_table = GlpiLocation::getTable();
+            $location_table = Location::getTable();
+            $location = new Location();
+            $found = $location->getFromDBByRequest([
+                'INNER JOIN' => [
+                    $glpi_location_table => [
+                        'FKEY' => [
+                            $location_table => 'locations_id',
+                            $glpi_location_table => 'id',
+                        ],
+                    ],
+                ],
+                'WHERE' => [
+                    GlpiLocation::getTableField('id') => $item->fields['locations_id'],
+                ]
+            ]);
+
+            if ($found === false) {
+                return null;
+            }
+
+            return $location->fields['boavizta_zone'];
+        }
+
+        throw new \LogicException('Not implemented yet');
     }
 }

@@ -26,23 +26,53 @@
  * SOFTWARE.
  * -------------------------------------------------------------------------
  * @copyright Copyright (C) 2024 Teclib' and contributors.
+ * @copyright Copyright (C) 2024 by the carbon plugin team.
  * @license   MIT https://opensource.org/licenses/mit-license.php
  * @link      https://github.com/pluginsGLPI/carbon
  * -------------------------------------------------------------------------
  */
 
-$table = 'glpi_plugin_carbon_computertypes';
-/** @var Migration $migration */
-$migration->addField($table, 'category', 'integer', ['after' => 'power_consumption']);
+namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta;
 
-$table = 'glpi_plugin_carbon_embodiedimpacts';
-/** @var Migration $migration */
-$migration->addField($table, 'engine', 'string', ['after' => 'items_id']);
-$migration->addField($table, 'engine_version', 'string', ['after' => 'engine']);
-$migration->addField($table, 'date_mod', 'timestamp', ['after' => 'engine_version']);
+use CommonDBTM;
+use Monitor as GlpiMonitor;
 
-$table = 'glpi_plugin_carbon_carbonemissions';
-/** @var Migration $migration */
-$migration->addField($table, 'engine', 'string', ['after' => 'items_id']);
-$migration->addField($table, 'engine_version', 'string', ['after' => 'engine']);
-$migration->addField($table, 'date_mod', 'timestamp', ['after' => 'engine_version']);
+class Monitor extends AbstractAsset
+{
+    protected static string $itemtype = GlpiMonitor::class;
+
+    protected string $endpoint        = 'peripheral/monitor';
+
+    protected function doEvaluation(CommonDBTM $item): ?array
+    {
+        // TODO: determine if the computer is a server, a computer, a laptop, a tablet...
+        // then adapt $this->endpoint depending on the result
+
+        // Ask for embodied impact only
+        $configuration = $this->analyzeHardware($item);
+
+        $description = [
+            'configuration' => $configuration,
+            'usage' => [
+                'avg_power' => 0
+            ],
+        ];
+        $response = $this->query($description);
+        $impacts = $this->parseResponse($response);
+
+        return $impacts;
+    }
+
+    protected function analyzeHardware(CommonDBTM $item): array
+    {
+        $configuration = [];
+
+        // Disable usage
+        $this->hardware['configuration'] = $configuration;
+        $this->hardware['usage'] = [
+            'avg_power' => 0
+        ];
+
+        return $configuration;
+    }
+}

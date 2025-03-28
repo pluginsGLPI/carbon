@@ -77,4 +77,12 @@ class SearchOptions
     public const CARBON_EMISSION_CALC_DATE        = self::SEARCH_OPTION_BASE + 605;
     public const CARBON_EMISSION_ENGINE           = self::SEARCH_OPTION_BASE + 606;
     public const CARBON_EMISSION_ENGINE_VER       = self::SEARCH_OPTION_BASE + 607;
+
+    public const USAGE_IMPACT_DATE = self::SEARCH_OPTION_BASE + 700;
+    public const USAGE_IMPACT_GWP = self::SEARCH_OPTION_BASE + 701;
+    public const USAGE_IMPACT_GWP_QUALITY = self::SEARCH_OPTION_BASE + 702;
+    public const USAGE_IMPACT_ADP = self::SEARCH_OPTION_BASE + 703;
+    public const USAGE_IMPACT_ADP_QUALITY = self::SEARCH_OPTION_BASE + 704;
+    public const USAGE_IMPACT_PE = self::SEARCH_OPTION_BASE + 705;
+    public const USAGE_IMPACT_PE_QUALITY = self::SEARCH_OPTION_BASE + 706;
 }

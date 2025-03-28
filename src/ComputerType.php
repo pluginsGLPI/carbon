@@ -44,21 +44,21 @@ class ComputerType extends AbstractType
     public static $itemtype = GlpiComputerType::class;
     public static $items_id = 'computertypes_id';
 
-    const TYPE_UNDEFINED  = 0;
-    const TYPE_DESKTOP    = 1;
-    const TYPE_SERVER     = 2;
-    const TYPE_LAPTOP     = 3;
-    const TYPE_TABLET     = 4;
-    const TYPE_SMARTPHONE = 5;
+    const CATEGORY_UNDEFINED  = 0;
+    const CATEGORY_DESKTOP    = 1;
+    const CATEGORY_SERVER     = 2;
+    const CATEGORY_LAPTOP     = 3;
+    const CATEGORY_TABLET     = 4;
+    const CATEGORY_SMARTPHONE = 5;
 
     public static function getTypes(): array
     {
         return [
-            self::TYPE_DESKTOP    => __('Computer'),
-            self::TYPE_SERVER     => __('Server'),
-            self::TYPE_LAPTOP     => __('Laptop'),
-            self::TYPE_TABLET     => __('Tablet'),
-            self::TYPE_SMARTPHONE => __('Smartphone'),
+            self::CATEGORY_DESKTOP    => __('Computer'),
+            self::CATEGORY_SERVER     => __('Server'),
+            self::CATEGORY_LAPTOP     => __('Laptop'),
+            self::CATEGORY_TABLET     => __('Tablet'),
+            self::CATEGORY_SMARTPHONE => __('Smartphone'),
         ];
     }
 

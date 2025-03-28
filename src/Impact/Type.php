@@ -26,23 +26,26 @@
  * SOFTWARE.
  * -------------------------------------------------------------------------
  * @copyright Copyright (C) 2024 Teclib' and contributors.
+ * @copyright Copyright (C) 2024 by the carbon plugin team.
  * @license   MIT https://opensource.org/licenses/mit-license.php
  * @link      https://github.com/pluginsGLPI/carbon
  * -------------------------------------------------------------------------
  */
 
-$table = 'glpi_plugin_carbon_computertypes';
-/** @var Migration $migration */
-$migration->addField($table, 'category', 'integer', ['after' => 'power_consumption']);
+namespace GlpiPlugin\Carbon\Impact;
 
-$table = 'glpi_plugin_carbon_embodiedimpacts';
-/** @var Migration $migration */
-$migration->addField($table, 'engine', 'string', ['after' => 'items_id']);
-$migration->addField($table, 'engine_version', 'string', ['after' => 'engine']);
-$migration->addField($table, 'date_mod', 'timestamp', ['after' => 'engine_version']);
+class Type
+{
+    const IMPACT_GWP = 0; // Global warming potential
+    const IMPACT_ADP = 1; // Abiotic Depletion Potential
+    const IMPACT_PE  = 2; // Primary Energy
 
-$table = 'glpi_plugin_carbon_carbonemissions';
-/** @var Migration $migration */
-$migration->addField($table, 'engine', 'string', ['after' => 'items_id']);
-$migration->addField($table, 'engine_version', 'string', ['after' => 'engine']);
-$migration->addField($table, 'date_mod', 'timestamp', ['after' => 'engine_version']);
+    public static function getImpactTypes(): array
+    {
+        return [
+            self::IMPACT_GWP => 'gwp',
+            self::IMPACT_ADP => 'adp',
+            self::IMPACT_PE  => 'pe',
+        ];
+    }
+}

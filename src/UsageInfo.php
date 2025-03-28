@@ -154,9 +154,16 @@ class UsageInfo extends CommonDBChild
             'items_id' => $item->getID(),
         ]);
 
+        $usage_impact = new UsageImpact();
+        $usage_impact->getFromDBByCrit([
+            'itemtype' => $item->getType(),
+            'items_id' => $item->getID(),
+        ]);
+
         TemplateRenderer::getInstance()->display('@carbon/environmentalimpact-item.html.twig', [
             'item' => $item,
             'embodied_impact' => $embodied_impact,
+            'usage_impact'    => $usage_impact,
         ]);
     }
 }

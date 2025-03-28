@@ -39,14 +39,14 @@ use DateTimeInterface;
 use Entity;
 use Location;
 
-class CarbonEmission extends CommonDBChild
+class UsageImpact extends CommonDBChild
 {
     public static $itemtype = 'itemtype';
     public static $items_id = 'items_id';
 
     public static function getTypeName($nb = 0)
     {
-        return _n("Carbon Emission", "Carbon Emissions", $nb, 'carbon');
+        return _n("Usage impact", "Usage impacts", $nb, 'carbon');
     }
 
     public function prepareInputForAdd($input)
@@ -91,57 +91,54 @@ class CarbonEmission extends CommonDBChild
         ];
 
         $tab[] = [
-            'id'                 => '5',
-            'table'              => self::getTable(),
-            'field'              => 'entities_id',
-            'name'               => Entity::getTypeName(1)
-        ];
-
-        $tab[] = [
-            'id'                 => '6',
-            'table'              => 'glpi_locations',
-            'field'              => 'name',
-            'linkfield'          => 'locations_id',
-            'name'               => Location::getTypeName(1),
-            'datatype'           => 'dropdown',
-        ];
-
-        $tab[] = [
-            'id'                 => SearchOptions::CARBON_EMISSION_DATE,
+            'id'                 => SearchOptions::USAGE_IMPACT_DATE,
             'table'              => self::getTable(),
             'field'              => 'date',
             'name'               => __('Date')
         ];
 
         $tab[] = [
-            'id'                 => SearchOptions::CARBON_EMISSION_ENERGY_PER_DAY,
+            'id'                 => SearchOptions::USAGE_IMPACT_GWP,
             'table'              => self::getTable(),
-            'field'              => 'energy_per_day',
-            'name'               => __('Energy', 'carbon'),
-            'unit'               => 'KWh',
+            'field'              => 'gwp',
+            'name'               => __('Global warming potential', 'carbon')
         ];
 
         $tab[] = [
-            'id'                 => SearchOptions::CARBON_EMISSION_PER_DAY,
+            'id'                 => SearchOptions::USAGE_IMPACT_GWP_QUALITY,
             'table'              => self::getTable(),
-            'field'              => 'emission_per_day',
-            'name'               => __('Emission', 'carbon'),
-            'unit'               => 'gCO<sub>2</sub>eq',
+            'field'              => 'gwp_quality',
+            'name'               => __('Global warming potential quality', 'carbon')
         ];
 
         $tab[] = [
-            'id'                 => SearchOptions::CARBON_EMISSION_ENERGY_QUALITY,
+            'id'                 => SearchOptions::USAGE_IMPACT_ADP,
             'table'              => self::getTable(),
-            'field'              => 'energy_quality',
-            'name'               => __('Energy quality', 'carbon')
+            'field'              => 'adp',
+            'name'               => __('Abiotic depletion potential', 'carbon')
 
         ];
 
         $tab[] = [
-            'id'                 => SearchOptions::CARBON_EMISSION_EMISSION_QUALITY,
+            'id'                 => SearchOptions::USAGE_IMPACT_ADP_QUALITY,
             'table'              => self::getTable(),
-            'field'              => 'emission_quality',
-            'name'               => __('Emission quality', 'carbon')
+            'field'              => 'adp_quality',
+            'name'               => __('Abiotic depletion potential quality', 'carbon')
+        ];
+
+        $tab[] = [
+            'id'                 => SearchOptions::USAGE_IMPACT_PE,
+            'table'              => self::getTable(),
+            'field'              => 'pe',
+            'name'               => __('Primary energy quality', 'carbon')
+
+        ];
+
+        $tab[] = [
+            'id'                 => SearchOptions::USAGE_IMPACT_PE_QUALITY,
+            'table'              => self::getTable(),
+            'field'              => 'pe_quality',
+            'name'               => __('Primary energy quality', 'carbon')
         ];
 
         $tab[] = [
@@ -166,25 +163,5 @@ class CarbonEmission extends CommonDBChild
         ];
 
         return $tab;
-    }
-
-    /**
-     * Gets date intervals where data are missing
-     * Gaps are returned as an array of start and end
-     * where start is the 1st msising date and end is the last missing date
-     *
-     * @param integer $id
-     * @param DateTimeInterface|null $start
-     * @param DateTimeInterface|null $stop
-     * @return array
-     */
-    public function findGaps(string $itemtype, int $id, ?DateTimeInterface $start, ?DateTimeInterface $stop = null): array
-    {
-        $criteria = [
-            'itemtype' => $itemtype,
-            'items_id' => $id,
-        ];
-        $interval = new DateInterval('P1D');
-        return Toolbox::findTemporalGapsInTable(self::getTable(), $start, $interval, $stop, $criteria);
     }
 }

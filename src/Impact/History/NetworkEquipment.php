@@ -58,7 +58,7 @@ class NetworkEquipment extends AbstractAsset
         return new EngineNetworkEquipment($item->getID());
     }
 
-    public function getEvaluableQuery(bool $entity_restrict = true): array
+    public function getEvaluableQuery(array $crit = [], bool $entity_restrict = true): array
     {
         $item_table = self::$itemtype::getTable();
         $item_model_table = self::$model_itemtype::getTable();
@@ -130,7 +130,7 @@ class NetworkEquipment extends AbstractAsset
                         ['NOT' => [Infocom::getTableField('date_mod') => null]],
                     ]
                 ]
-            ]
+            ] + $crit
         ];
 
         if ($entity_restrict) {
