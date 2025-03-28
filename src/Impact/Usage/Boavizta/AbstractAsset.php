@@ -80,7 +80,7 @@ abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterfa
     /**
      * Get the average power of the asset from the best source available (model or type)
      *
-     * @param int $id ID of the asset (itemtype determined from the class
+     * @param int $id ID of the asset (itemtype determined from the class)
      * @return null|int average power in Watt
      */
     abstract protected function getAveragePower(int $id): ?int;

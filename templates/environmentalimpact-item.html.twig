@@ -37,6 +37,19 @@
 ) }}
 
 {{ usage_carbon_emission_graph|raw }}
+<div class="card-body" id="cardBodyBorder1">
+  {% if usage_impact.fields.gwp is not null %}
+    <div class="h1 mb-3">{{ usage_impact.getHumanReadableImpact('gwp')|raw }}</div>
+  {% endif %}
+
+  {% if usage_impact.fields.adp is not null %}
+    <div class="h1 mb-3">{{ usage_impact.getHumanReadableImpact('adp')|raw }}</div>
+  {% endif %}
+
+  {% if usage_impact.fields.pe is not null %}
+    <div class="h1 mb-3">{{ usage_impact.getHumanReadableImpact('pe')|raw }}</div>
+  {% endif %}
+</div>
 
 <div>
   {% if not usage_impact.isNewItem() %}
