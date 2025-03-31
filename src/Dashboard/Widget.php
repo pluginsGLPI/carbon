@@ -33,10 +33,13 @@
 
 namespace GlpiPlugin\Carbon\Dashboard;
 
+use Computer;
 use Html;
 use Glpi\Application\View\TemplateRenderer;
 use Glpi\Dashboard\Widget as GlpiDashboardWidget;
 use GlpiPlugin\Carbon\Report;
+use Monitor;
+use NetworkEquipment;
 use Toolbox;
 
 class Widget extends GlpiDashboardWidget
@@ -81,12 +84,37 @@ class Widget extends GlpiDashboardWidget
                 'width'    => 16,
                 'height'   => 12,
             ],
-            'unhandledcomputers' => [
-                'label'    => __('Unhandled Computers', 'carbon'),
-                'function' => self::class . '::DisplayUnhandledComputers',
-                'width'    => 5,
-                'height'   => 4,
-            ],
+        ];
+        if (in_array(Computer::class, PLUGIN_CARBON_TYPES)) {
+            $types += [
+                'unhandledComputersRatio' => [
+                    'label'    => __('Unhandled Computers', 'carbon'),
+                    'function' => self::class . '::DisplayUnhandledComputersRatio',
+                    'width'    => 5,
+                    'height'   => 4,
+                ],
+            ];
+        }
+        if (in_array(Monitor::class, PLUGIN_CARBON_TYPES)) {
+            $types += [
+                'unhandledMonitorsRatio' => [
+                    'label'    => __('Unhandled Monitors', 'carbon'),
+                    'function' => self::class . '::DisplayUnhandledMonitorsRatio',
+                    'width'    => 5,
+                    'height'   => 4,
+                ],
+            ];
+        }
+        if (in_array(NetworkEquipment::class, PLUGIN_CARBON_TYPES)) {
+            $types += [
+                'unhandledNetworkequipmentsRatio' => [
+                    'label'    => __('Unhandled Network equipments', 'carbon'),
+                    'function' => self::class . '::DisplayUnhandledNetworkEquipmentsRatio',
+                    'width'    => 5,
+                    'height'   => 4,
+                ],
+            ];
+        }
             // 'graphpertype' => [
             //     'label'    => __('Carbon Emission Per Type', 'carbon'),
             //     'function' => self::class . '::DisplayGraphCarbonEmissionPerType',
@@ -638,7 +666,13 @@ class Widget extends GlpiDashboardWidget
         ]);
     }
 
-    public static function DisplayUnhandledComputers(array $params = []): string
+    /**
+     * Show complete staistics for unhandled computers
+     *
+     * @param array $params
+     * @return string
+     */
+    public static function DisplayUnhandledComputersRatio(array $params = []): string
     {
         $default = [
             'url'     => '',
@@ -646,7 +680,7 @@ class Widget extends GlpiDashboardWidget
             'alt'     => '',
             'color'   => '',
             'icon'    => '',
-            'id'      => 'plugin_carbon_unhandled_computers_' . mt_rand(),
+            'id'      => 'plugin_carbon_unhandled_computers_ratio_' . mt_rand(),
             'filters' => [], // TODO: Not implemented yet (is this useful ?)
         ];
         $p = array_merge($default, $params);
@@ -654,6 +688,70 @@ class Widget extends GlpiDashboardWidget
         $p['handled'] = Provider::getHandledComputersCount();
         $p['unhandled'] = Provider::getUnhandledComputersCount();
         return TemplateRenderer::getInstance()->render('@carbon/components/unhandled-computers-card.html.twig', [
+            'id' => $p['id'],
+            'color' => $p['color'],
+            'fg_color' => Toolbox::getFgColor($p['color']),
+            'fg_hover_color' => Toolbox::getFgColor($p['color'], 15),
+            'fg_hover_border' => Toolbox::getFgColor($p['color'], 30),
+            'handled' => $p['handled'],
+            'unhandled' => $p['unhandled'],
+        ]);
+    }
+
+    /**
+     * Show complete staistics for unhandled monitors
+     *
+     * @param array $params
+     * @return string
+     */
+    public static function DisplayUnhandledMonitorsRatio(array $params = []): string
+    {
+        $default = [
+            'url'     => '',
+            'label'   => '',
+            'alt'     => '',
+            'color'   => '',
+            'icon'    => '',
+            'id'      => 'plugin_carbon_unhandled_monitors_ratio_' . mt_rand(),
+            'filters' => [], // TODO: Not implemented yet (is this useful ?)
+        ];
+        $p = array_merge($default, $params);
+
+        $p['handled'] = Provider::getHandledMonitorsCount();
+        $p['unhandled'] = Provider::getUnhandledMonitorsCount();
+        return TemplateRenderer::getInstance()->render('@carbon/components/unhandled-monitors-card.html.twig', [
+            'id' => $p['id'],
+            'color' => $p['color'],
+            'fg_color' => Toolbox::getFgColor($p['color']),
+            'fg_hover_color' => Toolbox::getFgColor($p['color'], 15),
+            'fg_hover_border' => Toolbox::getFgColor($p['color'], 30),
+            'handled' => $p['handled'],
+            'unhandled' => $p['unhandled'],
+        ]);
+    }
+
+    /**
+     * Show complete staistics for unhandled network equipments
+     *
+     * @param array $params
+     * @return string
+     */
+    public static function DisplayUnhandledNetworkEquipmentsRatio(array $params = []): string
+    {
+        $default = [
+            'url'     => '',
+            'label'   => '',
+            'alt'     => '',
+            'color'   => '',
+            'icon'    => '',
+            'id'      => 'plugin_carbon_unhandled_networkequipments_ratio_' . mt_rand(),
+            'filters' => [], // TODO: Not implemented yet (is this useful ?)
+        ];
+        $p = array_merge($default, $params);
+
+        $p['handled'] = Provider::getHandledNetworkEquipmentsCount();
+        $p['unhandled'] = Provider::getUnhandledNetworkEquipmentsCount();
+        return TemplateRenderer::getInstance()->render('@carbon/components/unhandled-network-equipments-card.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
             'fg_color' => Toolbox::getFgColor($p['color']),

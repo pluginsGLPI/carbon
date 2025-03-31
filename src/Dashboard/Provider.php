@@ -51,6 +51,7 @@ use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\Impact\History\Computer as ComputerHistory;
 use GlpiPlugin\Carbon\SearchOptions;
 use Monitor;
+use NetworkEquipment;
 use QueryExpression;
 use QuerySubQuery;
 use Search;
@@ -427,6 +428,65 @@ class Provider
 
         $count = $search_data['data']['totalcount'] ?? null;
         $url = Monitor::getSearchURL() . '?' . GlpiToolbox::append_params($search_criteria);
+        return [
+            'number' => $count,
+            'url'    => $url,
+            'label'  => $params['label'],
+            'icon'   => $params['icon'],
+        ];
+    }
+
+    /**
+     * Counts the network equipments which are missing data to compute their
+     * environmental impact
+     *
+     * @param array $params
+     * @return array : count of network equipments or null if an error occurred
+     */
+    public static function getUnhandledNetworkEquipmentsCount(array $params = []): array
+    {
+        $default_params = [
+            'label' => __("plugin carbon - unhandled network equipments", 'carbon'),
+            'icon'  => "fas fa-network-wired",
+        ];
+        $params = array_merge($default_params, $params);
+
+        return self::getHandledNetworkEquipmentsCount($params, false);
+    }
+
+    /**
+     * Count the network equipments having all required data to compute carbon intensity
+     *
+     * @param array $params
+     * @param bool  $handled : true if we want to count handled network equipments, false to count unhandled monitors
+     * @return array
+     */
+    public static function getHandledNetworkEquipmentsCount(array $params = [], bool $handled = true): array
+    {
+        $default_params = [
+            'label' => __("plugin carbon - handled network equipments", 'carbon'),
+            'icon'  => "fas fa-network-wired",
+        ];
+        $params = array_merge($default_params, $params);
+
+        $search_criteria = [
+            'criteria' => [
+                [
+                    'field'      => SearchOptions::IS_HISTORIZABLE,
+                    'searchtype' => 'equals',
+                    'value'      => $handled ? 1 : 0
+                ],
+            ],
+            'reset'    => 'reset'
+        ];
+        // Exploit defaultWhere to inject WHERE criterias from dashboard filters
+        $filter_criteria = self::getFiltersCriteria(NetworkEquipment::getTable(), $params['apply_filters'] ?? []);
+        $search_data = Search::prepareDatasForSearch(NetworkEquipment::class, $search_criteria);
+        Search::constructSQL($search_data);
+        Search::constructData($search_data, true);
+
+        $count = $search_data['data']['totalcount'] ?? null;
+        $url = NetworkEquipment::getSearchURL() . '?' . GlpiToolbox::append_params($search_criteria);
         return [
             'number' => $count,
             'url'    => $url,

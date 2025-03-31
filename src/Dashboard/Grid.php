@@ -36,6 +36,7 @@ namespace GlpiPlugin\Carbon\Dashboard;
 use Computer;
 use Glpi\Dashboard\Filter;
 use Monitor;
+use NetworkEquipment;
 
 class Grid
 {
@@ -46,9 +47,9 @@ class Grid
         }
 
         $new_cards = [];
+        // Data completeness diagnosis
         if (in_array(Computer::class, PLUGIN_CARBON_TYPES)) {
             $new_cards += [
-                // Data completeness diagnosis
                 'plugin_carbon_complete_computers' => [
                     'widgettype'   => ['bigNumber'],
                     'group'        => __('Carbon', 'carbon'),
@@ -65,8 +66,7 @@ class Grid
                 ],
             ];
         }
-
-        if (in_array(Computer::class, PLUGIN_CARBON_TYPES)) {
+        if (in_array(Monitor::class, PLUGIN_CARBON_TYPES)) {
             $new_cards += [
                 'plugin_carbon_complete_monitors' => [
                     'widgettype'   => ['bigNumber'],
@@ -81,6 +81,24 @@ class Grid
                     'label'        => __('Unhandled monitors', 'carbon'),
                     'provider'     => Provider::class . '::getUnhandledMonitorsCount',
                     'filter'       => Filter::getAppliableFilters(Monitor::getTable()),
+                ],
+            ];
+        }
+        if (in_array(NetworkEquipment::class, PLUGIN_CARBON_TYPES)) {
+            $new_cards += [
+                'plugin_carbon_complete_network_equipments' => [
+                    'widgettype'   => ['bigNumber'],
+                    'group'        => __('Carbon', 'carbon'),
+                    'label'        => __('Handled network equipments', 'carbon'),
+                    'provider'     => Provider::class . '::getHandledNetworkEquipmentsCount',
+                    'filter'       => Filter::getAppliableFilters(NetworkEquipment::getTable()),
+                ],
+                'plugin_carbon_incomplete_network_equipments' => [
+                    'widgettype'   => ['bigNumber'],
+                    'group'        => __('Carbon', 'carbon'),
+                    'label'        => __('Unhandled network equipments', 'carbon'),
+                    'provider'     => Provider::class . '::getUnhandledNetworkEquipmentsCount',
+                    'filter'       => Filter::getAppliableFilters(NetworkEquipment::getTable()),
                 ],
             ];
         }
@@ -102,7 +120,6 @@ class Grid
             ],
 
             // Embodied impact
-
             'plugin_carbon_total_embodied_gwp_impact' => [
                 'widgettype'   => ['bigNumber'],
                 'group'        => __('Carbon', 'carbon'),
@@ -136,11 +153,35 @@ class Grid
                     'group'        => __('Carbon', 'carbon'),
                     'label'        => __('Monthly carbon emission', 'carbon'),
                 ],
-                'plugin_carbon_report_unhandled_computers' => [
-                    'widgettype'   => ['unhandledcomputers'],
-                    'group'        => __('Carbon', 'carbon'),
-                    'label'        => __('Unhandled computers', 'carbon'),
-                ],
+            ];
+            if (in_array(Computer::class, PLUGIN_CARBON_TYPES)) {
+                $new_cards += [
+                    'plugin_carbon_report_unhandled_computers_ratio' => [
+                        'widgettype'   => ['unhandledComputersRatio'],
+                        'group'        => __('Carbon', 'carbon'),
+                        'label'        => __('Unhandled computers ratio', 'carbon'),
+                    ],
+                ];
+            }
+            if (in_array(Monitor::class, PLUGIN_CARBON_TYPES)) {
+                $new_cards += [
+                    'plugin_carbon_report_unhandled_monitors_ratio' => [
+                        'widgettype'   => ['unhandledMonitorsRatio'],
+                        'group'        => __('Carbon', 'carbon'),
+                        'label'        => __('Unhandled monitors ratio', 'carbon'),
+                    ],
+                ];
+            }
+            if (in_array(NetworkEquipment::class, PLUGIN_CARBON_TYPES)) {
+                $new_cards += [
+                    'plugin_carbon_report_unhandled_network_equipments_ratio' => [
+                        'widgettype'   => ['unhandledNetworkequipmentsRatio'],
+                        'group'        => __('Carbon', 'carbon'),
+                        'label'        => __('Unhandled network equipments ratio', 'carbon'),
+                    ],
+                ];
+            }
+            $new_cards += [
                 'plugin_carbon_report_information_video' => [
                     'widgettype'   => ['information_video'],
                     'group'        => __('Carbon', 'carbon'),

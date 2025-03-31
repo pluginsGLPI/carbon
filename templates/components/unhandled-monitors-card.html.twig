@@ -58,17 +58,17 @@
             </div>
             <div class="col" style="text-align: left">
                 <div class="font-weight-medium">{{ __('Warning', 'carbon') }}</div>
-                <div class="text-secondary"><a href="{{ unhandled.url }}">{{ unhandled.number }} unhandled computers</a></div>
+                <div class="text-secondary"><a href="{{ unhandled.url }}">{{ unhandled.number }} unhandled monitor</a></div>
             </div>
             <div class="row">
                 <div class="col align-items-center">
-                    {% set totalComputers = handled.number + unhandled.number %}
-                    {% if totalComputers == 0 %}
-                        {% set totalComputers = 1 %}
+                    {% set totalMonitors = handled.number + unhandled.number %}
+                    {% if totalMonitors == 0 %}
+                        {% set totalMonitors = 1 %}
                     {% endif %}
-                    {% set ratio = 100 * unhandled.number / totalComputers %}
+                    {% set ratio = 100 * unhandled.number / totalMonitors %}
                     <div class="text-secondary p-3">
-                        {{ __("It represents %s percent of your parc that contains %s computers.", "carbon")|format(ratio|round(2, 'common'), totalComputers) }}
+                        {{ __("It represents %s percent of your parc that contains %s monitors.", "carbon")|format(ratio|round(2, 'common'), totalMonitors) }}
                     </div>
                 </div>
             </div>
