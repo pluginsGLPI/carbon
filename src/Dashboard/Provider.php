@@ -770,8 +770,20 @@ class Provider
         ];
     }
 
+    /**
+     * Total embodied abiotic depletion potential in antimony equivalent
+     *
+     * @param array $params
+     * @return array
+     */
     public static function getTotalEmbodiedAdp(array $params = []): array
     {
+        $default_params = [
+            'label' => __('Abiotic depletion potential', 'carbon'),
+            'icon'  => '',
+        ];
+        $params = array_merge($default_params, $params);
+
         $crit = [
             'itemtype' => PLUGIN_CARBON_TYPES,
         ];
@@ -781,9 +793,6 @@ class Provider
         } else {
             $value = Toolbox::getWeight($value) . __('Sbeq', 'carbon');
         }
-
-        $params['label'] = __('', 'carbon');
-        $params['icon'] = '';
 
         return [
             'number'     => $value,
