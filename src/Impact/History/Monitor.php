@@ -83,7 +83,6 @@ class Monitor extends AbstractAsset
         $computer_inner_joins = $request['INNER JOIN'];
         $computer_left_joins  = $request['LEFT JOIN'];
         unset($request['INNER JOIN'], $request['LEFT JOIN']);
-        unset($computer_inner_joins[$location_table]);
 
         $glpi_computertypes_table = GlpiComputerType::getTable();
         $computertypes_table = ComputerType::getTable();
@@ -106,12 +105,6 @@ class Monitor extends AbstractAsset
                 $computers_table => 'id',
                 $computers_items_table => GlpiComputer::getForeignKeyField(),
             ],
-        ];
-        $request['LEFT JOIN'][$location_table] = [
-            'FKEY'   => [
-                $item_table  => 'locations_id',
-                $location_table => 'id',
-            ]
         ];
         $request['LEFT JOIN'][$glpi_monitor_types_table] = [
             'FKEY' => [
