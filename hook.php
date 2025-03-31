@@ -132,8 +132,8 @@ function plugin_carbon_postShowTab(array $param)
         return;
     }
 
-    $asset_history = 'GlpiPlugin\\Carbon\\Impact\\History\\' . $asset_itemtype;
-    $asset_history::showHistorizableDiagnosis($param['item']);
+    $history_class = 'GlpiPlugin\\Carbon\\Impact\\History\\' . $asset_itemtype;
+    $history_class::showHistorizableDiagnosis($param['item']);
     UsageInfo::showCharts($param['item']);
 }
 
