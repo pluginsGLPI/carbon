@@ -148,7 +148,6 @@ class Widget extends GlpiDashboardWidget
             //     'width'    => 5,
             //     'height'   => 4,
             // ],
-        ];
 
         return $types;
     }
