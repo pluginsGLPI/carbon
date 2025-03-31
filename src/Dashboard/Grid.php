@@ -104,19 +104,25 @@ class Grid
         }
         // TODO : Data completeness diagnosis for other assets (Net equipment, ...)
 
-        // Usage impact
         $new_cards += [
-            'plugin_carbon_total_power' => [
+            // Usage impact
+            'plugin_carbon_total_usage_power' => [
                 'widgettype'   => ['bigNumber'],
                 'group'        => __('Carbon', 'carbon'),
                 'label'        => __('Total usage power consumption', 'carbon'),
                 'provider'     => Provider::class . '::getTotalUsagePower',
             ],
-            'plugin_carbon_total_carbon_emission' => [
+            'plugin_carbon_total_usage_carbon_emission' => [
                 'widgettype'   => ['bigNumber'],
                 'group'        => __('Carbon', 'carbon'),
                 'label'        => __('Total usage carbon emission', 'carbon'),
                 'provider'     => Provider::class . '::getTotalUsageCarbonEmission',
+            ],
+            'plugin_carbon_total_usage_adp_impact' => [
+                'widgettype'   => ['bigNumber'],
+                'group'        => __('Carbon', 'carbon'),
+                'label'        => __('Total usage abiotic depletion potential', 'carbon'),
+                'provider'     => Provider::class . '::getTotalUsageAdp',
             ],
 
             // Embodied impact
@@ -138,6 +144,14 @@ class Grid
                 'label'        => __('Total embodied abiotic depletion potential', 'carbon'),
                 'provider'     => Provider::class . '::getTotalEmbodiedAdp',
             ],
+
+            // embodied + usage impact
+            'plugin_carbon_total_adp_impact' => [
+                'widgettype'   => ['summaryNumbers', 'multipleNumber', 'pie', 'donut', 'halfpie', 'halfdonut', 'bar', 'hbar'],
+                'group'        => __('Carbon', 'carbon'),
+                'label'        => __('Total abiotic depletion potential', 'carbon'),
+                'provider'     => Provider::class . '::getTotalAdp',
+            ],
         ];
 
         // Declare the following cards only if we show the quick report page of the plugin
@@ -146,7 +160,7 @@ class Grid
                 'plugin_carbon_report_totalcarbonemission_ytd' => [
                     'widgettype'   => ['totalcarbonemission_ytd'],
                     'group'        => __('Carbon', 'carbon'),
-                    'label'        => __('Total usage carbon emission', 'carbon'),
+                    'label'        => __('Total usage carbon emission year to date', 'carbon'),
                 ],
                 'plugin_carbon_report_totalcarbonemission_two_last_months' => [
                     'widgettype'   => ['totalcarbonemission_two_last_months'],

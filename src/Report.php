@@ -87,7 +87,7 @@ class Report extends CommonDBTM
     public static function showInstantReport(): void
     {
         ob_start();
-        $dashboard = new DashboardGrid('plugin_carbon_board', 24, 16, 'mini_core');
+        $dashboard = new DashboardGrid('plugin_carbon_board', 24, 22, 'mini_core');
         $dashboard->show(true);
         $dashboard_html = ob_get_clean();
         TemplateRenderer::getInstance()->display('@carbon/quick-report.html.twig', [

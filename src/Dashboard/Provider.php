@@ -50,6 +50,8 @@ use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\Impact\History\Computer as ComputerHistory;
 use GlpiPlugin\Carbon\SearchOptions;
+use GlpiPlugin\Carbon\UsageImpact;
+use GlpiPlugin\Carbon\UsageInfo;
 use Monitor;
 use NetworkEquipment;
 use QueryExpression;
@@ -576,8 +578,8 @@ class Provider
     public static function getTotalUsageCarbonEmission(array $params = []): array
     {
         $default_params = [
-            'label' => __("plugin carbon - Total carbon emission", 'carbon'),
-            'icon'  => "fa-solid fa-temperature-arrow-up",
+            'label' => __('plugin carbon - Total carbon emission', 'carbon'),
+            'icon'  => 'fa-solid fa-temperature-arrow-up',
         ];
         $params = array_merge($default_params, $params);
         $crit = [
@@ -727,6 +729,12 @@ class Provider
 
     public static function getTotalEmbodiedGwp(array $params = []): array
     {
+        $default_params = [
+            'label' => __('Total embodied global warming potential', 'carbon'),
+            'icon'  => 'fa-solid fa-temperature-arrow-up',
+        ];
+        $params = array_merge($default_params, $params);
+
         $crit = [
             'itemtype' => PLUGIN_CARBON_TYPES,
         ];
@@ -736,9 +744,6 @@ class Provider
         } else {
             $value = Toolbox::getWeight($value) . __('CO₂eq', 'carbon');
         }
-
-        $params['label'] = __('Total embodied global warming potential', 'carbon');
-        $params['icon'] = 'fa-solid fa-temperature-arrow-up';
 
         return [
             'number'     => $value,
@@ -774,19 +779,22 @@ class Provider
      * Total embodied abiotic depletion potential in antimony equivalent
      *
      * @param array $params
+     * @param array $crit
      * @return array
      */
-    public static function getTotalEmbodiedAdp(array $params = []): array
+    public static function getTotalEmbodiedAdp(array $params = [], array $crit = []): array
     {
         $default_params = [
-            'label' => __('Abiotic depletion potential', 'carbon'),
-            'icon'  => '',
+            'label' => __('Embodied abiotic depletion potential', 'carbon'),
+            'icon'  => 'fa-solid fa-temperature-arrow-up',
         ];
         $params = array_merge($default_params, $params);
 
-        $crit = [
-            'itemtype' => PLUGIN_CARBON_TYPES,
-        ];
+        if (count($crit['itemtype'] ?? []) === 0) {
+            $crit['itemtype'] = PLUGIN_CARBON_TYPES;
+        } else {
+            $crit['itemtype'] = array_intersect($crit['itemtype'], PLUGIN_CARBON_TYPES);
+        }
         $value = self::getSum(EmbodiedImpact::getTable(), 'adp', $params, $crit);
         if ($value === null) {
             $value = 'N/A';
@@ -798,6 +806,78 @@ class Provider
             'number'     => $value,
             'label'      => $params['label'],
             'icon'       => $params['icon'],
+        ];
+    }
+
+    /**
+     * Get total usage abiotic depletion potential in antimony equivalent
+     *
+     * @param array $params
+     * @param array $crit
+     * @return array
+     */
+    public static function getTotalUsageAdp(array $params = [], array $crit = []): array
+    {
+        $default_params = [
+            'label' => __('Total usage abiotic depletion potential', 'carbon'),
+            'icon'  => 'fa-solid fa-temperature-arrow-up',
+        ];
+        $params = array_merge($default_params, $params);
+        if (count($crit['itemtype'] ?? []) === 0) {
+            $crit['itemtype'] = PLUGIN_CARBON_TYPES;
+        } else {
+            $crit['itemtype'] = array_intersect($crit['itemtype'], PLUGIN_CARBON_TYPES);
+        }
+
+        $value = self::getSum(UsageImpact::getTable(), 'adp', $params, $crit);
+        if ($value === null) {
+            $value = 'N/A';
+        } else {
+            $value = Toolbox::getWeight($value) . __('Sbeq', 'carbon');
+        }
+
+        return [
+            'number' => $value,
+            'label'  => $params['label'],
+            'icon'   => $params['icon'],
+        ];
+    }
+
+    /**
+     * get Total abiotic depletion potential
+     *
+     * @param array $params
+     * @param array $crit
+     * @return void
+     */
+    public static function getTotalAdp(array $params = [], array $crit = []): array
+    {
+        $default_params = [
+            'label' => __('Total abiotic depletion potential', 'carbon'),
+            'icon'  => 'fa-solid fa-temperature-arrow-up',
+        ];
+        $params = array_merge($default_params, $params);
+        if (count($crit['itemtype'] ?? []) === 0) {
+            $crit['itemtype'] = PLUGIN_CARBON_TYPES;
+        } else {
+            $crit['itemtype'] = array_intersect($crit['itemtype'], PLUGIN_CARBON_TYPES);
+        }
+
+        $embodied_value = self::getSum(EmbodiedImpact::getTable(), 'adp', $params, $crit);
+        $usage_value = self::getSum(UsageImpact::getTable(), 'adp', $params, $crit);
+
+        return [
+            'data'  => [
+                [
+                    'label' => __('Embodied abiotic depletion potential', 'carbon'),
+                    'number' => $embodied_value,
+                ], [
+                    'label' => __('Total usage abiotic depletion potential', 'carbon'),
+                    'number'  => $usage_value,
+                ],
+            ],
+            'label' => $params['label'],
+            'icon'  => $params['icon'],
         ];
     }
 
@@ -814,7 +894,7 @@ class Provider
         global $DB;
 
         $default_params = [
-            'icon'  => "fas fa-computer",
+            'icon'  => 'fas fa-computer',
             'label' => '',
             // 'color' => '#ea9999',
             'apply_filters' => [],
