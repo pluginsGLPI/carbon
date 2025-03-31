@@ -146,6 +146,12 @@ class Grid
             ],
 
             // embodied + usage impact
+            'plugin_carbon_total_gwp_impact' => [
+                'widgettype'   => ['summaryNumbers', 'multipleNumber', 'pie', 'donut', 'halfpie', 'halfdonut', 'bar', 'hbar'],
+                'group'        => __('Carbon', 'carbon'),
+                'label'        => __('Total global warming potential', 'carbon'),
+                'provider'     => Provider::class . '::getTotalGwp',
+            ],
             'plugin_carbon_total_adp_impact' => [
                 'widgettype'   => ['summaryNumbers', 'multipleNumber', 'pie', 'donut', 'halfpie', 'halfdonut', 'bar', 'hbar'],
                 'group'        => __('Carbon', 'carbon'),

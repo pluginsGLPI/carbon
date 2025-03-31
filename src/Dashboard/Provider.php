@@ -848,7 +848,7 @@ class Provider
      *
      * @param array $params
      * @param array $crit
-     * @return void
+     * @return array
      */
     public static function getTotalAdp(array $params = [], array $crit = []): array
     {
@@ -873,6 +873,37 @@ class Provider
                     'number' => $embodied_value,
                 ], [
                     'label' => __('Total usage abiotic depletion potential', 'carbon'),
+                    'number'  => $usage_value,
+                ],
+            ],
+            'label' => $params['label'],
+            'icon'  => $params['icon'],
+        ];
+    }
+
+    public static function getTotalGwp(array $params = [], array $crit = [])
+    {
+        $default_params = [
+            'label' => __('Total global warming potential', 'carbon'),
+            'icon'  => 'fa-solid fa-temperature-arrow-up',
+        ];
+        $params = array_merge($default_params, $params);
+        if (count($crit['itemtype'] ?? []) === 0) {
+            $crit['itemtype'] = PLUGIN_CARBON_TYPES;
+        } else {
+            $crit['itemtype'] = array_intersect($crit['itemtype'], PLUGIN_CARBON_TYPES);
+        }
+
+        $embodied_value = self::getSum(EmbodiedImpact::getTable(), 'gwp', $params, $crit);
+        $usage_value = self::getSum(CarbonEmission::getTable(), 'emission_per_day', $params, $crit);
+
+        return [
+            'data'  => [
+                [
+                    'label' => __('Embodied global warming potential', 'carbon'),
+                    'number' => $embodied_value,
+                ], [
+                    'label' => __('Total usage global warming potential', 'carbon'),
                     'number'  => $usage_value,
                 ],
             ],
