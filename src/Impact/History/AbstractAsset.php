@@ -229,7 +229,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      * Evaluate usage carbon emission for a single day
      *
      * @param CommonDBTM $item item ti evaluate
-     * @param EngineInterface $engine Calculatin engine to use
+     * @param EngineInterface $engine Calculation engine to use
      * @param DateTime $day Day to calculate
      * @return boolean
      */
