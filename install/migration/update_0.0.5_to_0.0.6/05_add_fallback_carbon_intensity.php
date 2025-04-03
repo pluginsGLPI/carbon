@@ -32,23 +32,35 @@
  */
 
 /** @var DBmysql $DB */
-global $DB;
-
-// Create RTE and Electricity map data sources in DB
-if (!$DB->runFile(__DIR__ . '/../mysql/plugin_carbon_initial.sql')) {
-    throw new \RuntimeException('Error creating data sources in DB');
-}
-
-$world_carbon_intensity = include(dirname(__DIR__) . '/data/carbon_intensity/world.php');
 
 $dbUtil = new DbUtils();
-$table = $dbUtil->getTableForItemType(GlpiPlugin\Carbon\CarbonIntensity::class);
+$source_table = $dbUtil->getTableForItemType(GlpiPlugin\Carbon\CarbonIntensitySource::class);
+$zone_table = $dbUtil->getTableForItemType(GlpiPlugin\Carbon\Zone::class);
+$carbon_intensity_table = $dbUtil->getTableForItemType(GlpiPlugin\Carbon\CarbonIntensity::class);
 
-// Those IDs are set in plugin_carbo_mysql_initial.sql
-$source_id = 1;
-$zone_id_world = 1;
+// World data
+$source_name = 'Ember - Energy Institute';
+$zone_name = 'World';
+$success = $DB->insert($source_table, [
+    'name' => $source_name
+]);
+if (!$success) {
+    throw new RuntimeException("Failed to insert new carbon intensity source: $source_name");
+}
+$source_id = $DB->insertId();
+
+$success = $DB->insert($zone_table, [
+    'name' => $zone_name
+]);
+if (!$success) {
+    throw new RuntimeException("Failed to insert new carbon intensity zone: $zone_name");
+}
+$zone_id_world = $DB->insertId();
+
+$world_carbon_intensity = include(dirname(__DIR__, 2) . '/data/carbon_intensity/world.php');
+$dbUtil = new DbUtils();
 foreach ($world_carbon_intensity as $year => $intensity) {
-    $success = $DB->insert($table, [
+    $DB->insert($carbon_intensity_table, [
         'date' => "$year-01-01 00:00:00",
         'plugin_carbon_carbonintensitysources_id' => $source_id,
         'plugin_carbon_zones_id' => $zone_id_world,
@@ -56,12 +68,28 @@ foreach ($world_carbon_intensity as $year => $intensity) {
         'data_quality' => 2 // constant GlpiPlugin\Carbon\DataTracking::DATA_QUALITY_ESTIMATED
     ]);
 }
+// Quebec Data
+$source_name = 'Hydro Quebec';
+$zone_name = 'Quebec';
+$success = $DB->insert($source_table, [
+    'name' => $source_name
+]);
+if (!$success) {
+    throw new RuntimeException("Failed to insert new carbon intensity source: $source_name");
+}
+$source_id = $DB->insertId();
 
-$source_id = 4;
-$zone_id_quebec = 3;
-$quebec_carbon_intensity = include(dirname(__DIR__) . '/data/carbon_intensity/quebec.php');
+$success = $DB->insert($zone_table, [
+    'name' => $zone_name
+]);
+if (!$success) {
+    throw new RuntimeException("Failed to insert new carbon intensity zone: $zone_name");
+}
+$zone_id_quebec = $DB->insertId();
+
+$quebec_carbon_intensity = include(dirname(__DIR__, 2) . '/data/carbon_intensity/quebec.php');
 foreach ($quebec_carbon_intensity as $year => $intensity) {
-    $success = $DB->insert($table, [
+    $success = $DB->insert($carbon_intensity_table, [
         'date' => "$year-01-01 00:00:00",
         'plugin_carbon_carbonintensitysources_id' => $source_id,
         'plugin_carbon_zones_id' => $zone_id_quebec,

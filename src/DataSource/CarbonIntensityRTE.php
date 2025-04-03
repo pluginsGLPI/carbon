@@ -44,6 +44,10 @@ use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\Toolbox;
 
+/**
+ * Query carbon intensity data from Réseau de Transport d'Électricité (RTE)
+ * @see https://odre.opendatasoft.com/explore/dataset/eco2mix-national-tr/api/?disjunctive.nature
+ */
 class CarbonIntensityRTE extends AbstractCarbonIntensity
 {
     const RECORDS_URL =         '/eco2mix-national-tr/records';

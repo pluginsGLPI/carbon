@@ -31,41 +31,41 @@
  * -------------------------------------------------------------------------
  */
 
-/** @var DBmysql $DB */
-global $DB;
+/**
+ * Ember (2024); Energy Institute - Statistical Review of World Energy (2024) – with major processing by Our World in Data.
+ * “Carbon intensity of electricity generation – Ember and Energy Institute” [dataset].
+ * Ember, “Yearly Electricity Data”; Energy Institute, “Statistical Review of World Energy” [original data].
+ * Retrieved April 3, 2025 from https://ourworldindata.org/grapher/carbon-intensity-electricity
+ */
 
-// Create RTE and Electricity map data sources in DB
-if (!$DB->runFile(__DIR__ . '/../mysql/plugin_carbon_initial.sql')) {
-    throw new \RuntimeException('Error creating data sources in DB');
-}
+/**
+ * Carbon intensity for the whole world, yearly
+ */
 
-$world_carbon_intensity = include(dirname(__DIR__) . '/data/carbon_intensity/world.php');
-
-$dbUtil = new DbUtils();
-$table = $dbUtil->getTableForItemType(GlpiPlugin\Carbon\CarbonIntensity::class);
-
-// Those IDs are set in plugin_carbo_mysql_initial.sql
-$source_id = 1;
-$zone_id_world = 1;
-foreach ($world_carbon_intensity as $year => $intensity) {
-    $success = $DB->insert($table, [
-        'date' => "$year-01-01 00:00:00",
-        'plugin_carbon_carbonintensitysources_id' => $source_id,
-        'plugin_carbon_zones_id' => $zone_id_world,
-        'intensity' => $intensity,
-        'data_quality' => 2 // constant GlpiPlugin\Carbon\DataTracking::DATA_QUALITY_ESTIMATED
-    ]);
-}
-
-$source_id = 4;
-$zone_id_quebec = 3;
-$quebec_carbon_intensity = include(dirname(__DIR__) . '/data/carbon_intensity/quebec.php');
-foreach ($quebec_carbon_intensity as $year => $intensity) {
-    $success = $DB->insert($table, [
-        'date' => "$year-01-01 00:00:00",
-        'plugin_carbon_carbonintensitysources_id' => $source_id,
-        'plugin_carbon_zones_id' => $zone_id_quebec,
-        'intensity' => $intensity,
-        'data_quality' => 2 // constant GlpiPlugin\Carbon\DataTracking::DATA_QUALITY_ESTIMATED
-    ]);
-}
+// year => intensity in gCo2eq/KWh
+return [
+    2000 => 517.84125,
+    2001 => 520.07886,
+    2002 => 523.3326,
+    2003 => 535.7409,
+    2004 => 530.9171,
+    2005 => 534.97253,
+    2006 => 538.3576,
+    2007 => 546.7014,
+    2008 => 540.01984,
+    2009 => 536.3891,
+    2010 => 536.8582,
+    2011 => 543.61914,
+    2012 => 542.0042,
+    2013 => 542.36743,
+    2014 => 538.8367,
+    2015 => 527.64355,
+    2016 => 520.14777,
+    2017 => 516.63275,
+    2018 => 512.9673,
+    2019 => 500.49585,
+    2020 => 487.3561,
+    2021 => 490.35458,
+    2022 => 485.99475,
+    2023 => 480.84857,
+];
