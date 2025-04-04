@@ -174,20 +174,20 @@ class Zone extends CommonDropdown
             return null;
         }
 
-        if ($item->fields['country'] == '') {
+        if (($item->fields['country'] ?? '') == '' && ($item->fields['state'] ?? '') == '') {
             return null;
         }
 
         // TODO: support translations
         $location_table = Location::getTable();
         $zone_table = Zone::getTable();
-        $iterator = $DB->request([
+        $request = [
             'SELECT' => Zone::getTableField('id'),
             'FROM'   => $zone_table,
             'INNER JOIN' => [
                 $location_table => [
                     'FKEY' => [
-                        $location_table => 'country',
+                        $location_table => 'state',
                         $zone_table => 'name',
                     ],
                 ],
@@ -195,10 +195,17 @@ class Zone extends CommonDropdown
             'WHERE'  => [
                 Location::getTableField('id') => $item->getID(),
             ]
-        ]);
+        ];
+        $iterator = $DB->request($request);
 
         if ($iterator->count() !== 1) {
-            return null;
+            // no state found, fallback to country
+            $request['INNER JOIN'][$location_table]['FKEY'][$location_table] = 'country';
+            $iterator = $DB->request($request);
+            if ($iterator->count() !== 1) {
+                // Give up
+                return null;
+            }
         }
 
         $zone_id = $iterator->current()['id'];
@@ -210,6 +217,12 @@ class Zone extends CommonDropdown
         return $zone;
     }
 
+    /**
+     * Get a zone by an asset criteria
+     *
+     * @param CommonDBTM $item
+     * @return Zone|null
+     */
     public static function getByAsset(CommonDBTM $item): ?Zone
     {
         /** @var DBmysql $DB */
@@ -227,13 +240,14 @@ class Zone extends CommonDropdown
         $location_table = Location::getTable();
         $zone_table = Zone::getTable();
         $item_table = $item::getTable();
-        $iterator = $DB->request([
+        $state_field = Location::getTableField('state');
+        $request = [
             'SELECT' => Zone::getTableField('id'),
             'FROM'   => $zone_table,
             'INNER JOIN' => [
                 $location_table => [
                     'FKEY' => [
-                        $location_table => 'country',
+                        $location_table => 'state',
                         $zone_table => 'name',
                     ],
                 ],
@@ -245,13 +259,22 @@ class Zone extends CommonDropdown
                 ],
             ],
             'WHERE'  => [
-                Location::getTableField('country') => ['<>', ''],
+                $state_field => ['<>', ''],
                 $item::getTableField('id') => $item->getID(),
             ]
-        ]);
+        ];
+        $iterator = $DB->request($request);
 
         if ($iterator->count() !== 1) {
-            return null;
+            // no state found, fallback to country
+            $request['INNER JOIN'][$location_table]['FKEY'][$location_table] = 'country';
+            unset($request['WHERE'][$state_field]);
+            $request['WHERE'][Location::getTableField('country')] = ['<>', ''];
+            $iterator = $DB->request($request);
+            if ($iterator->count() !== 1) {
+                // Give up
+                return null;
+            }
         }
 
         $zone_id = $iterator->current()['id'];
