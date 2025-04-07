@@ -98,10 +98,23 @@ class Zone extends CommonDropdown
         return '';
     }
 
+    public function prepareInputForAdd($input)
+    {
+        // Check that historizable source is not a fallback
+        if (!$this->checkSourceProvidesHistory($input)) {
+            return [];
+        }
+        return $input;
+    }
+
     public function prepareInputForUpdate($input)
     {
         unset($input['name']);
 
+        // Check that historizable source is not a fallback
+        if (!$this->checkSourceProvidesHistory($input)) {
+            return [];
+        }
         return $input;
     }
 
@@ -174,20 +187,20 @@ class Zone extends CommonDropdown
             return null;
         }
 
-        if ($item->fields['country'] == '') {
+        if (($item->fields['country'] ?? '') == '' && ($item->fields['state'] ?? '') == '') {
             return null;
         }
 
         // TODO: support translations
         $location_table = Location::getTable();
         $zone_table = Zone::getTable();
-        $iterator = $DB->request([
+        $request = [
             'SELECT' => Zone::getTableField('id'),
             'FROM'   => $zone_table,
             'INNER JOIN' => [
                 $location_table => [
                     'FKEY' => [
-                        $location_table => 'country',
+                        $location_table => 'state',
                         $zone_table => 'name',
                     ],
                 ],
@@ -195,10 +208,17 @@ class Zone extends CommonDropdown
             'WHERE'  => [
                 Location::getTableField('id') => $item->getID(),
             ]
-        ]);
+        ];
+        $iterator = $DB->request($request);
 
         if ($iterator->count() !== 1) {
-            return null;
+            // no state found, fallback to country
+            $request['INNER JOIN'][$location_table]['FKEY'][$location_table] = 'country';
+            $iterator = $DB->request($request);
+            if ($iterator->count() !== 1) {
+                // Give up
+                return null;
+            }
         }
 
         $zone_id = $iterator->current()['id'];
@@ -210,6 +230,12 @@ class Zone extends CommonDropdown
         return $zone;
     }
 
+    /**
+     * Get a zone by an asset criteria
+     *
+     * @param CommonDBTM $item
+     * @return Zone|null
+     */
     public static function getByAsset(CommonDBTM $item): ?Zone
     {
         /** @var DBmysql $DB */
@@ -227,13 +253,14 @@ class Zone extends CommonDropdown
         $location_table = Location::getTable();
         $zone_table = Zone::getTable();
         $item_table = $item::getTable();
-        $iterator = $DB->request([
+        $state_field = Location::getTableField('state');
+        $request = [
             'SELECT' => Zone::getTableField('id'),
             'FROM'   => $zone_table,
             'INNER JOIN' => [
                 $location_table => [
                     'FKEY' => [
-                        $location_table => 'country',
+                        $location_table => 'state',
                         $zone_table => 'name',
                     ],
                 ],
@@ -245,13 +272,22 @@ class Zone extends CommonDropdown
                 ],
             ],
             'WHERE'  => [
-                Location::getTableField('country') => ['<>', ''],
+                $state_field => ['<>', ''],
                 $item::getTableField('id') => $item->getID(),
             ]
-        ]);
+        ];
+        $iterator = $DB->request($request);
 
         if ($iterator->count() !== 1) {
-            return null;
+            // no state found, fallback to country
+            $request['INNER JOIN'][$location_table]['FKEY'][$location_table] = 'country';
+            unset($request['WHERE'][$state_field]);
+            $request['WHERE'][Location::getTableField('country')] = ['<>', ''];
+            $iterator = $DB->request($request);
+            if ($iterator->count() !== 1) {
+                // Give up
+                return null;
+            }
         }
 
         $zone_id = $iterator->current()['id'];
@@ -261,5 +297,29 @@ class Zone extends CommonDropdown
         }
 
         return $zone;
+    }
+
+    /**
+     * Validate if the source given in the input provides an history
+     *
+     * @param array $input
+     * @return boolean
+     */
+    private function checkSourceProvidesHistory(array $input): bool
+    {
+        if (!isset($input['plugin_carbon_carbonintensitysources_id_historical'])) {
+            return true;
+        }
+
+        if (CarbonIntensitySource::isNewID($input['plugin_carbon_carbonintensitysources_id_historical'])) {
+            return true;
+        }
+        $source = new CarbonIntensitySource();
+        if (!$source->getFromDB($input['plugin_carbon_carbonintensitysources_id_historical'])) {
+            // source does not exists
+            return false;
+        }
+
+        return ($source->fields['is_fallback'] == 0);
     }
 }

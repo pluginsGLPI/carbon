@@ -91,12 +91,12 @@
                             {{ fields.field('', field, __('Has a location', 'carbon')) }}
                         {% endif %}
 
-                        {% if status.has_country is defined %}
+                        {% if status.has_state_or_country is defined %}
                             {% set field = nok_field %}
-                            {% if status.has_country %}
+                            {% if status.has_state_or_country %}
                                 {% set field = ok_field %}
                             {% endif %}
-                            {{ fields.field('', field, __('The location has a country', 'carbon')) }}
+                            {{ fields.field('', field, __('The location has a state or a country', 'carbon')) }}
                         {% endif %}
 
                         {% if status.has_model is defined %}

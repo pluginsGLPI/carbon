@@ -31,18 +31,12 @@
  * -------------------------------------------------------------------------
  */
 
-$table = 'glpi_plugin_carbon_computertypes';
-/** @var Migration $migration */
-$migration->addField($table, 'category', 'integer', ['after' => 'power_consumption']);
+/**
+ * Carbon intensity for Quebec, Canada, constant
+ */
 
-$table = 'glpi_plugin_carbon_embodiedimpacts';
-/** @var Migration $migration */
-$migration->addField($table, 'engine', 'string', ['after' => 'items_id']);
-$migration->addField($table, 'engine_version', 'string', ['after' => 'engine']);
-$migration->addField($table, 'date_mod', 'timestamp', ['after' => 'engine_version']);
-
-$table = 'glpi_plugin_carbon_carbonemissions';
-/** @var Migration $migration */
-$migration->addField($table, 'engine', 'string', ['after' => 'items_id']);
-$migration->addField($table, 'engine_version', 'string', ['after' => 'engine']);
-$migration->addField($table, 'date_mod', 'timestamp', ['after' => 'engine_version']);
+// sourced from https://www.hydroquebec.com/developpement-durable/documentation-specialisee/taux-emission-ges.html
+// year => intensity in gCo2eq/KWh
+return [
+    1990 => 34.5
+];

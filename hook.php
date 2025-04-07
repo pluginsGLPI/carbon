@@ -128,7 +128,8 @@ function plugin_carbon_postShowTab(array $param)
         return;
     }
 
-    ComputerHistory::showHistorizableDiagnosis($param['item']);
+    $asset_history = 'GlpiPlugin\\Carbon\\Impact\\History\\' . $asset_itemtype;
+    $asset_history::showHistorizableDiagnosis($param['item']);
     UsageInfo::showCharts($param['item']);
 }
 

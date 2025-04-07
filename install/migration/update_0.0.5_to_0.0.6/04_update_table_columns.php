@@ -31,41 +31,22 @@
  * -------------------------------------------------------------------------
  */
 
+/** @var Migration $migration */
 /** @var DBmysql $DB */
-global $DB;
 
-// Create RTE and Electricity map data sources in DB
-if (!$DB->runFile(__DIR__ . '/../mysql/plugin_carbon_initial.sql')) {
-    throw new \RuntimeException('Error creating data sources in DB');
-}
+$table = 'glpi_plugin_carbon_computertypes';
+$migration->addField($table, 'category', 'integer', ['after' => 'power_consumption']);
 
-$world_carbon_intensity = include(dirname(__DIR__) . '/data/carbon_intensity/world.php');
+$table = 'glpi_plugin_carbon_embodiedimpacts';
+$migration->addField($table, 'engine', 'string', ['after' => 'items_id']);
+$migration->addField($table, 'engine_version', 'string', ['after' => 'engine']);
+$migration->addField($table, 'date_mod', 'timestamp', ['after' => 'engine_version']);
 
-$dbUtil = new DbUtils();
-$table = $dbUtil->getTableForItemType(GlpiPlugin\Carbon\CarbonIntensity::class);
+$table = 'glpi_plugin_carbon_carbonemissions';
+$migration->addField($table, 'engine', 'string', ['after' => 'items_id']);
+$migration->addField($table, 'engine_version', 'string', ['after' => 'engine']);
+$migration->addField($table, 'date_mod', 'timestamp', ['after' => 'engine_version']);
 
-// Those IDs are set in plugin_carbo_mysql_initial.sql
-$source_id = 1;
-$zone_id_world = 1;
-foreach ($world_carbon_intensity as $year => $intensity) {
-    $success = $DB->insert($table, [
-        'date' => "$year-01-01 00:00:00",
-        'plugin_carbon_carbonintensitysources_id' => $source_id,
-        'plugin_carbon_zones_id' => $zone_id_world,
-        'intensity' => $intensity,
-        'data_quality' => 2 // constant GlpiPlugin\Carbon\DataTracking::DATA_QUALITY_ESTIMATED
-    ]);
-}
-
-$source_id = 4;
-$zone_id_quebec = 3;
-$quebec_carbon_intensity = include(dirname(__DIR__) . '/data/carbon_intensity/quebec.php');
-foreach ($quebec_carbon_intensity as $year => $intensity) {
-    $success = $DB->insert($table, [
-        'date' => "$year-01-01 00:00:00",
-        'plugin_carbon_carbonintensitysources_id' => $source_id,
-        'plugin_carbon_zones_id' => $zone_id_quebec,
-        'intensity' => $intensity,
-        'data_quality' => 2 // constant GlpiPlugin\Carbon\DataTracking::DATA_QUALITY_ESTIMATED
-    ]);
-}
+$table = 'glpi_plugin_carbon_carbonintensitysources';
+$migration->addField($table, 'is_fallback', 'bool', ['after' => 'name']);
+$migration->migrationOneTable($table);

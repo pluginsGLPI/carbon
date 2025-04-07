@@ -36,6 +36,7 @@ namespace GlpiPlugin\Carbon\Tests;
 use Session;
 use Config;
 use CronTask as GLPICronTask;
+use DbUtils;
 use DisplayPreference;
 use GLPIKey;
 use Plugin;
@@ -121,7 +122,9 @@ class PluginInstallTest extends CommonTestCase
         $this->checkAutomaticAction();
         // $this->checkDashboard();
         $this->checkRights();
-        $this->checkDataSources();
+        $this->checkInitialDataSources();
+        $this->checkInitialZones();
+        $this->checkInitialCarbonIntensities();
         $this->checkDisplayPrefs();
         $this->checkPredefinedUsageProfiles();
     }
@@ -317,16 +320,98 @@ class PluginInstallTest extends CommonTestCase
         $this->assertEquals(4, count($preferences));
     }
 
-    private function checkDataSources()
+    private function checkInitialDataSources()
     {
         $sources = ['RTE', 'ElectricityMap'];
         foreach ($sources as $source_name) {
             $source = new CarbonIntensitySource();
             $source->getFromDBByCrit([
-                'name' => $source_name
+                'name' => $source_name,
+                'is_fallback' => 0
             ]);
             $this->assertFalse($source->isNewItem());
         }
+
+        $sources = ['Ember - Energy Institute', 'Hydro Quebec'];
+        foreach ($sources as $source_name) {
+            $source = new CarbonIntensitySource();
+            $source->getFromDBByCrit([
+                'name' => $source_name,
+                'is_fallback' => 1
+            ]);
+            $this->assertFalse($source->isNewItem());
+        }
+    }
+
+    private function checkInitialZones()
+    {
+        $zones = ['World', 'Quebec'];
+        foreach ($zones as $zone_name) {
+            $zone = new Zone();
+            $zone->getFromDBByCrit([
+                'name' => $zone_name
+            ]);
+            $this->assertFalse($zone->isNewItem());
+        }
+    }
+
+    private function checkInitialCarbonIntensities()
+    {
+        // Find the zone
+        $zone_name = 'World';
+        $zone = new Zone();
+        $zone->getFromDBByCrit([
+            'name' => $zone_name,
+        ]);
+        if ($zone->isNewItem()) {
+            $this->fail("$zone_name zone not found");
+        }
+
+        // Find the source for Ember - Energy Institute
+        $source_name = 'Ember - Energy Institute';
+        $source = new CarbonIntensitySource();
+        $source->getFromDBByCrit([
+            'name' => $source_name
+        ]);
+        if ($source->isNewItem()) {
+            $this->fail("$source_name not found");
+        }
+
+        $dbUtils = new DbUtils();
+        $table = $dbUtils->getTableForItemType(CarbonIntensity::class);
+        $count = $dbUtils->countElementsInTable($table, [
+            $source::getForeignKeyField() => $source->getID(),
+            $zone::getForeignKeyField() => $zone->getID(),
+        ]);
+        $this->assertEquals(24, $count);
+
+        // Find the zone
+        $zone_name = 'Quebec';
+        $zone = new Zone();
+        $zone->getFromDBByCrit([
+            'name' => $zone_name,
+        ]);
+        if ($zone->isNewItem()) {
+            $this->fail("$zone_name zone not found");
+        }
+
+        // Find the source for Hydro Quebec
+        $source_name = 'Hydro Quebec';
+        $source = new CarbonIntensitySource();
+        $source->getFromDBByCrit([
+            'name' => $source_name
+        ]);
+        if ($source->isNewItem()) {
+            $this->fail("$source_name not found");
+        }
+
+        $dbUtils = new DbUtils();
+        $table = $dbUtils->getTableForItemType(CarbonIntensity::class);
+        $count = $dbUtils->countElementsInTable($table, [
+            $source::getForeignKeyField() => $source->getID(),
+            $zone::getForeignKeyField() => $zone->getID(),
+        ]);
+        $this->assertEquals(1, $count);
     }
 
     private function checkPredefinedUsageProfiles()

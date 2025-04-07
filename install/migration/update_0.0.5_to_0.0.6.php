@@ -49,6 +49,7 @@ function update005to006(Migration $migration)
     // If a script requires a new table, it may create it by itself
 
     $update_scripts = scandir($update_dir);
+    natcasesort($update_scripts);
     foreach ($update_scripts as $update_script) {
         if (preg_match('/\.php$/', $update_script) !== 1) {
             continue;

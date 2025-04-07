@@ -31,6 +31,8 @@
  * -------------------------------------------------------------------------
  */
 
+/** @var DBmysql $DB */
+
 // Rename enbedded impacts table
 // Move data to new table
 $old_table = 'glpi_plugin_carbon_embeddedimpacts';
@@ -42,7 +44,6 @@ $old_itemtype = '\\GlpiPlugin\\Carbon\\EmbeddedImpact';
 $new_itemtype = '\\GlpiPlugin\\Carbon\\EmbodiedImpact';
 
 // Update display preferences
-/** @var DBmysql $DB */
 $DB->update(DisplayPreference::getTable(), [
     'itemtype' => $new_itemtype
 ], [
@@ -72,6 +73,7 @@ $migration->dropKey($table, 'unicity');
 $migration->changeField($table, 'plugin_carbon_carbonintensityzones_id', 'plugin_carbon_zones_id', "int unsigned NOT NULL DEFAULT '0'");
 $migration->migrationOneTable($table);
 $migration->addKey($table, ['date', 'plugin_carbon_carbonintensitysources_id', 'plugin_carbon_zones_id'], 'unicity', 'UNIQUE');
+$migration->migrationOneTable($table);
 
 $old_table = 'glpi_plugin_carbon_carbonintensitysources_carbonintensityzones';
 $new_table = 'glpi_plugin_carbon_carbonintensitysources_zones';

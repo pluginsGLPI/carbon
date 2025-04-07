@@ -72,6 +72,7 @@ CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_zones` (
 CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_carbonintensitysources` (
   `id`               int unsigned NOT NULL AUTO_INCREMENT,
   `name`             varchar(255) DEFAULT NULL,
+  `is_fallback`      tinyint      NOT NULL DEFAULT '0' COMMENT 'Fallback source for carbon intensity',
   PRIMARY KEY (`id`),
   UNIQUE KEY `unicity` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -80,8 +81,8 @@ CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_carbonintensitysources_zones` (
   `id`               int unsigned NOT NULL AUTO_INCREMENT,
   `plugin_carbon_carbonintensitysources_id` int unsigned NOT NULL DEFAULT '0',
   `plugin_carbon_zones_id`   int unsigned NOT NULL DEFAULT '0',
-  `code`                                    varchar(255) DEFAULT NULL         COMMENT 'Zone identifier in the API of the source',
-  `is_download_enabled`                     tinyint      NOT NULL DEFAULT '0' COMMENT 'Download enabled from the source for this zone',
+  `code`                     varchar(255) DEFAULT NULL         COMMENT 'Zone identifier in the API of the source',
+  `is_download_enabled`      tinyint      NOT NULL DEFAULT '0' COMMENT 'Download enabled from the source for this zone',
   PRIMARY KEY (`id`),
   UNIQUE KEY `unicity` (`plugin_carbon_carbonintensitysources_id`, `plugin_carbon_zones_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

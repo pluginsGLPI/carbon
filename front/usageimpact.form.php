@@ -116,7 +116,6 @@ if (isset($_POST['update'])) {
 
     if (!$gwp_impact->canHistorize($_POST['items_id'])) {
         Session::addMessageAfterRedirect(__('Missing data prevents historization of this asset.', 'carbon'), false, ERROR);
-        // Html::back();
     } else {
         if (!$gwp_impact->calculateImpact($_POST['items_id'])) {
             Session::addMessageAfterRedirect(__('Update of global warming potential failed.', 'carbon'), false, ERROR);

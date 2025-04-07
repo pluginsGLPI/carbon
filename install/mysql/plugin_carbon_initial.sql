@@ -29,9 +29,13 @@
 -- -------------------------------------------------------------------------
 --
 
-INSERT INTO `glpi_plugin_carbon_carbonintensitysources` (`id`, `name`) VALUES
-    (2, 'ElectricityMap'),
-    (1, 'RTE');
+INSERT INTO `glpi_plugin_carbon_carbonintensitysources` (`id`, `name`, `is_fallback`) VALUES
+    (1, 'Ember - Energy Institute', 1),
+    (2, 'RTE', 0),
+    (3, 'ElectricityMap', 0),
+    (4, 'Hydro Quebec', 1);
 
 INSERT INTO `glpi_plugin_carbon_zones` (`id`, `name`, `plugin_carbon_carbonintensitysources_id_historical`) VALUES
-    (1, 'France', 1);
+    (1, 'World', 1),
+    (2, 'France', 2),
+    (3, 'Quebec', 4);

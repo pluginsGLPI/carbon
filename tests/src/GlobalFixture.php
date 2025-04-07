@@ -129,7 +129,8 @@ class GlobalFixture
         // Support any line ending type
         $line_ending_mode = ini_get('auto_detect_line_endings');
         ini_set('auto_detect_line_endings', true);
-        if (($handle = fopen(__DIR__ . '/../fixtures/carbon_intensity.csv', 'r')) === false) {
+        $file = dirname(__DIR__) . '/fixtures/carbon_intensity.csv';
+        if (($handle = fopen($file, 'r')) === false) {
             fwrite(STDOUT, sprintf('Failed to open carbon intensity dataset CSV file' . PHP_EOL));
             exit(1);
         }
@@ -142,7 +143,11 @@ class GlobalFixture
             ]);
         }
         ini_set('auto_detect_line_endings', $line_ending_mode);
-        $count = (new DbUtils())->countElementsInTable($intensity_table);
+        $condition = [
+            'plugin_carbon_carbonintensitysources_id' => $source_id,
+            'plugin_carbon_zones_id'   => $zone_id,
+        ];
+        $count = (new DbUtils())->countElementsInTable($intensity_table, $condition);
         if ($count !== 3648) {
             fwrite(STDOUT, sprintf('Failed to load carbon intensity dataset' . PHP_EOL));
             exit(1);
