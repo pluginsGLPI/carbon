@@ -33,6 +33,7 @@
 
 namespace GlpiPlugin\Carbon\Engine\V1;
 
+use ArrayObject;
 use DateTime;
 use DateInterval;
 use DateTimeImmutable;
@@ -129,9 +130,14 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
             return new TrackedFloat(0);
         }
 
-        $iterator = $this->requestCarbonIntensitiesPerDay($start_time, $length, $zone);
         $total_seconds = (int) $length->format('%S');
-        $expected_count = ceil($total_seconds / 3600);
+        $expected_count = (int) ceil($total_seconds / 3600);
+        $iterator = $this->requestCarbonIntensitiesPerDay($start_time, $length, $zone);
+        if ($iterator->count() === 0) {
+            $row = array_fill(0, $expected_count, $this->getFallbackCarbonIntensity($start_time, $zone));
+            $iterator = new ArrayObject($row);
+            $iterator = $iterator->getIterator();
+        }
         $count = $iterator->count();
         if ($iterator->count() != $expected_count) {
             trigger_error(sprintf(

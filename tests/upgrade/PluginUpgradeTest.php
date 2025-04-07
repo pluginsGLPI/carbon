@@ -97,17 +97,15 @@ class PluginUpgradeTest extends PluginInstallTest
         $plugin->activate($plugin->getID());
         $plugin->init();
 
-        ob_start(function ($in) {
-            return $in;
-        });
         $DB->clearSchemaCache();
-        plugin_carbon_install();
+        ob_start();
+        $success = plugin_carbon_install();
+        $install_output = ob_get_clean();
+        $this->assertTrue($success, 'Failed to install plugin', $install_output);
         // Ignore SQL warnings. We must rely on schema comparison to detect errors
         // which impact plugin upgrade
         file_put_contents(GLPI_LOG_DIR . "/sql-errors.log", '');
-        $install_output = ob_get_contents();
-        ob_end_clean();
-        $this->assertTrue($plugin->isInstalled($plugin_name), $install_output);
+        $this->assertTrue($plugin->isInstalled($plugin_name));
     }
 
     protected function checkConfig()

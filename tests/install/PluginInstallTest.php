@@ -322,11 +322,22 @@ class PluginInstallTest extends CommonTestCase
 
     private function checkInitialDataSources()
     {
-        $sources = ['Ember - Energy Institute', 'Hydro Quebec', 'RTE', 'ElectricityMap'];
+        $sources = ['RTE', 'ElectricityMap'];
         foreach ($sources as $source_name) {
             $source = new CarbonIntensitySource();
             $source->getFromDBByCrit([
-                'name' => $source_name
+                'name' => $source_name,
+                'is_fallback' => 0
+            ]);
+            $this->assertFalse($source->isNewItem());
+        }
+
+        $sources = ['Ember - Energy Institute', 'Hydro Quebec'];
+        foreach ($sources as $source_name) {
+            $source = new CarbonIntensitySource();
+            $source->getFromDBByCrit([
+                'name' => $source_name,
+                'is_fallback' => 1
             ]);
             $this->assertFalse($source->isNewItem());
         }

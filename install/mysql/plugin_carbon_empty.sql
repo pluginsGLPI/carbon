@@ -72,6 +72,7 @@ CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_zones` (
 CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_carbonintensitysources` (
   `id`               int unsigned NOT NULL AUTO_INCREMENT,
   `name`             varchar(255) DEFAULT NULL,
+  `is_fallback`      tinyint      NOT NULL DEFAULT '0' COMMENT 'Fallback source for carbon intensity',
   PRIMARY KEY (`id`),
   UNIQUE KEY `unicity` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -346,12 +346,12 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
             $zone_table = Zone::getTable();
 
             $zone = new Zone();
-            $found = $zone->getFromDBByRequest([
+            $request = [
                 'INNER JOIN' => [
                     $location_table => [
                         'FKEY' => [
                             $zone_table => 'name',
-                            $location_table => 'country',
+                            $location_table => 'state',
                         ],
                     ],
                     $item_table => [
@@ -364,9 +364,16 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
                 'WHERE' => [
                     $item_table . '.id' => $items_id
                 ]
-            ]);
+            ];
+            $found = $zone->getFromDBByRequest($request);
             if ($found === false) {
-                return null;
+                // no state found, fallback to country
+                $request['INNER JOIN'][$location_table]['FKEY'][$location_table] = 'country';
+                $found = $zone->getFromDBByRequest($request);
+                if ($found === false) {
+                    // Give up
+                    return null;
+                }
             }
 
             return $zone;

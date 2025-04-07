@@ -41,9 +41,11 @@ use DateTimeImmutable;
 use DBmysqlIterator;
 use DbUtils;
 use DBmysql;
-use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\CarbonIntensity;
+use GlpiPlugin\Carbon\CarbonIntensitySource;
+use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
 use GlpiPlugin\Carbon\DataTracking\TrackedInt;
+use GlpiPlugin\Carbon\Zone;
 use QueryExpression;
 
 abstract class AbstractAsset implements EngineInterface
@@ -175,5 +177,100 @@ abstract class AbstractAsset implements EngineInterface
         }
 
         return new TrackedInt(0, null, TrackedInt::DATA_QUALITY_MANUAL);
+    }
+
+    /**
+     * Get a carbon intensity for the given zone or fallback to a carbon intensity
+     * for the world. Use the latest value before the given date
+     *
+     * @param DateTimeInterface $day
+     * @param Zone $zone
+     * @return array|null
+     */
+    protected function getFallbackCarbonIntensity(DateTimeInterface $day, Zone $zone): ?array
+    {
+        static $world_not_found_error_triggered = false;
+
+        /** @var DBmysql $DB */
+        global $DB;
+
+        $carbon_intensity_table = CarbonIntensity::getTable();
+        $carbon_intensity_source_zone_table = CarbonIntensitySource_Zone::getTable();
+        $carbon_intensity_source_table = CarbonIntensitySource::getTable();
+        $request = [
+            'SELECT' => "$carbon_intensity_table.*",
+            'FROM' => $carbon_intensity_table,
+            'INNER JOIN' => [
+                $carbon_intensity_source_zone_table => [
+                    'FKEY'   => [
+                        $carbon_intensity_table => 'plugin_carbon_zones_id',
+                        $carbon_intensity_source_zone_table => 'plugin_carbon_carbonintensitysources_id',
+                    ]
+                ],
+                $carbon_intensity_source_table => [
+                    'FKEY'   => [
+                        $carbon_intensity_source_zone_table => 'plugin_carbon_carbonintensitysources_id',
+                        $carbon_intensity_source_table => 'id',
+                    ]
+                ]
+            ],
+            'WHERE' => [
+                CarbonIntensitySource::getTableField('is_fallback') => 1,
+                CarbonIntensitySource::getTableField('name') => 'Ember - Energy Institute',
+                CarbonIntensitySource_Zone::getTableField('plugin_carbon_zones_id') => $zone->getID(),
+                CarbonIntensity::getTableField('date') => ['<=', $day->format('Y-m-d H:i:s')],
+            ],
+            'ORDER' => CarbonIntensity::getTableField('date') . ' DESC',
+            'LIMIT' => 1,
+        ];
+        $result = $DB->request($request);
+        if ($result->count() === 1) {
+            return $result->current();
+            // $intensity = $result->current()['intensity'];
+            // return $intensity;
+        }
+
+        // No data for the zone, fallback again to carbon intensity for the whole world
+        // We assume that electricity is (nearly) immediately consumed then worlwide and yearly
+        // carbon intensity generation and consumption is the same
+        unset($request['WHERE'][CarbonIntensitySource_Zone::getTableField('plugin_carbon_zones_id')]);
+        $carbon_intensity_zone_table = Zone::getTable();
+        $request['INNER JOIN'] = [
+            $carbon_intensity_zone_table => [
+                'FKEY'   => [
+                    $carbon_intensity_table => 'plugin_carbon_zones_id',
+                    $carbon_intensity_zone_table => 'id',
+                ]
+            ],
+            $carbon_intensity_source_table => [
+                'FKEY'   => [
+                    $carbon_intensity_table => 'plugin_carbon_carbonintensitysources_id',
+                    $carbon_intensity_source_table => 'id',
+                ]
+            ],
+        ];
+        $request['WHERE'][Zone::getTableField('name')] = 'World';
+
+        $result = $DB->request($request);
+        if ($result->count() === 1) {
+            return $result->current();
+            // $intensity = $result->current()['intensity'];
+            // return $intensity;
+        }
+
+        if (!$world_not_found_error_triggered) {
+            // Log an error, only once
+            //Should not happen as data for countries and workd are added in DB at install time
+            $world_not_found_error_triggered = true;
+            trigger_error(
+                sprintf(
+                    'No fallback carbon intensity found for zone %s and date %s',
+                    $zone->getField('name'),
+                    $day->format('Y-m-d H:i:s')
+                )
+            );
+        }
+
+        return null;
     }
 }

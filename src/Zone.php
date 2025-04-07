@@ -98,10 +98,23 @@ class Zone extends CommonDropdown
         return '';
     }
 
+    public function prepareInputForAdd($input)
+    {
+        // Check that historizable source is not a fallback
+        if (!$this->checkSourceProvidesHistory($input)) {
+            return [];
+        }
+        return $input;
+    }
+
     public function prepareInputForUpdate($input)
     {
         unset($input['name']);
 
+        // Check that historizable source is not a fallback
+        if (!$this->checkSourceProvidesHistory($input)) {
+            return [];
+        }
         return $input;
     }
 
@@ -284,5 +297,29 @@ class Zone extends CommonDropdown
         }
 
         return $zone;
+    }
+
+    /**
+     * Validate if the source given in the input provides an history
+     *
+     * @param array $input
+     * @return boolean
+     */
+    private function checkSourceProvidesHistory(array $input): bool
+    {
+        if (!isset($input['plugin_carbon_carbonintensitysources_id_historical'])) {
+            return true;
+        }
+
+        if (CarbonIntensitySource::isNewID($input['plugin_carbon_carbonintensitysources_id_historical'])) {
+            return true;
+        }
+        $source = new CarbonIntensitySource();
+        if (!$source->getFromDB($input['plugin_carbon_carbonintensitysources_id_historical'])) {
+            // source does not exists
+            return false;
+        }
+
+        return ($source->fields['is_fallback'] == 0);
     }
 }

@@ -152,12 +152,20 @@ class Monitor extends AbstractAsset
             'AND' => [
                 self::$itemtype::getTableField('is_deleted') => 0,
                 self::$itemtype::getTableField('is_template') => 0,
-
                 // Check the monitor is located the same place as the attached computer
                 // self::$itemtype::getTableField('locations_id') => new QueryExpression(DBmysql::quoteName(GlpiComputer::getTableField('locations_id'))),
-
-                ['NOT' => [Location::getTableField('country') => '']],
-                ['NOT' => [Location::getTableField('country') => null]],
+                [
+                    'OR' => [
+                        [
+                            ['NOT' => [Location::getTableField('country') => '']],
+                            ['NOT' => [Location::getTableField('country') => null]],
+                        ],
+                        [
+                            ['NOT' => [Location::getTableField('state') => '']],
+                            ['NOT' => [Location::getTableField('state') => null]],
+                        ]
+                    ]
+                ],
                 [
                     'OR' => [
                         MonitorType::getTableField('power_consumption') => ['>', 0],
@@ -188,6 +196,7 @@ class Monitor extends AbstractAsset
             self::$itemtype::getTableField('is_template'),
             Computer_Item::getTableField('computers_id'),
             Location::getTableField('id as location_id'),
+            Location::getTableField('state'),
             Location::getTableField('country'),
             GlpiMonitorModel::getTableField('id as model_id'),
             GlpiMonitorModel::getTableField('power_consumption as model_power_consumption'),
@@ -216,7 +225,7 @@ class Monitor extends AbstractAsset
         $status['is_template'] = ($data['is_template'] === 0);
         $status['has_computer'] = ($data['computers_id'] !== 0);
         $status['has_location'] = ($data['location_id'] !== 0);
-        $status['has_country'] = (strlen($data['country'] ?? '') > 0);
+        $status['has_state_or_country'] = (strlen($data['state'] ?? '') > 0) || (strlen($data['country'] ?? '') > 0);
         $status['has_model'] = ($data['model_id'] !== 0);
         $status['has_model_power_consumption'] = (($data['model_power_consumption'] ?? 0) !== 0);
         $status['has_type'] = ($data['type_id'] !== 0);

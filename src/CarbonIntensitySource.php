@@ -103,4 +103,20 @@ class CarbonIntensitySource extends CommonDropdown
 
         return true;
     }
+
+    public function rawSearchOptions()
+    {
+        $tab = parent::rawSearchOptions();
+
+        $tab[] = [
+            'id'                 => '3',
+            'table'              => $this->getTable(),
+            'field'              => 'is_fallback',
+            'name'               => __('Is a fallback source'),
+            'massiveaction'      => false,
+            'datatype'           => 'boolean',
+        ];
+
+        return $tab;
+    }
 }

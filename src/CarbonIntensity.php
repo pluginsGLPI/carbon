@@ -48,6 +48,17 @@ use QuerySubQuery;
 use QueryExpression;
 use Symfony\Component\Console\Helper\ProgressBar;
 
+/**
+ * Some data sources
+ *
+ * Carbon intensity of electricity productiion for many countries, yearly
+ *including a value for the whole world
+ * https://ourworldindata.org/grapher/carbon-intensity-electricity?tab=chart
+ */
+
+/**
+ * Undocumented class
+ */
 class CarbonIntensity extends CommonDropdown
 {
     private const MIN_HISTORY_LENGTH = '13 months ago';
