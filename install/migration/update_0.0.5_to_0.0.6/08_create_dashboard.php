@@ -59,92 +59,15 @@ if ($dashboard->getFromDB($dashboard_key) === false) {
 }
 
 // add cards
-$cards = [
-    'plugin_carbon_report_totalcarbonemission_ytd' => [
-        'x'            => 0,
-        'y'            => 0,
-        'width'        => 6,
-        'height'       => 3,
-        'color'        => '#BBDA50',
-        'widgettype'   => 'totalcarbonemission_ytd',
-        'use_gradient' => '0',
-        'limit'        => '7',
-        'point_labels' => '0',
-    ],
-    'plugin_carbon_report_totalcarbonemission_two_last_months' => [
-        'x'            => 6,
-        'y'            => 0,
-        'width'        => 6,
-        'height'       => 3,
-        'color'        => '#145161',
-        'widgettype'   => 'totalcarbonemission_two_last_months',
-        'use_gradient' => '0',
-        'limit'        => '7',
-        'point_labels' => '0',
-    ],
-    'plugin_carbon_report_unhandled_computers_ratio' => [
-        'x'            => 12,
-        'y'            => 0,
-        'width'        => 6,
-        'height'       => 3,
-        'color'        => '#f3f6f4',
-        'widgettype'   => 'unhandledComputersRatio',
-        'use_gradient' => '0',
-        'limit'        => '7',
-        'point_labels' => '0',
-    ],
-    'plugin_carbon_report_information_video'   => [
-        'x'            => 18,
-        'y'            => 0,
-        'width'        => 6,
-        'height'       => 3,
-        'color'        => '#f3f6f4',
-        'widgettype'   => 'information_video',
-        'use_gradient' => '0',
-        'limit'        => '7',
-        'point_labels' => '0',
-    ],
-    'plugin_carbon_report_methodology_information'   => [
-        'x'            => 12,
-        'y'            => 3,
-        'width'        => 12,
-        'height'       => 6,
-        'color'        => '#f3f6f4',
-        'widgettype'   => 'methodology_information',
-        'use_gradient' => '0',
-        'limit'        => '7',
-        'point_labels' => '0',
-    ],
-    'plugin_carbon_biggest_gwp_per_model'   => [
-        'x'            => 0,
-        'y'            => 3,
-        'width'        => 12,
-        'height'       => 6,
-        'color'        => '#f3f6f4',
-        'widgettype'   => 'most_gwp_impacting_computer_models',
-        'use_gradient' => '0',
-        'limit'        => '7',
-        'point_labels' => '0',
-    ],
-    'plugin_carbon_report_usage_carbon_emissions_graph'   => [
-        'x'            => 0,
-        'y'            => 9,
-        'width'        => 24,
-        'height'       => 7,
-        'color'        => '#f3f6f4',
-        'widgettype'   => 'usage_gwp_monthly',
-        'use_gradient' => '0',
-        'limit'        => '7',
-        'point_labels' => '0',
-    ],
-];
-foreach ($cards as $key => $options) {
+$cards_path = Plugin::getPhpDir('carbon') . '/install/data/report_dashboard.json';
+$cards = file_get_contents($cards_path);
+$cards = json_decode($cards, true);
+foreach ($cards as $key => $card) {
     $item = new DashboardItem();
-    $x = $options['x'];
-    $y = $options['y'];
-    $w = $options['width'];
-    $h = $options['height'];
-    unset($options['x'], $options['y'], $options['width'], $options['height']);
+    $x = $card['x'];
+    $y = $card['y'];
+    $w = $card['width'];
+    $h = $card['height'];
     $item->getFromDBByCrit([
         'dashboards_dashboards_id' => $dashboard->fields['id'],
         'card_id' => $key,
@@ -160,7 +83,7 @@ foreach ($cards as $key => $options) {
         'y'       => $y,
         'width'   => $w,
         'height'  => $h,
-        'card_options' => $options,
+        'card_options' => $card['card_options'],
     ]
     ]);
 }

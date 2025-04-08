@@ -460,10 +460,14 @@ class PluginInstallTest extends CommonTestCase
         }
 
         // Check there is widgets in the dashboard
+        $cards_path = Plugin::getPhpDir('carbon') . '/install/data/report_dashboard.json';
+        $cards = file_get_contents($cards_path);
+        $cards = json_decode($cards, true);
+        $expected_cards_count = count($cards);
         $dashboardItem = new Item();
         $rows = $dashboardItem->find([
             'dashboards_dashboards_id' => $dashboard->fields['id'],
         ]);
-        $this->assertCount(7, $rows);
+        $this->assertCount($expected_cards_count, $rows);
     }
 }
