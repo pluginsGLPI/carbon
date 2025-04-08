@@ -322,4 +322,26 @@ class Zone extends CommonDropdown
 
         return ($source->fields['is_fallback'] == 0);
     }
+
+    /**
+     * Check if the zone has a historical data source
+     *
+     * @return bool
+     */
+    public function hasHistoricalData(): bool
+    {
+        if ($this->isNewItem()) {
+            return false;
+        }
+        if (!isset($this->fields['plugin_carbon_carbonintensitysources_id_historical'])) {
+            return false;
+        }
+        $source = new CarbonIntensitySource();
+        if (!$source->getFromDB($this->fields['plugin_carbon_carbonintensitysources_id_historical'])) {
+            // source does not exists
+            return false;
+        }
+
+        return true;
+    }
 }

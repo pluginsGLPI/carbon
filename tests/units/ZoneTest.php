@@ -34,6 +34,7 @@
 namespace GlpiPlugin\Carbon\Tests;
 
 use Computer;
+use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\Zone;
 use Location;
 
@@ -150,5 +151,25 @@ class ZoneTest extends DbTestCase
         ]);
         $output = Zone::getByAsset($computer);
         $this->assertEquals($output->getID(), $zone->getID());
+    }
+
+    public function testHasHistoricalData()
+    {
+        // Test with an empty Zone object
+        $zone = new Zone();
+        $this->assertFalse($zone->hasHistoricalData());
+
+        // Test with a Zone object that has no historical data
+        /** @var Zone $zone */
+        $zone = $this->getItem(Zone::class);
+        $this->assertFalse($zone->hasHistoricalData());
+
+        $source = $this->getItem(CarbonIntensitySource::class, [
+            'name' => 'foo'
+        ]);
+        $zone->update(array_merge($zone->fields, [
+            'plugin_carbon_carbonintensitysources_id_historical' => $source->getID(),
+        ]));
+        $this->assertTrue($zone->hasHistoricalData());
     }
 }
