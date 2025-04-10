@@ -56,9 +56,9 @@ class Engine extends CommonGLPI
      * Returns null if no engine found
      *
      * @param string $itemtype itemtype of assets to analyze
-     * @return UsageImpactInterface|null an instance if an embodied impact calculation object or null on error
+     * @return AbstractUsageImpact|null an instance if an embodied impact calculation object or null on error
      */
-    public static function getEngineFromItemtype(string $itemtype): ?UsageImpactInterface
+    public static function getEngineFromItemtype(string $itemtype): ?AbstractUsageImpact
     {
         $usage_impact_namespace = Config::getUsageImpactEngine();
         $usage_impact_class = $usage_impact_namespace . '\\' . $itemtype;
@@ -74,9 +74,9 @@ class Engine extends CommonGLPI
         }
     }
 
-    public static function getEngine(string $engine_class): ?UsageImpactInterface
+    public static function getEngine(string $engine_class): ?AbstractUsageImpact
     {
-        if (!is_subclass_of($engine_class, UsageImpactInterface::class)) {
+        if (!is_subclass_of($engine_class, AbstractUsageImpact::class)) {
             return null;
         }
         $embodied_impact = new $engine_class();
@@ -91,10 +91,10 @@ class Engine extends CommonGLPI
     /**
      * Configure the engine depending on its specificities
      *
-     * @param UsageImpactInterface $engine the engine to configure
-     * @return UsageImpactInterface the configured engine
+     * @param AbstractUsageImpact $engine the engine to configure
+     * @return AbstractUsageImpact the configured engine
      */
-    protected static function configureEngine(UsageImpactInterface $engine): UsageImpactInterface
+    protected static function configureEngine(AbstractUsageImpact $engine): AbstractUsageImpact
     {
         $embodied_impact_namespace = explode('\\', get_class($engine));
         switch (array_slice($embodied_impact_namespace, -2, 1)[0]) {

@@ -109,9 +109,9 @@ class CronTask
         // Calculate other impacts
         $usage_impacts = Toolbox::getUsageImpactClasses();
         foreach ($usage_impacts as $usage_impact_type) {
-            /** @var UsageImpactInterface $usage_impact */
+            /** @ar UsageImpactInterface $usage_impact */
             $usage_impact = UsageEngine::getEngine($usage_impact_type);
-            if (!$usage_impact) {
+            if ($usage_impact === null) {
                 continue;
             }
             $usage_impact->setLimit($limit_per_type);
