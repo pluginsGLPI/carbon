@@ -77,6 +77,7 @@ class Widget extends GlpiDashboardWidget
                 'function' => self::class . '::DisplayGraphUsageCarbonEmissionPerModel',
                 'width'    => 6,
                 'height'   => 3,
+                'limit'    => true,
             ],
             'usage_gwp_monthly' => [
                 'label'    => __('Carbon Emission Per month', 'carbon'),
@@ -574,7 +575,7 @@ class Widget extends GlpiDashboardWidget
             'series' => [],
             'labels' => [],
         ];
-        $data = array_merge($data, Provider::getSumUsageEmissionsPerModel());
+        $data = array_merge($data, Provider::getSumUsageEmissionsPerModel($params));
 
         return TemplateRenderer::getInstance()->render('@carbon/components/graph-carbon-emission-per-model.html.twig', [
             'id' => $p['id'],

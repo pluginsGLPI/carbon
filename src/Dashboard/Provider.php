@@ -99,12 +99,15 @@ class Provider
     /**
      * Returns sum of of carbon emission grouped by computer model without time limitation.
      *
+     * @param array $params
+     * @param array $where
+     *
      * @return array of:
      *   - mixed  'number': sum for the model
      *   - string 'url': url to redirect when clicking on the slice
      *   - string 'label': name of the computer model
      */
-    public static function getSumUsageEmissionsPerModel(array $where = [])
+    public static function getSumUsageEmissionsPerModel(array $params = [], array $where = [])
     {
         /** @var DBmysql $DB */
         global $DB;
@@ -133,7 +136,7 @@ class Provider
             ],
             'WHERE' => [
                 CarbonEmission::getTableField('itemtype') => Computer::class
-            ] + $entity_restrict,
+            ] + $entity_restrict + $where,
             'GROUPBY' => [
                 ComputerModel::getTableField('id'),
                 new QueryExpression($sql_year_month)
@@ -152,6 +155,7 @@ class Provider
             'WHERE' => [],
             'GROUPBY' => ['id'],
             'ORDERBY' => 'monthly_emission_per_model DESC',
+            'LIMIT'   => $params['limit'] ?? 9999
         ];
 
         if (!empty($where)) {
