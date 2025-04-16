@@ -36,7 +36,7 @@ namespace GlpiPlugin\Carbon\Tests;
 use Config;
 use CronTask;
 use DisplayPreference;
-use GlpiPlugin\Carbon\ComputerPower;
+use Glpi\Dashboard\Dashboard;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use Plugin;
@@ -80,6 +80,7 @@ class PluginUninstallTest extends CommonTestCase
         // $this->checkDashboard();
         $this->checkRights();
         $this->checkDisplayPrefs();
+        $this->checkDashboard();
 
         Config::deleteConfigurationValues('carbon:test_dataset', ['version']);
     }
@@ -114,5 +115,13 @@ class PluginUninstallTest extends CommonTestCase
         $preferences = $displayPreference->find(['itemtype' => CarbonIntensity::class, 'users_id' => 0]);
 
         $this->assertEquals(0, count($preferences));
+    }
+
+    private function checkDashboard()
+    {
+        $dashboard_key = 'plugin_carbon_board';
+        $dashboard = new Dashboard();
+        $dashboard->getFromDB($dashboard_key);
+        $this->assertTrue($dashboard->isNewItem());
     }
 }

@@ -428,8 +428,9 @@ class PluginInstallTest extends CommonTestCase
     public function checkDashboard()
     {
         // Check the dashboard exists
+        $dashboard_key = 'plugin_carbon_board';
         $dashboard = new Dashboard();
-        $dashboard->getFromDB('plugin_carbon_board');
+        $dashboard->getFromDB($dashboard_key);
         $this->assertFalse($dashboard->isNewItem());
 
         // Check rights on the dashboard
