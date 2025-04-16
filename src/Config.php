@@ -119,7 +119,7 @@ class Config extends GlpiConfig
                 $boavizta = new DataSource\Boaviztapi(new DataSource\RestApiClient(), $input['boaviztapi_base_url']);
                 $zones = [];
                 try {
-                    $zones = $boavizta->getZones();
+                    $zones = $boavizta->queryZones();
                 } catch (\Exception $e) {
                     unset($input['boaviztapi_base_url']);
                     Session::addMessageAfterRedirect(__('Invalid Boavizta API URL', 'carbon'), false, ERROR);

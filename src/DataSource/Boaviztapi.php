@@ -121,7 +121,7 @@ class Boaviztapi
      *
      * @return array
      */
-    public function getZones(): array
+    public function queryZones(): array
     {
         $response = $this->get('utils/country_code');
         ksort($response);
@@ -185,10 +185,7 @@ class Boaviztapi
         }
     }
 
-    /**
-     * Show a dropdown of zones handleed by Boaviztapi
-     */
-    public static function dropdownBoaviztaZone(string $name, array $options)
+    public static function getZones()
     {
         /** @var DBmysql $DB */
         global $DB;
@@ -227,6 +224,18 @@ class Boaviztapi
             $zones[$row['code']] = $row['name'];
         }
 
-        return Dropdown::showFromArray($name, $zones, $options);
+        return $zones;
+    }
+
+    /**
+     * Show a dropdown of zones handleed by Boaviztapi
+     *
+     * @param string $name name of the input
+     * @param array $options see Dropdown::showFromArray for details
+     */
+    public static function dropdownBoaviztaZone(string $name, array $options = [])
+    {
+
+        return Dropdown::showFromArray($name, self::getZones(), $options);
     }
 }

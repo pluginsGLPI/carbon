@@ -100,7 +100,7 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
         $source_id = $source->getID();
 
         try {
-            $zones = $this->downloadZones();
+            $zones = $this->queryZones();
         } catch (\RuntimeException $e) {
             return 0;
         }
@@ -162,7 +162,7 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
         return $glpi_key->decrypt($value);
     }
 
-    protected function downloadZones(): array
+    protected function queryZones(): array
     {
         $response = $this->client->request('GET', $this->base_url . self::ZONES_URL, []);
         if (!$response) {

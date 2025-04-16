@@ -35,8 +35,11 @@ namespace GlpiPlugin\Carbon;
 
 use CommonDBChild;
 use CommonDBTM;
+use Html;
 use Location as GlpiLocation;
+use MassiveAction;
 use Glpi\Application\View\TemplateRenderer;
+use GlpiPlugin\Carbon\DataSource\Boaviztapi;
 
 /**
  * Additional data for a location
@@ -55,6 +58,75 @@ class Location extends CommonDBChild
         ]);
 
         return true;
+    }
+
+    public static function showMassiveActionsSubForm(MassiveAction $ma)
+    {
+        switch ($ma->getAction()) {
+            case 'MassUpdateBoaviztaZone':
+                echo '<div>';
+                echo __('Boavizta zone', 'carbon') . '&nbsp;';
+                Boaviztapi::dropdownBoaviztaZone('_boavizta_zone');
+                echo '</div>';
+                echo '<br /><br />' . Html::submit(_x('button', 'Post'), ['name' => 'massiveaction']);
+                return true;
+        }
+
+        return parent::showMassiveActionsSubForm($ma);
+    }
+
+    public static function processMassiveActionsForOneItemtype(MassiveAction $ma, CommonDBTM $item, array $ids)
+    {
+        switch ($ma->getAction()) {
+            case 'MassUpdateBoaviztaZone':
+                foreach ($ids as $id) {
+                    if ($item->getFromDB($id) && self::updateBoaviztaZone($item, $ma->POST['_boavizta_zone'])) {
+                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
+                    } else {
+                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
+                    }
+                }
+                return;
+        }
+    }
+
+    /**
+     * Update the power consumption associated to a computer type
+     *
+     * @param CommonDBTM $item Computer to update
+     * @param string $zone pwoer consumption to set
+     * @return bool
+     */
+    public static function updateBoaviztaZone(CommonDBTM $item, string $zone): bool
+    {
+        $location = new self();
+        $core_location_id = $item->getID();
+        $location->getFromDBByCrit([
+            'locations_id' => $core_location_id,
+        ]);
+        if ($location->isNewItem()) {
+            $id = $location->add([
+                'locations_id' => $core_location_id,
+                'boavizta_zone'    => $zone,
+            ]);
+            return !$location->isNewId($id);
+        } else {
+            return $location->update([
+                'id'            => $location->getID(),
+                'boavizta_zone' => $zone,
+            ]);
+        }
+    }
+
+    public static function getSpecificValueToDisplay($field, $values, array $options = [])
+    {
+        switch ($field) {
+            case 'boavizta_zone':
+                $categories = Boaviztapi::getZones();
+                return $categories[$values['boavizta_zone']] ?? '';
+        }
+
+        return '';
     }
 
     public static function onGlpiLocationAdd(CommonDBTM $item)

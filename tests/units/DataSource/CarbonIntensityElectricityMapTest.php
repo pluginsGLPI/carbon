@@ -55,6 +55,17 @@ class CarbonIntensityElectricityMapTest extends DbTestCase
         $this->assertTrue($output);
     }
 
+    public function testQueryZones()
+    {
+        $client = $this->createStub(RestApiClientInterface::class);
+        $response = file_get_contents(__DIR__ . '/../../fixtures/ElectricityMap/zones.json');
+        $client->method('request')->willReturn(json_decode($response, true));
+        $instance = new CarbonIntensityElectricityMap($client);
+        $output = $this->callPrivateMethod($instance, 'queryZones');
+        $this->assertIsArray($output);
+        $this->assertCount(2, $output);
+    }
+
     public function testFetchDay()
     {
         $client = $this->createStub(RestApiClientInterface::class);

@@ -101,6 +101,8 @@ class SearchOptions
 
     public const COMPUTER_TYPE_CATEGORY = self::SEARCH_OPTION_BASE + 800;
 
+    public const LOCATION_BOAVIZTA_ZONE = self::SEARCH_OPTION_BASE + 900;
+
     /*
      * Get search options added to a core itemtype by the plugin
      *
@@ -110,6 +112,19 @@ class SearchOptions
     public static function getCoreSearchOptions(string $itemtype): array
     {
         $sopt = [];
+
+        $sopt[] = [
+            'id'           => SearchOptions::LOCATION_BOAVIZTA_ZONE,
+            'table'        => getTableForItemType(Location::class),
+            'field'        => 'boavizta_zone',
+            'name'         => __('Boavizta zone', 'carbon'),
+            'datatype'     => 'specific',
+            'massiveaction' => false,
+            'linkfield'    => 'locations_id',
+            'joinparams' => [
+                'jointype' => 'child',
+            ],
+        ];
 
         if (in_array($itemtype, PLUGIN_CARBON_TYPES)) {
             $item_type_class = 'GlpiPlugin\\Carbon\\' . $itemtype . 'Type';

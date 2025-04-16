@@ -239,6 +239,10 @@ function plugin_carbon_MassiveActions($itemtype)
             return [
                 NetworkEquipmentType::class . MassiveAction::CLASS_ACTION_SEPARATOR . 'MassUpdatePower' => __('Update type power consumption', 'carbon'),
             ];
+        case GlpiLocation::class:
+            return [
+                Location::class . MassiveAction::CLASS_ACTION_SEPARATOR . 'MassUpdateBoaviztaZone' => __('Update zone for Boavizta engine', 'carbon'),
+            ];
     }
 
     return [];
