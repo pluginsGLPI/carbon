@@ -68,11 +68,11 @@ foreach ($cards as $key => $card) {
     $y = $card['y'];
     $w = $card['width'];
     $h = $card['height'];
-    $item->getFromDBByCrit([
+    $rows = $item->find([
         'dashboards_dashboards_id' => $dashboard->fields['id'],
         'card_id' => $key,
     ]);
-    if (!$item->isNewItem()) {
+    if (count($rows) > 0) {
         // The card already exists
         continue;
     }
@@ -117,9 +117,12 @@ $iterator = $DB->request([
 
 foreach ($iterator as $profile) {
     $dashboard_right = new DashboardRight();
-    $dashboard_right->add([
+    $input = [
         'dashboards_dashboards_id' => $dashboard->fields['id'],
         'itemtype'                 => Profile::class,
         'items_id'                 => $profile['id'],
-    ]);
+    ];
+    if (!$dashboard_right->getFromDBByCrit($input)) {
+        $dashboard_right->add($input);
+    }
 }
