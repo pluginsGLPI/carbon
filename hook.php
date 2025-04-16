@@ -142,7 +142,7 @@ function plugin_carbon_postShowTab(array $param)
  */
 function plugin_carbon_getAddSearchOptionsNew($itemtype): array
 {
-    return SearchOptions::getAssetSearchOptions($itemtype);
+    return SearchOptions::getCoreSearchOptions($itemtype);
 }
 
 /**
@@ -229,6 +229,7 @@ function plugin_carbon_MassiveActions($itemtype)
         case GlpiComputerType::class:
             return [
                 ComputerType::class . MassiveAction::CLASS_ACTION_SEPARATOR . 'MassUpdatePower' => __('Update type power consumption', 'carbon'),
+                ComputerType::class . MassiveAction::CLASS_ACTION_SEPARATOR . 'MassUpdateCategory' => __('Update category', 'carbon'),
             ];
         case GlpiMonitorType::class:
             return [

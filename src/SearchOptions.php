@@ -99,51 +99,51 @@ class SearchOptions
     public const USAGE_IMPACT_PE = self::SEARCH_OPTION_BASE + 705;
     public const USAGE_IMPACT_PE_QUALITY = self::SEARCH_OPTION_BASE + 706;
 
+    public const COMPUTER_TYPE_CATEGORY = self::SEARCH_OPTION_BASE + 800;
+
     /*
      * Get search options added to a core itemtype by the plugin
      *
      * @param string $itemtype
      * @return array
      */
-    public static function getAssetSearchOptions(string $itemtype): array
+    public static function getCoreSearchOptions(string $itemtype): array
     {
         $sopt = [];
 
-        if (!in_array($itemtype, PLUGIN_CARBON_TYPES)) {
-            return $sopt;
-        }
-
-        $item_type_class = 'GlpiPlugin\\Carbon\\' . $itemtype . 'Type';
-        $glpi_item_type_class = $itemtype . 'Type';
-        if (class_exists($item_type_class) && is_subclass_of($item_type_class, CommonDBTM::class)) {
-            $itemtype_fk = $itemtype::getForeignKeyField();
-            $sopt[] = [
-                'id'           => SearchOptions::POWER_CONSUMPTION,
-                'table'        => getTableForItemType($item_type_class),
-                'field'        => 'power_consumption',
-                'name'         => __('Power consumption', 'carbon'),
-                'datatype'     => 'number',
-                'massiveaction' => false,
-                'min'          => 0,
-                'max'          => 10000,
-                'unit'         => 'W',
-                'linkfield'    => $itemtype_fk,
-                'joinparams' => [
-                    'jointype' => 'child',
-                    'beforejoin' => [
-                        'table' => getTableForItemType($glpi_item_type_class),
-                        'joinparams' => [
-                            'jointype' => 'child',
+        if (in_array($itemtype, PLUGIN_CARBON_TYPES)) {
+            $item_type_class = 'GlpiPlugin\\Carbon\\' . $itemtype . 'Type';
+            $glpi_item_type_class = $itemtype . 'Type';
+            if (class_exists($item_type_class) && is_subclass_of($item_type_class, CommonDBTM::class)) {
+                $itemtype_fk = $itemtype::getForeignKeyField();
+                $sopt[] = [
+                    'id'           => SearchOptions::POWER_CONSUMPTION,
+                    'table'        => getTableForItemType($item_type_class),
+                    'field'        => 'power_consumption',
+                    'name'         => __('Power consumption', 'carbon'),
+                    'datatype'     => 'number',
+                    'massiveaction' => false,
+                    'min'          => 0,
+                    'max'          => 10000,
+                    'unit'         => 'W',
+                    'linkfield'    => $itemtype_fk,
+                    'joinparams' => [
+                        'jointype' => 'child',
+                        'beforejoin' => [
+                            'table' => getTableForItemType($glpi_item_type_class),
+                            'joinparams' => [
+                                'jointype' => 'child',
+                            ]
                         ]
-                    ]
-                ],
-                'computation' => "IF(TABLE.`power_consumption` IS NULL, 0, TABLE.`power_consumption`)",
-            ];
+                    ],
+                    'computation' => "IF(TABLE.`power_consumption` IS NULL, 0, TABLE.`power_consumption`)",
+                ];
+            }
         }
 
-        if ($itemtype === Computer::class) {
+        if ($itemtype === Computer::class && in_array($itemtype, PLUGIN_CARBON_TYPES)) {
             $sopt[] = [
-                'id'           => SearchOptions::USAGE_PROFILE,
+                'id'            => SearchOptions::USAGE_PROFILE,
                 'table'         => ComputerUsageProfile::getTable(),
                 'field'         => 'name',
                 'name'          => ComputerUsageProfile::getTypeName(),
@@ -170,7 +170,7 @@ class SearchOptions
                 OR `glpi_computermodels`.`power_consumption` > 0
             ), 1, 0)";
             $sopt[] = [
-                'id'           => SearchOptions::IS_HISTORIZABLE,
+                'id'            => SearchOptions::IS_HISTORIZABLE,
                 'table'         => getTableForItemType($itemtype),
                 'field'         => 'id',
                 'linkfield'     => 'id',
@@ -224,7 +224,19 @@ class SearchOptions
                 ],
                 'computation' => $computation,
             ];
-        } else if ($itemtype === Monitor::class) {
+        } else if ($itemtype === GlpiComputerType::class && in_array(Computer::class, PLUGIN_CARBON_TYPES)) {
+            $sopt[] = [
+                'id'             => SearchOptions::COMPUTER_TYPE_CATEGORY,
+                'table'          => getTableForItemType(ComputerType::class),
+                'field'          => 'category',
+                'name'           => __('Category', 'carbon'),
+                'datatype'       => 'specific',
+                'massive_action' => false,
+                'joinparams'     => [
+                    'jointype'   => 'child'
+                ]
+            ];
+        } else if ($itemtype === Monitor::class && in_array($itemtype, PLUGIN_CARBON_TYPES)) {
             $computation = "IF(`glpi_monitors_id_fd9c1a8262e8f3b6e96bc8948f2a6226`.`is_deleted` = 0
             AND `glpi_monitors_id_fd9c1a8262e8f3b6e96bc8948f2a6226`.`is_template` = 0
             AND NOT `glpi_locations_fad8b1764dcda16e3822068239df73f2`.`country`  = ''
@@ -234,7 +246,7 @@ class SearchOptions
                 OR `glpi_monitormodels`.`power_consumption` > 0
             ), 1, 0)";
             $sopt[] = [
-                'id'           => SearchOptions::IS_HISTORIZABLE,
+                'id'            => SearchOptions::IS_HISTORIZABLE,
                 'table'         => getTableForItemType($itemtype),
                 'field'         => 'id',
                 'linkfield'     => 'id',
@@ -287,7 +299,7 @@ class SearchOptions
                 ],
                 'computation' => $computation,
             ];
-        } else if ($itemtype === NetworkEquipment::class) {
+        } else if ($itemtype === NetworkEquipment::class && in_array($itemtype, PLUGIN_CARBON_TYPES)) {
             $computation = "IF(`glpi_networkequipments_id_aef00423a27f97ae31ca50f63fb1a6fb`.`is_deleted` = 0
             AND `glpi_networkequipments_id_aef00423a27f97ae31ca50f63fb1a6fb`.`is_template` = 0
             AND NOT `glpi_locations`.`country`  = ''
@@ -297,7 +309,7 @@ class SearchOptions
                 OR `glpi_networkequipmentmodels`.`power_consumption` > 0
             ), 1, 0)";
             $sopt[] = [
-                'id'           => SearchOptions::IS_HISTORIZABLE,
+                'id'            => SearchOptions::IS_HISTORIZABLE,
                 'table'         => getTableForItemType($itemtype),
                 'field'         => 'id',
                 'linkfield'     => 'id',
