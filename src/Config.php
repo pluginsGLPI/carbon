@@ -113,20 +113,24 @@ class Config extends GlpiConfig
         }
 
         //Test Boavizta URL by acquiring zones
-        if (isset($input['boaviztapi_base_url'])) {
-            $boavizta = new DataSource\Boaviztapi(new DataSource\RestApiClient(), $input['boaviztapi_base_url']);
-            $zones = [];
-            try {
-                $zones = $boavizta->getZones();
-            } catch (\Exception $e) {
-                unset($input['boaviztapi_base_url']);
-                Session::addMessageAfterRedirect(__('Invalid Boavizta API URL', 'carbon'), false, ERROR);
-            }
-            if (count($zones) > 0) {
-                // Create the source if it does not exists already
-                if ($boavizta->createSource()) {
-                    // Save zones into database
-                    $boavizta->saveZones($zones);
+        if (isset($input['boaviztapi_base_url']) && strlen($input['boaviztapi_base_url']) > 0) {
+            $old_url = GlpiConfig::getConfigurationValue('plugin:carbon', 'boaviztapi_base_url');
+            if ($old_url != $input['boaviztapi_base_url']) {
+                $boavizta = new DataSource\Boaviztapi(new DataSource\RestApiClient(), $input['boaviztapi_base_url']);
+                $zones = [];
+                try {
+                    $zones = $boavizta->getZones();
+                } catch (\Exception $e) {
+                    unset($input['boaviztapi_base_url']);
+                    Session::addMessageAfterRedirect(__('Invalid Boavizta API URL', 'carbon'), false, ERROR);
+                }
+                if (count($zones) > 0) {
+                    // Create the source if it does not exists already
+                    if ($boavizta->createSource()) {
+                        // Save zones into database
+                        $boavizta->saveZones($zones);
+                    }
+                    Session::addMessageAfterRedirect(__('Connection to Boavizta API established', 'carbon'), false, INFO);
                 }
             }
         }
