@@ -67,23 +67,35 @@ function plugin_carbon_install(array $args = []): bool
     $version = Install::detectVersion();
     $install = new Install(new Migration(PLUGIN_CARBON_VERSION));
 
+    $success = true;
+    $silent = !isCommandLine() && $_SESSION['glpi_use_mode'] !== Session::DEBUG_MODE;
+    if ($silent) {
+        // do not output messages
+        ob_start();
+    }
     if ($version === '0.0.0') {
         try {
-            return $install->install($args);
+            $success = $install->install($args);
         } catch (\Exception $e) {
             $backtrace = GlpiToolbox::backtrace('');
             trigger_error($e->getMessage() . PHP_EOL . $backtrace, E_USER_WARNING);
-            return false;
+            $success = false;
         }
     } else {
         try {
-            return $install->upgrade($version, $args);
+            $success = $install->upgrade($version, $args);
         } catch (\Exception $e) {
             $backtrace = GlpiToolbox::backtrace('');
             trigger_error($e->getMessage() . PHP_EOL . $backtrace, E_USER_WARNING);
-            return false;
+            $success = false;
         }
     }
+
+    if ($silent) {
+        // do not output messages
+        ob_end_clean();
+    }
+    return $success;
 }
 
 /**
