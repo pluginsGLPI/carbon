@@ -34,6 +34,7 @@
 namespace GlpiPlugin\Carbon;
 
 use CommonDBTM;
+use DateInterval;
 use DateTime;
 use DateTimeImmutable;
 use Glpi\Application\View\TemplateRenderer;
@@ -168,16 +169,30 @@ class Report extends CommonDBTM
     public static function getCarbonEmissionLastMonth(array $params = []): array
     {
         // Force dates filter to 2 last complete months
+        // End date is 1st day of current month (excluded)
         $end_date = new DateTime();
         $end_date->setTime(0, 0, 0, 0);
-        $end_date->setDate((int) $end_date->format('Y'), (int) $end_date->format('m'), 0); // Last day of previous month
+        $end_date->setDate((int) $end_date->format('Y'), (int) $end_date->format('m'), 1); // First day of current month
         $start_date = clone $end_date;
-        $start_date->setDate((int) $end_date->format('Y'), (int) $end_date->format('m'), 0);
-        $start_date->setDate((int) $start_date->format('Y'), (int) $start_date->format('m'), 1);
+        $start_date = $start_date->sub(new DateInterval("P2M")); // 2 months back from $end_date
 
         $params['args']['apply_filters']['dates'][0] = $start_date->format('Y-m-d\TH:i:s.v\Z');
         $params['args']['apply_filters']['dates'][1] = $end_date->format('Y-m-d\TH:i:s.v\Z');
         $data = Provider::getUsageCarbonEmissionPerMonth($params);
+
+        // Prepare date format
+        $date_format = 'Y F';
+        switch ($_SESSION['glpidate_format'] ?? 0) {
+            case 0:
+                $date_format = 'Y F';
+                break;
+            case 1:
+            case 2:
+                $date_format = 'F Y';
+                break;
+        }
+        $data['xaxis']['categories'][0] = (new DateTime($data['xaxis']['categories'][0]))->format($date_format);
+        $data['xaxis']['categories'][1] = (new DateTime($data['xaxis']['categories'][1]))->format($date_format);
 
         return $data;
     }

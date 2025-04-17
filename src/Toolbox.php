@@ -416,9 +416,9 @@ class Toolbox
     {
             $end_date = DateTime::createFromImmutable($date);
             $end_date->setTime(0, 0, 0, 0);
-            $end_date->setDate((int) $end_date->format('Y'), (int) $end_date->format('m'), 0); // Last day of previous month
+            $end_date->setDate((int) $end_date->format('Y'), (int) $end_date->format('m'), 1); // First day of current month (excluded)
             $start_date = clone $end_date;
-            $start_date->setDate((int) $end_date->format('Y') - 1, (int) $end_date->format('m') + 1, 1);
+            $start_date->setDate((int) $end_date->format('Y') - 1, (int) $end_date->format('m'), 1);
 
         return [$start_date, $end_date];
     }

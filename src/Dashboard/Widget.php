@@ -627,9 +627,9 @@ class Widget extends GlpiDashboardWidget
             'fg_hover_color' => Toolbox::getFgColor($p['color'], 15),
             'fg_hover_border' => Toolbox::getFgColor($p['color'], 30),
             'last_month_emissions' => $last_month_emissions,
-            'last_month' => $last_month['date_interval'][1],
+            'last_month' => $last_month['xaxis']['categories'][1],
             'penultimate_month_emissions' => $penultimate_month_emissions,
-            'penultimate_month' => $last_month['date_interval'][0],
+            'penultimate_month' => $last_month['xaxis']['categories'][0],
             'variation' => $comparison_text,
         ]);
     }

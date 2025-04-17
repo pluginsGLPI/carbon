@@ -948,7 +948,7 @@ class Provider
         $crit[] = [
             'AND' => [
                 ['date' => ['>=', $start_date->format('Y-m-d')]],
-                ['date' => ['<=', $end_date->format('Y-m-d')]],
+                ['date' => ['<', $end_date->format('Y-m-d')]],
             ]
         ];
 
