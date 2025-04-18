@@ -55,7 +55,7 @@ class ComputerType extends AbstractType
     {
         return [
             self::CATEGORY_UNDEFINED  => __('Unspecified'),
-            self::CATEGORY_DESKTOP    => __('Computer'),
+            self::CATEGORY_DESKTOP    => _n('Computer', 'Computers', 1),
             self::CATEGORY_SERVER     => __('Server'),
             self::CATEGORY_LAPTOP     => __('Laptop'),
             self::CATEGORY_TABLET     => __('Tablet'),
