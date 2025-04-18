@@ -40,8 +40,17 @@ use Ramsey\Uuid\Uuid;
 /** @var DBmysql $DB */
 global $DB;
 
+/** @var array $args arguments passed to the command line*/
+
 $dashboard = new Dashboard();
 $dashboard_key = 'plugin_carbon_board';
+
+if (($args['reset-report-dashboard'] ?? false)) {
+    $dashboard->deleteByCriteria([
+        'key' => $dashboard_key
+    ]);
+}
+
 /** @phpstan-ignore argument.type */
 if ($dashboard->getFromDB($dashboard_key) === false) {
     // The dashboard already exists, nothing to create

@@ -164,7 +164,7 @@ class Install
             $function = $data['function'];
             $target_version = $data['target_version'];
             include_once($file);
-            if ($function($this->migration)) {
+            if ($function($this->migration, $args)) {
                 Config::setConfigurationValues('plugin:carbon', ['dbversion' => $target_version]);
             } else {
                 return false;

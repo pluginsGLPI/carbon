@@ -55,6 +55,11 @@ use Toolbox as GlpiToolbox;
 
 /**
  * Plugin install process
+ * supported arguments for upgrade process
+ *   -p force-upgrade          : force execution of upgrade from the previous version
+ *                               or from the version specified wih version argument
+ *   -p version                : specifi the version to begin a forced upgrade
+ *   -p reset-report-dashboard : delete then recreate the dashboard of the reporting page
  *
  * @return boolean
  */

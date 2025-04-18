@@ -31,7 +31,7 @@
  * -------------------------------------------------------------------------
  */
 
-function update005to006(Migration $migration)
+function update005to006(Migration $migration, array $args = [])
 {
     /** @var DBmysql $DB */
     global $DB;
