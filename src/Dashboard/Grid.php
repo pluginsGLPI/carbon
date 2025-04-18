@@ -72,10 +72,10 @@ class Grid
         }
 
         if (strpos($_SERVER['REQUEST_URI'], '/ajax/dashboard.php') !== false) {
-            if ((($_GET['dashboard'] ?? '') == 'plugin_carbon_board')) {
+            if ((($_GET['dashboard'] ?? '') === 'plugin_carbon_board')) {
                 return true;
             }
-            if (($_POST['dashboard'] ?? '') == 'plugin_carbon_board') {
+            if (($_POST['dashboard'] ?? '') === 'plugin_carbon_board') {
                 if (in_array($_POST['action'], ['display_add_widget', 'display_edit_widget'])) {
                     return true;
                 }
