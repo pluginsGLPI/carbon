@@ -34,6 +34,8 @@
 namespace GlpiPlugin\Carbon\Dashboard;
 
 use Computer;
+use DateInterval;
+use DateTime;
 use Html;
 use Glpi\Application\View\TemplateRenderer;
 use Glpi\Dashboard\Widget as GlpiDashboardWidget;
@@ -48,13 +50,13 @@ class Widget extends GlpiDashboardWidget
     {
         $types = [
             // Total carbon emission year to last complete month
-            'totalcarbonemission_ytd' => [
+            'usage_carbon_emission_ytd' => [
                 'label'    => __('Total Carbon Emission', 'carbon'),
-                'function' => self::class . '::DisplayTotalCarbonEmissionYearToDate',
+                'function' => self::class . '::displayUsageCarbonEmissionYearToDate',
                 'width'    => 6,
                 'height'   => 3,
             ],
-            'totalcarbonemission_two_last_months' => [
+            'total_usage_carbon_emission_two_last_months' => [
                 'label'    => __('Monthly Carbon Emission', 'carbon'),
                 'function' => self::class . '::DisplayMonthlyCarbonEmission',
                 'width'    => 6,
@@ -85,10 +87,16 @@ class Widget extends GlpiDashboardWidget
                 'width'    => 16,
                 'height'   => 12,
             ],
+            'embodied_abiotic_depletion' => [
+                'label'    => __('Embodied abiotic depletion potential', 'carbon'),
+                'function' => self::class . '::displayEmbodiedAbioticDepletion',
+                'width'    => 6,
+                'height'   => 3,
+            ],
         ];
         if (in_array(Computer::class, PLUGIN_CARBON_TYPES)) {
             $types += [
-                'unhandledComputersRatio' => [
+                'unhandled_computers_ratio' => [
                     'label'    => __('Unhandled Computers', 'carbon'),
                     'function' => self::class . '::DisplayUnhandledComputersRatio',
                     'width'    => 5,
@@ -98,7 +106,7 @@ class Widget extends GlpiDashboardWidget
         }
         if (in_array(Monitor::class, PLUGIN_CARBON_TYPES)) {
             $types += [
-                'unhandledMonitorsRatio' => [
+                'unhandled_monitors_ratio' => [
                     'label'    => __('Unhandled Monitors', 'carbon'),
                     'function' => self::class . '::DisplayUnhandledMonitorsRatio',
                     'width'    => 5,
@@ -108,7 +116,7 @@ class Widget extends GlpiDashboardWidget
         }
         if (in_array(NetworkEquipment::class, PLUGIN_CARBON_TYPES)) {
             $types += [
-                'unhandledNetworkequipmentsRatio' => [
+                'unhandled_network_equipments_ratio' => [
                     'label'    => __('Unhandled Network equipments', 'carbon'),
                     'function' => self::class . '::DisplayUnhandledNetworkEquipmentsRatio',
                     'width'    => 5,
@@ -431,12 +439,12 @@ class Widget extends GlpiDashboardWidget
     //     );
     // }
 
-    // public static function DisplayGraphCarbonEmissionPerType(array $params = []): string
+    // public static function displayGraphCarbonEmissionPerType(array $params = []): string
     // {
     //     return self::halfDonut($params);
     // }
 
-    public static function DisplayGraphUsageCarbonEmissionPerMonth(array $params = [], array $crit = []): string
+    public static function displayGraphUsageCarbonEmissionPerMonth(array $params = [], array $crit = []): string
     {
         $default = [
             'url'     => '',
@@ -513,7 +521,6 @@ class Widget extends GlpiDashboardWidget
             $apex_data['series'][$key]['data'] = $serie['data'];
             $apex_data['series'][$key]['type'] = $serie['type'];
         }
-        // $apex_data['series'] = $data['data']['series'];
         $apex_data['labels'] = $data['labels'];
         $apex_data['xaxis']['categories'] = $data['labels'];
 
@@ -527,7 +534,7 @@ class Widget extends GlpiDashboardWidget
         ]);
     }
 
-    public static function DisplayGraphUsageCarbonEmissionPerModel(array $params = []): string
+    public static function displayGraphUsageCarbonEmissionPerModel(array $params = []): string
     {
         $default = [
             'url'     => '',
@@ -587,7 +594,7 @@ class Widget extends GlpiDashboardWidget
         ]);
     }
 
-    public static function DisplayMonthlyCarbonEmission(array $params = []): string
+    public static function displayMonthlyCarbonEmission(array $params = []): string
     {
         $default = [
             'number'  => 0,
@@ -601,17 +608,53 @@ class Widget extends GlpiDashboardWidget
         ];
         $p = array_merge($default, $params);
 
-        $last_month = Report::getCarbonEmissionLastMonth();
+        // Force dates filter to 2 last complete months
+        // End date is 1st day of current month (excluded)
+        $end_date = new DateTime();
+        $end_date->setTime(0, 0, 0, 0);
+        $end_date->setDate((int) $end_date->format('Y'), (int) $end_date->format('m'), 1); // First day of current month
+        $start_date = clone $end_date;
+        $start_date = $start_date->sub(new DateInterval("P2M")); // 2 months back from $end_date
+
+        $params['args']['apply_filters']['dates'][0] = $start_date->format('Y-m-d\TH:i:s.v\Z');
+        $params['args']['apply_filters']['dates'][1] = $end_date->format('Y-m-d\TH:i:s.v\Z');
+        $last_month = Provider::getUsageCarbonEmissionPerMonth($params);
+
+        // Prepare date format
+        $date_format = 'Y F';
+        switch ($_SESSION['glpidate_format'] ?? 0) {
+            case 0:
+                $date_format = 'Y F';
+                break;
+            case 1:
+            case 2:
+                $date_format = 'F Y';
+                break;
+        }
+        if (isset($last_month['date_interval'][0])) {
+            $last_month['date_interval'][0] = (new DateTime($last_month['date_interval'][0]))->format($date_format);
+        }
+        if (isset($last_month['date_interval'][1])) {
+            // This date is the end boundary excluded, and is the 1st day of a month.
+            // We need to find the previous month for display
+            $last_month['date_interval'][1] = (new DateTime($last_month['date_interval'][1]));
+            $last_month['date_interval'][1]->setDate((int) $end_date->format('Y'), (int) $end_date->format('m'), 0);
+            $last_month['date_interval'][1] = $last_month['date_interval'][1]->format($date_format);
+        }
+
+        // $last_month = Report::getCarbonEmissionLastMonth();
         $last_month_emissions = 0;
         if (count($last_month['series'][0]['data']) > 0) {
-            $last_month_emissions = array_pop($last_month['series'][0]['data'])['y'];
+            $last_month_emissions = (int) array_pop($last_month['series'][0]['data'])['y'];
         }
         $penultimate_month_emissions = 0;
-        $comparison_text = '';
+        $comparison_text = '= 0.00 %';
+        $percentage_change = 0;
         if (count($last_month['series'][0]['data']) > 0) {
             $penultimate_month_emissions = array_pop($last_month['series'][0]['data'])['y'];
-            $percentage_change = (($last_month_emissions - $penultimate_month_emissions) / $last_month_emissions) * 100;
-            $comparison_text = '= 0.00 %';
+            if ($last_month_emissions != 0) {
+                $percentage_change = (($last_month_emissions - $penultimate_month_emissions) / $last_month_emissions) * 100;
+            }
             if ($percentage_change > 0) {
                 $comparison_text = '↑ ' . Html::formatNumber(abs($percentage_change)) . ' %';
             } else if ($percentage_change < 0) {
@@ -620,16 +663,16 @@ class Widget extends GlpiDashboardWidget
         }
         $last_month_emissions .=  ' ' . $last_month['series'][0]['unit'];
         $penultimate_month_emissions .=  ' ' . $last_month['series'][0]['unit'];
-        return TemplateRenderer::getInstance()->render('@carbon/components/monthly-carbon-emission-card.html.twig', [
+        return TemplateRenderer::getInstance()->render('@carbon/dashboard/monthly-carbon-emission.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
             'fg_color' => Toolbox::getFgColor($p['color']),
             'fg_hover_color' => Toolbox::getFgColor($p['color'], 15),
             'fg_hover_border' => Toolbox::getFgColor($p['color'], 30),
             'last_month_emissions' => $last_month_emissions,
-            'last_month' => $last_month['xaxis']['categories'][1],
+            'last_month' => $last_month['date_interval'][1] ?? '',
             'penultimate_month_emissions' => $penultimate_month_emissions,
-            'penultimate_month' => $last_month['xaxis']['categories'][0],
+            'penultimate_month' => $last_month['date_interval'][0] ?? '',
             'variation' => $comparison_text,
         ]);
     }
@@ -640,7 +683,7 @@ class Widget extends GlpiDashboardWidget
      * @param array $params
      * @return string html of the widget
      */
-    public static function DisplayTotalCarbonEmissionYearToDate(array $params = []): string
+    public static function displayUsageCarbonEmissionYearToDate(array $params = []): string
     {
         $default = [
             'number'  => 0,
@@ -654,8 +697,8 @@ class Widget extends GlpiDashboardWidget
         ];
         $p = array_merge($default, $params);
 
-        $p['number'] = Report::getTotalCarbonEmission();
-        return TemplateRenderer::getInstance()->render('@carbon/components/total-carbon-emission-card.html.twig', [
+        $p['number'] = Report::getUsageCarbonEmission();
+        return TemplateRenderer::getInstance()->render('@carbon/dashboard/usage-carbon-emission-last-year.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
             'fg_color' => Toolbox::getFgColor($p['color']),
@@ -666,13 +709,38 @@ class Widget extends GlpiDashboardWidget
         ]);
     }
 
+    public static function displayEmbodiedAbioticDepletion(array $params = []): string
+    {
+        $default = [
+            'number'  => 0,
+            'url'     => '',
+            'label'   => '',
+            'alt'     => '',
+            'color'   => '',
+            'icon'    => '',
+            'id'      => 'plugin_carbon_embodied_abiotic_depletion_' . mt_rand(),
+            'filters' => [], // TODO: Not implemented yet (is this useful ?)
+        ];
+        $p = array_merge($default, $params);
+
+        $p['adp'] = Provider::getEmbodiedAbioticDepletion();
+        return TemplateRenderer::getInstance()->render('@carbon/dashboard/embodied-abiotic-depletion.html.twig', [
+            'id' => $p['id'],
+            'color' => $p['color'],
+            'fg_color' => Toolbox::getFgColor($p['color']),
+            'fg_hover_color' => Toolbox::getFgColor($p['color'], 15),
+            'fg_hover_border' => Toolbox::getFgColor($p['color'], 30),
+            'number' => $p['adp']['number'],
+        ]);
+    }
+
     /**
      * Show complete staistics for unhandled computers
      *
      * @param array $params
      * @return string
      */
-    public static function DisplayUnhandledComputersRatio(array $params = []): string
+    public static function displayUnhandledComputersRatio(array $params = []): string
     {
         $default = [
             'url'     => '',
@@ -704,7 +772,7 @@ class Widget extends GlpiDashboardWidget
      * @param array $params
      * @return string
      */
-    public static function DisplayUnhandledMonitorsRatio(array $params = []): string
+    public static function displayUnhandledMonitorsRatio(array $params = []): string
     {
         $default = [
             'url'     => '',
@@ -736,7 +804,7 @@ class Widget extends GlpiDashboardWidget
      * @param array $params
      * @return string
      */
-    public static function DisplayUnhandledNetworkEquipmentsRatio(array $params = []): string
+    public static function displayUnhandledNetworkEquipmentsRatio(array $params = []): string
     {
         $default = [
             'url'     => '',
@@ -762,7 +830,7 @@ class Widget extends GlpiDashboardWidget
         ]);
     }
 
-    public static function DisplayInformationVideo(array $params = []): string
+    public static function displayInformationVideo(array $params = []): string
     {
         $default = [
             'url'     => '',
@@ -784,7 +852,7 @@ class Widget extends GlpiDashboardWidget
         ]);
     }
 
-    public static function DisplayInformationMethodology(array $params = []): string
+    public static function displayInformationMethodology(array $params = []): string
     {
         $default = [
             'url'     => '',

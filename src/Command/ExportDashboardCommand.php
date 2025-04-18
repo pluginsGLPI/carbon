@@ -89,7 +89,7 @@ class ExportDashboardCommand extends Command
         $db_utils = new DbUtils();
         foreach ($iterator as $row) {
             $key = $row['card_id'];
-            unset($row['id'], $row['gridstack_id'], $row['card_id']);
+            unset($row['id'], $row['gridstack_id'], $row['card_id'], $row['dashboards_dashboards_id']);
             $row['card_options'] = $db_utils->importArrayFromDB($row['card_options']);
             // remove UUID from gridstack_id, using regex
             $this->dashboard_description[$key] = $row;

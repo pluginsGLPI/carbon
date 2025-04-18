@@ -29,14 +29,6 @@
  * -------------------------------------------------------------------------
  */
 
-.nb-carbon-emission-size {
-    font-size: 2rem;
-}
-
-.nb-monthly-carbon-emission {
-    font-size: 2rem;
-}
-
 .footer-height, .header-height{
     height: auto;
     margin-top: 0 !important;

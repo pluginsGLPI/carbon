@@ -57,12 +57,22 @@
                 <span><img src="{{ get_plugin_web_dir('carbon') }}/dist/images/icon-co2-calendar-green.png" class="icon-size" /></span>
             </div>
             <div class="col">
-                <div class="subheader">{{ __('Monthly carbon emission', 'carbon') }}</div>
-                <div class="subheader" id="monthlyMonth">{{ last_month }}</div>
-                <div class="my-3 nb-monthly-carbon-emission" id="monthlyEmission">{{ last_month_emissions }}</div>
+                <div class="subheader">{{ __('Monthly usage carbon emission', 'carbon') }}</div>
+                <div class="subheader">{{ last_month }}</div>
+                <div class="my-3 number">{{ last_month_emissions }}</div>
+                <div class="subheader">{{ __('Compared to %s', 'carbon')|format(penultimate_month) }}</div>
                 <p class="m-0 percent-color" id="monthlyComparison">{{ variation }}</p>
-                <div class="subheader">{{ __('Compared to last month', 'carbon') }}</div>
             </div>
         </div>
     </div>
 </div>
+<script>
+(function () {
+    observer = new ResizeObserver(entries => {
+        for (const entry of entries) {
+            $(entry.target).fitText(0.5);
+        }
+    })
+    observer.observe(document.querySelector('#{{ id }} .number'));
+})();
+</script>

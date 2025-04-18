@@ -507,7 +507,7 @@ class Provider
      * @param array $params
      * @return array
      */
-    public static function getTotalUsagePower(array $params = []): array
+    public static function getUsagePower(array $params = []): array
     {
         /** @var DBmysql $DB */
         global $DB;
@@ -579,7 +579,7 @@ class Provider
      * @param array $params
      * @return array
      */
-    public static function getTotalUsageCarbonEmission(array $params = []): array
+    public static function getUsageCarbonEmission(array $params = []): array
     {
         $default_params = [
             'label' => __('plugin carbon - Total carbon emission', 'carbon'),
@@ -731,7 +731,7 @@ class Provider
         return $criteria;
     }
 
-    public static function getTotalEmbodiedGwp(array $params = []): array
+    public static function getEmbodiedGlobalWarming(array $params = []): array
     {
         $default_params = [
             'label' => __('Total embodied global warming potential', 'carbon'),
@@ -756,7 +756,7 @@ class Provider
         ];
     }
 
-    public static function getTotalPrimaryEnergyConsumed(array $params = []): array
+    public static function getEmbodiedPrimaryEnergy(array $params = []): array
     {
         $crit = [
             'itemtype' => PLUGIN_CARBON_TYPES,
@@ -786,7 +786,7 @@ class Provider
      * @param array $crit
      * @return array
      */
-    public static function getTotalEmbodiedAdp(array $params = [], array $crit = []): array
+    public static function getEmbodiedAbioticDepletion(array $params = [], array $crit = []): array
     {
         $default_params = [
             'label' => __('Embodied abiotic depletion potential', 'carbon'),
@@ -814,13 +814,13 @@ class Provider
     }
 
     /**
-     * Get total usage abiotic depletion potential in antimony equivalent
+     * Get usage abiotic depletion potential in antimony equivalent
      *
      * @param array $params
      * @param array $crit
      * @return array
      */
-    public static function getTotalUsageAdp(array $params = [], array $crit = []): array
+    public static function getUsageAbioticDepletion(array $params = [], array $crit = []): array
     {
         $default_params = [
             'label' => __('Total usage abiotic depletion potential', 'carbon'),
@@ -854,7 +854,7 @@ class Provider
      * @param array $crit
      * @return array
      */
-    public static function getTotalAdp(array $params = [], array $crit = []): array
+    public static function getTotalAbioticDepletion(array $params = [], array $crit = []): array
     {
         $default_params = [
             'label' => __('Total abiotic depletion potential', 'carbon'),
@@ -885,7 +885,7 @@ class Provider
         ];
     }
 
-    public static function getTotalGwp(array $params = [], array $crit = [])
+    public static function getTotalGlobalWarming(array $params = [], array $crit = [])
     {
         $default_params = [
             'label' => __('Total global warming potential', 'carbon'),

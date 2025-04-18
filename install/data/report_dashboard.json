@@ -1,5 +1,5 @@
 {
-    "plugin_carbon_report_totalcarbonemission_ytd": {
+    "plugin_carbon_report_usage_carbon_emission_ytd": {
         "dashboards_dashboards_id": 8,
         "x": 0,
         "y": 0,
@@ -7,13 +7,13 @@
         "height": 3,
         "card_options": {
             "color": "#BBDA50",
-            "widgettype": "totalcarbonemission_ytd",
+            "widgettype": "usage_carbon_emission_ytd",
             "use_gradient": "0",
             "limit": "7",
             "point_labels": "0"
         }
     },
-    "plugin_carbon_report_totalcarbonemission_two_last_months": {
+    "plugin_carbon_report_usage_carbon_emission_two_last_months": {
         "dashboards_dashboards_id": 8,
         "x": 6,
         "y": 0,
@@ -21,7 +21,7 @@
         "height": 3,
         "card_options": {
             "color": "#145161",
-            "widgettype": "totalcarbonemission_two_last_months",
+            "widgettype": "total_usage_carbon_emission_two_last_months",
             "use_gradient": "0",
             "limit": "7",
             "point_labels": "0"
@@ -55,7 +55,7 @@
             "point_labels": "0"
         }
     },
-    "plugin_carbon_biggest_gwp_per_model": {
+    "plugin_carbon_report_biggest_gwp_per_model": {
         "dashboards_dashboards_id": 8,
         "x": 0,
         "y": 6,
@@ -91,13 +91,13 @@
         "height": 3,
         "card_options": {
             "color": "#f3f6f4",
-            "widgettype": "unhandledComputersRatio",
+            "widgettype": "unhandled_computers_ratio",
             "use_gradient": "0",
             "limit": "7",
             "point_labels": "0"
         }
     },
-    "plugin_carbon_total_embodied_adp_impact": {
+    "plugin_carbon_report_embodied_abiotic_depletion": {
         "dashboards_dashboards_id": 8,
         "x": 12,
         "y": 0,
@@ -105,7 +105,7 @@
         "height": 3,
         "card_options": {
             "color": "#c0c0c0",
-            "widgettype": "bigNumber",
+            "widgettype": "embodied_abiotic_depletion",
             "use_gradient": "0",
             "point_labels": "0",
             "limit": "7"
@@ -119,7 +119,7 @@
         "height": 3,
         "card_options": {
             "color": "#f3f6f4",
-            "widgettype": "unhandledMonitorsRatio",
+            "widgettype": "unhandled_monitors_ratio",
             "use_gradient": "0",
             "point_labels": "0",
             "limit": "7"
@@ -133,7 +133,7 @@
         "height": 3,
         "card_options": {
             "color": "#f3f6f4",
-            "widgettype": "unhandledNetworkequipmentsRatio",
+            "widgettype": "unhandled_network_equipments_ratio",
             "use_gradient": "0",
             "point_labels": "0",
             "limit": "7"
