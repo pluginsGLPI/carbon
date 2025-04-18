@@ -49,19 +49,7 @@ class Widget extends GlpiDashboardWidget
     public static function WidgetTypes(): array
     {
         $types = [
-            // Total carbon emission year to last complete month
-            'usage_carbon_emission_ytd' => [
-                'label'    => __('Total Carbon Emission', 'carbon'),
-                'function' => self::class . '::displayUsageCarbonEmissionYearToDate',
-                'width'    => 6,
-                'height'   => 3,
-            ],
-            'total_usage_carbon_emission_two_last_months' => [
-                'label'    => __('Monthly Carbon Emission', 'carbon'),
-                'function' => self::class . '::DisplayMonthlyCarbonEmission',
-                'width'    => 6,
-                'height'   => 3,
-            ],
+            // Informative
             'information_video' => [
                 'label'    => __('Environmental impact information video', 'carbon'),
                 'function' => self::class . '::DisplayInformationVideo',
@@ -71,6 +59,20 @@ class Widget extends GlpiDashboardWidget
             'methodology_information' => [
                 'label'    => __('Methodology information', 'carbon'),
                 'function' => self::class . '::DisplayInformationMethodology',
+                'width'    => 6,
+                'height'   => 3,
+            ],
+
+            // Usage impact
+            'usage_carbon_emission_ytd' => [
+                'label'    => __('Total Carbon Emission', 'carbon'),
+                'function' => self::class . '::displayUsageCarbonEmissionYearToDate',
+                'width'    => 6,
+                'height'   => 3,
+            ],
+            'total_usage_carbon_emission_two_last_months' => [
+                'label'    => __('Monthly Carbon Emission', 'carbon'),
+                'function' => self::class . '::DisplayMonthlyCarbonEmission',
                 'width'    => 6,
                 'height'   => 3,
             ],
@@ -87,13 +89,29 @@ class Widget extends GlpiDashboardWidget
                 'width'    => 16,
                 'height'   => 12,
             ],
+            'usage_abiotic_depletion' => [
+                'label'    => __('Usage abiotic depletion potential', 'carbon'),
+                'function' => self::class . '::displayUsageAbioticDepletion',
+                'width'    => 6,
+                'height'   => 3,
+            ],
+
+            // Embodied impact
             'embodied_abiotic_depletion' => [
                 'label'    => __('Embodied abiotic depletion potential', 'carbon'),
                 'function' => self::class . '::displayEmbodiedAbioticDepletion',
                 'width'    => 6,
                 'height'   => 3,
             ],
+            'embodied_primary_energy' => [
+                'label'    => __('Embodied consumed primary energy', 'carbon'),
+                'function' => self::class . '::displayEmbodiedPrimaryEnergy',
+                'width'    => 6,
+                'height'   => 3,
+            ],
         ];
+
+        // Data diagnostic
         if (in_array(Computer::class, PLUGIN_CARBON_TYPES)) {
             $types += [
                 'unhandled_computers_ratio' => [
@@ -734,6 +752,31 @@ class Widget extends GlpiDashboardWidget
         ]);
     }
 
+    public static function displayUsageAbioticDepletion(array $params = []): string
+    {
+        $default = [
+            'number'  => 0,
+            'url'     => '',
+            'label'   => '',
+            'alt'     => '',
+            'color'   => '',
+            'icon'    => '',
+            'id'      => 'plugin_carbon_usage_abiotic_depletion_' . mt_rand(),
+            'filters' => [], // TODO: Not implemented yet (is this useful ?)
+        ];
+        $p = array_merge($default, $params);
+
+        $p['adp'] = Provider::getUsageAbioticDepletion();
+        return TemplateRenderer::getInstance()->render('@carbon/dashboard/usage-abiotic-depletion.html.twig', [
+            'id' => $p['id'],
+            'color' => $p['color'],
+            'fg_color' => Toolbox::getFgColor($p['color']),
+            'fg_hover_color' => Toolbox::getFgColor($p['color'], 15),
+            'fg_hover_border' => Toolbox::getFgColor($p['color'], 30),
+            'number' => $p['adp']['number'],
+        ]);
+    }
+
     /**
      * Show complete staistics for unhandled computers
      *
@@ -871,6 +914,30 @@ class Widget extends GlpiDashboardWidget
             'fg_color' => Toolbox::getFgColor($p['color']),
             'fg_hover_color' => Toolbox::getFgColor($p['color'], 15),
             'fg_hover_border' => Toolbox::getFgColor($p['color'], 30),
+        ]);
+    }
+
+    public static function displayEmbodiedPrimaryEnergy(array $params = []): string
+    {
+        $default = [
+            'url'     => '',
+            'label'   => '',
+            'alt'     => '',
+            'color'   => '',
+            'icon'    => '',
+            'id'      => 'plugin_carbon_embodied_primary_energy_' . mt_rand(),
+            'filters' => [], // TODO: Not implemented yet (is this useful ?)
+        ];
+        $p = array_merge($default, $params);
+
+        $p['pe'] = Provider::getEmbodiedPrimaryEnergy();
+        return TemplateRenderer::getInstance()->render('@carbon/dashboard/embodied-primary-energy.html.twig', [
+            'id' => $p['id'],
+            'color' => $p['color'],
+            'fg_color' => Toolbox::getFgColor($p['color']),
+            'fg_hover_color' => Toolbox::getFgColor($p['color'], 15),
+            'fg_hover_border' => Toolbox::getFgColor($p['color'], 30),
+            'number' => $p['pe']['number'],
         ]);
     }
 }

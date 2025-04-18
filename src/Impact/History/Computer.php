@@ -230,7 +230,7 @@ class Computer extends AbstractAsset
         $status['has_type'] = ($data['type_id'] !== 0);
         $status['has_type_power_consumption'] = (($data['type_power_consumption'] ?? 0) !== 0);
         $status['has_usage_profile'] = ($data['plugin_carbon_computerusageprofiles_id'] !== 0);
-        $status['has_category'] = (($data['type'] ?? 0) !== ComputerType::CATEGORY_UNDEFINED);
+        $status['has_category'] = (($data['category'] ?? 0) !== ComputerType::CATEGORY_UNDEFINED);
 
         $item_oldest_date = $data['use_date']
             ?? $data['delivery_date']

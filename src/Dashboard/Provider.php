@@ -756,6 +756,12 @@ class Provider
         ];
     }
 
+    /**
+     * Get the primary energy consumed to build assets
+     *
+     * @param array $params
+     * @return array
+     */
     public static function getEmbodiedPrimaryEnergy(array $params = []): array
     {
         $crit = [
