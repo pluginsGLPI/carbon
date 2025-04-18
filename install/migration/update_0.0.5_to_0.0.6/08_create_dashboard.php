@@ -126,9 +126,12 @@ $iterator = $DB->request([
 
 foreach ($iterator as $profile) {
     $dashboard_right = new DashboardRight();
-    $dashboard_right->add([
+    $input = [
         'dashboards_dashboards_id' => $dashboard->fields['id'],
         'itemtype'                 => Profile::class,
         'items_id'                 => $profile['id'],
-    ]);
+    ];
+    if (!$dashboard_right->getFromDBByCrit($input)) {
+        $dashboard_right->add($input);
+    }
 }
