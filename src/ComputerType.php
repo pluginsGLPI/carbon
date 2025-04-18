@@ -191,4 +191,10 @@ class ComputerType extends AbstractType
 
         return '';
     }
+
+    public static function getSpecificValueToSelect($field, $name = '', $values = '', array $options = [])
+    {
+        $options['values'] = $values;
+        return self::dropdownType($name, $options);
+    }
 }

@@ -119,6 +119,7 @@ class SearchOptions
             'field'        => 'boavizta_zone',
             'name'         => __('Boavizta zone', 'carbon'),
             'datatype'     => 'specific',
+            'searchtype'   => ['equals', 'notequals'],
             'massiveaction' => false,
             'linkfield'    => 'locations_id',
             'joinparams' => [
@@ -246,6 +247,7 @@ class SearchOptions
                 'field'          => 'category',
                 'name'           => __('Category', 'carbon'),
                 'datatype'       => 'specific',
+                'searchtype'     => ['equals', 'notequals'],
                 'massive_action' => false,
                 'joinparams'     => [
                     'jointype'   => 'child'

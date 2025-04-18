@@ -129,6 +129,12 @@ class Location extends CommonDBChild
         return '';
     }
 
+    public static function getSpecificValueToSelect($field, $name = '', $values = '', array $options = [])
+    {
+        $options['values'] = $values;
+        return Boaviztapi::dropdownBoaviztaZone($name, $options);
+    }
+
     public static function onGlpiLocationAdd(CommonDBTM $item)
     {
         self::enableCarbonIntensityDownload($item);
