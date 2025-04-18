@@ -60,6 +60,11 @@ class Grid
         return $cards;
     }
 
+    /**
+     * Determine if the user is viewing or editing the reporting dashboard
+     *
+     * @return boolean
+     */
     protected static function in_carbon_report_page(): bool
     {
         if (strpos($_SERVER['REQUEST_URI'], 'carbon/front/report.php') !== false) {
@@ -80,6 +85,11 @@ class Grid
         return false;
     }
 
+    /**
+     * Get description of cards for standard dashboard (in GLPI Central page)
+     *
+     * @return array
+     */
     protected static function getStandardCards(): array
     {
         $new_cards = [];
@@ -198,6 +208,11 @@ class Grid
         return $new_cards;
     }
 
+    /**
+     * getdescription of cards for dashboard in the reporting page of the plugin
+     *
+     * @return array
+     */
     protected static function getReportCards(): array
     {
         $new_cards = [];
