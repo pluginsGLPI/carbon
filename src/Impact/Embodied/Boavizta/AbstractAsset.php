@@ -87,6 +87,13 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
             trigger_error($e->getMessage(), E_USER_WARNING);
             throw $e;
         }
+        if (!isset($response[0]) || !is_string($response[0])) {
+            trigger_error(sprintf(
+                'Invalid response from Boavizta API: %s',
+                json_encode($response[0] ?? '')
+            ), E_USER_WARNING);
+            throw new \RuntimeException('Invalid response from Boavizta API');
+        }
 
         return $response[0];
     }
