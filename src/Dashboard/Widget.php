@@ -1025,6 +1025,9 @@ class Widget extends GlpiDashboardWidget
                 'height' => '95%',
                 'redrawOnParentResize' => true,
                 'type'   => 'radar',
+                'toolbar' => [
+                    'show' => false,
+                ],
             ],
             'yaxis' => [
                 'stepSize' => 20,

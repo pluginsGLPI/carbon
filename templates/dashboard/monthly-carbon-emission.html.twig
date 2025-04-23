@@ -70,7 +70,7 @@
 (function () {
     observer = new ResizeObserver(entries => {
         for (const entry of entries) {
-            $(entry.target).fitText(0.5);
+            $(entry.target).fitText(0.6);
         }
     })
     observer.observe(document.querySelector('#{{ id }} .number'));
