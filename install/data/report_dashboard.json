@@ -1,0 +1,142 @@
+{
+    "plugin_carbon_report_usage_carbon_emission_ytd": {
+        "dashboards_dashboards_id": 8,
+        "x": 0,
+        "y": 0,
+        "width": 6,
+        "height": 3,
+        "card_options": {
+            "color": "#BBDA50",
+            "widgettype": "usage_carbon_emission_ytd",
+            "use_gradient": "0",
+            "limit": "7",
+            "point_labels": "0"
+        }
+    },
+    "plugin_carbon_report_usage_carbon_emission_two_last_months": {
+        "dashboards_dashboards_id": 8,
+        "x": 6,
+        "y": 0,
+        "width": 6,
+        "height": 3,
+        "card_options": {
+            "color": "#145161",
+            "widgettype": "total_usage_carbon_emission_two_last_months",
+            "use_gradient": "0",
+            "limit": "7",
+            "point_labels": "0"
+        }
+    },
+    "plugin_carbon_report_information_video": {
+        "dashboards_dashboards_id": 8,
+        "x": 18,
+        "y": 0,
+        "width": 6,
+        "height": 3,
+        "card_options": {
+            "color": "#f3f6f4",
+            "widgettype": "information_video",
+            "use_gradient": "0",
+            "limit": "7",
+            "point_labels": "0"
+        }
+    },
+    "plugin_carbon_report_methodology_information": {
+        "dashboards_dashboards_id": 8,
+        "x": 12,
+        "y": 6,
+        "width": 12,
+        "height": 6,
+        "card_options": {
+            "color": "#f3f6f4",
+            "widgettype": "methodology_information",
+            "use_gradient": "0",
+            "limit": "7",
+            "point_labels": "0"
+        }
+    },
+    "plugin_carbon_report_biggest_gwp_per_model": {
+        "dashboards_dashboards_id": 8,
+        "x": 0,
+        "y": 6,
+        "width": 12,
+        "height": 6,
+        "card_options": {
+            "color": "#f3f6f4",
+            "widgettype": "most_gwp_impacting_computer_models",
+            "use_gradient": "0",
+            "limit": "7",
+            "point_labels": "0"
+        }
+    },
+    "plugin_carbon_report_usage_carbon_emissions_graph": {
+        "dashboards_dashboards_id": 8,
+        "x": 0,
+        "y": 12,
+        "width": 24,
+        "height": 7,
+        "card_options": {
+            "color": "#f3f6f4",
+            "widgettype": "usage_gwp_monthly",
+            "use_gradient": "0",
+            "limit": "7",
+            "point_labels": "0"
+        }
+    },
+    "plugin_carbon_report_unhandled_computers_ratio": {
+        "dashboards_dashboards_id": 8,
+        "x": 0,
+        "y": 3,
+        "width": 6,
+        "height": 3,
+        "card_options": {
+            "color": "#f3f6f4",
+            "widgettype": "unhandled_computers_ratio",
+            "use_gradient": "0",
+            "limit": "7",
+            "point_labels": "0"
+        }
+    },
+    "plugin_carbon_report_embodied_abiotic_depletion": {
+        "dashboards_dashboards_id": 8,
+        "x": 12,
+        "y": 0,
+        "width": 6,
+        "height": 3,
+        "card_options": {
+            "color": "#c0c0c0",
+            "widgettype": "embodied_abiotic_depletion",
+            "use_gradient": "0",
+            "point_labels": "0",
+            "limit": "7"
+        }
+    },
+    "plugin_carbon_report_unhandled_monitors_ratio": {
+        "dashboards_dashboards_id": 8,
+        "x": 6,
+        "y": 3,
+        "width": 6,
+        "height": 3,
+        "card_options": {
+            "color": "#f3f6f4",
+            "widgettype": "unhandled_monitors_ratio",
+            "use_gradient": "0",
+            "point_labels": "0",
+            "limit": "7"
+        }
+    },
+    "plugin_carbon_report_unhandled_network_equipments_ratio": {
+        "dashboards_dashboards_id": 8,
+        "x": 12,
+        "y": 3,
+        "width": 6,
+        "height": 3,
+        "card_options": {
+            "color": "#f3f6f4",
+            "widgettype": "unhandled_network_equipments_ratio",
+            "use_gradient": "0",
+            "point_labels": "0",
+            "limit": "7"
+        }
+    }
+}

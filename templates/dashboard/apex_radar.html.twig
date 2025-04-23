@@ -35,55 +35,63 @@
         color: {{ fg_color }};
     }
 
+    #{{ chart_id }}:hover {
+        background-color: {{ fg_hover_color }};
+        border: 1px solid {{ fg_hover_border }};
+    }
+
     .theme-dark #{{ chart_id }} {
         background-color: {{ dark_bg_color }};
         color: {{ dark_fg_color }};
     }
 
     #{{ chart_id }} .ct-label {
-        fill:  {{ fg_color }};
+        fill: {{ fg_color }};
         color: {{ fg_color }};
     }
 
     .theme-dark #{{ chart_id }} .ct-label {
-        fill:  {{ dark_fg_color }};
+        fill: {{ dark_fg_color }};
         color: {{ dark_fg_color }};
+    }
+
+    #{{ chart_id }} .apexcharts-xaxis text{
+        fill: {{ fg_color }};
+    }
+
+    .theme-dark #{{ chart_id }} .apexcharts-xaxis text{
+        fill: {{ dark_fg_color }};
+    }
+
+    #{{ chart_id }} polygon, #{{ chart_id }} .apexcharts-plot-series line {
+        stroke: {{ fg_color }};
+    }
+
+    .theme-dark #{{ chart_id }}, #{{ chart_id }} .apexcharts-plot-series line {
+        stroke: {{ dark_fg_color }};
     }
 
     {{ palette_style }}
 </style>
-
 <div style="height: 100%">
     <div class="card g-chart {{ class }}" id="{{ chart_id }}">
-        <div class="chart ct-chart">
-            <span class='empty-card no-data'>
-                <div>{{ __('No data found') }}</div>
-            </span>
-        </div>
-         <span class="main-label {{ label_class }}">{{ chart_title }}</span>
+        <div class="chart ct-chart">{{ no_data_html }}</div>
+        {# <span class="main-label">{{ label }}</span> #}
         <i class="main-icon {{ icon }}"></i>
     </div>
 </div>
 
-<script type="text/javascript">
-    $(document).ready(function () {
-        var no_data = {{ no_data }};
-        var chart_options = {
-            chart: {
-                height: "90%",
-                type: "{{ chart_type }}",
-            },
-            plotOptions: {{ plot_options|raw }},
-            legend: {
-                show: {{ show_legend ? 'true' : 'false' }},
-            },
-            series: {{ series|raw }},
-            labels: {{ labels|raw }},
-        };
-        if (!no_data) {
-            document.querySelector("#{{ chart_id }} .empty-card").style.display = "none";
-            var chart = new ApexCharts(document.querySelector("#{{ chart_id }}"), chart_options);
-            chart.render();
-        }
-    });
+{% block scripts %}
+<script>
+  $(document).ready(function () {
+    var currentUrl = window.location.href;
+
+    if (currentUrl.includes('dashboard')) {
+      document.getElementById('cardBodyBorder1').classList.add('border', 'border-2');
+    }
+
+    var chart = new ApexCharts(document.querySelector("#{{ chart_id }} "), {{ data|json_encode(constant('JSON_PRETTY_PRINT'))|raw }});
+    chart.render();
+  });
 </script>
+{% endblock %}

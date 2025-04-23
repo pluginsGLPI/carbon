@@ -28,16 +28,35 @@
  # @link      https://github.com/pluginsGLPI/carbon
  # -------------------------------------------------------------------------
  #}
+<style>
+    #{{ id }} {
+        background-color: {{ color }};
+        color: {{ fg_color }};
+    }
 
-<div class="col-sm-6 col-lg-3">
-  <div class="card card-height">
-    <div class="card-body ">
-      <h3 class="card-title">{{__('Want to know more ?','carbon')}}</h3>
-      <p class="text-secondary">{{ __('Here is a video about the impact of numeric on the enviromnent.','carbon')}}</p>
+    #{{ id }}:hover {
+        background-color: {{ fg_hover_color }};
+        border: 1px solid {{ fg_hover_border }};
+    }
+
+    .theme-dark #{{ id }} {
+        background-color: {{ fg_color }};
+        color: {{ color }};
+    }
+
+    .theme-dark #{{ id }}:hover {
+        background-color: {{ fg_hover_color }};
+        color: {{ fg_color }};
+        border: 1px solid {{ fg_hover_border }};
+    }
+</style>
+<div class="card" id="{{ id }}">
+    <div class="card-body">
+        <h3 class="card-title">{{__('Want to know more ?','carbon')}}</h3>
+        <p class="text-secondary">{{ __('Here is a video about the impact of numeric on the enviromnent.','carbon')}}</p>
     </div>
     <!-- Card footer -->
-    <div class="card-footer d-flex justify-content-center">
-      <a href="https://www.youtube.com/watch?v=o4_DLOuGToQ" target="_blank" class="btn">Go see the video</a>
+    <div class="d-flex justify-content-center">
+        <a href="https://www.youtube.com/watch?v=o4_DLOuGToQ" target="_blank" class="btn">Go see the video</a>
     </div>
-  </div>
 </div>

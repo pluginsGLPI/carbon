@@ -30,72 +30,47 @@
  #}
 
 <style>
-    #{{ chart_id }} {
+    #{{ id }} {
         background-color: {{ color }};
         color: {{ fg_color }};
     }
 
-    .theme-dark #{{ chart_id }} {
-        background-color: {{ dark_bg_color }};
-        color: {{ dark_fg_color }};
+    #{{ id }}:hover {
+        background-color: {{ fg_hover_color }};
+        border: 1px solid {{ fg_hover_border }};
     }
 
-    #{{ chart_id }} .ct-label {
+    .theme-dark #{{ id }} {
+        background-color: {{ fg_color }};
+        color: {{ color }};
+    }
+
+    .theme-dark #{{ id }}:hover {
+        background-color: {{ fg_hover_color }};
         color: {{ fg_color }};
+        border: 1px solid {{ fg_hover_border }};
     }
-
-    .theme-dark #{{ chart_id }} .ct-label {
-        color: {{ dark_fg_color }};
-    }
-
-    #{{ chart_id }} .ct-grid {
-        stroke: {{ line_color }};
-    }
-
-    .theme-dark #{{ chart_id }} .ct-grid {
-        stroke: {{ dark_line_color}};
-    }
-
-    #{{ chart_id }} .ct-circle {
-        stroke: {{ color }};
-        stroke-width: 3;
-    }
-    #{{ chart_id }} .ct-circle + .ct-label {
-        stroke: {{ color }};
-    }
-    {{ palette_style }}
 </style>
-
-<div style="height: 100%">
-    <div class="card g-chart {{ class }}"
-        id="{{ chart_id }}">
-        <div class="chart ct-chart"></div>
-        <span class="main-label {{ label_class }}">{{ chart_title }}</span>
-        <i class="main-icon {{ icon }}"></i>
+<div class="card" id="{{ id }}">
+    <div class="card-body" style="height: 100%">
+        <div class="row align-items-center">
+            <div class="col-auto" id="carbonEmbodiedPrimaryEnergyElement">
+                <span><img src="{{ get_plugin_web_dir('carbon') }}/dist/images/carbon_emission_icon_darkgreen.png"></img></span>
+            </div>
+            <div class="col">
+                <div class="subheader">{{ __('Embodied primary energy', 'carbon') }}</div>
+            </div>
+            <div class="my-3 number text-center">{{ number|raw }}</div>
+        </div>
     </div>
 </div>
-
-<script type="text/javascript">
-    $(document).ready(function () {
-        var chart = new ApexCharts(document.querySelector("#{{ chart_id }}"), {
-            chart: {
-                height: "80%",
-                type: "{{ chart_type }}",
-            },
-            // title: {
-            //     text: "{{ chart_title }}",
-            // },
-            legend: {
-                show: {{ show_legend ? 'true' : 'false' }},
-            },
-            series: {{ series|raw }},
-            xaxis: {
-                categories: {{ categories|raw }},
-            },
-            yaxis: {{ yaxis|raw }},
-            stroke: {{ stroke|raw }}
-        });
-
-        chart.render();
-    });
+<script>
+(function () {
+    observer = new ResizeObserver(entries => {
+        for (const entry of entries) {
+            $(entry.target).fitText(0.7);
+        }
+    })
+    observer.observe(document.querySelector('#{{ id }} .number'));
+})();
 </script>

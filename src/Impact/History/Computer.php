@@ -46,6 +46,7 @@ use DbUtils;
 use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
+use GlpiPlugin\Carbon\UsageImpact;
 use Infocom;
 use Location;
 
@@ -160,7 +161,7 @@ class Computer extends AbstractAsset
                             ['NOT' => [Infocom::getTableField('delivery_date') => null]],
                             ['NOT' => [Infocom::getTableField('buy_date') => null]],
                             ['NOT' => [Infocom::getTableField('date_creation') => null]],
-                            ['NOT' => [Infocom::getTableField('date_mod') => null]],
+                            // ['NOT' => [Infocom::getTableField('date_mod') => null]],
                         ]
                     ]
                 ],
@@ -229,7 +230,7 @@ class Computer extends AbstractAsset
         $status['has_type'] = ($data['type_id'] !== 0);
         $status['has_type_power_consumption'] = (($data['type_power_consumption'] ?? 0) !== 0);
         $status['has_usage_profile'] = ($data['plugin_carbon_computerusageprofiles_id'] !== 0);
-        $status['has_category'] = (($data['type'] ?? 0) !== ComputerType::CATEGORY_UNDEFINED);
+        $status['has_category'] = (($data['category'] ?? 0) !== ComputerType::CATEGORY_UNDEFINED);
 
         $item_oldest_date = $data['use_date']
             ?? $data['delivery_date']
@@ -245,8 +246,13 @@ class Computer extends AbstractAsset
     public static function showHistorizableDiagnosis(CommonDBTM $item)
     {
         $status = self::getHistorizableDiagnosis($item);
-
+        $usage_impact = new UsageImpact();
+        $usage_impact->getFromDBByCrit([
+            'itemtype' => $item::getType(),
+            'items_id' => $item->getID(),
+        ]);
         TemplateRenderer::getInstance()->display('@carbon/history/status-item.html.twig', [
+            'usage_impact' => $usage_impact,
             'has_status' => ($status !== null),
             'status' => $status,
         ]);

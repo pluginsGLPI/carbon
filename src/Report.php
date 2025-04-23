@@ -34,10 +34,13 @@
 namespace GlpiPlugin\Carbon;
 
 use CommonDBTM;
+use DateInterval;
 use DateTime;
 use DateTimeImmutable;
 use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\Dashboard\Provider;
+use Glpi\Dashboard\Grid as DashboardGrid;
+use Html;
 
 class Report extends CommonDBTM
 {
@@ -84,15 +87,16 @@ class Report extends CommonDBTM
 
     public static function showInstantReport(): void
     {
-        // $carbon_emission_per_month = Provider::getCarbonEmissionPerMonth();
-
+        ob_start();
+        $dashboard = new DashboardGrid('plugin_carbon_board', 24, 22, 'mini_core');
+        $dashboard->show(true);
+        $dashboard_html = ob_get_clean();
         TemplateRenderer::getInstance()->display('@carbon/quick-report.html.twig', [
-            'handled'   => Provider::getHandledComputersCount(),
-            'unhandled' => Provider::getUnhandledComputersCount(),
+            'dashboard' => $dashboard_html,
         ]);
     }
 
-    public static function getTotalCarbonEmission(array $params = []): string
+    public static function getUsageCarbonEmission(array $params = []): array
     {
         if (!isset($params['args']['apply_filters']['dates'][0]) || !isset($params['args']['apply_filters']['dates'][1])) {
             list($start_date, $end_date) = (new Toolbox())->yearToLastMonth(new DateTimeImmutable('now'));
@@ -103,7 +107,7 @@ class Report extends CommonDBTM
             $end_date   = DateTime::createFromFormat('Y-m-d\TH:i:s.v\Z', $params['args']['apply_filters'][1]);
         }
 
-        $value = Provider::getTotalCarbonEmission($params);
+        $value = Provider::getUsageCarbonEmission($params)['number'];
 
         // Prepare date format
         $date_format = 'Y F';
@@ -116,6 +120,8 @@ class Report extends CommonDBTM
                 $date_format = 'F Y';
                 break;
         }
+        // modify the end date to use an included boundary for display
+        $end_date->setDate((int) $end_date->format('Y'), (int) $end_date->format('m'), 0);
         $response = [
             'value'    => $value,
             'date_interval' => [
@@ -124,7 +130,7 @@ class Report extends CommonDBTM
             ],
         ];
 
-        return json_encode($response);
+        return $response;
     }
 
     public static function getTotalEmbodiedCarbonEmission(array $params = []): array
@@ -138,7 +144,7 @@ class Report extends CommonDBTM
             $end_date   = DateTime::createFromFormat('Y-m-d\TH:i:s.v\Z', $params['args']['apply_filters'][1]);
         }
 
-        $value = Provider::getTotalEmbodiedGwp($params);
+        $value = Provider::getEmbodiedGlobalWarming($params);
 
         // Prepare date format
         $date_format = 'Y F';
@@ -160,138 +166,5 @@ class Report extends CommonDBTM
         ];
 
         return $response;
-    }
-
-    public static function getCarbonEmissionPerMonth(array $params = [], array $crit = []): string
-    {
-        if (!isset($params['args']['apply_filters']['dates'][0]) || !isset($params['args']['apply_filters']['dates'][1])) {
-            list($start_date, $end_date) = (new Toolbox())->yearToLastMonth(new DateTimeImmutable('now'));
-            $params['args']['apply_filters']['dates'][0] = $start_date->format('Y-m-d\TH:i:s.v\Z');
-            $params['args']['apply_filters']['dates'][1] = $end_date->format('Y-m-d\TH:i:s.v\Z');
-        } else {
-            $start_date = DateTime::createFromFormat('Y-m-d\TH:i:s.v\Z', $params['args']['apply_filters'][0]);
-            $end_date   = DateTime::createFromFormat('Y-m-d\TH:i:s.v\Z', $params['args']['apply_filters'][1]);
-        }
-        $data = Provider::getCarbonEmissionPerMonth($params['args'], $crit);
-
-        // Prepare date format
-        $date_format = 'Y F';
-        switch ($_SESSION['glpidate_format'] ?? 0) {
-            case 0:
-                $date_format = 'Y F';
-                break;
-            case 1:
-            case 2:
-                $date_format = 'F Y';
-                break;
-        }
-        $data['date_interval'] = [
-            $start_date->format($date_format),
-            $end_date->format($date_format),
-        ];
-        $apex_data = [
-            'chart' => [
-                'type' => 'line',
-                'height' => 350,
-            ],
-            'colors' => ['#BBDA50', '#A00'],
-            // 'title' => [
-                // 'text' => __('Consumed energy and carbon emission', 'carbon'),
-            // ],
-            'plotOptions' => [
-                'bar' => [
-                    'horizontal' => false,
-                    'columnWidth' => '55%',
-                    'endingShape' => 'rounded'
-                ],
-            ],
-            'dataLabels' => [
-                'enabled' => false,
-                'enabledOnSeries' => [0, 1],
-                'style' => [
-                    'colors' => ['#145161', '#800'],
-                ],
-            ],
-            'labels' => [],
-            'stroke' => [
-                'width' => [0, 4],
-            ],
-            'series' => [
-                [
-                    'name' =>  __('Carbon emission', 'carbon'),
-                    'type' => 'bar',
-                    'data' => []
-                ],
-                [
-                    'name' => __('Consumed energy', 'carbon'),
-                    'type' => 'line',
-                    'data' => []
-                ],
-            ],
-            'xaxis' => [
-                'categories' => []
-            ],
-            'yaxis' => [
-                [
-                    'title' => ['text' => __('Carbon emission', 'carbon')],
-                ], [
-                    'opposite' => true,
-                    'title' => ['text' => __('Consumed energy', 'carbon')],
-                ]
-            ],
-            'markers' => [
-                'size' => [3, 3],
-            ],
-            'tooltip' => [
-                'enabled' => true,
-            ],
-        ];
-        foreach ($data['data']['series'] as $key => $serie) {
-            $apex_data['series'][$key]['data'] = $serie['data'];
-            $apex_data['series'][$key]['name'] = $serie['name'];
-            $apex_data['series'][$key]['type'] = $serie['type'];
-        }
-        // $apex_data['series'] = $data['data']['series'];
-        $apex_data['labels'] = $data['data']['labels'];
-        $apex_data['xaxis']['categories'] = $data['data']['labels'];
-        return json_encode($apex_data);
-    }
-
-    public static function getCarbonEmissionLastMonth(array $params): string
-    {
-        // Force dates filter to 2 last complete months
-        $end_date = new DateTime();
-        $end_date->setTime(0, 0, 0, 0);
-        $end_date->setDate((int) $end_date->format('Y'), (int) $end_date->format('m'), 0); // Last day of previous month
-        $start_date = clone $end_date;
-        $start_date->setDate((int) $end_date->format('Y'), (int) $end_date->format('m'), 0);
-        $start_date->setDate((int) $start_date->format('Y'), (int) $start_date->format('m'), 1);
-
-        $params['args']['apply_filters']['dates'][0] = $start_date->format('Y-m-d\TH:i:s.v\Z');
-        $params['args']['apply_filters']['dates'][1] = $end_date->format('Y-m-d\TH:i:s.v\Z');
-        $data = Provider::getCarbonEmissionPerMonth($params['args']);
-
-        // Prepare date format
-        $date_format = 'Y F';
-        switch ($_SESSION['glpidate_format'] ?? 0) {
-            case 0:
-                $date_format = 'Y F';
-                break;
-            case 1:
-            case 2:
-                $date_format = 'F Y';
-                break;
-        }
-        $data['data']['date_interval'] = [
-            $start_date->format($date_format),
-            $end_date->format($date_format),
-        ];
-
-        return json_encode($data['data']);
-    }
-
-    public static function getHandledComputersCount(array $params = []): array
-    {
-        return Provider::getHandledComputersCount($params);
     }
 }

@@ -36,6 +36,7 @@ namespace GlpiPlugin\Carbon;
 use CommonDBTM;
 use CommonDropdown;
 use CommonGLPI;
+use Computer as GlpiComputer;
 use Entity;
 use Glpi\Application\View\TemplateRenderer;
 use Html;
@@ -257,11 +258,13 @@ class ComputerUsageProfile extends CommonDropdown
         $computers_id = $item->getID();
         $usage_profile_fk = ComputerUsageProfile::getForeignKeyField();
         $environmental_imapct->getFromDBByCrit([
-            'computers_id' => $computers_id
+            'itemtype'     => GlpiComputer::class,
+            'items_id' => $computers_id,
         ]);
         if ($environmental_imapct->isNewItem()) {
             $environmental_imapct->add([
-                'computers_id'    => $computers_id,
+                'itemtype'     => GlpiComputer::class,
+                'items_id' => $computers_id,
                 $usage_profile_fk => $usage_profile_id,
             ]);
             return true;

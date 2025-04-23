@@ -181,7 +181,7 @@ class ProviderTest extends DbTestCase
         $this->assertEquals($total_count - 3, $unhandled_count['number']);
     }
 
-    public function testGetSumEmissionsPerModel()
+    public function testGetSumUsageEmissionsPerModel()
     {
         $entities_id = $this->isolateInEntity('glpi', 'glpi');
 
@@ -231,7 +231,7 @@ class ProviderTest extends DbTestCase
             $items = $this->getItems($rows);
         }
 
-        $output = Provider::getSumEmissionsPerModel();
+        $output = Provider::getSumUsageEmissionsPerModel();
         $expected = [
             'series'   => [
                 8.0,
@@ -311,7 +311,7 @@ class ProviderTest extends DbTestCase
         $this->assertEquals($expected, $output);
     }
 
-    public function testGetCarbonEmissionPerMonth()
+    public function testGetUsageCarbonEmissionPerMonth()
     {
         $country = $this->getUniqueString();
         $source  = $this->getUniqueString();
@@ -360,7 +360,7 @@ class ProviderTest extends DbTestCase
             ]);
             $date_cursor->add(new DateInterval('P1D'));
         }
-        $output = Provider::getCarbonEmissionPerMonth([
+        $output = Provider::getUsageCarbonEmissionPerMonth([
             'label' => '',
             'icon' => '',
         ], [

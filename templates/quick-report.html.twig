@@ -33,221 +33,24 @@
     <!-- Header with background image -->
     <header class="page-header header-height illustration container-fluid">
         <div class="container-fluid">
-        <img src="../dist/images/illustration_bridge.png" class="illustration-header" alt="GLPI Carbon header" />
+        <img src="{{ get_plugin_web_dir('carbon') }}/dist/images/illustration_bridge.png" class="illustration-header" alt="GLPI Carbon header" />
             <h1 class="page-title title-color title-position">{{ __('GLPI Carbon', 'carbon') }}</h1>
         </div>
     </header>
+    <style>
+      /*  Hide dashboard toolbar to disable edit mode */
+      .dashboard-card .toolbar {
+        /* display: none; */
+      }
+    </style>
 
     {% block body %}
     <div class="page-body">
-        <div class="container-fluid px-0">
-            <div class="row row-cards pb-3">
-                <!-- Row for score cards -->
-                <div class = "col-sm-6 col-lg-3" id="responsiveClassElement1">
-                  <div class="card card-height" id="cardElement1">
-                    {% include '@carbon/components/total-carbon-emission-card.html.twig' %}
-                  </div>
-                </div>
-
-                <div class="col-sm-6 col-lg-3" id="responsiveClassElement2">
-                  <div class="card card-height" id="cardElement2">
-                    {% include '@carbon/components/monthly-carbon-emission-card.html.twig' %}
-                  </div>
-                </div>
-
-                <div class="col-sm-6 col-lg-3" id="responsiveClassElement3">
-                  <div class="card card-sm card-height" id="cardElement3">
-                    {% include '@carbon/components/unhandled-computers-card.html.twig'
-                      with {
-                        'handled': handled,
-                        'unhandled': unhandled
-                      }
-                    %}
-                  </div>
-                </div>
-                <div class = "col-sm-6 col-lg-3" id="responsiveClassElement4">
-                  <div class="card card-height" id="cardElement4">
-                    {% include '@carbon/components/total-embodied-emission-card.html.twig' %}
-                  </div>
-                </div>
-
-                {% include '@carbon/components/information-video-card.html.twig' %}
-                <!-- Row for score cards -->
-                  </div>
-              </div>
-              <div class="col-12">
-                  <div class="row row-cards pb-3 align-items-center">
-                    <div class="col-sm-6 col-lg-6">
-                      <div class="card">
-                        {% include '@carbon/components/graph-carbon-emission-per-model.html.twig' %}
-                      </div>
-                    </div>
-                    <!-- Information block -->
-                    {% include '@carbon/components/information-block.html.twig' %}
-                    <!-- Information block -->
-                  </div>
-              </div>
-
-              <!-- Bar graph -->
-              <div class="col-12">
-                <div class="row row-cards">
-                  <div class="col-sm-6 col-lg-12">
-                    <div class="card">
-                      {% include '@carbon/components/graph-carbon-emission-per-month.html.twig' %}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- Bar graph -->
-            </div>
-        </div>
-        <!-- Footer -->
-          <div class="container-fluid mt-3 footer-height d-flex justify-content-center">
-              <img src="../dist/images/illustration-footer.png" class="py-1 illustration-footer" alt="GLPI Carbon footer" />
-          </div>
+      {{ dashboard|raw }}
     </div>
     {% endblock %}
+
+  <footer class="container-fluid mt-3 footer-height d-flex justify-content-center">
+      <img src="{{ get_plugin_web_dir('carbon') }}/dist/images/illustration-footer.png" class="py-1 illustration-footer" alt="GLPI Carbon footer" />
+  </footer>
 </div>
-
-{% block scripts %}
-	<script>
-	document.addEventListener('DOMContentLoaded', function () {
-
-        // Define options for each chart
-        {# var carbonEmissionPerTypeOptions = {
-          series: [0.6543, 0.4255, 1.0041, 1.6217, 0.8615],
-          labels: ['Desktops', 'Tablets', 'Mobiles', 'Laptops', 'Others'],
-          chart: {
-            type: 'donut',
-            width: '80%',
-          },
-          colors: carbonColorPalette,
-          responsive: [{
-            breakpoint: 480,
-            options: {
-              chart: {
-                width: 300
-              },
-            legend: {
-              position: 'bottom'
-            }
-          }
-        }]
-        }; #}
-
-        {# var carbonEmissionPerMonthOptions = {
-          series: [{
-            name: 'Desktops',
-            data: [0.55,0.26,0.67,0.91,0.45,0.77,0.91,0.45,0.77,0.91,0.45,0.77]
-          }, {
-            name: 'Tablets',
-            data: [0.45,0.74,0.33,0.09,0.55,0.23,0.09,0.55,0.23,0.09,0.55,0.23]
-          }, {
-            name: 'Mobiles',
-            data: [0.67,0.33,0.45,0.77,0.91,0.45,0.77,0.91,0.45,0.77,0.91,0.45]
-          }, {
-            name: 'Laptops',
-            data: [0.91,0.45,0.77,0.91,0.45,0.77,0.91,0.45,0.77,0.91,0.45,0.77]
-          },
-          {
-            name: 'Others',
-            data: [0.45,0.77,0.91,0.45,0.77,0.91,0.45,0.77,0.91,0.45,0.77,0.91]
-          }],
-          chart: {
-            type: 'bar',
-            height: 350,
-            stacked: true,
-            toolbar: {
-              show: true
-            },
-            zoom: {
-              enabled: true
-            }
-          },
-          colors: ['#146151'],
-          responsive: [{
-            breakpoint: 480,
-              options: {
-                legend: {
-                  position: 'bottom',
-                  offsetX: -10,
-                  offsetY: 0
-                }
-              }
-          }],
-          plotOptions: {
-            bar: {
-              horizontal: false,
-              borderRadius: 10,
-              borderRadiusApplication: 'end', // 'around', 'end'
-              borderRadiusWhenStacked: 'last', // 'all', 'last'
-              dataLabels: {
-                total: {
-                  enabled: true,
-                  formatter: function (val) {
-                    return val.toFixed(2);
-                  },
-                  style: {
-                    fontSize: '13px',
-                    fontWeight: 900
-                  }
-                }
-              }
-            },
-          },
-          xaxis: {
-            type: 'datetime',
-            categories: ['01/01/2024', '01/02/2024', '01/03/2024', '01/04/2024', '01/05/2024', '01/06/2024', '01/07/2024', '01/08/2024', '01/09/2024', '01/10/2024', '01/11/2024', '01/12/2024'],
-          },
-          legend: {
-            position: 'right',
-            offsetY: 40
-          },
-          fill: {
-            opacity: 1
-          }
-        }; #}
-
-        {# var powerConsumptionPerTypeOptions = {
-          series: [1200, 1100, 960, 785, 805],
-          labels: ['Desktops', 'Tablets', 'Mobiles', 'Laptops', 'Others'],
-          chart: {
-            type: 'donut',
-            width: '80%',
-          },
-          colors: powerColorPalette,
-          responsive: [{
-            breakpoint: 480,
-            options: {
-              chart: {
-              width: 300
-              },
-              legend: {
-                position: 'bottom'
-              }
-            }
-          }]
-        }; #}
-
-        // Initialize charts
-        //var carbonConsumptionPerTypeChart = new ApexCharts(document.querySelector("#powerConsumptionPerModelChart"), powerConsumptionPerTypeOptions);
-        // Render charts
-        //carbonConsumptionPerTypeChart.render();
-
-        // Fetch data with Ajax
-
-        {# fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/totalPowerConsumption.php").then(response => {
-            console.log(response);
-            return response.json();
-        }).then(data => {
-            let totalPowerConsumption = data;
-            document.getElementById('powerConsumption').textContent = totalPowerConsumption;
-        }); #}
-
-
-        });
-</script>
-{% endblock %}
-
-{% block styles %}
-{% endblock %}

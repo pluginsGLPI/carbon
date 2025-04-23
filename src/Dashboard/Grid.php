@@ -35,106 +35,296 @@ namespace GlpiPlugin\Carbon\Dashboard;
 
 use Computer;
 use Glpi\Dashboard\Filter;
+use Monitor;
+use NetworkEquipment;
 
 class Grid
 {
-    public static function getDashboardCards($cards = [])
+    public static function getDashboardCards(): array
     {
-        if (is_null($cards)) {
-            $cards = [];
+        $cards = [];
+        // Declare the following cards only if we show / edit the quick report page of the plugin
+        $in_carbon_report_page = self::in_carbon_report_page();
+
+        if ($in_carbon_report_page) {
+            // Provide cards for the report page
+            $cards = array_merge($cards, self::getReportCards());
+        } else {
+            // Provide cards for the standard dashboard
+            $cards = array_merge($cards, self::getStandardCards());
         }
 
+        // Common cards
+        $group = __('Carbon', 'carbon');
+        $cards += [
+            'plugin_carbon_assets_completeness_ratio' => [
+                'widgettype'   => ['apex_radar', 'multipleNumber'],
+                'group'        => $group,
+                'label'        => __('Handled assets ratio', 'carbon'),
+                'provider'     => Provider::class . '::getHandledAssetsRatio',
+            ],
+            'plugin_carbon_assets_completeness' => [
+                'widgettype' => ['stackedbars'],
+                'group'      => $group,
+                'label'      => __('Handled assets count', 'carbon'),
+                'provider'   => Provider::class . '::getHandledAssetsCounts',
+            ]
+        ];
+
         return $cards;
+    }
 
-    //     $new_cards = [
-    //         'plugin_carbon_card_incomplete_computers' => [
-    //             'widgettype'   => ["bigNumber"],
-    //             'group'        => __("Carbon", "carbon"),
-    //             'label'        => __("Unhandled computers", "carbon"),
-    //             'provider'     => Provider::class . "::getUnhandledComputersCount",
-    //             'filter'       => Filter::getAppliableFilters(Computer::getTable()),
-    //         ],
-    //         'plugin_carbon_card_complete_computers' => [
-    //             'widgettype'   => ["bigNumber"],
-    //             'group'        => __("Carbon", "carbon"),
-    //             'label'        => __("Handled computers", "carbon"),
-    //             'provider'     => Provider::class . "::getHandledComputersCount",
-    //             'filter'       => Filter::getAppliableFilters(Computer::getTable()),
-    //         ],
-    //         'plugin_carbon_card_unhandled_computers' => [
-    //             'widgettype'   => ['unhandledcomputers'],
-    //             'group'        => __("Carbon", "carbon"),
-    //             'label'        => __("Unhandled computers", 'carbon'),
-    //         ],
-    //         'plugin_carbon_card_total_power' => [
-    //             'widgettype'   => ["bigNumber"],
-    //             'group'        => __("Carbon", "carbon"),
-    //             'label'        => __("Total power consumption", "carbon"),
-    //             'provider'     => Dashboard::class . "::cardTotalPowerProvider",
-    //         ],
-    //         // 'plugin_carbon_card_total_carbon_emission' => [
-    //         //     'widgettype'   => ["bigNumber"],
-    //         //     'group'        => __("Carbon", "carbon"),
-    //         //     'label'        => __("Total carbon emission", "carbon"),
-    //         //     'provider'     => Dashboard::class . "::cardTotalCarbonEmissionProvider",
-    //         // ],
-    //         'plugin_carbon_card_total_power_per_model' => [
-    //             'widgettype'   => ['pie', 'donut', 'halfpie', 'halfdonut', 'bar', 'hbar'],
-    //             'group'        => __("Carbon", "carbon"),
-    //             'label'        => __("Total power consumption per model", "carbon"),
-    //             'provider'     => Dashboard::class . "::cardTotalPowerPerModelProvider",
-    //         ],
-    //         'plugin_carbon_card_carbon_emission_per_month' => [
-    //             'widgettype'   => ['apex_lines'],
-    //             'group'        => __("Carbon", "carbon"),
-    //             'label'        => __("Carbon emission per month", 'carbon'),
-    //             'provider'     => Provider::class . "::getCarbonEmissionPerMonth",
-    //         ],
-    //         'plugin_carbon_card_carbon_intensity' => [
-    //             'widgettype'   => ['lines', 'bars'],
-    //             'group'        => __("Carbon", "carbon"),
-    //             'label'        => __("Carbon intensity  (gCO<sub>2</sub>eq / KWh)", 'carbon'),
-    //             'provider'     => Dashboard::class . "::cardCarbonintensityProvider",
-    //         ],
-    //         'plugin_carbon_card_carbon_emission_per_type' => [
-    //             'widgettype'   => ['graphpertype'],
-    //             'group'        => __("Carbon", "carbon"),
-    //             'label'        => __("Carbon emission per type", 'carbon'),
-    //             'provider'     => Provider::class . "::getSumEmissionsPerModel",
-    //         ],
-    //         'plugin_carbon_card_total_carbon_emission' => [
-    //             'widgettype'   => ['totalcarbonemission'],
-    //             'group'        => __("Carbon", "carbon"),
-    //             'label'        => __("Total carbon emission", 'carbon'),
-    //         ],
-    //         'plugin_carbon_card_monthly_carbon_emission' => [
-    //             'widgettype'   => ['monthlycarbonemission'],
-    //             'group'        => __("Carbon", "carbon"),
-    //             'label'        => __("Monthly carbon emission", 'carbon'),
-    //         ],
-    //            'group'        => __("Carbon", "carbon"),
-    //            'label'        => __("Monthly carbon emission", 'carbon'),
-    //        ],
-    //        'plugin_carbon_card_total_embodied_gwp_impact' => [
-    //            'widgettype'   => ['bigNumber'],
-    //            'group'        => __("Carbon", "carbon"),
-    //            'label'        => __("Total embodied global warming potential", 'carbon'),
-    //            'provider'     => Provider::class . "::getTotalEmbodiedGwp",
-    //        ],
-    //        'plugin_carbon_card_total_embodied_pe_impact' => [
-    //            'widgettype'   => ['bigNumber'],
-    //            'group'        => __("Carbon", "carbon"),
-    //            'label'        => __("Total embodied primary energy consumed", 'carbon'),
-    //            'provider'     => Provider::class . "::getTotalPrimaryEnergyConsumed",
-    //        ],
-    //        'plugin_carbon_card_total_embodied_adp_impact' => [
-    //            'widgettype'   => ['bigNumber'],
-    //            'group'        => __("Carbon", "carbon"),
-    //            'label'        => __("Total embodied abiotic depletion potential", 'carbon'),
-    //            'provider'     => Provider::class . "::getTotalEmbodiedAdp",
-    //        ],
-    //    ];
+    /**
+     * Determine if the user is viewing or editing the reporting dashboard
+     *
+     * @return boolean
+     */
+    protected static function in_carbon_report_page(): bool
+    {
+        if (strpos($_SERVER['REQUEST_URI'], 'carbon/front/report.php') !== false) {
+            return true;
+        }
 
-    //     return array_merge($cards, $new_cards);
+        if (strpos($_SERVER['REQUEST_URI'], '/ajax/dashboard.php') !== false) {
+            if ((($_GET['dashboard'] ?? '') === 'plugin_carbon_board')) {
+                return true;
+            }
+            if (($_POST['dashboard'] ?? '') === 'plugin_carbon_board') {
+                if (in_array($_POST['action'], ['display_add_widget', 'display_edit_widget'])) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Get description of cards for standard dashboard (in GLPI Central page)
+     *
+     * @return array
+     */
+    protected static function getStandardCards(): array
+    {
+        $new_cards = [];
+        $group = __('Carbon', 'carbon');
+
+        // Data completeness diagnosis
+        if (in_array(Computer::class, PLUGIN_CARBON_TYPES)) {
+            $new_cards += [
+                'plugin_carbon_complete_computers' => [
+                    'widgettype'   => ['bigNumber'],
+                    'group'        => $group,
+                    'label'        => __('Handled computers', 'carbon'),
+                    'provider'     => Provider::class . '::getHandledComputersCount',
+                    'filter'       => Filter::getAppliableFilters(Computer::getTable()),
+                ],
+                'plugin_carbon_incomplete_computers' => [
+                    'widgettype'   => ['bigNumber'],
+                    'group'        => $group,
+                    'label'        => __('Unhandled computers', 'carbon'),
+                    'provider'     => Provider::class . '::getUnhandledComputersCount',
+                    'filter'       => Filter::getAppliableFilters(Computer::getTable()),
+                ],
+            ];
+        }
+        if (in_array(Monitor::class, PLUGIN_CARBON_TYPES)) {
+            $new_cards += [
+                'plugin_carbon_complete_monitors' => [
+                    'widgettype'   => ['bigNumber'],
+                    'group'        => $group,
+                    'label'        => __('Handled monitors', 'carbon'),
+                    'provider'     => Provider::class . '::getHandledMonitorsCount',
+                    'filter'       => Filter::getAppliableFilters(Monitor::getTable()),
+                ],
+                'plugin_carbon_incomplete_monitors' => [
+                    'widgettype'   => ['bigNumber'],
+                    'group'        => $group,
+                    'label'        => __('Unhandled monitors', 'carbon'),
+                    'provider'     => Provider::class . '::getUnhandledMonitorsCount',
+                    'filter'       => Filter::getAppliableFilters(Monitor::getTable()),
+                ],
+            ];
+        }
+        if (in_array(NetworkEquipment::class, PLUGIN_CARBON_TYPES)) {
+            $new_cards += [
+                'plugin_carbon_complete_network_equipments' => [
+                    'widgettype'   => ['bigNumber'],
+                    'group'        => $group,
+                    'label'        => __('Handled network equipments', 'carbon'),
+                    'provider'     => Provider::class . '::getHandledNetworkEquipmentsCount',
+                    'filter'       => Filter::getAppliableFilters(NetworkEquipment::getTable()),
+                ],
+                'plugin_carbon_incomplete_network_equipments' => [
+                    'widgettype'   => ['bigNumber'],
+                    'group'        => $group,
+                    'label'        => __('Unhandled network equipments', 'carbon'),
+                    'provider'     => Provider::class . '::getUnhandledNetworkEquipmentsCount',
+                    'filter'       => Filter::getAppliableFilters(NetworkEquipment::getTable()),
+                ],
+            ];
+        }
+
+        $new_cards += [
+            // Usage impact
+            'plugin_carbon_total_usage_power' => [
+                'widgettype'   => ['bigNumber'],
+                'group'        => $group,
+                'label'        => __('Usage power consumption', 'carbon'),
+                'provider'     => Provider::class . '::getUsagePower',
+            ],
+            'plugin_carbon_total_usage_carbon_emission' => [
+                'widgettype'   => ['bigNumber'],
+                'group'        => $group,
+                'label'        => __('Usage carbon emission', 'carbon'),
+                'provider'     => Provider::class . '::getUsageCarbonEmission',
+            ],
+            'plugin_carbon_total_usage_adp_impact' => [
+                'widgettype'   => ['bigNumber'],
+                'group'        => $group,
+                'label'        => __('Usage abiotic depletion potential', 'carbon'),
+                'provider'     => Provider::class . '::getUsageAbioticDepletion',
+            ],
+
+            // Embodied impact
+            'plugin_carbon_embodied_gwp_impact' => [
+                'widgettype'   => ['bigNumber'],
+                'group'        => $group,
+                'label'        => __('Embodied global warming potential', 'carbon'),
+                'provider'     => Provider::class . '::getEmbodiedGlobalWarming',
+            ],
+            'plugin_carbon_embodied_pe_impact' => [
+                'widgettype'   => ['bigNumber'],
+                'group'        => $group,
+                'label'        => __('Embodied primary energy consumed', 'carbon'),
+                'provider'     => Provider::class . '::getEmbodiedPrimaryEnergy',
+            ],
+            'plugin_carbon_embodied_adp_impact' => [
+                'widgettype'   => ['bigNumber'],
+                'group'        => $group,
+                'label'        => __('Embodied abiotic depletion potential', 'carbon'),
+                'provider'     => Provider::class . '::getEmbodiedAbioticDepletion',
+            ],
+
+            // embodied + usage impact
+            'plugin_carbon_total_gwp_impact' => [
+                'widgettype'   => ['bigNumber'],
+                'group'        => $group,
+                'label'        => __('Global warming potential', 'carbon'),
+                'provider'     => Provider::class . '::getTotalGlobalWarming',
+            ],
+            'plugin_carbon_total_adp_impact' => [
+                'widgettype'   => ['bigNumber'],
+                'group'        => $group,
+                'label'        => __('Abiotic depletion potential', 'carbon'),
+                'provider'     => Provider::class . '::getTotalAbioticDepletion',
+            ],
+        ];
+
+        return $new_cards;
+    }
+
+    /**
+     * getdescription of cards for dashboard in the reporting page of the plugin
+     *
+     * @return array
+     */
+    protected static function getReportCards(): array
+    {
+        $new_cards = [];
+        $group = __('Carbon', 'carbon');
+
+        // Data completeness diagnosis
+        if (in_array(Computer::class, PLUGIN_CARBON_TYPES)) {
+            $new_cards += [
+                'plugin_carbon_report_unhandled_computers_ratio' => [
+                    'widgettype'   => ['unhandled_computers_ratio'],
+                    'group'        => $group,
+                    'label'        => __('Unhandled computers ratio', 'carbon'),
+                ],
+            ];
+        }
+        if (in_array(Monitor::class, PLUGIN_CARBON_TYPES)) {
+            $new_cards += [
+                'plugin_carbon_report_unhandled_monitors_ratio' => [
+                    'widgettype'   => ['unhandled_monitors_ratio'],
+                    'group'        => $group,
+                    'label'        => __('Unhandled monitors ratio', 'carbon'),
+                ],
+            ];
+        }
+        if (in_array(NetworkEquipment::class, PLUGIN_CARBON_TYPES)) {
+            $new_cards += [
+                'plugin_carbon_report_unhandled_network_equipments_ratio' => [
+                    'widgettype'   => ['unhandled_network_equipments_ratio'],
+                    'group'        => $group,
+                    'label'        => __('Unhandled network equipments ratio', 'carbon'),
+                ],
+            ];
+        }
+
+        // Usage impact
+        $new_cards += [
+            'plugin_carbon_report_usage_carbon_emission_ytd' => [
+                'widgettype'   => ['usagecarbonemission_ytd'],
+                'group'        => $group,
+                'label'        => __('Usage carbon emission year to date', 'carbon'),
+            ],
+            'plugin_carbon_report_usage_carbon_emission_two_last_months' => [
+                'widgettype'   => ['totalusagecarbonemission_two_last_months'],
+                'group'        => $group,
+                'label'        => __('Monthly carbon emission', 'carbon'),
+            ],
+            'plugin_carbon_report_usage_carbon_emissions_graph' => [
+                'widgettype'   => ['usage_gwp_monthly'],
+                'group'        => $group,
+                'label'        => __('Usage global warming potential chart', 'carbon'),
+            ],
+            'plugin_carbon_report_biggest_gwp_per_model' => [
+                'widgettype'   => ['most_gwp_impacting_computer_models'],
+                'group'        => $group,
+                'label'        => __('Biggest monthly averaged carbon emission per model', 'carbon'),
+            ],
+            'plugin_carbon_report_usage_abiotic_depletion' => [
+                'widgettype'   => ['usage_abiotic_depletion'],
+                'group'        => $group,
+                'label'        => __('Usage abiotic depletion potential', 'carbon'),
+            ],
+
+            // Embodied impact
+            // 'plugin_carbon_report_embodied_global_warming' => [
+            //     'widgettype'   => ['embodied_global_warming'],
+            //     'group'        => $group,
+            //     'label'        => __('Embodied global warming potential', 'carbon'),
+            //     'provider'     => Provider::class . '::getEmbodiedGlobalWarming',
+            // ],
+            'plugin_carbon_report_embodied_abiotic_depletion' => [
+                'widgettype'   => ['embodied_abiotic_depletion'],
+                'group'        => $group,
+                'label'        => __('Embodied abiotic depletion potential', 'carbon'),
+            ],
+            'plugin_carbon_report_embodied_pe_impact' => [
+                'widgettype'   => ['embodied_primary_energy'],
+                'group'        => $group,
+                'label'        => __('Embodied primary energy consumed', 'carbon'),
+                'provider'     => Provider::class . '::getEmbodiedPrimaryEnergy',
+            ],
+        ];
+
+        // Informational content
+        $new_cards += [
+            'plugin_carbon_report_information_video' => [
+                'widgettype'   => ['information_video'],
+                'group'        => $group,
+                'label'        => __('Environmental impact information video', 'carbon'),
+            ],
+            'plugin_carbon_report_methodology_information' => [
+                'widgettype'   => ['methodology_information'],
+                'group'        => $group,
+                'label'        => __('Environmental impact methodology_information', 'carbon'),
+            ],
+        ];
+
+        return $new_cards;
     }
 }

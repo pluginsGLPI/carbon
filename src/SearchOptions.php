@@ -33,6 +33,19 @@
 
 namespace GlpiPlugin\Carbon;
 
+use CommonDBTM;
+use Computer;
+use Location as GlpiLocation;
+use ComputerType as GlpiComputerType;
+use ComputerModel;
+use Computer_Item;
+use Monitor;
+use MonitorType as GlpiMonitorType;
+use MonitorModel;
+use NetworkEquipment;
+use NetworkEquipmentType as GlpiNetworkEquipmentType;
+use NetworkEquipmentModel;
+
 /**
  * This file is *REQUIRED* in the whole life time of the plugin
  * used in install process
@@ -85,4 +98,277 @@ class SearchOptions
     public const USAGE_IMPACT_ADP_QUALITY = self::SEARCH_OPTION_BASE + 704;
     public const USAGE_IMPACT_PE = self::SEARCH_OPTION_BASE + 705;
     public const USAGE_IMPACT_PE_QUALITY = self::SEARCH_OPTION_BASE + 706;
+
+    public const COMPUTER_TYPE_CATEGORY = self::SEARCH_OPTION_BASE + 800;
+
+    public const LOCATION_BOAVIZTA_ZONE = self::SEARCH_OPTION_BASE + 900;
+
+    /*
+     * Get search options added to a core itemtype by the plugin
+     *
+     * @param string $itemtype
+     * @return array
+     */
+    public static function getCoreSearchOptions(string $itemtype): array
+    {
+        $sopt = [];
+
+        $sopt[] = [
+            'id'           => SearchOptions::LOCATION_BOAVIZTA_ZONE,
+            'table'        => getTableForItemType(Location::class),
+            'field'        => 'boavizta_zone',
+            'name'         => __('Boavizta zone', 'carbon'),
+            'datatype'     => 'specific',
+            'searchtype'   => ['equals', 'notequals'],
+            'massiveaction' => false,
+            'linkfield'    => 'locations_id',
+            'joinparams' => [
+                'jointype' => 'child',
+            ],
+        ];
+
+        if (in_array($itemtype, PLUGIN_CARBON_TYPES)) {
+            $item_type_class = 'GlpiPlugin\\Carbon\\' . $itemtype . 'Type';
+            $glpi_item_type_class = $itemtype . 'Type';
+            if (class_exists($item_type_class) && is_subclass_of($item_type_class, CommonDBTM::class)) {
+                $itemtype_fk = $itemtype::getForeignKeyField();
+                $sopt[] = [
+                    'id'           => SearchOptions::POWER_CONSUMPTION,
+                    'table'        => getTableForItemType($item_type_class),
+                    'field'        => 'power_consumption',
+                    'name'         => __('Power consumption', 'carbon'),
+                    'datatype'     => 'number',
+                    'massiveaction' => false,
+                    'min'          => 0,
+                    'max'          => 10000,
+                    'unit'         => 'W',
+                    'linkfield'    => $itemtype_fk,
+                    'joinparams' => [
+                        'jointype' => 'child',
+                        'beforejoin' => [
+                            'table' => getTableForItemType($glpi_item_type_class),
+                            'joinparams' => [
+                                'jointype' => 'child',
+                            ]
+                        ]
+                    ],
+                    'computation' => "IF(TABLE.`power_consumption` IS NULL, 0, TABLE.`power_consumption`)",
+                ];
+            }
+        }
+
+        if ($itemtype === Computer::class && in_array($itemtype, PLUGIN_CARBON_TYPES)) {
+            $sopt[] = [
+                'id'            => SearchOptions::USAGE_PROFILE,
+                'table'         => ComputerUsageProfile::getTable(),
+                'field'         => 'name',
+                'name'          => ComputerUsageProfile::getTypeName(),
+                'datatype'      => 'dropdown',
+                'massiveaction' => false,
+                'joinparams' => [
+                    'jointype' => 'empty',
+                    'beforejoin' => [
+                        'table'    => UsageInfo::getTable(),
+                        'joinparams' => [
+                            'jointype' => 'child',
+                        ]
+                    ]
+                ]
+            ];
+
+            $computation = "IF(`glpi_computers_id_e1f6cdb2d63e8a0252da5d4cb339a927`.`is_deleted` = 0
+            AND `glpi_computers_id_e1f6cdb2d63e8a0252da5d4cb339a927`.`is_template` = 0
+            AND NOT `glpi_locations`.`country`  = ''
+            AND NOT `glpi_locations`.`country` IS NULL
+            AND `glpi_plugin_carbon_computerusageprofiles_09f8403aa14af64cd70f350288a0331b`.`id` > 0
+            AND (
+                `glpi_plugin_carbon_computertypes_a643ab3ffd70abf99533ed214da87d60`.`power_consumption` > 0
+                OR `glpi_computermodels`.`power_consumption` > 0
+            ), 1, 0)";
+            $sopt[] = [
+                'id'            => SearchOptions::IS_HISTORIZABLE,
+                'table'         => getTableForItemType($itemtype),
+                'field'         => 'id',
+                'linkfield'     => 'id',
+                'name'          => __('Is historizable', 'carbon'),
+                'datatype'      => 'bool',
+                'massiveaction' => false,
+                'joinparams' => [
+                    'jointype' => 'empty',
+                    'beforejoin' => [
+                        [
+                            'table' => GlpiLocation::getTable(),
+                            'joinparams' => [
+                                'jointype' => 'empty',
+                                'nolink'   => true,
+                            ]
+                        ],
+                        [
+                            'table' => ComputerType::getTable(),
+                            'joinparams' => [
+                                'jointype' => 'child',
+                                'nolink'   => true,
+                                'beforejoin' => [
+                                    'table' => GlpiComputerType::getTable(),
+                                    'joinparams' => [
+                                        'jointype' => 'empty',
+                                    ]
+                                ]
+                            ]
+                        ],
+                        [
+                            'table' => ComputerModel::getTable(),
+                            'joinparams' => [
+                                'jointype' => 'empty',
+                                'nolink'   => true,
+                            ]
+                        ],
+                        [
+                            'table' => ComputerUsageProfile::getTable(),
+                            'joinparams' => [
+                                'jointype' => 'empty',
+                                'nolink'   => true,
+                                'beforejoin' => [
+                                    'table' => UsageInfo::getTable(),
+                                    'joinparams' => [
+                                        'jointype' => 'itemtype_item',
+                                    ]
+                                ]
+                            ]
+                        ],
+                    ],
+                ],
+                'computation' => $computation,
+            ];
+        } else if ($itemtype === GlpiComputerType::class && in_array(Computer::class, PLUGIN_CARBON_TYPES)) {
+            $sopt[] = [
+                'id'             => SearchOptions::COMPUTER_TYPE_CATEGORY,
+                'table'          => getTableForItemType(ComputerType::class),
+                'field'          => 'category',
+                'name'           => __('Category', 'carbon'),
+                'datatype'       => 'specific',
+                'searchtype'     => ['equals', 'notequals'],
+                'massive_action' => false,
+                'joinparams'     => [
+                    'jointype'   => 'child'
+                ]
+            ];
+        } else if ($itemtype === Monitor::class && in_array($itemtype, PLUGIN_CARBON_TYPES)) {
+            $computation = "IF(`glpi_monitors_id_fd9c1a8262e8f3b6e96bc8948f2a6226`.`is_deleted` = 0
+            AND `glpi_monitors_id_fd9c1a8262e8f3b6e96bc8948f2a6226`.`is_template` = 0
+            AND NOT `glpi_locations_fad8b1764dcda16e3822068239df73f2`.`country`  = ''
+            AND NOT `glpi_locations_fad8b1764dcda16e3822068239df73f2`.`country` IS NULL
+            AND (
+                `glpi_plugin_carbon_monitortypes_54b036337d1b9bbf4f13db0e1ae93bc9`.`power_consumption` > 0
+                OR `glpi_monitormodels`.`power_consumption` > 0
+            ), 1, 0)";
+            $sopt[] = [
+                'id'            => SearchOptions::IS_HISTORIZABLE,
+                'table'         => getTableForItemType($itemtype),
+                'field'         => 'id',
+                'linkfield'     => 'id',
+                'name'          => __('Is historizable', 'carbon'),
+                'datatype'      => 'bool',
+                'massiveaction' => false,
+                'joinparams' => [
+                    'jointype' => 'empty',
+                    'beforejoin' => [
+                        [
+                            'table' => GlpiLocation::getTable(),
+                            'joinparams' => [
+                                'jointype' => 'empty',
+                                'nolink'   => true,
+                                'beforejoin' => [
+                                    'table' => Computer::getTable(),
+                                    'joinparams' => [
+                                        'jointype' => 'empty',
+                                        'beforejoin' => [
+                                            'table' => Computer_Item::getTable(),
+                                            'joinparams' => [
+                                                'jointype' => 'itemtype_item',
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ],
+                        [
+                            'table' => MonitorType::getTable(),
+                            'joinparams' => [
+                                'jointype' => 'child',
+                                'nolink'   => true,
+                                'beforejoin' => [
+                                    'table' => GlpiMonitorType::getTable(),
+                                    'joinparams' => [
+                                        'jointype' => 'empty',
+                                    ]
+                                ]
+                            ]
+                        ],
+                        [
+                            'table' => MonitorModel::getTable(),
+                            'joinparams' => [
+                                'jointype' => 'empty',
+                                'nolink'   => true,
+                            ]
+                        ],
+                    ],
+                ],
+                'computation' => $computation,
+            ];
+        } else if ($itemtype === NetworkEquipment::class && in_array($itemtype, PLUGIN_CARBON_TYPES)) {
+            $computation = "IF(`glpi_networkequipments_id_aef00423a27f97ae31ca50f63fb1a6fb`.`is_deleted` = 0
+            AND `glpi_networkequipments_id_aef00423a27f97ae31ca50f63fb1a6fb`.`is_template` = 0
+            AND NOT `glpi_locations`.`country`  = ''
+            AND NOT `glpi_locations`.`country` IS NULL
+            AND (
+                `glpi_plugin_carbon_networkequipmenttypes_640a9703b62363e5d254356fb4df69ef`.`power_consumption` > 0
+                OR `glpi_networkequipmentmodels`.`power_consumption` > 0
+            ), 1, 0)";
+            $sopt[] = [
+                'id'            => SearchOptions::IS_HISTORIZABLE,
+                'table'         => getTableForItemType($itemtype),
+                'field'         => 'id',
+                'linkfield'     => 'id',
+                'name'          => __('Is historizable', 'carbon'),
+                'datatype'      => 'bool',
+                'massiveaction' => false,
+                'joinparams' => [
+                    'jointype' => 'empty',
+                    'beforejoin' => [
+                        [
+                            'table' => GlpiLocation::getTable(),
+                            'joinparams' => [
+                                'jointype' => 'empty',
+                                'nolink'   => true,
+                            ]
+                        ],
+                        [
+                            'table' => NetworkEquipmentType::getTable(),
+                            'joinparams' => [
+                                'jointype' => 'child',
+                                'nolink'   => true,
+                                'beforejoin' => [
+                                    'table' => GlpiNetworkEquipmentType::getTable(),
+                                    'joinparams' => [
+                                        'jointype' => 'empty',
+                                    ]
+                                ]
+                            ]
+                        ],
+                        [
+                            'table' => NetworkEquipmentModel::getTable(),
+                            'joinparams' => [
+                                'jointype' => 'empty',
+                                'nolink'   => true,
+                            ]
+                        ],
+                    ],
+                ],
+                'computation' => $computation,
+            ];
+        }
+
+        return $sopt;
+    }
 }

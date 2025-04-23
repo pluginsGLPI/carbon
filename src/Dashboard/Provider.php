@@ -37,7 +37,7 @@ use Computer;
 use ComputerModel;
 use ComputerType as GlpiComputerType;
 use DateTime;
-use DBmysqlIterator;
+use DateTimeImmutable;
 use DBmysql;
 use DbUtils;
 use Glpi\Dashboard\Filter;
@@ -50,9 +50,14 @@ use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\Impact\History\Computer as ComputerHistory;
 use GlpiPlugin\Carbon\SearchOptions;
+use GlpiPlugin\Carbon\UsageImpact;
+use GlpiPlugin\Carbon\UsageInfo;
+use Monitor;
+use NetworkEquipment;
 use QueryExpression;
 use QuerySubQuery;
 use Search;
+use Session;
 use Toolbox as GlpiToolbox;
 
 class Provider
@@ -63,9 +68,10 @@ class Provider
      * @param string $table table to read
      * @param string $field table field to use for the sum
      * @param array $params additional parameters (filters)
+     * @param array $crit   additional criteria
      * @return ?float
      */
-    public static function getSum(string $table, string $field, array $params = []): ?float
+    public static function getSum(string $table, string $field, array $params = [], array $crit = []): ?float
     {
         /** @var DBmysql $DB */
         global $DB;
@@ -75,6 +81,7 @@ class Provider
                 'SUM' => "$field AS total"
             ],
             'FROM'      => $table,
+            'WHERE'     => $crit,
         ];
 
         $request = array_merge_recursive(
@@ -93,12 +100,15 @@ class Provider
     /**
      * Returns sum of of carbon emission grouped by computer model without time limitation.
      *
+     * @param array $params
+     * @param array $where
+     *
      * @return array of:
      *   - mixed  'number': sum for the model
      *   - string 'url': url to redirect when clicking on the slice
      *   - string 'label': name of the computer model
      */
-    public static function getSumEmissionsPerModel(array $where = [])
+    public static function getSumUsageEmissionsPerModel(array $params = [], array $where = [])
     {
         /** @var DBmysql $DB */
         global $DB;
@@ -127,7 +137,7 @@ class Provider
             ],
             'WHERE' => [
                 CarbonEmission::getTableField('itemtype') => Computer::class
-            ] + $entity_restrict,
+            ] + $entity_restrict + $where,
             'GROUPBY' => [
                 ComputerModel::getTableField('id'),
                 new QueryExpression($sql_year_month)
@@ -146,6 +156,7 @@ class Provider
             'WHERE' => [],
             'GROUPBY' => ['id'],
             'ORDERBY' => 'monthly_emission_per_model DESC',
+            'LIMIT'   => $params['limit'] ?? 9999
         ];
 
         if (!empty($where)) {
@@ -336,13 +347,181 @@ class Provider
      * Count the computers having all required data to compute carbon intensity
      *
      * @param array $params
+     * @param bool  $handled : true if we want to count handled computers, false to count unhandled computers
      * @return array
      */
-    public static function getHandledComputersCount(array $params = [], $handled = true): array
+    public static function getHandledComputersCount(array $params = [], bool $handled = true): array
     {
         $default_params = [
-            'label' => __("plugin carbon - handled computers", 'carbon'),
             'icon'  => "fas fa-computer",
+        ];
+        $params = array_merge($default_params, $params);
+
+        return self::getHandledAssetCount(Computer::class, $params, $handled);
+    }
+
+    /**
+     * Counts the monitors which are missing data to compute their
+     * environmental impact
+     *
+     * @param array $params
+     * @return array : count of monitors or null if an error occurred
+     */
+    public static function getUnhandledMonitorsCount(array $params = []): array
+    {
+        $default_params = [
+            'label' => __("plugin carbon - unhandled monitor", 'carbon'),
+            'icon'  => "fas fa-desktop",
+        ];
+        $params = array_merge($default_params, $params);
+
+        return self::getHandledMonitorsCount($params, false);
+    }
+
+    /**
+     * Count the monitors having all required data to compute carbon intensity
+     *
+     * @param array $params
+     * @param bool  $handled : true if we want to count handled monitors, false to count unhandled monitors
+     * @return array
+     */
+    public static function getHandledMonitorsCount(array $params = [], bool $handled = true): array
+    {
+        $default_params = [
+            'label' => __("plugin carbon - handled monitors", 'carbon'),
+            'icon'  => "fas fa-desktop",
+        ];
+        $params = array_merge($default_params, $params);
+
+        return self::getHandledAssetCount(Monitor::class, $params, $handled);
+    }
+
+    /**
+     * Counts the network equipments which are missing data to compute their
+     * environmental impact
+     *
+     * @param array $params
+     * @return array : count of network equipments or null if an error occurred
+     */
+    public static function getUnhandledNetworkEquipmentsCount(array $params = []): array
+    {
+        $default_params = [
+            'label' => __("plugin carbon - unhandled network equipments", 'carbon'),
+            'icon'  => "fas fa-network-wired",
+        ];
+        $params = array_merge($default_params, $params);
+
+        return self::getHandledNetworkEquipmentsCount($params, false);
+    }
+
+    /**
+     * Count the network equipments having all required data to compute carbon intensity
+     *
+     * @param array $params
+     * @param bool  $handled : true if we want to count handled network equipments, false to count unhandled monitors
+     * @return array
+     */
+    public static function getHandledNetworkEquipmentsCount(array $params = [], bool $handled = true): array
+    {
+        $default_params = [
+            'label' => __("plugin carbon - handled network equipments", 'carbon'),
+            'icon'  => "fas fa-network-wired",
+        ];
+        $params = array_merge($default_params, $params);
+
+        return self::getHandledAssetCount(NetworkEquipment::class, $params, $handled);
+    }
+
+    public static function getHandledAssetsRatio(array $params = [])
+    {
+        $default_params = [
+            'label' => __('plugin carbon - handled assets ratio', 'carbon'),
+            'icon'  => '',
+        ];
+        $params = array_merge($default_params, $params);
+
+        $data = [];
+        foreach (PLUGIN_CARBON_TYPES as $itemtype) {
+            $itemtype_name = $itemtype::getTypeName(Session::getPluralNumber());
+            $itemtype_name = strtolower($itemtype_name);
+
+            $handled = self::getHandledAssetCount($itemtype, $params);
+            $unhandled = self::getHandledAssetCount($itemtype, $params, false);
+
+            $total = $handled['number'] + $unhandled['number'];
+            if ($total === 0) {
+                continue;
+            }
+
+            $handled_percent = ($handled['number'] / $total) * 100;
+            $data[] = [
+                'number' => number_format($handled_percent, 0),
+                'url'    => $unhandled['url'],
+                'label'  => $itemtype_name,
+            ];
+        }
+
+        return [
+            'data' => $data,
+            'label' => $params['label'],
+            'icon'  => $params['icon'],
+        ];
+    }
+
+    public static function getHandledAssetsCounts(array $params = [])
+    {
+        $default_params = [
+            'label' => __('plugin carbon - handled assets ratio', 'carbon'),
+            'icon'  => '',
+        ];
+        $params = array_merge($default_params, $params);
+
+        $data = [
+            'labels' => [],
+            'series' => []
+        ];
+        foreach (PLUGIN_CARBON_TYPES as $itemtype) {
+            $itemtype_name = $itemtype::getTypeName(Session::getPluralNumber());
+            $itemtype_name = strtolower($itemtype_name);
+
+            $handled = self::getHandledAssetCount($itemtype, $params);
+            $unhandled = self::getHandledAssetCount($itemtype, $params, false);
+
+            $data['labels'][] = $itemtype_name;
+            $data['series'][0]['name'] = __('Handled', 'carbon');
+            $data['series'][0]['data'][] = [
+                'value' => $handled['number'],
+                'url'   => $handled['url']
+            ];
+            $data['series'][1]['name'] = __('Unhandled', 'carbon');
+            $data['series'][1]['data'][] = [
+                'value' => $unhandled['number'],
+                'url'   => $unhandled['url'],
+            ];
+        }
+
+        return [
+            'data' => $data,
+            'label' => $params['label'],
+            'icon'  => $params['icon'],
+        ];
+    }
+
+    /**
+     * Count the computers having all required data to compute carbon intensity
+     *
+     * @param string $itemtype the itemtype to count
+     * @param array  $params
+     * @param bool   $handled : true if we want to count handled computers, false to count unhandled computers
+     * @return array count of items
+     */
+    protected static function getHandledAssetCount(string $itemtype, array $params = [], bool $handled = true): array
+    {
+        $itemtype_name = $itemtype::getTypeName(Session::getPluralNumber());
+        $itemtype_name = strtolower($itemtype_name);
+        $default_params = [
+            'label' => sprintf(__("plugin carbon - handled %s", 'carbon'), $itemtype_name),
+            'icon'  => "",
         ];
         $params = array_merge($default_params, $params);
 
@@ -356,14 +535,17 @@ class Provider
             ],
             'reset'    => 'reset'
         ];
+        $itemtype_table = (new DbUtils())->getTableForItemType($itemtype);
         // Exploit defaultWhere to inject WHERE criterias from dashboard filters
-        $filter_criteria = self::getFiltersCriteria(Computer::getTable(), $params['apply_filters'] ?? []);
-        $search_data = Search::prepareDatasForSearch(Computer::class, $search_criteria);
+        $filter_criteria = self::getFiltersCriteria($itemtype_table, $params['apply_filters'] ?? []);
+        $search_data = Search::prepareDatasForSearch($itemtype, $search_criteria);
         Search::constructSQL($search_data);
         Search::constructData($search_data, true);
 
+        $search_url = GlpiToolbox::getItemTypeSearchURL($itemtype);
         $count = $search_data['data']['totalcount'] ?? null;
-        $url = Computer::getSearchURL() . '?' . GlpiToolbox::append_params($search_criteria);
+        $url = $search_url . '?' . GlpiToolbox::append_params($search_criteria);
+
         return [
             'number' => $count,
             'url'    => $url,
@@ -375,40 +557,104 @@ class Provider
     /**
      * Get total power of assets having all required data to compute carbon intensity
      *
-     * @return string|null
+     * @param array $params
+     * @return array
      */
-    public static function getTotalPower(): ?string
+    public static function getUsagePower(array $params = []): array
     {
         /** @var DBmysql $DB */
         global $DB;
 
-        $request = (new ComputerHistory())->getEvaluableQuery();
-        $request['SELECT'] = [
-            'SUM' => ComputerType::getTableField('power_consumption') . ' AS total',
+        $default_params = [
+            'label' => __("plugin carbon - Total usage power consumption", 'carbon'),
+            'icon'  => "fa-solid fa-plug",
         ];
+        $params = array_merge($default_params, $params);
 
-        $result = $DB->request($request);
-
-        if ($result->numrows() == 1) {
-            return Toolbox::getPower($result->current()['total'] ?? 0);
+        $total_power = 0;
+        $types_computed = 0;
+        foreach (PLUGIN_CARBON_TYPES as $itemtype) {
+            $type_history = 'GlpiPlugin\\Carbon\\Impact\\History\\' . $itemtype;
+            if (!class_exists($type_history)) {
+                trigger_error(
+                    sprintf(
+                        "Class %s does not exist; unable to compute total usage power consumption for itemtype %s",
+                        $type_history,
+                        $itemtype
+                    ),
+                    E_USER_WARNING
+                );
+                continue;
+            }
+            $itemtype_type = 'GlpiPlugin\\Carbon\\' . $itemtype . 'Type';
+            $itemtype_model = $itemtype . 'Model';
+            $model_power_field =  DBMysql::quoteName($itemtype_model::getTableField('power_consumption'));
+            $type_power_field = DBMysql::quoteName($itemtype_type::getTableField('power_consumption'));
+            $request = (new $type_history())->getEvaluableQuery();
+            // If a value is set in a model, it cannut be  reset to NULL, then let's consoder 0 as NULL
+            // and coalesce model, power and 0 to implement precedence
+            $sum_coalesce = new QueryExpression(
+                'SUM(COALESCE('
+                    . 'IF(' . $model_power_field . ' > 0, ' . $model_power_field . ', NULL),'
+                    . 'IF(' . $type_power_field  . ' > 0, ' . $type_power_field  . ', NULL),'
+                    . '0'
+                . ')) AS total'
+            );
+            $request['SELECT'] = [
+                $sum_coalesce,
+            ];
+            $result = $DB->request($request);
+            if ($result->numrows() != 1) {
+                continue;
+            }
+            $total_power += ($result->current()['total'] ?? 0);
+            $types_computed++;
         }
+        if ($types_computed == 0) {
+            return [
+                'number' => 'N/A',
+                'label'  => $params['label'],
+                'icon'   => $params['icon'],
+            ];
+        }
+        $total_power = Toolbox::getPower($total_power);
 
-        return null;
+        return [
+            'number' => $total_power,
+            'label'  => $params['label'],
+            'icon'   => $params['icon'],
+        ];
     }
 
     /**
-     * Get total CO2 emissions for last month (all assets)
+     * Get total usage CO2 emissions for last month (all assets)
      *
-     * @return string
+     * @param array $params
+     * @return array
      */
-    public static function getTotalCarbonEmission(array $params = []): string
+    public static function getUsageCarbonEmission(array $params = []): array
     {
-        $value = self::getSum(CarbonEmission::getTable(), 'emission_per_day', $params);
-        if ($value === null) {
-            return 'N/A';
+        $default_params = [
+            'label' => __('plugin carbon - Total carbon emission', 'carbon'),
+            'icon'  => 'fa-solid fa-temperature-arrow-up',
+        ];
+        $params = array_merge($default_params, $params);
+        $crit = [
+            'itemtype' => PLUGIN_CARBON_TYPES,
+        ];
+
+        $gwp = self::getSum(CarbonEmission::getTable(), 'emission_per_day', $params, $crit);
+        if ($gwp === null) {
+            $gwp = 'N/A';
+        } else {
+            $gwp = Toolbox::getWeight($gwp) . __('CO₂eq', 'carbon');
         }
 
-        return Toolbox::getWeight($value) . __('CO₂eq', 'carbon');
+        return [
+            'number' => $gwp,
+            'label'  => $params['label'],
+            'icon'   => $params['icon'],
+        ];
     }
 
     public static function getCarbonIntensity(array $params): array
@@ -500,132 +746,6 @@ class Provider
     }
 
     /**
-     * Get carbon emission per month for all assets in the current entity
-     * @param array $params
-     * @param array $crit   Plugin specific criteria, used to show data for a single item
-     *
-     * @return array
-     */
-    public static function getCarbonEmissionPerMonth(array $params = [], $crit = []): array
-    {
-        /** @var DBmysql $DB */
-        global $DB;
-
-        $default_params = [
-            'icon'  => "fas fa-computer",
-            'label' => '',
-            // 'color' => '#ea9999',
-            'apply_filters' => [],
-        ];
-        $params = array_merge($default_params, $params);
-
-        $emissions_table = CarbonEmission::getTable();
-
-        $dbUtils = new DbUtils();
-        $entityRestrict = $dbUtils->getEntitiesRestrictCriteria($emissions_table, '', '', 'auto');
-        $sql_year_month = "DATE_FORMAT(`date`, '%Y-%m')";
-        $request = [
-            'SELECT'    => [
-                'SUM' => [
-                    CarbonEmission::getTableField('emission_per_day') . ' AS total_emission_per_month',
-                    CarbonEmission::getTableField('energy_per_day') . ' AS total_energy_per_month'
-                ],
-                new QueryExpression("$sql_year_month as `date`")
-            ],
-            'FROM'    => $emissions_table,
-            'GROUPBY' => new QueryExpression($sql_year_month),
-            'ORDER'   => new QueryExpression($sql_year_month),
-            'WHERE'   => $entityRestrict + $crit,
-        ];
-        $filter = self::getFiltersCriteria($emissions_table, $params['apply_filters']);
-        $request = array_merge_recursive($request, $filter);
-        $result = $DB->request($request);
-
-        // get last 12 months in format YYYY-MM
-        $date = new DateTime();
-        $date->setTime(0, 0, 0, 0);
-        $date->setDate((int) $date->format('Y'), (int) $date->format('m'), 1); // First day of current month
-        $date->modify('-12 months');
-        $months = [];
-        for ($i = 0; $i < 12; $i++) {
-            $months[] = $date->format('Y-m');
-            $date->modify('+1 month');
-        }
-
-        $data = [
-            'series' => [
-                0 => [
-                    'data' => []
-                ],
-                1 => [
-                    'data' => []
-                ],
-            ],
-            'labels' => $months,
-        ];
-        if ($result->count() > 0) {
-            $data['labels'] = [];
-        }
-        foreach ($result as $row) {
-            $date = new DateTime($row['date']);
-            $date_formatted = $date->format('Y-m');
-            $data['xaxis']['categories'][] = $date_formatted;
-            $data['series'][0]['data'][] = [
-                'x' => $date_formatted,
-                'y' => $row['total_emission_per_month'],
-            ];
-            $data['series'][1]['data'][] = [
-                'x' => $date_formatted,
-                'y' => $row['total_energy_per_month'],
-            ];
-            $data['labels'][] = $date_formatted;
-        }
-
-        // Scale carbon emission
-        $units = [
-            __('g', 'carbon'),
-            __('Kg', 'carbon'),
-            __('t', 'carbon'),
-            __('Kt', 'carbon'),
-            __('Mt', 'carbon'),
-            __('Gt', 'carbon'),
-            __('Tt', 'carbon'),
-            __('Pt', 'carbon'),
-            __('Et', 'carbon'),
-            __('Zt', 'carbon'),
-            __('Yt', 'carbon'),
-        ];
-        $scaled = Toolbox::scaleSerie($data['series'][0]['data'], $units);
-        $data['series'][0]['data'] = $scaled['serie'];
-        $data['series'][0]['name'] =  __('Carbon emission', 'carbon') . ' (' . $scaled['unit'] . __('CO₂eq', 'carbon') . ')';
-        $data['series'][0]['unit'] = $scaled['unit'] . __('CO₂eq', 'carbon'); // Not supported by apex charts
-        $data['series'][0]['type'] = 'bar';
-
-        // Scale energy consumption
-        $units = [
-            __('KWh', 'carbon'),
-            __('MWh', 'carbon'),
-            __('GWh', 'carbon'),
-            __('TWh', 'carbon'),
-            __('PWh', 'carbon'),
-            __('EWh', 'carbon'),
-            __('ZWh', 'carbon'),
-            __('YWh', 'carbon'),
-        ];
-        $scaled = Toolbox::scaleSerie($data['series'][1]['data'], $units);
-        $data['series'][1]['data'] = $scaled['serie'];
-        $data['series'][1]['name'] = __('Consumed energy', 'carbon') . ' (' . $scaled['unit'] . ')';
-        $data['series'][1]['unit'] = $scaled['unit']; // Not supported by apex charts
-        $data['series'][1]['type'] = 'line';
-
-        return [
-            'data'  => $data,
-            'label' => $params['label'],
-            'icon'  => $params['icon'],
-        ];
-    }
-
-    /**
      * Get the filters criteria
      *
      * @param string $table
@@ -664,17 +784,23 @@ class Provider
         return $criteria;
     }
 
-    public static function getTotalEmbodiedGwp(array $params = []): array
+    public static function getEmbodiedGlobalWarming(array $params = []): array
     {
-        $value = self::getSum(EmbodiedImpact::getTable(), 'gwp', $params);
+        $default_params = [
+            'label' => __('Total embodied global warming potential', 'carbon'),
+            'icon'  => 'fa-solid fa-temperature-arrow-up',
+        ];
+        $params = array_merge($default_params, $params);
+
+        $crit = [
+            'itemtype' => PLUGIN_CARBON_TYPES,
+        ];
+        $value = self::getSum(EmbodiedImpact::getTable(), 'gwp', $params, $crit);
         if ($value === null) {
             $value = 'N/A';
         } else {
             $value = Toolbox::getWeight($value) . __('CO₂eq', 'carbon');
         }
-
-        $params['label'] = __('', 'carbon');
-        $params['icon'] = 'fa-solid fa-temperature-arrow-up';
 
         return [
             'number'     => $value,
@@ -683,17 +809,26 @@ class Provider
         ];
     }
 
-    public static function getTotalPrimaryEnergyConsumed(array $params = []): array
+    /**
+     * Get the primary energy consumed to build assets
+     *
+     * @param array $params
+     * @return array
+     */
+    public static function getEmbodiedPrimaryEnergy(array $params = []): array
     {
-        $value = self::getSum(EmbodiedImpact::getTable(), 'pe', $params);
+        $crit = [
+            'itemtype' => PLUGIN_CARBON_TYPES,
+        ];
+        $value = self::getSum(EmbodiedImpact::getTable(), 'pe', $params, $crit);
         if ($value === null) {
             $value = 'N/A';
         } else {
             // Convert into Watt.hour
-            $value = Toolbox::getWeight($value / 3600) . __('h', 'carbon');
+            $value = Toolbox::getEnergy($value / 3600);
         }
 
-        $params['label'] = __('', 'carbon');
+        $params['label'] = __('Total embodied primary energy', 'carbon');
         $params['icon'] = 'fa-solid fa-fire-flame-simple';
 
         return [
@@ -703,22 +838,284 @@ class Provider
         ];
     }
 
-    public static function getTotalEmbodiedAdp(array $params = []): array
+    /**
+     * Total embodied abiotic depletion potential in antimony equivalent
+     *
+     * @param array $params
+     * @param array $crit
+     * @return array
+     */
+    public static function getEmbodiedAbioticDepletion(array $params = [], array $crit = []): array
     {
-        $value = self::getSum(EmbodiedImpact::getTable(), 'adp', $params);
+        $default_params = [
+            'label' => __('Embodied abiotic depletion potential', 'carbon'),
+            'icon'  => 'fa-solid fa-temperature-arrow-up',
+        ];
+        $params = array_merge($default_params, $params);
+
+        if (count($crit['itemtype'] ?? []) === 0) {
+            $crit['itemtype'] = PLUGIN_CARBON_TYPES;
+        } else {
+            $crit['itemtype'] = array_intersect($crit['itemtype'], PLUGIN_CARBON_TYPES);
+        }
+        $value = self::getSum(EmbodiedImpact::getTable(), 'adp', $params, $crit);
         if ($value === null) {
             $value = 'N/A';
         } else {
             $value = Toolbox::getWeight($value) . __('Sbeq', 'carbon');
         }
 
-        $params['label'] = __('', 'carbon');
-        $params['icon'] = '';
-
         return [
             'number'     => $value,
             'label'      => $params['label'],
             'icon'       => $params['icon'],
         ];
+    }
+
+    /**
+     * Get usage abiotic depletion potential in antimony equivalent
+     *
+     * @param array $params
+     * @param array $crit
+     * @return array
+     */
+    public static function getUsageAbioticDepletion(array $params = [], array $crit = []): array
+    {
+        $default_params = [
+            'label' => __('Total usage abiotic depletion potential', 'carbon'),
+            'icon'  => 'fa-solid fa-temperature-arrow-up',
+        ];
+        $params = array_merge($default_params, $params);
+        if (count($crit['itemtype'] ?? []) === 0) {
+            $crit['itemtype'] = PLUGIN_CARBON_TYPES;
+        } else {
+            $crit['itemtype'] = array_intersect($crit['itemtype'], PLUGIN_CARBON_TYPES);
+        }
+
+        $value = self::getSum(UsageImpact::getTable(), 'adp', $params, $crit);
+        if ($value === null) {
+            $value = 'N/A';
+        } else {
+            $value = Toolbox::getWeight($value) . __('Sbeq', 'carbon');
+        }
+
+        return [
+            'number' => $value,
+            'label'  => $params['label'],
+            'icon'   => $params['icon'],
+        ];
+    }
+
+    /**
+     * get Total abiotic depletion potential
+     *
+     * @param array $params
+     * @param array $crit
+     * @return array
+     */
+    public static function getTotalAbioticDepletion(array $params = [], array $crit = []): array
+    {
+        $default_params = [
+            'label' => __('Total abiotic depletion potential', 'carbon'),
+            'icon'  => 'fa-solid fa-temperature-arrow-up',
+        ];
+        $params = array_merge($default_params, $params);
+        if (count($crit['itemtype'] ?? []) === 0) {
+            $crit['itemtype'] = PLUGIN_CARBON_TYPES;
+        } else {
+            $crit['itemtype'] = array_intersect($crit['itemtype'], PLUGIN_CARBON_TYPES);
+        }
+
+        $embodied_value = self::getSum(EmbodiedImpact::getTable(), 'adp', $params, $crit);
+        $usage_value = self::getSum(UsageImpact::getTable(), 'adp', $params, $crit);
+
+        return [
+            'data'  => [
+                [
+                    'label' => __('Embodied abiotic depletion potential', 'carbon'),
+                    'number' => $embodied_value,
+                ], [
+                    'label' => __('Total usage abiotic depletion potential', 'carbon'),
+                    'number'  => $usage_value,
+                ],
+            ],
+            'label' => $params['label'],
+            'icon'  => $params['icon'],
+        ];
+    }
+
+    public static function getTotalGlobalWarming(array $params = [], array $crit = [])
+    {
+        $default_params = [
+            'label' => __('Total global warming potential', 'carbon'),
+            'icon'  => 'fa-solid fa-temperature-arrow-up',
+        ];
+        $params = array_merge($default_params, $params);
+        if (count($crit['itemtype'] ?? []) === 0) {
+            $crit['itemtype'] = PLUGIN_CARBON_TYPES;
+        } else {
+            $crit['itemtype'] = array_intersect($crit['itemtype'], PLUGIN_CARBON_TYPES);
+        }
+
+        $embodied_value = self::getSum(EmbodiedImpact::getTable(), 'gwp', $params, $crit);
+        $usage_value = self::getSum(CarbonEmission::getTable(), 'emission_per_day', $params, $crit);
+
+        return [
+            'data'  => [
+                [
+                    'label' => __('Embodied global warming potential', 'carbon'),
+                    'number' => $embodied_value,
+                ], [
+                    'label' => __('Total usage global warming potential', 'carbon'),
+                    'number'  => $usage_value,
+                ],
+            ],
+            'label' => $params['label'],
+            'icon'  => $params['icon'],
+        ];
+    }
+
+    /**
+     * Get carbon emission per month for all assets in the current entity
+     * @param array $params
+     * @param array $crit   Plugin specific criteria, used to show data for a single item
+     *
+     * @return array
+     */
+    public static function getUsageCarbonEmissionPerMonth(array $params = [], array $crit = []): array
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        $default_params = [
+            'icon'  => 'fas fa-computer',
+            'label' => '',
+            // 'color' => '#ea9999',
+            'apply_filters' => [],
+        ];
+        $params = array_merge($default_params, $params);
+
+        if (!isset($params['args']['apply_filters']['dates'][0]) || !isset($params['args']['apply_filters']['dates'][1])) {
+            list($start_date, $end_date) = (new Toolbox())->yearToLastMonth(new DateTimeImmutable('now'));
+            $params['args']['apply_filters']['dates'][0] = $start_date->format('Y-m-d\TH:i:s.v\Z');
+            $params['args']['apply_filters']['dates'][1] = $end_date->format('Y-m-d\TH:i:s.v\Z');
+        } else {
+            $start_date = DateTime::createFromFormat('Y-m-d\TH:i:s.v\Z', $params['args']['apply_filters']['dates'][0]);
+            $end_date   = DateTime::createFromFormat('Y-m-d\TH:i:s.v\Z', $params['args']['apply_filters']['dates'][1]);
+        }
+
+        $crit[] = [
+            'AND' => [
+                ['date' => ['>=', $start_date->format('Y-m-d')]],
+                ['date' => ['<', $end_date->format('Y-m-d')]],
+            ]
+        ];
+
+        $emissions_table = CarbonEmission::getTable();
+
+        $dbUtils = new DbUtils();
+        $entityRestrict = $dbUtils->getEntitiesRestrictCriteria($emissions_table, '', '', 'auto');
+        $sql_year_month = "DATE_FORMAT(`date`, '%Y-%m')";
+        $request = [
+            'SELECT'    => [
+                'SUM' => [
+                    CarbonEmission::getTableField('emission_per_day') . ' AS total_emission_per_month',
+                    CarbonEmission::getTableField('energy_per_day') . ' AS total_energy_per_month'
+                ],
+                new QueryExpression("$sql_year_month as `date`")
+            ],
+            'FROM'    => $emissions_table,
+            'GROUPBY' => new QueryExpression($sql_year_month),
+            'ORDER'   => new QueryExpression($sql_year_month),
+            'WHERE'   => $entityRestrict + $crit,
+        ];
+        $filter = self::getFiltersCriteria($emissions_table, $params['apply_filters']);
+        $request = array_merge_recursive($request, $filter);
+        $result = $DB->request($request);
+
+        $data = [
+            'series' => [
+                0 => [
+                    'data' => []
+                ],
+                1 => [
+                    'data' => []
+                ],
+            ],
+            'labels' => [],
+        ];
+
+        // Prepare date format
+        $date_format = 'Y F';
+        switch ($_SESSION['glpidate_format'] ?? 0) {
+            case 0:
+                $date_format = 'Y-m';
+                break;
+            case 1:
+            case 2:
+                $date_format = 'm-Y';
+                break;
+        }
+
+        foreach ($result as $row) {
+            $date = new DateTime($row['date']);
+            $date_formatted = $date->format($date_format);
+            $data['xaxis']['categories'][] = $date_formatted;
+            $data['series'][0]['data'][] = [
+                'x' => $date_formatted,
+                'y' => $row['total_emission_per_month'],
+            ];
+            $data['series'][1]['data'][] = [
+                'x' => $date_formatted,
+                'y' => $row['total_energy_per_month'],
+            ];
+            $data['labels'][] = $date_formatted;
+        }
+
+        // Scale carbon emission
+        $units = [
+            __('g', 'carbon'),
+            __('Kg', 'carbon'),
+            __('t', 'carbon'),
+            __('Kt', 'carbon'),
+            __('Mt', 'carbon'),
+            __('Gt', 'carbon'),
+            __('Tt', 'carbon'),
+            __('Pt', 'carbon'),
+            __('Et', 'carbon'),
+            __('Zt', 'carbon'),
+            __('Yt', 'carbon'),
+        ];
+        $scaled = Toolbox::scaleSerie($data['series'][0]['data'], $units);
+        $data['series'][0]['name'] =  __('Carbon emission', 'carbon') . ' (' . $scaled['unit'] . __('CO₂eq', 'carbon') . ')';
+        $data['series'][0]['data'] = $scaled['serie'];
+        $data['series'][0]['unit'] = $scaled['unit'] . __('CO₂eq', 'carbon'); // Not supported by apex charts
+        $data['series'][0]['type'] = 'bar';
+
+        // Scale energy consumption
+        $units = [
+            __('KWh', 'carbon'),
+            __('MWh', 'carbon'),
+            __('GWh', 'carbon'),
+            __('TWh', 'carbon'),
+            __('PWh', 'carbon'),
+            __('EWh', 'carbon'),
+            __('ZWh', 'carbon'),
+            __('YWh', 'carbon'),
+        ];
+        $scaled = Toolbox::scaleSerie($data['series'][1]['data'], $units);
+        $data['series'][1]['name'] = __('Consumed energy', 'carbon') . ' (' . $scaled['unit'] . ')';
+        $data['series'][1]['data'] = $scaled['serie'];
+        $data['series'][1]['unit'] = $scaled['unit']; // Not supported by apex charts
+        $data['series'][1]['type'] = 'line';
+
+        // $data = self::getCarbonEmissionPerMonth($params['args'], $crit);
+
+        $data['date_interval'] = [
+            $start_date->format($date_format),
+            $end_date->format($date_format),
+        ];
+
+        return $data;
     }
 }

@@ -124,7 +124,7 @@ class ToolboxTest extends DbTestCase
 
         $expected = [
             new DateTime('2022-04-01 00:00:00'),
-            new DateTime('2023-03-31 00:00:00'),
+            new DateTime('2023-04-01 00:00:00'),
         ];
         $this->assertEquals($expected, $output);
 
@@ -132,7 +132,7 @@ class ToolboxTest extends DbTestCase
         $output = $instance->yearToLastMonth(new DateTimeImmutable('2025-03-06 12:43:34'));
         $expected = [
             new DateTime('2024-03-01 00:00:00'),
-            new DateTime('2025-02-28 00:00:00'),
+            new DateTime('2025-03-01 00:00:00'),
         ];
         $this->assertEquals($expected, $output);
     }

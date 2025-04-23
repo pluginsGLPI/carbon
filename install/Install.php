@@ -56,11 +56,25 @@ class Install
     private bool $force_upgrade = false;
 
     /**
+     * Version to upgrade from, when upgrade is forced
+     *
+     * @var string
+     */
+    private string $force_upgrade_from_version = '';
+
+    /**
      * Oldest version that can be upgraded
      *
      * @var string
      */
     private const OLDEST_UPGRADABLE_VERSION = '0.0.0';
+
+    /**
+     * Regular expression for semver version : 3 numbers separated wit a dot
+     *
+     * @var string
+     */
+    private const SEMVER_REGEX = '\d+\.\d+\.(?:\d+|x)';
 
     public function __construct(Migration $migration)
     {
@@ -128,7 +142,21 @@ class Install
             return false;
         }
 
-        $this->force_upgrade = in_array('force-upgrade', $args);
+        $this->force_upgrade = array_key_exists('force-upgrade', $args);
+        if ($this->force_upgrade) {
+            $this->force_upgrade_from_version = PLUGIN_CARBON_VERSION;
+            if (array_key_exists('version', $args)) {
+                $this->force_upgrade_from_version = $args['version'];
+                // Check the version os SEMVER compliant
+                $regex = '!^' . self::SEMVER_REGEX . '$!';
+                if (preg_match($regex, $this->force_upgrade_from_version) !== 1) {
+                    throw new \RuntimeException('Invalid start version for upgrade.');
+                }
+                if (version_compare($this->force_upgrade_from_version, self::OLDEST_UPGRADABLE_VERSION) < 0) {
+                    throw new \RuntimeException('Cannot upgrade from unsupported old version: ' . $this->force_upgrade_from_version . '.');
+                }
+            }
+        }
 
         ini_set("max_execution_time", "0");
         $migrations = $this->getMigrationsToDo($from_version);
@@ -136,7 +164,7 @@ class Install
             $function = $data['function'];
             $target_version = $data['target_version'];
             include_once($file);
-            if ($function($this->migration)) {
+            if ($function($this->migration, $args)) {
                 Config::setConfigurationValues('plugin:carbon', ['dbversion' => $target_version]);
             } else {
                 return false;
@@ -168,6 +196,7 @@ class Install
             $operator = '>';
             if ($this->force_upgrade) {
                 $operator .= '=';
+                $current_version = $this->force_upgrade_from_version;
             }
             if (version_compare($versions_matches['target_version'], $current_version, $operator)) {
                 $function = preg_replace(

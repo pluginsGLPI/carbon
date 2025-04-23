@@ -51,10 +51,11 @@ class ComputerType extends AbstractType
     const CATEGORY_TABLET     = 4;
     const CATEGORY_SMARTPHONE = 5;
 
-    public static function getTypes(): array
+    public static function getCategories(): array
     {
         return [
-            self::CATEGORY_DESKTOP    => __('Computer'),
+            self::CATEGORY_UNDEFINED  => __('Unspecified'),
+            self::CATEGORY_DESKTOP    => _n('Computer', 'Computers', 1),
             self::CATEGORY_SERVER     => __('Server'),
             self::CATEGORY_LAPTOP     => __('Laptop'),
             self::CATEGORY_TABLET     => __('Tablet'),
@@ -72,6 +73,14 @@ class ComputerType extends AbstractType
                 echo '</div>';
                 echo '<br /><br />' . Html::submit(_x('button', 'Post'), ['name' => 'massiveaction']);
                 return true;
+
+            case 'MassUpdateCategory':
+                echo '<div>';
+                echo __('Category', 'carbon') . '&nbsp;';
+                self::dropdownType('category');
+                echo '</div>';
+                echo '<br /><br />' . Html::submit(_x('button', 'Post'), ['name' => 'massiveaction']);
+                return true;
         }
 
         return parent::showMassiveActionsSubForm($ma);
@@ -85,7 +94,16 @@ class ComputerType extends AbstractType
                     if ($item->getFromDB($id) && self::updatePowerConsumption($item, $ma->POST['power_consumption'])) {
                         $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
                     } else {
-                        // Example of ko count
+                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
+                    }
+                }
+                return;
+
+            case 'MassUpdateCategory':
+                foreach ($ids as $id) {
+                    if ($item->getFromDB($id) && self::updateCategory($item, $ma->POST['category'])) {
+                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
+                    } else {
                         $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
                     }
                 }
@@ -100,11 +118,11 @@ class ComputerType extends AbstractType
      * @param integer $power pwoer consumption to set
      * @return bool
      */
-    public static function updatePowerConsumption(CommonDBTM $item, int $power)
+    public static function updatePowerConsumption(CommonDBTM $item, int $power): bool
     {
-        $computer_type = new ComputerType();
+        $computer_type = new self();
         $core_computer_type_id = $item->getID();
-        $id = $computer_type->getFromDBByCrit([
+        $computer_type->getFromDBByCrit([
             'computertypes_id' => $core_computer_type_id,
         ]);
         if ($computer_type->isNewItem()) {
@@ -115,8 +133,36 @@ class ComputerType extends AbstractType
             return !$computer_type->isNewId($id);
         } else {
             return $computer_type->update([
-                'id'                => $id,
+                'id'                => $computer_type->getID(),
                 'power_consumption' => $power,
+            ]);
+        }
+    }
+
+    /**
+     * Update the category of a computer
+     *
+     * @param CommonDBTM $item Computer to update
+     * @param integer $category pwoer consumption to set
+     * @return bool
+     */
+    public static function updateCategory(CommonDBTM $item, int $category): bool
+    {
+        $computer_type = new self();
+        $core_computer_type_id = $item->getID();
+        $computer_type->getFromDBByCrit([
+            'computertypes_id' => $core_computer_type_id,
+        ]);
+        if ($computer_type->isNewItem()) {
+            $id = $computer_type->add([
+                'computertypes_id'  => $core_computer_type_id,
+                'category' => $category,
+            ]);
+            return !$computer_type->isNewId($id);
+        } else {
+            return $computer_type->update([
+                'id'                => $computer_type->getID(),
+                'category' => $category,
             ]);
         }
     }
@@ -131,7 +177,24 @@ class ComputerType extends AbstractType
      */
     public static function dropdownType(string $name, array $options = [])
     {
-        $items = self::getTypes();
+        $items = self::getCategories();
         return Dropdown::showFromArray($name, $items, $options);
+    }
+
+    public static function getSpecificValueToDisplay($field, $values, array $options = [])
+    {
+        switch ($field) {
+            case 'category':
+                $categories = self::getCategories();
+                return $categories[$values['category']] ?? '';
+        }
+
+        return '';
+    }
+
+    public static function getSpecificValueToSelect($field, $name = '', $values = '', array $options = [])
+    {
+        $options['values'] = $values;
+        return self::dropdownType($name, $options);
     }
 }

@@ -29,31 +29,48 @@
  # -------------------------------------------------------------------------
  #}
 
-<div class="card-body carbon-emission-card" style="height: 100%">
-    <div class="row align-items-center">
-        <div class="col-auto" id="carbonEmissionIconElement">
-            <span><img src="{{ get_plugin_web_dir('carbon') }}/dist/images/carbon_emission_icon_darkgreen.png"></img></span>
+<style>
+    #{{ id }} {
+        background-color: {{ color }};
+        color: {{ fg_color }};
+    }
+
+    #{{ id }}:hover {
+        background-color: {{ fg_hover_color }};
+        border: 1px solid {{ fg_hover_border }};
+    }
+
+    .theme-dark #{{ id }} {
+        background-color: {{ fg_color }};
+        color: {{ color }};
+    }
+
+    .theme-dark #{{ id }}:hover {
+        background-color: {{ fg_hover_color }};
+        color: {{ fg_color }};
+        border: 1px solid {{ fg_hover_border }};
+    }
+</style>
+<div class="card" id="{{ id }}">
+    <div class="card-body" style="height: 100%">
+        <div class="row align-items-center">
+            <div class="col-auto" id="carbonUsageAbioticDepletionIconElement">
+                <span><img src="{{ get_plugin_web_dir('carbon') }}/dist/images/carbon_emission_icon_darkgreen.png"></img></span>
+            </div>
+            <div class="col">
+                <div class="subheader">{{ __('Usage abiotic depletion potential', 'carbon') }}</div>
+            </div>
+            <div class="my-3 number text-center">{{ number|raw }}</div>
         </div>
-        <div class="col">
-            <div class="subheader">{{ __('Total Carbon Emission', 'carbon') }}</div>
-            <div class="subheader">&nbsp;</div>
-        </div>
-        <div class="my-3 nb-carbon-emission-size text-center" id="carbonEmission"><i class="fas fa-spinner fa-spin"></i></div>
     </div>
 </div>
-
-{% block scripts %}
-    <script>
-        $(document).ready(function() {
-            fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/totalCarbonEmission.php").then(response => {
-                return response.json();
-            }).then(data => {
-                let totalCarbonEmission = data.value;
-                document.getElementById('carbonEmission').innerHTML = totalCarbonEmission;
-                let start_date = data.date_interval[0];
-                let end_date   = data.date_interval[1];
-                document.querySelector('#carbonEmissionIconElement + div > div + div').textContent = start_date + ' - ' + end_date;
-            });
-        });
-    </script>
-{% endblock %}
+<script>
+(function () {
+    observer = new ResizeObserver(entries => {
+        for (const entry of entries) {
+            $(entry.target).fitText(0.7);
+        }
+    })
+    observer.observe(document.querySelector('#{{ id }} .number'));
+})();
+</script>

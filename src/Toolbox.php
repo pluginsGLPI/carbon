@@ -38,6 +38,7 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DBmysql;
+use Glpi\Dashboard\Dashboard as GlpiDashboard;
 use Infocom;
 use Location;
 use QueryExpression;
@@ -221,7 +222,7 @@ class Toolbox
         return sprintf(__('%1$s&nbsp;%2$s'), round($weight, 2), $human_readable_unit);
     }
 
-        /**
+    /**
      * Format a power passing a power in grams
      *
      * @param float $p  Power in Watt
@@ -241,6 +242,39 @@ class Toolbox
             __('EW', 'carbon'),
             __('ZW', 'carbon'),
             __('YW', 'carbon'),
+        ];
+        $multiple = 1000;
+        foreach ($units as $human_readable_unit) {
+            if ($p < $multiple) {
+                break;
+            }
+            $p = $p / $multiple;
+        }
+
+       //TRANS: %1$s is a number maybe float or string and %2$s the unit
+        return sprintf(__('%1$s&nbsp;%2$s'), round($p, 2), $human_readable_unit);
+    }
+
+        /**
+     * Format a power passing a power in grams
+     *
+     * @param float $p  Power in Watt
+     *
+     * @return string  formatted power
+     **/
+    public static function getEnergy(float $p): string
+    {
+       //TRANS: list of unit (W for watt)
+        $units = [
+            __('Wh', 'carbon'),
+            __('KWh', 'carbon'),
+            __('MWh', 'carbon'),
+            __('GWh', 'carbon'),
+            __('TWh', 'carbon'),
+            __('PWh', 'carbon'),
+            __('EWh', 'carbon'),
+            __('ZWh', 'carbon'),
+            __('YWh', 'carbon'),
         ];
         $multiple = 1000;
         foreach ($units as $human_readable_unit) {
@@ -382,9 +416,9 @@ class Toolbox
     {
             $end_date = DateTime::createFromImmutable($date);
             $end_date->setTime(0, 0, 0, 0);
-            $end_date->setDate((int) $end_date->format('Y'), (int) $end_date->format('m'), 0); // Last day of previous month
+            $end_date->setDate((int) $end_date->format('Y'), (int) $end_date->format('m'), 1); // First day of current month (excluded)
             $start_date = clone $end_date;
-            $start_date->setDate((int) $end_date->format('Y') - 1, (int) $end_date->format('m') + 1, 1);
+            $start_date->setDate((int) $end_date->format('Y') - 1, (int) $end_date->format('m'), 1);
 
         return [$start_date, $end_date];
     }
@@ -520,5 +554,17 @@ class Toolbox
         }
 
         return $gaps;
+    }
+
+    public static function getDashboardId(): ?int
+    {
+        $dashboard = new GlpiDashboard();
+        $dashboard_key = 'plugin_carbon_board';
+        /** @phpstan-ignore argument.type */
+        if ($dashboard->getFromDB($dashboard_key) === false) {
+            return null;
+        }
+
+        return $dashboard->fields['id']; // do not use getID()
     }
 }

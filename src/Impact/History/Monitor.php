@@ -46,12 +46,12 @@ use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Engine\V1\Monitor as EngineMonitor;
 use GlpiPlugin\Carbon\MonitorType;
+use GlpiPlugin\Carbon\UsageImpact;
 use Infocom;
 use Location;
 use Monitor as GlpiMonitor;
 use MonitorType as GlpiMonitorType;
 use MonitorModel as GlpiMonitorModel;
-use QueryExpression;
 
 class Monitor extends AbstractAsset
 {
@@ -83,7 +83,6 @@ class Monitor extends AbstractAsset
         $computer_inner_joins = $request['INNER JOIN'];
         $computer_left_joins  = $request['LEFT JOIN'];
         unset($request['INNER JOIN'], $request['LEFT JOIN']);
-        unset($computer_inner_joins[$location_table]);
 
         $glpi_computertypes_table = GlpiComputerType::getTable();
         $computertypes_table = ComputerType::getTable();
@@ -106,12 +105,6 @@ class Monitor extends AbstractAsset
                 $computers_table => 'id',
                 $computers_items_table => GlpiComputer::getForeignKeyField(),
             ],
-        ];
-        $request['LEFT JOIN'][$location_table] = [
-            'FKEY'   => [
-                $item_table  => 'locations_id',
-                $location_table => 'id',
-            ]
         ];
         $request['LEFT JOIN'][$glpi_monitor_types_table] = [
             'FKEY' => [
@@ -234,7 +227,7 @@ class Monitor extends AbstractAsset
         $item_oldest_date = $data['use_date']
             ?? $data['delivery_date']
             ?? $data['buy_date']
-            // ?? $data['date_creation']
+            ?? $data['date_creation']
             // ?? $data['date_mod']
             ?? null;
         $status['has_inventory_entry_date'] = ($item_oldest_date !== null);
@@ -245,7 +238,11 @@ class Monitor extends AbstractAsset
     public static function showHistorizableDiagnosis(CommonDBTM $item)
     {
         $status = self::getHistorizableDiagnosis($item);
-
+        $usage_impact = new UsageImpact();
+        $usage_impact->getFromDBByCrit([
+            'itemtype' => $item::getType(),
+            'items_id' => $item->getID(),
+        ]);
         TemplateRenderer::getInstance()->display('@carbon/history/status-item.html.twig', [
             'has_status' => ($status !== null),
             'status' => $status,

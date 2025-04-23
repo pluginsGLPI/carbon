@@ -201,7 +201,6 @@ class MonitorTest extends CommonAsset
         }
     }
 
-
     public function testCanHistorize()
     {
         $computer = $this->getItem(GlpiComputer::class);
@@ -235,8 +234,8 @@ class MonitorTest extends CommonAsset
 
         // Add an empty location
         $location = $this->getItem(Location::class);
-        $monitor->update([
-            'id' => $id,
+        $computer->update([
+            'id' => $computer->getID(),
             'locations_id' => $location->getID(),
         ]);
         $this->assertFalse($history->canHistorize($id));

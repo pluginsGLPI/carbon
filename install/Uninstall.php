@@ -39,6 +39,7 @@ use DisplayPreference;
 use Migration;
 use ProfileRight;
 use CronTask as GlpiCronTask;
+use Glpi\Dashboard\Dashboard;
 use GlpiPlugin\Carbon\CronTask;
 
 class Uninstall
@@ -50,6 +51,7 @@ class Uninstall
         $this->deleteAutomaticActions();
         $this->deleteRights();
         $this->deleteDisplayPrefs();
+        $this->deleteDashboard();
 
         return true;
     }
@@ -105,5 +107,14 @@ class Uninstall
         if (!$displayPreference->deleteByCriteria(['itemtype' => CarbonIntensity::class])) {
             throw new \RuntimeException('Error while deleting display preferences');
         }
+    }
+
+    private function deleteDashboard()
+    {
+        $dashboard_key = 'plugin_carbon_board';
+        $dashboard = new Dashboard();
+        /** @phpstan-ignore argument.type */
+        $dashboard->getFromDB($dashboard_key);
+        $dashboard->delete($dashboard->fields);
     }
 }

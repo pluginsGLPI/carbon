@@ -213,7 +213,7 @@ class Computer extends AbstractAsset
         $computer_type_table = ComputerType::getTable();
         $glpi_computer_type_table = GlpiComputerType::getTable();
         $result = $DB->request([
-            'SELECT'     => ComputerType::getTableField('type'),
+            'SELECT'     => ComputerType::getTableField('category'),
             'FROM'       => $computer_type_table,
             'INNER JOIN' => [
                 $glpi_computer_type_table => [
@@ -240,7 +240,7 @@ class Computer extends AbstractAsset
             trigger_error(sprintf('SQL query shall return 1 row, got %d', $row_count), WARNING);
         }
 
-        return $result->current()['type'];
+        return $result->current()['category'];
     }
 
     /**

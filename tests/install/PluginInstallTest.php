@@ -37,11 +37,14 @@ use Session;
 use Config;
 use CronTask as GLPICronTask;
 use DbUtils;
+use Glpi\Dashboard\Dashboard;
 use DisplayPreference;
 use GLPIKey;
 use Plugin;
 use Profile;
 use ProfileRight;
+use Glpi\Dashboard\Item;
+use Glpi\Dashboard\Right;
 use Glpi\System\Diagnostic\DatabaseSchemaIntegrityChecker;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
@@ -120,7 +123,7 @@ class PluginInstallTest extends CommonTestCase
 
         $this->checkConfig();
         $this->checkAutomaticAction();
-        // $this->checkDashboard();
+        $this->checkDashboard();
         $this->checkRights();
         $this->checkInitialDataSources();
         $this->checkInitialZones();
@@ -269,7 +272,7 @@ class PluginInstallTest extends CommonTestCase
     {
         // Key is ID of the profile, value is the name of the profile
         $expected_profiles = [
-            4 =>  READ + PURGE, // 'Super-Admin'
+            4 =>  READ + UPDATE + PURGE, // 'Super-Admin'
         ];
         $this->checkRight(Report::$rightname, $expected_profiles);
     }
@@ -419,5 +422,53 @@ class PluginInstallTest extends CommonTestCase
         $usage_profile = new ComputerUsageProfile();
         $rows = $usage_profile->find();
         $this->assertEquals(2, count($rows));
+    }
+
+
+    public function checkDashboard()
+    {
+        // Check the dashboard exists
+        $dashboard_key = 'plugin_carbon_board';
+        $dashboard = new Dashboard();
+        $dashboard->getFromDB($dashboard_key);
+        $this->assertFalse($dashboard->isNewItem());
+
+        // Check rights on the dashboard
+        $right = new Right();
+        $profile = new Profile();
+        $profiles = $profile->find();
+        $profile_itemtype = Profile::getType();
+        foreach ($profiles as $profile) {
+            $profile_right = new ProfileRight();
+            $profile_right->getFromDBByCrit([
+                'profiles_id' => $profile['id'],
+                'name'        => 'config',
+            ]);
+            if ($profile_right->isNewItem()) {
+                continue;
+            }
+
+            $rows = $right->find([
+                'dashboards_dashboards_id' => $dashboard->fields['id'],
+                'itemtype'                 => $profile_itemtype,
+                'items_id'                 => $profile['id']
+            ]);
+            if (($profile_right->fields['rights'] && READ + UPDATE) != READ + UPDATE) {
+                $this->assertCount(0, $rows);
+            } else {
+                $this->assertCount(1, $rows);
+            }
+        }
+
+        // Check there is widgets in the dashboard
+        $cards_path = Plugin::getPhpDir('carbon') . '/install/data/report_dashboard.json';
+        $cards = file_get_contents($cards_path);
+        $cards = json_decode($cards, true);
+        $expected_cards_count = count($cards);
+        $dashboardItem = new Item();
+        $rows = $dashboardItem->find([
+            'dashboards_dashboards_id' => $dashboard->fields['id'],
+        ]);
+        $this->assertCount($expected_cards_count, $rows);
     }
 }

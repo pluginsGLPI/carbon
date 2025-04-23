@@ -80,7 +80,7 @@ abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterfa
     /**
      * Get the average power of the asset from the best source available (model or type)
      *
-     * @param int $id ID of the asset (itemtype determined from the class
+     * @param int $id ID of the asset (itemtype determined from the class)
      * @return null|int average power in Watt
      */
     abstract protected function getAveragePower(int $id): ?int;
@@ -104,6 +104,13 @@ abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterfa
         } catch (\RuntimeException $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
             throw $e;
+        }
+        if (!isset($response[0]) || !is_string($response[0])) {
+            trigger_error(sprintf(
+                'Invalid response from Boavizta API: %s',
+                json_encode($response[0] ?? '')
+            ), E_USER_WARNING);
+            throw new \RuntimeException('Invalid response from Boavizta API');
         }
 
         return $response[0];

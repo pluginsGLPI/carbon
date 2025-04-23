@@ -51,27 +51,28 @@
     }
 </style>
 <div class="card" id="{{ id }}">
-    <div class="card-body">
+    <div class="card-body" style="height: 100%">
         <div class="row align-items-center">
             <div class="col-auto">
-                <span><img src="{{ get_plugin_web_dir('carbon') }}/dist/images/device_icon_black.png" /></span>
+                <span><img src="{{ get_plugin_web_dir('carbon') }}/dist/images/icon-co2-calendar-green.png" class="icon-size" /></span>
             </div>
-            <div class="col" style="text-align: left">
-                <div class="font-weight-medium">{{ __('Warning', 'carbon') }}</div>
-                <div class="text-secondary"><a href="{{ unhandled.url }}">{{ unhandled.number }} unhandled computers</a></div>
-            </div>
-            <div class="row">
-                <div class="col align-items-center">
-                    {% set totalComputers = handled.number + unhandled.number %}
-                    {% if totalComputers == 0 %}
-                        {% set totalComputers = 1 %}
-                    {% endif %}
-                    {% set ratio = 100 * unhandled.number / totalComputers %}
-                    <div class="text-secondary p-3">
-                        {{ __("It represents %s percent of your parc that contains %s computers.", "carbon")|format(ratio|round(2, 'common'), totalComputers) }}
-                    </div>
-                </div>
+            <div class="col">
+                <div class="subheader">{{ __('Monthly usage carbon emission', 'carbon') }}</div>
+                <div class="subheader">{{ last_month }}</div>
+                <div class="my-3 number">{{ last_month_emissions }}</div>
+                <div class="subheader">{{ __('Compared to %s', 'carbon')|format(penultimate_month) }}</div>
+                <p class="m-0 percent-color" id="monthlyComparison">{{ variation }}</p>
             </div>
         </div>
     </div>
 </div>
+<script>
+(function () {
+    observer = new ResizeObserver(entries => {
+        for (const entry of entries) {
+            $(entry.target).fitText(0.5);
+        }
+    })
+    observer.observe(document.querySelector('#{{ id }} .number'));
+})();
+</script>

@@ -36,72 +36,29 @@
     'fas fa-chart-pie'
 ) }}
 
+{{ usage_carbon_emission_graph|raw }}
 <div class="card-body" id="cardBodyBorder1">
-  <div class="subheader">{{ __('Carbon Emission per Month', 'carbon') }}</div>
-  <div class="h1 mb-3" id="carbonEmissionPerMonth"></div>
-  <div id="carbonEmissionPerMonthChart" class="chart-lg"></div>
-
   {% if usage_impact.fields.gwp is not null %}
-    <div class="h1 mb-3">{{ usage_impact.fields.gwp }} gCO<sub>2</sub>eq</div>
+    <div class="h1 mb-3">{{ usage_impact.getHumanReadableImpact('gwp')|raw }}</div>
   {% endif %}
 
   {% if usage_impact.fields.adp is not null %}
-    <div class="h1 mb-3">{{ usage_impact.fields.adp }} gSbeq</div>
+    <div class="h1 mb-3">{{ usage_impact.getHumanReadableImpact('adp')|raw }}</div>
   {% endif %}
 
   {% if usage_impact.fields.pe is not null %}
-    <div class="h1 mb-3">{{ usage_impact.fields.pe }} J</div>
+    <div class="h1 mb-3">{{ usage_impact.getHumanReadableImpact('pe')|raw }}</div>
   {% endif %}
-
-  <div>
-    {% if not usage_impact.isNewItem() %}
-      {% set reset_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', reset: '', id: '" ~ usage_impact.getID() ~ "'}" %}
-      <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/usageimpact.form.php' }}', {{ reset_args }})">{{ __('Reset data', 'carbon') }}</a>
-    {% endif %}
-    {% set calculate_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', calculate: '', itemtype: '" ~ asset.getType() ~ "', items_id: '" ~ asset.getID() ~ "'}" %}
-    <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/usageimpact.form.php' }}', {{ calculate_args }})">{{ __('Calculate data', 'carbon') }}</a>
-  </div>
 </div>
 
-<script type="text/javascript">
-  $(document).ready(function () {
-    var carbonEmissionPerMonthOptions = {
-      chart: {
-        type: 'bar',
-        height: 350,
-      },
-      colors: ['#BBDA50'],
-      series : [],
-      plotOptions: {
-        bar: {
-          horizontal: false,
-          columnWidth: '55%',
-          endingShape: 'rounded'
-        },
-      },
-      dataLabels: {
-          style: {
-            colors: ['#145161'],
-          },
-      },
-      xaxis: {
-        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-      },
-    };
-
-    var carbonEmissionPerMonthChart = new ApexCharts(document.querySelector("#carbonEmissionPerMonthChart"), carbonEmissionPerMonthOptions);
-    carbonEmissionPerMonthChart.render();
-
-    var itemtype = '{{ asset.getType() }}';
-    var items_id = {{ asset.getID() }};
-
-    fetch(CFG_GLPI['root_doc'] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/Dashboard/carbonEmissionPerMonthForItem.php?itemtype=" + itemtype + "&items_id=" + items_id).then(response => {
-        return response.json();
-    }).then(data => {
-      carbonEmissionPerMonthChart.updateOptions(data);
-    });
-  });
-</script>
+<div>
+  {% if not usage_impact.isNewItem() %}
+    {% set reset_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', reset: '', id: '" ~ usage_impact.getID() ~ "'}" %}
+    <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/usageimpact.form.php' }}', {{ reset_args }})">{{ __('Reset data', 'carbon') }}</a>
+  {% endif %}
+  {% set calculate_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', calculate: '', itemtype: '" ~ asset.getType() ~ "', items_id: '" ~ asset.getID() ~ "'}" %}
+  <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/usageimpact.form.php' }}', {{ calculate_args }})">{{ __('Calculate data', 'carbon') }}</a>
+</div>
 
 {{ fields.largeTitle(
     __('Embodied impact', 'carbon'),
@@ -110,18 +67,17 @@
 
 <div class="card-body" id="cardBodyBorder1">
   {% if embodied_impact.fields.gwp is not null %}
-    <div class="h1 mb-3">{{ embodied_impact.fields.gwp }} gCO<sub>2</sub>eq</div>
+    <div class="h1 mb-3">{{ embodied_impact.getHumanReadableImpact('gwp')|raw }}</div>
   {% endif %}
 
   {% if embodied_impact.fields.adp is not null %}
-    <div class="h1 mb-3">{{ embodied_impact.fields.adp }} gSbeq</div>
+    <div class="h1 mb-3">{{ embodied_impact.getHumanReadableImpact('adp')|raw }}</div>
   {% endif %}
 
   {% if embodied_impact.fields.pe is not null %}
-    <div class="h1 mb-3">{{ embodied_impact.fields.pe }} J</div>
+    <div class="h1 mb-3">{{ embodied_impact.getHumanReadableImpact('pe')|raw }}</div>
   {% endif %}
 
-  <div class="subheader">{{ __('Embodied impact', 'carbon') }}</div>
   <div>
     {% if not embodied_impact.isNewItem() %}
       {% set reset_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', reset: '', id: '" ~ embodied_impact.getID() ~ "'}" %}

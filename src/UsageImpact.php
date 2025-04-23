@@ -166,4 +166,21 @@ class UsageImpact extends CommonDBChild
 
         return $tab;
     }
+
+    /**
+     * Get impact value in a human r eadable format, selecting the best unit
+     */
+    public function getHumanReadableImpact(string $field): string
+    {
+        switch ($field) {
+            case 'gwp':
+                return Toolbox::getWeight($this->fields[$field]) . 'CO2eq';
+            case 'adp':
+                return Toolbox::getWeight($this->fields[$field]) . 'Sbeq';
+            case 'pe':
+                return Toolbox::getEnergy($this->fields[$field] / 3600); // Convert J into Wh
+        }
+
+        return '';
+    }
 }
