@@ -432,6 +432,81 @@ class Provider
         return self::getHandledAssetCount(NetworkEquipment::class, $params, $handled);
     }
 
+    public static function getHandledAssetsRatio(array $params = [])
+    {
+        $default_params = [
+            'label' => __('plugin carbon - handled assets ratio', 'carbon'),
+            'icon'  => '',
+        ];
+        $params = array_merge($default_params, $params);
+
+        $data = [];
+        foreach (PLUGIN_CARBON_TYPES as $itemtype) {
+            $itemtype_name = $itemtype::getTypeName(Session::getPluralNumber());
+            $itemtype_name = strtolower($itemtype_name);
+
+            $handled = self::getHandledAssetCount($itemtype, $params);
+            $unhandled = self::getHandledAssetCount($itemtype, $params, false);
+
+            $total = $handled['number'] + $unhandled['number'];
+            if ($total === 0) {
+                continue;
+            }
+
+            $handled_percent = ($handled['number'] / $total) * 100;
+            $data[] = [
+                'number' => number_format($handled_percent, 0),
+                'url'    => $unhandled['url'],
+                'label'  => $itemtype_name,
+            ];
+        }
+
+        return [
+            'data' => $data,
+            'label' => $params['label'],
+            'icon'  => $params['icon'],
+        ];
+    }
+
+    public static function getHandledAssetsCounts(array $params = [])
+    {
+        $default_params = [
+            'label' => __('plugin carbon - handled assets ratio', 'carbon'),
+            'icon'  => '',
+        ];
+        $params = array_merge($default_params, $params);
+
+        $data = [
+            'labels' => [],
+            'series' => []
+        ];
+        foreach (PLUGIN_CARBON_TYPES as $itemtype) {
+            $itemtype_name = $itemtype::getTypeName(Session::getPluralNumber());
+            $itemtype_name = strtolower($itemtype_name);
+
+            $handled = self::getHandledAssetCount($itemtype, $params);
+            $unhandled = self::getHandledAssetCount($itemtype, $params, false);
+
+            $data['labels'][] = $itemtype_name;
+            $data['series'][0]['name'] = __('Handled', 'carbon');
+            $data['series'][0]['data'][] = [
+                'value' => $handled['number'],
+                'url'   => $handled['url']
+            ];
+            $data['series'][1]['name'] = __('Unhandled', 'carbon');
+            $data['series'][1]['data'][] = [
+                'value' => $unhandled['number'],
+                'url'   => $unhandled['url'],
+            ];
+        }
+
+        return [
+            'data' => $data,
+            'label' => $params['label'],
+            'icon'  => $params['icon'],
+        ];
+    }
+
     /**
      * Count the computers having all required data to compute carbon intensity
      *

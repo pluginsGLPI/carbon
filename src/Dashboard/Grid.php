@@ -54,6 +54,23 @@ class Grid
             $cards = array_merge($cards, self::getStandardCards());
         }
 
+        // Common cards
+        $group = __('Carbon', 'carbon');
+        $cards += [
+            'plugin_carbon_assets_completeness_ratio' => [
+                'widgettype'   => ['apex_radar', 'multipleNumber'],
+                'group'        => $group,
+                'label'        => __('Handled assets ratio', 'carbon'),
+                'provider'     => Provider::class . '::getHandledAssetsRatio',
+            ],
+            'plugin_carbon_assets_completeness' => [
+                'widgettype' => ['stackedbars'],
+                'group'      => $group,
+                'label'      => __('Handled assets count', 'carbon'),
+                'provider'   => Provider::class . '::getHandledAssetsCounts',
+            ]
+        ];
+
         return $cards;
     }
 

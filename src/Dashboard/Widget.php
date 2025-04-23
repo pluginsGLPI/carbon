@@ -42,6 +42,7 @@ use Glpi\Dashboard\Widget as GlpiDashboardWidget;
 use GlpiPlugin\Carbon\Report;
 use Monitor;
 use NetworkEquipment;
+use Session;
 use Toolbox;
 
 class Widget extends GlpiDashboardWidget
@@ -142,39 +143,49 @@ class Widget extends GlpiDashboardWidget
                 ],
             ];
         }
-            // 'graphpertype' => [
-            //     'label'    => __('Carbon Emission Per Type', 'carbon'),
-            //     'function' => self::class . '::DisplayGraphCarbonEmissionPerType',
-            //     'limit'    => true,
-            //     'width'    => 12,
-            //     'height'   => 10,
-            // ],
-            // 'totalcarbonemission' => [
-            //     'label'    => __('Total Carbon Emission', 'carbon'),
-            //     'function' => self::class . '::DisplayTotalCarbonEmission',
-            //     'width'    => 5,
-            //     'height'   => 4,
-            // ],
-            // 'monthlycarbonemission' => [
-            //     'label'    => __('Monthly Carbon Emission', 'carbon'),
-            //     'function' => self::class . '::DisplayMonthlyCarbonEmission',
-            //     'width'    => 5,
-            //     'height'   => 4,
-            // ],
-            // 'apex_lines' => [
-            //     'label'    => __('Multiple lines', 'carbon'),
-            //     'function' => self::class . '::multipleLines',
-            //     'image'    => $CFG_GLPI['root_doc'] . '/pics/charts/line.png',
-            //     'width'    => 5,
-            //     'height'   => 4,
-            // ]
-            // 'apex_pie' => [
-            //     'label'    => __('Pie', 'carbon'),
-            //     'function' => self::class . '::apex_pie',
-            //     'image'    => $CFG_GLPI['root_doc'] . '/pics/charts/line.png',
-            //     'width'    => 5,
-            //     'height'   => 4,
-            // ],
+
+        $types += [
+            'apex_radar' => [
+                'label'    => __('Radar chart', 'carbon'),
+                'function' => self::class . '::apexRadar',
+                // 'image'    => '',
+                'width'    => 4,
+                'height'   => 4,
+            ]
+        ];
+        // 'graphpertype' => [
+        //     'label'    => __('Carbon Emission Per Type', 'carbon'),
+        //     'function' => self::class . '::DisplayGraphCarbonEmissionPerType',
+        //     'limit'    => true,
+        //     'width'    => 12,
+        //     'height'   => 10,
+        // ],
+        // 'totalcarbonemission' => [
+        //     'label'    => __('Total Carbon Emission', 'carbon'),
+        //     'function' => self::class . '::DisplayTotalCarbonEmission',
+        //     'width'    => 5,
+        //     'height'   => 4,
+        // ],
+        // 'monthlycarbonemission' => [
+        //     'label'    => __('Monthly Carbon Emission', 'carbon'),
+        //     'function' => self::class . '::DisplayMonthlyCarbonEmission',
+        //     'width'    => 5,
+        //     'height'   => 4,
+        // ],
+        // 'apex_lines' => [
+        //     'label'    => __('Multiple lines', 'carbon'),
+        //     'function' => self::class . '::multipleLines',
+        //     'image'    => $CFG_GLPI['root_doc'] . '/pics/charts/line.png',
+        //     'width'    => 5,
+        //     'height'   => 4,
+        // ]
+        // 'apex_pie' => [
+        //     'label'    => __('Pie', 'carbon'),
+        //     'function' => self::class . '::apex_pie',
+        //     'image'    => $CFG_GLPI['root_doc'] . '/pics/charts/line.png',
+        //     'width'    => 5,
+        //     'height'   => 4,
+        // ],
 
         return $types;
     }
@@ -939,5 +950,121 @@ class Widget extends GlpiDashboardWidget
             'fg_hover_border' => Toolbox::getFgColor($p['color'], 30),
             'number' => $p['pe']['number'],
         ]);
+    }
+
+    /**
+     * Displays a widget with a radar (or web) chart
+     *
+     * @param array $params
+     * @return string
+     */
+    public static function apexRadar(array $params = []): string
+    {
+        $default = [
+            'data'         => [],
+            'label'        => '',
+            'alt'          => '',
+            'color'        => '',
+            'icon'         => '',
+            'donut'        => false,
+            'half'         => false,
+            'use_gradient' => false,
+            'limit'        => 99999,
+            'filters'      => [],
+            'rand'         => mt_rand(),
+        ];
+        $p = array_merge($default, $params);
+        $p['cache_key'] = $p['cache_key'] ?? $p['rand'];
+
+        $nodata   = isset($p['data']['nodata']) && $p['data']['nodata'];
+
+        $fg_color      = Toolbox::getFgColor($p['color']);
+        $dark_bg_color = Toolbox::getFgColor($p['color'], 80);
+        $dark_fg_color = Toolbox::getFgColor($p['color'], 40);
+
+        $chart_id = Toolbox::slugify("chart_{$p['cache_key']}");
+
+        $class = "radar";
+        $class .= count($p['filters']) > 0 ? " filter-" . implode(' filter-', $p['filters']) : "";
+
+        $series = [
+            [
+                'name' => __('Handled percentage', 'carbon'),
+                'data' => [],
+            ],
+        ];
+
+        $categories = [];
+        foreach ($p['data'] as $itemtype_data) {
+            $categories[] = $itemtype_data['label'];
+            $series[0]['data'][] = $itemtype_data['number'];
+        }
+
+        $nb_series = count($series);
+        $palette_style = "";
+        if ($p['use_gradient']) {
+            $palette_style = self::getCssGradientPalette(
+                $p['color'],
+                $nb_series,
+                ".dashboard #{$chart_id}",
+                false
+            );
+        }
+
+        $no_data_html = "";
+        if ($nodata) {
+            $no_data_html = "<span class='empty-card no-data'>
+               <div>" . __('No data found') . "</div>
+            <span>";
+        }
+
+        $data = [
+            'series' => $series,
+            'chart' => [
+                'width'  => '100%',
+                'height' => '95%',
+                'redrawOnParentResize' => true,
+                'type'   => 'radar',
+            ],
+            'yaxis' => [
+                'stepSize' => 20,
+            ],
+            'xaxis' => [
+                'categories' => $categories,
+            ],
+            'title' => [
+                'text' => $p['label'],
+            ],
+            'dataLabels' => [
+            //     'style' => [
+            //         'colors' => [$fg_color],
+            //     ]
+                'background' => [
+                    'enabled' => true,
+                    'foreColor' => $fg_color,
+                ],
+            ],
+            'colors' => [
+                $fg_color,
+            ],
+            // 'legend' => [
+            //     'show' => true,
+            //     'showForSingleSeries' => true,
+            // ],
+        ];
+
+        $output = TemplateRenderer::getInstance()->render('@carbon/dashboard/apex_radar.html.twig', [
+            'chart_id' => $chart_id,
+            'class'    => $class,
+            'color' => $p['color'],
+            'fg_color' => $fg_color,
+            'dark_fg_color' => $dark_fg_color,
+            'dark_bg_color' => $dark_bg_color,
+            'palette_style' => $palette_style,
+            'label' => $p['label'],
+            'data' => $data,
+        ]);
+
+        return $output;
     }
 }
