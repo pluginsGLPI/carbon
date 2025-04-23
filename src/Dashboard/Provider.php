@@ -57,6 +57,7 @@ use NetworkEquipment;
 use QueryExpression;
 use QuerySubQuery;
 use Search;
+use Session;
 use Toolbox as GlpiToolbox;
 
 class Provider
@@ -352,35 +353,11 @@ class Provider
     public static function getHandledComputersCount(array $params = [], bool $handled = true): array
     {
         $default_params = [
-            'label' => __("plugin carbon - handled computers", 'carbon'),
             'icon'  => "fas fa-computer",
         ];
         $params = array_merge($default_params, $params);
 
-        $search_criteria = [
-            'criteria' => [
-                [
-                    'field'      => SearchOptions::IS_HISTORIZABLE,
-                    'searchtype' => 'equals',
-                    'value'      => $handled ? 1 : 0
-                ],
-            ],
-            'reset'    => 'reset'
-        ];
-        // Exploit defaultWhere to inject WHERE criterias from dashboard filters
-        $filter_criteria = self::getFiltersCriteria(Computer::getTable(), $params['apply_filters'] ?? []);
-        $search_data = Search::prepareDatasForSearch(Computer::class, $search_criteria);
-        Search::constructSQL($search_data);
-        Search::constructData($search_data, true);
-
-        $count = $search_data['data']['totalcount'] ?? null;
-        $url = Computer::getSearchURL() . '?' . GlpiToolbox::append_params($search_criteria);
-        return [
-            'number' => $count,
-            'url'    => $url,
-            'label'  => $params['label'],
-            'icon'   => $params['icon'],
-        ];
+        return self::getHandledAssetCount(Computer::class, $params, $handled);
     }
 
     /**
@@ -416,30 +393,7 @@ class Provider
         ];
         $params = array_merge($default_params, $params);
 
-        $search_criteria = [
-            'criteria' => [
-                [
-                    'field'      => SearchOptions::IS_HISTORIZABLE,
-                    'searchtype' => 'equals',
-                    'value'      => $handled ? 1 : 0
-                ],
-            ],
-            'reset'    => 'reset'
-        ];
-        // Exploit defaultWhere to inject WHERE criterias from dashboard filters
-        $filter_criteria = self::getFiltersCriteria(Monitor::getTable(), $params['apply_filters'] ?? []);
-        $search_data = Search::prepareDatasForSearch(Monitor::class, $search_criteria);
-        Search::constructSQL($search_data);
-        Search::constructData($search_data, true);
-
-        $count = $search_data['data']['totalcount'] ?? null;
-        $url = Monitor::getSearchURL() . '?' . GlpiToolbox::append_params($search_criteria);
-        return [
-            'number' => $count,
-            'url'    => $url,
-            'label'  => $params['label'],
-            'icon'   => $params['icon'],
-        ];
+        return self::getHandledAssetCount(Monitor::class, $params, $handled);
     }
 
     /**
@@ -475,6 +429,27 @@ class Provider
         ];
         $params = array_merge($default_params, $params);
 
+        return self::getHandledAssetCount(NetworkEquipment::class, $params, $handled);
+    }
+
+    /**
+     * Count the computers having all required data to compute carbon intensity
+     *
+     * @param string $itemtype the itemtype to count
+     * @param array  $params
+     * @param bool   $handled : true if we want to count handled computers, false to count unhandled computers
+     * @return array count of items
+     */
+    protected static function getHandledAssetCount(string $itemtype, array $params = [], bool $handled = true): array
+    {
+        $itemtype_name = $itemtype::getTypeName(Session::getPluralNumber());
+        $itemtype_name = strtolower($itemtype_name);
+        $default_params = [
+            'label' => sprintf(__("plugin carbon - handled %s", 'carbon'), $itemtype_name),
+            'icon'  => "",
+        ];
+        $params = array_merge($default_params, $params);
+
         $search_criteria = [
             'criteria' => [
                 [
@@ -485,14 +460,17 @@ class Provider
             ],
             'reset'    => 'reset'
         ];
+        $itemtype_table = (new DbUtils())->getTableForItemType($itemtype);
         // Exploit defaultWhere to inject WHERE criterias from dashboard filters
-        $filter_criteria = self::getFiltersCriteria(NetworkEquipment::getTable(), $params['apply_filters'] ?? []);
-        $search_data = Search::prepareDatasForSearch(NetworkEquipment::class, $search_criteria);
+        $filter_criteria = self::getFiltersCriteria($itemtype_table, $params['apply_filters'] ?? []);
+        $search_data = Search::prepareDatasForSearch($itemtype, $search_criteria);
         Search::constructSQL($search_data);
         Search::constructData($search_data, true);
 
+        $search_url = GlpiToolbox::getItemTypeSearchURL($itemtype);
         $count = $search_data['data']['totalcount'] ?? null;
-        $url = NetworkEquipment::getSearchURL() . '?' . GlpiToolbox::append_params($search_criteria);
+        $url = $search_url . '?' . GlpiToolbox::append_params($search_criteria);
+
         return [
             'number' => $count,
             'url'    => $url,
