@@ -49,10 +49,17 @@
         color: {{ fg_color }};
         border: 1px solid {{ fg_hover_border }};
     }
+
+    #{{ id }} .apexcharts-title-text {
+        fill: {{ fg_color }};
+    }
+
+    .theme-dark #{{ id }} .apexcharts-title-text {
+        fill: {{ dark_fg_color }};
+    }
 </style>
 <div class="card" id="{{ id }}">
     <div id="carbonEmissionPerModelChart" class="card-body card-max-height">
-    <div class="subheader">{{ __('Biggest monthly averaged carbon emission per model', 'carbon') }}</div>
     <div class="h1 mb-3" id="carbonEmissionPerModel"></div>
     <div class="chart-lg"></div>
     </div>

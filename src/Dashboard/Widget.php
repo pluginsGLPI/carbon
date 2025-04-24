@@ -567,19 +567,24 @@ class Widget extends GlpiDashboardWidget
     {
         $default = [
             'url'     => '',
-            'label'   => '',
+            'label'   => __('Biggest monthly averaged carbon emission per model', 'carbon'),
             'alt'     => '',
             'color'   => '',
             'icon'    => '',
-            'id'      => 'plugin_usage_carbon_emissions_per_model_' . mt_rand(),
+            'id'      => 'plugin_carbon_usage_carbon_emissions_per_model_' . mt_rand(),
             'filters' => [], // TODO: Not implemented yet (is this useful ?)
         ];
         $p = array_merge($default, $params);
+        $fg_color = Toolbox::getFgColor($p['color']);
+        $dark_fg_color = Toolbox::getFgColor($p['color'], 40);
 
         $data = [
             'colors' => ['#146151', '#FEEC5C', '#BBDA50', '#F78343', '#97989C'],
             'chart' => [
                 'type' => 'donut',
+            ],
+            'title' => [
+                'text' => $p['label'],
             ],
             'plotOptions' => [
                 'pie' => [
@@ -616,7 +621,8 @@ class Widget extends GlpiDashboardWidget
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/graph-carbon-emission-per-model.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
-            'fg_color' => Toolbox::getFgColor($p['color']),
+            'fg_color' => $fg_color,
+            'dark_fg_color' => $dark_fg_color;
             'fg_hover_color' => Toolbox::getFgColor($p['color'], 15),
             'fg_hover_border' => Toolbox::getFgColor($p['color'], 30),
             'data' => $data,
