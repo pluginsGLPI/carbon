@@ -53,6 +53,10 @@
             'fas fa-gears'
         ) }}
 
+        <div>
+        <p>{{ __('Usage carbon emissions are always calculated internally', 'carbon') }}</p>
+        </div>
+
         {{ fields.dropdownArrayField(
             'impact_engine',
             current_config['impact_engine'],
