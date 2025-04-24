@@ -72,3 +72,10 @@
 .percent-color {
     color: #BBDA50;
 }
+
+.info-tooltip {
+    position: absolute;
+    bottom: 5px;
+    right: 10px;
+    text-align: right;
+}

@@ -61,6 +61,11 @@
                 <div class="subheader">{{ __('Embodied primary energy', 'carbon') }}</div>
             </div>
             <div class="my-3 number text-center">{{ number|raw }}</div>
+            <div class="info-tooltip">
+                <span id="{{ id }}_tip">
+                    <i class="fa-solid fa-circle-info"></i>
+                </span>
+            </div>
         </div>
     </div>
 </div>
@@ -74,3 +79,4 @@
     observer.observe(document.querySelector('#{{ id }} .number'));
 })();
 </script>
+{{ tooltip_html|raw }}

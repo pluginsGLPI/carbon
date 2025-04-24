@@ -100,8 +100,8 @@ class Widget extends GlpiDashboardWidget
 
             // Embodied impact
             'embodied_global_warming' => [
-                'label'    => __('Embodied global warming potential', 'carbon'),
-                'function' => self::class . '::displayEmbodiedGlobalWarming',
+                'label'    => __('Embodied carbon emission', 'carbon'),
+                'function' => self::class . '::displayEmbodiedCarbonEmission',
                 'width'    => 6,
                 'height'   => 3,
             ],
@@ -189,6 +189,32 @@ class Widget extends GlpiDashboardWidget
         // ],
 
         return $types;
+    }
+
+    /**
+     * Get external URL to a detailed description of the given path
+     *
+     * @param string $object_descriptor
+     * @return string
+     */
+    public static function getInfoLink(string $object_descriptor): string
+    {
+        // $lang = substr($_SESSION['glpilanguage'], 0, 2);
+        $lang = 'en';
+        $base_url = sprintf(
+            'https://glpi-plugins.readthedocs.io/%s/latest/carbon/knowledge_base/',
+            $lang
+        );
+        switch ($object_descriptor) {
+            case 'abiotic_depletion_impact':
+                return "$base_url/abiotic_depletion_impact";
+            case 'primary_energy_impact':
+                return "$base_url/primary_energy_impact";
+            case 'global_warming_impact':
+                return "$base_url/global_warming_impact";
+        }
+
+        return '';
     }
 
     /**
@@ -713,6 +739,15 @@ class Widget extends GlpiDashboardWidget
             Toolbox::dynamicRound($penultimate_month_emissions),
             $last_month['series'][0]['unit']
         );
+
+        $url = self::getInfoLink('carbon_emission');
+        $tooltip = __('Evaluates the usage carbon emission in CO₂ equivalent during the last 2 months. %s More information %s', 'carbon');
+        $tooltip = sprintf($tooltip, '<br /><a target="_blank" href="' . $url . '">', '</a>');
+        $tooltip_html = Html::showToolTip($tooltip, [
+            'display' => false,
+            'applyto' => $p['id'] . '_tip',
+        ]);
+
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/monthly-carbon-emission.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
@@ -724,6 +759,7 @@ class Widget extends GlpiDashboardWidget
             'penultimate_month_emissions' => $penultimate_month_emissions,
             'penultimate_month' => $last_month['date_interval'][0] ?? '',
             'variation' => $comparison_text,
+            'tooltip_html' => $tooltip_html,
         ]);
     }
 
@@ -758,6 +794,15 @@ class Widget extends GlpiDashboardWidget
                 $date_format = 'F Y';
                 break;
         }
+
+        $url = self::getInfoLink('carbon_emission');
+        $tooltip = __('Evaluates the usage carbon emission in CO₂ equivalent during the last 12 elapsed months. %s More information %s', 'carbon');
+        $tooltip = sprintf($tooltip, '<br /><a target="_blank" href="' . $url . '">', '</a>');
+        $tooltip_html = Html::showToolTip($tooltip, [
+            'display' => false,
+            'applyto' => $p['id'] . '_tip',
+        ]);
+
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/usage-carbon-emission-last-year.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
@@ -769,10 +814,11 @@ class Widget extends GlpiDashboardWidget
                 $start_date->format($date_format),
                 $end_date->format($date_format),
             ],
+            'tooltip_html' => $tooltip_html,
         ]);
     }
 
-    public static function displayEmbodiedGlobalWarming(array $params = []): string
+    public static function displayEmbodiedCarbonEmission(array $params = []): string
     {
         $default = [
             'number'  => 0,
@@ -786,6 +832,14 @@ class Widget extends GlpiDashboardWidget
         ];
         $p = array_merge($default, $params);
 
+        $url = self::getInfoLink('global_warming_impact');
+        $tooltip = __('Evaluates the embodied global warming potential in CO₂ equivalent. %s More information %s', 'carbon');
+        $tooltip = sprintf($tooltip, '<br /><a target="_blank" href="' . $url . '">', '</a>');
+        $tooltip_html = Html::showToolTip($tooltip, [
+            'display' => false,
+            'applyto' => $p['id'] . '_tip',
+        ]);
+
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/embodied-global-warming.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
@@ -793,6 +847,7 @@ class Widget extends GlpiDashboardWidget
             'fg_hover_color' => GlpiToolbox::getFgColor($p['color'], 15),
             'fg_hover_border' => GlpiToolbox::getFgColor($p['color'], 30),
             'number' => $p['number'],
+            'tooltip_html' => $tooltip_html,
         ]);
     }
 
@@ -809,6 +864,13 @@ class Widget extends GlpiDashboardWidget
             'filters' => [], // TODO: Not implemented yet (is this useful ?)
         ];
         $p = array_merge($default, $params);
+        $url = self::getInfoLink('abiotic_depletion_impact');
+        $tooltip = __('Evaluates the consumption of non renewable resources in Antimony equivalent. %s More information %s', 'carbon');
+        $tooltip = sprintf($tooltip, '<br /><a target="_blank" href="' . $url . '">', '</a>');
+        $tooltip_html = Html::showToolTip($tooltip, [
+            'display' => false,
+            'applyto' => $p['id'] . '_tip',
+        ]);
 
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/embodied-abiotic-depletion.html.twig', [
             'id' => $p['id'],
@@ -817,6 +879,7 @@ class Widget extends GlpiDashboardWidget
             'fg_hover_color' => GlpiToolbox::getFgColor($p['color'], 15),
             'fg_hover_border' => GlpiToolbox::getFgColor($p['color'], 30),
             'number' => $p['number'],
+            'tooltip_html' => $tooltip_html,
         ]);
     }
 
@@ -834,6 +897,14 @@ class Widget extends GlpiDashboardWidget
         ];
         $p = array_merge($default, $params);
 
+        $url = self::getInfoLink('abiotic_depletion_impact');
+        $tooltip = __('Evaluates the consumption of non renewable resources in Antimony equivalent. %s More information %s', 'carbon');
+        $tooltip = sprintf($tooltip, '<br /><a target="_blank" href="' . $url . '">', '</a>');
+        $tooltip_html = Html::showToolTip($tooltip, [
+            'display' => false,
+            'applyto' => $p['id'] . '_tip',
+        ]);
+
         // $p['adp'] = Provider::getUsageAbioticDepletion();
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/usage-abiotic-depletion.html.twig', [
             'id' => $p['id'],
@@ -842,6 +913,7 @@ class Widget extends GlpiDashboardWidget
             'fg_hover_color' => GlpiToolbox::getFgColor($p['color'], 15),
             'fg_hover_border' => GlpiToolbox::getFgColor($p['color'], 30),
             'number' => $p['number'],
+            'tooltip_html' => $tooltip_html,
         ]);
     }
 
@@ -998,6 +1070,14 @@ class Widget extends GlpiDashboardWidget
         ];
         $p = array_merge($default, $params);
 
+        $url = self::getInfoLink('primary_energy_impact');
+        $tooltip = __('Evaluates the primary energy consumed. %s More information %s', 'carbon');
+        $tooltip = sprintf($tooltip, '<br /><a target="_blank" href="' . $url . '">', '</a>');
+        $tooltip_html = Html::showToolTip($tooltip, [
+            'display' => false,
+            'applyto' => $p['id'] . '_tip',
+        ]);
+
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/embodied-primary-energy.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
@@ -1005,6 +1085,7 @@ class Widget extends GlpiDashboardWidget
             'fg_hover_color' => GlpiToolbox::getFgColor($p['color'], 15),
             'fg_hover_border' => GlpiToolbox::getFgColor($p['color'], 30),
             'number' => $p['number'],
+            'tooltip_html' => $tooltip_html,
         ]);
     }
 
