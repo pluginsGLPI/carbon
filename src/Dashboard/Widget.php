@@ -126,7 +126,7 @@ class Widget extends GlpiDashboardWidget
                     'label'    => __('Unhandled Computers', 'carbon'),
                     'function' => self::class . '::DisplayUnhandledComputersRatio',
                     'width'    => 5,
-                    'height'   => 4,
+                    'height'   => 3,
                 ],
             ];
         }
@@ -136,7 +136,7 @@ class Widget extends GlpiDashboardWidget
                     'label'    => __('Unhandled Monitors', 'carbon'),
                     'function' => self::class . '::DisplayUnhandledMonitorsRatio',
                     'width'    => 5,
-                    'height'   => 4,
+                    'height'   => 3,
                 ],
             ];
         }
@@ -146,7 +146,7 @@ class Widget extends GlpiDashboardWidget
                     'label'    => __('Unhandled Network equipments', 'carbon'),
                     'function' => self::class . '::DisplayUnhandledNetworkEquipmentsRatio',
                     'width'    => 5,
-                    'height'   => 4,
+                    'height'   => 3,
                 ],
             ];
         }
@@ -866,7 +866,7 @@ class Widget extends GlpiDashboardWidget
 
         $p['handled'] = Provider::getHandledAssetCount(Computer::class, true);
         $p['unhandled'] = Provider::getHandledAssetCount(Computer::class, false);
-        return TemplateRenderer::getInstance()->render('@carbon/components/unhandled-computers-card.html.twig', [
+        return TemplateRenderer::getInstance()->render('@carbon/dashboard/unhandled-computers-card.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
             'fg_color' => GlpiToolbox::getFgColor($p['color']),
@@ -898,7 +898,7 @@ class Widget extends GlpiDashboardWidget
 
         $p['handled'] = Provider::getHandledAssetCount(Monitor::class, true);
         $p['unhandled'] = Provider::getHandledAssetCount(Monitor::class, false);
-        return TemplateRenderer::getInstance()->render('@carbon/components/unhandled-monitors-card.html.twig', [
+        return TemplateRenderer::getInstance()->render('@carbon/dashboard/unhandled-monitors-card.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
             'fg_color' => GlpiToolbox::getFgColor($p['color']),
@@ -930,7 +930,7 @@ class Widget extends GlpiDashboardWidget
 
         $p['handled'] = Provider::getHandledAssetCount(NetworkEquipment::class, true);
         $p['unhandled'] = Provider::getHandledAssetCount(NetworkEquipment::class, false);
-        return TemplateRenderer::getInstance()->render('@carbon/components/unhandled-network-equipments-card.html.twig', [
+        return TemplateRenderer::getInstance()->render('@carbon/dashboard/unhandled-network-equipments-card.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
             'fg_color' => GlpiToolbox::getFgColor($p['color']),
@@ -954,7 +954,7 @@ class Widget extends GlpiDashboardWidget
         ];
         $p = array_merge($default, $params);
 
-        return TemplateRenderer::getInstance()->render('@carbon/components/information-video-card.html.twig', [
+        return TemplateRenderer::getInstance()->render('@carbon/dashboard/information-video-card.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
             'fg_color' => GlpiToolbox::getFgColor($p['color']),
@@ -976,7 +976,7 @@ class Widget extends GlpiDashboardWidget
         ];
         $p = array_merge($default, $params);
 
-        return TemplateRenderer::getInstance()->render('@carbon/components/information-block.html.twig', [
+        return TemplateRenderer::getInstance()->render('@carbon/dashboard/information-block.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
             'fg_color' => GlpiToolbox::getFgColor($p['color']),
