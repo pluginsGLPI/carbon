@@ -553,7 +553,7 @@ class Widget extends GlpiDashboardWidget
         $apex_data['labels'] = $data['labels'];
         $apex_data['xaxis']['categories'] = $data['labels'];
 
-        return TemplateRenderer::getInstance()->render('@carbon/components/graph-carbon-emission-per-month.html.twig', [
+        return TemplateRenderer::getInstance()->render('@carbon/dashboard/graph-carbon-emission-per-month.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
             'fg_color' => Toolbox::getFgColor($p['color']),
@@ -613,7 +613,7 @@ class Widget extends GlpiDashboardWidget
         ];
         $data = array_merge($data, Provider::getSumUsageEmissionsPerModel($params));
 
-        return TemplateRenderer::getInstance()->render('@carbon/components/graph-carbon-emission-per-model.html.twig', [
+        return TemplateRenderer::getInstance()->render('@carbon/dashboard/graph-carbon-emission-per-model.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
             'fg_color' => Toolbox::getFgColor($p['color']),
