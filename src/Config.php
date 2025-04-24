@@ -204,4 +204,26 @@ class Config extends GlpiConfig
 
         return __NAMESPACE__ . '\\Impact\\History\\' . $engine;
     }
+
+    /**
+     * Get demo mode status
+     *
+     * @return boolean true if demo mode enabled
+     */
+    public static function isDemoMode(): bool
+    {
+        $demo_mode = GlpiConfig::getConfigurationValue('plugin:carbon', 'demo');
+
+        return $demo_mode != 0;
+    }
+
+    /**
+     * Disable demo mode
+     *
+     * @return void
+     */
+    public static function exitDemoMode()
+    {
+        GlpiConfig::deleteConfigurationValues('plugin:carbon', ['demo']);
+    }
 }

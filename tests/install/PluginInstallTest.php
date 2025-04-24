@@ -248,8 +248,9 @@ class PluginInstallTest extends CommonTestCase
         require_once($plugin_path . '/setup.php');
 
         $expected = [
-            'electricitymap_api_key'  => 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-            'dbversion'               => PLUGIN_CARBON_SCHEMA_VERSION,
+            'electricitymap_api_key' => 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+            'demo'                   => '1',
+            'dbversion'              => PLUGIN_CARBON_SCHEMA_VERSION,
         ];
 
         $config = Config::getConfigurationValues('plugin:' . TEST_PLUGIN_NAME);
@@ -265,7 +266,7 @@ class PluginInstallTest extends CommonTestCase
             }
             $this->assertEquals($expected_value, $value, "configuration key $key mismatch");
         }
-        $this->assertCount(2, $config);
+        $this->assertCount(3, $config);
     }
 
     private function checkRights()

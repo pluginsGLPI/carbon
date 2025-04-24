@@ -45,6 +45,7 @@
     </style>
 
     {% block body %}
+    {{ include('central/messages.html.twig') }}
     <div class="page-body">
       {{ dashboard|raw }}
     </div>

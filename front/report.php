@@ -31,6 +31,7 @@
  * -------------------------------------------------------------------------
  */
 
+use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\Report;
 
 include '../../../inc/includes.php';
@@ -43,6 +44,11 @@ if (!Plugin::isPluginActive('carbon')) {
 if (!Report::canView()) {
     // Will die
     Html::displayRightError();
+}
+
+if (isset($_GET['disable_demo'])) {
+    Config::exitDemoMode();
+    Html::back();
 }
 
 Html::header(

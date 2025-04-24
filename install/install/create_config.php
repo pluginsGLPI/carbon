@@ -43,7 +43,8 @@ $PLUGIN_HOOKS[Hooks::SECURED_CONFIGS]['carbon'] = [
 
 $current_config = Config::getConfigurationValues('plugin:carbon');
 $config_entries = [
-    'electricitymap_api_key'              => 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'electricitymap_api_key' => 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'demo'                   => 1,
 ];
 foreach ($config_entries as $key => $value) {
     if (!isset($current_config[$key])) {

@@ -34,9 +34,14 @@
 namespace GlpiPlugin\Carbon\Dashboard;
 
 use Computer;
+use DateTimeImmutable;
 use Glpi\Dashboard\Filter;
+use GlpiPlugin\Carbon\CarbonIntensity;
+use GlpiPlugin\Carbon\Config;
+use GlpiPlugin\Carbon\Toolbox;
 use Monitor;
 use NetworkEquipment;
+use Session;
 
 class Grid
 {
@@ -62,6 +67,9 @@ class Grid
                 'group'        => $group,
                 'label'        => __('Handled assets ratio', 'carbon'),
                 'provider'     => Provider::class . '::getHandledAssetsRatio',
+                'args'         => [
+                    'itemtypes'   => PLUGIN_CARBON_TYPES
+                ]
             ],
             'plugin_carbon_assets_completeness' => [
                 'widgettype' => ['stackedbars'],
@@ -70,6 +78,16 @@ class Grid
                 'provider'   => Provider::class . '::getHandledAssetsCounts',
             ]
         ];
+
+        if (Config::isDemoMode()) {
+            // Use demo providers
+            foreach ($cards as &$card) {
+                if (!isset($card['provider'])) {
+                    continue;
+                }
+                $card['provider'] = str_replace(Provider::class, DemoProvider::class, $card['provider']);
+            }
+        }
 
         return $cards;
     }
@@ -110,57 +128,33 @@ class Grid
         $group = __('Carbon', 'carbon');
 
         // Data completeness diagnosis
-        if (in_array(Computer::class, PLUGIN_CARBON_TYPES)) {
+
+        foreach (PLUGIN_CARBON_TYPES as $itemtype) {
+            $type_name = $itemtype::getTypeName(Session::getPluralNumber());
+            $card_complete_key = 'plugin_carbon_complete_' . $type_name;
+            $card_incomplete_key = 'plugin_carbon_incomplete_' . $type_name;
             $new_cards += [
-                'plugin_carbon_complete_computers' => [
+                $card_complete_key => [
                     'widgettype'   => ['bigNumber'],
                     'group'        => $group,
-                    'label'        => __('Handled computers', 'carbon'),
-                    'provider'     => Provider::class . '::getHandledComputersCount',
+                    'label'        => sprintf(__('Handled %s', 'carbon'), $type_name),
+                    'provider'     => Provider::class . '::getHandledAssetCount',
+                    'args'         => [
+                        'itemtype' => $itemtype,
+                        'handled'  => true,
+                    ],
                     'filter'       => Filter::getAppliableFilters(Computer::getTable()),
                 ],
-                'plugin_carbon_incomplete_computers' => [
+                $card_incomplete_key => [
                     'widgettype'   => ['bigNumber'],
                     'group'        => $group,
-                    'label'        => __('Unhandled computers', 'carbon'),
-                    'provider'     => Provider::class . '::getUnhandledComputersCount',
+                    'label'        => sprintf(__('Unhandled %s', 'carbon'), $type_name),
+                    'provider'     => Provider::class . '::getHandledAssetCount',
+                    'args'         => [
+                        'itemtype' => $itemtype,
+                        'handled'  => false,
+                    ],
                     'filter'       => Filter::getAppliableFilters(Computer::getTable()),
-                ],
-            ];
-        }
-        if (in_array(Monitor::class, PLUGIN_CARBON_TYPES)) {
-            $new_cards += [
-                'plugin_carbon_complete_monitors' => [
-                    'widgettype'   => ['bigNumber'],
-                    'group'        => $group,
-                    'label'        => __('Handled monitors', 'carbon'),
-                    'provider'     => Provider::class . '::getHandledMonitorsCount',
-                    'filter'       => Filter::getAppliableFilters(Monitor::getTable()),
-                ],
-                'plugin_carbon_incomplete_monitors' => [
-                    'widgettype'   => ['bigNumber'],
-                    'group'        => $group,
-                    'label'        => __('Unhandled monitors', 'carbon'),
-                    'provider'     => Provider::class . '::getUnhandledMonitorsCount',
-                    'filter'       => Filter::getAppliableFilters(Monitor::getTable()),
-                ],
-            ];
-        }
-        if (in_array(NetworkEquipment::class, PLUGIN_CARBON_TYPES)) {
-            $new_cards += [
-                'plugin_carbon_complete_network_equipments' => [
-                    'widgettype'   => ['bigNumber'],
-                    'group'        => $group,
-                    'label'        => __('Handled network equipments', 'carbon'),
-                    'provider'     => Provider::class . '::getHandledNetworkEquipmentsCount',
-                    'filter'       => Filter::getAppliableFilters(NetworkEquipment::getTable()),
-                ],
-                'plugin_carbon_incomplete_network_equipments' => [
-                    'widgettype'   => ['bigNumber'],
-                    'group'        => $group,
-                    'label'        => __('Unhandled network equipments', 'carbon'),
-                    'provider'     => Provider::class . '::getUnhandledNetworkEquipmentsCount',
-                    'filter'       => Filter::getAppliableFilters(NetworkEquipment::getTable()),
                 ],
             ];
         }
@@ -235,30 +229,17 @@ class Grid
         $group = __('Carbon', 'carbon');
 
         // Data completeness diagnosis
-        if (in_array(Computer::class, PLUGIN_CARBON_TYPES)) {
+        foreach (PLUGIN_CARBON_TYPES as $itemtype) {
+            $type_name = $itemtype::getTypeName(Session::getPluralNumber());
+            $type_name = strtolower($type_name);
+            $card_incomplete_ratio_key = 'plugin_carbon_incomplete_' . $type_name . '_ratio';
             $new_cards += [
-                'plugin_carbon_report_unhandled_computers_ratio' => [
-                    'widgettype'   => ['unhandled_computers_ratio'],
+                $card_incomplete_ratio_key => [
+                    'widgettype'   => ['unhandled_' . $type_name . '_ratio'],
                     'group'        => $group,
-                    'label'        => __('Unhandled computers ratio', 'carbon'),
-                ],
-            ];
-        }
-        if (in_array(Monitor::class, PLUGIN_CARBON_TYPES)) {
-            $new_cards += [
-                'plugin_carbon_report_unhandled_monitors_ratio' => [
-                    'widgettype'   => ['unhandled_monitors_ratio'],
-                    'group'        => $group,
-                    'label'        => __('Unhandled monitors ratio', 'carbon'),
-                ],
-            ];
-        }
-        if (in_array(NetworkEquipment::class, PLUGIN_CARBON_TYPES)) {
-            $new_cards += [
-                'plugin_carbon_report_unhandled_network_equipments_ratio' => [
-                    'widgettype'   => ['unhandled_network_equipments_ratio'],
-                    'group'        => $group,
-                    'label'        => __('Unhandled network equipments ratio', 'carbon'),
+                    'label'        => sprintf(__('Unhandled %s ratio', 'carbon'), $type_name),
+                    'provider'     => Provider::class . '::getHandledAssetsCounts',
+                    'args'         => ['itemtypes' => $itemtype]
                 ],
             ];
         }
@@ -266,29 +247,40 @@ class Grid
         // Usage impact
         $new_cards += [
             'plugin_carbon_report_usage_carbon_emission_ytd' => [
-                'widgettype'   => ['usagecarbonemission_ytd'],
+                'widgettype'   => ['usage_carbon_emission_ytd'],
                 'group'        => $group,
                 'label'        => __('Usage carbon emission year to date', 'carbon'),
+                'provider'     => Provider::class . '::getUsageCarbonEmissionYearToDate',
             ],
             'plugin_carbon_report_usage_carbon_emission_two_last_months' => [
-                'widgettype'   => ['totalusagecarbonemission_two_last_months'],
+                'widgettype'   => ['total_usage_carbon_emission_two_last_months'],
                 'group'        => $group,
                 'label'        => __('Monthly carbon emission', 'carbon'),
+                'provider'     => Provider::class . '::getUsageCarbonEmissionlastTwoMonths',
+                'args'         => [
+                    'crit'        => []
+                ]
             ],
             'plugin_carbon_report_usage_carbon_emissions_graph' => [
                 'widgettype'   => ['usage_gwp_monthly'],
                 'group'        => $group,
                 'label'        => __('Usage global warming potential chart', 'carbon'),
+                'provider'     => Provider::class . '::getUsageCarbonEmissionPerMonth',
+                'args'         => [
+                    'crit'        => []
+                ]
             ],
             'plugin_carbon_report_biggest_gwp_per_model' => [
                 'widgettype'   => ['most_gwp_impacting_computer_models'],
                 'group'        => $group,
                 'label'        => __('Biggest monthly averaged carbon emission per model', 'carbon'),
+                'provider'     => Provider::class . '::getSumUsageEmissionsPerModel',
             ],
             'plugin_carbon_report_usage_abiotic_depletion' => [
                 'widgettype'   => ['usage_abiotic_depletion'],
                 'group'        => $group,
                 'label'        => __('Usage abiotic depletion potential', 'carbon'),
+                'provider'     => Provider::class . '::getUsageAbioticDepletion',
             ],
 
             // Embodied impact
@@ -302,6 +294,7 @@ class Grid
                 'widgettype'   => ['embodied_abiotic_depletion'],
                 'group'        => $group,
                 'label'        => __('Embodied abiotic depletion potential', 'carbon'),
+                'provider'     => Provider::class . '::getEmbodiedAbioticDepletion',
             ],
             'plugin_carbon_report_embodied_pe_impact' => [
                 'widgettype'   => ['embodied_primary_energy'],

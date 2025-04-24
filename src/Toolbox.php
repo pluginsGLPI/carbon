@@ -210,16 +210,31 @@ class Toolbox
             __('Zt', 'carbon'),
             __('Yt', 'carbon'),
         ];
-        $multiple = 1000;
+        $multiple = 990;
         foreach ($units as $human_readable_unit) {
             if ($weight < $multiple) {
                 break;
             }
-            $weight = $weight / $multiple;
+            $weight = $weight / 1000;
         }
 
+        $weight = self::dynamicRound($weight);
+
        //TRANS: %1$s is a number maybe float or string and %2$s the unit
-        return sprintf(__('%1$s&nbsp;%2$s'), round($weight, 2), $human_readable_unit);
+        return sprintf(__('%1$s&nbsp;%2$s'), $weight, $human_readable_unit);
+    }
+
+    public static function dynamicRound(float $number): float
+    {
+        if ($number < 10) {
+            $number = round($number, 2);
+        } else if ($number < 100) {
+            $number = round($number, 1);
+        } else {
+            $number = round($number, 0);
+        }
+
+        return $number;
     }
 
     /**
@@ -243,19 +258,21 @@ class Toolbox
             __('ZW', 'carbon'),
             __('YW', 'carbon'),
         ];
-        $multiple = 1000;
+        $multiple = 990;
         foreach ($units as $human_readable_unit) {
             if ($p < $multiple) {
                 break;
             }
-            $p = $p / $multiple;
+            $p = $p / 1000;
         }
 
+        $p = self::dynamicRound($p);
+
        //TRANS: %1$s is a number maybe float or string and %2$s the unit
-        return sprintf(__('%1$s&nbsp;%2$s'), round($p, 2), $human_readable_unit);
+        return sprintf(__('%1$s&nbsp;%2$s'), $p, $human_readable_unit);
     }
 
-        /**
+    /**
      * Format a power passing a power in grams
      *
      * @param float $p  Power in Watt
@@ -276,16 +293,18 @@ class Toolbox
             __('ZWh', 'carbon'),
             __('YWh', 'carbon'),
         ];
-        $multiple = 1000;
+        $multiple = 990;
         foreach ($units as $human_readable_unit) {
             if ($p < $multiple) {
                 break;
             }
-            $p = $p / $multiple;
+            $p = $p / 1000;
         }
 
+        $p = self::dynamicRound($p);
+
        //TRANS: %1$s is a number maybe float or string and %2$s the unit
-        return sprintf(__('%1$s&nbsp;%2$s'), round($p, 2), $human_readable_unit);
+        return sprintf(__('%1$s&nbsp;%2$s'), $p, $human_readable_unit);
     }
 
     /**
