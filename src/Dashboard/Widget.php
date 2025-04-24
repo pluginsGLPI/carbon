@@ -622,7 +622,7 @@ class Widget extends GlpiDashboardWidget
             'id' => $p['id'],
             'color' => $p['color'],
             'fg_color' => $fg_color,
-            'dark_fg_color' => $dark_fg_color;
+            'dark_fg_color' => $dark_fg_color,
             'fg_hover_color' => Toolbox::getFgColor($p['color'], 15),
             'fg_hover_border' => Toolbox::getFgColor($p['color'], 30),
             'data' => $data,
