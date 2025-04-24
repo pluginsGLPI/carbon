@@ -196,17 +196,17 @@ class Widget extends GlpiDashboardWidget
      *
      * @return string html
      */
-    public static function multipleLines(array $params = []): string
-    {
-        return self::getLinesGraph(
-            array_merge($params, [
-                'legend'   => true,
-                'multiple' => true,
-            ]),
-            $params['data']['labels'],
-            $params['data']['series']
-        );
-    }
+    // public static function multipleLines(array $params = []): string
+    // {
+    //     return self::getLinesGraph(
+    //         array_merge($params, [
+    //             'legend'   => true,
+    //             'multiple' => true,
+    //         ]),
+    //         $params['data']['labels'],
+    //         $params['data']['series']
+    //     );
+    // }
 
     /**
      * Display a widget with a lines chart
@@ -232,111 +232,111 @@ class Widget extends GlpiDashboardWidget
      *
      * @return string html of the widget
      */
-    private static function getLinesGraph(
-        array $params = [],
-        array $labels = [],
-        array $series = []
-    ): string {
-        $defaults = [
-            'data'         => [],
-            'label'        => '',
-            'alt'          => '',
-            'color'        => '',
-            'icon'         => '',
-            'area'         => false,
-            'legend'       => false,
-            'multiple'     => false,
-            'use_gradient' => false,
-            'point_labels' => false,
-            'limit'        => 99999,
-            'filters'      => [],
-            'rand'         => mt_rand(),
-        ];
+    // private static function getLinesGraph(
+    //     array $params = [],
+    //     array $labels = [],
+    //     array $series = []
+    // ): string {
+    //     $defaults = [
+    //         'data'         => [],
+    //         'label'        => '',
+    //         'alt'          => '',
+    //         'color'        => '',
+    //         'icon'         => '',
+    //         'area'         => false,
+    //         'legend'       => false,
+    //         'multiple'     => false,
+    //         'use_gradient' => false,
+    //         'point_labels' => false,
+    //         'limit'        => 99999,
+    //         'filters'      => [],
+    //         'rand'         => mt_rand(),
+    //     ];
 
-        $p = array_merge($defaults, $params);
-        $p['cache_key'] = $p['cache_key'] ?? $p['rand'];
+    //     $p = array_merge($defaults, $params);
+    //     $p['cache_key'] = $p['cache_key'] ?? $p['rand'];
 
-        $nb_series = count($series);
-        $nb_labels = min($p['limit'], count($labels));
-        array_splice($labels, 0, -$nb_labels);
-        if ($p['multiple']) {
-            foreach ($series as &$serie) {
-                if (isset($serie['data'])) {
-                    array_splice($serie['data'], 0, -$nb_labels);
-                }
-            }
-            unset($serie);
-        } else {
-            array_splice($series[0], 0, -$nb_labels);
-        }
+    //     $nb_series = count($series);
+    //     $nb_labels = min($p['limit'], count($labels));
+    //     array_splice($labels, 0, -$nb_labels);
+    //     if ($p['multiple']) {
+    //         foreach ($series as &$serie) {
+    //             if (isset($serie['data'])) {
+    //                 array_splice($serie['data'], 0, -$nb_labels);
+    //             }
+    //         }
+    //         unset($serie);
+    //     } else {
+    //         array_splice($series[0], 0, -$nb_labels);
+    //     }
 
-        // Chart title
-        $chart_title = $p['label'];
+    //     // Chart title
+    //     $chart_title = $p['label'];
 
-        // Line or area ?
-        $chart_type = $p['area'] ? 'area' : 'line';
+    //     // Line or area ?
+    //     $chart_type = $p['area'] ? 'area' : 'line';
 
-        // legend
-        $show_legend = $p['legend'] ? true : false;
+    //     // legend
+    //     $show_legend = $p['legend'] ? true : false;
 
-        // Series and y axis
-        $yaxis = [];
-        $stroke = [];
-        foreach ($series as $key => $serie) {
-            $yaxis[$key] = [
-                'title' => [
-                    'text' => $serie['name'],
-                ],
-                'opposite' => ($key % 2 > 0),
-            ];
-            $stroke['width'][] = (($serie['type'] ?? 'line') == 'line') ? 4 : 0;
-        }
+    //     // Series and y axis
+    //     $yaxis = [];
+    //     $stroke = [];
+    //     foreach ($series as $key => $serie) {
+    //         $yaxis[$key] = [
+    //             'title' => [
+    //                 'text' => $serie['name'],
+    //             ],
+    //             'opposite' => ($key % 2 > 0),
+    //         ];
+    //         $stroke['width'][] = (($serie['type'] ?? 'line') == 'line') ? 4 : 0;
+    //     }
 
-        $fg_color        = Toolbox::getFgColor($p['color']);
-        $line_color      = Toolbox::getFgColor($p['color'], 10);
-        $dark_bg_color   = Toolbox::getFgColor($p['color'], 80);
-        $dark_fg_color   = Toolbox::getFgColor($p['color'], 40);
-        $dark_line_color = Toolbox::getFgColor($p['color'], 90);
+    //     $fg_color        = Toolbox::getFgColor($p['color']);
+    //     $line_color      = Toolbox::getFgColor($p['color'], 10);
+    //     $dark_bg_color   = Toolbox::getFgColor($p['color'], 80);
+    //     $dark_fg_color   = Toolbox::getFgColor($p['color'], 40);
+    //     $dark_line_color = Toolbox::getFgColor($p['color'], 90);
 
-        $chart_id        = "chart-{$p['cache_key']}";
+    //     $chart_id        = "chart-{$p['cache_key']}";
 
-        $palette_style = "";
-        if (!$p['multiple'] || $p['use_gradient']) {
-            $palette_style = self::getCssGradientPalette($p['color'], $nb_series, "#{$chart_id}");
-        }
+    //     $palette_style = "";
+    //     if (!$p['multiple'] || $p['use_gradient']) {
+    //         $palette_style = self::getCssGradientPalette($p['color'], $nb_series, "#{$chart_id}");
+    //     }
 
-        $chart_id = 'chart_' . $p['cache_key'];
-        $class = "line";
-        $class .= $p['area'] ? " area" : "";
-        $class .= $p['multiple'] ? " multiple" : "";
-        $class .= count($p['filters']) > 0 ? " filter-" . implode(' filter-', $p['filters']) : "";
-        $categories  = json_encode($labels);
-        $series      = json_encode($series);
-        $yaxis       = json_encode($yaxis);
-        $stroke      = json_encode($stroke);
-        $class       = count($p['filters']) > 0 ? " filter-" . implode(' filter-', $p['filters']) : "";
+    //     $chart_id = 'chart_' . $p['cache_key'];
+    //     $class = "line";
+    //     $class .= $p['area'] ? " area" : "";
+    //     $class .= $p['multiple'] ? " multiple" : "";
+    //     $class .= count($p['filters']) > 0 ? " filter-" . implode(' filter-', $p['filters']) : "";
+    //     $categories  = json_encode($labels);
+    //     $series      = json_encode($series);
+    //     $yaxis       = json_encode($yaxis);
+    //     $stroke      = json_encode($stroke);
+    //     $class       = count($p['filters']) > 0 ? " filter-" . implode(' filter-', $p['filters']) : "";
 
-        return TemplateRenderer::getInstance()->render('@carbon/dashboard/multiple-lines.html.twig', [
-            'class'       => $class,
-            'chart_id'    => $chart_id,
-            'chart_type'  => $chart_type,
-            'chart_title' => $chart_title,
-            'show_legend' => $show_legend,
-            'series'      => $series,
-            'categories'  => $categories,
-            'yaxis'       => $yaxis,
-            'icon'        => $p['icon'],
-            'label_class' => $p['label'],
-            'color'       => $p['color'],
-            'palette_style' => $palette_style,
-            'fg_color'    => $fg_color,
-            'line_color'  => $line_color,
-            'dark_bg_color' => $dark_bg_color,
-            'dark_fg_color' => $dark_fg_color,
-            'dark_line_color' => $dark_line_color,
-            'stroke'          => $stroke,
-        ]);
-    }
+    //     return TemplateRenderer::getInstance()->render('@carbon/dashboard/multiple-lines.html.twig', [
+    //         'class'       => $class,
+    //         'chart_id'    => $chart_id,
+    //         'chart_type'  => $chart_type,
+    //         'chart_title' => $chart_title,
+    //         'show_legend' => $show_legend,
+    //         'series'      => $series,
+    //         'categories'  => $categories,
+    //         'yaxis'       => $yaxis,
+    //         'icon'        => $p['icon'],
+    //         'label_class' => $p['label'],
+    //         'color'       => $p['color'],
+    //         'palette_style' => $palette_style,
+    //         'fg_color'    => $fg_color,
+    //         'line_color'  => $line_color,
+    //         'dark_bg_color' => $dark_bg_color,
+    //         'dark_fg_color' => $dark_fg_color,
+    //         'dark_line_color' => $dark_line_color,
+    //         'stroke'          => $stroke,
+    //     ]);
+    // }
 
     // /**
     //  * Display a widget with a pie chart
