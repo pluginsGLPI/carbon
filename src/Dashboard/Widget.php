@@ -477,7 +477,7 @@ class Widget extends GlpiDashboardWidget
     {
         $default = [
             'url'     => '',
-            'label'   => '',
+            'label'   => __('Consumed energy and carbon emission per month', 'carbon'),
             'alt'     => '',
             'color'   => '#FFFFFF',
             'icon'    => '',
@@ -486,10 +486,19 @@ class Widget extends GlpiDashboardWidget
         ];
         $p = array_merge($default, $params);
 
+        $fg_color      = Toolbox::getFgColor($p['color']);
+        $dark_bg_color = Toolbox::getFgColor($p['color'], 80);
+        $dark_fg_color = Toolbox::getFgColor($p['color'], 40);
+        $fg_hover_color = Toolbox::getFgColor($p['color'], 15);
+        $fb_hover_border = Toolbox::getFgColor($p['color'], 30);
+
         $apex_data = [
             'chart' => [
                 'type' => 'line',
                 'height' => 350,
+            ],
+            'title' => [
+                'text' => $p['label'],
             ],
             'colors' => ['#BBDA50', '#A00'],
             // 'title' => [
@@ -556,9 +565,11 @@ class Widget extends GlpiDashboardWidget
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/graph-carbon-emission-per-month.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
-            'fg_color' => Toolbox::getFgColor($p['color']),
-            'fg_hover_color' => Toolbox::getFgColor($p['color'], 15),
-            'fg_hover_border' => Toolbox::getFgColor($p['color'], 30),
+            'fg_color' => $fg_color,
+            'dark_fg_color'   => $dark_fg_color,
+            'dark_bg_color'   => $dark_bg_color,
+            'fg_hover_color' => $fg_hover_color,
+            'fg_hover_border' => $fb_hover_border,
             'data' => $apex_data,
         ]);
     }
