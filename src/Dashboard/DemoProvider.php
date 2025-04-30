@@ -44,6 +44,20 @@ use Session;
 
 class DemoProvider
 {
+    public static function getEmbodiedGlobalWarming(array $params = []): array
+    {
+        $value = 616000000;
+        $value = Toolbox::getEnergy($value);
+
+        $params['icon'] = 'fa-solid fa-temperature-arrow-up';
+
+        return [
+            'number' => $value,
+            'label'  => $params['label'],
+            'icon'   => $params['icon'],
+        ];
+    }
+
     public static function getEmbodiedPrimaryEnergy(array $params = []): array
     {
         $value = 491000000;

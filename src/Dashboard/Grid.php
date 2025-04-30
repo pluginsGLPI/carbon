@@ -284,12 +284,12 @@ class Grid
             ],
 
             // Embodied impact
-            // 'plugin_carbon_report_embodied_global_warming' => [
-            //     'widgettype'   => ['embodied_global_warming'],
-            //     'group'        => $group,
-            //     'label'        => __('Embodied global warming potential', 'carbon'),
-            //     'provider'     => Provider::class . '::getEmbodiedGlobalWarming',
-            // ],
+            'plugin_carbon_report_embodied_global_warming' => [
+                'widgettype'   => ['embodied_global_warming'],
+                'group'        => $group,
+                'label'        => __('Embodied global warming potential', 'carbon'),
+                'provider'     => Provider::class . '::getEmbodiedGlobalWarming',
+            ],
             'plugin_carbon_report_embodied_abiotic_depletion' => [
                 'widgettype'   => ['embodied_abiotic_depletion'],
                 'group'        => $group,

@@ -99,6 +99,12 @@ class Widget extends GlpiDashboardWidget
             ],
 
             // Embodied impact
+            'embodied_global_warming' => [
+                'label'    => __('Embodied global warming potential', 'carbon'),
+                'function' => self::class . '::displayEmbodiedGlobalWarming',
+                'width'    => 6,
+                'height'   => 3,
+            ],
             'embodied_abiotic_depletion' => [
                 'label'    => __('Embodied abiotic depletion potential', 'carbon'),
                 'function' => self::class . '::displayEmbodiedAbioticDepletion',
@@ -763,6 +769,30 @@ class Widget extends GlpiDashboardWidget
                 $start_date->format($date_format),
                 $end_date->format($date_format),
             ],
+        ]);
+    }
+
+    public static function displayEmbodiedGlobalWarming(array $params = []): string
+    {
+        $default = [
+            'number'  => 0,
+            'url'     => '',
+            'label'   => '',
+            'alt'     => '',
+            'color'   => '',
+            'icon'    => '',
+            'id'      => 'plugin_carbon_embodied_global_warming_' . mt_rand(),
+            'filters' => [], // TODO: Not implemented yet (is this useful ?)
+        ];
+        $p = array_merge($default, $params);
+
+        return TemplateRenderer::getInstance()->render('@carbon/dashboard/embodied-global-warming.html.twig', [
+            'id' => $p['id'],
+            'color' => $p['color'],
+            'fg_color' => GlpiToolbox::getFgColor($p['color']),
+            'fg_hover_color' => GlpiToolbox::getFgColor($p['color'], 15),
+            'fg_hover_border' => GlpiToolbox::getFgColor($p['color'], 30),
+            'number' => $p['number'],
         ]);
     }
 

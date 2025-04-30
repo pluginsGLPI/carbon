@@ -128,5 +128,18 @@
             "point_labels": "0",
             "limit": "7"
         }
+    },
+    "plugin_carbon_report_embodied_global_warming": {
+        "x": 10,
+        "y": 0,
+        "width": 5,
+        "height": 3,
+        "card_options": {
+            "color": "#fafafa",
+            "widgettype": "embodied_global_warming",
+            "use_gradient": "0",
+            "point_labels": "0",
+            "limit": "7"
+        }
     }
 }
