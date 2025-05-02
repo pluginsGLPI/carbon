@@ -169,7 +169,7 @@ class ProviderTest extends DbTestCase
         // 1 having both power_consumption from computer type and computer model
         // 1 having both power_consumption from computer type only
         // 1 having both power_consumption from computer model only
-        $handled_count = Provider::getHandledComputersCount();
+        $handled_count = Provider::getHandledAssetCount(Computer::class, true);
         $this->assertEquals(3, $handled_count['number']);
     }
 
@@ -177,7 +177,7 @@ class ProviderTest extends DbTestCase
     {
         $total_count = $this->handledComputersCountFixture();
 
-        $unhandled_count = Provider::getUnhandledComputersCount();
+        $unhandled_count = Provider::getHandledAssetCount(Computer::class, false);
         $this->assertEquals($total_count - 3, $unhandled_count['number']);
     }
 
@@ -233,19 +233,21 @@ class ProviderTest extends DbTestCase
 
         $output = Provider::getSumUsageEmissionsPerModel();
         $expected = [
-            'series'   => [
-                8.0,
-                4.0,
+            'data' => [
+                'series'   => [
+                    8.0,
+                    4.0,
+                ],
+                'labels'   => [
+                    $computer_model_2->fields['name'] . " (1 Computer)",
+                    $computer_model_1->fields['name'] . " (1 Computer)",
+                ],
+                'url' => [
+                    Computer::getSearchURL() . '?criteria%5B0%5D%5Bfield%5D=40&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=' . $computer_model_2->getID() . '&reset=reset',
+                    Computer::getSearchURL() . '?criteria%5B0%5D%5Bfield%5D=40&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=' . $computer_model_1->getID() . '&reset=reset',
+                ],
+                'unit' => 'g CO₂eq',
             ],
-            'labels'   => [
-                $computer_model_2->fields['name'] . " (1 Computer)",
-                $computer_model_1->fields['name'] . " (1 Computer)",
-            ],
-            'url' => [
-                Computer::getSearchURL() . '?criteria%5B0%5D%5Bfield%5D=40&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=' . $computer_model_2->getID() . '&reset=reset',
-                Computer::getSearchURL() . '?criteria%5B0%5D%5Bfield%5D=40&criteria%5B0%5D%5Bsearchtype%5D=equals&criteria%5B0%5D%5Bvalue%5D=' . $computer_model_1->getID() . '&reset=reset',
-            ],
-            'unit' => 'g CO₂eq',
         ];
         $this->assertEquals($expected, $output);
     }
@@ -361,15 +363,15 @@ class ProviderTest extends DbTestCase
             $date_cursor->add(new DateInterval('P1D'));
         }
         $output = Provider::getUsageCarbonEmissionPerMonth([
-            'label' => '',
-            'icon' => '',
-        ], [
             [
                 'date' => ['<=', '2024-05-31'],
             ],
             [
                 'date' => ['>=', '2024-02-01'],
             ]
+        ], [
+            'label' => '',
+            'icon' => '',
         ]);
 
         // TODO: check all values

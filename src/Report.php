@@ -41,6 +41,7 @@ use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\Dashboard\Provider;
 use Glpi\Dashboard\Grid as DashboardGrid;
 use Html;
+use Plugin;
 
 class Report extends CommonDBTM
 {
@@ -91,8 +92,25 @@ class Report extends CommonDBTM
         $dashboard = new DashboardGrid('plugin_carbon_board', 24, 22, 'mini_core');
         $dashboard->show(true);
         $dashboard_html = ob_get_clean();
+
+        $messages = [];
+        if (Config::isDemoMode()) {
+            $exit_demo_url = Plugin::getWebDir('carbon') . '/front/report.php?disable_demo=1';
+
+            // TRANS: %s are replaced with an HTML anchor : <a> and </a>
+            $message = sprintf(
+                __('Demo mode enabled. The data below are not representative of the assets in the database. %sDisable demo mode%s', 'carbon'),
+                '<a href="' . $exit_demo_url . '">',
+                '</a>'
+            );
+            $messages = [
+                'infos' => [$message],
+            ];
+        }
+
         TemplateRenderer::getInstance()->display('@carbon/quick-report.html.twig', [
             'dashboard' => $dashboard_html,
+            'messages'  => $messages,
         ]);
     }
 
@@ -100,8 +118,8 @@ class Report extends CommonDBTM
     {
         if (!isset($params['args']['apply_filters']['dates'][0]) || !isset($params['args']['apply_filters']['dates'][1])) {
             list($start_date, $end_date) = (new Toolbox())->yearToLastMonth(new DateTimeImmutable('now'));
-            $params['args']['apply_filters']['dates'][0] = $start_date->format('Y-m-d\TH:i:s.v\Z');
-            $params['args']['apply_filters']['dates'][1] = $end_date->format('Y-m-d\TH:i:s.v\Z');
+            $params['apply_filters']['dates'][0] = $start_date->format('Y-m-d\TH:i:s.v\Z');
+            $params['apply_filters']['dates'][1] = $end_date->format('Y-m-d\TH:i:s.v\Z');
         } else {
             $start_date = DateTime::createFromFormat('Y-m-d\TH:i:s.v\Z', $params['args']['apply_filters'][0]);
             $end_date   = DateTime::createFromFormat('Y-m-d\TH:i:s.v\Z', $params['args']['apply_filters'][1]);

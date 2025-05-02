@@ -36,6 +36,7 @@ namespace GlpiPlugin\Carbon\Dashboard;
 use Computer;
 use ComputerModel;
 use ComputerType as GlpiComputerType;
+use DateInterval;
 use DateTime;
 use DateTimeImmutable;
 use DBmysql;
@@ -86,7 +87,7 @@ class Provider
 
         $request = array_merge_recursive(
             $request,
-            self::getFiltersCriteria($table, $params['args']['apply_filters'] ?? [])
+            self::getFiltersCriteria($table, $params['apply_filters'] ?? [])
         );
 
         $result = $DB->request($request);
@@ -206,7 +207,9 @@ class Provider
 
         $data['unit'] = $emissions['unit'];
 
-        return $data;
+        return [
+            'data' => $data
+        ];
     }
 
     public static function getSumEmissionsPerType(array $where = [])
@@ -325,113 +328,6 @@ class Provider
         return $data;
     }
 
-    /**
-     * Counts the computers which are missing data to compute their
-     * environmental impact
-     *
-     * @param array $params
-     * @return array : count of computers or null if an error occurred
-     */
-    public static function getUnhandledComputersCount(array $params = []): array
-    {
-        $default_params = [
-            'label' => __("plugin carbon - unhandled computers", 'carbon'),
-            'icon'  => "fas fa-computer",
-        ];
-        $params = array_merge($default_params, $params);
-
-        return self::getHandledComputersCount($params, false);
-    }
-
-    /**
-     * Count the computers having all required data to compute carbon intensity
-     *
-     * @param array $params
-     * @param bool  $handled : true if we want to count handled computers, false to count unhandled computers
-     * @return array
-     */
-    public static function getHandledComputersCount(array $params = [], bool $handled = true): array
-    {
-        $default_params = [
-            'icon'  => "fas fa-computer",
-        ];
-        $params = array_merge($default_params, $params);
-
-        return self::getHandledAssetCount(Computer::class, $params, $handled);
-    }
-
-    /**
-     * Counts the monitors which are missing data to compute their
-     * environmental impact
-     *
-     * @param array $params
-     * @return array : count of monitors or null if an error occurred
-     */
-    public static function getUnhandledMonitorsCount(array $params = []): array
-    {
-        $default_params = [
-            'label' => __("plugin carbon - unhandled monitor", 'carbon'),
-            'icon'  => "fas fa-desktop",
-        ];
-        $params = array_merge($default_params, $params);
-
-        return self::getHandledMonitorsCount($params, false);
-    }
-
-    /**
-     * Count the monitors having all required data to compute carbon intensity
-     *
-     * @param array $params
-     * @param bool  $handled : true if we want to count handled monitors, false to count unhandled monitors
-     * @return array
-     */
-    public static function getHandledMonitorsCount(array $params = [], bool $handled = true): array
-    {
-        $default_params = [
-            'label' => __("plugin carbon - handled monitors", 'carbon'),
-            'icon'  => "fas fa-desktop",
-        ];
-        $params = array_merge($default_params, $params);
-
-        return self::getHandledAssetCount(Monitor::class, $params, $handled);
-    }
-
-    /**
-     * Counts the network equipments which are missing data to compute their
-     * environmental impact
-     *
-     * @param array $params
-     * @return array : count of network equipments or null if an error occurred
-     */
-    public static function getUnhandledNetworkEquipmentsCount(array $params = []): array
-    {
-        $default_params = [
-            'label' => __("plugin carbon - unhandled network equipments", 'carbon'),
-            'icon'  => "fas fa-network-wired",
-        ];
-        $params = array_merge($default_params, $params);
-
-        return self::getHandledNetworkEquipmentsCount($params, false);
-    }
-
-    /**
-     * Count the network equipments having all required data to compute carbon intensity
-     *
-     * @param array $params
-     * @param bool  $handled : true if we want to count handled network equipments, false to count unhandled monitors
-     * @return array
-     */
-    public static function getHandledNetworkEquipmentsCount(array $params = [], bool $handled = true): array
-    {
-        $default_params = [
-            'label' => __("plugin carbon - handled network equipments", 'carbon'),
-            'icon'  => "fas fa-network-wired",
-        ];
-        $params = array_merge($default_params, $params);
-
-        return self::getHandledAssetCount(NetworkEquipment::class, $params, $handled);
-    }
-
     public static function getHandledAssetsRatio(array $params = [])
     {
         $default_params = [
@@ -445,8 +341,8 @@ class Provider
             $itemtype_name = $itemtype::getTypeName(Session::getPluralNumber());
             $itemtype_name = strtolower($itemtype_name);
 
-            $handled = self::getHandledAssetCount($itemtype, $params);
-            $unhandled = self::getHandledAssetCount($itemtype, $params, false);
+            $handled = self::getHandledAssetCount($itemtype, true, $params);
+            $unhandled = self::getHandledAssetCount($itemtype, false, $params);
 
             $total = $handled['number'] + $unhandled['number'];
             if ($total === 0) {
@@ -468,7 +364,16 @@ class Provider
         ];
     }
 
-    public static function getHandledAssetsCounts(array $params = [])
+    /**
+     * Get count of handled and unhandled assets
+     *
+     * Handled assets are assets with enough data to calculate usage carbon emission
+     *
+     * @param array|string $itemtypes types of asets to count
+     * @param array $params
+     * @return array
+     */
+    public static function getHandledAssetsCounts($itemtypes, array $params = []): array
     {
         $default_params = [
             'label' => __('plugin carbon - handled assets ratio', 'carbon'),
@@ -476,16 +381,22 @@ class Provider
         ];
         $params = array_merge($default_params, $params);
 
+        if (count($params['args']['itemtypes'] ?? []) === 0) {
+            $itemtypes = PLUGIN_CARBON_TYPES;
+        } else {
+            $itemtypes = array_intersect(PLUGIN_CARBON_TYPES, $params['args']['itemtypes']);
+        }
+
         $data = [
             'labels' => [],
             'series' => []
         ];
-        foreach (PLUGIN_CARBON_TYPES as $itemtype) {
+        foreach ($itemtypes as $itemtype) {
             $itemtype_name = $itemtype::getTypeName(Session::getPluralNumber());
             $itemtype_name = strtolower($itemtype_name);
 
-            $handled = self::getHandledAssetCount($itemtype, $params);
-            $unhandled = self::getHandledAssetCount($itemtype, $params, false);
+            $handled = self::getHandledAssetCount($itemtype, true, $params);
+            $unhandled = self::getHandledAssetCount($itemtype, false, $params);
 
             $data['labels'][] = $itemtype_name;
             $data['series'][0]['name'] = __('Handled', 'carbon');
@@ -508,20 +419,23 @@ class Provider
     }
 
     /**
-     * Count the computers having all required data to compute carbon intensity
+     * Count the assets having all required data to compute carbon intensity
      *
      * @param string $itemtype the itemtype to count
+     * @param bool   $handled : true if we want to count handled assets, false to count unhandled assets
      * @param array  $params
-     * @param bool   $handled : true if we want to count handled computers, false to count unhandled computers
      * @return array count of items
      */
-    protected static function getHandledAssetCount(string $itemtype, array $params = [], bool $handled = true): array
+    public static function getHandledAssetCount(string $itemtype, bool $handled, array $params = []): array
     {
         $itemtype_name = $itemtype::getTypeName(Session::getPluralNumber());
         $itemtype_name = strtolower($itemtype_name);
+        $label = $handled ?
+            __("plugin carbon - handled %s", 'carbon')
+            : __("plugin carbon - unhandled %s", 'carbon');
         $default_params = [
-            'label' => sprintf(__("plugin carbon - handled %s", 'carbon'), $itemtype_name),
-            'icon'  => "",
+            'label' => sprintf($label, $itemtype_name),
+            'icon'  => '',
         ];
         $params = array_merge($default_params, $params);
 
@@ -627,7 +541,7 @@ class Provider
     }
 
     /**
-     * Get total usage CO2 emissions for last month (all assets)
+     * Get usage CO2 emissions
      *
      * @param array $params
      * @return array
@@ -635,7 +549,7 @@ class Provider
     public static function getUsageCarbonEmission(array $params = []): array
     {
         $default_params = [
-            'label' => __('plugin carbon - Total carbon emission', 'carbon'),
+            'label' => __('plugin carbon - Usage carbon emission', 'carbon'),
             'icon'  => 'fa-solid fa-temperature-arrow-up',
         ];
         $params = array_merge($default_params, $params);
@@ -655,6 +569,24 @@ class Provider
             'label'  => $params['label'],
             'icon'   => $params['icon'],
         ];
+    }
+
+    /**
+     * Get the usage carbon emission of the 12 last elapsed months
+     *
+     * @param array $params
+     * @return array
+     */
+    public static function getUsageCarbonEmissionYearToDate(array $params = []): array
+    {
+        list($start_date, $end_date) = (new Toolbox())->yearToLastMonth(new DateTimeImmutable('now'));
+        $params['apply_filters'] = [
+            'dates' => [
+                $start_date->format('Y-m-d\TH:i:s.v\Z'),
+                $end_date->format('Y-m-d\TH:i:s.v\Z'),
+            ]
+        ];
+        return self::getUsageCarbonEmission($params);
     }
 
     public static function getCarbonIntensity(array $params): array
@@ -828,13 +760,12 @@ class Provider
             $value = Toolbox::getEnergy($value / 3600);
         }
 
-        $params['label'] = __('Total embodied primary energy', 'carbon');
         $params['icon'] = 'fa-solid fa-fire-flame-simple';
 
         return [
-            'number'     => $value,
-            'label'      => $params['label'],
-            'icon'       => $params['icon'],
+            'number' => $value,
+            'label'  => $params['label'],
+            'icon'   => $params['icon'],
         ];
     }
 
@@ -882,7 +813,7 @@ class Provider
     public static function getUsageAbioticDepletion(array $params = [], array $crit = []): array
     {
         $default_params = [
-            'label' => __('Total usage abiotic depletion potential', 'carbon'),
+            'label' => __('Usage abiotic depletion potential', 'carbon'),
             'icon'  => 'fa-solid fa-temperature-arrow-up',
         ];
         $params = array_merge($default_params, $params);
@@ -976,24 +907,30 @@ class Provider
     }
 
     /**
-     * Get carbon emission per month for all assets in the current entity
-     * @param array $params
+     * Get carbon emission per month in the current entity
      * @param array $crit   Plugin specific criteria, used to show data for a single item
+     * @param array $params
      *
      * @return array
      */
-    public static function getUsageCarbonEmissionPerMonth(array $params = [], array $crit = []): array
+    public static function getUsageCarbonEmissionPerMonth(array $crit = [], array $params = []): array
     {
         /** @var DBmysql $DB */
         global $DB;
 
         $default_params = [
+            'label'   => __('Consumed energy and carbon emission per month', 'carbon'),
             'icon'  => 'fas fa-computer',
-            'label' => '',
             // 'color' => '#ea9999',
             'apply_filters' => [],
         ];
         $params = array_merge($default_params, $params);
+        if (!isset($crit['itemtype'])) {
+            $crit['itemtype'] = PLUGIN_CARBON_TYPES;
+        } else if (is_string($crit['itemtype'])) {
+            $crit['itemtype'] = [$crit['itemtype']];
+        }
+        $crit['itemtype'] = array_intersect($crit['itemtype'], PLUGIN_CARBON_TYPES);
 
         if (!isset($params['args']['apply_filters']['dates'][0]) || !isset($params['args']['apply_filters']['dates'][1])) {
             list($start_date, $end_date) = (new Toolbox())->yearToLastMonth(new DateTimeImmutable('now'));
@@ -1090,7 +1027,6 @@ class Provider
         $data['series'][0]['name'] =  __('Carbon emission', 'carbon') . ' (' . $scaled['unit'] . __('CO₂eq', 'carbon') . ')';
         $data['series'][0]['data'] = $scaled['serie'];
         $data['series'][0]['unit'] = $scaled['unit'] . __('CO₂eq', 'carbon'); // Not supported by apex charts
-        $data['series'][0]['type'] = 'bar';
 
         // Scale energy consumption
         $units = [
@@ -1107,7 +1043,6 @@ class Provider
         $data['series'][1]['name'] = __('Consumed energy', 'carbon') . ' (' . $scaled['unit'] . ')';
         $data['series'][1]['data'] = $scaled['serie'];
         $data['series'][1]['unit'] = $scaled['unit']; // Not supported by apex charts
-        $data['series'][1]['type'] = 'line';
 
         // $data = self::getCarbonEmissionPerMonth($params['args'], $crit);
 
@@ -1116,6 +1051,24 @@ class Provider
             $end_date->format($date_format),
         ];
 
-        return $data;
+        return [
+            'data'  => $data,
+            'label' => $params['label'],
+            'icon'  => $params['icon'],
+        ];
+    }
+
+    public static function getUsageCarbonEmissionlastTwoMonths(array $crit = [], array $params = [])
+    {
+        $end_date = new DateTime();
+        $end_date->setTime(0, 0, 0, 0);
+        $end_date->setDate((int) $end_date->format('Y'), (int) $end_date->format('m'), 1); // First day of current month
+        $start_date = clone $end_date;
+        $start_date = $start_date->sub(new DateInterval("P2M")); // 2 months back from $end_date
+
+        $params['args']['apply_filters']['dates'][0] = $start_date->format('Y-m-d\TH:i:s.v\Z');
+        $params['args']['apply_filters']['dates'][1] = $end_date->format('Y-m-d\TH:i:s.v\Z');
+
+        return self::getUsageCarbonEmissionPerMonth($crit, $params);
     }
 }
