@@ -47,7 +47,7 @@ class DemoProvider
     public static function getEmbodiedGlobalWarming(array $params = []): array
     {
         $value = 616000000;
-        $value = Toolbox::getEnergy($value);
+        $value = Toolbox::getWeight($value) . __('CO₂eq', 'carbon');;
 
         $params['icon'] = 'fa-solid fa-temperature-arrow-up';
 
