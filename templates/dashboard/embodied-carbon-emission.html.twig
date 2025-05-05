@@ -54,11 +54,11 @@
 <div class="card" id="{{ id }}">
     <div class="card-body" style="height: 100%">
         <div class="row align-items-center">
-            <div class="col-auto" id="carbonEmbodiedGlobalWarmingIconElement">
-                <span><img src="{{ get_plugin_web_dir('carbon') }}/dist/images/carbon_emission_icon_darkgreen.png"></img></span>
+            <div class="col-auto" id="carbonEmbodiedCarbonEmissionIconElement">
+                <span><img class="icon-size" src="{{ get_plugin_web_dir('carbon') }}/dist/images/icon-fossil-primary-energy.png"></img></span>
             </div>
             <div class="col">
-                <div class="subheader">{{ __('Embodied global warming potential', 'carbon') }}</div>
+                <div class="subheader">{{ __('Embodied carbon emission', 'carbon') }}</div>
             </div>
             <div class="my-3 number text-center">{{ number|raw }}</div>
             <div class="info-tooltip">

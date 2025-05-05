@@ -210,8 +210,8 @@ class Widget extends GlpiDashboardWidget
                 return "$base_url/abiotic_depletion_impact";
             case 'primary_energy_impact':
                 return "$base_url/primary_energy_impact";
-            case 'global_warming_impact':
-                return "$base_url/global_warming_impact";
+            case 'carbon_emission':
+                return "$base_url/carbon_emission";
         }
 
         return '';
@@ -832,15 +832,15 @@ class Widget extends GlpiDashboardWidget
         ];
         $p = array_merge($default, $params);
 
-        $url = self::getInfoLink('global_warming_impact');
-        $tooltip = __('Evaluates the embodied global warming potential in CO₂ equivalent. %s More information %s', 'carbon');
+        $url = self::getInfoLink('carbon_emission');
+        $tooltip = __('Evaluates the embodied carbon emission in CO₂ equivalent. %s More information %s', 'carbon');
         $tooltip = sprintf($tooltip, '<br /><a target="_blank" href="' . $url . '">', '</a>');
         $tooltip_html = Html::showToolTip($tooltip, [
             'display' => false,
             'applyto' => $p['id'] . '_tip',
         ]);
 
-        return TemplateRenderer::getInstance()->render('@carbon/dashboard/embodied-global-warming.html.twig', [
+        return TemplateRenderer::getInstance()->render('@carbon/dashboard/embodied-carbon-emission.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
             'fg_color' => GlpiToolbox::getFgColor($p['color']),

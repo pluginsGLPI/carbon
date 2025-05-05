@@ -44,6 +44,7 @@ require('../pics/illustration-footer.png');
 require('../pics/device_icon_black.png');
 require('../pics/icon-co2-calendar-green.png');
 require('../pics/icon-co2-calendar-yellow.png');
+require('../pics/icon-fossil-primary-energy.png');
 
 // Import css :
 require('../css/main.css');
