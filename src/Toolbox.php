@@ -589,7 +589,7 @@ class Toolbox
     }
 
     /**
-     * tune a foreground color luminosity depending on a background color
+     * tune a foreground color luminosity depending on a background luminosity
      *
      * @param string $bg_color
      * @param string $fg_color
@@ -597,7 +597,8 @@ class Toolbox
      * @param integer $max_steps
      * @return string
      */
-    public static function getAdaptedFgColor(string $bg_color, string $fg_color, $target_ratio = 4.5, $max_steps = 100): string {
+    public static function getAdaptedFgColor(string $bg_color, string $fg_color, $target_ratio = 4.5, $max_steps = 100): string
+    {
         $hsl = Color::hexToHsl($fg_color);
         $bg_color = new Color($bg_color);
         $fg_luminance = self::relative_luminance(new Color($fg_color));
@@ -617,7 +618,8 @@ class Toolbox
         return '#' . Color::hslToHex($hsl);
     }
 
-    protected static function relative_luminance(Color $color): float {
+    protected static function relative_luminance(Color $color): float
+    {
         $rgb = array_map(function ($rgb_component) {
             $rgb_component = $rgb_component / 255.0;
             return ($rgb_component <= 0.03928) ? ($rgb_component / 12.92) : pow(($rgb_component + 0.055) / 1.055, 2.4);
@@ -630,6 +632,5 @@ class Toolbox
         $l1 = self::relative_luminance($color_1);
         $l2 = self::relative_luminance($color_2);
         return ($l1 > $l2) ? ($l1 + 0.05) / ($l2 + 0.05) : ($l2 + 0.05) / ($l1 + 0.05);
-
     }
 }
