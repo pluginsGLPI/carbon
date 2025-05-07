@@ -209,6 +209,18 @@ class DemoProvider
         $params['args']['apply_filters']['dates'][0] = $start_date->format('Y-m-d\TH:i:s.v\Z');
         $params['args']['apply_filters']['dates'][1] = $end_date->format('Y-m-d\TH:i:s.v\Z');
 
+        // Prepare date format
+        $date_format = 'Y F';
+        switch ($_SESSION['glpidate_format'] ?? 0) {
+            case 0:
+                $date_format = 'Y-m';
+                break;
+            case 1:
+            case 2:
+                $date_format = 'm-Y';
+                break;
+        }
+
         $data = [
             'series' => [
                 0 => [
@@ -248,6 +260,10 @@ class DemoProvider
                 '2025-02',
                 '2025-03',
             ],
+            'date_interval' => [
+                $start_date->format($date_format),
+                $end_date->format($date_format),
+            ]
         ];
 
         return [
