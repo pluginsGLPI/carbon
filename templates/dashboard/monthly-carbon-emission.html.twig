@@ -39,6 +39,20 @@
         border: 1px solid {{ fg_hover_border }};
     }
 
+    #{{ id }} .label {
+        text-transform: uppercase;
+        color: {{ label_color }};
+        font-weight: bold;
+    }
+
+    #{{ id }} .variation-up {
+        color: {{ increase_color }}
+    }
+
+    #{{ id }} .variation-dn {
+        color: {{ decrease_color }}
+    }
+
     .theme-dark #{{ id }} {
         background-color: {{ fg_color }};
         color: {{ color }};
@@ -49,6 +63,18 @@
         color: {{ fg_color }};
         border: 1px solid {{ fg_hover_border }};
     }
+
+    .theme-dark #{{ id }} .label {
+        color: {{ dark_label_color }};
+    }
+
+    .theme-dark #{{ id }} .variation-up {
+        color: {{ dark_increase_color }}
+    }
+
+    .theme-dark #{{ id }} .variation-dn {
+        color: {{ dark_decrease_color }}
+    }
 </style>
 <div class="card" id="{{ id }}">
     <div class="card-body" style="height: 100%">
@@ -57,11 +83,15 @@
                 <span><img src="{{ get_plugin_web_dir('carbon') }}/dist/images/icon-co2-calendar-green.png" class="icon-size" /></span>
             </div>
             <div class="col">
-                <div class="subheader">{{ __('Monthly usage carbon emission', 'carbon') }}</div>
-                <div class="subheader">{{ last_month }}</div>
+                <div class="label">{{ __('Monthly usage carbon emission', 'carbon') }}</div>
+                <div class="label">{{ last_month }}</div>
                 <div class="my-3 number">{{ last_month_emissions }}</div>
-                <div class="subheader">{{ __('Compared to %s', 'carbon')|format(penultimate_month) }}</div>
-                <p class="m-0 percent-color" id="monthlyComparison">{{ variation }}</p>
+                <div class="label">{{ __('Compared to %s', 'carbon')|format(penultimate_month) }}</div>
+                {% if variation > 0 %}
+                    <p class="m-0 variation-up" id="monthlyComparison">↑ {{ percentage_change }}%</p>
+                {% else %}
+                    <p class="m-0 variation-dn" id="monthlyComparison">↓ {{ percentage_change }}%</p>
+                {% endif %}
             </div>
             <div class="info-tooltip">
                 <span id="{{ id }}_tip">

@@ -716,17 +716,11 @@ class Widget extends GlpiDashboardWidget
             $last_month_emissions = (float) array_pop($last_month['series'][0]['data'])['y'];
         }
         $penultimate_month_emissions = 0;
-        $comparison_text = '= 0.00 %';
         $percentage_change = 0;
         if (count($last_month['series'][0]['data']) > 0) {
             $penultimate_month_emissions = (float) array_pop($last_month['series'][0]['data'])['y'];
             if ($last_month_emissions != 0) {
                 $percentage_change = (($last_month_emissions - $penultimate_month_emissions) / $last_month_emissions) * 100;
-            }
-            if ($percentage_change > 0) {
-                $comparison_text = '↑ ' . Html::formatNumber(abs($percentage_change)) . ' %';
-            } else if ($percentage_change < 0) {
-                $comparison_text = '↓ ' . Html::formatNumber(abs($percentage_change)) . ' %';
             }
         }
         $last_month_emissions = sprintf(
@@ -748,17 +742,28 @@ class Widget extends GlpiDashboardWidget
             'applyto' => $p['id'] . '_tip',
         ]);
 
+        $label_color = '#626976';
+        $fg_color = GlpiToolbox::getFgColor($p['color']);
+        $decrease_color = '#00FF00';
+        $increase_color = '#FF0000';
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/monthly-carbon-emission.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
-            'fg_color' => GlpiToolbox::getFgColor($p['color']),
+            'fg_color' => $fg_color,
             'fg_hover_color' => GlpiToolbox::getFgColor($p['color'], 15),
             'fg_hover_border' => GlpiToolbox::getFgColor($p['color'], 30),
+            'label_color'     => Toolbox::getAdaptedFgColor($p['color'], $label_color, 4),
+            'dark_label_color' => Toolbox::getAdaptedFgColor($fg_color, $label_color, 4),
+            'increase_color'   => Toolbox::getAdaptedFgColor($p['color'], $increase_color),
+            'decrease_color'   => Toolbox::getAdaptedFgColor($p['color'], $decrease_color),
+            'dark_increase_color'   => Toolbox::getAdaptedFgColor($fg_color, $increase_color),
+            'dark_decrease_color'   => Toolbox::getAdaptedFgColor($fg_color, $decrease_color),
             'last_month_emissions' => $last_month_emissions,
             'last_month' => $last_month['date_interval'][1] ?? '',
             'penultimate_month_emissions' => $penultimate_month_emissions,
             'penultimate_month' => $last_month['date_interval'][0] ?? '',
-            'variation' => $comparison_text,
+            'percentage_change' => Html::formatNumber(abs($percentage_change)),
+            'variation' => $percentage_change,
             'tooltip_html' => $tooltip_html,
         ]);
     }
@@ -803,12 +808,16 @@ class Widget extends GlpiDashboardWidget
             'applyto' => $p['id'] . '_tip',
         ]);
 
+        $label_color = '#626976';
+        $fg_color = GlpiToolbox::getFgColor($p['color']);
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/usage-carbon-emission-last-year.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
-            'fg_color' => GlpiToolbox::getFgColor($p['color']),
+            'fg_color' => $fg_color,
             'fg_hover_color' => GlpiToolbox::getFgColor($p['color'], 15),
             'fg_hover_border' => GlpiToolbox::getFgColor($p['color'], 30),
+            'label_color'     => Toolbox::getAdaptedFgColor($p['color'], $label_color, 4),
+            'dark_label_color' => Toolbox::getAdaptedFgColor($fg_color, $label_color, 4),
             'number' => $p['number'],
             'date_interval' => [
                 $start_date->format($date_format),
@@ -827,7 +836,7 @@ class Widget extends GlpiDashboardWidget
             'alt'     => '',
             'color'   => '',
             'icon'    => '',
-            'id'      => 'plugin_carbon_embodied_global_warming_' . mt_rand(),
+            'id'      => 'plugin_carbon_embodied_carbon_emission_' . mt_rand(),
             'filters' => [], // TODO: Not implemented yet (is this useful ?)
         ];
         $p = array_merge($default, $params);
@@ -840,12 +849,16 @@ class Widget extends GlpiDashboardWidget
             'applyto' => $p['id'] . '_tip',
         ]);
 
+        $label_color = '#626976';
+        $fg_color = GlpiToolbox::getFgColor($p['color']);
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/embodied-carbon-emission.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
-            'fg_color' => GlpiToolbox::getFgColor($p['color']),
-            'fg_hover_color' => GlpiToolbox::getFgColor($p['color'], 15),
+            'fg_color' => $fg_color,
+            'fg_hover_color'  => GlpiToolbox::getFgColor($p['color'], 15),
             'fg_hover_border' => GlpiToolbox::getFgColor($p['color'], 30),
+            'label_color'     => Toolbox::getAdaptedFgColor($p['color'], $label_color, 4),
+            'dark_label_color' => Toolbox::getAdaptedFgColor($fg_color, $label_color, 4),
             'number' => $p['number'],
             'tooltip_html' => $tooltip_html,
         ]);
@@ -872,12 +885,16 @@ class Widget extends GlpiDashboardWidget
             'applyto' => $p['id'] . '_tip',
         ]);
 
+        $label_color = '#626976';
+        $fg_color = GlpiToolbox::getFgColor($p['color']);
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/embodied-abiotic-depletion.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
-            'fg_color' => GlpiToolbox::getFgColor($p['color']),
+            'fg_color' => $fg_color,
             'fg_hover_color' => GlpiToolbox::getFgColor($p['color'], 15),
             'fg_hover_border' => GlpiToolbox::getFgColor($p['color'], 30),
+            'label_color'     => Toolbox::getAdaptedFgColor($p['color'], $label_color, 4),
+            'dark_label_color' => Toolbox::getAdaptedFgColor($fg_color, $label_color, 4),
             'number' => $p['number'],
             'tooltip_html' => $tooltip_html,
         ]);
@@ -905,13 +922,16 @@ class Widget extends GlpiDashboardWidget
             'applyto' => $p['id'] . '_tip',
         ]);
 
-        // $p['adp'] = Provider::getUsageAbioticDepletion();
+        $label_color = '#626976';
+        $fg_color = GlpiToolbox::getFgColor($p['color']);
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/usage-abiotic-depletion.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
-            'fg_color' => GlpiToolbox::getFgColor($p['color']),
+            'fg_color' => $fg_color,
             'fg_hover_color' => GlpiToolbox::getFgColor($p['color'], 15),
             'fg_hover_border' => GlpiToolbox::getFgColor($p['color'], 30),
+            'label_color'     => Toolbox::getAdaptedFgColor($p['color'], $label_color, 4),
+            'dark_label_color' => Toolbox::getAdaptedFgColor($fg_color, $label_color, 4),
             'number' => $p['number'],
             'tooltip_html' => $tooltip_html,
         ]);
@@ -1071,19 +1091,23 @@ class Widget extends GlpiDashboardWidget
         $p = array_merge($default, $params);
 
         $url = self::getInfoLink('primary_energy_impact');
-        $tooltip = __('Evaluates the primary energy consumed. %s More information %s', 'carbon');
+        $tooltip = __('Evaluates the primary energy consumed to build the hardware. %s More information %s', 'carbon');
         $tooltip = sprintf($tooltip, '<br /><a target="_blank" href="' . $url . '">', '</a>');
         $tooltip_html = Html::showToolTip($tooltip, [
             'display' => false,
             'applyto' => $p['id'] . '_tip',
         ]);
 
+        $label_color = '#626976';
+        $fg_color = GlpiToolbox::getFgColor($p['color']);
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/embodied-primary-energy.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
-            'fg_color' => GlpiToolbox::getFgColor($p['color']),
-            'fg_hover_color' => GlpiToolbox::getFgColor($p['color'], 15),
-            'fg_hover_border' => GlpiToolbox::getFgColor($p['color'], 30),
+            'fg_color' => $fg_color,
+            'fg_hover_color'   => GlpiToolbox::getFgColor($p['color'], 15),
+            'fg_hover_border'  => GlpiToolbox::getFgColor($p['color'], 30),
+            'label_color'      => Toolbox::getAdaptedFgColor($p['color'], $label_color, 4),
+            'dark_label_color' => Toolbox::getAdaptedFgColor($fg_color, $label_color, 4),
             'number' => $p['number'],
             'tooltip_html' => $tooltip_html,
         ]);

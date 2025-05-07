@@ -40,6 +40,12 @@
         border: 1px solid {{ fg_hover_border }};
     }
 
+    #{{ id }} .label {
+        text-transform: uppercase;
+        color: {{ label_color }};
+        font-weight: bold;
+    }
+
     .theme-dark #{{ id }} {
         background-color: {{ fg_color }};
         color: {{ color }};
@@ -50,6 +56,10 @@
         color: {{ fg_color }};
         border: 1px solid {{ fg_hover_border }};
     }
+
+    .theme-dark #{{ id }} .label {
+        color: {{ dark_label_color }};
+    }
 </style>
 <div class="card" id="{{ id }}">
     <div class="card-body" style="height: 100%">
@@ -58,7 +68,7 @@
                 <span><img src="{{ get_plugin_web_dir('carbon') }}/dist/images/carbon_emission_icon_darkgreen.png"></img></span>
             </div>
             <div class="col">
-                <div class="subheader">{{ __('Usage abiotic depletion potential', 'carbon') }}</div>
+                <div class="label">{{ __('Usage abiotic depletion potential', 'carbon') }}</div>
             </div>
             <div class="my-3 number text-center">{{ number|raw }}</div>
             <div class="info-tooltip">

@@ -69,10 +69,6 @@
     min-height: 185px !important;
 }
 
-.percent-color {
-    color: #BBDA50;
-}
-
 .info-tooltip {
     position: absolute;
     bottom: 5px;
