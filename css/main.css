@@ -52,7 +52,7 @@
 
 }
 
-.icon-size {
+.icon-size, .icon-size svg {
     /* width: 63px; */
     height: 63px;
 }

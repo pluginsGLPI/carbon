@@ -46,6 +46,10 @@
         font-weight: bold;
     }
 
+    #{{ id }} .icon .cls-1 {
+        fill: {{ icon_color }} !important;
+    }
+
     .theme-dark #{{ id }} {
         background-color: {{ fg_color }};
         color: {{ color }};
@@ -60,12 +64,18 @@
     .theme-dark #{{ id }} .label {
         color: {{ dark_label_color }};
     }
+
+    .theme-dark #{{ id }} .icon .cls-1 {
+        fill: {{ dark_icon_color }} !important;
+    }
 </style>
 <div class="card" id="{{ id }}">
     <div class="card-body" style="height: 100%">
         <div class="row align-items-center">
             <div class="col-auto" id="carbonUsageAbioticDepletionIconElement">
-                <span><img src="{{ get_plugin_web_dir('carbon') }}/dist/images/carbon_emission_icon_darkgreen.png"></img></span>
+                <span class="icon icon-size">
+                    {{ source('@carbon/dashboard/icon-pickaxe.svg') }}
+                </span>
             </div>
             <div class="col">
                 <div class="label">{{ __('Usage abiotic depletion potential', 'carbon') }}</div>

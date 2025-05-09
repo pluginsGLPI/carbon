@@ -46,6 +46,10 @@
         font-weight: bold;
     }
 
+    #{{ id }} .icon .cls-1 {
+        fill: {{ icon_color }} !important;
+    }
+
     .theme-dark #{{ id }} {
         background-color: {{ fg_color }};
         color: {{ color }};
@@ -60,13 +64,17 @@
     .theme-dark #{{ id }} .label {
         color: {{ dark_label_color }};
     }
+
+    .theme-dark #{{ id }} .icon .cls-1 {
+        fill: {{ dark_icon_color }} !important;
+    }
 </style>
 <div class="card" id="{{ id }}">
     <div class="card-body" style="height: 100%">
         <div class="row align-items-center">
             <div class="col-auto" id="carbonEmbodiedPrimaryEnergyElement">
-                <span>
-                    <img class="icon-size" src="{{ get_plugin_web_dir('carbon') }}/dist/images/icon-fossil-primary-energy.png"></img>
+                <span class="icon icon-size">
+                    {{ source('@carbon/dashboard/icon-fossil-primary-energy.svg') }}
                 </span>
             </div>
             <div class="col">

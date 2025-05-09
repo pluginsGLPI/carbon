@@ -53,6 +53,14 @@
         color: {{ decrease_color }}
     }
 
+    #{{ id }} .icon .cls-1 {
+        fill: {{ icon_color }} !important;
+    }
+
+    #{{ id }} .icon .cls-2 {
+        stroke: {{ icon_color }} !important;
+    }
+
     .theme-dark #{{ id }} {
         background-color: {{ fg_color }};
         color: {{ color }};
@@ -75,12 +83,23 @@
     .theme-dark #{{ id }} .variation-dn {
         color: {{ dark_decrease_color }}
     }
+
+    .theme-dark #{{ id }} .icon .cls-1 {
+        fill: {{ dark_icon_color }} !important;
+    }
+
+    .theme-dark #{{ id }} .icon .cls-2 {
+        stroke: {{ dark_icon_color }} !important;
+    }
 </style>
 <div class="card" id="{{ id }}">
     <div class="card-body" style="height: 100%">
         <div class="row align-items-center">
             <div class="col-auto">
-                <span><img src="{{ get_plugin_web_dir('carbon') }}/dist/images/icon-co2-calendar-green.png" class="icon-size" /></span>
+                {# <span><img src="{{ get_plugin_web_dir('carbon') }}/dist/images/icon-co2-calendar-green.png" class="icon-size" /></span> #}
+                <span class="icon icon-size">
+                    {{ source('@carbon/dashboard/icon-carbon-emission-agenda.svg') }}
+                </span>
             </div>
             <div class="col">
                 <div class="label">{{ __('Monthly usage carbon emission', 'carbon') }}</div>
