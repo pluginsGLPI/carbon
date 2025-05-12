@@ -64,19 +64,6 @@
             "point_labels": "0"
         }
     },
-    "plugin_carbon_report_embodied_pe_impact": {
-        "x": 0,
-        "y": 3,
-        "width": 5,
-        "height": 3,
-        "card_options": {
-            "color": "#bcbcbc",
-            "widgettype": "embodied_primary_energy",
-            "use_gradient": "0",
-            "point_labels": "0",
-            "limit": "7"
-        }
-    },
     "plugin_carbon_assets_completeness": {
         "x": 15,
         "y": 0,
@@ -85,19 +72,6 @@
         "card_options": {
             "color": "#f4cccc",
             "widgettype": "stackedbars",
-            "use_gradient": "0",
-            "point_labels": "0",
-            "limit": "7"
-        }
-    },
-    "plugin_carbon_report_usage_abiotic_depletion": {
-        "x": 10,
-        "y": 3,
-        "width": 5,
-        "height": 3,
-        "card_options": {
-            "color": "#fafafa",
-            "widgettype": "usage_abiotic_depletion",
             "use_gradient": "0",
             "point_labels": "0",
             "limit": "7"
@@ -122,8 +96,21 @@
         "width": 5,
         "height": 3,
         "card_options": {
-            "color": "#c0c0c0",
+            "color": "#ffd966",
             "widgettype": "embodied_abiotic_depletion",
+            "use_gradient": "0",
+            "point_labels": "0",
+            "limit": "7"
+        }
+    },
+    "plugin_carbon_report_usage_abiotic_depletion": {
+        "x": 10,
+        "y": 3,
+        "width": 5,
+        "height": 3,
+        "card_options": {
+            "color": "#ffd966",
+            "widgettype": "usage_abiotic_depletion",
             "use_gradient": "0",
             "point_labels": "0",
             "limit": "7"
@@ -135,8 +122,21 @@
         "width": 5,
         "height": 3,
         "card_options": {
-            "color": "#fafafa",
+            "color": "#7a941e",
             "widgettype": "embodied_global_warming",
+            "use_gradient": "0",
+            "point_labels": "0",
+            "limit": "7"
+        }
+    },
+    "plugin_carbon_report_embodied_pe_impact": {
+        "x": 0,
+        "y": 3,
+        "width": 5,
+        "height": 3,
+        "card_options": {
+            "color": "#7bb9f1",
+            "widgettype": "embodied_primary_energy",
             "use_gradient": "0",
             "point_labels": "0",
             "limit": "7"
