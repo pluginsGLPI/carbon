@@ -666,22 +666,27 @@ class Widget extends GlpiDashboardWidget
 
         // Prepare date format
         $date_format = 'Y F';
+        $original_date_format = 'Y-m';
         switch ($_SESSION['glpidate_format'] ?? 0) {
             case 0:
                 $date_format = 'Y F';
+                $original_date_format = 'Y-m';
                 break;
             case 1:
             case 2:
                 $date_format = 'F Y';
+                $original_date_format = 'm-Y';
                 break;
         }
         if (isset($last_month['date_interval'][0])) {
-            $last_month['date_interval'][0] = (new DateTime($last_month['date_interval'][0]))->format($date_format);
+            $last_month['date_interval'][0] = DateTime::createFromFormat($original_date_format, $last_month['date_interval'][0])->format($date_format);
+            // $last_month['date_interval'][0] = (new DateTime($last_month['date_interval'][0]))->format($date_format);
         }
         if (isset($last_month['date_interval'][1])) {
             // This date is the end boundary excluded, and is the 1st day of a month.
             // We need to find the previous month for display
-            $last_month['date_interval'][1] = (new DateTime($last_month['date_interval'][1]));
+            // $last_month['date_interval'][1] = (new DateTime($last_month['date_interval'][1]));
+            $last_month['date_interval'][1] = DateTime::createFromFormat($original_date_format, $last_month['date_interval'][1]);
             $last_month['date_interval'][1]->setDate((int) $end_date->format('Y'), (int) $end_date->format('m'), 0);
             $last_month['date_interval'][1] = $last_month['date_interval'][1]->format($date_format);
         }
