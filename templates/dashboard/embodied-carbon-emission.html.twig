@@ -72,13 +72,13 @@
 <div class="card" id="{{ id }}">
     <div class="card-body" style="height: 100%">
         <div class="row align-items-center">
-            <div class="col-auto" id="carbonUsageAbioticDepletionIconElement">
+            <div class="col-auto" id="carbonEmbodiedCarbonEmissionIconElement">
                 <span class="icon icon-size">
-                    {{ source('@carbon/dashboard/icon-pickaxe.svg') }}
+                    {{ source('@carbon/dashboard/icon-carbon-emission.svg') }}
                 </span>
             </div>
             <div class="col">
-                <div class="label">{{ __('Usage abiotic depletion potential', 'carbon') }}</div>
+                <div class="label">{{ __('Embodied carbon emission', 'carbon') }}</div>
             </div>
             <div class="my-3 number text-center">{{ number|raw }}</div>
             <div class="info-tooltip">

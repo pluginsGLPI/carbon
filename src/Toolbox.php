@@ -43,6 +43,7 @@ use Infocom;
 use Location;
 use QueryExpression;
 use QuerySubQuery;
+use Mexitek\PHPColors\Color;
 
 class Toolbox
 {
@@ -585,5 +586,51 @@ class Toolbox
         }
 
         return $dashboard->fields['id']; // do not use getID()
+    }
+
+    /**
+     * tune a foreground color luminosity depending on a background luminosity
+     *
+     * @param string $bg_color
+     * @param string $fg_color
+     * @param float $target_ratio
+     * @param integer $max_steps
+     * @return string
+     */
+    public static function getAdaptedFgColor(string $bg_color, string $fg_color, $target_ratio = 4.5, $max_steps = 100): string
+    {
+        $hsl = Color::hexToHsl($fg_color);
+        $bg_color = new Color($bg_color);
+        $fg_luminance = self::relative_luminance(new Color($fg_color));
+        $bg_luminance = self::relative_luminance($bg_color);
+        $direction = ($fg_luminance < $bg_luminance) ? -0.01 : 0.01;
+
+        for ($i = 0; $i < $max_steps; $i++) {
+            $rgb_test = new Color(Color::hslToHex($hsl));
+            if (self::contrastRatio($rgb_test, $bg_color) >= $target_ratio) {
+                return '#' . $rgb_test->getHex();
+            }
+            $hsl['L'] += $direction;
+            $hsl['L'] = max(0.0, min(1.0, $hsl['L']));
+        }
+
+        // Return the last tested value id contrast is still not satisfying
+        return '#' . Color::hslToHex($hsl);
+    }
+
+    protected static function relative_luminance(Color $color): float
+    {
+        $rgb = array_map(function ($rgb_component) {
+            $rgb_component = $rgb_component / 255.0;
+            return ($rgb_component <= 0.03928) ? ($rgb_component / 12.92) : pow(($rgb_component + 0.055) / 1.055, 2.4);
+        }, $color->getRGB());
+        return 0.2126 * $rgb['R'] + 0.7152 * $rgb['G'] + 0.0722 * $rgb['B'];
+    }
+
+    protected static function contrastRatio(Color $color_1, Color $color_2)
+    {
+        $l1 = self::relative_luminance($color_1);
+        $l2 = self::relative_luminance($color_2);
+        return ($l1 > $l2) ? ($l1 + 0.05) / ($l2 + 0.05) : ($l2 + 0.05) / ($l1 + 0.05);
     }
 }

@@ -40,6 +40,16 @@
         border: 1px solid {{ fg_hover_border }};
     }
 
+    #{{ id }} .label {
+        text-transform: uppercase;
+        color: {{ label_color }};
+        font-weight: bold;
+    }
+
+    #{{ id }} .icon .cls-1 {
+        fill: {{ icon_color }} !important;
+    }
+
     .theme-dark #{{ id }} {
         background-color: {{ fg_color }};
         color: {{ color }};
@@ -50,17 +60,32 @@
         color: {{ fg_color }};
         border: 1px solid {{ fg_hover_border }};
     }
+
+    .theme-dark #{{ id }} .label {
+        color: {{ dark_label_color }};
+    }
+
+    .theme-dark #{{ id }} .icon .cls-1 {
+        fill: {{ dark_icon_color }} !important;
+    }
 </style>
 <div class="card" id="{{ id }}">
     <div class="card-body" style="height: 100%">
         <div class="row align-items-center">
             <div class="col-auto" id="carbonEmbodiedPrimaryEnergyElement">
-                <span><img src="{{ get_plugin_web_dir('carbon') }}/dist/images/carbon_emission_icon_darkgreen.png"></img></span>
+                <span class="icon icon-size">
+                    {{ source('@carbon/dashboard/icon-fossil-primary-energy.svg') }}
+                </span>
             </div>
             <div class="col">
-                <div class="subheader">{{ __('Embodied primary energy', 'carbon') }}</div>
+                <div class="label">{{ __('Embodied primary energy', 'carbon') }}</div>
             </div>
             <div class="my-3 number text-center">{{ number|raw }}</div>
+            <div class="info-tooltip">
+                <span id="{{ id }}_tip">
+                    <i class="fa-solid fa-circle-info"></i>
+                </span>
+            </div>
         </div>
     </div>
 </div>
@@ -74,3 +99,4 @@
     observer.observe(document.querySelector('#{{ id }} .number'));
 })();
 </script>
+{{ tooltip_html|raw }}

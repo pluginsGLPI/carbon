@@ -43,7 +43,13 @@
   {% endif %}
 
   {% if usage_impact.fields.adp is not null %}
-    <div class="h1 mb-3">{{ usage_impact.getHumanReadableImpact('adp')|raw }}</div>
+    <div class="h1 mb-3">
+      <span id="usage_abiotic_depletion_tip">
+        {{ usage_impact.getHumanReadableImpact('adp')|raw }}
+        {# <i class="fa-solid fa-circle-info"></i> #}
+      </span>
+      {{ usage_abiotic_depletion_tooltip_html|raw }}
+    </div>
   {% endif %}
 
   {% if usage_impact.fields.pe is not null %}
@@ -67,15 +73,33 @@
 
 <div class="card-body" id="cardBodyBorder1">
   {% if embodied_impact.fields.gwp is not null %}
-    <div class="h1 mb-3">{{ embodied_impact.getHumanReadableImpact('gwp')|raw }}</div>
+    <div class="h1 mb-3">
+      <span id="carbon_emission_tip">
+        {{ embodied_impact.getHumanReadableImpact('gwp')|raw }}
+        {# <i class="fa-solid fa-circle-info"></i> #}
+      </span>
+      {{ carbon_emission_tooltip_html|raw }}
+    </div>
   {% endif %}
 
   {% if embodied_impact.fields.adp is not null %}
-    <div class="h1 mb-3">{{ embodied_impact.getHumanReadableImpact('adp')|raw }}</div>
+    <div class="h1 mb-3">
+      <span id="embodied_abiotic_depletion_tip">
+        {{ embodied_impact.getHumanReadableImpact('adp')|raw }}
+        {# <i class="fa-solid fa-circle-info"></i> #}
+      </span>
+      {{ embodied_abiotic_depletion_tooltip_html|raw }}
+    </div>
   {% endif %}
 
   {% if embodied_impact.fields.pe is not null %}
-    <div class="h1 mb-3">{{ embodied_impact.getHumanReadableImpact('pe')|raw }}</div>
+    <div class="h1 mb-3">
+      <span id="embodied_primary_energy_tip">
+        {{ embodied_impact.getHumanReadableImpact('pe')|raw }}
+        {# <i class="fa-solid fa-circle-info"></i> #}
+      </span>
+      {{ embodied_primary_energy_tooltip_html|raw }}
+    </div>
   {% endif %}
 
   <div>

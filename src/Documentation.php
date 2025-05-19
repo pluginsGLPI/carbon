@@ -1,4 +1,6 @@
-/*!
+<?php
+
+/**
  * -------------------------------------------------------------------------
  * carbon plugin for GLPI
  * -------------------------------------------------------------------------
@@ -29,49 +31,34 @@
  * -------------------------------------------------------------------------
  */
 
-.footer-height, .header-height{
-    height: auto;
-    margin-top: 0 !important;
-    position: relative;
-}
+namespace GlpiPlugin\Carbon;
 
-.illustration-footer, .illustration-header {
-    width: 100%;
-    height: auto;
-}
+class Documentation
+{
+    private const BASE_URL = 'https://glpi-plugins.readthedocs.io/%s/latest/carbon/knowledge_base/';
+    /**
+     * Get external URL to a detailed description of the given path
+     *
+     * @param string $object_descriptor
+     * @return string
+     */
+    public static function getInfoLink(string $object_descriptor): string
+    {
+        // $lang = substr($_SESSION['glpilanguage'], 0, 2);
+        $lang = 'en';
+        $base_url = sprintf(
+            self::BASE_URL,
+            $lang
+        );
+        switch ($object_descriptor) {
+            case 'abiotic_depletion_impact':
+                return "$base_url/abiotic_depletion_impact";
+            case 'primary_energy_impact':
+                return "$base_url/primary_energy_impact";
+            case 'carbon_emission':
+                return "$base_url/carbon_emission";
+        }
 
-.title-color {
-    color: #005B52 !important;
-}
-
-.title-position {
-    position: absolute;
-    top: 30%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-
-}
-
-.icon-size, .icon-size svg {
-    /* width: 63px; */
-    height: 63px;
-}
-
-.unhandled-computers-card {
-    background-color: #FCF8A1;
-}
-
-.card-max-height {
-    max-height: 380px !important;
-}
-
-.plugin_carbon_quick_report .card {
-    min-height: 185px !important;
-}
-
-.info-tooltip {
-    position: absolute;
-    bottom: 5px;
-    right: 10px;
-    text-align: right;
+        return '';
+    }
 }

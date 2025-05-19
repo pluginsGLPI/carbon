@@ -40,6 +40,7 @@ use CommonGLPI;
 use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\Dashboard\Provider;
 use GlpiPlugin\Carbon\Dashboard\Widget;
+use Html;
 use Monitor;
 use NetworkEquipment;
 use Plugin;
@@ -188,10 +189,42 @@ class UsageInfo extends CommonDBChild
             'itemtype' => $asset->getType(),
             'items_id' => $asset->getID(),
         ]);
+        if (in_array($asset->getType(), [Computer::class, NetworkEquipment::class, Monitor::class])) {
+            // TODO: decide if we show or not this impact.
+            unset($usage_impact->fields['pe']);
+        }
 
         $data = Provider::getUsageCarbonEmissionPerMonth([
             'itemtype' => $asset->getType(),
             'items_id' => $asset->getID(),
+        ]);
+
+        $url = Documentation::getInfoLink('carbon_emission');
+        $tooltip = __('Evaluates the carbon emission in CO₂ equivalent. %s More information %s', 'carbon');
+        $tooltip = sprintf($tooltip, '<br /><a target="_blank" href="' . $url . '">', '</a>');
+        $carbon_emission_tooltip_html = Html::showToolTip($tooltip, [
+            'display' => false,
+            'applyto' => 'carbon_emission_tip',
+        ]);
+
+        $url = Documentation::getInfoLink('abiotic_depletion_impact');
+        $tooltip = __('Evaluates the consumption of non renewable resources in Antimony equivalent. %s More information %s', 'carbon');
+        $tooltip = sprintf($tooltip, '<br /><a target="_blank" href="' . $url . '">', '</a>');
+        $usage_abiotic_depletion_tooltip_html = Html::showToolTip($tooltip, [
+            'display' => false,
+            'applyto' => 'usage_abiotic_depletion_tip',
+        ]);
+        $embodied_abiotic_depletion_tooltip_html = Html::showToolTip($tooltip, [
+            'display' => false,
+            'applyto' => 'embodied_abiotic_depletion_tip',
+        ]);
+
+        $url = Documentation::getInfoLink('primary_energy');
+        $tooltip = __('Evaluates the primary energy consumed. %s More information %s', 'carbon');
+        $tooltip = sprintf($tooltip, '<br /><a target="_blank" href="' . $url . '">', '</a>');
+        $embodied_primary_energy_tooltip_html = Html::showToolTip($tooltip, [
+            'display' => false,
+            'applyto' => 'embodied_primary_energy_tip',
         ]);
 
         TemplateRenderer::getInstance()->display('@carbon/environmentalimpact-item.html.twig', [
@@ -200,6 +233,10 @@ class UsageInfo extends CommonDBChild
             'embodied_impact' => $embodied_impact,
             'usage_impact'    => $usage_impact,
             'usage_carbon_emission_graph' => Widget::DisplayGraphUsageCarbonEmissionPerMonth($data),
+            'carbon_emission_tooltip_html' => $carbon_emission_tooltip_html,
+            'usage_abiotic_depletion_tooltip_html' => $usage_abiotic_depletion_tooltip_html,
+            'embodied_abiotic_depletion_tooltip_html' => $embodied_abiotic_depletion_tooltip_html,
+            'embodied_primary_energy_tooltip_html' => $embodied_primary_energy_tooltip_html,
         ]);
     }
 }
