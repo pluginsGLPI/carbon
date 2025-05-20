@@ -91,7 +91,7 @@ class Location extends CommonDBChild
     }
 
     /**
-     * Update the power consumption associated to a computer type
+     * Update the location with the Boavizta zone
      *
      * @param CommonDBTM $item Computer to update
      * @param string $zone pwoer consumption to set
