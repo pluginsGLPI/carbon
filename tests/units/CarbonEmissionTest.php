@@ -44,6 +44,8 @@ class CarbonEmissionTest extends DbTestCase
 {
     public function testFindGaps()
     {
+        $this->DBVersionCheck();
+
         $instance = new CarbonEmission();
         $itemtype = Computer::class;
         $start_date = '2019-01-01 00:00:00';

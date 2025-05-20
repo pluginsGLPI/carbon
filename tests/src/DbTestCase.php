@@ -48,4 +48,21 @@ class DbTestCase extends CommonTestCase
         $DB->rollback();
         parent::tearDown();
     }
+
+    protected function DBVersionCheck()
+    {
+        global $DB;
+        $version_string = $DB->getVersion();
+
+        $server  = preg_match('/-MariaDB/', $version_string) ? 'MariaDB' : 'MySQL';
+        $version = preg_replace('/^((\d+\.?)+).*$/', '$1', $version_string);
+
+        if ($server === 'MySQL' && version_compare($version, '8.0.0', '<')) {
+            $this->markTestSkipped('Mysql/MariaDB 8.0 minimum required');
+        }
+
+        if ($server === 'MariaDB' && version_compare($version, '10.2.0', '<')) {
+            $this->markTestSkipped('Mysql/MariaDB 10.4 minimum required');
+        }
+    }
 }
