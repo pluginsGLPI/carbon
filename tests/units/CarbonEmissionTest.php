@@ -68,12 +68,12 @@ class CarbonEmissionTest extends DbTestCase
         $gaps = $instance->findGaps($itemtype, $asset->getID(), $start_date, $stop_date);
         $expected = [
             [
-                'start' => strtotime('2019-01-01 00:00:00'),
-                'end'   => strtotime('2019-12-31 00:00:00'),
+                'start' => '2019-01-01 00:00:00',
+                'end'   => '2020-01-01 00:00:00',
             ],
             [
-                'start' => strtotime('2021-01-01 00:00:00'),
-                'end'   => strtotime('2023-12-31 00:00:00'),
+                'start' => '2021-01-01 00:00:00',
+                'end'   => '2023-12-31 00:00:00',
             ],
         ];
         $this->assertEquals($expected, $gaps);
@@ -90,16 +90,16 @@ class CarbonEmissionTest extends DbTestCase
         $gaps = $instance->findGaps($itemtype, $asset->getID(), $start_date, $stop_date);
         $expected = [
             [
-                'start' => strtotime('2019-01-01 00:00:00'),
-                'end'   => strtotime('2019-12-31 00:00:00'),
+                'start' => '2019-01-01 00:00:00',
+                'end'   => '2020-01-01 00:00:00',
             ],
             [
-                'start' => strtotime('2020-04-05 00:00:00'),
-                'end'   => strtotime('2020-04-09 00:00:00'),
+                'start' => '2020-04-05 00:00:00',
+                'end'   => '2020-04-10 00:00:00',
             ],
             [
-                'start' => strtotime('2021-01-01 00:00:00'),
-                'end'   => strtotime('2023-12-31 00:00:00'),
+                'start' => '2021-01-01 00:00:00',
+                'end'   => '2023-12-31 00:00:00',
             ],
         ];
         $this->assertEquals($expected, $gaps);
@@ -115,20 +115,20 @@ class CarbonEmissionTest extends DbTestCase
         $gaps = $instance->findGaps($itemtype, $asset->getID(), $start_date, $stop_date);
         $expected = [
             [
-                'start' => strtotime('2019-01-01 00:00:00'),
-                'end'   => strtotime('2019-12-31 00:00:00'),
+                'start' => '2019-01-01 00:00:00',
+                'end'   => '2020-01-01 00:00:00',
             ],
             [
-                'start' => strtotime('2020-04-05 00:00:00'),
-                'end'   => strtotime('2020-04-09 00:00:00'),
+                'start' => '2020-04-05 00:00:00',
+                'end'   => '2020-04-10 00:00:00',
             ],
             [
-                'start' => strtotime('2020-06-20 00:00:00'),
-                'end'   => strtotime('2020-06-26 00:00:00'),
+                'start' => '2020-06-20 00:00:00',
+                'end'   => '2020-06-27 00:00:00',
             ],
             [
-                'start' => strtotime('2021-01-01 00:00:00'),
-                'end'   => strtotime('2023-12-31 00:00:00'),
+                'start' => '2021-01-01 00:00:00',
+                'end'   => '2023-12-31 00:00:00',
             ],
         ];
         $this->assertEquals($expected, $gaps);
