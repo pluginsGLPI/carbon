@@ -331,7 +331,7 @@ class Provider
     public static function getHandledAssetsRatio(array $params = [])
     {
         $default_params = [
-            'label' => __('plugin carbon - handled assets ratio', 'carbon'),
+            'label' => __('handled assets ratio', 'carbon'),
             'icon'  => '',
         ];
         $params = array_merge($default_params, $params);
@@ -376,7 +376,7 @@ class Provider
     public static function getHandledAssetsCounts($itemtypes, array $params = []): array
     {
         $default_params = [
-            'label' => __('plugin carbon - handled assets ratio', 'carbon'),
+            'label' => __('handled assets ratio', 'carbon'),
             'icon'  => '',
         ];
         $params = array_merge($default_params, $params);
@@ -402,7 +402,7 @@ class Provider
             $data['series'][0]['name'] = __('Handled', 'carbon');
             $data['series'][0]['data'][] = [
                 'value' => $handled['number'],
-                'url'   => $handled['url']
+                'url'   => $handled['url'],
             ];
             $data['series'][1]['name'] = __('Unhandled', 'carbon');
             $data['series'][1]['data'][] = [
