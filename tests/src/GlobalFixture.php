@@ -127,8 +127,8 @@ class GlobalFixture
 
         $intensity_table = 'glpi_plugin_carbon_carbonintensities';
         // Support any line ending type
-        $line_ending_mode = ini_get('auto_detect_line_endings');
-        ini_set('auto_detect_line_endings', true);
+        // $line_ending_mode = ini_get('auto_detect_line_endings');
+        // ini_set('auto_detect_line_endings', true);
         $file = dirname(__DIR__) . '/fixtures/carbon_intensity.csv';
         if (($handle = fopen($file, 'r')) === false) {
             fwrite(STDOUT, sprintf('Failed to open carbon intensity dataset CSV file' . PHP_EOL));
@@ -142,7 +142,7 @@ class GlobalFixture
                 'intensity' => $row[1],
             ]);
         }
-        ini_set('auto_detect_line_endings', $line_ending_mode);
+        // ini_set('auto_detect_line_endings', $line_ending_mode);
         $condition = [
             'plugin_carbon_carbonintensitysources_id' => $source_id,
             'plugin_carbon_zones_id'   => $zone_id,
