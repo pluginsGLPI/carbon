@@ -115,6 +115,9 @@ class Uninstall
         $dashboard = new Dashboard();
         /** @phpstan-ignore argument.type */
         $dashboard->getFromDB($dashboard_key);
+        if ($dashboard->isNewItem()) {
+            return;
+        }
         $dashboard->delete($dashboard->fields);
     }
 }
