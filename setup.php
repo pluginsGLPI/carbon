@@ -188,24 +188,22 @@ function plugin_carbon_check_prerequisites()
         $prerequisitesSuccess = false;
     }
 
-    // TODO: enable when minimal requirement of GLPI match this plugin
-    // $db_version = $DB->getVersion();
-    // if (strpos($db_version, 'MariaDB') !== false) {
-    //     // MariaDB
-    //     // get numbers and dot only from version
-    //     $db_version_number = preg_replace('/[^0-9.]/', '', $db_version);
-    //     if (version_compare($db_version_number, '10.2', 'lt')) {
-    //         echo "This plugin requires MySQL >= 8.0 or MariaDB >= 10.2<br>";
-    //         $prerequisitesSuccess = false;
-    //     }
-    //     $prerequisitesSuccess = false;
-    // } else {
-    //     // MySQL
-    //     if (version_compare($db_version, '8.0', 'lt')) {
-    //         echo "This plugin requires MySQL >= 8.0 or MariaDB >= 10.2<br>";
-    //         $prerequisitesSuccess = false;
-    //     }
-    // }
+    if (getenv('CI') === false) {
+        // only when not under test
+        $version_string = $DB->getVersion();
+
+        $server  = preg_match('/-MariaDB/', $version_string) ? 'MariaDB' : 'MySQL';
+        $version = preg_replace('/^((\d+\.?)+).*$/', '$1', $version_string);
+        if ($server === 'MySQL' && version_compare($version, '8.0.0', '<')) {
+            echo 'This plugin requires MySQL >= 8.0 or MariaDB >= 10.2<br>';
+            $prerequisitesSuccess = false;
+        }
+
+        if ($server === 'MariaDB' && version_compare($version, '10.2.0', '<')) {
+            echo 'This plugin requires MySQL >= 8.0 or MariaDB >= 10.2<br>';
+            $prerequisitesSuccess = false;
+        }
+    }
 
     return $prerequisitesSuccess;
 }
