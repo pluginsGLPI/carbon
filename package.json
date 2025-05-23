@@ -2,6 +2,7 @@
     "name": "carbon",
     "description": "Measurement of carbon emissions of GLPI devices",
     "license": "GPL-2.0-or-later",
+    "version": "1.0.0",
     "dependencies": {
         "apexcharts": "^3.49.0"
     },
