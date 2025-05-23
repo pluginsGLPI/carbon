@@ -152,7 +152,7 @@ class Install
                 if (preg_match($regex, $this->force_upgrade_from_version) !== 1) {
                     throw new \RuntimeException('Invalid start version for upgrade.');
                 }
-                if (version_compare($this->force_upgrade_from_version, self::OLDEST_UPGRADABLE_VERSION) < 0) {
+                if (version_compare($this->force_upgrade_from_version, $oldest_upgradable_version) < 0) {
                     throw new \RuntimeException('Cannot upgrade from unsupported old version: ' . $this->force_upgrade_from_version . '.');
                 }
             }
