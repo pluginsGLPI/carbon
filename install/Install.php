@@ -137,10 +137,6 @@ class Install
     public function upgrade(string $from_version, array $args = []): bool
     {
         $oldest_upgradable_version = self::OLDEST_UPGRADABLE_VERSION;
-        if (version_compare($from_version, $oldest_upgradable_version, 'lt')) {
-            $this->migration->displayError("Upgrade is not supported before $oldest_upgradable_version!");
-            return false;
-        }
 
         $this->force_upgrade = array_key_exists('force-upgrade', $args);
         if ($this->force_upgrade) {
@@ -150,11 +146,21 @@ class Install
                 // Check the version os SEMVER compliant
                 $regex = '!^' . self::SEMVER_REGEX . '$!';
                 if (preg_match($regex, $this->force_upgrade_from_version) !== 1) {
-                    throw new \RuntimeException('Invalid start version for upgrade.');
+                    $e = new \RuntimeException('Invalid start version for upgrade.');
+                    trigger_error($e->getMessage(), E_USER_WARNING);
+                    throw $e;
                 }
                 if (version_compare($this->force_upgrade_from_version, $oldest_upgradable_version) < 0) {
-                    throw new \RuntimeException('Cannot upgrade from unsupported old version: ' . $this->force_upgrade_from_version . '.');
+                    $e = new \RuntimeException('Upgrade is not supported before ' . $this->force_upgrade_from_version . '.');
+                    trigger_error($e->getMessage(), E_USER_WARNING);
+                    throw $e;
                 }
+            }
+        } else {
+            if (version_compare($from_version, $oldest_upgradable_version, 'lt')) {
+                $e = new \RuntimeException("Upgrade is not supported before $oldest_upgradable_version!");
+                trigger_error($e->getMessage(), E_USER_WARNING);
+                throw $e;
             }
         }
 

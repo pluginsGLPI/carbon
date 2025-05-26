@@ -82,16 +82,28 @@ function plugin_carbon_install(array $args = []): bool
         try {
             $success = $install->install($args);
         } catch (\Exception $e) {
-            $backtrace = GlpiToolbox::backtrace('');
-            trigger_error($e->getMessage() . PHP_EOL . $backtrace, E_USER_WARNING);
+            trigger_error($e->getMessage(), E_USER_WARNING);
+            if (!isCommandLine()) {
+                Session::addMessageAfterRedirect(
+                    $e->getMessage(),
+                    false,
+                    ERROR
+                );
+            }
             $success = false;
         }
     } else {
         try {
             $success = $install->upgrade($version, $args);
         } catch (\Exception $e) {
-            $backtrace = GlpiToolbox::backtrace('');
-            trigger_error($e->getMessage() . PHP_EOL . $backtrace, E_USER_WARNING);
+            trigger_error($e->getMessage(), E_USER_WARNING);
+            if (!isCommandLine()) {
+                Session::addMessageAfterRedirect(
+                    $e->getMessage(),
+                    false,
+                    ERROR
+                );
+            }
             $success = false;
         }
     }
