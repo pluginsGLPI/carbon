@@ -171,11 +171,16 @@ class Install
             $target_version = $data['target_version'];
             include_once($file);
             if ($function($this->migration, $args)) {
+                // Set the version to the target one s it is complete
+                // May be useful if subsequent steps fail and need to run upgrade again, by not running already done steps
                 Config::setConfigurationValues('plugin:carbon', ['dbversion' => $target_version]);
             } else {
                 return false;
             }
         }
+
+        // If no migration was ran, we still set the version to the current one
+        Config::setConfigurationValues('plugin:carbon', ['dbversion' => PLUGIN_CARBON_SCHEMA_VERSION]);
 
         return true;
     }
