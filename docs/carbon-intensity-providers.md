@@ -9,18 +9,6 @@ Currently, the GLPI Carbon plugin uses the following data providers:
 - electricymaps
 - ODRÉ (opendata réseaux-énergies)
 
-## CO2 Signal
-
-This data provider is a free and reduced version of _electricity maps_. It provides real-time data on electricity mix for numerous countries. No historical data is available.
-
-The API requires a free API key and has a rate limit. It is free for non-commercial use.
-
-Provider: https://www.co2signal.com/
-
-API documentation: https://docs.co2signal.com/#introduction
-
-Base URL for API: https://api.co2signal.com/v1/
-
 ## Electricity maps
 
 This data provider provides real-time and historical data on electricity mix for numerous countries (mainly Europe and North America).
