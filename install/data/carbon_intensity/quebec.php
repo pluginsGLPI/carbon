@@ -36,7 +36,8 @@
  */
 
 // sourced from https://www.hydroquebec.com/developpement-durable/documentation-specialisee/taux-emission-ges.html
+// https://www.hydroquebec.com/data/developpement-durable/pdf/amelioration-precision-empreinte-carbone-electricite.pdf
 // year => intensity in gCo2eq/KWh
 return [
-    1990 => 34.5
+    2017 => 34.5
 ];
