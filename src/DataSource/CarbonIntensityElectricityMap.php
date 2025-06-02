@@ -48,6 +48,12 @@ use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\Toolbox;
 use Symfony\Component\Console\Helper\ProgressBar;
 
+/**
+ * Query carbon intensity data from Electricity map
+ *
+ * API documentation:
+ * @see https://static.electricitymaps.com/api/docs/index.html
+ */
 class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
 {
     const HISTORY_URL = '/carbon-intensity/history';

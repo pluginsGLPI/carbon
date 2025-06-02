@@ -47,6 +47,9 @@ use GlpiPlugin\Carbon\Toolbox;
 /**
  * Query carbon intensity data from Réseau de Transport d'Électricité (RTE)
  * @see https://odre.opendatasoft.com/explore/dataset/eco2mix-national-tr/api/?disjunctive.nature
+ *
+ * API documentation
+ * @see https://help.opendatasoft.com/apis/ods-explore-v2/explore_v2.1.html
  */
 class CarbonIntensityRTE extends AbstractCarbonIntensity
 {
