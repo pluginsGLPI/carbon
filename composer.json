@@ -33,7 +33,7 @@
         "css-lint": "node_modules/.bin/stylelint --color --formatter verbose '**/*.css' '**/*.scss'",
         "js-lint": "node_modules/.bin/eslint --color .",
         "license-headers": "vendor/bin/licence-headers-check --ansi --no-interaction",
-        "build-schema": "tools/build-db-schema.php carbon | plantuml -p -tpng > tools/carbon.png"
+        "build-schema": "tools/build-db-schema.php carbon | plantuml -p -tpng > docs/db-schema.png"
     },
     "version": "1.0.0"
 }
