@@ -58,11 +58,11 @@ class DbTestCase extends CommonTestCase
         $version = preg_replace('/^((\d+\.?)+).*$/', '$1', $version_string);
 
         if ($server === 'MySQL' && version_compare($version, '8.0.0', '<')) {
-            $this->markTestSkipped('Mysql/MariaDB 8.0 minimum required');
+            $this->markTestSkipped('Mysql 8.0 minimum required');
         }
 
         if ($server === 'MariaDB' && version_compare($version, '10.2.0', '<')) {
-            $this->markTestSkipped('Mysql/MariaDB 10.4 minimum required');
+            $this->markTestSkipped('MariaDB 10.4 minimum required');
         }
     }
 }

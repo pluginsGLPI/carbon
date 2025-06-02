@@ -64,19 +64,6 @@
             "point_labels": "0"
         }
     },
-    "plugin_carbon_assets_completeness": {
-        "x": 15,
-        "y": 0,
-        "width": 5,
-        "height": 3,
-        "card_options": {
-            "color": "#f4cccc",
-            "widgettype": "stackedbars",
-            "use_gradient": "0",
-            "point_labels": "0",
-            "limit": "7"
-        }
-    },
     "plugin_carbon_report_usage_carbon_emissions_graph": {
         "x": 10,
         "y": 6,
@@ -103,19 +90,6 @@
             "limit": "7"
         }
     },
-    "plugin_carbon_report_usage_abiotic_depletion": {
-        "x": 10,
-        "y": 3,
-        "width": 5,
-        "height": 3,
-        "card_options": {
-            "color": "#ffd966",
-            "widgettype": "usage_abiotic_depletion",
-            "use_gradient": "0",
-            "point_labels": "0",
-            "limit": "7"
-        }
-    },
     "plugin_carbon_report_embodied_global_warming": {
         "x": 10,
         "y": 0,
@@ -135,8 +109,34 @@
         "width": 5,
         "height": 3,
         "card_options": {
-            "color": "#7bb9f1",
+            "color": "#326319",
             "widgettype": "embodied_primary_energy",
+            "use_gradient": "0",
+            "point_labels": "0",
+            "limit": "7"
+        }
+    },
+    "plugin_carbon_report_usage_abiotic_depletion": {
+        "x": 10,
+        "y": 3,
+        "width": 5,
+        "height": 3,
+        "card_options": {
+            "color": "#fccd3e",
+            "widgettype": "usage_abiotic_depletion",
+            "use_gradient": "0",
+            "point_labels": "0",
+            "limit": "7"
+        }
+    },
+    "plugin_carbon_assets_completeness": {
+        "x": 15,
+        "y": 0,
+        "width": 5,
+        "height": 3,
+        "card_options": {
+            "color": "#d9ead3",
+            "widgettype": "stackedbars",
             "use_gradient": "0",
             "point_labels": "0",
             "limit": "7"

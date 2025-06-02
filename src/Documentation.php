@@ -35,7 +35,7 @@ namespace GlpiPlugin\Carbon;
 
 class Documentation
 {
-    private const BASE_URL = 'https://glpi-plugins.readthedocs.io/%s/latest/carbon/knowledge_base/';
+    private const BASE_URL = 'https://glpi-plugins.readthedocs.io/%s/latest/carbon';
     /**
      * Get external URL to a detailed description of the given path
      *
@@ -52,11 +52,11 @@ class Documentation
         );
         switch ($object_descriptor) {
             case 'abiotic_depletion_impact':
-                return "$base_url/abiotic_depletion_impact";
+                return "$base_url/types_of_impact.html#antimony-equivalent";
             case 'primary_energy_impact':
-                return "$base_url/primary_energy_impact";
+                return "$base_url/carbon/types_of_impact.html#primary-energy";
             case 'carbon_emission':
-                return "$base_url/carbon_emission";
+                return "$base_url/carbon/types_of_impact.html#carbon-dioxyde-equivalent";
         }
 
         return '';

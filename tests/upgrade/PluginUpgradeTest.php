@@ -57,6 +57,8 @@ class PluginUpgradeTest extends PluginInstallTest
 
         $plugin_name = TEST_PLUGIN_NAME;
 
+        // $this->markTestSkipped('There is no upgrade to test yet');
+
         $this->setupGLPIFramework();
         $this->assertTrue($DB->connected);
 

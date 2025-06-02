@@ -726,7 +726,6 @@ class Widget extends GlpiDashboardWidget
         $fg_color = GlpiToolbox::getFgColor($p['color']);
         $decrease_color = '#00FF00';
         $increase_color = '#FF0000';
-        $icon_color = '#BBDA50';
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/monthly-carbon-emission.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
@@ -739,8 +738,6 @@ class Widget extends GlpiDashboardWidget
             'decrease_color'      => Toolbox::getAdaptedFgColor($p['color'], $decrease_color),
             'dark_increase_color' => Toolbox::getAdaptedFgColor($fg_color, $increase_color),
             'dark_decrease_color' => Toolbox::getAdaptedFgColor($fg_color, $decrease_color),
-            'icon_color'          => Toolbox::getAdaptedFgColor($p['color'], $icon_color, 4),
-            'dark_icon_color'     => Toolbox::getAdaptedFgColor($fg_color, $icon_color, 4),
             'last_month_emissions' => $last_month_emissions,
             'last_month' => $last_month['date_interval'][1] ?? '',
             'penultimate_month_emissions' => $penultimate_month_emissions,
@@ -802,8 +799,6 @@ class Widget extends GlpiDashboardWidget
             'fg_hover_border'  => GlpiToolbox::getFgColor($p['color'], 30),
             'label_color'      => Toolbox::getAdaptedFgColor($p['color'], $label_color, 4),
             'dark_label_color' => Toolbox::getAdaptedFgColor($fg_color, $label_color, 4),
-            'icon_color'       => Toolbox::getAdaptedFgColor($p['color'], $icon_color, 4),
-            'dark_icon_color'  => Toolbox::getAdaptedFgColor($fg_color, $icon_color, 4),
             'number' => $p['number'],
             'date_interval' => [
                 $start_date->format($date_format),
@@ -846,8 +841,6 @@ class Widget extends GlpiDashboardWidget
             'fg_hover_border' => GlpiToolbox::getFgColor($p['color'], 30),
             'label_color'     => Toolbox::getAdaptedFgColor($p['color'], $label_color, 4),
             'dark_label_color' => Toolbox::getAdaptedFgColor($fg_color, $label_color, 4),
-            'icon_color'       => Toolbox::getAdaptedFgColor($p['color'], $icon_color, 4),
-            'dark_icon_color'  => Toolbox::getAdaptedFgColor($fg_color, $icon_color, 4),
             'number' => $p['number'],
             'tooltip_html' => $tooltip_html,
         ]);
@@ -885,8 +878,6 @@ class Widget extends GlpiDashboardWidget
             'fg_hover_border'  => GlpiToolbox::getFgColor($p['color'], 30),
             'label_color'      => Toolbox::getAdaptedFgColor($p['color'], $label_color, 4),
             'dark_label_color' => Toolbox::getAdaptedFgColor($fg_color, $label_color, 4),
-            'icon_color'       => Toolbox::getAdaptedFgColor($p['color'], $icon_color, 4),
-            'dark_icon_color'  => Toolbox::getAdaptedFgColor($fg_color, $icon_color, 4),
             'number' => $p['number'],
             'tooltip_html' => $tooltip_html,
         ]);
@@ -925,8 +916,6 @@ class Widget extends GlpiDashboardWidget
             'fg_hover_border'  => GlpiToolbox::getFgColor($p['color'], 30),
             'label_color'      => Toolbox::getAdaptedFgColor($p['color'], $label_color, 4),
             'dark_label_color' => Toolbox::getAdaptedFgColor($fg_color, $label_color, 4),
-            'icon_color'       => Toolbox::getAdaptedFgColor($p['color'], $icon_color, 4),
-            'dark_icon_color'  => Toolbox::getAdaptedFgColor($fg_color, $icon_color, 4),
             'number' => $p['number'],
             'tooltip_html' => $tooltip_html,
         ]);
@@ -1095,7 +1084,6 @@ class Widget extends GlpiDashboardWidget
 
         $label_color = '#626976';
         $fg_color = GlpiToolbox::getFgColor($p['color']);
-        $icon_color = '#156252';
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/embodied-primary-energy.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
@@ -1104,8 +1092,6 @@ class Widget extends GlpiDashboardWidget
             'fg_hover_border'  => GlpiToolbox::getFgColor($p['color'], 30),
             'label_color'      => Toolbox::getAdaptedFgColor($p['color'], $label_color, 4),
             'dark_label_color' => Toolbox::getAdaptedFgColor($fg_color, $label_color, 4),
-            'icon_color'       => Toolbox::getAdaptedFgColor($p['color'], $icon_color, 4),
-            'dark_icon_color'  => Toolbox::getAdaptedFgColor($fg_color, $icon_color, 4),
             'number' => $p['number'],
             'tooltip_html' => $tooltip_html,
         ]);
