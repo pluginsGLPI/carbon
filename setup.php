@@ -73,6 +73,7 @@ function plugin_init_carbon()
     /** @var array $CFG_GLPI */
     global $CFG_GLPI;
 
+    require_once(__DIR__ . '/vendor/autoload.php');
     plugin_carbon_setupHooks();
     plugin_carbon_registerClasses();
 

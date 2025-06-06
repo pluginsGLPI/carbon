@@ -35,11 +35,17 @@ namespace GlpiPlugin\Carbon;
 
 use CommonDBChild;
 use CommonDBTM;
+use Geocoder\Provider\Nominatim\Nominatim;
+use Geocoder\Query\GeocodeQuery;
+use Geocoder\StatefulGeocoder;
 use Html;
 use Location as GlpiLocation;
 use MassiveAction;
 use Glpi\Application\View\TemplateRenderer;
+use GLPINetwork;
 use GlpiPlugin\Carbon\DataSource\Boaviztapi;
+use GuzzleHttp\Client;
+use League\ISO3166\ISO3166;
 
 /**
  * Additional data for a location
@@ -138,6 +144,7 @@ class Location extends CommonDBChild
     public static function onGlpiLocationAdd(CommonDBTM $item)
     {
         self::enableCarbonIntensityDownload($item);
+        $item->fields['_boavizta_zone'] = self::getCountryCode($item);
         self::setBoaviztaZone($item);
     }
 
@@ -148,6 +155,7 @@ class Location extends CommonDBChild
 
     public static function onGlpiLocationPreUpdate(CommonDBTM $item)
     {
+        $item->input['_boavizta_zone'] = self::getCountryCode($item);
         self::setBoaviztaZone($item);
     }
 
@@ -219,5 +227,34 @@ class Location extends CommonDBChild
         }
 
         return $location->delete($location->fields, true);
+    }
+
+    protected static function getCountryCode(CommonDBTM $item): string
+    {
+        $http_client = new Client();
+        $user_agent = GLPINetwork::getGlpiUserAgent();
+        $provider = Nominatim::withOpenStreetMapServer($http_client, $user_agent);
+        $geocoder = new StatefulGeocoder($provider, 'fr');
+        $location_elements = [
+            $item->input['address'] ?? $item->fields['address'],
+            $item->input['town'] ?? $item->fields['town'],
+            $item->input['state'] ?? $item->fields['state'],
+            $item->input['country'] ?? $item->fields['country'],
+        ];
+        $location_elements = array_filter($location_elements);
+        if (empty($location_elements)) {
+            return '';
+        }
+        $location_string = implode(', ', $location_elements);
+        $result = $geocoder->geocodeQuery(GeocodeQuery::create($location_string));
+        if ($result->isEmpty()) {
+            return '';
+        }
+        $location = $result->get(0);
+        $alpha2_code = $location->getCountry()->getCode();
+        $data = (new ISO3166())->alpha2($alpha2_code);
+        $alpha3_code = $data['alpha3'];
+
+        return $alpha3_code;
     }
 }

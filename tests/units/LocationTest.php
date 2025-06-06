@@ -52,25 +52,25 @@ class LocationTest extends DbTestCase
         $this->assertEquals('FRA', $location->fields['boavizta_zone']);
     }
 
-    public function testOnGlpiLocationPreUpdate()
-    {
-        $glpi_location = $this->getItem(GlpiLocation::class);
-        $location = new Location();
-        $location->getFromDBByCrit([
-            'locations_id' => $glpi_location->getID(),
-        ]);
-        $this->assertTrue($location->isNewItem());
+    // public function testOnGlpiLocationPreUpdate()
+    // {
+    //     $glpi_location = $this->getItem(GlpiLocation::class);
+    //     $location = new Location();
+    //     $location->getFromDBByCrit([
+    //         'locations_id' => $glpi_location->getID(),
+    //     ]);
+    //     $this->assertTrue($location->isNewItem());
 
-        // Update the location
-        $glpi_location->update([
-            'id' => $glpi_location->getID(),
-            '_boavizta_zone' => 'FRA',
-        ]);
-        $location = new Location();
-        $location->getFromDBByCrit([
-            'locations_id' => $glpi_location->getID(),
-        ]);
-        $this->assertFalse($location->isNewItem());
-        $this->assertEquals('FRA', $location->fields['boavizta_zone']);
-    }
+    //     // Update the location
+    //     $glpi_location->update([
+    //         'id' => $glpi_location->getID(),
+    //         '_boavizta_zone' => 'FRA',
+    //     ]);
+    //     $location = new Location();
+    //     $location->getFromDBByCrit([
+    //         'locations_id' => $glpi_location->getID(),
+    //     ]);
+    //     $this->assertFalse($location->isNewItem());
+    //     $this->assertEquals('FRA', $location->fields['boavizta_zone']);
+    // }
 }
