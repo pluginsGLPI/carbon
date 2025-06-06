@@ -81,9 +81,6 @@ class Computer extends AbstractAsset
      */
     protected function getType(CommonDBTM $item): int
     {
-        /** @var DBmysql $DB */
-        global $DB;
-
         $computer_table = GlpiComputer::getTable();
         $computer_type_table = ComputerType::getTable();
         $glpi_computer_type_table = GlpiComputerType::getTable();
