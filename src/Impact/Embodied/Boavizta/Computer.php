@@ -53,9 +53,7 @@ class Computer extends AbstractAsset
 
     protected function doEvaluation(CommonDBTM $item): ?array
     {
-        // TODO: determine if the computer is a server, a computer, a laptop, a tablet...
-        // then adapt $this->endpoint depending on the result
-
+        // adapt $this->endpoint depending on the type of computer (server, laptop, ...)
         $type = $this->getType($item);
         $this->endpoint = $this->getEndpoint($type);
 
