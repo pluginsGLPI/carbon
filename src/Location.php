@@ -66,35 +66,35 @@ class Location extends CommonDBChild
         return true;
     }
 
-    public static function showMassiveActionsSubForm(MassiveAction $ma)
-    {
-        switch ($ma->getAction()) {
-            case 'MassUpdateBoaviztaZone':
-                echo '<div>';
-                echo __('Boavizta zone', 'carbon') . '&nbsp;';
-                Boaviztapi::dropdownBoaviztaZone('_boavizta_zone');
-                echo '</div>';
-                echo '<br /><br />' . Html::submit(_x('button', 'Post'), ['name' => 'massiveaction']);
-                return true;
-        }
+    // public static function showMassiveActionsSubForm(MassiveAction $ma)
+    // {
+    //     switch ($ma->getAction()) {
+    //         case 'MassUpdateBoaviztaZone':
+    //             echo '<div>';
+    //             echo __('Boavizta zone', 'carbon') . '&nbsp;';
+    //             Boaviztapi::dropdownBoaviztaZone('_boavizta_zone');
+    //             echo '</div>';
+    //             echo '<br /><br />' . Html::submit(_x('button', 'Post'), ['name' => 'massiveaction']);
+    //             return true;
+    //     }
 
-        return parent::showMassiveActionsSubForm($ma);
-    }
+    //     return parent::showMassiveActionsSubForm($ma);
+    // }
 
-    public static function processMassiveActionsForOneItemtype(MassiveAction $ma, CommonDBTM $item, array $ids)
-    {
-        switch ($ma->getAction()) {
-            case 'MassUpdateBoaviztaZone':
-                foreach ($ids as $id) {
-                    if ($item->getFromDB($id) && self::updateBoaviztaZone($item, $ma->POST['_boavizta_zone'])) {
-                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
-                    } else {
-                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
-                    }
-                }
-                return;
-        }
-    }
+    // public static function processMassiveActionsForOneItemtype(MassiveAction $ma, CommonDBTM $item, array $ids)
+    // {
+    //     switch ($ma->getAction()) {
+    //         case 'MassUpdateBoaviztaZone':
+    //             foreach ($ids as $id) {
+    //                 if ($item->getFromDB($id) && self::updateBoaviztaZone($item, $ma->POST['_boavizta_zone'])) {
+    //                     $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
+    //                 } else {
+    //                     $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
+    //                 }
+    //             }
+    //             return;
+    //     }
+    // }
 
     /**
      * Update the location with the Boavizta zone
@@ -124,22 +124,22 @@ class Location extends CommonDBChild
         }
     }
 
-    public static function getSpecificValueToDisplay($field, $values, array $options = [])
-    {
-        switch ($field) {
-            case 'boavizta_zone':
-                $categories = Boaviztapi::getZones();
-                return $categories[$values['boavizta_zone']] ?? '';
-        }
+    // public static function getSpecificValueToDisplay($field, $values, array $options = [])
+    // {
+    //     switch ($field) {
+    //         case 'boavizta_zone':
+    //             $categories = Boaviztapi::getZones();
+    //             return $categories[$values['boavizta_zone']] ?? '';
+    //     }
 
-        return '';
-    }
+    //     return '';
+    // }
 
-    public static function getSpecificValueToSelect($field, $name = '', $values = '', array $options = [])
-    {
-        $options['values'] = $values;
-        return Boaviztapi::dropdownBoaviztaZone($name, $options);
-    }
+    // public static function getSpecificValueToSelect($field, $name = '', $values = '', array $options = [])
+    // {
+    //     $options['values'] = $values;
+    //     return Boaviztapi::dropdownBoaviztaZone($name, $options);
+    // }
 
     public static function onGlpiLocationAdd(CommonDBTM $item)
     {
