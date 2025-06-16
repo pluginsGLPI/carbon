@@ -45,6 +45,7 @@ use GlpiPlugin\Carbon\Report;
 use GlpiPlugin\Carbon\Toolbox;
 use Monitor;
 use NetworkEquipment;
+use Plugin;
 use Toolbox as GlpiToolbox;
 
 class Widget extends GlpiDashboardWidget
@@ -1041,6 +1042,9 @@ class Widget extends GlpiDashboardWidget
 
     public static function displayInformationMethodology(array $params = []): string
     {
+        /** @var array $CFG_GLPI */
+        global $CFG_GLPI;
+
         $default = [
             'url'     => '',
             'label'   => '',
@@ -1052,12 +1056,18 @@ class Widget extends GlpiDashboardWidget
         ];
         $p = array_merge($default, $params);
 
+        $icon_url = $CFG_GLPI['root_doc'] . '/plugins/carbon/images/ecology-icon-light.png';
+        /** @phpstan-ignore-next-line */
+        if (version_compare(GLPI_VERSION, '11.0', '<')) {
+            $icon_url = Plugin::getWebDir('carbon') . '/public/images/ecology-icon-light.png';
+        }
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/information-block.html.twig', [
-            'id' => $p['id'],
-            'color' => $p['color'],
-            'fg_color' => GlpiToolbox::getFgColor($p['color']),
-            'fg_hover_color' => GlpiToolbox::getFgColor($p['color'], 15),
+            'id'              => $p['id'],
+            'color'           => $p['color'],
+            'fg_color'        => GlpiToolbox::getFgColor($p['color']),
+            'fg_hover_color'  => GlpiToolbox::getFgColor($p['color'], 15),
             'fg_hover_border' => GlpiToolbox::getFgColor($p['color'], 30),
+            'icon_url'        => $icon_url,
         ]);
     }
 

@@ -31,6 +31,7 @@
  * -------------------------------------------------------------------------
  */
 
+use atoum\atoum\report\fields\runner\atoum\version;
 use Config as GlpiConfig;
 use GlpiPlugin\Carbon\Dashboard\Widget;
 use Glpi\Plugin\Hooks;
@@ -119,10 +120,20 @@ function plugin_carbon_setupHooks()
     $PLUGIN_HOOKS[Hooks::PRE_ITEM_ADD]['carbon'][GlpiProfile::class] = 'plugin_carbon_profileAdd';
 
     // Add ApexCharts.js library
-    $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][] = 'dist/bundle.js';
+    $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][] = 'bundle.js';
+    /** @phpstan-ignore-next-line */
+    if (version_compare(GLPI_VERSION, '11.0', '<')) {
+        // For GLPI < 11.0, we need to add resource the old way
+        $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][] = 'public/bundle.js';
+    }
 
     // Import CSS
-    $PLUGIN_HOOKS[Hooks::ADD_CSS]['carbon'][] = 'dist/main.css';
+    $PLUGIN_HOOKS[Hooks::ADD_CSS]['carbon'][] = 'main.css';
+    /** @phpstan-ignore-next-line */
+    if (version_compare(GLPI_VERSION, '11.0', '<')) {
+        // For GLPI < 11.0, we need to add resource the old way
+        $PLUGIN_HOOKS[Hooks::ADD_CSS]['carbon'][] = 'public/main.css';
+    }
 
     $PLUGIN_HOOKS['add_default_where']['carbon'] = 'plugin_carbon_add_default_where';
 
@@ -150,7 +161,7 @@ function plugin_carbon_registerClasses()
  */
 function plugin_version_carbon()
 {
-    return [
+    $requirements = [
         'name'           => 'GLPI Carbon',
         'version'        => PLUGIN_CARBON_VERSION,
         'author'         => '<a href="http://www.teclib.com">Teclib\'</a>',
@@ -159,10 +170,16 @@ function plugin_version_carbon()
         'requirements'   => [
             'glpi' => [
                 'min' => PLUGIN_CARBON_MIN_GLPI_VERSION,
-                'max' => PLUGIN_CARBON_MAX_GLPI_VERSION,
             ]
         ]
     ];
+
+    $dev_version = strpos(PLUGIN_CARBON_VERSION, 'dev') !== false;
+    if (!$dev_version) {
+       // This is not a development version
+       // $requirements['requirements']['glpi']['max'] = PLUGIN_CARBON_MAX_GLPI_VERSION;
+    }
+    return $requirements;
 }
 
 /**

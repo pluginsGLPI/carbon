@@ -65,7 +65,7 @@ class UsageInfo extends CommonDBChild
         return 'fa-solid fa-solar-panel';
     }
 
-    public function canPurgeItem()
+    public function canPurgeItem(): bool
     {
         if ($this->isNewItem()) {
             return false;
@@ -138,13 +138,21 @@ class UsageInfo extends CommonDBChild
 
     public function showForItem($ID, $withtemplate = '')
     {
+        /** @var array $CFG_GLPI */
+        global $CFG_GLPI;
+
         // TODO: Design a rights system for the whole plugin
         $canedit = self::canUpdate();
+
+        $target = $CFG_GLPI['root_doc'] . '/plugins/carbon/front/usageimpact.form.php';
+        if (version_compare(GLPI_VERSION, '11.0', '<')) {
+            $target = Plugin::getWebDir('carbon') . '/front/usageimpact.form.php';
+        }
 
         $options = [
             'candel'   => false,
             'can_edit' => $canedit,
-            'target'   => Plugin::getWebDir('carbon') . '/front/usageimpact.form.php',
+            'target'   => $target,
         ];
         $this->initForm($this->getID(), $options);
         TemplateRenderer::getInstance()->display('@carbon/usageinfo.html.twig', [
@@ -172,6 +180,9 @@ class UsageInfo extends CommonDBChild
 
     public static function showCharts(CommonDBTM $asset)
     {
+        /** @var array $CFG_GLPI  */
+        global $CFG_GLPI;
+
         $embodied_impact = new EmbodiedImpact();
         $embodied_impact->getFromDBByCrit([
             'itemtype' => $asset->getType(),
@@ -227,6 +238,12 @@ class UsageInfo extends CommonDBChild
             'applyto' => 'embodied_primary_energy_tip',
         ]);
 
+        $usage_imapct_action_url    = $CFG_GLPI['root_doc'] . '/plugins/carbon/front/usageimpact.form.php';
+        $embodied_impact_action_url = $CFG_GLPI['root_doc'] . '/plugins/carbon/front/embodiedimpact.form.php';
+        if (version_compare(GLPI_VERSION, '11.0', '<')) {
+            $usage_imapct_action_url    = Plugin::getWebDir('carbon') . '/front/usageimpact.form.php';
+            $embodied_impact_action_url = Plugin::getWebDir('carbon') . '/front/embodiedimpact.form.php';
+        }
         TemplateRenderer::getInstance()->display('@carbon/environmentalimpact-item.html.twig', [
             'usage_info'      => $usage_info,
             'asset'           => $asset,
@@ -237,6 +254,8 @@ class UsageInfo extends CommonDBChild
             'usage_abiotic_depletion_tooltip_html' => $usage_abiotic_depletion_tooltip_html,
             'embodied_abiotic_depletion_tooltip_html' => $embodied_abiotic_depletion_tooltip_html,
             'embodied_primary_energy_tooltip_html' => $embodied_primary_energy_tooltip_html,
+            'usage_impact_action_url'    => $usage_imapct_action_url,
+            'embodied_impact_action_url' => $embodied_impact_action_url,
         ]);
     }
 }

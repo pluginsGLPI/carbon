@@ -33,7 +33,7 @@
     <!-- Header with background image -->
     <header class="page-header header-height illustration container-fluid">
         <div class="container-fluid">
-        <img src="{{ get_plugin_web_dir('carbon') }}/dist/images/illustration_bridge.png" class="illustration-header" alt="GLPI Carbon header" />
+        <img src="{{ header_pic_url }}" class="illustration-header" alt="GLPI Carbon header" />
             <h1 class="page-title title-color title-position">{{ __('GLPI Carbon', 'carbon') }}</h1>
         </div>
     </header>
@@ -52,6 +52,6 @@
     {% endblock %}
 
   <footer class="container-fluid mt-3 footer-height d-flex justify-content-center">
-      <img src="{{ get_plugin_web_dir('carbon') }}/dist/images/illustration-footer.png" class="py-1 illustration-footer" alt="GLPI Carbon footer" />
+      <img src="{{ footer_pic_url }}" class="py-1 illustration-footer" alt="GLPI Carbon footer" />
   </footer>
 </div>

@@ -38,11 +38,11 @@
 
 {{ usage_carbon_emission_graph|raw }}
 <div class="card-body" id="cardBodyBorder1">
-  {% if usage_impact.fields.gwp is not null %}
+  {% if usage_impact.fields.gwp ?? null is not null %}
     <div class="h1 mb-3">{{ usage_impact.getHumanReadableImpact('gwp')|raw }}</div>
   {% endif %}
 
-  {% if usage_impact.fields.adp is not null %}
+  {% if usage_impact.fields.adp ?? null is not null %}
     <div class="h1 mb-3">
       <span id="usage_abiotic_depletion_tip">
         {{ usage_impact.getHumanReadableImpact('adp')|raw }}
@@ -52,7 +52,7 @@
     </div>
   {% endif %}
 
-  {% if usage_impact.fields.pe is not null %}
+  {% if usage_impact.fields.pe ?? null is not null %}
     <div class="h1 mb-3">{{ usage_impact.getHumanReadableImpact('pe')|raw }}</div>
   {% endif %}
 </div>
@@ -60,10 +60,10 @@
 <div>
   {% if not usage_impact.isNewItem() %}
     {% set reset_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', reset: '', id: '" ~ usage_impact.getID() ~ "'}" %}
-    <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/usageimpact.form.php' }}', {{ reset_args }})">{{ __('Reset data', 'carbon') }}</a>
+    <a class="btn btn-primary" onclick="submitGetLink('{{ usage_impact_action_url}}', {{ reset_args }})">{{ __('Reset data', 'carbon') }}</a>
   {% endif %}
   {% set calculate_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', calculate: '', itemtype: '" ~ asset.getType() ~ "', items_id: '" ~ asset.getID() ~ "'}" %}
-  <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/usageimpact.form.php' }}', {{ calculate_args }})">{{ __('Calculate data', 'carbon') }}</a>
+  <a class="btn btn-primary" onclick="submitGetLink('{{ usage_impact_action_url }}', {{ calculate_args }})">{{ __('Calculate data', 'carbon') }}</a>
 </div>
 
 {{ fields.largeTitle(
@@ -72,7 +72,7 @@
 ) }}
 
 <div class="card-body" id="cardBodyBorder1">
-  {% if embodied_impact.fields.gwp is not null %}
+  {% if embodied_impact.fields.gwp ?? null is not null %}
     <div class="h1 mb-3">
       <span id="carbon_emission_tip">
         {{ embodied_impact.getHumanReadableImpact('gwp')|raw }}
@@ -82,7 +82,7 @@
     </div>
   {% endif %}
 
-  {% if embodied_impact.fields.adp is not null %}
+  {% if embodied_impact.fields.adp ?? null is not null %}
     <div class="h1 mb-3">
       <span id="embodied_abiotic_depletion_tip">
         {{ embodied_impact.getHumanReadableImpact('adp')|raw }}
@@ -92,7 +92,7 @@
     </div>
   {% endif %}
 
-  {% if embodied_impact.fields.pe is not null %}
+  {% if embodied_impact.fields.pe ?? null is not null %}
     <div class="h1 mb-3">
       <span id="embodied_primary_energy_tip">
         {{ embodied_impact.getHumanReadableImpact('pe')|raw }}
@@ -105,8 +105,9 @@
   <div>
     {% if not embodied_impact.isNewItem() %}
       {% set reset_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', reset: '', id: '" ~ embodied_impact.getID() ~ "'}" %}
-      <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/embodiedimpact.form.php' }}', {{ reset_args }})">{{ __('Reset data', 'carbon') }}</a>
-    {% endif %}    {% set calculate_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', calculate: '', itemtype: '" ~ asset.getType() ~ "', items_id: '" ~ asset.getID() ~ "'}" %}
-    <a class="btn btn-primary" onclick="submitGetLink('{{ get_plugin_web_dir('carbon') ~ '/front/embodiedimpact.form.php' }}', {{ calculate_args }})">{{ __('Calculate data', 'carbon') }}</a>
+      <a class="btn btn-primary" onclick="submitGetLink('{{ embodied_impact_action_url }}', {{ reset_args }})">{{ __('Reset data', 'carbon') }}</a>
+    {% endif %}
+    {% set calculate_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', calculate: '', itemtype: '" ~ asset.getType() ~ "', items_id: '" ~ asset.getID() ~ "'}" %}
+    <a class="btn btn-primary" onclick="submitGetLink('{{ embodied_impact_action_url }}', {{ calculate_args }})">{{ __('Calculate data', 'carbon') }}</a>
   </div>
 </div>

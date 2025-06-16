@@ -46,7 +46,7 @@ use GlpiPlugin\Carbon\DataSource\Boaviztapi;
  */
 class Location extends CommonDBChild
 {
-   // From CommonDBRelation
+    // From CommonDBRelation
     public static $itemtype       = GlpiLocation::class;
     public static $items_id       = 'locations_id';
 

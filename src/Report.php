@@ -88,6 +88,9 @@ class Report extends CommonDBTM
 
     public static function showInstantReport(): void
     {
+        /** @var array $CFG_GLPI */
+        global $CFG_GLPI;
+
         ob_start();
         $dashboard = new DashboardGrid('plugin_carbon_board', 24, 22, 'mini_core');
         $dashboard->show(true);
@@ -95,7 +98,11 @@ class Report extends CommonDBTM
 
         $messages = [];
         if (Config::isDemoMode()) {
-            $exit_demo_url = Plugin::getWebDir('carbon') . '/front/report.php?disable_demo=1';
+            $exit_demo_url = '/plugins/carbon/front/report.php?disable_demo=1';
+            if (version_compare(GLPI_VERSION, '11.0', '<')) {
+                // For GLPI < 11.0, we need to add resource the old way
+                $exit_demo_url = Plugin::getWebDir('carbon') . '/front/report.php?disable_demo=1';
+            }
 
             // TRANS: %s are replaced with an HTML anchor : <a> and </a>
             $message = sprintf(
@@ -108,9 +115,18 @@ class Report extends CommonDBTM
             ];
         }
 
+        $header_pic_url = $CFG_GLPI['root_doc'] . '/plugins/carbon/images/illustration_bridge.png';
+        $footer_pic_url = $CFG_GLPI['root_doc'] . '/plugins/carbon/images/illustration-footer.png';
+        if (version_compare(GLPI_VERSION, '11.0', '<')) {
+            // For GLPI < 11.0, we need to add resource the old way
+            $header_pic_url = Plugin::getWebDir('carbon') . '/images/illustration_bridge.png';
+            $footer_pic_url = Plugin::getWebDir('carbon') . '/images/illustration-footer.png';
+        }
         TemplateRenderer::getInstance()->display('@carbon/quick-report.html.twig', [
             'dashboard' => $dashboard_html,
             'messages'  => $messages,
+            'header_pic_url' => $header_pic_url,
+            'footer_pic_url' => $footer_pic_url,
         ]);
     }
 
