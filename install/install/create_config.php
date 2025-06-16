@@ -45,6 +45,8 @@ $current_config = Config::getConfigurationValues('plugin:carbon');
 $config_entries = [
     'electricitymap_api_key' => 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
     'demo'                   => 1,
+    'impact_engine'          => 'Boavizta',
+    'boaviztapi_base_url'    => '',
 ];
 foreach ($config_entries as $key => $value) {
     if (!isset($current_config[$key])) {
