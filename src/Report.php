@@ -99,6 +99,7 @@ class Report extends CommonDBTM
         $messages = [];
         if (Config::isDemoMode()) {
             $exit_demo_url = '/plugins/carbon/front/report.php?disable_demo=1';
+            /** @phpstan-ignore if.alwaysTrue */
             if (version_compare(GLPI_VERSION, '11.0', '<')) {
                 // For GLPI < 11.0, we need to add resource the old way
                 $exit_demo_url = Plugin::getWebDir('carbon') . '/front/report.php?disable_demo=1';
@@ -117,6 +118,7 @@ class Report extends CommonDBTM
 
         $header_pic_url = $CFG_GLPI['root_doc'] . '/plugins/carbon/images/illustration_bridge.png';
         $footer_pic_url = $CFG_GLPI['root_doc'] . '/plugins/carbon/images/illustration-footer.png';
+        /** @phpstan-ignore if.alwaysTrue */
         if (version_compare(GLPI_VERSION, '11.0', '<')) {
             // For GLPI < 11.0, we need to add resource the old way
             $header_pic_url = Plugin::getWebDir('carbon') . '/images/illustration_bridge.png';

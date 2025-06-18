@@ -145,6 +145,7 @@ class UsageInfo extends CommonDBChild
         $canedit = self::canUpdate();
 
         $target = $CFG_GLPI['root_doc'] . '/plugins/carbon/front/usageimpact.form.php';
+        /** @phpstan-ignore-next-line */
         if (version_compare(GLPI_VERSION, '11.0', '<')) {
             $target = Plugin::getWebDir('carbon') . '/front/usageimpact.form.php';
         }
@@ -240,6 +241,7 @@ class UsageInfo extends CommonDBChild
 
         $usage_imapct_action_url    = $CFG_GLPI['root_doc'] . '/plugins/carbon/front/usageimpact.form.php';
         $embodied_impact_action_url = $CFG_GLPI['root_doc'] . '/plugins/carbon/front/embodiedimpact.form.php';
+        /** @phpstan-ignore-next-line */
         if (version_compare(GLPI_VERSION, '11.0', '<')) {
             $usage_imapct_action_url    = Plugin::getWebDir('carbon') . '/front/usageimpact.form.php';
             $embodied_impact_action_url = Plugin::getWebDir('carbon') . '/front/embodiedimpact.form.php';

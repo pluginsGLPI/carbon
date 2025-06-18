@@ -55,8 +55,8 @@ use GlpiPlugin\Carbon\UsageImpact;
 use GlpiPlugin\Carbon\UsageInfo;
 use Monitor;
 use NetworkEquipment;
-use QueryExpression;
-use QuerySubQuery;
+use QueryExpression; // TODO: when GLPI 11.0 is required, use Glpi\DBAL\QueryExpression instead
+use QuerySubQuery; // TODO: when GLPI 11.0 is required, use Glpi\DBAL\QuerySubQuery instead
 use Search;
 use Session;
 use Toolbox as GlpiToolbox;
@@ -123,9 +123,10 @@ class Provider
             'SELECT'    => [
                 ComputerModel::getTableField('id'),
                 ComputerModel::getTableField('name'),
-                new QueryExpression("$sql_year_month as `date`"),
+                /**  */
+                @new QueryExpression("$sql_year_month as `date`"),
                 'SUM' => 'emission_per_day AS monthly_emission_per_model',
-                new QueryExpression('COUNT(DISTINCT ' . CarbonEmission::getTableField('items_id') . ') AS nb_computers_per_model'),
+                @new QueryExpression('COUNT(DISTINCT ' . CarbonEmission::getTableField('items_id') . ') AS nb_computers_per_model'),
             ],
             'FROM'      => $computermodels_table,
             'INNER JOIN' => [
@@ -141,7 +142,7 @@ class Provider
             ] + $entity_restrict + $where,
             'GROUPBY' => [
                 ComputerModel::getTableField('id'),
-                new QueryExpression($sql_year_month)
+                @new QueryExpression($sql_year_month)
             ],
             'ORDER'   => ComputerModel::getTableField('name'),
         ];
@@ -153,7 +154,7 @@ class Provider
                 'AVG' => 'monthly_emission_per_model AS total_per_model',
                 'MAX' => 'nb_computers_per_model AS nb_computers_per_model'
             ],
-            'FROM' => new QuerySubQuery($subrequest, 'montly_per_model'),
+            'FROM' => @new QuerySubQuery($subrequest, 'montly_per_model'),
             'WHERE' => [],
             'GROUPBY' => ['id'],
             'ORDERBY' => 'monthly_emission_per_model DESC',
@@ -226,7 +227,7 @@ class Provider
                 GlpiComputerType::getTableField('id'),
                 GlpiComputerType::getTableField('name'),
                 'SUM' => 'emission_per_day AS total_per_type',
-                new QueryExpression('COUNT(DISTINCT ' . CarbonEmission::getTableField('items_id') . ') AS nb_computers_per_type'),
+                @new QueryExpression('COUNT(DISTINCT ' . CarbonEmission::getTableField('items_id') . ') AS nb_computers_per_type'),
             ],
             'FROM'      => $glpicomputertypes_table,
             'INNER JOIN' => [
@@ -507,7 +508,7 @@ class Provider
             $request = (new $type_history())->getEvaluableQuery();
             // If a value is set in a model, it cannut be  reset to NULL, then let's consoder 0 as NULL
             // and coalesce model, power and 0 to implement precedence
-            $sum_coalesce = new QueryExpression(
+            $sum_coalesce = @new QueryExpression(
                 'SUM(COALESCE('
                     . 'IF(' . $model_power_field . ' > 0, ' . $model_power_field . ', NULL),'
                     . 'IF(' . $type_power_field  . ' > 0, ' . $type_power_field  . ', NULL),'
@@ -636,18 +637,18 @@ class Provider
             $date = $DB->quoteName($date);
             $date = "DATE_FORMAT($date, '%Y')";
             $intensity = ['AVG' => "$intensity AS `intensity`"];
-            $request['GROUPBY'] = new QueryExpression($date);
+            $request['GROUPBY'] = @new QueryExpression($date);
             $request['LIMIT'] = 10;
         } else if ($count > 365 * 24) {
             $date = $DB->quoteName($date);
             $date = "DATE_FORMAT($date, '%Y-%m')";
             $intensity = ['AVG' => "$intensity AS `intensity`"];
-            $request['GROUPBY'] = new QueryExpression($date);
+            $request['GROUPBY'] = @new QueryExpression($date);
         } else if ($count > 30 * 24) {
             $date = $DB->quoteName($date);
             $date = "DATE_FORMAT($date, '%Y-%m-%d')";
             $intensity = ['AVG' => "$intensity AS `intensity`"];
-            $request['GROUPBY'] = new QueryExpression($date);
+            $request['GROUPBY'] = @new QueryExpression($date);
         } else {
             $intensity = [$intensity];
         }
@@ -959,11 +960,11 @@ class Provider
                     CarbonEmission::getTableField('emission_per_day') . ' AS total_emission_per_month',
                     CarbonEmission::getTableField('energy_per_day') . ' AS total_energy_per_month'
                 ],
-                new QueryExpression("$sql_year_month as `date`")
+                @new QueryExpression("$sql_year_month as `date`")
             ],
             'FROM'    => $emissions_table,
-            'GROUPBY' => new QueryExpression($sql_year_month),
-            'ORDER'   => new QueryExpression($sql_year_month),
+            'GROUPBY' => @new QueryExpression($sql_year_month),
+            'ORDER'   => @new QueryExpression($sql_year_month),
             'WHERE'   => $entityRestrict + $crit,
         ];
         $filter = self::getFiltersCriteria($emissions_table, $params['apply_filters']);
