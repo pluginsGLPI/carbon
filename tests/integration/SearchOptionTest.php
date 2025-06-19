@@ -69,6 +69,9 @@ class SearchOptionTest extends CommonTestCase
         ],
         NetworkEquipmentType::class => [],
         Location::class => [],
+        Zone::class => [
+            'entities_id',
+        ],
     ];
 
     private array $mapping = [

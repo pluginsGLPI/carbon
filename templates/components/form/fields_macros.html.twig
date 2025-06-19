@@ -45,7 +45,7 @@
    {% set field %}
       {% do call('Html::showTimeField', [name, {
          'value': value,
-         'rand': rand,
+         'rand': options.rand,
          'width': '100%'
       }|merge(options)]) %}
    {% endset %}
@@ -55,7 +55,7 @@
 {% macro dropdownBoaviztaZone(name, value, label = '', options = {}) %}
    {% import 'components/form/fields_macros.html.twig' as fields %}
 
-   {% if options.multiple %}
+   {% if options.multiple ?? false %}
       {# Needed for empty value as the input wont be sent in this case... we need something to know the input was displayed AND empty #}
       {% set defined_input_name = "_#{name}_defined" %}
       <input type="hidden" name="{{ defined_input_name }}" value="1"></input>
@@ -64,18 +64,18 @@
       {% set name = "#{name}[]" %}
    {% endif %}
    {% set options = {'rand': random()}|merge(options) %}
-   {% if options.fields_template.isMandatoryField(name) %}
+   {% if options.fields_template.isMandatoryField(name)|default(false) %}
       {% set options = {'specific_tags': {'required': true}}|merge(options) %}
    {% endif %}
 
-   {% if options.disabled %}
+   {% if options.disabled|default(false) %}
       {% set options = options|merge({specific_tags: {'disabled': 'disabled'}}) %}
    {% endif %}
 
    {% set field %}
       {% do call('GlpiPlugin\\Carbon\\DataSource\\Boaviztapi::dropdownBoaviztaZone', [name, {
          'value': value,
-         'rand': rand,
+         'rand': options.rand,
          'width': '100%',
       }|merge(options)]) %}
    {% endset %}
@@ -87,7 +87,7 @@
 {% macro dropdownComputerType(name, value, label = '', options = {}) %}
    {% import 'components/form/fields_macros.html.twig' as fields %}
 
-   {% if options.multiple %}
+   {% if options.multiple ?? false %}
       {# Needed for empty value as the input wont be sent in this case... we need something to know the input was displayed AND empty #}
       {% set defined_input_name = "_#{name}_defined" %}
       <input type="hidden" name="{{ defined_input_name }}" value="1"></input>
@@ -95,8 +95,11 @@
       {# Multiple values will be set, input need to be an array #}
       {% set name = "#{name}[]" %}
    {% endif %}
-   {% set options = {'rand': random()}|merge(options) %}
-   {% if options.fields_template.isMandatoryField(name) %}
+   {% set options = {
+      'rand': random(),
+      'disabled': false,
+   }|merge(options) %}
+   {% if options.fields_template.isMandatoryField(name)|default(false) %}
       {% set options = {'specific_tags': {'required': true}}|merge(options) %}
    {% endif %}
 
@@ -107,7 +110,7 @@
    {% set field %}
       {% do call('GlpiPlugin\\Carbon\\ComputerType::dropdownType', [name, {
          'value': value,
-         'rand': rand,
+         'rand': options.rand,
          'width': '100%',
       }|merge(options)]) %}
    {% endset %}

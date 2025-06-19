@@ -47,7 +47,7 @@ class EmbodiedImpact extends CommonDBTM
 {
     public static $rightname = 'carbon:report';
 
-    public function canEdit($ID)
+    public function canEdit($ID): bool
     {
         return false;
     }

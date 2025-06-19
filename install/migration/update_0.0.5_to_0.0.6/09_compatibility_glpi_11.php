@@ -1,4 +1,6 @@
-/*!
+<?php
+
+/**
  * -------------------------------------------------------------------------
  * carbon plugin for GLPI
  * -------------------------------------------------------------------------
@@ -29,56 +31,8 @@
  * -------------------------------------------------------------------------
  */
 
-.footer-height, .header-height{
-    height: auto;
-    margin-top: 0 !important;
-    position: relative;
-}
-
-.illustration-footer, .illustration-header {
-    width: 100%;
-    height: auto;
-}
-
-.title-color {
-    color: #005B52 !important;
-}
-
-.title-position {
-    position: absolute;
-    top: 30%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-
-}
-
-.icon-size, .icon-size svg {
-    /* width: 63px; */
-    height: 63px;
-}
-
-.unhandled-computers-card {
-    background-color: #FCF8A1;
-}
-
-.card-max-height {
-    max-height: 380px !important;
-}
-
-.plugin_carbon_quick_report .card {
-    min-height: 185px !important;
-}
-
-.info-tooltip {
-    position: absolute;
-    bottom: 5px;
-    right: 10px;
-    text-align: right;
-}
-
-.plugin-carbon-dashboard-info-icon {
-    display: block;
-    width: 62px;
-    height: 77px;
-    background-image: url('../pics/ecology-icon-light.png');
-}
+$table = 'glpi_plugin_carbon_zones';
+/** @var Migration $migration */
+$migration->addField($table, 'entities_id', 'fkey', ['after' => 'name']);
+$migration->addKey($table, 'entities_id', 'entities_id', 'INDEX');
+$migration->addKey($table, 'plugin_carbon_carbonintensitysources_id_historical', 'plugin_carbon_carbonintensitysources_id_historical', 'INDEX');

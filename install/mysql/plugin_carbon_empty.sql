@@ -64,9 +64,12 @@ CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_carbonintensities` (
 CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_zones` (
   `id`                                                 int unsigned NOT NULL AUTO_INCREMENT,
   `name`                                               varchar(255) DEFAULT NULL,
+  `entities_id`                                        int unsigned NOT NULL DEFAULT '0',
   `plugin_carbon_carbonintensitysources_id_historical` int unsigned NOT NULL DEFAULT '0' COMMENT 'Source to be used for historical calculation',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `unicity` (`name`)
+  UNIQUE KEY `unicity` (`name`),
+  INDEX `entities_id` (`entities_id`),
+  INDEX `plugin_carbon_carbonintensitysources_id_historical` (`plugin_carbon_carbonintensitysources_id_historical`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_carbonintensitysources` (

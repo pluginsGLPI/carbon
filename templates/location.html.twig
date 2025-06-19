@@ -35,7 +35,7 @@
 {{ fields.smallTitle(__('Environmental impact', 'carbon')) }}
 {{ carbonFields.dropdownBoaviztaZone(
     '_boavizta_zone',
-    item.fields['boavizta_zone'],
+    item.fields['boavizta_zone'] ?? '',
     __('Boavizta zone', 'carbon'),
     {
         'display_emptychoice': true,

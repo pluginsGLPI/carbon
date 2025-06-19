@@ -53,7 +53,7 @@ class ComputerUsageProfile extends CommonDropdown
         return _n("Computer usage profile", "Computer usage profiles", $nb, 'carbon');
     }
 
-    public static function canView()
+    public static function canView(): bool
     {
         return Entity::canView();
     }
