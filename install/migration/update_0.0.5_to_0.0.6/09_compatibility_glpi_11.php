@@ -33,6 +33,6 @@
 
 $table = 'glpi_plugin_carbon_zones';
 /** @var Migration $migration */
-$migration->addField($table, 'entities_id', 'fkey');
+$migration->addField($table, 'entities_id', 'fkey', ['after' => 'name']);
 $migration->addKey($table, 'entities_id', 'entities_id', 'INDEX');
 $migration->addKey($table, 'plugin_carbon_carbonintensitysources_id_historical', 'plugin_carbon_carbonintensitysources_id_historical', 'INDEX');
