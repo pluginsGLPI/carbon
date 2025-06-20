@@ -183,8 +183,8 @@ function plugin_version_carbon()
 
     $dev_version = strpos(PLUGIN_CARBON_VERSION, 'dev') !== false;
     if (!$dev_version) {
-       // This is not a development version
-       $requirements['requirements']['glpi']['max'] = PLUGIN_CARBON_MAX_GLPI_VERSION;
+        // This is not a development version
+        $requirements['requirements']['glpi']['max'] = PLUGIN_CARBON_MAX_GLPI_VERSION;
     }
     return $requirements;
 }
