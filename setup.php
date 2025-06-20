@@ -31,7 +31,6 @@
  * -------------------------------------------------------------------------
  */
 
-use atoum\atoum\report\fields\runner\atoum\version;
 use Config as GlpiConfig;
 use GlpiPlugin\Carbon\Dashboard\Widget;
 use Glpi\Plugin\Hooks;
