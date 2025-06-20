@@ -120,20 +120,22 @@ function plugin_carbon_setupHooks()
     $PLUGIN_HOOKS[Hooks::PRE_ITEM_ADD]['carbon'][GlpiProfile::class] = 'plugin_carbon_profileAdd';
 
     // Add ApexCharts.js library
-    $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][] = 'bundle.js';
+    $js_file = 'bundle.js';
     /** @phpstan-ignore-next-line */
     if (version_compare(GLPI_VERSION, '11.0', '<')) {
         // For GLPI < 11.0, we need to add resource the old way
-        $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][] = 'public/bundle.js';
+        $js_file = 'public/bundle.js';
     }
+    $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][] = $js_file;
 
     // Import CSS
-    $PLUGIN_HOOKS[Hooks::ADD_CSS]['carbon'][] = 'main.css';
+    $css_file = 'main.css';
     /** @phpstan-ignore-next-line */
     if (version_compare(GLPI_VERSION, '11.0', '<')) {
         // For GLPI < 11.0, we need to add resource the old way
-        $PLUGIN_HOOKS[Hooks::ADD_CSS]['carbon'][] = 'public/main.css';
+        $css_file = 'public/main.css';
     }
+    $PLUGIN_HOOKS[Hooks::ADD_CSS]['carbon'][] = $css_file;
 
     $PLUGIN_HOOKS['add_default_where']['carbon'] = 'plugin_carbon_add_default_where';
 
