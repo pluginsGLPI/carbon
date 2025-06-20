@@ -44,7 +44,7 @@ use Location as GlpiLocation;
 use Profile as GlpiProfile;
 use GlpiPlugin\Carbon\Dashboard\Grid;
 
-define('PLUGIN_CARBON_VERSION', '1.0.0-beta.1');
+define('PLUGIN_CARBON_VERSION', '1.0.0-dev');
 define('PLUGIN_CARBON_SCHEMA_VERSION', '1.0.0');
 
 // Minimal GLPI version, inclusive
@@ -179,7 +179,7 @@ function plugin_version_carbon()
     $dev_version = strpos(PLUGIN_CARBON_VERSION, 'dev') !== false;
     if (!$dev_version) {
        // This is not a development version
-       // $requirements['requirements']['glpi']['max'] = PLUGIN_CARBON_MAX_GLPI_VERSION;
+       $requirements['requirements']['glpi']['max'] = PLUGIN_CARBON_MAX_GLPI_VERSION;
     }
     return $requirements;
 }
