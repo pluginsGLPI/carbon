@@ -71,7 +71,14 @@ define('PLUGIN_CARBON_TYPES', [
 function plugin_init_carbon()
 {
     /** @var array $CFG_GLPI */
-    global $CFG_GLPI;
+     /** @var array $PLUGIN_HOOKS */
+    global $CFG_GLPI, $PLUGIN_HOOKS;
+
+    $PLUGIN_HOOKS[Hooks::CSRF_COMPLIANT]['carbon'] = true;
+
+    if (!Plugin::isPluginActive('carbon')) {
+        return;
+    }
 
     require_once(__DIR__ . '/vendor/autoload.php');
     plugin_carbon_setupHooks();
@@ -84,8 +91,6 @@ function plugin_carbon_setupHooks()
 {
     /** @var array $PLUGIN_HOOKS */
     global $PLUGIN_HOOKS;
-
-    $PLUGIN_HOOKS[Hooks::CSRF_COMPLIANT]['carbon'] = true;
 
     // Secured config
     $PLUGIN_HOOKS[Hooks::SECURED_CONFIGS]['carbon'] = [
