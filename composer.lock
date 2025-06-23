@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bf53631b6a3894c234e8676478c102a7",
+    "content-hash": "17dec2af1b7cd4d712138676b8281b81",
     "packages": [
         {
             "name": "clue/stream-filter",
@@ -257,16 +257,16 @@
         },
         {
             "name": "league/iso3166",
-            "version": "4.3.2",
+            "version": "4.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/alcohol/iso3166.git",
-                "reference": "5133fed7d54728222f4058702487dccedda20472"
+                "reference": "3f692113a1c07859ec69303a0127b43da8a66768"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/alcohol/iso3166/zipball/5133fed7d54728222f4058702487dccedda20472",
-                "reference": "5133fed7d54728222f4058702487dccedda20472",
+                "url": "https://api.github.com/repos/alcohol/iso3166/zipball/3f692113a1c07859ec69303a0127b43da8a66768",
+                "reference": "3f692113a1c07859ec69303a0127b43da8a66768",
                 "shasum": ""
             },
             "require": {
@@ -320,7 +320,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-10-10T07:39:24+00:00"
+            "time": "2025-06-05T08:06:30+00:00"
         },
         {
             "name": "php-http/discovery",
@@ -800,51 +800,6 @@
                 "source": "https://github.com/geocoder-php/php-common/tree/4.6.0"
             },
             "time": "2022-07-30T11:09:43+00:00"
-        },
-        {
-            "name": "xylemical/php-expressions",
-            "version": "1.2.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/xylemical/php-expressions.git",
-                "reference": "7abf0ae168785dc7d723c415e3c2dd8d6126e6bc"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/xylemical/php-expressions/zipball/7abf0ae168785dc7d723c415e3c2dd8d6126e6bc",
-                "reference": "7abf0ae168785dc7d723c415e3c2dd8d6126e6bc",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.1.0|>=8.0"
-            },
-            "require-dev": {
-                "ext-bcmath": "*",
-                "phpunit/phpunit": "^7.0|^8.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Xylemical\\Expressions\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "An extensible mathematical expression parser and evaluator.",
-            "homepage": "https://github.com/xylemical/php-expressions",
-            "keywords": [
-                "expression evaluator",
-                "math calculator",
-                "math parser",
-                "shunting-yard algorithm"
-            ],
-            "support": {
-                "issues": "https://github.com/xylemical/php-expressions/issues",
-                "source": "https://github.com/xylemical/php-expressions/tree/1.2.0"
-            },
-            "time": "2025-01-27T22:17:54+00:00"
         }
     ],
     "packages-dev": [
@@ -2945,16 +2900,16 @@
         },
         {
             "name": "squizlabs/php_codesniffer",
-            "version": "3.13.0",
+            "version": "3.13.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHP_CodeSniffer.git",
-                "reference": "65ff2489553b83b4597e89c3b8b721487011d186"
+                "reference": "5b5e3821314f947dd040c70f7992a64eac89025c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/65ff2489553b83b4597e89c3b8b721487011d186",
-                "reference": "65ff2489553b83b4597e89c3b8b721487011d186",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/5b5e3821314f947dd040c70f7992a64eac89025c",
+                "reference": "5b5e3821314f947dd040c70f7992a64eac89025c",
                 "shasum": ""
             },
             "require": {
@@ -3025,7 +2980,7 @@
                     "type": "thanks_dev"
                 }
             ],
-            "time": "2025-05-11T03:36:00+00:00"
+            "time": "2025-06-17T22:17:01+00:00"
         },
         {
             "name": "symfony/console",
