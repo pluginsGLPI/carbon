@@ -185,11 +185,11 @@ function plugin_carbon_postItemForm(array $params)
 {
     switch ($params['item']->getType()) {
         case GlpiLocation::class:
-            // $location = new Location();
-            // $location->getFromDBByCrit([
-            //     GlpiLocation::getForeignKeyField() => $params['item']->getID(),
-            // ]);
-            // $location->showForm($location->getID());
+            $location = new Location();
+            $location->getFromDBByCrit([
+                GlpiLocation::getForeignKeyField() => $params['item']->getID(),
+            ]);
+            $location->showForm($location->getID());
             break;
     }
 }

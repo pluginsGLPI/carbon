@@ -81,6 +81,7 @@ class Config extends GlpiConfig
     public function showForm($ID, $options = [])
     {
         $current_config = GlpiConfig::getConfigurationValues('plugin:carbon');
+        $current_config['geocoding_enabled'] = $current_config['geocoding_enabled'] ?? '0';
         $canedit        = Session::haveRight(Config::$rightname, UPDATE);
 
         TemplateRenderer::getInstance()->display('@carbon/config.html.twig', [
