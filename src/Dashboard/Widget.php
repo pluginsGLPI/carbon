@@ -627,6 +627,9 @@ class Widget extends GlpiDashboardWidget
             'labels' => [],
         ];
         $apex_data = array_merge($apex_data, $p['data']);
+        $limit = min($params['limit'], count($p['data']));
+        $apex_data['series'] = array_slice($apex_data['series'], 0, $limit);
+        $apex_data['labels'] = array_slice($apex_data['labels'], 0, $limit);
 
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/graph-carbon-emission-per-model.html.twig', [
             'id' => $p['id'],

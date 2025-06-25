@@ -157,7 +157,7 @@ class Provider
             'FROM' => @new QuerySubQuery($subrequest, 'montly_per_model'),
             'WHERE' => [],
             'GROUPBY' => ['id'],
-            'ORDERBY' => 'monthly_emission_per_model DESC',
+            'ORDERBY' => 'total_per_model DESC',
             'LIMIT'   => $params['limit'] ?? 9999
         ];
 
