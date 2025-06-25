@@ -114,19 +114,21 @@ class SearchOptions
     {
         $sopt = [];
 
-        $sopt[] = [
-            'id'           => SearchOptions::LOCATION_BOAVIZTA_ZONE,
-            'table'        => getTableForItemType(Location::class),
-            'field'        => 'boavizta_zone',
-            'name'         => __('Boavizta zone', 'carbon'),
-            'datatype'     => 'specific',
-            'searchtype'   => ['equals', 'notequals'],
-            'massiveaction' => false,
-            'linkfield'    => 'locations_id',
-            'joinparams' => [
-                'jointype' => 'child',
-            ],
-        ];
+        if ($itemtype === GlpiLocation::class) {
+            $sopt[] = [
+                'id'           => SearchOptions::LOCATION_BOAVIZTA_ZONE,
+                'table'        => getTableForItemType(Location::class),
+                'field'        => 'boavizta_zone',
+                'name'         => __('Boavizta zone', 'carbon'),
+                'datatype'     => 'specific',
+                'searchtype'   => ['equals', 'notequals'],
+                'massiveaction' => false,
+                'linkfield'    => 'locations_id',
+                'joinparams' => [
+                    'jointype' => 'child',
+                ],
+            ];
+        }
 
         if (in_array($itemtype, PLUGIN_CARBON_TYPES)) {
             $item_type_class = 'GlpiPlugin\\Carbon\\' . $itemtype . 'Type';
