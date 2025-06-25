@@ -133,6 +133,7 @@ class SearchOptions
         if (in_array($itemtype, PLUGIN_CARBON_TYPES)) {
             $item_type_class = 'GlpiPlugin\\Carbon\\' . $itemtype . 'Type';
             $glpi_item_type_class = $itemtype . 'Type';
+            /** @phpstan-ignore-next-line */
             if (class_exists($item_type_class) && is_subclass_of($item_type_class, CommonDBTM::class)) {
                 $itemtype_fk = $itemtype::getForeignKeyField();
                 $sopt[] = [

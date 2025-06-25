@@ -210,7 +210,15 @@ class PluginInstallTest extends CommonTestCase
         $rows = $cronTask->find([
             'itemtype' => ['LIKE', '%' . 'Carbon' . '%'],
         ]);
-        $this->assertEquals(4, count($rows));
+        $this->assertEquals(5, count($rows));
+
+        $cronTask = new GLPICronTask();
+        $cronTask->getFromDBByCrit([
+            'itemtype' => CronTask::class,
+            'name'     => 'LocationCountryCode',
+        ]);
+        $this->assertFalse($cronTask->isNewItem());
+        $this->assertEquals(10, $cronTask->fields['param']);
 
         $cronTask = new GLPICronTask();
         $cronTask->getFromDBByCrit([

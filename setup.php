@@ -71,8 +71,16 @@ define('PLUGIN_CARBON_TYPES', [
 function plugin_init_carbon()
 {
     /** @var array $CFG_GLPI */
-    global $CFG_GLPI;
+     /** @var array $PLUGIN_HOOKS */
+    global $CFG_GLPI, $PLUGIN_HOOKS;
 
+    $PLUGIN_HOOKS[Hooks::CSRF_COMPLIANT]['carbon'] = true;
+
+    if (!Plugin::isPluginActive('carbon')) {
+        return;
+    }
+
+    require_once(__DIR__ . '/vendor/autoload.php');
     plugin_carbon_setupHooks();
     plugin_carbon_registerClasses();
 
@@ -83,8 +91,6 @@ function plugin_carbon_setupHooks()
 {
     /** @var array $PLUGIN_HOOKS */
     global $PLUGIN_HOOKS;
-
-    $PLUGIN_HOOKS[Hooks::CSRF_COMPLIANT]['carbon'] = true;
 
     // Secured config
     $PLUGIN_HOOKS[Hooks::SECURED_CONFIGS]['carbon'] = [
@@ -177,8 +183,8 @@ function plugin_version_carbon()
 
     $dev_version = strpos(PLUGIN_CARBON_VERSION, 'dev') !== false;
     if (!$dev_version) {
-       // This is not a development version
-       $requirements['requirements']['glpi']['max'] = PLUGIN_CARBON_MAX_GLPI_VERSION;
+        // This is not a development version
+        $requirements['requirements']['glpi']['max'] = PLUGIN_CARBON_MAX_GLPI_VERSION;
     }
     return $requirements;
 }

@@ -33,6 +33,13 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
+use Geocoder\Collection;
+use Geocoder\Geocoder;
+use Geocoder\Model\AddressCollection;
+use Geocoder\Model\AdminLevel;
+use Geocoder\Model\AdminLevelCollection;
+use Geocoder\Model\Country;
+use Geocoder\Provider\Nominatim\Model\NominatimAddress;
 use GlpiPlugin\Carbon\Zone;
 use Location as GlpiLocation;
 use GlpiPlugin\Carbon\Location;
@@ -41,8 +48,15 @@ class LocationTest extends DbTestCase
 {
     public function testOnGlpiLocationAdd()
     {
+        $glpi_location = $this->getItem(GlpiLocation::class);
+        $location = new Location();
+        $location->getFromDBByCrit([
+            'locations_id' => $glpi_location->getID(),
+        ]);
+        $this->assertTrue($location->isNewItem());
+
         $glpi_location = $this->getItem(GlpiLocation::class, [
-            '_boavizta_zone' => 'FRA'
+            '_boavizta_zone' => 'FRA',
         ]);
         $location = new Location();
         $location->getFromDBByCrit([
@@ -72,5 +86,61 @@ class LocationTest extends DbTestCase
         ]);
         $this->assertFalse($location->isNewItem());
         $this->assertEquals('FRA', $location->fields['boavizta_zone']);
+    }
+
+    public function testgetIncompleteLocations()
+    {
+        $iterator = Location::getIncompleteLocations();
+        $output = $iterator->count();
+        $this->assertEquals(0, $output);
+
+        $glpi_location = $this->getItem(GlpiLocation::class);
+        $iterator = Location::getIncompleteLocations();
+        $output = $iterator->count();
+        $this->assertEquals(1, $output);
+
+        $glpi_location = $this->getItem(GlpiLocation::class, [
+            '_boavizta_zone' => 'FRA',
+        ]);
+        $iterator = Location::getIncompleteLocations();
+        $output = $iterator->count();
+        $this->assertEquals(1, $output);
+    }
+
+    public function testGetcountryCode()
+    {
+        $geocoder_collection = new AddressCollection([
+            new NominatimAddress(
+                '',
+                new AdminLevelCollection([
+                    new AdminLevel(1, 'Île-de-France', 'IDF'),
+                    new AdminLevel(2, 'Paris', '75'),
+                ]),
+                null,
+                null,
+                null,
+                null,
+                '75000',
+                'Paris',
+                null,
+                new Country(
+                    'France',
+                    'FR'
+                ),
+            ),
+        ]);
+        $geocoder = $this->createStub(Geocoder::class);
+        $geocoder->method('geocodeQuery')->willReturn($geocoder_collection);
+
+        $glpi_location = $this->getItem(GlpiLocation::class, [
+            'name' => 'Paris',
+            'town'    => 'Paris',
+            'country' => 'France'
+        ]);
+        $output = Location::getCountryCode(
+            $glpi_location,
+            $geocoder
+        );
+        $this->assertEquals('FRA', $output);
     }
 }

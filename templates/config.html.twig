@@ -54,7 +54,7 @@
         ) }}
 
         <div>
-        <p>{{ __('Usage carbon emissions are always calculated internally', 'carbon') }}</p>
+            <p>{{ __('Usage carbon emissions are always calculated internally', 'carbon') }}</p>
         </div>
 
         {{ fields.dropdownArrayField(
@@ -73,6 +73,16 @@
             'boaviztapi_base_url',
             current_config['boaviztapi_base_url'],
             __('Base URL to the Boaviztapi instance', 'carbon')
+        ) }}
+
+        <div>
+            <p>{{ __('Geocoding converts a location into a ISO 3166 (3 letters) code. Boavizta needs this to determine usage impacts of assets. This feature sends address stored in a location to Nominatim.org service. If this is an issue, you can disable it below, and fill the coutry code manually.', 'carbon') }}</p>
+        </div>
+
+        {{ fields.checkboxField(
+            'geocoding_enabled',
+            current_config['geocoding_enabled'],
+            __('Enable geocoding', 'carbon')
         ) }}
 
         <button type="submit" class="btn btn-primary mx-1" name="update" value="1">
