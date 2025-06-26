@@ -99,4 +99,28 @@ class NetworkEquipmentTest extends EngineTestCase
             80 * 24 * 1 / 1000,
         ];
     }
+
+    public function testGetCarbonEmissionPerDay()
+    {
+        $zone = new Zone();
+        $zone->getEmpty();
+
+        $model = $this->getItem(static::$model_class, ['power_consumption' => 400]);
+        $item = $this->getItem(static::$itemtype_class, [
+            static::$model_class::getForeignKeyField() => $model->getID(),
+        ]);
+
+        $engine = new static::$engine_class($item->getID());
+        $output = $engine->getCarbonEmissionPerDay(
+            new DateTime('2024-01-01 00:00:00'),
+            $zone
+        );
+
+        // Expects to use World carbon intensity as fallback
+        $this->assertEqualsWithDelta(
+            4616.15,
+            $output->getValue(),
+            static::EPSILON
+        );
+    }
 }
