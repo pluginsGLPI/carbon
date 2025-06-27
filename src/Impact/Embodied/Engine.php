@@ -67,7 +67,12 @@ class Engine extends CommonGLPI
         }
 
         $embodied_impact = new $embodied_impact_class();
-        return self::configureEngine($embodied_impact);
+        try {
+            return self::configureEngine($embodied_impact);
+        } catch (\RuntimeException $e) {
+            // If the engine cannot be configured, it is not usable
+            return null;
+        }
     }
 
     public static function getEngine(string $engine_class): ?EmbodiedImpactInterface
@@ -77,7 +82,12 @@ class Engine extends CommonGLPI
         }
         $embodied_impact = new $engine_class();
 
-        return self::configureEngine($embodied_impact);
+        try {
+            return self::configureEngine($embodied_impact);
+        } catch (\RuntimeException $e) {
+            // If the engine cannot be configured, it is not usable
+            return null;
+        }
     }
 
     /**

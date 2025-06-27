@@ -155,6 +155,10 @@ class CronTask
         $limit_per_type = max(1, floor(($remaining) / count($embodied_impacts)));
         foreach ($embodied_impacts as $embodied_impact_type) {
             $embodied_impact = EmbodiedEngine::getEngine($embodied_impact_type);
+            if ($embodied_impact === null) {
+                // An error occured while configuring the engine
+                continue;
+            }
             $embodied_impact->setLimit($limit_per_type);
             $count = $embodied_impact->evaluateItems();
             $task->addVolume($count);
