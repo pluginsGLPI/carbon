@@ -31,26 +31,6 @@
  * -------------------------------------------------------------------------
  */
 
-use Glpi\Plugin\Hooks;
-
-/** @var array $PLUGIN_HOOKS */
-global $PLUGIN_HOOKS;
-
-$PLUGIN_HOOKS[Hooks::SECURED_CONFIGS]['carbon'] = [
-    'electricitymap_api_key',
-    'co2signal_api_key'
-];
-
-$current_config = Config::getConfigurationValues('plugin:carbon');
-$config_entries = [
-    'electricitymap_api_key' => 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-    'demo'                   => 1,
-    'impact_engine'          => 'Boavizta',
-    'boaviztapi_base_url'    => '',
-    'geocoding_enabled'      => '0',
-];
-foreach ($config_entries as $key => $value) {
-    if (!isset($current_config[$key])) {
-        Config::setConfigurationValues('plugin:carbon', [$key => $value]);
-    }
-}
+Config::setConfigurationValues('plugin:carbon', [
+    'geocoding_enabled' => 0,
+]);
