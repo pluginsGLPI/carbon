@@ -47,6 +47,7 @@ $config_entries = [
     'demo'                   => 1,
     'impact_engine'          => 'Boavizta',
     'boaviztapi_base_url'    => '',
+    'geocoding_enabled'      => '0',
 ];
 foreach ($config_entries as $key => $value) {
     if (!isset($current_config[$key])) {
