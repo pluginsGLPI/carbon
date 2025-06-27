@@ -258,6 +258,7 @@ class PluginInstallTest extends CommonTestCase
         $expected = [
             'electricitymap_api_key' => 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
             'demo'                   => '1',
+            'geocoding_enabled'      => '0',
             'dbversion'              => PLUGIN_CARBON_SCHEMA_VERSION,
         ];
 
