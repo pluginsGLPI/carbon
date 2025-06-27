@@ -257,13 +257,15 @@ class PluginInstallTest extends CommonTestCase
 
         $expected = [
             'electricitymap_api_key' => 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+            'impact_engine'          => 'Boavizta',
+            'boaviztapi_base_url'    => '',
             'demo'                   => '1',
+            'geocoding_enabled'      => '0',
             'dbversion'              => PLUGIN_CARBON_SCHEMA_VERSION,
         ];
 
         $config = Config::getConfigurationValues('plugin:' . TEST_PLUGIN_NAME);
         // Ignore keys that are not in the expected list
-        $config = array_intersect_key($config, $expected);
         $this->assertCount(count($expected), $config);
 
         $glpi_key = new GLPIKey();
@@ -274,7 +276,6 @@ class PluginInstallTest extends CommonTestCase
             }
             $this->assertEquals($expected_value, $value, "configuration key $key mismatch");
         }
-        $this->assertCount(3, $config);
     }
 
     private function checkRights()
