@@ -160,9 +160,9 @@ class Provider
             'LIMIT'   => $params['limit'] ?? 9999
         ];
 
-        if (!empty($where)) {
+        if ($where !== []) {
             $filter_criteria = self::getFiltersCriteria(Computer::getTable(), []);
-            $request['WHERE'] = $request['WHERE'] + $filter_criteria;
+            $request['WHERE'] += $filter_criteria;
         }
         $result = $DB->request($request);
 
@@ -244,8 +244,8 @@ class Provider
             'ORDER'   => GlpiComputerType::getTableField('name'),
         ];
 
-        if (!empty($where)) {
-            $request['WHERE'] = $request['WHERE'] + $where;
+        if ($where !== []) {
+            $request['WHERE'] += $where;
         }
         $result = $DB->request($request);
 
@@ -311,8 +311,8 @@ class Provider
             'GROUPBY' => ComputerModel::getTableField('id'),
             'ORDER'   => ComputerModel::getTableField('name'),
         ];
-        if (!empty($where)) {
-            $request['WHERE'] = $request['WHERE'] + $where;
+        if ($where !== []) {
+            $request['WHERE'] += $where;
         }
         $result = $DB->request($request);
 

@@ -299,7 +299,7 @@ class Location extends CommonDBChild
             $item->input['country'] ?? $item->fields['country'],
         ];
         $location_elements = array_filter($location_elements);
-        if (empty($location_elements)) {
+        if ($location_elements === []) {
             return '';
         }
         $location_string = implode(', ', $location_elements);
