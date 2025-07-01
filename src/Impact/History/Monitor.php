@@ -204,7 +204,7 @@ class Monitor extends AbstractAsset
         ];
         // Change inner joins into left joins to identify missing data
         // Warning : the order of the array merge below is important or the resulting SQL query will fail
-        $request['LEFT JOIN'] = $request['LEFT JOIN'] + $request['INNER JOIN'];
+        $request['LEFT JOIN'] += $request['INNER JOIN'];
         unset($request['INNER JOIN']);
         // remove where criterias
         unset($request['WHERE']);
