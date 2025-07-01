@@ -53,7 +53,7 @@ class Boaviztapi
             $this->base_url = $url;
         } else {
             $url = Config::getConfigurationValue('plugin:carbon', 'boaviztapi_base_url');
-            if (!is_string($url) || strlen($url) === 0) {
+            if (!is_string($url) || $url === '') {
                 throw new \RuntimeException('Invalid Boaviztapi base URL');
             }
             $this->base_url = $url;

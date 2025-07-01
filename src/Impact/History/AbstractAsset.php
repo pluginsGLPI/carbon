@@ -362,7 +362,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         } catch (\Exception $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
             Session::addMessageAfterRedirect(
-                sprintf(__('Error while calculating impact', 'carbon')),
+                __('Error while calculating impact', 'carbon'),
                 false,
                 ERROR
             );

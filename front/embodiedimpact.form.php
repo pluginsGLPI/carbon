@@ -36,7 +36,7 @@ use GlpiPlugin\Carbon\EmbodiedImpact;
 use GlpiPlugin\Carbon\Impact\Embodied\AbstractEmbodiedImpact;
 use GlpiPlugin\Carbon\Impact\Embodied\Engine;
 
-include('../../../inc/includes.php');
+include(__DIR__ . '/../../../inc/includes.php');
 
 // Check if plugin is activated...
 if (!Plugin::isPluginActive('carbon')) {

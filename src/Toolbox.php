@@ -215,7 +215,7 @@ class Toolbox
             if ($weight < $multiple) {
                 break;
             }
-            $weight = $weight / 1000;
+            $weight /= 1000;
         }
 
         $weight = self::dynamicRound($weight);
@@ -263,7 +263,7 @@ class Toolbox
             if ($p < $multiple) {
                 break;
             }
-            $p = $p / 1000;
+            $p /= 1000;
         }
 
         $p = self::dynamicRound($p);
@@ -298,7 +298,7 @@ class Toolbox
             if ($p < $multiple) {
                 break;
             }
-            $p = $p / 1000;
+            $p /= 1000;
         }
 
         $p = self::dynamicRound($p);
@@ -340,7 +340,7 @@ class Toolbox
             if ($average < $multiple) {
                 break;
             }
-            $average = $average / $multiple;
+            $average /= $multiple;
             $power++;
         }
 
@@ -648,7 +648,7 @@ class Toolbox
     protected static function relative_luminance(Color $color): float
     {
         $rgb = array_map(function ($rgb_component) {
-            $rgb_component = $rgb_component / 255.0;
+            $rgb_component /= 255.0;
             return ($rgb_component <= 0.03928) ? ($rgb_component / 12.92) : pow(($rgb_component + 0.055) / 1.055, 2.4);
         }, $color->getRGB());
         return 0.2126 * $rgb['R'] + 0.7152 * $rgb['G'] + 0.0722 * $rgb['B'];

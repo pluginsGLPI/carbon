@@ -30,7 +30,7 @@
  * -------------------------------------------------------------------------
  */
 
-include("../../../inc/includes.php");
+include(__DIR__ . "/../../../inc/includes.php");
 
 use GlpiPlugin\Carbon\MonitorType;
 if (!Plugin::isPluginActive('carbon')) {

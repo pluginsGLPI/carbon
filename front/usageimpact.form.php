@@ -36,7 +36,7 @@ use GlpiPlugin\Carbon\Impact\History\AbstractAsset;
 use GlpiPlugin\Carbon\Impact\Usage\Engine;
 use GlpiPlugin\Carbon\UsageImpact;
 
-include('../../../inc/includes.php');
+include(__DIR__ . '/../../../inc/includes.php');
 
 // Check if plugin is activated...
 if (!Plugin::isPluginActive('carbon')) {
