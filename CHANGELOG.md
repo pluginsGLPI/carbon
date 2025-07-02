@@ -4,9 +4,6 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
-## [0.0.1](https://gitlab.teclib.com/editions/research-development/glpi-greenit/carbon/compare/0.0.0...v0.0.1) (2025-07-02)
-
-
 ---
 
 ## [1.0.0](https://gitlab.teclib.com/editions/research-development/glpi-greenit/carbon/compare/668e7b68956c8fe6decff7563bc64b8057eaa25e...v1.0.0) (2025-05-23)
@@ -625,4 +622,3 @@ All notable changes to this project will be documented in this file.
 
 
 ---
-
