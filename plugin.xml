@@ -35,7 +35,7 @@ Carbon est un plugin permettant d'évaluer l'impact environnemental de votre inf
       <lang>en_US</lang>
       <lang>fr_FR</lang>
   </langs>
-   <license>MIT</license>
+   <license>GPLv3</license>
    <tags>
       <en>
          <tag>Environmental impact</tag>
