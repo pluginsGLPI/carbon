@@ -1,0 +1,54 @@
+<root>
+   <name>Carbon</name>
+   <key>carbon</key>
+   <state>stable</state>
+   <logo>https://raw.githubusercontent.com/pluginsGLPI/carbon/master/icon.png</logo>
+   <description>
+      <short>
+         <en>Carbon aims to assess the environmental impact of your IT infrastructure.</en>
+         <fr>Carbon vise à évaluer l'impact environnemental de votre infrastructure informatique.</fr>
+      </short>
+      <long>
+         <en>
+Carbon is a plugin that aims to assess the environmental impact of your IT infrastructure.
+         </en>
+         <fr>
+Carbon est un plugin permettant d'évaluer l'impact environnemental de votre infrastructure informatique.
+         </fr>
+      </long>
+   </description>
+   <homepage>https://pluginsglpi.github.io/carbon/</homepage>
+   <download>https://github.com/pluginsGLPI/carbon/releases</download>
+   <issues>https://github.com/pluginsGLPI/carbon/issues</issues>
+   <readme>https://glpi-plugins.readthedocs.io/en/latest/carbon/index.html</readme>
+   <authors>
+      <author>Teclib'</author>
+   </authors>
+   <versions>
+      <version>
+         <num>1.0.0</num>
+         <compatibility>~10.0.18</compatibility>
+         <download_url>https://github.com/pluginsGLPI/carbon/releases/download/1.0.0/glpi-carbon-1.0.0.tar.bz2</download_url>
+      </version>
+   </versions>
+   <langs>
+      <lang>en_US</lang>
+      <lang>fr_FR</lang>
+  </langs>
+   <license>MIT</license>
+   <tags>
+      <en>
+         <tag>Environmental impact</tag>
+         <tag>Carbon footprint</tag>
+         <tag>Sustainability</tag>
+      </en>
+      <fr>
+         <tag>Impact environnemental</tag>
+         <tag>Empreinte carbone</tag>
+         <tag>Développement durable</tag>
+      </fr>
+   </tags>
+   <screenshots>
+      <screenshot>https://raw.githubusercontent.com/pluginsGLPI/carbon/master/screenshot_1.png</screenshot>
+   </screenshots>
+</root>

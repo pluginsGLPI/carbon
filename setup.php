@@ -169,11 +169,11 @@ function plugin_carbon_registerClasses()
 function plugin_version_carbon()
 {
     $requirements = [
-        'name'           => 'GLPI Carbon',
+        'name'           => 'Carbon',
         'version'        => PLUGIN_CARBON_VERSION,
         'author'         => '<a href="http://www.teclib.com">Teclib\'</a>',
-        'license'        => 'MIT',
-        'homepage'       => '',
+        'license'        => 'GPLv3',
+        'homepage'       => 'https://github.com/pluginsGLPI/carbon',
         'requirements'   => [
             'glpi' => [
                 'min' => PLUGIN_CARBON_MIN_GLPI_VERSION,
