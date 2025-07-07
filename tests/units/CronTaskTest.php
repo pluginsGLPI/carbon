@@ -44,14 +44,14 @@ use Geocoder\Model\AdminLevel;
 use Geocoder\Model\AdminLevelCollection;
 use Geocoder\Model\Country;
 use Geocoder\Provider\Nominatim\Model\NominatimAddress;
-use GlpiPlugin\Carbon\DataSource\CarbonIntensityInterface;
+use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientInterface;
 use Location as GlpiLocation;
 
 class CronTaskTest extends DbTestCase
 {
     public function downloadSourceProvider()
     {
-        $data_source1 = $this->createStub(CarbonIntensityInterface::class);
+        $data_source1 = $this->createStub(ClientInterface::class);
         $data_source1->method('getZones')->willReturn([['name' => 'test_zone']]);
         $intensity1 = $this->createStub(CarbonIntensity::class);
         $intensity1->method('downloadOneZone')->willReturn(0);
@@ -61,7 +61,7 @@ class CronTaskTest extends DbTestCase
             0,
         ];
 
-        $data_source2 = $this->createStub(CarbonIntensityInterface::class);
+        $data_source2 = $this->createStub(ClientInterface::class);
         $data_source2->method('getZones')->willReturn([['name' => 'test_zone']]);
         $intensity2 = $this->createStub(CarbonIntensity::class);
         $intensity2->method('downloadOneZone')->willReturn(1024);
@@ -71,7 +71,7 @@ class CronTaskTest extends DbTestCase
             1,
         ];
 
-        $data_source3 = $this->createStub(CarbonIntensityInterface::class);
+        $data_source3 = $this->createStub(ClientInterface::class);
         $data_source3->method('getZones')->willReturn([['name' => 'test_zone']]);
         $intensity3 = $this->createStub(CarbonIntensity::class);
         $intensity3->method('downloadOneZone')->willReturn(-5);

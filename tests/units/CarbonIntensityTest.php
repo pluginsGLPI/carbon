@@ -42,6 +42,7 @@ use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
 use GlpiPlugin\Carbon\DataSource\AbstractCarbonIntensity;
+use GlpiPlugin\Carbon\DataSource\CarbonIntensity\AbstractClient;
 use Infocom;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -288,7 +289,7 @@ class CarbonIntensityTest extends DbTestCase
     {
         $instance = new CarbonIntensity();
 
-        $data_source = $this->getMockBuilder(AbstractCarbonIntensity::class)
+        $data_source = $this->getMockBuilder(AbstractClient::class)
             ->getMock();
         $result = $instance->getDownloadStartDate('foo', $data_source);
         $expected = (new DateTime('13 months ago'))->setTime(0, 0, 0); // CarbonIntensity::MIN_HISTORY_LENGTH
@@ -310,7 +311,7 @@ class CarbonIntensityTest extends DbTestCase
     {
         $instance = new CarbonIntensity();
 
-        $data_source = $this->getMockBuilder(AbstractCarbonIntensity::class)
+        $data_source = $this->getMockBuilder(AbstractClient::class)
             ->getMock();
         $data_source->method('getSourceName')->willReturn('bar');
         $data_source->method('getMaxIncrementalAge')->willReturn(
@@ -359,7 +360,7 @@ class CarbonIntensityTest extends DbTestCase
             $zone::getForeignKeyField() => $zone->getID()
         ]);
 
-        $data_source = $this->getMockBuilder(AbstractCarbonIntensity::class)
+        $data_source = $this->getMockBuilder(AbstractClient::class)
             ->getMock();
         $hours = null;
         $data_source->method('fullDownload')->willReturnCallback(

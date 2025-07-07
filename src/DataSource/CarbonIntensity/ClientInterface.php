@@ -30,7 +30,7 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\DataSource;
+namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity;
 
 use DateTimeImmutable;
 use GlpiPlugin\Carbon\CarbonIntensity;
@@ -84,7 +84,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
  *
  */
 
-interface CarbonIntensityInterface
+interface ClientInterface
 {
     /**
      * Fetch carbon intensities from the source.
@@ -137,7 +137,18 @@ interface CarbonIntensityInterface
     public function getHardStartDate(): DateTimeImmutable;
 
     /**
-     * Get zones handled by the data source
+     * Get supported zones from the provider
+     *
+     * Returned zones are in the form: id => name in english
+     * If the array is empty then the datasource does not provide a way to
+     * enumerate the suppoted zones
+     *
+     * @return array
+     */
+    public function getSupportedZones(): array;
+
+    /**
+     * Get the zones handled by the data source
      *
      * @return array
      */

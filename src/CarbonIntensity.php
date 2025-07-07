@@ -40,8 +40,8 @@ use DateTimeInterface;
 use DBmysql;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\Zone;
-use GlpiPlugin\Carbon\DataSource\CarbonIntensityInterface;
 use Glpi\DBAL\QueryParam;
+use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
@@ -205,13 +205,13 @@ class CarbonIntensity extends CommonDropdown
     /**
      * Download data for a single zone
      *
-     * @param CarbonIntensityInterface $data_source
+     * @param ClientInterface $data_source
      * @param string $zone_name zone name
      * @param integer $limit maximum count of items to process
      * @param ProgressBar $progress_bar progress bar to update (CLI mode only)
      * @return integer count of item downloaded
      */
-    public function downloadOneZone(CarbonIntensityInterface $data_source, string $zone_name, int $limit = 0, ?ProgressBar $progress_bar = null): int
+    public function downloadOneZone(ClientInterface $data_source, string $zone_name, int $limit = 0, ?ProgressBar $progress_bar = null): int
     {
         $start_date = $this->getDownloadStartDate($zone_name, $data_source);
 
@@ -280,10 +280,10 @@ class CarbonIntensity extends CommonDropdown
      * Get the oldest date where data are required
      *
      * @param string                   $zone_name   ignored for now; zone to examine
-     * @param CarbonIntensityInterface $data_source ignored for now; data source
+     * @param ClientInterface          $data_source ignored for now; data source
      * @return DateTimeImmutable|null
      */
-    public function getDownloadStartDate(string $zone_name, CarbonIntensityInterface $data_source): ?DateTimeImmutable
+    public function getDownloadStartDate(string $zone_name, ClientInterface $data_source): ?DateTimeImmutable
     {
         // Get the default oldest date od data to download
         $start_date = new DateTime(self::MIN_HISTORY_LENGTH);
@@ -303,11 +303,11 @@ class CarbonIntensity extends CommonDropdown
     /**
      * Get date where data download shall end, excluding the incremental download mode for the specified data source
      *
-     * @param string                   $zone_name   zone to examine
-     * @param CarbonIntensityInterface $data_source data source
+     * @param string              $zone_name   zone to examine
+     * @param ClientInterface     $data_source data source
      * @return DateTimeImmutable
      */
-    public function getDownloadStopDate(string $zone_name, CarbonIntensityInterface $data_source): DateTimeImmutable
+    public function getDownloadStopDate(string $zone_name, ClientInterface $data_source): DateTimeImmutable
     {
         $stop_date = $data_source->getMaxIncrementalAge();
         $first_known_intensity_date = $this->getFirstKnownDate($zone_name, $data_source->getSourceName());

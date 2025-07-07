@@ -127,7 +127,7 @@ class CreateTestInventoryCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('plugin:carbon:create_test_inventory')
+            ->setName('plugins:carbon:create_test_inventory')
             ->setDescription('Create a test inventory')
             ->setHelp('This command creates an inventory for testing, using internal data.');
 
