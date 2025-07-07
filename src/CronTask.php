@@ -35,10 +35,8 @@ namespace GlpiPlugin\Carbon;
 use CronTask as GlpiCronTask;
 use Config as GlpiConfig;
 use Geocoder\Geocoder;
-use GlpiPlugin\Carbon\DataSource\RestApiClient;
-use GlpiPlugin\Carbon\DataSource\CarbonIntensityRTE;
-use GlpiPlugin\Carbon\DataSource\CarbonIntensityElectricityMap;
-use GlpiPlugin\Carbon\DataSource\CarbonIntensityInterface;
+use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientFactory;
+use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientInterface;
 use GlpiPlugin\Carbon\Impact\Embodied\Engine as EmbodiedEngine;
 use GlpiPlugin\Carbon\Impact\Usage\UsageImpactInterface as UsageImpactInterface;
 use GlpiPlugin\Carbon\Impact\Usage\Engine as UsageEngine;
@@ -74,6 +72,12 @@ class CronTask
             case 'DownloadElectricityMap':
                 return [
                     'description' => __('Download carbon emissions from ElectricityMap', 'carbon'),
+                    'parameter' => __('Maximum number of entries to download', 'carbon'),
+                ];
+
+            case 'DownloadWatttime':
+                return [
+                    'description' => __('Download carbon emissions from Watttime', 'carbon'),
                     'parameter' => __('Maximum number of entries to download', 'carbon'),
                 ];
 
@@ -167,7 +171,8 @@ class CronTask
      */
     public static function cronDownloadRte(GlpiCronTask $task): int
     {
-        return self::downloadCarbonIntensityFromSource($task, new CarbonIntensityRTE(new RestApiClient([])), new CarbonIntensity());
+        $client = ClientFactory::create('rte');
+        return self::downloadCarbonIntensityFromSource($task, $client, new CarbonIntensity());
     }
 
     /**
@@ -177,18 +182,30 @@ class CronTask
      */
     public static function cronDownloadElectricityMap(GlpiCronTask $task): int
     {
-        return self::downloadCarbonIntensityFromSource($task, new CarbonIntensityElectricityMap(new RestApiClient([])), new CarbonIntensity());
+        $client = ClientFactory::create('electricitymap');
+        return self::downloadCarbonIntensityFromSource($task, $client, new CarbonIntensity());
+    }
+
+    /**
+     * Automatic action for Watttime datasource
+     *
+     * @return int
+     */
+    public static function cronDownloadWatttime(GlpiCronTask $task): int
+    {
+        $client = ClientFactory::create('watttime');
+        return self::downloadCarbonIntensityFromSource($task, $client, new CarbonIntensity());
     }
 
     /**
      * Download carbon intensity data from a 3rd party source
      *
      * @param GlpiCronTask $task
-     * @param CarbonIntensityInterface $data_source
+     * @param ClientInterface $data_source
      * @param CarbonIntensity $intensity
      * @return integer
      */
-    protected static function downloadCarbonIntensityFromSource(GlpiCronTask $task, CarbonIntensityInterface $data_source, CarbonIntensity $intensity): int
+    protected static function downloadCarbonIntensityFromSource(GlpiCronTask $task, ClientInterface $data_source, CarbonIntensity $intensity): int
     {
         $task->setVolume(0); // start with zero
         $remaining = $task->fields['param'];

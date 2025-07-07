@@ -30,7 +30,7 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\DataSource;
+namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity;
 
 use DateInterval;
 use DateTime;
@@ -43,6 +43,7 @@ use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
 use Config as GlpiConfig;
 use GLPIKey;
+use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\Toolbox;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -53,7 +54,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
  * API documentation:
  * @see https://static.electricitymaps.com/api/docs/index.html
  */
-class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
+class ElectricityMapClient extends AbstractClient
 {
     const HISTORY_URL = '/carbon-intensity/history';
     const PAST_URL    = '/carbon-intensity/past-range';
@@ -167,6 +168,11 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
         return $glpi_key->decrypt($value);
     }
 
+    /**
+     * Get zones from the provider
+     *
+     * @return array
+     */
     protected function queryZones(): array
     {
         $response = $this->client->request('GET', $this->base_url . self::ZONES_URL, []);
@@ -184,6 +190,17 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
         }
 
         return $response;
+    }
+
+    public function getSupportedZones(): array
+    {
+        $zones = [];
+        $raw_zones = $this->queryZones();
+        foreach ($raw_zones as $id => $zone) {
+            $zones[$id] = $zone['zoneName'];
+        }
+
+        return $zones;
     }
 
     /**
@@ -218,7 +235,7 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
             return [];
         }
 
-        if (isset($response['status']) && $response['status'] === 'error') {
+        if (isset($response['status']) && $response['status'] === 'error' || isset($response['error'])) {
             // An error ocured
             if ($response['message'] === 'Invalid auth-token') {
                 throw new AbortException('Invalid auth-token');

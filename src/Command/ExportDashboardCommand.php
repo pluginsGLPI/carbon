@@ -53,7 +53,7 @@ class ExportDashboardCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('plugin:carbon:export_report_dashboard')
+            ->setName('plugins:carbon:export_report_dashboard')
             ->setDescription('exports the report dashboard description')
             ->setHelp('This command exports the report dashboard description to a JSON file');
     }

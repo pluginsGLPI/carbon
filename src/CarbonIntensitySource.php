@@ -36,6 +36,7 @@ use CommonDropdown;
 use CommonDBTM;
 use CommonGLPI;
 use DbUtils;
+use DBmysql;
 use Session;
 
 class CarbonIntensitySource extends CommonDropdown
@@ -117,5 +118,25 @@ class CarbonIntensitySource extends CommonDropdown
         ];
 
         return $tab;
+    }
+
+    /**
+     * Get an array of source names for downloadable data
+     *
+     * @return array
+     */
+    public function getDownloadableSources(): array
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        $iterator = $DB->request([
+            'SELECT' => ['id', 'name'],
+            'FROM'   => self::getTable(),
+            'WHERE'  => [
+                'is_fallback' => 0,
+            ]
+        ]);
+        return iterator_to_array($iterator);
     }
 }

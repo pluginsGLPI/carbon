@@ -30,7 +30,7 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\DataSource;
+namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity;
 
 use Config as GlpiConfig;
 use DBmysql;
@@ -44,7 +44,7 @@ use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
 use GlpiPlugin\Carbon\Zone;
 use Symfony\Component\Console\Helper\ProgressBar;
 
-abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
+abstract class AbstractClient implements ClientInterface
 {
     protected int $step;
 

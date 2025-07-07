@@ -30,7 +30,7 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\DataSource;
+namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity;
 
 use DateInterval;
 use DateTime;
@@ -40,6 +40,7 @@ use DateTimeZone;
 use DBmysql;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
+use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
 use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\Toolbox;
@@ -51,7 +52,7 @@ use GlpiPlugin\Carbon\Toolbox;
  * API documentation
  * @see https://help.opendatasoft.com/apis/ods-explore-v2/explore_v2.1.html
  */
-class CarbonIntensityRTE extends AbstractCarbonIntensity
+class RteClient extends AbstractClient
 {
     const RECORDS_URL =         '/eco2mix-national-tr/records';
     const EXPORT_URL_REALTIME      = '/eco2mix-national-tr/exports/json';
@@ -95,6 +96,13 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         $recent_limit->setTime(0, 0, 0);
 
         return DateTimeImmutable::createFromMutable($recent_limit);
+    }
+
+    public function getSupportedZones(): array
+    {
+        return [
+            null => 'France'
+        ];
     }
 
     public function createZones(): int

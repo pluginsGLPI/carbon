@@ -30,16 +30,13 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\DataSource\Tests;
+namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\Tests;
 
-use DateTime;
 use DateTimeImmutable;
-use GlpiPlugin\Carbon\CarbonIntensity;
-use GlpiPlugin\Carbon\Zone;
-use GlpiPlugin\Carbon\DataSource\AbstractCarbonIntensity;
+use GlpiPlugin\Carbon\DataSource\CarbonIntensity\AbstractClient;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 
-class AbstractCarbonIntensityTest extends DbTestCase
+class AbstractClientTest extends DbTestCase
 {
     public function sliceDateRangeByMonthProvider()
     {
@@ -127,7 +124,7 @@ class AbstractCarbonIntensityTest extends DbTestCase
     {
         foreach ($this->sliceDateRangeByMonthProvider() as $data) {
             list ($start, $stop, $expected) = $data;
-            $stub = $this->getMockBuilder(AbstractCarbonIntensity::class)->getMock();
+            $stub = $this->getMockBuilder(AbstractClient::class)->getMock();
             $output = $this->callPrivateMethod($stub, 'sliceDateRangeByMonth', $start, $stop);
 
             if (count($expected) === 0) {
@@ -176,7 +173,7 @@ class AbstractCarbonIntensityTest extends DbTestCase
     {
         foreach ($this->sliceDateRangeByDayProvider() as $data) {
             list ($start, $stop, $expected) = $data;
-            $stub = $this->getMockBuilder(AbstractCarbonIntensity::class)->getMock();
+            $stub = $this->getMockBuilder(AbstractClient::class)->getMock();
             $output = $this->callPrivateMethod($stub, 'sliceDateRangeByDay', $start, $stop);
 
             if (count($expected) === 0) {
