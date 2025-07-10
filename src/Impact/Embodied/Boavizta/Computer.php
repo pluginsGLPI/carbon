@@ -40,6 +40,9 @@ use DeviceProcessor;
 use GlpiPlugin\Carbon\ComputerType;
 use ComputerType as GlpiComputerType;
 use DBmysql;
+use DeviceHardDrive;
+use InterfaceType;
+use Item_DeviceHardDrive;
 use Item_DeviceMemory;
 use Item_DeviceProcessor;
 use Item_Devices;
@@ -158,15 +161,28 @@ class Computer extends AbstractAsset
                     }
                     break;
                 case Item_DeviceMemory::class:
-                    $configuration['memory'][] = [
-                        'units' => 1,
-                        'capacity' => ceil($item_device->fields['size'] / 1024),
+                    $configuration['ram'][] = [
+                        'units'    => 1,
+                        'capacity' => ceil($item_device->fields['size'] / 1024), // Convert to GB
                     ];
                     break;
-                case Item_Disk::class:
+                case Item_DeviceHardDrive::class:
+                    $type = 'hdd';
+                    $device_hard_drive = new DeviceHardDrive();
+                    $device_hard_drive->getFromDB($item_device->fields['deviceharddrives_id']);
+                    if (!$device_hard_drive->isNewItem()) {
+                        $interface_type = new InterfaceType();
+                        $interface_type->getFromDB($device_hard_drive->fields['interfacetypes_id']);
+                        if (!$interface_type->isNewItem()) {
+                            if (in_array($interface_type->fields['name'], ['NVME'])) {
+                                $type = 'ssd';
+                            }
+                        }
+                    }
                     $configuration['disk'][] = [
-                        'units' => 1,
-                        'capacity' => ceil($item_device->fields['capacity'] / 1024),
+                        'units'    => 1,
+                        'type'     => $type,
+                        'capacity' => ceil($item_device->fields['capacity'] / 1024), // Convert to GB
                     ];
                     break;
             }
