@@ -36,17 +36,17 @@ namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta;
 
 use CommonDBTM;
 use Computer as GlpiComputer;
+use DBmysql;
 use DeviceProcessor;
 use GlpiPlugin\Carbon\ComputerType;
 use ComputerType as GlpiComputerType;
-use DBmysql;
 use DeviceHardDrive;
 use InterfaceType;
 use Item_DeviceHardDrive;
 use Item_DeviceMemory;
 use Item_DeviceProcessor;
 use Item_Devices;
-use Item_Disk;
+use Manufacturer;
 
 class Computer extends AbstractAsset
 {
@@ -161,12 +161,21 @@ class Computer extends AbstractAsset
                     }
                     break;
                 case Item_DeviceMemory::class:
-                    $configuration['ram'][] = [
+                    $manufacturer = $this->getDeviceManufacturer($item_device);
+                    $ram = [
                         'units'    => 1,
                         'capacity' => ceil($item_device->fields['size'] / 1024), // Convert to GB
                     ];
+                    if (!empty($manufacturer)) {
+                        $ram['manufacturer'] = $manufacturer;
+                    }
+                    $configuration['ram'][] = $ram;
                     break;
                 case Item_DeviceHardDrive::class:
+                    $hard_drive = [
+                        'units'    => 1,
+                        'capacity' => ceil($item_device->fields['capacity'] / 1024), // Convert to GB
+                    ];
                     $type = 'hdd';
                     $device_hard_drive = new DeviceHardDrive();
                     $device_hard_drive->getFromDB($item_device->fields['deviceharddrives_id']);
@@ -176,18 +185,73 @@ class Computer extends AbstractAsset
                         if (!$interface_type->isNewItem()) {
                             if (in_array($interface_type->fields['name'], ['NVME'])) {
                                 $type = 'ssd';
+                                $manufacturer = $this->getDeviceManufacturer($item_device);
+                                if ($manufacturer !== null) {
+                                    $$hard_drive['manufacturer'] = $manufacturer;
+                                }
+                                $hard_drive['manufacturer'] = $manufacturer;
                             }
                         }
                     }
-                    $configuration['disk'][] = [
-                        'units'    => 1,
-                        'type'     => $type,
-                        'capacity' => ceil($item_device->fields['capacity'] / 1024), // Convert to GB
-                    ];
+                    $hard_drive['type'] = $type;
+                    $configuration['disk'][] = $hard_drive;
                     break;
             }
         }
 
         return $configuration;
+    }
+
+    /**
+     * Get the manufacturer of the device
+     *
+     * @param Item_Devices $item
+     * @return string|null
+     */
+    private function getDeviceManufacturer(Item_Devices $item): ?string
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        // Get the manufacturer of the device
+        $table_device = getTableForItemType($item::$itemtype_2);
+        $table_device_item = getTableForItemType($item->getType());
+        $table_manufacturer = getTableForItemType(Manufacturer::class);
+        $device_fk = getForeignKeyFieldForItemType($item::$itemtype_2);
+        $manufacturer_fk = getForeignKeyFieldForItemType(Manufacturer::class);
+        $request = [
+            'SELECT' => [
+                $table_manufacturer => ['id', 'name'],
+            ],
+            'FROM' => $table_device_item,
+            'INNER JOIN' => [
+                $table_device => [
+                    'ON' => [
+                        $table_device_item => $device_fk,
+                        $table_device => 'id',
+                    ]
+                ],
+                $table_manufacturer => [
+                    'ON' => [
+                        $table_manufacturer => 'id',
+                        $table_device  => $manufacturer_fk,
+                    ]
+                ],
+            ],
+            'WHERE' => [
+                $item->getTableField('id') => $item->getID(),
+            ]
+        ];
+
+        $result = $DB->request($request);
+        if ($result->numRows() === 0) {
+            return null;
+        }
+        $data = $result->current();
+        if (empty($data['name'])) {
+            return null;
+        }
+
+        return $data['name'];
     }
 }
