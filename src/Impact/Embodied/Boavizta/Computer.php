@@ -161,19 +161,24 @@ class Computer extends AbstractAsset
                     }
                     break;
                 case Item_DeviceMemory::class:
-                    $manufacturer = $this->getDeviceManufacturer($item_device);
                     $ram = [
-                        'units'    => 1,
                         'capacity' => ceil($item_device->fields['size'] / 1024), // Convert to GB
                     ];
+                    $manufacturer = $this->getDeviceManufacturer($item_device);
                     if (!empty($manufacturer)) {
                         $ram['manufacturer'] = $manufacturer;
                     }
-                    $configuration['ram'][] = $ram;
+                    $key_match = $this->arrayMatch($ram, $configuration['ram'] ?? []);
+                    if ($key_match !== null) {
+                        // increment the units count of the RAM
+                        $configuration['ram'][$key_match]['units']++;
+                    } else {
+                        $ram['units'] = 1;
+                        $configuration['ram'][] = $ram;
+                    }
                     break;
                 case Item_DeviceHardDrive::class:
                     $hard_drive = [
-                        'units'    => 1,
                         'capacity' => ceil($item_device->fields['capacity'] / 1024), // Convert to GB
                     ];
                     $type = 'hdd';
@@ -194,12 +199,39 @@ class Computer extends AbstractAsset
                         }
                     }
                     $hard_drive['type'] = $type;
-                    $configuration['disk'][] = $hard_drive;
+                    $key_match = $this->arrayMatch($hard_drive, $configuration['disk'] ?? []);
+                    if ($key_match !== null) {
+                        // increment the units count of the disk
+                        $configuration['disk'][$key_match]['units']++;
+                    } else {
+                        $hard_drive['units'] = 1;
+                        $configuration['disk'][] = $hard_drive;
+                    }
                     break;
             }
         }
 
         return $configuration;
+    }
+
+    /**
+     * Checks if the array $needle matches any of the arrays in $haystack
+     *
+     * @param array $needle
+     * @param array $haystack
+     * @return mixed key the key of the component in $haystack if found, null otherwise
+     */
+    private function arrayMatch(array $needle, array $haystack)
+    {
+        foreach ($haystack as $key => $item) {
+            // ignore units as it does not represents characteristics of a component
+            unset($item['units']);
+            if ($item === $needle) {
+                return $key;
+            }
+        }
+
+        return null;
     }
 
     /**
