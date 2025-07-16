@@ -5,6 +5,7 @@
 # 
 # Translators:
 # Michael Schieferer, 2022
+# Christian Hoffmeister, 2025
 # 
 #, fuzzy
 msgid ""
@@ -13,7 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-09-21 13:21+0200\n"
 "PO-Revision-Date: 2022-11-23 14:34+0000\n"
-"Last-Translator: Michael Schieferer, 2022\n"
+"Last-Translator: Christian Hoffmeister, 2025\n"
 "Language-Team: German (Germany) (https://app.transifex.com/teclib/teams/28042/de_DE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -29,7 +30,7 @@ msgstr ""
 
 #: front/report.php:49 entrée standard:37
 msgid "GLPI Carbon"
-msgstr ""
+msgstr "GLPI Carbon"
 
 #: src/CarbonIntensityZone.php:50
 msgid "Carbon intensity zone"
@@ -356,69 +357,69 @@ msgstr ""
 
 #: src/ComputerUsageProfile.php:105 entrée standard:52
 msgid "Start time"
-msgstr ""
+msgstr "Startzeit"
 
 #: src/ComputerUsageProfile.php:113 entrée standard:58
 msgid "Stop time"
-msgstr ""
+msgstr "Stopzeit"
 
 #: src/ComputerUsageProfile.php:121 entrée standard:66
 msgid "Monday"
-msgstr ""
+msgstr "Montag"
 
 #: src/ComputerUsageProfile.php:129 entrée standard:72
 msgid "Tuesday"
-msgstr ""
+msgstr "Dienstag"
 
 #: src/ComputerUsageProfile.php:137 entrée standard:78
 msgid "Wednesday"
-msgstr ""
+msgstr "MIttwoch"
 
 #: src/ComputerUsageProfile.php:145 entrée standard:84
 msgid "Thursday"
-msgstr ""
+msgstr "Donnerstag"
 
 #: src/ComputerUsageProfile.php:153 entrée standard:90
 msgid "Friday"
-msgstr ""
+msgstr "Freitag"
 
 #: src/ComputerUsageProfile.php:161 entrée standard:96
 msgid "Saturday"
-msgstr ""
+msgstr "Samstag"
 
 #: src/ComputerUsageProfile.php:169 entrée standard:103
 msgid "Sunday"
-msgstr ""
+msgstr "Sonntag"
 
 #: src/CarbonIntensitySource_CarbonIntensityZone.php:124
 #: src/CarbonIntensitySource_CarbonIntensityZone.php:219 entrée standard:40
 msgid "Name"
-msgstr ""
+msgstr "Name"
 
 #: src/CarbonIntensitySource_CarbonIntensityZone.php:125
 msgid "Download enabled"
-msgstr ""
+msgstr "Download erlauben"
 
 #: src/CarbonIntensitySource_CarbonIntensityZone.php:126
 msgid "Source for historical"
-msgstr ""
+msgstr "Quelle für historisches"
 
 #: src/CarbonIntensitySource_CarbonIntensityZone.php:132
 #: src/CarbonIntensitySource_CarbonIntensityZone.php:225
 msgid "Total"
-msgstr ""
+msgstr "Total"
 
 #: src/CarbonIntensitySource_CarbonIntensityZone.php:284 entrée standard:189
 msgid "No"
-msgstr ""
+msgstr "Nein"
 
 #: src/CarbonIntensitySource_CarbonIntensityZone.php:284 entrée standard:186
 msgid "Yes"
-msgstr ""
+msgstr "Ja"
 
 #: src/CarbonIntensitySource_CarbonIntensityZone.php:285
 msgid "Enable / Disable"
-msgstr ""
+msgstr "Einschalten / Ausschalten"
 
 #: src/CarbonEmission.php:50
 msgid "Carbon Emission"
@@ -443,7 +444,7 @@ msgstr ""
 
 #: install/migration/update_0.0.0_to_0.0.1/create_uasge_profiles.php:39
 msgid "Office hours"
-msgstr ""
+msgstr "Bürozeiten"
 
 #: install/migration/update_0.0.0_to_0.0.1/create_automatic_actions.php:46
 msgid "Compute carbon emissions of computers"
@@ -459,7 +460,7 @@ msgstr ""
 
 #: entrée standard:35
 msgid "No zone available"
-msgstr ""
+msgstr "Keine Zone verfügbar"
 
 #: entrée standard:37
 msgid "Please run the automatic action to downlaod data from this source."
@@ -481,7 +482,7 @@ msgstr ""
 
 #: entrée standard:38
 msgid "Warning"
-msgstr ""
+msgstr "Warnung"
 
 #: entrée standard:33
 msgid "Carbon Emission per Type"
@@ -493,7 +494,7 @@ msgstr ""
 
 #: entrée standard:40
 msgid "Information"
-msgstr ""
+msgstr "Information"
 
 #: entrée standard:50
 msgid ""
@@ -538,11 +539,11 @@ msgstr ""
 
 #: entrée standard:104
 msgid "Start"
-msgstr ""
+msgstr "Start"
 
 #: entrée standard:109
 msgid "Previous"
-msgstr ""
+msgstr "Vorherige"
 
 #: entrée standard:118
 #, php-format
@@ -551,31 +552,31 @@ msgstr ""
 
 #: entrée standard:141
 msgid "Next"
-msgstr ""
+msgstr "weiter"
 
 #: entrée standard:146
 msgid "End"
-msgstr ""
+msgstr "Ende"
 
 #: entrée standard:50 standard:281
 msgid "No data"
-msgstr ""
+msgstr "Keine Daten"
 
 #: entrée standard:88
 msgid "Check all"
-msgstr ""
+msgstr "Alles prüfen"
 
 #: entrée standard:123
 msgid "Filter"
-msgstr ""
+msgstr "Filter"
 
 #: entrée standard:129
 msgid "Export"
-msgstr ""
+msgstr "Exportieren"
 
 #: entrée standard:184
 msgid "All"
-msgstr ""
+msgstr "Alles"
 
 #: entrée standard:310
 #, php-format

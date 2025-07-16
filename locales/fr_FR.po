@@ -2,11 +2,11 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 # Translators:
 # François Déchelle, 2022
 # Thierry Bugier <tbugier@teclib.com>, 2025
-# 
+#
 #, fuzzy
 msgid ""
 msgstr ""
@@ -78,7 +78,7 @@ msgstr "Création du nom de la source de données"
 
 #: src/Command/CreateFakeCarbonIntensityCommand.php:81
 msgid "Creating data zone name"
-msgstr ""
+msgstr "Création du nom de la zone de données"
 
 #: src/Command/CreateFakeCarbonIntensityCommand.php:92
 msgid "Creating fake data..."
@@ -107,7 +107,7 @@ msgstr "Nombre maximum d'éléments à télécharger"
 
 #: src/CronTask.php:56
 msgid "Download carbon emissions from ElectricityMap"
-msgstr ""
+msgstr "Téléchargement des émissions de carbone depuis ElectricityMap"
 
 #: src/CronTask.php:62
 msgid "Compute daily environnemental impact for all assets"
@@ -136,9 +136,9 @@ msgstr "Intensité"
 #: src/Report.php:48
 msgid "Carbon report"
 msgid_plural "Carbon reports"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Rapport carbone"
+msgstr[1] "Rapports carbone"
+msgstr[2] "Rapports carbone"
 
 #: src/Toolbox.php:194 src/Dashboard/Provider.php:519
 msgid "g"
@@ -307,27 +307,27 @@ msgstr "Ordinateurs gérés"
 
 #: src/Dashboard/Dashboard.php:63
 msgid "Total power consumption"
-msgstr ""
+msgstr "Puissance de consommation totale"
 
 #: src/Dashboard/Dashboard.php:69 src/Dashboard/Dashboard.php:104
 msgid "Total carbon emission"
-msgstr ""
+msgstr "Emissions de carbone totale"
 
 #: src/Dashboard/Dashboard.php:75
 msgid "Total power consumption per model"
-msgstr ""
+msgstr "Puissance de consommation totale par modèle"
 
 #: src/Dashboard/Dashboard.php:81
 msgid "Total carbon emission per model"
-msgstr ""
+msgstr "Emission de carbone totale par modèle"
 
 #: src/Dashboard/Dashboard.php:87 src/Dashboard/Dashboard.php:255
 msgid "Carbon emission per month"
-msgstr ""
+msgstr "Emissions de carbone par mois"
 
 #: src/Dashboard/Dashboard.php:93
 msgid "Carbon intensity  (gCO<sub>2</sub>eq / KWh)"
-msgstr ""
+msgstr "Intensité carbone (gCO<sub>2</sub>eq / KWh)"
 
 #: src/Dashboard/Dashboard.php:99
 msgid "Carbon emission per type"
@@ -339,22 +339,22 @@ msgstr "Emission de carbone mensuelle"
 
 #: src/Dashboard/Dashboard.php:119
 msgid "Carbon emission per month graph"
-msgstr ""
+msgstr "Graphe d'émissions carbone par mois"
 
 #: src/Dashboard/Dashboard.php:273
 msgid "Carbon dioxyde intensity"
-msgstr ""
+msgstr "Intensité de dioxyde de carbone"
 
 #: src/ComputerUsageProfile.php:48
 msgid "Computer usage profile"
 msgid_plural "Computer usage profiles"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Profil d'utilisation d'ordinateur"
+msgstr[1] "Profils d'utilisation d'ordinateur"
+msgstr[2] "Profils d'utilisation d'ordinateur"
 
 #: src/ComputerUsageProfile.php:84
 msgid "Knowbase category"
-msgstr ""
+msgstr "Catégorie de base de connaissance"
 
 #: src/ComputerUsageProfile.php:90
 msgid "As child of"
@@ -439,14 +439,14 @@ msgstr ""
 
 #: setup.php:204
 msgid "Environmental Impact"
-msgstr ""
+msgstr "Impact environnemental"
 
 #. TRANS: %s is the number of new version
 #: install/migration/update_0.0.0_to_0.0.1.php:44
 #: install/migration/update_xxx_to_yyy.php:45
 #, php-format
 msgid "Update to %s"
-msgstr ""
+msgstr "Mise à jour vers %s"
 
 #: install/migration/update_0.0.0_to_0.0.1/create_uasge_profiles.php:39
 msgid "Office hours"
@@ -458,7 +458,7 @@ msgstr ""
 
 #: install/migration/update_0.0.0_to_0.0.1/create_automatic_actions.php:58
 msgid "Collect carbon intensities from RTE"
-msgstr ""
+msgstr "Collecte les intensités carbone depuis RTE"
 
 #: install/migration/update_0.0.0_to_0.0.1/create_automatic_actions.php:70
 msgid "Collect carbon intensities from ElectricityMap"
@@ -470,7 +470,7 @@ msgstr "Pas de zone disponible"
 
 #: entrée standard:37
 msgid "Please run the automatic action to downlaod data from this source."
-msgstr ""
+msgstr "Veuillez exécuter l'action automatique pour télécharger les données depuis cette source."
 
 #: entrée standard:43
 msgid "Key for electricitymap.org API"
@@ -480,11 +480,11 @@ msgstr "Clé pour l'API electricitymap.org"
 msgid ""
 "This power value is used as default when the power of a computer model is "
 "unknown"
-msgstr ""
+msgstr "Cette valeur de puissance est utilisée par défaut quand la puissance d'un modèle d'ordinateur est inconnue"
 
 #: entrée standard:61
 msgid "Days of week where the computer usually runs"
-msgstr ""
+msgstr "Jours de la semaine où l'ordinateur est habituellement en fonctionnement"
 
 #: entrée standard:38
 msgid "Warning"
@@ -492,11 +492,11 @@ msgstr "Attention"
 
 #: entrée standard:33
 msgid "Carbon Emission per Type"
-msgstr ""
+msgstr "Emission de carbone par type"
 
 #: entrée standard:33
 msgid "Consumed energy and carbon emission per month"
-msgstr ""
+msgstr "Energie consommée et émission de carbone par mois"
 
 #: entrée standard:40
 msgid "Information"
@@ -508,7 +508,10 @@ msgid ""
 "using industry-standard methodologies. We utilize accurate measurement tools"
 " and algorithms to ensure the precision and reliability of our environmental"
 " metrics."
-msgstr ""
+msgstr "Nos données proviennent de sources fiables et sont soigneusement calculées "
+"selon des méthodologies reconnues dans l'industrie. Nous utilisons des outils "
+"de mesure précis et des algorithmes pour garantir la fiabilité et la précision "
+"de nos indicateurs environnementaux."
 
 #: entrée standard:51
 msgid ""
@@ -517,16 +520,20 @@ msgid ""
 "these regulations. Adopting these practices now ensures compliance and helps"
 " combat climate change."
 msgstr ""
+"Alors que nous avançons vers un avenir plus vert, les entreprises devront bientôt "
+"déclarer leur consommation d'énergie et leurs émissions de carbone. D'ici 2025, "
+"de nombreuses régions appliqueront ces réglementations. Adopter ces pratiques dès "
+"maintenant garantit la conformité et contribue à lutter contre le changement climatique."
 
 #: entrée standard:55
 msgid "Did you know ?"
-msgstr ""
+msgstr "Le saviez vous ?"
 
 #: entrée standard:56
 msgid ""
 "1 gram of CO₂ is equivalent to the CO₂ emitted when you drive a car for "
 "about 20 meters."
-msgstr ""
+msgstr "1 gramme de CO₂ est équivalent au CO₂ émis quand vous roulez en voiture sur environ 20 mètres."
 
 #: entrée standard:81
 #, php-format
@@ -541,7 +548,7 @@ msgstr ""
 #: entrée standard:94
 #, php-format
 msgid "%s-%s/%s"
-msgstr ""
+msgstr "%s-%s/%s"
 
 #: entrée standard:104
 msgid "Start"
@@ -554,7 +561,7 @@ msgstr "Précédent"
 #: entrée standard:118
 #, php-format
 msgid "%s-%s of %s"
-msgstr ""
+msgstr "%s-%s de %s"
 
 #: entrée standard:141
 msgid "Next"
@@ -562,7 +569,7 @@ msgstr "Suivant"
 
 #: entrée standard:146
 msgid "End"
-msgstr ""
+msgstr "Fin"
 
 #: entrée standard:50 standard:281
 msgid "No data"
@@ -570,32 +577,32 @@ msgstr "Aucune donnée"
 
 #: entrée standard:88
 msgid "Check all"
-msgstr ""
+msgstr "Tout cocher"
 
 #: entrée standard:123
 msgid "Filter"
-msgstr ""
+msgstr "Filtre"
 
 #: entrée standard:129
 msgid "Export"
-msgstr ""
+msgstr "Exporter"
 
 #: entrée standard:184
 msgid "All"
-msgstr ""
+msgstr "Tout"
 
 #: entrée standard:310
 #, php-format
 msgid "Show %s entries"
-msgstr ""
+msgstr "Voir %s entrées"
 
 #: entrée standard:42
 msgid "Compared to last month"
-msgstr ""
+msgstr "Comparé au mois précédent"
 
 #: entrée standard:35
 msgid "Want to know more ?"
-msgstr ""
+msgstr "Vous voulez en savoir plus ?"
 
 #: entrée standard:36
 msgid "Here is a video about the impact of numeric on the enviromnent."
