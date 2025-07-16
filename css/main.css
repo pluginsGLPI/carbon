@@ -79,5 +79,5 @@
     display: block;
     width: 62px;
     height: 77px;
-    background-image: url('../pics/ecology-icon-light.png');
+    background-image: url("../pics/ecology-icon-light.png");
 }
