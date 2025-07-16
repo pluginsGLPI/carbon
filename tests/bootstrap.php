@@ -43,13 +43,18 @@ if (!$glpiConfigDir = getenv('TEST_GLPI_CONFIG_DIR')) {
 }
 
 define('GLPI_ROOT', realpath(__DIR__ . '/../../../'));
-define("GLPI_CONFIG_DIR", GLPI_ROOT . "/$glpiConfigDir");
-fwrite(STDOUT, "GLPI config path: " . GLPI_CONFIG_DIR . PHP_EOL);
-fwrite(STDOUT, "checking config file " . GLPI_CONFIG_DIR . '/config_db.php' . PHP_EOL);
-if (!file_exists(GLPI_CONFIG_DIR . '/config_db.php')) {
-    echo GLPI_ROOT . "/$glpiConfigDir/config_db.php missing. Was GLPI successfully initialized ?" . PHP_EOL;
-    exit(1);
+fwrite(STDOUT, "GLPI config path: " . $glpiConfigDir . PHP_EOL);
+fwrite(STDOUT, "checking config file " . $glpiConfigDir . '/config_db.php' . PHP_EOL);
+if (!file_exists(GLPI_ROOT . '/' . $glpiConfigDir . '/config_db.php')) {
+    fwrite(STDERR, GLPI_ROOT . "/$glpiConfigDir/config_db.php missing. Faling back to standard config path" . PHP_EOL);
+    $glpiConfigDir = 'config';
+    if (!file_exists(GLPI_ROOT . '/config/config_db.php')) {
+        echo GLPI_ROOT . "/config/config_db.php missing" . PHP_EOL;
+        echo "No config file found in GLPI directory. Please run GLPI install first." . PHP_EOL;
+        exit(1);
+    }
 }
+define("GLPI_CONFIG_DIR", GLPI_ROOT . "/$glpiConfigDir");
 unset($glpiConfigDir);
 
 define('GLPI_LOG_DIR', __DIR__ . '/logs');
