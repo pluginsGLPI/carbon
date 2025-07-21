@@ -1,10 +1,9 @@
 [main]
 host = https://www.transifex.com
 
-[o:teclib:p:glpi-plugin-carbon:r:all_versions]
+[o:teclib:p:glpi-plugin-carbon:r:1_0_0]
 file_filter   = locales/<lang>.po
 source_file   = locales/carbon.pot
 type          = PO
-minimum_perc  = 0
-resource_name = all versions
-
+minimum_perc  = 1
+resource_name = 1.0.0

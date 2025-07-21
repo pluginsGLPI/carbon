@@ -5,6 +5,7 @@
 # 
 # Translators:
 # Diego Nobre <diego@koruma.com.br>, 2022
+# Pablo Pierri <pablo.terdulino@gmail.com>, 2025
 # 
 #, fuzzy
 msgid ""
@@ -13,7 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-09-21 13:21+0200\n"
 "PO-Revision-Date: 2022-11-23 14:34+0000\n"
-"Last-Translator: Diego Nobre <diego@koruma.com.br>, 2022\n"
+"Last-Translator: Pablo Pierri <pablo.terdulino@gmail.com>, 2025\n"
 "Language-Team: Portuguese (Brazil) (https://app.transifex.com/teclib/teams/28042/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -68,7 +69,7 @@ msgstr[2] ""
 
 #: src/Command/CreateTestInventoryCommand.php:149
 msgid "Creating test inventory"
-msgstr ""
+msgstr "Criando um teste de inventário"
 
 #: src/Command/CreateFakeCarbonIntensityCommand.php:70
 #: src/Command/CollectCarbonIntensityCommand.php:71
@@ -141,23 +142,23 @@ msgstr[2] ""
 
 #: src/Toolbox.php:194 src/Dashboard/Provider.php:519
 msgid "g"
-msgstr ""
+msgstr "g"
 
 #: src/Toolbox.php:195 src/Dashboard/Provider.php:520
 msgid "Kg"
-msgstr ""
+msgstr "Kg"
 
 #: src/Toolbox.php:196 src/Dashboard/Provider.php:521
 msgid "t"
-msgstr ""
+msgstr "t"
 
 #: src/Toolbox.php:197 src/Dashboard/Provider.php:522
 msgid "Kt"
-msgstr ""
+msgstr "Kt"
 
 #: src/Toolbox.php:198 src/Dashboard/Provider.php:523
 msgid "Mt"
-msgstr ""
+msgstr "Mt"
 
 #: src/Toolbox.php:199 src/Dashboard/Provider.php:524
 msgid "Gt"
@@ -203,7 +204,7 @@ msgstr ""
 
 #: src/Toolbox.php:232
 msgid "GW"
-msgstr ""
+msgstr "GW"
 
 #: src/Toolbox.php:233
 msgid "TW"
@@ -257,12 +258,12 @@ msgstr ""
 #: src/Dashboard/Provider.php:473 src/Dashboard/Provider.php:488 entrée
 #: standard:120
 msgid "Carbon emission"
-msgstr ""
+msgstr "Emissão de carbono"
 
 #: src/Dashboard/Provider.php:478 src/Dashboard/Provider.php:491 entrée
 #: standard:123
 msgid "Consumed energy"
-msgstr ""
+msgstr "Energia consumida"
 
 #: src/Dashboard/Provider.php:538
 msgid "KWh"

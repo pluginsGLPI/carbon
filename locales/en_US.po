@@ -8,114 +8,610 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-24 17:33+0100\n"
+"POT-Creation-Date: 2024-09-21 13:21+0200\n"
 "PO-Revision-Date: 2022-11-23 14:34+0000\n"
-"Language-Team: English (United States) (https://www.transifex.com/teclib/teams/28042/en_US/)\n"
+"Language-Team: English (United States) (https://app.transifex.com/teclib/teams/28042/en_US/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: en_US\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: front/config.form.php:15
-msgid "This is the GLPI Carbon plugin config page"
+#. TRANS: %s is the user login
+#: front/environnementalimpact.form.php:57
+#, php-format
+msgid "%s updates an item"
 msgstr ""
 
-#: src/Power.php:17
+#: front/report.php:49 entrée standard:37
+msgid "GLPI Carbon"
+msgstr ""
+
+#: src/CarbonIntensityZone.php:50
+msgid "Carbon intensity zone"
+msgid_plural "Carbon intensity zones"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/CarbonIntensityZone.php:122 src/CarbonIntensityZone.php:137
+msgid "Data source for historical calculation"
+msgstr ""
+
+#: src/AbstractType.php:50 entrée standard:37
 msgid "Power"
 msgid_plural "Powers"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Power.php:140 src/PowerModel_ComputerModel.php:31
-#: src/CarbonEmission.php:81 src/PowerModel.php:26
-#, php-format
-msgid "Installing %s"
-msgstr ""
-
-#: src/Power.php:166
-msgid "Compute powers for all computers"
-msgstr ""
-
-#: src/PowerModel_ComputerModel.php:22
-msgid "Associated element"
-msgid_plural "Associated elements"
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/PowerModelCategory.php:14 hook.php:109
-msgid "Carbon Plugin - Power model categories"
-msgstr ""
-
-#: src/Dashboard.php:20
-msgid "GLPI Carbon - Total power consumption"
-msgstr ""
-
-#: src/Dashboard.php:25
-msgid "GLPI Carbon - Total carbon emission"
-msgstr ""
-
-#: src/Dashboard.php:30
-msgid "GLPI Carbon - Total power consumption per model"
-msgstr ""
-
-#: src/Dashboard.php:35
-msgid "GLPI Carbon - Total carbon emission per model"
-msgstr ""
-
-#: src/Dashboard.php:40
-msgid "GLPI Carbon - Carbon emission per month"
-msgstr ""
-
-#: src/CarbonEmission.php:17
-msgid "CarbonEmission"
-msgid_plural "CarbonEmissions"
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/CarbonEmission.php:108
-msgid "Compute carbon emissions for all computers"
-msgstr ""
-
-#: src/PowerModel.php:17
-msgid "PowerModel"
-msgid_plural "PowerModels"
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/Config.php:15
+#: src/AbstractType.php:58 src/Dashboard/Dashboard.php:50
+#: src/Dashboard/Dashboard.php:56 src/Dashboard/Dashboard.php:62
+#: src/Dashboard/Dashboard.php:68 src/Dashboard/Dashboard.php:74
+#: src/Dashboard/Dashboard.php:80 src/Dashboard/Dashboard.php:86
+#: src/Dashboard/Dashboard.php:92 src/Dashboard/Dashboard.php:98
+#: src/Dashboard/Dashboard.php:103 src/Dashboard/Dashboard.php:108
+#: src/Dashboard/Dashboard.php:113 src/Dashboard/Dashboard.php:118
 msgid "Carbon"
 msgstr ""
 
-#: hook.php:68
-msgid "Computes power consumption of computers"
+#: src/CarbonIntensitySource.php:45
+msgid "Carbon intensity source"
+msgid_plural "Carbon intensity sources"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Command/CreateTestInventoryCommand.php:149
+msgid "Creating test inventory"
 msgstr ""
 
-#: hook.php:80
-msgid "Computes carbon emissions of computers"
+#: src/Command/CreateFakeCarbonIntensityCommand.php:70
+#: src/Command/CollectCarbonIntensityCommand.php:71
+msgid "Creating data source name"
 msgstr ""
 
-#: hook.php:121
-msgid "Power (W)"
+#: src/Command/CreateFakeCarbonIntensityCommand.php:81
+msgid "Creating data zone name"
 msgstr ""
 
-#: hook.php:132
-msgid "Carbon emission (kgCO2)"
+#: src/Command/CreateFakeCarbonIntensityCommand.php:92
+msgid "Creating fake data..."
 msgstr ""
 
-#: setup.php:130
-msgid "Installed / not configured"
+#: src/Command/CollectCarbonIntensityCommand.php:83
+msgid "Reading eco2mix data..."
 msgstr ""
 
-#: entrée standard:12
-msgid "Base URL for electricitymap.org API"
+#: src/Profile.php:46 src/EnvironnementalImpact.php:54
+msgid "Environnemental impact"
 msgstr ""
 
-#: entrée standard:17
-msgid "Key for electricitymap.org API"
-msgstr ""
-
-#: entrée standard:22
+#: src/Profile.php:87 entrée standard:48
 msgctxt "button"
 msgid "Save"
 msgstr ""
+
+#: src/CronTask.php:50
+msgid "Download carbon emissions from RTE"
+msgstr ""
+
+#: src/CronTask.php:51 src/CronTask.php:57
+msgid "Maximum number of entries to download"
+msgstr ""
+
+#: src/CronTask.php:56
+msgid "Download carbon emissions from ElectricityMap"
+msgstr ""
+
+#: src/CronTask.php:62
+msgid "Compute daily environnemental impact for all assets"
+msgstr ""
+
+#: src/CronTask.php:63
+msgid "Maximum number of entries to calculate"
+msgstr ""
+
+#: src/CarbonIntensity.php:57
+msgid "Carbon intensity"
+msgstr ""
+
+#: src/CarbonIntensity.php:96
+msgid "ID"
+msgstr ""
+
+#: src/CarbonIntensity.php:105
+msgid "Emission date"
+msgstr ""
+
+#: src/CarbonIntensity.php:132
+msgid "Intensity"
+msgstr ""
+
+#: src/Report.php:48
+msgid "Carbon report"
+msgid_plural "Carbon reports"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Toolbox.php:194 src/Dashboard/Provider.php:519
+msgid "g"
+msgstr ""
+
+#: src/Toolbox.php:195 src/Dashboard/Provider.php:520
+msgid "Kg"
+msgstr ""
+
+#: src/Toolbox.php:196 src/Dashboard/Provider.php:521
+msgid "t"
+msgstr ""
+
+#: src/Toolbox.php:197 src/Dashboard/Provider.php:522
+msgid "Kt"
+msgstr ""
+
+#: src/Toolbox.php:198 src/Dashboard/Provider.php:523
+msgid "Mt"
+msgstr ""
+
+#: src/Toolbox.php:199 src/Dashboard/Provider.php:524
+msgid "Gt"
+msgstr ""
+
+#: src/Toolbox.php:200 src/Dashboard/Provider.php:525
+msgid "Tt"
+msgstr ""
+
+#: src/Toolbox.php:201 src/Dashboard/Provider.php:526
+msgid "Pt"
+msgstr ""
+
+#: src/Toolbox.php:202 src/Dashboard/Provider.php:527
+msgid "Et"
+msgstr ""
+
+#: src/Toolbox.php:203 src/Dashboard/Provider.php:528
+msgid "Zt"
+msgstr ""
+
+#: src/Toolbox.php:204 src/Dashboard/Provider.php:529
+msgid "Yt"
+msgstr ""
+
+#. TRANS: %1$s is a number maybe float or string and %2$s the unit
+#: src/Toolbox.php:215 src/Toolbox.php:248
+#, php-format
+msgid "%1$s %2$s"
+msgstr ""
+
+#: src/Toolbox.php:229
+msgid "W"
+msgstr ""
+
+#: src/Toolbox.php:230
+msgid "KW"
+msgstr ""
+
+#: src/Toolbox.php:231
+msgid "MW"
+msgstr ""
+
+#: src/Toolbox.php:232
+msgid "GW"
+msgstr ""
+
+#: src/Toolbox.php:233
+msgid "TW"
+msgstr ""
+
+#: src/Toolbox.php:234
+msgid "PW"
+msgstr ""
+
+#: src/Toolbox.php:235
+msgid "EW"
+msgstr ""
+
+#: src/Toolbox.php:236
+msgid "ZW"
+msgstr ""
+
+#: src/Toolbox.php:237
+msgid "YW"
+msgstr ""
+
+#: src/Dashboard/Widget.php:45
+msgid "Carbon Emission Per Type"
+msgstr ""
+
+#: src/Dashboard/Widget.php:51
+msgid "Carbon Emission Per Month"
+msgstr ""
+
+#: src/Dashboard/Widget.php:57 entrée standard:38
+msgid "Total Carbon Emission"
+msgstr ""
+
+#: src/Dashboard/Widget.php:63
+msgid "Monthly Carbon Emission"
+msgstr ""
+
+#: src/Dashboard/Widget.php:69
+msgid "Unhandled Computers"
+msgstr ""
+
+#: src/Dashboard/Filters/Item.php:42
+msgid "Item"
+msgstr ""
+
+#: src/Dashboard/Provider.php:357 src/Dashboard/Provider.php:533
+#: src/Dashboard/Provider.php:534
+msgid "CO₂eq"
+msgstr ""
+
+#: src/Dashboard/Provider.php:473 src/Dashboard/Provider.php:488 entrée
+#: standard:120
+msgid "Carbon emission"
+msgstr ""
+
+#: src/Dashboard/Provider.php:478 src/Dashboard/Provider.php:491 entrée
+#: standard:123
+msgid "Consumed energy"
+msgstr ""
+
+#: src/Dashboard/Provider.php:538
+msgid "KWh"
+msgstr ""
+
+#: src/Dashboard/Provider.php:539
+msgid "MWh"
+msgstr ""
+
+#: src/Dashboard/Provider.php:540
+msgid "GWh"
+msgstr ""
+
+#: src/Dashboard/Provider.php:541
+msgid "TWh"
+msgstr ""
+
+#: src/Dashboard/Provider.php:542
+msgid "PWh"
+msgstr ""
+
+#: src/Dashboard/Provider.php:543
+msgid "EWh"
+msgstr ""
+
+#: src/Dashboard/Provider.php:544
+msgid "ZWh"
+msgstr ""
+
+#: src/Dashboard/Provider.php:545
+msgid "YWh"
+msgstr ""
+
+#: src/Dashboard/Dashboard.php:51 src/Dashboard/Dashboard.php:114
+msgid "Unhandled computers"
+msgstr ""
+
+#: src/Dashboard/Dashboard.php:57
+msgid "Handled computers"
+msgstr ""
+
+#: src/Dashboard/Dashboard.php:63
+msgid "Total power consumption"
+msgstr ""
+
+#: src/Dashboard/Dashboard.php:69 src/Dashboard/Dashboard.php:104
+msgid "Total carbon emission"
+msgstr ""
+
+#: src/Dashboard/Dashboard.php:75
+msgid "Total power consumption per model"
+msgstr ""
+
+#: src/Dashboard/Dashboard.php:81
+msgid "Total carbon emission per model"
+msgstr ""
+
+#: src/Dashboard/Dashboard.php:87 src/Dashboard/Dashboard.php:255
+msgid "Carbon emission per month"
+msgstr ""
+
+#: src/Dashboard/Dashboard.php:93
+msgid "Carbon intensity  (gCO<sub>2</sub>eq / KWh)"
+msgstr ""
+
+#: src/Dashboard/Dashboard.php:99
+msgid "Carbon emission per type"
+msgstr ""
+
+#: src/Dashboard/Dashboard.php:109 entrée standard:38
+msgid "Monthly carbon emission"
+msgstr ""
+
+#: src/Dashboard/Dashboard.php:119
+msgid "Carbon emission per month graph"
+msgstr ""
+
+#: src/Dashboard/Dashboard.php:273
+msgid "Carbon dioxyde intensity"
+msgstr ""
+
+#: src/ComputerUsageProfile.php:48
+msgid "Computer usage profile"
+msgid_plural "Computer usage profiles"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/ComputerUsageProfile.php:84
+msgid "Knowbase category"
+msgstr ""
+
+#: src/ComputerUsageProfile.php:90
+msgid "As child of"
+msgstr ""
+
+#: src/ComputerUsageProfile.php:105 entrée standard:52
+msgid "Start time"
+msgstr ""
+
+#: src/ComputerUsageProfile.php:113 entrée standard:58
+msgid "Stop time"
+msgstr ""
+
+#: src/ComputerUsageProfile.php:121 entrée standard:66
+msgid "Monday"
+msgstr ""
+
+#: src/ComputerUsageProfile.php:129 entrée standard:72
+msgid "Tuesday"
+msgstr ""
+
+#: src/ComputerUsageProfile.php:137 entrée standard:78
+msgid "Wednesday"
+msgstr ""
+
+#: src/ComputerUsageProfile.php:145 entrée standard:84
+msgid "Thursday"
+msgstr ""
+
+#: src/ComputerUsageProfile.php:153 entrée standard:90
+msgid "Friday"
+msgstr ""
+
+#: src/ComputerUsageProfile.php:161 entrée standard:96
+msgid "Saturday"
+msgstr ""
+
+#: src/ComputerUsageProfile.php:169 entrée standard:103
+msgid "Sunday"
+msgstr ""
+
+#: src/CarbonIntensitySource_CarbonIntensityZone.php:124
+#: src/CarbonIntensitySource_CarbonIntensityZone.php:219 entrée standard:40
+msgid "Name"
+msgstr ""
+
+#: src/CarbonIntensitySource_CarbonIntensityZone.php:125
+msgid "Download enabled"
+msgstr ""
+
+#: src/CarbonIntensitySource_CarbonIntensityZone.php:126
+msgid "Source for historical"
+msgstr ""
+
+#: src/CarbonIntensitySource_CarbonIntensityZone.php:132
+#: src/CarbonIntensitySource_CarbonIntensityZone.php:225
+msgid "Total"
+msgstr ""
+
+#: src/CarbonIntensitySource_CarbonIntensityZone.php:284 entrée standard:189
+msgid "No"
+msgstr ""
+
+#: src/CarbonIntensitySource_CarbonIntensityZone.php:284 entrée standard:186
+msgid "Yes"
+msgstr ""
+
+#: src/CarbonIntensitySource_CarbonIntensityZone.php:285
+msgid "Enable / Disable"
+msgstr ""
+
+#: src/CarbonEmission.php:50
+msgid "Carbon Emission"
+msgid_plural "Carbon Emissions"
+msgstr[0] ""
+msgstr[1] ""
+
+#: hook.php:133 hook.php:172
+msgid "Power consumption (W)"
+msgstr ""
+
+#: setup.php:204
+msgid "Environmental Impact"
+msgstr ""
+
+#. TRANS: %s is the number of new version
+#: install/migration/update_0.0.0_to_0.0.1.php:44
+#: install/migration/update_xxx_to_yyy.php:45
+#, php-format
+msgid "Update to %s"
+msgstr ""
+
+#: install/migration/update_0.0.0_to_0.0.1/create_uasge_profiles.php:39
+msgid "Office hours"
+msgstr ""
+
+#: install/migration/update_0.0.0_to_0.0.1/create_automatic_actions.php:46
+msgid "Compute carbon emissions of computers"
+msgstr ""
+
+#: install/migration/update_0.0.0_to_0.0.1/create_automatic_actions.php:58
+msgid "Collect carbon intensities from RTE"
+msgstr ""
+
+#: install/migration/update_0.0.0_to_0.0.1/create_automatic_actions.php:70
+msgid "Collect carbon intensities from ElectricityMap"
+msgstr ""
+
+#: entrée standard:35
+msgid "No zone available"
+msgstr ""
+
+#: entrée standard:37
+msgid "Please run the automatic action to downlaod data from this source."
+msgstr ""
+
+#: entrée standard:43
+msgid "Key for electricitymap.org API"
+msgstr ""
+
+#: entrée standard:36
+msgid ""
+"This power value is used as default when the power of a computer model is "
+"unknown"
+msgstr ""
+
+#: entrée standard:61
+msgid "Days of week where the computer usually runs"
+msgstr ""
+
+#: entrée standard:38
+msgid "Warning"
+msgstr ""
+
+#: entrée standard:33
+msgid "Carbon Emission per Type"
+msgstr ""
+
+#: entrée standard:33
+msgid "Consumed energy and carbon emission per month"
+msgstr ""
+
+#: entrée standard:40
+msgid "Information"
+msgstr ""
+
+#: entrée standard:50
+msgid ""
+"Our data is sourced from reliable sources and is meticulously calculated "
+"using industry-standard methodologies. We utilize accurate measurement tools"
+" and algorithms to ensure the precision and reliability of our environmental"
+" metrics."
+msgstr ""
+
+#: entrée standard:51
+msgid ""
+"As we move towards a greener future, businesses will soon be required to "
+"report energy usage and carbon emissions. By 2025, many areas will enforce "
+"these regulations. Adopting these practices now ensures compliance and helps"
+" combat climate change."
+msgstr ""
+
+#: entrée standard:55
+msgid "Did you know ?"
+msgstr ""
+
+#: entrée standard:56
+msgid ""
+"1 gram of CO₂ is equivalent to the CO₂ emitted when you drive a car for "
+"about 20 meters."
+msgstr ""
+
+#: entrée standard:81
+#, php-format
+msgid "%s rows / page"
+msgstr ""
+
+#: entrée standard:90
+#, php-format
+msgid "Showing %s to %s of %s rows"
+msgstr ""
+
+#: entrée standard:94
+#, php-format
+msgid "%s-%s/%s"
+msgstr ""
+
+#: entrée standard:104
+msgid "Start"
+msgstr ""
+
+#: entrée standard:109
+msgid "Previous"
+msgstr ""
+
+#: entrée standard:118
+#, php-format
+msgid "%s-%s of %s"
+msgstr ""
+
+#: entrée standard:141
+msgid "Next"
+msgstr ""
+
+#: entrée standard:146
+msgid "End"
+msgstr ""
+
+#: entrée standard:50 standard:281
+msgid "No data"
+msgstr ""
+
+#: entrée standard:88
+msgid "Check all"
+msgstr ""
+
+#: entrée standard:123
+msgid "Filter"
+msgstr ""
+
+#: entrée standard:129
+msgid "Export"
+msgstr ""
+
+#: entrée standard:184
+msgid "All"
+msgstr ""
+
+#: entrée standard:310
+#, php-format
+msgid "Show %s entries"
+msgstr ""
+
+#: entrée standard:42
+msgid "Compared to last month"
+msgstr ""
+
+#: entrée standard:35
+msgid "Want to know more ?"
+msgstr ""
+
+#: entrée standard:36
+msgid "Here is a video about the impact of numeric on the enviromnent."
+msgstr ""
+
+#: entrée standard:33
+msgid "Carbon Emission per Month"
+msgstr ""
+
+#: entrée standard:36
+msgid ""
+"This power value is used as default when the power of a network equipment "
+"model is unknown"
+msgstr ""
+
+#: entrée standard:36
+msgid ""
+"This power value is used as default when the power of a monitor model is "
+"unknown"
+msgstr ""
+
+#: entrée standard:36
+msgid "Usage information"
+msgstr ""
+
+#: entrée standard:41
+msgid "Usage profile"
+msgid_plural "Usage profiles"
+msgstr[0] ""
+msgstr[1] ""

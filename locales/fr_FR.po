@@ -5,7 +5,7 @@
 # 
 # Translators:
 # François Déchelle, 2022
-# Thierry Bugier <tbugier@teclib.com>, 2024
+# Thierry Bugier <tbugier@teclib.com>, 2025
 # 
 #, fuzzy
 msgid ""
@@ -14,7 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-09-21 13:21+0200\n"
 "PO-Revision-Date: 2022-11-23 14:34+0000\n"
-"Last-Translator: Thierry Bugier <tbugier@teclib.com>, 2024\n"
+"Last-Translator: Thierry Bugier <tbugier@teclib.com>, 2025\n"
 "Language-Team: French (France) (https://app.transifex.com/teclib/teams/28042/fr_FR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -35,9 +35,9 @@ msgstr ""
 #: src/CarbonIntensityZone.php:50
 msgid "Carbon intensity zone"
 msgid_plural "Carbon intensity zones"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Zone d'intensité carbone"
+msgstr[1] "Zones d'intensité carbone"
+msgstr[2] "Zones d'intensité carbone"
 
 #: src/CarbonIntensityZone.php:122 src/CarbonIntensityZone.php:137
 msgid "Data source for historical calculation"
@@ -63,18 +63,18 @@ msgstr "Carbon"
 #: src/CarbonIntensitySource.php:45
 msgid "Carbon intensity source"
 msgid_plural "Carbon intensity sources"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Source d'intensité carbone"
+msgstr[1] "Sources d'intensité carbone"
+msgstr[2] "Sources d'intensité carbone"
 
 #: src/Command/CreateTestInventoryCommand.php:149
 msgid "Creating test inventory"
-msgstr ""
+msgstr "Création de l'inventaire de test"
 
 #: src/Command/CreateFakeCarbonIntensityCommand.php:70
 #: src/Command/CollectCarbonIntensityCommand.php:71
 msgid "Creating data source name"
-msgstr ""
+msgstr "Création du nom de la source de données"
 
 #: src/Command/CreateFakeCarbonIntensityCommand.php:81
 msgid "Creating data zone name"
@@ -82,15 +82,15 @@ msgstr ""
 
 #: src/Command/CreateFakeCarbonIntensityCommand.php:92
 msgid "Creating fake data..."
-msgstr ""
+msgstr "Création de données factices..."
 
 #: src/Command/CollectCarbonIntensityCommand.php:83
 msgid "Reading eco2mix data..."
-msgstr ""
+msgstr "Lecture des données Eco2mix"
 
 #: src/Profile.php:46 src/EnvironnementalImpact.php:54
 msgid "Environnemental impact"
-msgstr ""
+msgstr "Impact environnemental"
 
 #: src/Profile.php:87 entrée standard:48
 msgctxt "button"
@@ -99,11 +99,11 @@ msgstr "Sauvegarder"
 
 #: src/CronTask.php:50
 msgid "Download carbon emissions from RTE"
-msgstr ""
+msgstr "Télécharge les émissions de carbone depuis RTE"
 
 #: src/CronTask.php:51 src/CronTask.php:57
 msgid "Maximum number of entries to download"
-msgstr ""
+msgstr "Nombre maximum d'éléments à télécharger"
 
 #: src/CronTask.php:56
 msgid "Download carbon emissions from ElectricityMap"
@@ -115,11 +115,11 @@ msgstr ""
 
 #: src/CronTask.php:63
 msgid "Maximum number of entries to calculate"
-msgstr ""
+msgstr "Nombre maximum d'éléments à calculer"
 
 #: src/CarbonIntensity.php:57
 msgid "Carbon intensity"
-msgstr ""
+msgstr "Intensité carbone"
 
 #: src/CarbonIntensity.php:96
 msgid "ID"
@@ -127,11 +127,11 @@ msgstr ""
 
 #: src/CarbonIntensity.php:105
 msgid "Emission date"
-msgstr ""
+msgstr "Date d'émission"
 
 #: src/CarbonIntensity.php:132
 msgid "Intensity"
-msgstr ""
+msgstr "Intensité"
 
 #: src/Report.php:48
 msgid "Carbon report"
@@ -142,47 +142,47 @@ msgstr[2] ""
 
 #: src/Toolbox.php:194 src/Dashboard/Provider.php:519
 msgid "g"
-msgstr ""
+msgstr "g"
 
 #: src/Toolbox.php:195 src/Dashboard/Provider.php:520
 msgid "Kg"
-msgstr ""
+msgstr "Kg"
 
 #: src/Toolbox.php:196 src/Dashboard/Provider.php:521
 msgid "t"
-msgstr ""
+msgstr "t"
 
 #: src/Toolbox.php:197 src/Dashboard/Provider.php:522
 msgid "Kt"
-msgstr ""
+msgstr "Kt"
 
 #: src/Toolbox.php:198 src/Dashboard/Provider.php:523
 msgid "Mt"
-msgstr ""
+msgstr "Mt"
 
 #: src/Toolbox.php:199 src/Dashboard/Provider.php:524
 msgid "Gt"
-msgstr ""
+msgstr "Gt"
 
 #: src/Toolbox.php:200 src/Dashboard/Provider.php:525
 msgid "Tt"
-msgstr ""
+msgstr "Tt"
 
 #: src/Toolbox.php:201 src/Dashboard/Provider.php:526
 msgid "Pt"
-msgstr ""
+msgstr "Pt"
 
 #: src/Toolbox.php:202 src/Dashboard/Provider.php:527
 msgid "Et"
-msgstr ""
+msgstr "Et"
 
 #: src/Toolbox.php:203 src/Dashboard/Provider.php:528
 msgid "Zt"
-msgstr ""
+msgstr "Zt"
 
 #: src/Toolbox.php:204 src/Dashboard/Provider.php:529
 msgid "Yt"
-msgstr ""
+msgstr "Yt"
 
 #. TRANS: %1$s is a number maybe float or string and %2$s the unit
 #: src/Toolbox.php:215 src/Toolbox.php:248
@@ -192,118 +192,118 @@ msgstr ""
 
 #: src/Toolbox.php:229
 msgid "W"
-msgstr ""
+msgstr "W"
 
 #: src/Toolbox.php:230
 msgid "KW"
-msgstr ""
+msgstr "KW"
 
 #: src/Toolbox.php:231
 msgid "MW"
-msgstr ""
+msgstr "MW"
 
 #: src/Toolbox.php:232
 msgid "GW"
-msgstr ""
+msgstr "GW"
 
 #: src/Toolbox.php:233
 msgid "TW"
-msgstr ""
+msgstr "TW"
 
 #: src/Toolbox.php:234
 msgid "PW"
-msgstr ""
+msgstr "PW"
 
 #: src/Toolbox.php:235
 msgid "EW"
-msgstr ""
+msgstr "EW"
 
 #: src/Toolbox.php:236
 msgid "ZW"
-msgstr ""
+msgstr "ZW"
 
 #: src/Toolbox.php:237
 msgid "YW"
-msgstr ""
+msgstr "YW"
 
 #: src/Dashboard/Widget.php:45
 msgid "Carbon Emission Per Type"
-msgstr ""
+msgstr "Emission de carbone par type"
 
 #: src/Dashboard/Widget.php:51
 msgid "Carbon Emission Per Month"
-msgstr ""
+msgstr "Emission de carbone par mois"
 
 #: src/Dashboard/Widget.php:57 entrée standard:38
 msgid "Total Carbon Emission"
-msgstr ""
+msgstr "Emission de carbone totale"
 
 #: src/Dashboard/Widget.php:63
 msgid "Monthly Carbon Emission"
-msgstr ""
+msgstr "Emission de carbone mensuelle"
 
 #: src/Dashboard/Widget.php:69
 msgid "Unhandled Computers"
-msgstr ""
+msgstr "Ordinateurs non gérés"
 
 #: src/Dashboard/Filters/Item.php:42
 msgid "Item"
-msgstr ""
+msgstr "Element"
 
 #: src/Dashboard/Provider.php:357 src/Dashboard/Provider.php:533
 #: src/Dashboard/Provider.php:534
 msgid "CO₂eq"
-msgstr ""
+msgstr "CO₂eq"
 
 #: src/Dashboard/Provider.php:473 src/Dashboard/Provider.php:488 entrée
 #: standard:120
 msgid "Carbon emission"
-msgstr ""
+msgstr "Emission de carbone"
 
 #: src/Dashboard/Provider.php:478 src/Dashboard/Provider.php:491 entrée
 #: standard:123
 msgid "Consumed energy"
-msgstr ""
+msgstr "Energie consommée"
 
 #: src/Dashboard/Provider.php:538
 msgid "KWh"
-msgstr ""
+msgstr "KWh"
 
 #: src/Dashboard/Provider.php:539
 msgid "MWh"
-msgstr ""
+msgstr "MWh"
 
 #: src/Dashboard/Provider.php:540
 msgid "GWh"
-msgstr ""
+msgstr "GWh"
 
 #: src/Dashboard/Provider.php:541
 msgid "TWh"
-msgstr ""
+msgstr "TWh"
 
 #: src/Dashboard/Provider.php:542
 msgid "PWh"
-msgstr ""
+msgstr "PWh"
 
 #: src/Dashboard/Provider.php:543
 msgid "EWh"
-msgstr ""
+msgstr "EWh"
 
 #: src/Dashboard/Provider.php:544
 msgid "ZWh"
-msgstr ""
+msgstr "ZWh"
 
 #: src/Dashboard/Provider.php:545
 msgid "YWh"
-msgstr ""
+msgstr "YWh"
 
 #: src/Dashboard/Dashboard.php:51 src/Dashboard/Dashboard.php:114
 msgid "Unhandled computers"
-msgstr ""
+msgstr "Ordinateurs non gérés"
 
 #: src/Dashboard/Dashboard.php:57
 msgid "Handled computers"
-msgstr ""
+msgstr "Ordinateurs gérés"
 
 #: src/Dashboard/Dashboard.php:63
 msgid "Total power consumption"
@@ -331,11 +331,11 @@ msgstr ""
 
 #: src/Dashboard/Dashboard.php:99
 msgid "Carbon emission per type"
-msgstr ""
+msgstr "Emission de carbone par type"
 
 #: src/Dashboard/Dashboard.php:109 entrée standard:38
 msgid "Monthly carbon emission"
-msgstr ""
+msgstr "Emission de carbone mensuelle"
 
 #: src/Dashboard/Dashboard.php:119
 msgid "Carbon emission per month graph"
@@ -362,52 +362,52 @@ msgstr ""
 
 #: src/ComputerUsageProfile.php:105 entrée standard:52
 msgid "Start time"
-msgstr ""
+msgstr "Heure de démarrage"
 
 #: src/ComputerUsageProfile.php:113 entrée standard:58
 msgid "Stop time"
-msgstr ""
+msgstr "Heure d'arrêt"
 
 #: src/ComputerUsageProfile.php:121 entrée standard:66
 msgid "Monday"
-msgstr ""
+msgstr "Lundi"
 
 #: src/ComputerUsageProfile.php:129 entrée standard:72
 msgid "Tuesday"
-msgstr ""
+msgstr "Mardi"
 
 #: src/ComputerUsageProfile.php:137 entrée standard:78
 msgid "Wednesday"
-msgstr ""
+msgstr "Mercredi"
 
 #: src/ComputerUsageProfile.php:145 entrée standard:84
 msgid "Thursday"
-msgstr ""
+msgstr "Jeudi"
 
 #: src/ComputerUsageProfile.php:153 entrée standard:90
 msgid "Friday"
-msgstr ""
+msgstr "Vendredi"
 
 #: src/ComputerUsageProfile.php:161 entrée standard:96
 msgid "Saturday"
-msgstr ""
+msgstr "Samedi"
 
 #: src/ComputerUsageProfile.php:169 entrée standard:103
 msgid "Sunday"
-msgstr ""
+msgstr "Dimanche"
 
 #: src/CarbonIntensitySource_CarbonIntensityZone.php:124
 #: src/CarbonIntensitySource_CarbonIntensityZone.php:219 entrée standard:40
 msgid "Name"
-msgstr ""
+msgstr "Nom"
 
 #: src/CarbonIntensitySource_CarbonIntensityZone.php:125
 msgid "Download enabled"
-msgstr ""
+msgstr "Téléchargement activé"
 
 #: src/CarbonIntensitySource_CarbonIntensityZone.php:126
 msgid "Source for historical"
-msgstr ""
+msgstr "Source pour l'historique"
 
 #: src/CarbonIntensitySource_CarbonIntensityZone.php:132
 #: src/CarbonIntensitySource_CarbonIntensityZone.php:225
@@ -416,22 +416,22 @@ msgstr ""
 
 #: src/CarbonIntensitySource_CarbonIntensityZone.php:284 entrée standard:189
 msgid "No"
-msgstr ""
+msgstr "Non"
 
 #: src/CarbonIntensitySource_CarbonIntensityZone.php:284 entrée standard:186
 msgid "Yes"
-msgstr ""
+msgstr "Oui"
 
 #: src/CarbonIntensitySource_CarbonIntensityZone.php:285
 msgid "Enable / Disable"
-msgstr ""
+msgstr "Activer / Désactiver"
 
 #: src/CarbonEmission.php:50
 msgid "Carbon Emission"
 msgid_plural "Carbon Emissions"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Emission de carbone"
+msgstr[1] "Emissions de carbone"
+msgstr[2] "Emissions de carbone"
 
 #: hook.php:133 hook.php:172
 msgid "Power consumption (W)"
@@ -462,11 +462,11 @@ msgstr ""
 
 #: install/migration/update_0.0.0_to_0.0.1/create_automatic_actions.php:70
 msgid "Collect carbon intensities from ElectricityMap"
-msgstr ""
+msgstr "Collecte les intensités carbone depuis ElectricityMap"
 
 #: entrée standard:35
 msgid "No zone available"
-msgstr ""
+msgstr "Pas de zone disponible"
 
 #: entrée standard:37
 msgid "Please run the automatic action to downlaod data from this source."
@@ -488,7 +488,7 @@ msgstr ""
 
 #: entrée standard:38
 msgid "Warning"
-msgstr ""
+msgstr "Attention"
 
 #: entrée standard:33
 msgid "Carbon Emission per Type"
@@ -500,7 +500,7 @@ msgstr ""
 
 #: entrée standard:40
 msgid "Information"
-msgstr ""
+msgstr "Information"
 
 #: entrée standard:50
 msgid ""
@@ -531,7 +531,7 @@ msgstr ""
 #: entrée standard:81
 #, php-format
 msgid "%s rows / page"
-msgstr ""
+msgstr "%s lignes / page"
 
 #: entrée standard:90
 #, php-format
@@ -549,7 +549,7 @@ msgstr ""
 
 #: entrée standard:109
 msgid "Previous"
-msgstr ""
+msgstr "Précédent"
 
 #: entrée standard:118
 #, php-format
@@ -558,7 +558,7 @@ msgstr ""
 
 #: entrée standard:141
 msgid "Next"
-msgstr ""
+msgstr "Suivant"
 
 #: entrée standard:146
 msgid "End"
@@ -566,7 +566,7 @@ msgstr ""
 
 #: entrée standard:50 standard:281
 msgid "No data"
-msgstr ""
+msgstr "Aucune donnée"
 
 #: entrée standard:88
 msgid "Check all"
@@ -600,6 +600,7 @@ msgstr ""
 #: entrée standard:36
 msgid "Here is a video about the impact of numeric on the enviromnent."
 msgstr ""
+"Voici une vidéo à propos de l'impact du numérique sur l'environnement."
 
 #: entrée standard:33
 msgid "Carbon Emission per Month"
@@ -619,11 +620,11 @@ msgstr ""
 
 #: entrée standard:36
 msgid "Usage information"
-msgstr ""
+msgstr "Informations d'utilisation"
 
 #: entrée standard:41
 msgid "Usage profile"
 msgid_plural "Usage profiles"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Profil d'utilisation"
+msgstr[1] "Profils d'utilisation"
+msgstr[2] "Profils d'utilisation"
