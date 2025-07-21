@@ -137,7 +137,7 @@ function plugin_carbon_setupHooks()
     /** @phpstan-ignore-next-line */
     if (version_compare(GLPI_VERSION, '11.0', '<')) {
         // For GLPI < 11.0, we need to add resource the old way
-        $css_file = 'public/main.css';
+        $css_file = 'css/main.css';
     }
     $PLUGIN_HOOKS[Hooks::ADD_CSS]['carbon'][] = $css_file;
 

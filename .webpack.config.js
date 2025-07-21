@@ -56,20 +56,20 @@ module.exports = {
         publicPath: '',
     },
 
-    // Config for pics loading
     module: {
         rules: [
             {
+                // Config for pics loading
                 test: /\.(png|svg|jpg|jpeg|gif)$/i,
                 type: 'asset/resource',
                 generator: {
                     filename: 'images/[name][ext]',
                 },
             },
-    // Config for css loading
             {
-                test : /\.css$/,
-                use : [MiniCssExtractPlugin.loader, 'css-loader']
+                // Config for css loading
+                test: /\.css$/,
+                use: [MiniCssExtractPlugin.loader, 'css-loader']
             }
         ],
     },
