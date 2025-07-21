@@ -477,12 +477,11 @@ class Toolbox
         if ($interval->m !== 0 || $interval->y !== 0) {
             throw new \InvalidArgumentException('Interval must be in days, hours, minutes or seconds');
         }
-        $interval_in_seconds = $interval->s + $interval->i * 60 + $interval->h * 3600 + $interval->d * 86400;
+        // $interval_in_seconds = $interval->s + $interval->i * 60 + $interval->h * 3600 + $interval->d * 86400;
+        $sql_interval = self::dateIntervalToMySQLInterval($interval);
 
         // Get start date as unix timestamp
-        $start_timestamp = $start->format('U');
-        $start_timestamp = $start_timestamp - ($start_timestamp % $interval_in_seconds);
-        $boundaries[] = new QueryExpression('UNIX_TIMESTAMP(`date`) >= ' . $start_timestamp);
+        $boundaries[] = new QueryExpression('`date` >= "' . $start->format('Y-m-d H:i:s') . '"');
 
         // get stop date as unix timestamp
         if ($stop === null) {
@@ -491,17 +490,15 @@ class Toolbox
             $stop->setTime(0, 0, 0);
             $stop->sub(new DateInterval('P1D'));
         }
-        $stop_timestamp = $stop->format('U');
-        $stop_timestamp = $stop_timestamp - ($stop_timestamp % $interval_in_seconds);
-        $boundaries[] = new QueryExpression('UNIX_TIMESTAMP(`date`) <= ' . $stop_timestamp);
+        $boundaries[] = new QueryExpression('`date` <= "' . $stop->format('Y-m-d H:i:s') . '"');
 
         // prepare sub query to get start and end date of an atomic date range
         // An atomic date range is set to 1 hour
         // To reduce problems with DST, we use the unix timestamp of the date
         $atomic_ranges_subquery = new QuerySubQuery([
             'SELECT' => [
-                new QueryExpression('UNIX_TIMESTAMP(`date`) as `start_date`'),
-                new QueryExpression("UNIX_TIMESTAMP(`date`) + $interval_in_seconds as `end_date`"),
+                new QueryExpression('`date` as `start_date`'),
+                new QueryExpression("DATE_ADD(`date`, $sql_interval) as `end_date`"),
             ],
             'FROM'   => $table,
             'WHERE'  => $criteria + $boundaries,
@@ -522,7 +519,6 @@ class Toolbox
         $islands_subquery = new QuerySubQuery([
             'SELECT' => [
                 '*',
-                // new QueryExpression('CASE WHEN `groups`.`previous_end_date` >= `start_date` THEN 0 ELSE 1 END AS `is_island_start`'), // For debugging purpose
                 new QueryExpression('SUM(CASE WHEN `groups`.`previous_end_date` >= `start_date` THEN 0 ELSE 1 END) OVER (ORDER BY `groups`.`row_number`) AS `ìsland_id`')
             ],
             'FROM' => $groups_subquery
@@ -543,36 +539,68 @@ class Toolbox
             // No island at all, the whole range is a gap
             return [
                 [
-                    'start' => date('Y-m-d H:i:s', $start_timestamp),
-                    'end'   => date('Y-m-d H:i:s', $stop_timestamp),
+                    'start' => $start->format('Y-m-d H:i:s'),
+                    'end'   => $stop->format('Y-m-d H:i:s'),
                 ]
             ];
         }
 
         // Find gaps from islands
-        $expected_start_date = $start_timestamp;
+        $expected_start_date = $start;
         $gaps = [];
         foreach ($result as $row) {
-            if ($expected_start_date < $row['island_start_date']) {
+            if ($expected_start_date < new DateTimeImmutable($row['island_start_date'])) {
                 // The current island starts after the expected start date
                 // Then there is a gap
                 $gaps[] = [
-                    'start' => date('Y-m-d H:i:s', $expected_start_date),
-                    'end'   => date('Y-m-d H:i:s', $row['island_start_date']),
+                    'start' => $expected_start_date->format('Y-m-d H:i:s'),
+                    'end'   => $row['island_start_date'],
                 ];
             }
-            $expected_start_date = $row['island_end_date'];
+            $expected_start_date = new DateTimeImmutable($row['island_end_date']);
         }
-        if ($expected_start_date < $stop_timestamp) {
+        if ($expected_start_date < $stop) {
             // The last island ends before the stop date
             // Then there is a gap
             $gaps[] = [
-                'start' => date('Y-m-d H:i:s', $expected_start_date),
-                'end'   => date('Y-m-d H:i:s', $stop_timestamp),
+                'start' => $expected_start_date->format('Y-m-d H:i:s'),
+                'end'   => $stop->format('Y-m-d H:i:s'),
             ];
         }
 
         return $gaps;
+    }
+
+    /**
+     * Convert a DateInterval to a MySQL INTERVAL string
+     *
+     * @param DateInterval $interval
+     * @return string
+     */
+    public static function dateIntervalToMySQLInterval(DateInterval $interval): string
+    {
+        $parts = [];
+
+        if ($interval->y > 0) {
+            $parts[] = "INTERVAL {$interval->y} YEAR";
+        }
+        if ($interval->m > 0) {
+            $parts[] = "INTERVAL {$interval->m} MONTH";
+        }
+        if ($interval->d > 0) {
+            $parts[] = "INTERVAL {$interval->d} DAY";
+        }
+        if ($interval->h > 0) {
+            $parts[] = "INTERVAL {$interval->h} HOUR";
+        }
+        if ($interval->i > 0) {
+            $parts[] = "INTERVAL {$interval->i} MINUTE";
+        }
+        if ($interval->s > 0) {
+            $parts[] = "INTERVAL {$interval->s} SECOND";
+        }
+
+        return implode(' + ', $parts);
     }
 
     public static function getDashboardId(): ?int

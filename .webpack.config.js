@@ -28,34 +28,48 @@
  * -------------------------------------------------------------------------
  */
 
-const { type } = require('os');
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
+const { globSync } = require('glob');
+const libOutputPath = 'public/lib';
+
 module.exports = {
     plugins: [new MiniCssExtractPlugin()],
-    entry: path.resolve(__dirname, './js/main.js'),
+    entry: function () {
+            // Create an entry per *.js file in lib/bundle directory.
+            // Entry name will be name of the file (without ext).
+            let entries = {};
+
+            const files = globSync(path.resolve(__dirname, 'lib/bundles') + '/!(*.min).js');
+            for (const file of files) {
+                entries[path.basename(file, '.js')] = file;
+            }
+
+            return entries;
+        },
     mode: 'production',
     output: {
-        path: path.resolve(__dirname, 'public'),
-        filename: 'bundle.js',
+        path: path.resolve(__dirname, libOutputPath),
+        // filename: 'bundle.js',
         clean: true,
+        publicPath: '',
     },
 
-    // Config for pics loading
     module: {
         rules: [
             {
+                // Config for pics loading
                 test: /\.(png|svg|jpg|jpeg|gif)$/i,
                 type: 'asset/resource',
                 generator: {
                     filename: 'images/[name][ext]',
                 },
             },
-    // Config for css loading
             {
-                test : /\.css$/,
-                use : [MiniCssExtractPlugin.loader, 'css-loader']
+                // Config for css loading
+                test: /\.css$/,
+                use: [MiniCssExtractPlugin.loader, 'css-loader']
             }
         ],
     },
