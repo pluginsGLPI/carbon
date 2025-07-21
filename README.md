@@ -2,7 +2,7 @@
 
 ![GLPI Banner](https://user-images.githubusercontent.com/29282308/31666160-8ad74b1a-b34b-11e7-839b-043255af4f58.png)
 
-[![License GPL 3.0](https://img.shields.io/badge/License-GPL%203.0-blue.svg)](https://github.com/pluginsGLPI/carbon/blob/master/LICENSE.md)
+[![License GPL 3.0](https://img.shields.io/badge/License-GPL%203.0-blue.svg)](https://github.com/pluginsGLPI/carbon/blob/main/LICENSE)
 [![Telegram GLPI](https://img.shields.io/badge/Telegram-GLPI-blue.svg)](https://t.me/glpien)
 [![Follow Twitter](https://img.shields.io/badge/Twitter-GLPI%20Project-26A2FA.svg)](https://twitter.com/GLPI_PROJECT)
 [![Project Status: Active](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
