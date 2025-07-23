@@ -265,6 +265,8 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
             'zone' => $zone,
         ];
 
+        $this->step = 60;
+
         $response = $this->client->request('GET', $this->base_url . self::PAST_URL, ['query' => $params]);
         if (!$response) {
             return [];
@@ -279,6 +281,11 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
             return [];
         }
 
+        return $$response['history'];
+    }
+
+    protected function formatOutput(array $response, int $step): array
+    {
         $intensities = [];
         foreach ($response['history'] as $record) {
             $datetime = DateTime::createFromFormat('Y-m-d\TH:i:s+', $record['datetime'], new DateTimeZone('UTC'));

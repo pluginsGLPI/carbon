@@ -46,9 +46,13 @@ use Symfony\Component\Console\Helper\ProgressBar;
 
 abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
 {
+    protected int $step;
+
     abstract public function getSourceName(): string;
 
     abstract public function getDataInterval(): string;
+
+    abstract protected function formatOutput(array $response, int $step): array;
 
     /**
      * Create the source in the database
@@ -194,6 +198,7 @@ abstract class AbstractCarbonIntensity implements CarbonIntensityInterface
             } catch (AbortException $e) {
                 break;
             }
+            $data = $this->formatOutput($data, $this->step);
             if (!isset($data[$zone])) {
                 break;
             }
