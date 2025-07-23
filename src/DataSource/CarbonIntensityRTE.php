@@ -53,12 +53,15 @@ use GlpiPlugin\Carbon\Toolbox;
 class CarbonIntensityRTE extends AbstractCarbonIntensity
 {
     const RECORDS_URL =         '/eco2mix-national-tr/records';
-    const EXPORT_URL_TO_2023  = '/eco2mix-national-tr/exports/json';
-    const EXPORT_URL_TO_2012  = '/eco2mix-national-cons-def/exports/json';
+    const EXPORT_URL_REALTIME      = '/eco2mix-national-tr/exports/json';
+    const EXPORT_URL_CONSOLIDATED  = '/eco2mix-national-cons-def/exports/json';
 
     private RestApiClientInterface $client;
 
     private string $base_url;
+
+    /** @var bool Use consolidated dataset (true) or realtime dataset (false) */
+    private bool $use_consolidated = false;
 
     public function __construct(RestApiClientInterface $client, string $url = '')
     {
@@ -212,31 +215,71 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         $timezone = $this->prepareTimezone($start->getTimezone()->getName());
         $params = [
             'select' => 'taux_co2,date_heure',
-            'where' => "date_heure IN [date'$from' TO date'$to']",
+            'where' => "date_heure IN [date'$from' TO date'$to'[",
             'order_by' => 'date_heure asc',
             'timezone' => $timezone,
         ];
-        if ($stop < DateTime::createFromFormat(DateTimeInterface::ATOM, '2023-02-01T00:00:00+00:00')) {
-            $step = 15;
-            $url = $this->base_url . self::EXPORT_URL_TO_2012;
+        $expected_samples_count = $stop->diff($start);
+        // convert to 15 minutes interval
+        $expected_samples_count = (int) ($expected_samples_count->days * 24 * 4)
+            + (int) ($expected_samples_count->h * 4)
+            + (int) ($expected_samples_count->i / 15);
+        if ($this->use_consolidated) {
+            $this->step = 15;
+            $url = $this->base_url . self::EXPORT_URL_CONSOLIDATED;
         } else {
-            $step = 15;
-            $url = $this->base_url . self::EXPORT_URL_TO_2023;
+            $this->step = 15;
+            $url = $this->base_url . self::EXPORT_URL_REALTIME;
         }
+
+        $alt_response = [];
         $response = $this->client->request('GET', $url, ['timeout' => 8, 'query' => $params]);
+        // Tolerate DST switching issues (4 missing samples or too many samples)
+        if (!$response || abs(count($response) - $expected_samples_count) > 4) {
+            // Retry with realtime dataset
+            if (!$this->use_consolidated) {
+                $this->use_consolidated = true;
+                $url = $this->base_url . self::EXPORT_URL_CONSOLIDATED;
+                $step = 15;
+                $alt_response = $this->client->request('GET', $url, ['timeout' => 8, 'query' => $params]);
+                if (!$alt_response) {
+                    trigger_error('No response from RTE API for ' . $zone, E_USER_WARNING);
+                    return [];
+                }
+                if (count($alt_response) === 0) {
+                    trigger_error('Empty response from RTE API for ' . $zone, E_USER_WARNING);
+                    return [];
+                }
+                if (abs(count($alt_response) - $expected_samples_count) > 4) {
+                    trigger_error('Not enough samples from RTE API for ' . $zone . ' (expected: ' . $expected_samples_count . ', got: ' . count($alt_response) . ')', E_USER_WARNING);
+                }
+
+                if (!isset($alt_response['error_code']) && count($alt_response) > count($response)) {
+                    // Use the alternative response if more samples than the original response
+                    $response = $alt_response;
+                }
+            }
+        }
+
         if (!$response) {
             trigger_error('No response from RTE API for ' . $zone, E_USER_WARNING);
             return [];
         }
-        if (isset($response['error_code'])) {
-            trigger_error($this->formatError($response));
+        if (count($response) === 0) {
+            trigger_error('Empty response from RTE API for ' . $zone, E_USER_WARNING);
             return [];
         }
+        if (abs(count($response) - $expected_samples_count) > 4) {
+            trigger_error('Not enough samples from RTE API for ' . $zone . ' (expected: ' . $expected_samples_count . ', got: ' . count($response) . ')', E_USER_WARNING);
+        }
+        if (isset($response['error_code'])) {
+            trigger_error($this->formatError($response));
+        }
 
-        return $this->formatOutput($response, $step);
+        return $response;
     }
 
-    private function formatOutput(array $response, int $step): array
+    protected function formatOutput(array $response, int $step): array
     {
         // array sort records, just in case
         usort($response, function ($a, $b) {
