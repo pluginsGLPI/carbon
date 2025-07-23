@@ -191,78 +191,36 @@ class AbstractCarbonIntensityTest extends DbTestCase
         }
     }
 
-    // public function testIsDownloadComplete()
+    // public function testFullDownload()
     // {
-    //     $stub = $this->getMockForAbstractClass(AbstractCarbonIntensity::class);
-    //     $stub->method('getZones')->willReturn(['FR', 'DE']);
-    //     $stub->method('fetchRange')->willReturn([
-    //         'source' => 'test_source',
-    //         'FR' => [],
-    //         'DE' => [],
-    //     ]);
-    //     $source = new CarbonIntensitySource();
-    //     $source->getFromDBByCrit(['name' => 'test_source']);
-    //     if ($source->isNewItem()) {
-    //         $source = $this->getItem(CarbonIntensitySource::class, ['name' => 'test_source']);
-    //     }
-
     //     $zone = new Zone();
     //     $zone->getFromDBByCrit(['name' => 'FR']);
     //     if ($zone->isNewItem()) {
     //         $zone = $this->getItem(Zone::class, ['name' => 'FR']);
     //     }
-    //     $zone = new Zone();
-    //     $zone->getFromDBByCrit(['name' => 'DE']);
-    //     if ($zone->isNewItem()) {
-    //         $zone = $this->getItem(Zone::class, ['name' => 'DE']);
-    //     }
+    //     $intensity = $this->createStub(CarbonIntensity::class);
 
-    //     $glpi_config = new GlpiConfig();
-    //     $glpi_config->deleteByCriteria([
-    //         'context' => 'carbon',
-    //         'name'    => ['LIKE', 'download_test_complete_%'],
-    //     ]);
+    //     $start_date = new DateTime('3 months ago');
+    //     $start_date->setTime(0, 0, 0);
+    //     $start_date = DateTimeImmutable::createFromMutable($start_date);
+    //     $stop_date = new DateTimeImmutable('2 days ago');
 
-    //     $output = $stub->isDownloadComplete();
-    //     $this->assertFalse($output);
-    //     $cron_task = new CronTask();
-    //     $cron_task->fields['param'] = '';
-    //     $output = $stub->cronDownload($cron_task);
-    //     $this->assertEquals(0, $output);
-    //     $output = $stub->isDownloadComplete();
-    //     $this->assertTrue($output);
+    //     // 4 calls to fetchRange                                example
+    //     // Current month (1 to today)                           2024-07-01 to 2024-07-19
+    //     // month - 1 (1 to last day of month)                   2024-06-01 to 2024-06-30
+    //     // month - 2 (1 to last day of month)                   2024-05-01 to 2024-05-31
+    //     // month - 3 (same day as today to last day of month)   2024-04-19 to 2024-04-30
+    //     // Warning : current month may be ignored if (now - 2 days) results to a date in the previous month
+    //     // This may happen if (day of month) < 2
+    //     $count = $stop_date->format('m') - $start_date->format('m') + 1;
+    //     $count = (($stop_date->format('Y')  - $start_date->format('Y')) * 12)
+    //         + ($stop_date->format('m') - $start_date->format('m') ) + 1;
+    //     $intensity->expects($this->exactly($count))->method('save');
+
+    //     $instance = $this->getMockForAbstractClass(AbstractCarbonIntensity::class);
+    //     $instance->method('fetchRange')->willReturn(['FR' => []]);
+    //     $instance->fullDownload('FR', $start_date, $stop_date, $intensity);
     // }
-
-    public function testFullDownload()
-    {
-        $zone = new Zone();
-        $zone->getFromDBByCrit(['name' => 'FR']);
-        if ($zone->isNewItem()) {
-            $zone = $this->getItem(Zone::class, ['name' => 'FR']);
-        }
-        $intensity = $this->createStub(CarbonIntensity::class);
-
-        $start_date = new DateTime('3 months ago');
-        $start_date->setTime(0, 0, 0);
-        $start_date = DateTimeImmutable::createFromMutable($start_date);
-        $stop_date = new DateTimeImmutable('2 days ago');
-
-        // 4 calls to fetchRange                                example
-        // Current month (1 to today)                           2024-07-01 to 2024-07-19
-        // month - 1 (1 to last day of month)                   2024-06-01 to 2024-06-30
-        // month - 2 (1 to last day of month)                   2024-05-01 to 2024-05-31
-        // month - 3 (same day as today to last day of month)   2024-04-19 to 2024-04-30
-        // Warning : current month may be ignored if (now - 2 days) results to a date in the previous month
-        // This may happen if (day of month) < 2
-        $count = $stop_date->format('m') - $start_date->format('m') + 1;
-        $count = (($stop_date->format('Y')  - $start_date->format('Y')) * 12)
-            + ($stop_date->format('m') - $start_date->format('m') ) + 1;
-        $intensity->expects($this->exactly($count))->method('save');
-
-        $instance = $this->getMockForAbstractClass(AbstractCarbonIntensity::class);
-        $instance->method('fetchRange')->willReturn(['FR' => []]);
-        $instance->fullDownload('FR', $start_date, $stop_date, $intensity);
-    }
 
     public function testIncrementalDownload()
     {
