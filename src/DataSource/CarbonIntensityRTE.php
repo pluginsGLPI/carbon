@@ -37,6 +37,7 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
+use DBmysql;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
 use GlpiPlugin\Carbon\Zone;
@@ -145,6 +146,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
      */
     public function fetchDay(DateTimeImmutable $day, string $zone): array
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $start = DateTime::createFromImmutable($day);
@@ -210,6 +212,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
      */
     public function fetchRange(DateTimeImmutable $start, DateTimeImmutable $stop, string $zone): array
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $format = DateTime::ATOM;
