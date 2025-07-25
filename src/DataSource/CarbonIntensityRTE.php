@@ -145,12 +145,14 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
      */
     public function fetchDay(DateTimeImmutable $day, string $zone): array
     {
+        global $DB;
+
         $start = DateTime::createFromImmutable($day);
         $stop = clone $start;
         $stop->setTime(23, 59, 59);
 
         $format = DateTime::ATOM;
-        $timezone = $this->prepareTimezone($start->getTimezone()->getName());
+        $timezone = $DB->guessTimezone();
         $from = $start->format($format);
         $to = $stop->format($format);
 
@@ -208,11 +210,13 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
      */
     public function fetchRange(DateTimeImmutable $start, DateTimeImmutable $stop, string $zone): array
     {
+        global $DB;
+
         $format = DateTime::ATOM;
         $from = $start->format($format);
         $to = $stop->format($format);
 
-        $timezone = $this->prepareTimezone($start->getTimezone()->getName());
+        $timezone = $DB->guessTimezone();
         $params = [
             'select' => 'taux_co2,date_heure',
             'where' => "date_heure IN [date'$from' TO date'$to'[",
