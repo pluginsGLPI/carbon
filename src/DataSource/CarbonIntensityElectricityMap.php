@@ -230,8 +230,9 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
         }
 
         $intensities = [];
+        $timezone = new DateTimeZone('UTC');
         foreach ($response['history'] as $record) {
-            $datetime = DateTime::createFromFormat('Y-m-d\TH:i:s+', $record['datetime'], new DateTimeZone('UTC'));
+            $datetime = DateTime::createFromFormat('Y-m-d\TH:i:s+', $record['datetime'], $timezone);
             if (!$datetime instanceof DateTimeInterface) {
                 continue;
             }
@@ -287,8 +288,9 @@ class CarbonIntensityElectricityMap extends AbstractCarbonIntensity
     protected function formatOutput(array $response, int $step): array
     {
         $intensities = [];
+        $timezone = new DateTimeZone('UTC');
         foreach ($response['history'] as $record) {
-            $datetime = DateTime::createFromFormat('Y-m-d\TH:i:s+', $record['datetime'], new DateTimeZone('UTC'));
+            $datetime = DateTime::createFromFormat('Y-m-d\TH:i:s+', $record['datetime'], $timezone);
             if (!$datetime instanceof DateTimeInterface) {
                 var_dump(DateTime::getLastErrors());
                 continue;
