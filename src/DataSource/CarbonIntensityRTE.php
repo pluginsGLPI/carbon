@@ -239,20 +239,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
             // Retry with realtime dataset
             if (!$this->use_consolidated) {
                 $this->use_consolidated = true;
-                $url = $this->base_url . self::EXPORT_URL_CONSOLIDATED;
-                $this->step = 15;
-                $alt_response = $this->client->request('GET', $url, ['timeout' => 8, 'query' => $params]);
-                if (!$alt_response) {
-                    trigger_error('No response from RTE API for ' . $zone, E_USER_WARNING);
-                    return [];
-                }
-                if (count($alt_response) === 0) {
-                    trigger_error('Empty response from RTE API for ' . $zone, E_USER_WARNING);
-                    return [];
-                }
-                if (abs(count($alt_response) - $expected_samples_count) > 4) {
-                    trigger_error('Not enough samples from RTE API for ' . $zone . ' (expected: ' . $expected_samples_count . ', got: ' . count($alt_response) . ')', E_USER_WARNING);
-                }
+                $alt_response = $this->fetchRange($start, $stop, $zone);
 
                 if (!isset($alt_response['error_code']) && count($alt_response) > count($response)) {
                     // Use the alternative response if more samples than the original response
