@@ -240,7 +240,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
             if (!$this->use_consolidated) {
                 $this->use_consolidated = true;
                 $url = $this->base_url . self::EXPORT_URL_CONSOLIDATED;
-                $step = 15;
+                $this->step = 15;
                 $alt_response = $this->client->request('GET', $url, ['timeout' => 8, 'query' => $params]);
                 if (!$alt_response) {
                     trigger_error('No response from RTE API for ' . $zone, E_USER_WARNING);
