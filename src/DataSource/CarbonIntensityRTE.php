@@ -220,27 +220,39 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         $to = $stop->format($format);
 
         $timezone = $DB->guessTimezone();
+        $interval = $stop->diff($start);
+        $where = "date_heure IN [date'$from' TO date'$to'";
+        if ($interval->y === 0 && $interval->m === 0 && $interval->d === 0 && $interval->h === 1) {
+            $where .= ']';
+        } else {
+            $where .= '[';
+        }
         $params = [
             'select' => 'taux_co2,date_heure',
-            'where' => "date_heure IN [date'$from' TO date'$to'[",
+            'where' => $where,
             'order_by' => 'date_heure asc',
             'timezone' => $timezone,
         ];
-        $expected_samples_count = $stop->diff($start);
         // convert to 15 minutes interval
-        $expected_samples_count = (int) ($expected_samples_count->days * 24 * 4)
-            + (int) ($expected_samples_count->h * 4)
-            + (int) ($expected_samples_count->i / 15);
         if ($this->use_consolidated) {
-            $this->step = 15;
+            $this->step = 60;
             $url = $this->base_url . self::EXPORT_URL_CONSOLIDATED;
         } else {
             $this->step = 15;
             $url = $this->base_url . self::EXPORT_URL_REALTIME;
         }
+        $expected_samples_count = (int) ($interval->days * 24)
+            + (int) ($interval->h)
+            + (int) ($interval->i / 60);
 
         $alt_response = [];
         $response = $this->client->request('GET', $url, ['timeout' => 8, 'query' => $params]);
+        if ($response) {
+            // Adjust step as consolidated dataset may return data for each 15 minutes !
+            $this->step = $this->detectStep($response);
+            $expected_samples_count *= (60 / $this->step);
+        }
+
         // Tolerate DST switching issues (4 missing samples or too many samples)
         if (!$response || abs(count($response) - $expected_samples_count) > 4) {
             // Retry with realtime dataset
@@ -280,12 +292,24 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
             return $a['date_heure'] <=> $b['date_heure'];
         });
 
+        $this->step = $this->detectStep($response);
         // Deduplicate entries (solves switching from winter time to summer time)
         // because there are 2 samples at same UTC date time
         $filtered_response = $this->deduplicate($response);
 
         // Convert samples from 15 min to 1 hour
-        $intensities = $this->convertToHourly($filtered_response, $step);
+        if ($this->step < 60) {
+            $intensities = $this->convertToHourly($filtered_response, $this->step);
+        } else {
+            $intensities = [];
+            foreach ($filtered_response as $record) {
+                $intensities[] = [
+                    'datetime' => DateTime::createFromFormat(DateTimeInterface::ATOM, $record['date_heure'])->format('Y-m-d\TH:00:00'),
+                    'intensity' => (float) $record['taux_co2'],
+                    'data_quality' => AbstractTracked::DATA_QUALITY_RAW_REAL_TIME_MEASUREMENT,
+                ];
+            }
+        }
 
         return [
             'source' => self::getSourceName(),
@@ -309,6 +333,23 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         }
 
         return $filtered_response;
+    }
+
+    protected function detectStep(array $records): ?int
+    {
+        if (count($records) < 2) {
+            return 60;
+        }
+
+        $sample_1 = DateTime::createFromFormat(DateTime::ATOM, $records[0]['date_heure']);
+        $sample_2 = DateTime::createFromFormat(DateTime::ATOM, $records[1]['date_heure']);
+        $diff = $sample_1->diff($sample_2);
+
+        if ($diff->h === 1) {
+            return 60; // 1 hour step
+        } else {
+            return $diff->i; // Return the minutes step
+        }
     }
 
     /**
@@ -398,15 +439,5 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         $message = $message = $response['error_code']
         . ' ' . $response['message'];
         return $message;
-    }
-
-    private function prepareTimezone(string $timezone): string
-    {
-        switch ($timezone) {
-            case '+00:00':
-                return 'UTC';
-        }
-
-        return $timezone;
     }
 }
