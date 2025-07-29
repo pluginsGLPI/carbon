@@ -253,7 +253,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
             $expected_samples_count *= (60 / $this->step);
         }
 
-        // Tolerate DST switching issues (4 missing samples or too many samples)
+        // Tolerate DST switching issues with 15 minutes samples (4 missing samples or too many samples)
         if (!$response || abs(count($response) - $expected_samples_count) > 4) {
             // Retry with realtime dataset
             if (!$this->use_consolidated) {
@@ -294,7 +294,8 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
 
         $this->step = $this->detectStep($response);
         // Deduplicate entries (solves switching from winter time to summer time)
-        // because there are 2 samples at same UTC date time
+        // because there are 2 samples at same date time, during 1 hour
+        // Even if we use UTC timezone.
         $filtered_response = $this->deduplicate($response);
 
         // Convert samples from 15 min to 1 hour
@@ -373,10 +374,10 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
             $minute = (int) $date->format('i');
 
             if ($previous_record_date !== null) {
-                // Ensure that current date is 15 minutes ahead than previous record date
+                // Ensure that current date is $step minutes ahead than previous record date
                 $diff = $date->getTimestamp() - $previous_record_date->getTimestamp();
                 if ($diff !== $step * 60) {
-                    if ($diff == 4500 && $this->switchToWinterTime($date)) {
+                    if ($diff == 4500 && $this->switchToWinterTime($previous_record_date, $date)) {
                         // 4500 = 1h + 15m
                         $filled_date = DateTime::createFromFormat('Y-m-d\TH:i:s', end($intensities)['datetime']);
                         $filled_date->add(new DateInterval('PT1H'));
@@ -415,23 +416,11 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
      *
      * @return bool
      */
-    private function switchToWinterTime(DateTime $date): bool
+    private function switchToWinterTime(DateTime $previous, DateTime $date): bool
     {
-        // We assume that the datetime is already switched to winter time
-        // Therefore summer time is 03:00:00 and winter time is 02:00:00
-        $date = clone $date;
-        $date->setTimezone(new DateTimeZone('Europe/Paris'));
-        $month = (int) $date->format('m');
-        $day_of_month = (int) $date->format('d');
-        $day_of_week = (int) $date->format('w');
-        // Find if this is the day and time to switch to winter time
-        if ($month === 10 && $day_of_week === 0 && $day_of_month >= 25) {
-            if ($date->format('H:i:s') === '02:00:00') {
-                return true;
-            }
-        }
-
-        return false;
+        $first_dst = $previous->format('I');
+        $second_dst = $date->format('I');
+        return $first_dst === '1' && $second_dst === '0';
     }
 
     private function formatError(array $response): string
