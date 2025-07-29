@@ -287,6 +287,8 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
 
     protected function formatOutput(array $response, int $step): array
     {
+        /** @var DBMysql $DB */
+        global $DB;
         // array sort records, just in case
         usort($response, function ($a, $b) {
             return $a['date_heure'] <=> $b['date_heure'];
@@ -298,6 +300,13 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         // Even if we use UTC timezone.
         $filtered_response = $this->deduplicate($response);
 
+        // Convert string dates into datetime objects, restoring timezone as type Continent/City instead of offset
+        // This is needed to detect later the switching to winter time
+        $timezone = new DateTimeZone($DB->guessTimezone());
+        foreach ($filtered_response as &$record) {
+            $record['date_heure'] = DateTime::createFromFormat('Y-m-d\TH:i:s??????', $record['date_heure'], $timezone);
+        }
+
         // Convert samples from 15 min to 1 hour
         if ($this->step < 60) {
             $intensities = $this->convertToHourly($filtered_response, $this->step);
@@ -305,7 +314,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
             $intensities = [];
             foreach ($filtered_response as $record) {
                 $intensities[] = [
-                    'datetime' => DateTime::createFromFormat(DateTimeInterface::ATOM, $record['date_heure'])->format('Y-m-d\TH:00:00'),
+                    'datetime' => $record['date_heure']->format('Y-m-d\TH:00:00'),
                     'intensity' => (float) $record['taux_co2'],
                     'data_quality' => AbstractTracked::DATA_QUALITY_RAW_REAL_TIME_MEASUREMENT,
                 ];
@@ -368,7 +377,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         $previous_record_date = null;
 
         foreach ($records as $record) {
-            $date = DateTime::createFromFormat(DateTimeInterface::ATOM, $record['date_heure']);
+            $date = $record['date_heure'];
             $count++;
             $intensity += $record['taux_co2'];
             $minute = (int) $date->format('i');
