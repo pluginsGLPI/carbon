@@ -253,8 +253,6 @@ abstract class AbstractAsset implements EngineInterface
         $result = $DB->request($request);
         if ($result->count() === 1) {
             return $result->current();
-            // $intensity = $result->current()['intensity'];
-            // return $intensity;
         }
 
         if (!$world_not_found_error_triggered) {
