@@ -45,6 +45,7 @@ use ProfileRight;
 use Glpi\Dashboard\Item;
 use Glpi\Dashboard\Right;
 use Glpi\System\Diagnostic\DatabaseSchemaIntegrityChecker;
+use Glpi\Toolbox\Sanitizer;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\Zone;
@@ -338,30 +339,44 @@ class PluginInstallTest extends CommonTestCase
         foreach ($sources as $source_name) {
             $source = new CarbonIntensitySource();
             $source->getFromDBByCrit([
-                'name' => $source_name,
+                'name' => Sanitizer::sanitize($source_name),
                 'is_fallback' => 0
             ]);
-            $this->assertFalse($source->isNewItem());
+            $this->assertFalse($source->isNewItem(), "Source '$source_name' not found");
         }
 
         $sources = ['Ember - Energy Institute', 'Hydro Quebec'];
         foreach ($sources as $source_name) {
             $source = new CarbonIntensitySource();
             $source->getFromDBByCrit([
-                'name' => $source_name,
+                'name' => Sanitizer::sanitize($source_name),
                 'is_fallback' => 1
             ]);
-            $this->assertFalse($source->isNewItem());
+            $this->assertFalse($source->isNewItem(), "Source '$source_name' not found");
         }
     }
 
     private function checkInitialZones()
     {
-        $zones = ['World', 'Quebec'];
+        $total_count = 0;
+
+        // Zones added from PHP code
+        $zones = ['Quebec'];
+        $total_count += count($zones);
         foreach ($zones as $zone_name) {
             $zone = new Zone();
             $zone->getFromDBByCrit([
-                'name' => $zone_name
+                'name' => Sanitizer::sanitize($zone_name)
+            ]);
+            $this->assertFalse($zone->isNewItem(), "Zone '$zone_name' not found");
+        }
+
+        // zones added from CSV file
+        $total_count += count($this->zones);
+        foreach ($this->zones as $zone_name) {
+            $zone = new Zone();
+            $zone->getFromDBByCrit([
+                'name' => Sanitizer::sanitize($zone_name)
             ]);
             $this->assertFalse($zone->isNewItem());
         }
@@ -369,21 +384,11 @@ class PluginInstallTest extends CommonTestCase
 
     private function checkInitialCarbonIntensities()
     {
-        // Find the zone
-        $zone_name = 'World';
-        $zone = new Zone();
-        $zone->getFromDBByCrit([
-            'name' => $zone_name,
-        ]);
-        if ($zone->isNewItem()) {
-            $this->fail("$zone_name zone not found");
-        }
-
         // Find the source for Ember - Energy Institute
         $source_name = 'Ember - Energy Institute';
         $source = new CarbonIntensitySource();
         $source->getFromDBByCrit([
-            'name' => $source_name
+            'name' => Sanitizer::sanitize($source_name)
         ]);
         if ($source->isNewItem()) {
             $this->fail("$source_name not found");
@@ -393,9 +398,8 @@ class PluginInstallTest extends CommonTestCase
         $table = $dbUtils->getTableForItemType(CarbonIntensity::class);
         $count = $dbUtils->countElementsInTable($table, [
             $source::getForeignKeyField() => $source->getID(),
-            $zone::getForeignKeyField() => $zone->getID(),
         ]);
-        $this->assertEquals(24, $count);
+        $this->assertEquals(5174, $count);
 
         // Find the zone
         $zone_name = 'Quebec';
@@ -480,4 +484,222 @@ class PluginInstallTest extends CommonTestCase
         ]);
         $this->assertCount($expected_cards_count, $rows);
     }
+
+    private $zones = [
+        'Afghanistan',
+        'Albania',
+        'Algeria',
+        'American Samoa',
+        'Angola',
+        'Antigua and Barbuda',
+        'Argentina',
+        'Armenia',
+        'Aruba',
+        'Australia',
+        'Austria',
+        'Azerbaijan',
+        'Bahamas',
+        'Bahrain',
+        'Bangladesh',
+        'Barbados',
+        'Belarus',
+        'Belgium',
+        'Belize',
+        'Benin',
+        'Bermuda',
+        'Bhutan',
+        'Bolivia',
+        'Bosnia and Herzegovina',
+        'Botswana',
+        'Brazil',
+        'British Virgin Islands',
+        'Brunei',
+        'Bulgaria',
+        'Burkina Faso',
+        'Burundi',
+        'Cambodia',
+        'Cameroon',
+        'Canada',
+        'Cape Verde',
+        'Cayman Islands',
+        'Central African Republic',
+        'Chad',
+        'Chile',
+        'China',
+        'Colombia',
+        'Comoros',
+        'Congo',
+        'Cook Islands',
+        'Costa Rica',
+        'Cote d\'Ivoire',
+        'Croatia',
+        'Cuba',
+        'Cyprus',
+        'Czechia',
+        'Democratic Republic of Congo',
+        'Denmark',
+        'Djibouti',
+        'Dominica',
+        'Dominican Republic',
+        'Ecuador',
+        'Egypt',
+        'El Salvador',
+        'Equatorial Guinea',
+        'Eritrea',
+        'Estonia',
+        'Eswatini',
+        'Ethiopia',
+        'Falkland Islands',
+        'Faroe Islands',
+        'Fiji',
+        'Finland',
+        'France',
+        'French Guiana',
+        'French Polynesia',
+        'Gabon',
+        'Gambia',
+        'Georgia',
+        'Germany',
+        'Ghana',
+        'Gibraltar',
+        'Greece',
+        'Greenland',
+        'Grenada',
+        'Guadeloupe',
+        'Guam',
+        'Guatemala',
+        'Guinea',
+        'Guinea-Bissau',
+        'Guyana',
+        'Haiti',
+        'Honduras',
+        'Hong Kong',
+        'Hungary',
+        'Iceland',
+        'India',
+        'Indonesia',
+        'Iran',
+        'Iraq',
+        'Ireland',
+        'Israel',
+        'Italy',
+        'Jamaica',
+        'Japan',
+        'Jordan',
+        'Kazakhstan',
+        'Kenya',
+        'Kiribati',
+        'Kosovo',
+        'Kuwait',
+        'Kyrgyzstan',
+        'Laos',
+        'Latvia',
+        'Lebanon',
+        'Lesotho',
+        'Liberia',
+        'Libya',
+        'Lithuania',
+        'Luxembourg',
+        'Macao',
+        'Madagascar',
+        'Malawi',
+        'Malaysia',
+        'Maldives',
+        'Mali',
+        'Malta',
+        'Martinique',
+        'Mauritania',
+        'Mauritius',
+        'Mexico',
+        'Moldova',
+        'Mongolia',
+        'Montserrat',
+        'Morocco',
+        'Mozambique',
+        'Myanmar',
+        'Namibia',
+        'Nauru',
+        'Nepal',
+        'Netherlands',
+        'New Caledonia',
+        'New Zealand',
+        'Nicaragua',
+        'Niger',
+        'Nigeria',
+        'North Korea',
+        'North Macedonia',
+        'Norway',
+        'Oman',
+        'Pakistan',
+        'Palestine',
+        'Panama',
+        'Papua New Guinea',
+        'Paraguay',
+        'Peru',
+        'Philippines',
+        'Poland',
+        'Portugal',
+        'Puerto Rico',
+        'Qatar',
+        'Reunion',
+        'Romania',
+        'Russia',
+        'Rwanda',
+        'Saint Helena',
+        'Saint Kitts and Nevis',
+        'Saint Lucia',
+        'Saint Pierre and Miquelon',
+        'Saint Vincent and the Grenadines',
+        'Samoa',
+        'Sao Tome and Principe',
+        'Saudi Arabia',
+        'Senegal',
+        'Serbia',
+        'Seychelles',
+        'Sierra Leone',
+        'Singapore',
+        'Slovakia',
+        'Slovenia',
+        'Solomon Islands',
+        'Somalia',
+        'South Africa',
+        'South Korea',
+        'Spain',
+        'Sri Lanka',
+        'Sudan',
+        'Suriname',
+        'Sweden',
+        'Switzerland',
+        'Syria',
+        'Taiwan',
+        'Tajikistan',
+        'Tanzania',
+        'Thailand',
+        'Togo',
+        'Tonga',
+        'Trinidad and Tobago',
+        'Tunisia',
+        'Turkey',
+        'Turkmenistan',
+        'Turks and Caicos Islands',
+        'Uganda',
+        'Ukraine',
+        'United Arab Emirates',
+        'United Kingdom',
+        'United States',
+        'United States Virgin Islands',
+        'Uruguay',
+        'Uzbekistan',
+        'Vanuatu',
+        'Venezuela',
+        'Vietnam',
+        'Western Sahara',
+        'World',
+        'Yemen',
+        'Zambia',
+        'Zimbabwe',
+        'East Timor',
+        'Montenegro',
+        'South Sudan'
+    ];
 }

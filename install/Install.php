@@ -35,6 +35,7 @@ namespace GlpiPlugin\Carbon;
 use Config;
 use DBmysql;
 use DirectoryIterator;
+use Glpi\Toolbox\Sanitizer;
 use Migration;
 use Plugin;
 
@@ -224,5 +225,75 @@ class Install
         ksort($migrations, SORT_NATURAL);
 
         return $migrations;
+    }
+
+    /**
+     * Get or create a carbon intensity zone by name
+     *
+     * @param string $name Name of the zone
+     * @param int $is_fallback Is the zone a fallback zone (1) or not (0)
+     * @return int ID of the zone
+     */
+    public static function getOrCreateSource(string $name, int $is_fallback = 1): int
+    {
+        $source = new CarbonIntensitySource();
+        $source->getFromDBByCrit(['name' => Sanitizer::sanitize($name)]);
+        if ($source->isNewItem()) {
+            $source->add([
+                'name' => Sanitizer::sanitize($name),
+                'is_fallback' => $is_fallback,
+            ]);
+            /** @phpstan-ignore if.alwaysTrue */
+            if ($source->isNewItem()) {
+                throw new \RuntimeException("Failed to create carbon intensity source '$name' in DB");
+            }
+        }
+        return $source->getID();
+    }
+
+    /**
+     * Get or create a carbon intensity zone by name
+     *
+     * @param string $name Name of the zone
+     * @param int $source_id ID of the source to associate with the zone
+     * @return int ID of the zone
+     */
+    public static function getOrCreateZone(string $name, int $source_id): int
+    {
+        static $zone_cache = [];
+        if (isset($zone_cache[$name])) {
+            return $zone_cache[$name];
+        }
+
+        $zone = new Zone();
+        $zone->getFromDBByCrit(['name' => Sanitizer::sanitize($name)]);
+        if ($zone->isNewItem()) {
+            $zone->add([
+                'name' => Sanitizer::sanitize($name),
+                'plugin_carbon_carbonintensitysources_id_historical' => $source_id,
+            ]);
+            /** @phpstan-ignore if.alwaysTrue */
+            if ($zone->isNewItem()) {
+                throw new \RuntimeException("Failed to create zone '$name' in DB");
+            }
+        }
+        $zone_cache[$name] = $zone->getID();
+
+        return $zone->getID();
+    }
+
+    public static function linkSourceZone(int $source_id, int $zone_id)
+    {
+        $source_zone = new CarbonIntensitySource_Zone();
+        $source_zone->getFromDBByCrit([
+            'plugin_carbon_carbonintensitysources_id' => $source_id,
+            'plugin_carbon_zones_id'                  => $zone_id,
+        ]);
+        if ($source_zone->isNewItem()) {
+            $source_zone->add([
+                'plugin_carbon_carbonintensitysources_id' => $source_id,
+                'plugin_carbon_zones_id'                  => $zone_id,
+            ]);
+        }
     }
 }
