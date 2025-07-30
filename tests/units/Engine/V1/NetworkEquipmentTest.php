@@ -111,13 +111,13 @@ class NetworkEquipmentTest extends EngineTestCase
 
         $engine = new static::$engine_class($item->getID());
         $output = $engine->getCarbonEmissionPerDay(
-            new DateTime('2024-01-01 00:00:00'),
+            new DateTime('2024-02-01 00:00:00'),
             $zone
         );
 
         // Expects to use World carbon intensity as fallback
         $this->assertEqualsWithDelta(
-            4616.15,
+            4540.867,
             $output->getValue(),
             static::EPSILON
         );
