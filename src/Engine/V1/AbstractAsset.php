@@ -203,7 +203,7 @@ abstract class AbstractAsset implements EngineInterface
                 $carbon_intensity_source_zone_table => [
                     'FKEY'   => [
                         $carbon_intensity_table => 'plugin_carbon_zones_id',
-                        $carbon_intensity_source_zone_table => 'plugin_carbon_carbonintensitysources_id',
+                        $carbon_intensity_source_zone_table => 'plugin_carbon_zones_id',
                     ]
                 ],
                 $carbon_intensity_source_table => [
