@@ -305,6 +305,6 @@ class Zone extends CommonDropdown
             return false;
         }
 
-        return true;
+        return $source->fields['is_fallback'] === 0;
     }
 }
