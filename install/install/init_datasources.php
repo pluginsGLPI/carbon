@@ -69,6 +69,7 @@ if ($handle = fopen($data_source, 'r')) {
         }
 
         $zone_id = Install::getOrCreateZone($entity, $source_id);
+        Install::linkSourceZone($source_id, $zone_id);
 
         // Insert into the database
         $success = $DB->insert($table, [
@@ -87,6 +88,7 @@ if ($handle = fopen($data_source, 'r')) {
 
 $source_id = Install::getOrCreateSource('Hydro Quebec');
 $zone_id_quebec = Install::getOrCreateZone('Quebec', $source_id);
+Install::linkSourceZone($source_id, $zone_id);
 
 $quebec_carbon_intensity = include(dirname(__DIR__) . '/data/carbon_intensity/quebec.php');
 foreach ($quebec_carbon_intensity as $year => $intensity) {
