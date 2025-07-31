@@ -35,10 +35,12 @@ namespace GlpiPlugin\Carbon;
 use CommonDropdown;
 use CommonDBTM;
 use CommonGLPI;
+use DateTime;
 use DBmysql;
 use DbUtils;
 use Glpi\Toolbox\Sanitizer;
 use Location;
+use LogicException;
 use Session;
 
 /**
@@ -306,5 +308,62 @@ class Zone extends CommonDropdown
         }
 
         return $source->fields['is_fallback'] === 0;
+    }
+
+    /**
+     * Get the zone the asset belongs to
+     * Location's country must match a zone name
+     *
+     * @param CommonDBTM $item
+     * @param null|DateTime $date Date for which the zone must be found
+     * @param bool $use_country Do not search by state first
+     * @return bool
+     */
+    public function getByItem(CommonDBTM $item, ?DateTime $date = null, bool $use_country = false): bool
+    {
+        if ($item->isNewItem()) {
+            return false;
+        }
+
+        // TODO: use date to find where was the asset at the given date
+        if ($date === null) {
+            $item_table = $item->getTable();
+            $location_table = Location::getTable();
+            $zone_table = Zone::getTable();
+
+            $request = [
+                'INNER JOIN' => [
+                    $location_table => [
+                        'FKEY' => [
+                            $zone_table => 'name',
+                            $location_table => 'state',
+                        ],
+                    ],
+                    $item_table => [
+                        'FKEY' => [
+                            $item_table => Location::getForeignKeyField(),
+                            $location_table => 'id',
+                        ],
+                    ]
+                ],
+                'WHERE' => [
+                    $item_table . '.id' => $item->getID()
+                ]
+            ];
+            $found = false;
+            if (!$use_country) {
+                $found = $this->getFromDBByRequest($request);
+            }
+
+            if ($found) {
+                return true;
+            }
+
+            // no state found, fallback to country
+            $request['INNER JOIN'][$location_table]['FKEY'][$location_table] = 'country';
+            return $this->getFromDBByRequest($request);
+        }
+
+        throw new LogicException('Not implemented yet');
     }
 }

@@ -60,7 +60,7 @@ class Monitor extends AbstractAsset
 
     public static function getEngine(CommonDBTM $item): EngineInterface
     {
-        return new EngineMonitor($item->getID());
+        return new EngineMonitor($item);
     }
 
     public function getEvaluableQuery(array $crit = [], bool $entity_restrict = true): array
