@@ -110,7 +110,9 @@ class Inventory implements EngineInterface
                 return true;
 
             case GlpiComputer::class:
-                $item = new Computer($items_id);
+                $computer = new GlpiComputer();
+                $computer->getFromDB($items_id);
+                $item = new Computer($computer);
                 break;
         }
 
