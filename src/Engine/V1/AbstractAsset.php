@@ -272,7 +272,12 @@ abstract class AbstractAsset implements EngineInterface
         // No result, try to find a zone by country
         $zone = new Zone();
         $zone->getByItem($this->item, null, true);
+        $result = $DB->request($request);
+        if ($result->count() === 1) {
+            return $result->current();
+        }
 
+        // Still no result, fallback to the world carbon intensity
         return $this->getFallbackCarbonIntensityForEmberWorldwide($day, $zone);
     }
 
