@@ -188,8 +188,6 @@ abstract class AbstractAsset implements EngineInterface
      */
     protected function getFallbackCarbonIntensity(DateTimeInterface $day, Zone $zone): ?array
     {
-        static $world_not_found_error_triggered = false;
-
         /** @var DBmysql $DB */
         global $DB;
 
@@ -282,7 +280,6 @@ abstract class AbstractAsset implements EngineInterface
     {
         /** @var DBmysql $DB */
         global $DB;
-
 
         $carbon_intensity_table = CarbonIntensity::getTable();
         $carbon_intensity_source_zone_table = CarbonIntensitySource_Zone::getTable();
