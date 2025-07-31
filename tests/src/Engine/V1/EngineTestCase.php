@@ -55,7 +55,7 @@ abstract class EngineTestCase extends DbTestCase
     public function getPowerProvider(): \Generator
     {
         $item = $this->getItem(static::$itemtype_class);
-        $engine = new static::$engine_class($item->getID());
+        $engine = new static::$engine_class($item);
         yield 'item without model nor type' => [
             $engine,
             0
@@ -70,7 +70,7 @@ abstract class EngineTestCase extends DbTestCase
             static::$glpi_type_class::getForeignKeyField() => $glpi_type->getID(),
             static::$model_class::getForeignKeyField() => $model->getID(),
         ]);
-        $engine = new static::$engine_class($item->getID());
+        $engine = new static::$engine_class($item);
         yield 'item with empty power data' => [
             $engine,
             0
@@ -81,7 +81,7 @@ abstract class EngineTestCase extends DbTestCase
             static::$glpi_type_class::getForeignKeyField() => $glpi_type->getID(),
             static::$model_class::getForeignKeyField() => $model->getID(),
         ]);
-        $engine = new static::$engine_class($item->getID());
+        $engine = new static::$engine_class($item);
         yield 'item with power data in model' => [
             $engine,
             20
@@ -97,7 +97,7 @@ abstract class EngineTestCase extends DbTestCase
             static::$glpi_type_class::getForeignKeyField() => $glpi_type->getID(),
             static::$model_class::getForeignKeyField() => $model->getID(),
         ]);
-        $engine = new static::$engine_class($item->getID());
+        $engine = new static::$engine_class($item);
         yield 'item with power data in type' => [
             $engine,
             40
@@ -108,7 +108,7 @@ abstract class EngineTestCase extends DbTestCase
             static::$glpi_type_class::getForeignKeyField() => $glpi_type->getID(),
             static::$model_class::getForeignKeyField() => $model->getID(),
         ]);
-        $engine = new static::$engine_class($item->getID());
+        $engine = new static::$engine_class($item);
         yield 'item with power data in model and type' => [
             $engine,
             20

@@ -57,7 +57,7 @@ class Computer extends AbstractAsset
 
     public static function getEngine(CommonDBTM $item): EngineInterface
     {
-        return new EngineComputer($item->getID());
+        return new EngineComputer($item);
     }
 
     public function getEvaluableQuery(array $crit = [], bool $entity_restrict = true): array

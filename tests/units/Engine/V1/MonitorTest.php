@@ -76,7 +76,7 @@ class MonitorTest extends EngineTestCase
             'items_id'     => $monitor->getID(),
         ]);
 
-        $engine = new Monitor($monitor->getID());
+        $engine = new Monitor($monitor);
         $output = $engine->getUsageProfile();
 
         $this->assertEquals($output->getID(), $profile->getID());
@@ -106,7 +106,7 @@ class MonitorTest extends EngineTestCase
             'itemtype' => $item->getType(),
             'items_id' => $item->getID(),
         ]);
-        $engine = new static::$engine_class($item->getID());
+        $engine = new static::$engine_class($item);
         yield 'item in worked day' => [
             $engine,
             new DateTime('2024-01-01 00:00:00'),
@@ -135,7 +135,7 @@ class MonitorTest extends EngineTestCase
             'itemtype' => $item->getType(),
             'items_id' => $item->getID(),
         ]);
-        $engine = new static::$engine_class($item->getID());
+        $engine = new static::$engine_class($item);
         yield 'item in week end' => [
             $engine,
             new DateTime('2024-01-06 00:00:00'),
@@ -181,7 +181,7 @@ class MonitorTest extends EngineTestCase
         ]);
 
         /* 23 hours * 31 Watts */
-        $engine = new Monitor($monitor->getID());
+        $engine = new Monitor($monitor);
         $expected_emission = 8.0 * 31 / 1000 * $intensity; // in CO2eq/KWh
         yield 'Monitor' => [
             $engine,
