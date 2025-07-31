@@ -48,6 +48,7 @@ use Glpi\System\Diagnostic\DatabaseSchemaIntegrityChecker;
 use Glpi\Toolbox\Sanitizer;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
+use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
 use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\CronTask;
@@ -384,6 +385,8 @@ class PluginInstallTest extends CommonTestCase
 
     private function checkInitialCarbonIntensities()
     {
+        global $DB;
+
         // Find the source for Ember - Energy Institute
         $source_name = 'Ember - Energy Institute';
         $source = new CarbonIntensitySource();
@@ -428,6 +431,39 @@ class PluginInstallTest extends CommonTestCase
             $zone::getForeignKeyField() => $zone->getID(),
         ]);
         $this->assertEquals(1, $count);
+
+        // Check all sources and zones are linked together via source_zone table
+        $source_zone_table = getTableForItemType(CarbonIntensitySource_Zone::class);
+        $zone_table = $dbUtils->getTableForItemType(Zone::class);
+        $source_table = $dbUtils->getTableForItemType(CarbonIntensitySource::class);
+        $source_fk = getForeignKeyFieldForItemType(CarbonIntensitySource::class);
+        $zone_fk = getForeignKeyFieldForItemType(Zone::class);
+        $iterator = $DB->request([
+            'SELECT' => '*',
+            'FROM' => $source_zone_table,
+            'LEFT JOIN' => [
+                $source_table => [
+                    'FKEY' => [
+                        $source_zone_table => $source_fk,
+                        $source_table      => 'id',
+                    ]
+                ],
+                $zone_table => [
+                    'FKEY' => [
+                        $source_zone_table => $zone_fk,
+                        $zone_table        => 'id',
+                    ]
+                ],
+            ],
+            'WHERE' => [
+                'OR' => [
+                    $source_table . '.id' => null,
+                    $zone_table   . '.id' => null,
+                ]
+            ]
+        ]);
+
+        $this->assertCount(0, $iterator);
     }
 
     private function checkPredefinedUsageProfiles()
