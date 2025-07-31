@@ -60,8 +60,13 @@ class Computer extends AbstractAsset
         $this->endpoint = $this->getEndpoint($type);
 
         // Ask for embodied impact only
+        $handle_hardware = in_array($type, [
+            ComputerType::CATEGORY_SERVER,
+            ComputerType::CATEGORY_DESKTOP,
+            ComputerType::CATEGORY_UNDEFINED,
+        ]);
         $configuration = $this->analyzeHardware($item);
-        if (count($configuration) === 0) {
+        if ($handle_hardware && count($configuration) === 0) {
             return null;
         }
         $description = [
