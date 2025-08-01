@@ -75,8 +75,8 @@ class LocationTest extends DbTestCase
         $this->assertTrue($location->isNewItem());
 
         // Update the location
-        $glpi_location->update([
-            'id' => $glpi_location->getID(),
+
+        $this->updateItem($glpi_location, [
             '_boavizta_zone' => 'FRA',
         ]);
         $location = new Location();

@@ -118,6 +118,8 @@ class PluginInstallTest extends CommonTestCase
         if (!Plugin::isPluginActive(TEST_PLUGIN_NAME)) {
             // For unit test script which expects that installation runs in the tests context
             $this->executeInstallation();
+            GlobalFixture::loadDataset();
+            $this->setupGLPIFramework();
         }
         $this->assertTrue(Plugin::isPluginActive(TEST_PLUGIN_NAME), 'Plugin not activated');
         $this->checkSchema(PLUGIN_CARBON_VERSION);

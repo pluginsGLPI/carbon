@@ -32,11 +32,12 @@
 
 // Rename configuration key embedded_impact_engine
 $value = Config::getConfigurationValue('plugin:carbon', 'embedded_impact_engine');
-if ($value !== null) {
-    Config::setConfigurationValues('plugin:carbon', [
-        'impact_engine' => $value,
-    ]);
+if ($value === null) {
+    $value = 'Boavizta';
 }
+Config::setConfigurationValues('plugin:carbon', [
+    'impact_engine' => $value,
+]);
 $config = new Config();
 $config->deleteByCriteria([
     'context' => 'plugin:carbon',
