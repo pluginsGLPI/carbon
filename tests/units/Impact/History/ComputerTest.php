@@ -45,6 +45,7 @@ use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\UsageInfo;
+use GlpiPlugin\Carbon\Zone;
 
 /**
  * @covers \GlpiPlugin\Carbon\Impact\History\Computer
@@ -84,7 +85,7 @@ class ComputerTest extends CommonAsset
 
         $model_power = 55;
         $location = $this->getItem(Location::class, [
-            'country' => PLUGIN_CARBON_TEST_FAKE_ZONE_NAME,
+            'state' => 'Quebec',
         ]);
         $model = $this->getItem(ComputerModel::class, ['power_consumption' => $model_power]);
         $glpi_type = $this->getItem(GlpiComputerType::class);
@@ -139,16 +140,15 @@ class ComputerTest extends CommonAsset
         ]);
         $this->assertEquals(7, count($emissions));
 
-        // Values from the fake carbon intensities added in global fixtures
         $expected = [
             [
                 'date'             => '2024-02-01 00:00:00',
                 'energy_per_day'   => 0.495,
-                'emission_per_day' => 14.245,
+                'emission_per_day' => 234.138,
             ],[
                 'date' => '2024-02-02 00:00:00',
                 'energy_per_day'   => 0.495,
-                'emission_per_day' => 14.025,
+                'emission_per_day' => 234.138,
             ], [
                 'date' => '2024-02-03 00:00:00',
                 'energy_per_day'   => 0,
@@ -160,15 +160,15 @@ class ComputerTest extends CommonAsset
             ], [
                 'date' => '2024-02-05 00:00:00',
                 'energy_per_day'   => 0.495,
-                'emission_per_day' => 14.41,
+                'emission_per_day' => 234.138,
             ], [
                 'date' => '2024-02-06 00:00:00',
                 'energy_per_day'   => 0.495,
-                'emission_per_day' => 15.895,
+                'emission_per_day' => 234.138,
             ], [
                 'date' => '2024-02-07 00:00:00',
                 'energy_per_day'   => 0.495,
-                'emission_per_day' => 12.98,
+                'emission_per_day' => 234.138,
             ],
         ];
         foreach ($emissions as $emission) {
