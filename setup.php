@@ -42,7 +42,7 @@ use Location as GlpiLocation;
 use Profile as GlpiProfile;
 use GlpiPlugin\Carbon\Dashboard\Grid;
 
-define('PLUGIN_CARBON_VERSION', '1.0.0-beta.2');
+define('PLUGIN_CARBON_VERSION', '1.0.0-beta.3');
 define('PLUGIN_CARBON_SCHEMA_VERSION', '1.0.0');
 
 // Minimal GLPI version, inclusive
@@ -124,11 +124,11 @@ function plugin_carbon_setupHooks()
     $PLUGIN_HOOKS[Hooks::PRE_ITEM_ADD]['carbon'][GlpiProfile::class] = 'plugin_carbon_profileAdd';
 
     // Add ApexCharts.js library
-    $js_file = 'bundle.js';
+    $js_file = 'lib/apexcharts.js';
     /** @phpstan-ignore-next-line */
     if (version_compare(GLPI_VERSION, '11.0', '<')) {
         // For GLPI < 11.0, we need to add resource the old way
-        $js_file = 'public/bundle.js';
+        $js_file = 'public/lib/apexcharts.js';
     }
     $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][] = $js_file;
 
@@ -137,7 +137,7 @@ function plugin_carbon_setupHooks()
     /** @phpstan-ignore-next-line */
     if (version_compare(GLPI_VERSION, '11.0', '<')) {
         // For GLPI < 11.0, we need to add resource the old way
-        $css_file = 'public/main.css';
+        $css_file = 'css/main.css';
     }
     $PLUGIN_HOOKS[Hooks::ADD_CSS]['carbon'][] = $css_file;
 

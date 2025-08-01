@@ -58,8 +58,8 @@
 </div>
 
 <div>
-  {% if not usage_impact.isNewItem() %}
-    {% set reset_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', reset: '', id: '" ~ usage_impact.getID() ~ "'}" %}
+  {% if not usage_impact.isNewItem() or usage_carbon_emission_count > 0 %}
+    {% set reset_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', reset: '', itemtype: '" ~ asset.getType() ~ "', items_id: '" ~ asset.getID() ~ "'}" %}
     <a class="btn btn-primary" onclick="submitGetLink('{{ usage_impact_action_url}}', {{ reset_args }})">{{ __('Reset data', 'carbon') }}</a>
   {% endif %}
   {% set calculate_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', calculate: '', itemtype: '" ~ asset.getType() ~ "', items_id: '" ~ asset.getID() ~ "'}" %}

@@ -32,6 +32,7 @@
 
 namespace GlpiPlugin\Carbon\DataSource\Tests;
 
+use DateTime;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensityRTE;
 use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
@@ -62,8 +63,17 @@ class CarbonIntensityRTETest extends DbTestCase
     public function testFetchRange()
     {
         $client = $this->createStub(RestApiClientInterface::class);
-        $response = file_get_contents(__DIR__ . '/../../fixtures/RTE/export-sample.json');
-        $client->method('request')->willReturn(json_decode($response, true));
+        $response = [];
+        $date = new DateTime('2021-03-01 00:00:00');
+        $date_increment = new \DateInterval('PT15M'); // 15 minutes interval
+        for ($i = 0; $i < 2496; $i++) {
+            $response[] = [
+                'taux_co2'   => 1,
+                'date_heure' => $date->format('Y-m-d\TH:i:sP'),
+            ];
+            $date->add($date_increment);
+        }
+        $client->method('request')->willReturn($response);
 
         $source = new CarbonIntensityRTE($client);
 
@@ -71,12 +81,9 @@ class CarbonIntensityRTETest extends DbTestCase
         $stop  = new DateTimeImmutable('2021-03-27');
         $intensities = $source->fetchRange($start, $stop, '');
         $this->assertIsArray($intensities);
-        $this->assertArrayHasKey('source', $intensities);
-        $this->assertEquals('RTE', $intensities['source']);
-        $this->assertArrayHasKey('France', $intensities);
-        $this->assertIsArray($intensities['France']);
-        // There are 288 intensities in the sample file
-        $this->assertEquals((288 / 4), count($intensities['France']));
+        $this->assertIsArray($intensities);
+        // There are 2496 intensities in the sample set
+        $this->assertEquals((2496), count($intensities));
     }
 
     public function testFullDownload()

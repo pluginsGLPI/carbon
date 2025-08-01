@@ -60,14 +60,20 @@ if (isset($_POST['update'])) {
     );
     Html::back();
 } else if (isset($_POST['reset'])) {
-    if (!isset($_POST['id'])) {
+    if (!isset($_POST['itemtype']) || !isset($_POST['items_id'])) {
         Session::addMessageAfterRedirect(__('Missing arguments in request.', 'carbon'), false, ERROR);
         Html::back();
     }
     $usage_impact = new UsageImpact();
-    $usage_impact->check($_POST['id'], PURGE);
+    $usage_impact->getFromDBByCrit([
+        'itemtype' => $_POST['itemtype'],
+        'items_id' => $_POST['items_id'],
+    ]);
+    if (!$usage_impact->isNewItem()) {
+        $usage_impact->check($usage_impact->getID(), PURGE);
+    }
 
-    $gwp_impact_class = '\\GlpiPlugin\\Carbon\\Impact\\History\\' . $usage_impact->fields['itemtype'];
+    $gwp_impact_class = '\\GlpiPlugin\\Carbon\\Impact\\History\\' . $_POST['itemtype'];
     if (!class_exists($gwp_impact_class) || !is_subclass_of($gwp_impact_class, AbstractAsset::class)) {
         Session::addMessageAfterRedirect(__('Bad arguments.', 'carbon'), false, ERROR);
         Html::back();
@@ -77,17 +83,17 @@ if (isset($_POST['update'])) {
     $gwp_impact = new $gwp_impact_class();
     $itemtype = $gwp_impact->getItemtype();
     $item = new $itemtype();
-    $item->getFromDB($usage_impact->fields['items_id']);
+    $item->getFromDB($_POST['items_id']);
     if (!$item->canUpdateItem()) {
         Session::addMessageAfterRedirect(__('Reset denied.', 'carbon'), false, ERROR);
         Html::back();
     }
 
-    if (!$gwp_impact->resetForItem($usage_impact->fields['items_id'])) {
+    if (!$gwp_impact->resetForItem($item->getID())) {
         Session::addMessageAfterRedirect(__('Reset failed.', 'carbon'), false, ERROR);
     }
 
-    if (!$usage_impact->delete($usage_impact->fields)) {
+    if (!$usage_impact->isNewItem() && !$usage_impact->delete($usage_impact->fields)) {
         Session::addMessageAfterRedirect(__('Delete of usage impact failed.', 'carbon'), false, ERROR);
     }
 } else if (isset($_POST['calculate'])) {

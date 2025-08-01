@@ -37,6 +37,7 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
+use DBmysql;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
 use GlpiPlugin\Carbon\Zone;
@@ -53,12 +54,15 @@ use GlpiPlugin\Carbon\Toolbox;
 class CarbonIntensityRTE extends AbstractCarbonIntensity
 {
     const RECORDS_URL =         '/eco2mix-national-tr/records';
-    const EXPORT_URL_TO_2023  = '/eco2mix-national-tr/exports/json';
-    const EXPORT_URL_TO_2012  = '/eco2mix-national-cons-def/exports/json';
+    const EXPORT_URL_REALTIME      = '/eco2mix-national-tr/exports/json';
+    const EXPORT_URL_CONSOLIDATED  = '/eco2mix-national-cons-def/exports/json';
 
     private RestApiClientInterface $client;
 
     private string $base_url;
+
+    /** @var bool Use consolidated dataset (true) or realtime dataset (false) */
+    private bool $use_consolidated = false;
 
     public function __construct(RestApiClientInterface $client, string $url = '')
     {
@@ -142,12 +146,15 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
      */
     public function fetchDay(DateTimeImmutable $day, string $zone): array
     {
+        /** @var DBmysql $DB */
+        global $DB;
+
         $start = DateTime::createFromImmutable($day);
         $stop = clone $start;
         $stop->setTime(23, 59, 59);
 
         $format = DateTime::ATOM;
-        $timezone = $this->prepareTimezone($start->getTimezone()->getName());
+        $timezone = $DB->guessTimezone();
         $from = $start->format($format);
         $to = $stop->format($format);
 
@@ -205,50 +212,114 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
      */
     public function fetchRange(DateTimeImmutable $start, DateTimeImmutable $stop, string $zone): array
     {
+        /** @var DBmysql $DB */
+        global $DB;
+
         $format = DateTime::ATOM;
         $from = $start->format($format);
         $to = $stop->format($format);
 
-        $timezone = $this->prepareTimezone($start->getTimezone()->getName());
+        $timezone = $DB->guessTimezone();
+        $interval = $stop->diff($start);
+        $where = "date_heure IN [date'$from' TO date'$to'";
+        if ($interval->y === 0 && $interval->m === 0 && $interval->d === 0 && $interval->h === 1) {
+            $where .= ']';
+        } else {
+            $where .= '[';
+        }
         $params = [
             'select' => 'taux_co2,date_heure',
-            'where' => "date_heure IN [date'$from' TO date'$to']",
+            'where' => $where,
             'order_by' => 'date_heure asc',
             'timezone' => $timezone,
         ];
-        if ($stop < DateTime::createFromFormat(DateTimeInterface::ATOM, '2023-02-01T00:00:00+00:00')) {
-            $step = 15;
-            $url = $this->base_url . self::EXPORT_URL_TO_2012;
+        // convert to 15 minutes interval
+        if ($this->use_consolidated) {
+            $this->step = 60;
+            $url = $this->base_url . self::EXPORT_URL_CONSOLIDATED;
         } else {
-            $step = 15;
-            $url = $this->base_url . self::EXPORT_URL_TO_2023;
+            $this->step = 15;
+            $url = $this->base_url . self::EXPORT_URL_REALTIME;
         }
+        $expected_samples_count = (int) ($interval->days * 24)
+            + (int) ($interval->h)
+            + (int) ($interval->i / 60);
+
+        $alt_response = [];
         $response = $this->client->request('GET', $url, ['timeout' => 8, 'query' => $params]);
+        if ($response) {
+            // Adjust step as consolidated dataset may return data for each 15 minutes !
+            $this->step = $this->detectStep($response);
+            $expected_samples_count *= (60 / $this->step);
+        }
+
+        // Tolerate DST switching issues with 15 minutes samples (4 missing samples or too many samples)
+        if (!$response || abs(count($response) - $expected_samples_count) > 4) {
+            // Retry with realtime dataset
+            if (!$this->use_consolidated) {
+                $this->use_consolidated = true;
+                $alt_response = $this->fetchRange($start, $stop, $zone);
+
+                if (!isset($alt_response['error_code']) && count($alt_response) > count($response)) {
+                    // Use the alternative response if more samples than the original response
+                    $response = $alt_response;
+                }
+            }
+        }
+
         if (!$response) {
             trigger_error('No response from RTE API for ' . $zone, E_USER_WARNING);
             return [];
         }
-        if (isset($response['error_code'])) {
-            trigger_error($this->formatError($response));
+        if (count($response) === 0) {
+            trigger_error('Empty response from RTE API for ' . $zone, E_USER_WARNING);
             return [];
         }
+        if (abs(count($response) - $expected_samples_count) > 4) {
+            trigger_error('Not enough samples from RTE API for ' . $zone . ' (expected: ' . $expected_samples_count . ', got: ' . count($response) . ')', E_USER_WARNING);
+        }
+        if (isset($response['error_code'])) {
+            trigger_error($this->formatError($response));
+        }
 
-        return $this->formatOutput($response, $step);
+        return $response;
     }
 
-    private function formatOutput(array $response, int $step): array
+    protected function formatOutput(array $response, int $step): array
     {
+        /** @var DBMysql $DB */
+        global $DB;
         // array sort records, just in case
         usort($response, function ($a, $b) {
             return $a['date_heure'] <=> $b['date_heure'];
         });
 
+        $this->step = $this->detectStep($response);
         // Deduplicate entries (solves switching from winter time to summer time)
-        // because there are 2 samples at same UTC date time
+        // because there are 2 samples at same date time, during 1 hour
+        // Even if we use UTC timezone.
         $filtered_response = $this->deduplicate($response);
 
+        // Convert string dates into datetime objects, restoring timezone as type Continent/City instead of offset
+        // This is needed to detect later the switching to winter time
+        $timezone = new DateTimeZone($DB->guessTimezone());
+        foreach ($filtered_response as &$record) {
+            $record['date_heure'] = DateTime::createFromFormat('Y-m-d\TH:i:s??????', $record['date_heure'], $timezone);
+        }
+
         // Convert samples from 15 min to 1 hour
-        $intensities = $this->convertToHourly($filtered_response, $step);
+        if ($this->step < 60) {
+            $intensities = $this->convertToHourly($filtered_response, $this->step);
+        } else {
+            $intensities = [];
+            foreach ($filtered_response as $record) {
+                $intensities[] = [
+                    'datetime' => $record['date_heure']->format('Y-m-d\TH:00:00'),
+                    'intensity' => (float) $record['taux_co2'],
+                    'data_quality' => AbstractTracked::DATA_QUALITY_RAW_REAL_TIME_MEASUREMENT,
+                ];
+            }
+        }
 
         return [
             'source' => self::getSourceName(),
@@ -274,6 +345,23 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         return $filtered_response;
     }
 
+    protected function detectStep(array $records): ?int
+    {
+        if (count($records) < 2) {
+            return 60;
+        }
+
+        $sample_1 = DateTime::createFromFormat(DateTime::ATOM, $records[0]['date_heure']);
+        $sample_2 = DateTime::createFromFormat(DateTime::ATOM, $records[1]['date_heure']);
+        $diff = $sample_1->diff($sample_2);
+
+        if ($diff->h === 1) {
+            return 60; // 1 hour step
+        } else {
+            return $diff->i; // Return the minutes step
+        }
+    }
+
     /**
      * Convert records to 1 hour
      *
@@ -289,16 +377,16 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         $previous_record_date = null;
 
         foreach ($records as $record) {
-            $date = DateTime::createFromFormat(DateTimeInterface::ATOM, $record['date_heure']);
+            $date = $record['date_heure'];
             $count++;
             $intensity += $record['taux_co2'];
             $minute = (int) $date->format('i');
 
             if ($previous_record_date !== null) {
-                // Ensure that current date is 15 minutes ahead than previous record date
+                // Ensure that current date is $step minutes ahead than previous record date
                 $diff = $date->getTimestamp() - $previous_record_date->getTimestamp();
                 if ($diff !== $step * 60) {
-                    if ($diff == 4500 && $this->switchToWinterTime($date)) {
+                    if ($diff == 4500 && $this->switchToWinterTime($previous_record_date, $date)) {
                         // 4500 = 1h + 15m
                         $filled_date = DateTime::createFromFormat('Y-m-d\TH:i:s', end($intensities)['datetime']);
                         $filled_date->add(new DateInterval('PT1H'));
@@ -337,23 +425,11 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
      *
      * @return bool
      */
-    private function switchToWinterTime(DateTime $date): bool
+    private function switchToWinterTime(DateTime $previous, DateTime $date): bool
     {
-        // We assume that the datetime is already switched to winter time
-        // Therefore summer time is 03:00:00 and winter time is 02:00:00
-        $date = clone $date;
-        $date->setTimezone(new DateTimeZone('Europe/Paris'));
-        $month = (int) $date->format('m');
-        $day_of_month = (int) $date->format('d');
-        $day_of_week = (int) $date->format('w');
-        // Find if this is the day and time to switch to winter time
-        if ($month === 10 && $day_of_week === 0 && $day_of_month >= 25) {
-            if ($date->format('H:i:s') === '02:00:00') {
-                return true;
-            }
-        }
-
-        return false;
+        $first_dst = $previous->format('I');
+        $second_dst = $date->format('I');
+        return $first_dst === '1' && $second_dst === '0';
     }
 
     private function formatError(array $response): string
@@ -361,15 +437,5 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
         $message = $message = $response['error_code']
         . ' ' . $response['message'];
         return $message;
-    }
-
-    private function prepareTimezone(string $timezone): string
-    {
-        switch ($timezone) {
-            case '+00:00':
-                return 'UTC';
-        }
-
-        return $timezone;
     }
 }

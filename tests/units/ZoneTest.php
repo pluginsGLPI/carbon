@@ -171,4 +171,81 @@ class ZoneTest extends DbTestCase
         ]));
         $this->assertTrue($zone->hasHistoricalData());
     }
+
+    public function testGetByItem()
+    {
+        // Test with a new Computer object
+        $item = new Computer();
+        $zone = new Zone();
+        $this->assertFalse($zone->getByItem($item));
+
+        // Test with a Computer object that has no location
+        $item = $this->getItem(Computer::class);
+        $zone = new Zone();
+        $this->assertFalse($zone->getByItem($item));
+
+        // Test with a Computer object that has a location with country and no matching zone
+        $location = $this->getItem(Location::class, [
+            'country' => 'foo'
+        ]);
+        $item->update(['id' => $item->getID(), 'locations_id' => $location->getID()]);
+        $zone = new Zone();
+        $this->assertFalse($zone->getByItem($item));
+
+        // Test with a Computer object that has a location with country and a matching zone
+        $expected_zone = $this->getItem(Zone::class, [
+            'name' => 'foo'
+        ]);
+        $zone = new Zone();
+        $this->assertTrue($zone->getByItem($item));
+        $this->assertEquals($zone->getID(), $expected_zone->getID());
+
+        // Test with a Computer object that has a location with state and no matching zone
+        $location = $this->getItem(Location::class, [
+            'state' => 'bar'
+        ]);
+        $item->update(['id' => $item->getID(), 'locations_id' => $location->getID()]);
+        $zone = new Zone();
+        $this->assertFalse($zone->getByItem($item));
+
+        // Test with a Computer object that has a location with state and a matching zone
+        $expected_zone = $this->getItem(Zone::class, [
+            'name' => 'bar'
+        ]);
+        $zone = new Zone();
+        $this->assertTrue($zone->getByItem($item));
+        $this->assertEquals($zone->getID(), $expected_zone->getID());
+
+        // Test with a Computer object that has a location with both country and state and no matching zone
+        $location = $this->getItem(Location::class, [
+            'country' => 'fooo',
+            'state' => 'baz'
+        ]);
+        $item->update(['id' => $item->getID(), 'locations_id' => $location->getID()]);
+        $zone = new Zone();
+        $this->assertFalse($zone->getByItem($item));
+
+        // Test with a Computer object that has a location with both country and state and a matching zone for state
+        $expected_zone = $this->getItem(Zone::class, [
+            'name' => 'baz'
+        ]);
+        $zone = new Zone();
+        $this->assertTrue($zone->getByItem($item));
+        $this->assertEquals($zone->getID(), $expected_zone->getID());
+
+        // Test with a Computer object that has a location with both country and state and a matching zone for state and country
+        $location = $this->getItem(Location::class, [
+            'country' => 'foo',
+            'state' => 'baz'
+        ]);
+        $item->update(['id' => $item->getID(), 'locations_id' => $location->getID()]);
+        $zone = new Zone();
+        $this->assertTrue($zone->getByItem($item));
+        $this->assertEquals($zone->getID(), $expected_zone->getID());
+        $expected_zone = new Zone();
+        $expected_zone->getFromDBByCrit(['name' => 'foo']); // Reuse zone created earlier
+        $zone = new Zone();
+        $this->assertTrue($zone->getByItem($item, null, true));
+        $this->assertEquals($zone->getID(), $expected_zone->getID());
+    }
 }

@@ -55,7 +55,7 @@ class NetworkEquipment extends AbstractAsset
 
     public static function getEngine(CommonDBTM $item): EngineInterface
     {
-        return new EngineNetworkEquipment($item->getID());
+        return new EngineNetworkEquipment($item);
     }
 
     public function getEvaluableQuery(array $crit = [], bool $entity_restrict = true): array

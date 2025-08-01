@@ -4,16 +4,17 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 # Translators:
-# Kaya Zeren <kayazeren@gmail.com>, 2024
+# Thierry Bugier <tbugier@teclib.com>, 2025
+# Kaya Zeren <kayazeren@gmail.com>, 2025
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-21 13:21+0200\n"
-"PO-Revision-Date: 2022-11-23 14:34+0000\n"
-"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2024\n"
+"POT-Creation-Date: 2025-07-24 02:00+0000\n"
+"PO-Revision-Date: 2025-07-03 13:58+0000\n"
+"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2025\n"
 "Language-Team: Turkish (Turkey) (https://app.transifex.com/teclib/teams/28042/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -21,455 +22,23 @@ msgstr ""
 "Language: tr_TR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#. TRANS: %s is the user login
-#: front/environnementalimpact.form.php:57
-#, php-format
-msgid "%s updates an item"
-msgstr "%s bir ögeyi günceller"
-
-#: front/report.php:49 entrée standard:37
-msgid "GLPI Carbon"
-msgstr "GLPI Carbon"
-
-#: src/CarbonIntensityZone.php:50
-msgid "Carbon intensity zone"
-msgid_plural "Carbon intensity zones"
-msgstr[0] "Karbon yoğunluğu bölgesi"
-msgstr[1] "Karbon yoğunluğu bölgeleri"
-
-#: src/CarbonIntensityZone.php:122 src/CarbonIntensityZone.php:137
-msgid "Data source for historical calculation"
-msgstr "Geçmişe dönük hesaplama için veri kaynağı"
-
-#: src/AbstractType.php:50 entrée standard:37
-msgid "Power"
-msgid_plural "Powers"
-msgstr[0] "Güç"
-msgstr[1] "Güçler"
-
-#: src/AbstractType.php:58 src/Dashboard/Dashboard.php:50
-#: src/Dashboard/Dashboard.php:56 src/Dashboard/Dashboard.php:62
-#: src/Dashboard/Dashboard.php:68 src/Dashboard/Dashboard.php:74
-#: src/Dashboard/Dashboard.php:80 src/Dashboard/Dashboard.php:86
-#: src/Dashboard/Dashboard.php:92 src/Dashboard/Dashboard.php:98
-#: src/Dashboard/Dashboard.php:103 src/Dashboard/Dashboard.php:108
-#: src/Dashboard/Dashboard.php:113 src/Dashboard/Dashboard.php:118
-msgid "Carbon"
-msgstr "Carbon"
-
-#: src/CarbonIntensitySource.php:45
-msgid "Carbon intensity source"
-msgid_plural "Carbon intensity sources"
-msgstr[0] "Karbon yoğunluğu kaynağı"
-msgstr[1] "Karbon yoğunluğu kaynakları"
-
-#: src/Command/CreateTestInventoryCommand.php:149
-msgid "Creating test inventory"
-msgstr "Sınama envanteri oluşturuluyor"
-
-#: src/Command/CreateFakeCarbonIntensityCommand.php:70
-#: src/Command/CollectCarbonIntensityCommand.php:71
-msgid "Creating data source name"
-msgstr "Veri kaynağı adı oluşturuluyor"
-
-#: src/Command/CreateFakeCarbonIntensityCommand.php:81
-msgid "Creating data zone name"
-msgstr "Veri bölgesi adı oluşturuluyor"
-
-#: src/Command/CreateFakeCarbonIntensityCommand.php:92
-msgid "Creating fake data..."
-msgstr "Sahte veriler oluşturuluyor..."
-
-#: src/Command/CollectCarbonIntensityCommand.php:83
-msgid "Reading eco2mix data..."
-msgstr "Eco2mix verileri okunuyor..."
-
-#: src/Profile.php:46 src/EnvironnementalImpact.php:54
-msgid "Environnemental impact"
-msgstr "Çevresel etki"
-
-#: src/Profile.php:87 entrée standard:48
-msgctxt "button"
-msgid "Save"
-msgstr "Kaydet"
-
-#: src/CronTask.php:50
-msgid "Download carbon emissions from RTE"
-msgstr "RTE üzerinden karbon emisyonlarını indir"
-
-#: src/CronTask.php:51 src/CronTask.php:57
-msgid "Maximum number of entries to download"
-msgstr "İndirilecek en fazla kayıt sayısı"
-
-#: src/CronTask.php:56
-msgid "Download carbon emissions from ElectricityMap"
-msgstr "ElectricityMap üzerinden karbon emisyonlarını indir"
-
-#: src/CronTask.php:62
-msgid "Compute daily environnemental impact for all assets"
-msgstr "Tüm varlıkların günlük çevresel etkisini hesapla"
-
-#: src/CronTask.php:63
-msgid "Maximum number of entries to calculate"
-msgstr "Hesaplanacak en fazla kayıt sayısı"
-
-#: src/CarbonIntensity.php:57
-msgid "Carbon intensity"
-msgstr "Karbon yoğunluğu"
-
-#: src/CarbonIntensity.php:96
-msgid "ID"
-msgstr "Kimlik"
-
-#: src/CarbonIntensity.php:105
-msgid "Emission date"
-msgstr "Emisyon tarihi"
-
-#: src/CarbonIntensity.php:132
-msgid "Intensity"
-msgstr "Yoğunluk"
-
-#: src/Report.php:48
-msgid "Carbon report"
-msgid_plural "Carbon reports"
-msgstr[0] "Karbon raporu"
-msgstr[1] "Karbon raporları"
-
-#: src/Toolbox.php:194 src/Dashboard/Provider.php:519
-msgid "g"
-msgstr "g"
-
-#: src/Toolbox.php:195 src/Dashboard/Provider.php:520
-msgid "Kg"
-msgstr "Kg"
-
-#: src/Toolbox.php:196 src/Dashboard/Provider.php:521
-msgid "t"
-msgstr "t"
-
-#: src/Toolbox.php:197 src/Dashboard/Provider.php:522
-msgid "Kt"
-msgstr "Kt"
-
-#: src/Toolbox.php:198 src/Dashboard/Provider.php:523
-msgid "Mt"
-msgstr "Mt"
-
-#: src/Toolbox.php:199 src/Dashboard/Provider.php:524
-msgid "Gt"
-msgstr "Gt"
-
-#: src/Toolbox.php:200 src/Dashboard/Provider.php:525
-msgid "Tt"
-msgstr "Tt"
-
-#: src/Toolbox.php:201 src/Dashboard/Provider.php:526
-msgid "Pt"
-msgstr "Pt"
-
-#: src/Toolbox.php:202 src/Dashboard/Provider.php:527
-msgid "Et"
-msgstr "Et"
-
-#: src/Toolbox.php:203 src/Dashboard/Provider.php:528
-msgid "Zt"
-msgstr "Zt"
-
-#: src/Toolbox.php:204 src/Dashboard/Provider.php:529
-msgid "Yt"
-msgstr "Yt"
-
-#. TRANS: %1$s is a number maybe float or string and %2$s the unit
-#: src/Toolbox.php:215 src/Toolbox.php:248
-#, php-format
-msgid "%1$s %2$s"
-msgstr "%1$s %2$s"
-
-#: src/Toolbox.php:229
-msgid "W"
-msgstr "W"
-
-#: src/Toolbox.php:230
-msgid "KW"
-msgstr "KW"
-
-#: src/Toolbox.php:231
-msgid "MW"
-msgstr "MW"
-
-#: src/Toolbox.php:232
-msgid "GW"
-msgstr "GW"
-
-#: src/Toolbox.php:233
-msgid "TW"
-msgstr "TW"
-
-#: src/Toolbox.php:234
-msgid "PW"
-msgstr "PW"
-
-#: src/Toolbox.php:235
-msgid "EW"
-msgstr "EW"
-
-#: src/Toolbox.php:236
-msgid "ZW"
-msgstr "ZW"
-
-#: src/Toolbox.php:237
-msgid "YW"
-msgstr "YW"
-
-#: src/Dashboard/Widget.php:45
-msgid "Carbon Emission Per Type"
-msgstr "Türe göre karbon emisyonu"
-
-#: src/Dashboard/Widget.php:51
-msgid "Carbon Emission Per Month"
-msgstr "Aylık karbon emisyonu"
-
-#: src/Dashboard/Widget.php:57 entrée standard:38
-msgid "Total Carbon Emission"
-msgstr "Toplam karbon emisyonu"
-
-#: src/Dashboard/Widget.php:63
-msgid "Monthly Carbon Emission"
-msgstr "Aylık karbon emisyonu"
-
-#: src/Dashboard/Widget.php:69
-msgid "Unhandled Computers"
-msgstr "İşlenmeyen bilgisayarlar"
-
-#: src/Dashboard/Filters/Item.php:42
-msgid "Item"
-msgstr "Öge"
-
-#: src/Dashboard/Provider.php:357 src/Dashboard/Provider.php:533
-#: src/Dashboard/Provider.php:534
-msgid "CO₂eq"
-msgstr "CO₂eq"
-
-#: src/Dashboard/Provider.php:473 src/Dashboard/Provider.php:488 entrée
-#: standard:120
-msgid "Carbon emission"
-msgstr "Karbon emisyonu"
-
-#: src/Dashboard/Provider.php:478 src/Dashboard/Provider.php:491 entrée
-#: standard:123
-msgid "Consumed energy"
-msgstr "Tüketilen enerji"
-
-#: src/Dashboard/Provider.php:538
-msgid "KWh"
-msgstr "KWh"
-
-#: src/Dashboard/Provider.php:539
-msgid "MWh"
-msgstr "MWh"
-
-#: src/Dashboard/Provider.php:540
-msgid "GWh"
-msgstr "GWh"
-
-#: src/Dashboard/Provider.php:541
-msgid "TWh"
-msgstr "TWh"
-
-#: src/Dashboard/Provider.php:542
-msgid "PWh"
-msgstr "PWh"
-
-#: src/Dashboard/Provider.php:543
-msgid "EWh"
-msgstr "EWh"
-
-#: src/Dashboard/Provider.php:544
-msgid "ZWh"
-msgstr "ZWh"
-
-#: src/Dashboard/Provider.php:545
-msgid "YWh"
-msgstr "YWh"
-
-#: src/Dashboard/Dashboard.php:51 src/Dashboard/Dashboard.php:114
-msgid "Unhandled computers"
-msgstr "İşlenmeyen bilgisayarlar"
-
-#: src/Dashboard/Dashboard.php:57
-msgid "Handled computers"
-msgstr "İşlenen bilgisayarlar"
-
-#: src/Dashboard/Dashboard.php:63
-msgid "Total power consumption"
-msgstr "Toplam güç tüketimi"
-
-#: src/Dashboard/Dashboard.php:69 src/Dashboard/Dashboard.php:104
-msgid "Total carbon emission"
-msgstr "Toplam karbon emisyonu"
-
-#: src/Dashboard/Dashboard.php:75
-msgid "Total power consumption per model"
-msgstr "Her model için toplam güç tüketimi"
-
-#: src/Dashboard/Dashboard.php:81
-msgid "Total carbon emission per model"
-msgstr "Her model için toplam karbon emisyonu"
-
-#: src/Dashboard/Dashboard.php:87 src/Dashboard/Dashboard.php:255
-msgid "Carbon emission per month"
-msgstr "Aylık karbon emisyonu"
-
-#: src/Dashboard/Dashboard.php:93
-msgid "Carbon intensity  (gCO<sub>2</sub>eq / KWh)"
-msgstr "Karbon yoğunluğu  (gCO<sub>2</sub>eq / KWh)"
-
-#: src/Dashboard/Dashboard.php:99
-msgid "Carbon emission per type"
-msgstr "Türe göre karbon emisyonu"
-
-#: src/Dashboard/Dashboard.php:109 entrée standard:38
-msgid "Monthly carbon emission"
-msgstr "Aylık karbon emisyonu"
-
-#: src/Dashboard/Dashboard.php:119
-msgid "Carbon emission per month graph"
-msgstr "Aylık karbon emisyonu çizelgesi"
-
-#: src/Dashboard/Dashboard.php:273
-msgid "Carbon dioxyde intensity"
-msgstr "Karbondioksit yoğunluğu"
-
-#: src/ComputerUsageProfile.php:48
-msgid "Computer usage profile"
-msgid_plural "Computer usage profiles"
-msgstr[0] "Bilgisayar kullanım profili"
-msgstr[1] "Bilgisayar kullanım profilleri"
-
-#: src/ComputerUsageProfile.php:84
-msgid "Knowbase category"
-msgstr "Bilgi bankası kategorisi"
-
-#: src/ComputerUsageProfile.php:90
-msgid "As child of"
-msgstr "Şunun alt ögesi olarak"
-
-#: src/ComputerUsageProfile.php:105 entrée standard:52
-msgid "Start time"
-msgstr "Başlangıç zamanı"
-
-#: src/ComputerUsageProfile.php:113 entrée standard:58
-msgid "Stop time"
-msgstr "Bitiş zamanı"
-
-#: src/ComputerUsageProfile.php:121 entrée standard:66
-msgid "Monday"
-msgstr "Pazartesi"
-
-#: src/ComputerUsageProfile.php:129 entrée standard:72
-msgid "Tuesday"
-msgstr "Salı"
-
-#: src/ComputerUsageProfile.php:137 entrée standard:78
-msgid "Wednesday"
-msgstr "Çarşamba"
-
-#: src/ComputerUsageProfile.php:145 entrée standard:84
-msgid "Thursday"
-msgstr "Perşembe"
-
-#: src/ComputerUsageProfile.php:153 entrée standard:90
-msgid "Friday"
-msgstr "Cuma"
-
-#: src/ComputerUsageProfile.php:161 entrée standard:96
-msgid "Saturday"
-msgstr "Cumartesi"
-
-#: src/ComputerUsageProfile.php:169 entrée standard:103
-msgid "Sunday"
-msgstr "Pazar"
-
-#: src/CarbonIntensitySource_CarbonIntensityZone.php:124
-#: src/CarbonIntensitySource_CarbonIntensityZone.php:219 entrée standard:40
-msgid "Name"
-msgstr "Ad"
-
-#: src/CarbonIntensitySource_CarbonIntensityZone.php:125
-msgid "Download enabled"
-msgstr "İndirme açık"
-
-#: src/CarbonIntensitySource_CarbonIntensityZone.php:126
-msgid "Source for historical"
-msgstr "Geçmiş kaynağı"
-
-#: src/CarbonIntensitySource_CarbonIntensityZone.php:132
-#: src/CarbonIntensitySource_CarbonIntensityZone.php:225
-msgid "Total"
-msgstr "Toplam"
-
-#: src/CarbonIntensitySource_CarbonIntensityZone.php:284 entrée standard:189
-msgid "No"
-msgstr "Hayır"
-
-#: src/CarbonIntensitySource_CarbonIntensityZone.php:284 entrée standard:186
-msgid "Yes"
-msgstr "Evet"
-
-#: src/CarbonIntensitySource_CarbonIntensityZone.php:285
-msgid "Enable / Disable"
-msgstr "Aç / Kapat"
-
-#: src/CarbonEmission.php:50
-msgid "Carbon Emission"
-msgid_plural "Carbon Emissions"
-msgstr[0] "Karbon emisyonu"
-msgstr[1] "Karbon emisyonları"
-
-#: hook.php:133 hook.php:172
-msgid "Power consumption (W)"
-msgstr "Güç tüketimi (W)"
-
-#: setup.php:204
-msgid "Environmental Impact"
-msgstr "Çevresel etki"
-
-#. TRANS: %s is the number of new version
-#: install/migration/update_0.0.0_to_0.0.1.php:44
-#: install/migration/update_xxx_to_yyy.php:45
-#, php-format
-msgid "Update to %s"
-msgstr "%s olarak güncelle"
-
-#: install/migration/update_0.0.0_to_0.0.1/create_uasge_profiles.php:39
-msgid "Office hours"
-msgstr "Çalışma saatleri"
-
-#: install/migration/update_0.0.0_to_0.0.1/create_automatic_actions.php:46
-msgid "Compute carbon emissions of computers"
-msgstr "Bilgisayarların karbon emisyonlarını hesapla"
-
-#: install/migration/update_0.0.0_to_0.0.1/create_automatic_actions.php:58
-msgid "Collect carbon intensities from RTE"
-msgstr "RTE üzerinden karbon yoğunluklarını al"
-
-#: install/migration/update_0.0.0_to_0.0.1/create_automatic_actions.php:70
-msgid "Collect carbon intensities from ElectricityMap"
-msgstr "ElectricityMap üzerinden karbon yoğunluklarını al"
-
-#: entrée standard:35
-msgid "No zone available"
-msgstr "Kullanılabilecek bir bölge yok"
-
-#: entrée standard:37
-msgid "Please run the automatic action to downlaod data from this source."
-msgstr "Lütfen bu kaynaktan veri indirecek otomatik işlemi çalıştırın."
-
-#: entrée standard:43
-msgid "Key for electricitymap.org API"
-msgstr "electricitymap.org API anahtarı"
-
-#: entrée standard:36
+#: templates/environmentalimpact-item.html.twig
+msgid "Usage"
+msgstr "Kullanım"
+
+#: templates/environmentalimpact-item.html.twig
+msgid "Reset data"
+msgstr "Verileri sıfırla"
+
+#: templates/environmentalimpact-item.html.twig
+msgid "Calculate data"
+msgstr "Verileri hesapla"
+
+#: templates/environmentalimpact-item.html.twig
+msgid "Embodied impact"
+msgstr "Gerçekleşen etki"
+
+#: templates/computertype.html.twig
 msgid ""
 "This power value is used as default when the power of a computer model is "
 "unknown"
@@ -477,27 +46,163 @@ msgstr ""
 "Bir bilgisayar modelinin gücü bilinmediğinde varsayılan olarak bu güç değeri"
 " kullanılır"
 
-#: entrée standard:61
-msgid "Days of week where the computer usually runs"
-msgstr "Bilgisayarın genellikle çalıştığı haftanın günleri"
+#: templates/computertype.html.twig templates/monitortype.html.twig
+#: templates/networkequipmenttype.html.twig src/AbstractType.php:50
+msgid "Power"
+msgid_plural "Powers"
+msgstr[0] "Güç"
+msgstr[1] "Güçler"
 
-#: entrée standard:38
+#: templates/computertype.html.twig src/ComputerType.php:78
+#: src/SearchOptions.php:251
+msgid "Category"
+msgstr "Kategori"
+
+#: templates/usageinfo.html.twig
+msgid "Asset usage"
+msgstr "Varlık kullanımı"
+
+#: templates/usageinfo.html.twig
+msgid "Usage profile"
+msgid_plural "Usage profiles"
+msgstr[0] "Kullanım profili"
+msgstr[1] "Kullanım profilleri"
+
+#: templates/config.html.twig
+msgid "Electricity maps"
+msgstr "Elektrik haritaları"
+
+#: templates/config.html.twig
+msgid "Key for electricitymap.org API"
+msgstr "electricitymap.org API anahtarı"
+
+#: templates/config.html.twig
+msgid "Impact engine"
+msgstr "Etki hesaplayıcı"
+
+#: templates/config.html.twig
+msgid "Usage carbon emissions are always calculated internally"
+msgstr "Kullanım karbon emisyonları her zaman içeride hesaplanır"
+
+#: templates/config.html.twig src/Impact/Embodied/Engine.php:46
+#: src/Impact/Usage/Engine.php:46
+msgid "Boavizta"
+msgstr "Boavizta"
+
+#: templates/config.html.twig
+msgid "Base URL to the Boaviztapi instance"
+msgstr "Boaviztapi kopyasının temel adresi"
+
+#: templates/config.html.twig
+msgid ""
+"Geocoding converts a location into a ISO 3166 (3 letters) code. Boavizta "
+"needs this to determine usage impacts of assets. This feature sends the "
+"address stored in a location to nominatim.org service. If this is an issue, "
+"you can disable it below, and fill the coutry code manually."
+msgstr ""
+"Coğrafi kodlama, bir konumu ISO 3166 (3 harf) koduna dönüştürür. Boavizta "
+"varlıkların kullanım etkilerini belirlemek için buna gerek duyar. Bu "
+"özellik, bir konumda kaydedilen adresi nominatim.org hizmetine gönderir. Bu "
+"durum sizin için bir uygun değilse, aşağıdan kapatabilir ve ülke kodunu el "
+"ile yazabilirsiniz."
+
+#: templates/config.html.twig
+msgid "Enable geocoding"
+msgstr "Coğrafi kodlama kullanılsın"
+
+#: templates/quick-report.html.twig front/report.php:54
+msgid "GLPI Carbon"
+msgstr "GLPI Carbon"
+
+#: templates/monitortype.html.twig
+msgid ""
+"This power value is used as default when the power of a monitor model is "
+"unknown"
+msgstr ""
+"Bir ekran modelinin gücü bilinmediğinde varsayılan olarak bu güç değeri "
+"kullanılır"
+
+#: templates/pages/CarbonIntensitySource/tab_zone.html.twig
+msgid "No zone available"
+msgstr "Kullanılabilecek bir bölge yok"
+
+#: templates/pages/CarbonIntensitySource/tab_zone.html.twig
+msgid "Please run the automatic action to downlaod data from this source."
+msgstr "Lütfen bu kaynaktan veri indirecek otomatik işlemi çalıştırın."
+
+#: templates/networkequipmenttype.html.twig
+msgid ""
+"This power value is used as default when the power of a network equipment "
+"model is unknown"
+msgstr ""
+"Bir ağ aygıtı modelinin gücü bilinmediğinde varsayılan olarak bu güç değeri "
+"kullanılır"
+
+#: templates/dashboard/information-video-card.html.twig
+msgid "Want to know more ?"
+msgstr "Ayrıntılı bilgi almak ister misiniz?"
+
+#: templates/dashboard/information-video-card.html.twig
+msgid "Here is a video about the impact of numeric on the enviromnent."
+msgstr ""
+"Sayısal değerlerin çevreye etkisini anlatan bir videoya bakabilirsiniz."
+
+#: templates/dashboard/embodied-primary-energy.html.twig
+msgid "Embodied primary energy"
+msgstr "Gerçekleşen birincil enerji"
+
+#: templates/dashboard/embodied-carbon-emission.html.twig
+#: src/Dashboard/Widget.php:104
+msgid "Embodied carbon emission"
+msgstr "Gerçekleşen karbon emisyonu"
+
+#: templates/dashboard/embodied-abiotic-depletion.html.twig
+#: src/Dashboard/Widget.php:110 src/Dashboard/Grid.php:198
+#: src/Dashboard/Grid.php:295 src/Dashboard/Provider.php:782
+#: src/Dashboard/Provider.php:866 src/Dashboard/DemoProvider.php:77
+msgid "Embodied abiotic depletion potential"
+msgstr "Gerçekleşen abiyotik tükenme potansiyeli"
+
+#: templates/dashboard/unhandled-network-equipments-card.html.twig
+#: templates/dashboard/unhandled-monitors-card.html.twig
+#: templates/dashboard/unhandled-computers-card.html.twig
 msgid "Warning"
 msgstr "Uyarı"
 
-#: entrée standard:33
-msgid "Carbon Emission per Type"
-msgstr "Türe göre karbon emisyonu"
+#: templates/dashboard/unhandled-network-equipments-card.html.twig
+#, php-format
+msgid ""
+"It represents %s percent of your parc that contains %s network equipments."
+msgstr "Parkınızın yüzde %s kadarındaki %s ağ aygıtını gösterir."
 
-#: entrée standard:33
-msgid "Consumed energy and carbon emission per month"
-msgstr "Aylık tüketilen enerji ve karbon emisyonu"
+#: templates/dashboard/unhandled-monitors-card.html.twig
+#, php-format
+msgid "It represents %s percent of your parc that contains %s monitors."
+msgstr "Parkınızın yüzde %s kadarındaki %s ekranı gösterir."
 
-#: entrée standard:40
+#: templates/dashboard/usage-carbon-emission-last-year.html.twig
+msgid "Yearly Usage Carbon Emission"
+msgstr "Yıllık kullanım karbon emisyonu"
+
+#: templates/dashboard/unhandled-computers-card.html.twig
+#, php-format
+msgid "It represents %s percent of your parc that contains %s computers."
+msgstr "Parkınızın yüzde %s kadarındaki %s bilgisayarı gösterir."
+
+#: templates/dashboard/monthly-carbon-emission.html.twig
+msgid "Monthly usage carbon emission"
+msgstr "Aylık kullanım karbon emisyonu"
+
+#: templates/dashboard/monthly-carbon-emission.html.twig
+#, php-format
+msgid "Compared to %s"
+msgstr "%s ile karşılaştırma"
+
+#: templates/dashboard/information-block.html.twig
 msgid "Information"
 msgstr "Bilgiler"
 
-#: entrée standard:50
+#: templates/dashboard/information-block.html.twig
 msgid ""
 "Our data is sourced from reliable sources and is meticulously calculated "
 "using industry-standard methodologies. We utilize accurate measurement tools"
@@ -506,27 +211,27 @@ msgid ""
 msgstr ""
 "Verilerimiz güvenilir kaynaklardan elde edilir ve endüstri standardı "
 "yöntemler kullanılarak titizlikle hesaplanır. Çevresel ölçümlerimizin "
-"hassasiyetini ve güvenilirliğini sağlamak için doğru ölçüm araçları ve "
-"algoritmalar kullanırız."
+"hassasiyetini ve güvenilirliğini sağlamak için doğru ölçüm araçlarını ve "
+"algoritmaları kullanırız."
 
-#: entrée standard:51
+#: templates/dashboard/information-block.html.twig
 msgid ""
 "As we move towards a greener future, businesses will soon be required to "
 "report energy usage and carbon emissions. By 2025, many areas will enforce "
 "these regulations. Adopting these practices now ensures compliance and helps"
 " combat climate change."
 msgstr ""
-"Daha yeşil bir geleceğe doğru ilerlerken, işletmelerin yakında enerji "
+"Daha yeşil bir geleceğe doğru ilerlerken, yakında kuruluşların enerji "
 "kullanımını ve karbon emisyonlarını bildirmeleri gerekecek. 2025 yılına "
 "kadar birçok bölge bu düzenlemeleri yürürlüğe koyacak. Bu uygulamaları "
 "benimsemek uyumluluğu garanti ediyor ve iklim değişikliğiyle mücadeleye "
 "yardımcı oluyor."
 
-#: entrée standard:55
+#: templates/dashboard/information-block.html.twig
 msgid "Did you know ?"
 msgstr "Biliyor musunuz?"
 
-#: entrée standard:56
+#: templates/dashboard/information-block.html.twig
 msgid ""
 "1 gram of CO₂ is equivalent to the CO₂ emitted when you drive a car for "
 "about 20 meters."
@@ -534,106 +239,864 @@ msgstr ""
 "1 gram CO₂, bir otomobili yaklaşık 20 metre sürdüğünüzde ortaya çıkan CO₂ "
 "miktarına eşdeğerdir."
 
-#: entrée standard:81
-#, php-format
-msgid "%s rows / page"
-msgstr "%s satır / sayfa"
+#: templates/dashboard/usage-abiotic-depletion.html.twig
+#: src/Dashboard/Widget.php:96 src/Dashboard/Grid.php:178
+#: src/Dashboard/Grid.php:281 src/Dashboard/Provider.php:816
+#: src/Dashboard/DemoProvider.php:95
+msgid "Usage abiotic depletion potential"
+msgstr "Kullanım abiyotik tükenme potansiyeli"
 
-#: entrée standard:90
-#, php-format
-msgid "Showing %s to %s of %s rows"
-msgstr "%s - %s / %s kayıt görüntüleniyor"
+#: templates/location.html.twig src/UsageInfo.php:91
+msgid "Environmental impact"
+msgstr "Çevresel etki"
 
-#: entrée standard:94
-#, php-format
-msgid "%s-%s/%s"
-msgstr "%s-%s/%s"
+#: templates/location.html.twig src/SearchOptions.php:121 src/Location.php:78
+msgid "Boavizta zone"
+msgstr "Boavizta bölgesi"
 
-#: entrée standard:104
-msgid "Start"
-msgstr "İlk"
+#: templates/history/status-item.html.twig
+msgid "Historization status"
+msgstr "Geçmiş oluşturma durumu"
 
-#: entrée standard:109
-msgid "Previous"
-msgstr "Önceki"
+#: templates/history/status-item.html.twig
+msgid "No status"
+msgstr "Herhangi bir durum yok"
 
-#: entrée standard:118
-#, php-format
-msgid "%s-%s of %s"
-msgstr "%s-%s / %s"
-
-#: entrée standard:141
-msgid "Next"
-msgstr "Sonraki"
-
-#: entrée standard:146
-msgid "End"
-msgstr "Son"
-
-#: entrée standard:50 standard:281
-msgid "No data"
-msgstr "Herhangi bir veri yok"
-
-#: entrée standard:88
-msgid "Check all"
-msgstr "Tümünü işaretle"
-
-#: entrée standard:123
-msgid "Filter"
-msgstr "Süz"
-
-#: entrée standard:129
-msgid "Export"
-msgstr "Dışa aktar"
-
-#: entrée standard:184
-msgid "All"
-msgstr "Tümü"
-
-#: entrée standard:310
-#, php-format
-msgid "Show %s entries"
-msgstr "%s kaydı görüntüle"
-
-#: entrée standard:42
-msgid "Compared to last month"
-msgstr "Geçen ay ile karşılaştırma"
-
-#: entrée standard:35
-msgid "Want to know more ?"
-msgstr "Ayrıntılı bilgi almak ister misiniz?"
-
-#: entrée standard:36
-msgid "Here is a video about the impact of numeric on the enviromnent."
-msgstr ""
-"Sayısal değerlerin çevreye etkisini anlatan bir videoya bakabilirsiniz."
-
-#: entrée standard:33
-msgid "Carbon Emission per Month"
-msgstr "Aylık karbon emisyonu"
-
-#: entrée standard:36
+#: templates/history/status-item.html.twig
 msgid ""
-"This power value is used as default when the power of a network equipment "
-"model is unknown"
-msgstr ""
-"Bir ağ aygıtı modelinin gücü bilinmediğinde varsayılan olarak bu güç değeri "
-"kullanılır"
+"This data is missing and prevents from environmental impact calculation."
+msgstr "Bu veriler eksik ve çevresel etki hesaplamasını engelliyor."
 
-#: entrée standard:36
+#: templates/history/status-item.html.twig
 msgid ""
-"This power value is used as default when the power of a monitor model is "
-"unknown"
-msgstr ""
-"Bir ekran modelinin gücü bilinmediğinde varsayılan olarak bu güç değeri "
-"kullanılır"
+"This data is missing and may reduce the quality of environmental impact "
+"calculation."
+msgstr "Bu veriler eksik ve çevresel etki hesaplamasını engelleyebilir."
 
-#: entrée standard:36
-msgid "Usage information"
+#: templates/history/status-item.html.twig
+msgid "Is not in the trash bin"
+msgstr "Çöp kutusunda olmayan"
+
+#: templates/history/status-item.html.twig
+msgid "Is not a template"
+msgstr "Bir kalıp olmayan"
+
+#: templates/history/status-item.html.twig
+msgid "Linked to a computer"
+msgstr "Bir bilgisayar ile bağlantılı olan"
+
+#: templates/history/status-item.html.twig
+msgid "Has a location"
+msgstr "Konumu şu olan "
+
+#: templates/history/status-item.html.twig
+msgid "The location has a state or a country"
+msgstr "Konumu bir il ya da ülke olan"
+
+#: templates/history/status-item.html.twig
+msgid "The asset has a model"
+msgstr "Varlık modeli şu olan"
+
+#: templates/history/status-item.html.twig
+msgid "The model has a power consumption"
+msgstr "Modelin güç tüketimi şu olan"
+
+#: templates/history/status-item.html.twig
+msgid "The asset has a type"
+msgstr "Varlık türü şu olan"
+
+#: templates/history/status-item.html.twig
+msgid "The asset has a category"
+msgstr "Varlık kategorisi şu olan"
+
+#: templates/history/status-item.html.twig
+msgid "The type has a power consumption"
+msgstr "Türün güç tüketimi şu olan"
+
+#: templates/history/status-item.html.twig
+msgid "The asset has a usage profile"
+msgstr "Varlık kullanım profili şu olan"
+
+#: templates/history/status-item.html.twig
+msgid "The asset has an inventory entry date"
+msgstr "Varlık envanter kaydı tarihi şu olan"
+
+#: templates/history/status-item.html.twig
+msgid "Legend"
+msgstr "İşaret"
+
+#: templates/history/status-item.html.twig
+msgid "Satisfied requirement"
+msgstr "Gereksinim karşılanıyor"
+
+#: templates/history/status-item.html.twig
+msgid "Missing requirement"
+msgstr "Gereksinim eksik"
+
+#: templates/history/status-item.html.twig
+msgid "Optional missing data"
+msgstr "İsteğe bağlı eksik veriler"
+
+#: templates/computerusageprofile.html.twig src/ComputerUsageProfile.php:132
+#: src/ComputerUsageProfile.php:153
+msgid "Start time"
+msgstr "Başlangıç zamanı"
+
+#: templates/computerusageprofile.html.twig src/ComputerUsageProfile.php:161
+msgid "Stop time"
+msgstr "Bitiş zamanı"
+
+#: templates/computerusageprofile.html.twig
+msgid "Days of week where the computer usually runs"
+msgstr "Bilgisayarın genellikle çalıştığı haftanın günleri"
+
+#: src/CarbonIntensitySource.php:45
+msgid "Carbon intensity source"
+msgid_plural "Carbon intensity sources"
+msgstr[0] "Karbon yoğunluğu kaynağı"
+msgstr[1] "Karbon yoğunluğu kaynakları"
+
+#: src/ComputerType.php:70 src/MonitorType.php:50
+#: src/NetworkEquipmentType.php:50 src/SearchOptions.php:142
+msgid "Power consumption"
+msgstr "Güç tüketimi"
+
+#: src/EmbodiedImpact.php:90
+msgid "Global Warming Potential"
+msgstr "Küresel ısınma potansiyeli"
+
+#: src/EmbodiedImpact.php:100
+msgid "Abiotic Depletion Potential"
+msgstr "Abiyotik tükenme potansiyeli"
+
+#: src/EmbodiedImpact.php:110
+msgid "Primary energy"
+msgstr "Birincil enerji"
+
+#: src/EmbodiedImpact.php:120 src/CarbonEmission.php:150
+#: src/UsageImpact.php:149
+msgid "Date of evaluation"
+msgstr "Değerlendirme tarihi"
+
+#: src/EmbodiedImpact.php:127 src/CarbonEmission.php:157
+#: src/UsageImpact.php:156
+msgid "Engine"
+msgstr "Hesaplayıcı"
+
+#: src/EmbodiedImpact.php:134 src/CarbonEmission.php:164
+#: src/UsageImpact.php:163
+msgid "Engine version"
+msgstr "Hesaplayıcı sürümü"
+
+#: src/Report.php:52
+msgid "Carbon report"
+msgid_plural "Carbon reports"
+msgstr[0] "Karbon raporu"
+msgstr[1] "Karbon raporları"
+
+#: src/Report.php:109
+#, php-format
+msgid ""
+"Demo mode enabled. The data below are not representative of the assets in "
+"the database. %sDisable demo mode%s"
+msgstr ""
+"Tanıtım kipi açık. Aşağıdaki veriler veri tabanındaki varlıkları "
+"göstermiyor. %sTanıtım kipini kapat%s"
+
+#: src/CarbonEmission.php:48
+msgid "Carbon Emission"
+msgid_plural "Carbon Emissions"
+msgstr[0] "Karbon emisyonu"
+msgstr[1] "Karbon emisyonları"
+
+#: src/CarbonEmission.php:119
+msgid "Energy"
+msgstr "Enerji"
+
+#: src/CarbonEmission.php:127
+msgid "Emission"
+msgstr "Emisyon"
+
+#: src/CarbonEmission.php:135
+msgid "Energy quality"
+msgstr "Enerji kalitesi"
+
+#: src/CarbonEmission.php:143
+msgid "Emission quality"
+msgstr "Emisyon kalitesi"
+
+#: src/CarbonIntensity.php:69
+msgid "Carbon intensity"
+msgstr "Karbon yoğunluğu"
+
+#: src/CarbonIntensity.php:112
+msgid "Emission date"
+msgstr "Emisyon tarihi"
+
+#: src/CarbonIntensity.php:139
+msgid "Intensity"
+msgstr "Yoğunluk"
+
+#: src/Profile.php:45
+msgid "Environnemental impact"
+msgstr "Çevresel etki"
+
+#: src/CronTask.php:69
+msgid "Find the Alpha3 country code (ISO3166)"
+msgstr "Alpha3 ülke kodunu bul (ISO3166)"
+
+#: src/CronTask.php:70
+msgid "Maximum number of locations to solve"
+msgstr "Çözülecek en fazla konum sayısı"
+
+#: src/CronTask.php:75
+msgid "Download carbon emissions from RTE"
+msgstr "RTE üzerinden karbon emisyonlarını indir"
+
+#: src/CronTask.php:76 src/CronTask.php:82
+msgid "Maximum number of entries to download"
+msgstr "İndirilecek en fazla kayıt sayısı"
+
+#: src/CronTask.php:81
+msgid "Download carbon emissions from ElectricityMap"
+msgstr "ElectricityMap üzerinden karbon emisyonlarını indir"
+
+#: src/CronTask.php:87
+msgid "Compute usage environnemental impact for all assets"
+msgstr "Tüm varlıkların kullanım çevresel etkisini hesapla"
+
+#: src/CronTask.php:88 src/CronTask.php:93
+msgid "Maximum number of entries to calculate"
+msgstr "Hesaplanacak en fazla kayıt sayısı"
+
+#: src/CronTask.php:92
+msgid "Compute embodied environnemental impact for all assets"
+msgstr "Tüm varlıkların gerçekleşen çevresel etkisini hesapla"
+
+#: src/CronTask.php:216
+msgid "No zone to download"
+msgstr "İndirilecek bir bölge yok"
+
+#: src/UsageImpact.php:50
+msgid "Usage impact"
+msgid_plural "Usage impacts"
+msgstr[0] "Kullanım etkisi"
+msgstr[1] "Kullanım etkileri"
+
+#: src/UsageImpact.php:105 src/Dashboard/Grid.php:206
+msgid "Global warming potential"
+msgstr "Küresel ısınma potansiyeli"
+
+#: src/UsageImpact.php:112
+msgid "Global warming potential quality"
+msgstr "Küresel ısınma potansiyeli kalitesi"
+
+#: src/UsageImpact.php:119 src/Dashboard/Grid.php:212
+msgid "Abiotic depletion potential"
+msgstr "Abiyotik tükenme potansiyeli"
+
+#: src/UsageImpact.php:127
+msgid "Abiotic depletion potential quality"
+msgstr "Abiyotik tükenme potansiyeli kalitesi"
+
+#: src/UsageImpact.php:134 src/UsageImpact.php:142
+msgid "Primary energy quality"
+msgstr "Birincil enerji kalitesi"
+
+#: src/CarbonIntensitySource_Zone.php:70
+msgid "Source name"
+msgstr "Kaynak adı"
+
+#: src/CarbonIntensitySource_Zone.php:78
+msgid "Zone name"
+msgstr "Bölge adı"
+
+#: src/CarbonIntensitySource_Zone.php:86
+#: src/CarbonIntensitySource_Zone.php:165
+#: src/CarbonIntensitySource_Zone.php:261 src/Zone.php:167
+msgid "Download enabled"
+msgstr "İndirme açık"
+
+#: src/CarbonIntensitySource_Zone.php:94
+msgid "Code"
+msgstr "Kod"
+
+#: src/CarbonIntensitySource_Zone.php:166
+msgid "Source for historical"
+msgstr "Geçmiş oluşturma kaynağı"
+
+#: src/CarbonIntensitySource_Zone.php:341
+msgid "Enable / Disable"
+msgstr "Aç / Kapat"
+
+#: src/UsageInfo.php:59
+msgid "Usage informations"
 msgstr "Kullanım bilgileri"
 
-#: entrée standard:41
-msgid "Usage profile"
-msgid_plural "Usage profiles"
-msgstr[0] "Kullanım profili"
-msgstr[1] "Kullanım profilleri"
+#: src/UsageInfo.php:214 src/Dashboard/Widget.php:829
+#, php-format
+msgid ""
+"Evaluates the carbon emission in CO₂ equivalent. %s More information %s"
+msgstr ""
+"Karbon emisyonunu CO₂ eşdeğeri olarak değerlendirir. %s Ayrıntılı bilgi alın"
+" %s"
+
+#: src/UsageInfo.php:222 src/Dashboard/Widget.php:866
+#: src/Dashboard/Widget.php:904
+#, php-format
+msgid ""
+"Evaluates the consumption of non renewable resources in Antimony equivalent."
+" %s More information %s"
+msgstr ""
+"Yenilenebilir olmayan kaynakların tüketimini antimon eşdeğeri olarak "
+"değerlendirir. %s Ayrıntılı bilgi alın %s"
+
+#: src/UsageInfo.php:234 src/Dashboard/Widget.php:1090
+#, php-format
+msgid "Evaluates the primary energy consumed. %s More information %s"
+msgstr "Birincil enerji tüketimini değerlendirir. %s Ayrıntılı bilgi alın %s"
+
+#: src/SearchOptions.php:196 src/SearchOptions.php:275
+#: src/SearchOptions.php:342 src/SearchOptions.php:406
+msgid "Is historizable"
+msgstr "Geçmiş oluşturulabilir"
+
+#: src/Dashboard/Widget.php:57 src/Dashboard/Grid.php:311
+msgid "Environmental impact information video"
+msgstr "Çevresel etki bilgilendirme videosu"
+
+#: src/Dashboard/Widget.php:63
+msgid "Methodology information"
+msgstr "Yöntem bilgileri"
+
+#: src/Dashboard/Widget.php:71
+msgid "Total Carbon Emission"
+msgstr "Toplam karbon emisyonu"
+
+#: src/Dashboard/Widget.php:77
+msgid "Monthly Carbon Emission"
+msgstr "Aylık karbon emisyonu"
+
+#: src/Dashboard/Widget.php:83 src/Dashboard/Widget.php:579
+#: src/Dashboard/Grid.php:275
+msgid "Biggest monthly averaged carbon emission per model"
+msgstr "Her model için en büyük aylık ortalama karbon emisyonu"
+
+#: src/Dashboard/Widget.php:90
+msgid "Carbon Emission Per month"
+msgstr "Aylık karbon emisyonu"
+
+#: src/Dashboard/Widget.php:116
+msgid "Embodied consumed primary energy"
+msgstr "Gerçekleşen birincil enerji tüketimi"
+
+#: src/Dashboard/Widget.php:127
+msgid "Unhandled Computers"
+msgstr "İşlenmeyen bilgisayarlar"
+
+#: src/Dashboard/Widget.php:137
+msgid "Unhandled Monitors"
+msgstr "İşlenmeyen ekranlar"
+
+#: src/Dashboard/Widget.php:147
+msgid "Unhandled Network equipments"
+msgstr "İşlenmeyen ağ aygıtları"
+
+#: src/Dashboard/Widget.php:157
+msgid "Radar chart"
+msgstr "Radar çizelge"
+
+#: src/Dashboard/Widget.php:482 src/Dashboard/Provider.php:922
+msgid "Consumed energy and carbon emission per month"
+msgstr "Aylık enerji tüketimi ve karbon emisyonu"
+
+#: src/Dashboard/Widget.php:527 src/Dashboard/Widget.php:542
+#: src/Dashboard/Provider.php:1027 src/Dashboard/DemoProvider.php:125
+#: src/Dashboard/DemoProvider.php:226
+msgid "Carbon emission"
+msgstr "Karbon emisyonu"
+
+#: src/Dashboard/Widget.php:532 src/Dashboard/Widget.php:545
+#: src/Dashboard/Provider.php:1043 src/Dashboard/DemoProvider.php:143
+#: src/Dashboard/DemoProvider.php:239
+msgid "Consumed energy"
+msgstr "Enerji tüketimi"
+
+#: src/Dashboard/Widget.php:721
+#, php-format
+msgid ""
+"Evaluates the usage carbon emission in CO₂ equivalent during the last 2 "
+"months. %s More information %s"
+msgstr ""
+"Son 2 aylık karbon emisyonunu kullanımını CO₂ eşdeğeri olarak değerlendirir."
+" %s Ayrıntılı bilgi alın %s"
+
+#: src/Dashboard/Widget.php:787
+#, php-format
+msgid ""
+"Evaluates the usage carbon emission in CO₂ equivalent during the last 12 "
+"elapsed months. %s More information %s"
+msgstr ""
+"Son 12 aylık karbon emisyonunu kullanımını CO₂ eşdeğeri olarak "
+"değerlendirir. %s Ayrıntılı bilgi alın %s"
+
+#: src/Dashboard/Widget.php:1080
+msgid "Total embodied primary energy"
+msgstr "Toplam gerçekleşen birincil enerji"
+
+#: src/Dashboard/Widget.php:1149
+msgid "Handled percentage"
+msgstr "İşlenen yüzde"
+
+#: src/Dashboard/Grid.php:62 src/Dashboard/Grid.php:127
+#: src/Dashboard/Grid.php:228
+msgid "Carbon"
+msgstr "Karbon"
+
+#: src/Dashboard/Grid.php:67 src/Dashboard/Provider.php:379
+msgid "Handled assets ratio"
+msgstr "İşlenen varlık oranı"
+
+#: src/Dashboard/Grid.php:76
+msgid "Handled assets count"
+msgstr "İşlenen varlık sayısı"
+
+#: src/Dashboard/Grid.php:139
+#, php-format
+msgid "Handled %s"
+msgstr "İşlenen %s"
+
+#: src/Dashboard/Grid.php:150
+#, php-format
+msgid "Unhandled %s"
+msgstr "İşlenmeyen %s"
+
+#: src/Dashboard/Grid.php:166
+msgid "Usage power consumption"
+msgstr "Kullanım güç tüketimi"
+
+#: src/Dashboard/Grid.php:172
+msgid "Usage carbon emission"
+msgstr "Kullanım karbon emisyonu"
+
+#: src/Dashboard/Grid.php:186 src/Dashboard/Grid.php:289
+#: src/Dashboard/Provider.php:897
+msgid "Embodied global warming potential"
+msgstr "Gerçekleşen küresel ısınma potansiyeli"
+
+#: src/Dashboard/Grid.php:192 src/Dashboard/Grid.php:301
+msgid "Embodied primary energy consumed"
+msgstr "Gerçekleşen birincil enerji tüketimi"
+
+#: src/Dashboard/Grid.php:239
+#, php-format
+msgid "Unhandled %s ratio"
+msgstr "İşlenmeyen %s oranı"
+
+#: src/Dashboard/Grid.php:251
+msgid "Usage carbon emission year to date"
+msgstr "Yıl başından bugüne kadar kullanım karbon emisyonu"
+
+#: src/Dashboard/Grid.php:257
+msgid "Monthly carbon emission"
+msgstr "Aylık karbon emisyonu"
+
+#: src/Dashboard/Grid.php:266
+msgid "Usage global warming potential chart"
+msgstr "Kullanım küresel ısınma potansiyeli çizelgesi"
+
+#: src/Dashboard/Grid.php:316
+msgid "Environmental impact methodology_information"
+msgstr "Çevresel etki yöntemi bilgileri"
+
+#: src/Dashboard/Provider.php:173 src/Dashboard/Provider.php:564
+#: src/Dashboard/Provider.php:734 src/Dashboard/Provider.php:1027
+#: src/Dashboard/Provider.php:1029 src/Dashboard/DemoProvider.php:49
+#: src/Dashboard/DemoProvider.php:125 src/Dashboard/DemoProvider.php:226
+msgid "CO₂eq"
+msgstr "CO₂eq"
+
+#: src/Dashboard/Provider.php:175 src/Dashboard/Provider.php:1014
+#: src/Toolbox.php:201
+msgid "g"
+msgstr "g"
+
+#: src/Dashboard/Provider.php:176 src/Dashboard/Provider.php:1015
+#: src/Toolbox.php:202
+msgid "Kg"
+msgstr "Kg"
+
+#: src/Dashboard/Provider.php:177 src/Dashboard/Provider.php:1016
+#: src/Toolbox.php:203
+msgid "t"
+msgstr "t"
+
+#: src/Dashboard/Provider.php:178 src/Dashboard/Provider.php:1017
+#: src/Toolbox.php:204
+msgid "Kt"
+msgstr "Kt"
+
+#: src/Dashboard/Provider.php:179 src/Dashboard/Provider.php:1018
+#: src/Toolbox.php:205
+msgid "Mt"
+msgstr "Mt"
+
+#: src/Dashboard/Provider.php:180 src/Dashboard/Provider.php:1019
+#: src/Toolbox.php:206
+msgid "Gt"
+msgstr "Gt"
+
+#: src/Dashboard/Provider.php:181 src/Dashboard/Provider.php:1020
+#: src/Toolbox.php:207
+msgid "Tt"
+msgstr "Tt"
+
+#: src/Dashboard/Provider.php:182 src/Dashboard/Provider.php:1021
+#: src/Toolbox.php:208
+msgid "Pt"
+msgstr "Pt"
+
+#: src/Dashboard/Provider.php:183 src/Dashboard/Provider.php:1022
+#: src/Toolbox.php:209
+msgid "Et"
+msgstr "Et"
+
+#: src/Dashboard/Provider.php:184 src/Dashboard/Provider.php:1023
+#: src/Toolbox.php:210
+msgid "Zt"
+msgstr "Zt"
+
+#: src/Dashboard/Provider.php:185 src/Dashboard/Provider.php:1024
+#: src/Toolbox.php:211
+msgid "Yt"
+msgstr "Yt"
+
+#: src/Dashboard/Provider.php:334
+msgid "handled assets ratio"
+msgstr "işlenen varlık oranı"
+
+#: src/Dashboard/Provider.php:402 src/Dashboard/DemoProvider.php:334
+msgid "Handled"
+msgstr "İşlenen"
+
+#: src/Dashboard/Provider.php:407 src/Dashboard/DemoProvider.php:339
+msgid "Unhandled"
+msgstr "İşlenmeyen"
+
+#: src/Dashboard/Provider.php:434 src/Dashboard/DemoProvider.php:279
+#, php-format
+msgid "plugin carbon - handled %s"
+msgstr "Carbon eklentisi- İşlenen %s"
+
+#: src/Dashboard/Provider.php:435 src/Dashboard/DemoProvider.php:280
+#, php-format
+msgid "plugin carbon - unhandled %s"
+msgstr "Carbon eklentisi- İşlenmeyen %s"
+
+#: src/Dashboard/Provider.php:483
+msgid "plugin carbon - Total usage power consumption"
+msgstr "Carbon eklentisi - Toplam kullanım güç tüketimi"
+
+#: src/Dashboard/Provider.php:552 src/Dashboard/DemoProvider.php:362
+msgid "plugin carbon - Usage carbon emission"
+msgstr "Carbon eklentisi - Kullanım karbon emisyonu"
+
+#: src/Dashboard/Provider.php:722
+msgid "Total embodied global warming potential"
+msgstr "Toplam gerçekleşen küresel ısınma potansiyeli"
+
+#: src/Dashboard/Provider.php:796 src/Dashboard/Provider.php:830
+#: src/Dashboard/DemoProvider.php:83 src/Dashboard/DemoProvider.php:101
+msgid "Sbeq"
+msgstr "Sbeq"
+
+#: src/Dashboard/Provider.php:850
+msgid "Total abiotic depletion potential"
+msgstr "Toplam abiyotik tükenme potansiyeli"
+
+#: src/Dashboard/Provider.php:869
+msgid "Total usage abiotic depletion potential"
+msgstr "Toplam kullanım abiyotik tükenme potansiyeli"
+
+#: src/Dashboard/Provider.php:881
+msgid "Total global warming potential"
+msgstr "Toplam küresel ısınma potansiyeli"
+
+#: src/Dashboard/Provider.php:900
+msgid "Total usage global warming potential"
+msgstr "Toplam kullanım küresel ısınma potansiyeli"
+
+#: src/Dashboard/Provider.php:1033 src/Toolbox.php:287
+msgid "KWh"
+msgstr "KWh"
+
+#: src/Dashboard/Provider.php:1034 src/Toolbox.php:288
+msgid "MWh"
+msgstr "MWh"
+
+#: src/Dashboard/Provider.php:1035 src/Toolbox.php:289
+msgid "GWh"
+msgstr "GWh"
+
+#: src/Dashboard/Provider.php:1036 src/Toolbox.php:290
+msgid "TWh"
+msgstr "TWh"
+
+#: src/Dashboard/Provider.php:1037 src/Toolbox.php:291
+msgid "PWh"
+msgstr "PWh"
+
+#: src/Dashboard/Provider.php:1038 src/Toolbox.php:292
+msgid "EWh"
+msgstr "EWh"
+
+#: src/Dashboard/Provider.php:1039 src/Toolbox.php:293
+msgid "ZWh"
+msgstr "ZWh"
+
+#: src/Dashboard/Provider.php:1040 src/Toolbox.php:294
+msgid "YWh"
+msgstr "YWh"
+
+#: src/Dashboard/DemoProvider.php:113
+msgid "Usage carbon emission per month"
+msgstr "Aylık kullanım karbon emisyonu"
+
+#: src/Dashboard/DemoProvider.php:311
+msgid "plugin carbon - handled assets ratio"
+msgstr "Carbon eklentisi- İşlenen varlık oranı"
+
+#: src/Dashboard/Dashboard.php:69
+msgid "Carbon dioxyde intensity"
+msgstr "Karbondioksit yoğunluğu"
+
+#: src/ComputerUsageProfile.php:52
+msgid "Computer usage profile"
+msgid_plural "Computer usage profiles"
+msgstr[0] "Bilgisayar kullanım profili"
+msgstr[1] "Bilgisayar kullanım profilleri"
+
+#: src/ComputerUsageProfile.php:101
+msgid "Start time is invalid"
+msgstr "Başlangıç zamanı geçersiz"
+
+#: src/ComputerUsageProfile.php:106
+msgid "Stop time is invalid"
+msgstr "Bitiş zamanı geçersiz"
+
+#: src/Config.php:125
+msgid "Invalid Boavizta API URL"
+msgstr "Boavizta API adresi geçersiz"
+
+#: src/Config.php:133
+msgid "Connection to Boavizta API established"
+msgstr "Boavizta API bağlantısı kuruldu"
+
+#: src/Zone.php:50
+msgid "Carbon intensity zone"
+msgid_plural "Carbon intensity zones"
+msgstr[0] "Karbon yoğunluğu bölgesi"
+msgstr[1] "Karbon yoğunluğu bölgeleri"
+
+#: src/Zone.php:136 src/Zone.php:151
+msgid "Data source for historical calculation"
+msgstr "Geçmiş hesaplaması veri kaynağı"
+
+#: src/Command/CollectCarbonIntensityCommand.php:69
+#: src/Command/CreateFakeCarbonIntensityCommand.php:67
+msgid "Creating data source name"
+msgstr "Veri kaynağı adı oluşturuluyor"
+
+#: src/Command/CollectCarbonIntensityCommand.php:86
+msgid "Zone not found"
+msgstr "Bölge bulunamadı"
+
+#: src/Command/CollectCarbonIntensityCommand.php:92
+msgid "Reading eco2mix data..."
+msgstr "Eco2mix verileri okunuyor..."
+
+#: src/Command/CreateTestInventoryCommand.php:146
+msgid "Creating test inventory"
+msgstr "Sınama envanteri oluşturuluyor"
+
+#: src/Command/ExportDashboardCommand.php:69
+msgid "Updating the report dashboard description"
+msgstr "Rapor panosu açıklaması güncelleniyor"
+
+#: src/Command/ExportDashboardCommand.php:75
+msgid "Dashboard not found"
+msgstr "Pano bulunamadı"
+
+#: src/Command/ExportDashboardCommand.php:101
+#, php-format
+msgid "Dashboard description saved to %s"
+msgstr "Pano açıklaması %s üzerine kaydedildi"
+
+#: src/Command/CreateFakeCarbonIntensityCommand.php:78
+msgid "Creating data zone name"
+msgstr "Veri bölgesi adı oluşturuluyor"
+
+#: src/Command/CreateFakeCarbonIntensityCommand.php:89
+msgid "Creating fake data..."
+msgstr "Sahte veriler oluşturuluyor..."
+
+#: src/Toolbox.php:251
+msgid "W"
+msgstr "W"
+
+#: src/Toolbox.php:252
+msgid "KW"
+msgstr "KW"
+
+#: src/Toolbox.php:253
+msgid "MW"
+msgstr "MW"
+
+#: src/Toolbox.php:254
+msgid "GW"
+msgstr "GW"
+
+#: src/Toolbox.php:255
+msgid "TW"
+msgstr "TW"
+
+#: src/Toolbox.php:256
+msgid "PW"
+msgstr "PW"
+
+#: src/Toolbox.php:257
+msgid "EW"
+msgstr "EW"
+
+#: src/Toolbox.php:258
+msgid "ZW"
+msgstr "ZW"
+
+#: src/Toolbox.php:259
+msgid "YW"
+msgstr "YW"
+
+#: src/Toolbox.php:286
+msgid "Wh"
+msgstr "Wh"
+
+#: src/Impact/Embodied/AbstractEmbodiedImpact.php:83
+#: src/Impact/Usage/AbstractUsageImpact.php:83
+msgid "grams of carbon dioxyde equivalent"
+msgstr "gram karbondioksit eşdeğeri"
+
+#: src/Impact/Embodied/AbstractEmbodiedImpact.php:85
+#: src/Impact/Usage/AbstractUsageImpact.php:85
+msgid "grams of antimony equivalent"
+msgstr "gram antimon eşdeğeri"
+
+#: src/Impact/Embodied/AbstractEmbodiedImpact.php:87
+#: src/Impact/Usage/AbstractUsageImpact.php:87
+msgid "joules"
+msgstr "jul"
+
+#: src/Impact/History/AbstractAsset.php:418
+msgid "Error while calculating impact"
+msgstr "Etki hesaplanırken sorun çıktı"
+
+#: src/Impact/History/AbstractAsset.php:426
+msgid "Nothing to calculate"
+msgstr "Hesaplanacak bir şey yok"
+
+#: src/Impact/History/AbstractAsset.php:432
+#, php-format
+msgid "%d entries calculated"
+msgstr "%d kayıt hesaplandı"
+
+#: hook.php:255
+msgid "Associate to an usage profile"
+msgstr "Bir kullanım profili ile ilişkilendir"
+
+#: hook.php:259 hook.php:264 hook.php:268
+msgid "Update type power consumption"
+msgstr "Güncelleme türü güç tüketimi"
+
+#: hook.php:260
+msgid "Update category"
+msgstr "Güncelleme kategorisi"
+
+#: hook.php:272
+msgid "Update zone for Boavizta engine"
+msgstr "Boavizta hesaplayıcı bölgesini güncelle"
+
+#: setup.php:275
+msgid "Environmental Impact"
+msgstr "Çevresel etki"
+
+#: front/embodiedimpact.form.php:64 front/embodiedimpact.form.php:87
+#: front/usageimpact.form.php:64 front/usageimpact.form.php:95
+msgid "Missing arguments in request."
+msgstr "İstekte argümanlar eksik."
+
+#: front/embodiedimpact.form.php:69 front/embodiedimpact.form.php:78
+#: front/usageimpact.form.php:82
+msgid "Reset denied."
+msgstr "Sıfırlama reddedildi."
+
+#: front/embodiedimpact.form.php:83 front/usageimpact.form.php:87
+msgid "Reset failed."
+msgstr "Sıfırlanamadı."
+
+#: front/embodiedimpact.form.php:93 front/usageimpact.form.php:126
+msgid "Unable to find calculation engine for this asset."
+msgstr "Bu varlık için bir hesaplayıcısı bulunamadı."
+
+#: front/embodiedimpact.form.php:102
+msgid "Update failed."
+msgstr "Güncellenemedi."
+
+#: front/usageimpact.form.php:72 front/usageimpact.form.php:101
+#: front/usageimpact.form.php:109
+msgid "Bad arguments."
+msgstr "Argümanlar yanlış."
+
+#: front/usageimpact.form.php:91
+msgid "Delete of usage impact failed."
+msgstr "Kullanım etkisi silinemedi."
+
+#: front/usageimpact.form.php:117
+msgid "Missing data prevents historization of this asset."
+msgstr "Eksik veriler bu varlığın geçmiş hesaplamasını engelliyor. "
+
+#: front/usageimpact.form.php:120
+msgid "Update of global warming potential failed."
+msgstr "Küresel ısınma potansiyeli güncellenemedi."
+
+#: front/usageimpact.form.php:131
+msgid "Update of usage impact failed."
+msgstr "Kullanım etkisi güncellenemedi."
+
+#: install/migration/update_0.0.6_to_1.0.0/02_create_automatic_actions.php:45
+#: install/install/create_automatic_actions.php:45
+msgid "Find the Alpha3 country code (ISO3166) of locations"
+msgstr "Konumların Alpha3 ülke kodunu bul (ISO3166)"
+
+#: install/migration/update_0.0.3_to_0.0.4/add_automatic_action.php:60
+#: install/install/create_automatic_actions.php:93
+msgid "Compute embodied impact of assets"
+msgstr "Varlıkların gerçekleşen etkisini hesapla"
+
+#: install/install/create_uasge_profiles.php:41
+msgid "Always on"
+msgstr "Her zaman açık"
+
+#: install/install/create_uasge_profiles.php:52
+msgid "Office hours"
+msgstr "Çalışma saatleri"
+
+#: install/install/create_automatic_actions.php:57
+msgid "Compute carbon emissions of computers"
+msgstr "Bilgisayarların karbon emisyonlarını hesapla"
+
+#: install/install/create_automatic_actions.php:69
+msgid "Collect carbon intensities from RTE"
+msgstr "RTE üzerinden karbon yoğunluklarını al"
+
+#: install/install/create_automatic_actions.php:81
+msgid "Collect carbon intensities from ElectricityMap"
+msgstr "ElectricityMap üzerinden karbon yoğunluklarını al"

@@ -1,18 +1,19 @@
 {
     "name": "carbon",
     "description": "Measurement of carbon emissions of GLPI devices",
-    "license": "GPL-2.0-or-later",
-    "version": "1.0.0",
+    "license": "GPL-3.0-or-later",
+    "version": "1.0.0-beta.3",
     "dependencies": {
         "apexcharts": "^3.49.0"
     },
     "scripts": {
-        "build": "webpack --config webpack.config.js",
+        "build": "webpack --config .webpack.config.js",
         "postinstall": "npm run-script build"
     },
     "devDependencies": {
         "css-loader": "^6.11.0",
         "file-loader": "^6.2.0",
+        "glob": "^11.0.2",
         "mini-css-extract-plugin": "^2.9.0",
         "style-loader": "^3.3.4",
         "stylelint-config-standard-scss": "^8.0.0",

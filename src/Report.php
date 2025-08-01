@@ -82,7 +82,7 @@ class Report extends CommonDBTM
     {
         $values = parent::getRights();
 
-        return array_intersect_key($values, [READ => true, PURGE => true]);
+        return array_intersect_key($values, [READ => true, UPDATE => true, PURGE => true]);
     }
 
     public static function showInstantReport(): void
@@ -115,13 +115,13 @@ class Report extends CommonDBTM
             ];
         }
 
-        $header_pic_url = $CFG_GLPI['root_doc'] . '/plugins/carbon/images/illustration_bridge.png';
-        $footer_pic_url = $CFG_GLPI['root_doc'] . '/plugins/carbon/images/illustration-footer.png';
+        $header_pic_url = $CFG_GLPI['root_doc'] . '/plugins/carbon/pics/illustration_bridge.png';
+        $footer_pic_url = $CFG_GLPI['root_doc'] . '/plugins/carbon/pics/illustration-footer.png';
         /** @phpstan-ignore if.alwaysTrue */
         if (version_compare(GLPI_VERSION, '11.0', '<')) {
             // For GLPI < 11.0, we need to add resource the old way
-            $header_pic_url = Plugin::getWebDir('carbon') . '/public/images/illustration_bridge.png';
-            $footer_pic_url = Plugin::getWebDir('carbon') . '/public/images/illustration-footer.png';
+            $header_pic_url = Plugin::getWebDir('carbon') . '/pics/illustration_bridge.png';
+            $footer_pic_url = Plugin::getWebDir('carbon') . '/pics/illustration-footer.png';
         }
         TemplateRenderer::getInstance()->display('@carbon/quick-report.html.twig', [
             'dashboard' => $dashboard_html,

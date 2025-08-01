@@ -58,11 +58,6 @@ class Monitor extends AbstractSwitchable
         /** @var DBmysql $DB */
         global $DB;
 
-        $item = GlpiMonitor::getById($this->items_id);
-        if ($item === false) {
-            return null;
-        }
-
         $computers_table = GlpiComputer::getTable();
         $computer_item_table = Computer_Item::getTable();
         $usageinfo_table = UsageInfo::getTable();
@@ -98,7 +93,7 @@ class Monitor extends AbstractSwitchable
                 ]
             ],
             'WHERE' => [
-                Computer_Item::getTableField('items_id') => $this->items_id,
+                Computer_Item::getTableField('items_id') => $this->item->getID(),
             ],
         ];
 

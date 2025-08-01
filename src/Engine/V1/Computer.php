@@ -83,7 +83,7 @@ class Computer extends AbstractSwitchable
                 ]
             ],
             'WHERE' => [
-                GlpiComputer::getTableField('id') => $this->items_id,
+                GlpiComputer::getTableField('id') => $this->item->getID(),
             ],
         ];
 

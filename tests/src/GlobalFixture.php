@@ -133,7 +133,7 @@ class GlobalFixture
             fwrite(STDOUT, sprintf('Failed to open carbon intensity dataset CSV file' . PHP_EOL));
             exit(1);
         }
-        while (($row = fgetcsv($handle, 256)) !== false) {
+        while (($row = fgetcsv($handle, 256, ',', '"', '\\')) !== false) {
             $DB->insert($intensity_table, [
                 'plugin_carbon_carbonintensitysources_id' => $source_id,
                 'plugin_carbon_zones_id'   => $zone_id,
