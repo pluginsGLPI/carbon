@@ -246,37 +246,34 @@ class NetworkEquipmentTest extends CommonAsset
         $this->assertFalse($history->canHistorize($id));
 
         // Set a type power consumption
-        $power_consumption->update([
-            'id' => $type->getID(),
-            'power_consumption' => 55,
-        ]);
+        $this->updateItem($power_consumption, [
+                'power_consumption' => 55,
+            ]
+        );
         $this->assertTrue($history->canHistorize($id));
 
         // *** test blocking conditions ***
 
         // Put the asset in the trash bin
-        $network_equipment->update([
-            'id' => $id,
-            'is_deleted' => 1,
-        ]);
+        $this->updateItem( $network_equipment, [
+                'is_deleted' => 1,
+            ]
+        );
         $this->assertFalse($history->canHistorize($id));
 
         // Restore the asset
-        $network_equipment->update([
-            'id' => $id,
-            'is_deleted' => 0,
-        ]);
+        $this->updateItem($network_equipment, [
+                'is_deleted' => 0,
+            ]);
 
         // Transform the asset into a template
-        $network_equipment->update([
-            'id' => $id,
+        $this->updateItem($network_equipment, [
             'is_template' => 1,
         ]);
         $this->assertFalse($history->canHistorize($id));
 
         // Restore the asset
-        $network_equipment->update([
-            'id' => $id,
+        $this->updateItem($network_equipment, [
             'is_template' => 0,
         ]);
         $this->assertTrue($history->canHistorize($id));

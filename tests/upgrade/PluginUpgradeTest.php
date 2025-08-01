@@ -116,10 +116,13 @@ class PluginUpgradeTest extends PluginInstallTest
 
         $expected = [
             'electricitymap_api_key'             => 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-            'dbversion'                          => PLUGIN_CARBON_SCHEMA_VERSION,
+            'impact_engine'                      => 'Boavizta',
+            'boaviztapi_base_url'                => '',
             'geocoding_enabled'                  => '0',
             'RTE_zone_setup_complete'            => '0',
             'ElectricityMap_zone_setup_complete' => '0',
+            'demo'                               => '0',
+            'dbversion'                          => PLUGIN_CARBON_SCHEMA_VERSION,
         ];
 
         $config = Config::getConfigurationValues('plugin:' . TEST_PLUGIN_NAME);

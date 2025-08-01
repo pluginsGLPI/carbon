@@ -260,11 +260,6 @@ class Install
      */
     public static function getOrCreateZone(string $name, int $source_id): int
     {
-        static $zone_cache = [];
-        if (isset($zone_cache[$name])) {
-            return $zone_cache[$name];
-        }
-
         $zone = new Zone();
         $zone->getFromDBByCrit(['name' => Sanitizer::sanitize($name)]);
         if ($zone->isNewItem()) {
@@ -277,12 +272,18 @@ class Install
                 throw new \RuntimeException("Failed to create zone '$name' in DB");
             }
         }
-        $zone_cache[$name] = $zone->getID();
 
         return $zone->getID();
     }
 
-    public static function linkSourceZone(int $source_id, int $zone_id)
+    /**
+     * Link a carbon intensity source to a zone
+     *
+     * @param int $source_id ID of the carbon intensity source
+     * @param int $zone_id ID of the zone
+     * @return int ID of the link
+     */
+    public static function linkSourceZone(int $source_id, int $zone_id): int
     {
         $source_zone = new CarbonIntensitySource_Zone();
         $source_zone->getFromDBByCrit([
@@ -295,5 +296,7 @@ class Install
                 'plugin_carbon_zones_id'                  => $zone_id,
             ]);
         }
+
+        return $source_zone->getID();
     }
 }
