@@ -145,7 +145,7 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
 
         $entries = [];
         foreach ($iterator as $data) {
-            $is_download_enabled = 'N/A';
+            $is_download_enabled = __('Not downloadable', 'carbon') . Html::showToolTip(__('This is a fallback source, there is no real-time data available', 'carbon'), ['display' => false]);
             if ($data['is_fallback'] == 0) {
                 $is_download_enabled = self::getToggleLink($data['id'], $data['is_download_enabled']);
             }
