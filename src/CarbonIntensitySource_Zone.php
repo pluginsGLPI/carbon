@@ -349,6 +349,13 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
 
     public function toggleZone(?bool $state = null): bool
     {
+        // Check if the source is a fallback source
+        $source = new CarbonIntensitySource();
+        $source->getFromDB($this->fields['plugin_carbon_carbonintensitysources_id']);
+        if ($source->fields['is_fallback'] === 1) {
+            // Fallback sources cannot be toggled
+            return false;
+        }
         if ($state === null) {
             $state = $this->fields['is_download_enabled'];
             $state = $state == 0 ? 1 : 0;
