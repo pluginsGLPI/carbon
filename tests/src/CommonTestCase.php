@@ -115,11 +115,11 @@ class CommonTestCase extends TestCase
         if (session_status() == PHP_SESSION_ACTIVE) {
             session_write_close();
         }
-        $LOADED_PLUGINS = null;
-        $PLUGINS_INCLUDED = null;
-        $AJAX_INCLUDE = null;
+        unset($LOADED_PLUGINS);
+        unset($PLUGINS_INCLUDED);
+        unset($AJAX_INCLUDE);
         $_SESSION = [];
-        require_once GLPI_ROOT . "/inc/includes.php";
+        require GLPI_ROOT . "/inc/includes.php";
         //\Toolbox::setDebugMode(Session::DEBUG_MODE);
 
         // Security of PHP_SELF
