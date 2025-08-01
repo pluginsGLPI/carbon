@@ -30,16 +30,13 @@
  * -------------------------------------------------------------------------
  */
 
-// Rename configuration key embedded_impact_engine
-$value = Config::getConfigurationValue('plugin:carbon', 'embedded_impact_engine');
-if ($value === null) {
-    $value = 'Boavizta';
+$current_config = Config::getConfigurationValues('plugin:carbon');
+$config_entries = [
+    'boaviztapi_base_url'    => '',
+    'demo'                   => '0',
+];
+foreach ($config_entries as $key => $value) {
+    if (!isset($current_config[$key])) {
+        Config::setConfigurationValues('plugin:carbon', [$key => $value]);
+    }
 }
-Config::setConfigurationValues('plugin:carbon', [
-    'impact_engine' => $value,
-]);
-$config = new Config();
-$config->deleteByCriteria([
-    'context' => 'plugin:carbon',
-    'name' => 'embedded_impact_engine',
-]);
