@@ -89,7 +89,7 @@ class MonitorTest extends CommonAsset
 
         $model_power = 55;
         $location = $this->getItem(Location::class, [
-            'country' => PLUGIN_CARBON_TEST_FAKE_ZONE_NAME,
+            'state' => 'Quebec',
         ]);
 
         $computer_model_power = 80;
@@ -166,11 +166,11 @@ class MonitorTest extends CommonAsset
             [
                 'date'             => '2024-02-01 00:00:00',
                 'energy_per_day'   => 0.495,
-                'emission_per_day' => 14.245,
+                'emission_per_day' => 234.138,
             ],[
                 'date' => '2024-02-02 00:00:00',
                 'energy_per_day'   => 0.495,
-                'emission_per_day' => 14.025,
+                'emission_per_day' => 234.138,
             ], [
                 'date' => '2024-02-03 00:00:00',
                 'energy_per_day'   => 0,
@@ -182,15 +182,15 @@ class MonitorTest extends CommonAsset
             ], [
                 'date' => '2024-02-05 00:00:00',
                 'energy_per_day'   => 0.495,
-                'emission_per_day' => 14.41,
+                'emission_per_day' => 234.138,
             ], [
                 'date' => '2024-02-06 00:00:00',
                 'energy_per_day'   => 0.495,
-                'emission_per_day' => 15.895,
+                'emission_per_day' => 234.138,
             ], [
                 'date' => '2024-02-07 00:00:00',
                 'energy_per_day'   => 0.495,
-                'emission_per_day' => 12.98,
+                'emission_per_day' => 234.138,
             ],
         ];
         foreach ($emissions as $emission) {
@@ -225,23 +225,20 @@ class MonitorTest extends CommonAsset
         $this->assertFalse($history->canHistorize($id));
 
         // Add a date of inventory entry
-        $management->update([
-            'id' => $management->getID(),
+        $this->updateItem($management, [
             'use_date' => '2020-01-01',
         ]);
         $this->assertFalse($history->canHistorize($id));
 
         // Add an empty location
         $location = $this->getItem(Location::class);
-        $computer->update([
-            'id' => $computer->getID(),
+        $this->updateItem($computer, [
             'locations_id' => $location->getID(),
         ]);
         $this->assertFalse($history->canHistorize($id));
 
         // Add a country to the location
-        $location->update([
-            'id' => $location->getID(),
+        $this->updateItem($location, [
             'country' => 'France',
         ]);
         $this->assertFalse($history->canHistorize($id));
@@ -265,23 +262,20 @@ class MonitorTest extends CommonAsset
         $this->assertFalse($history->canHistorize($id));
 
         // Add a power consumption to the model
-        $model->update([
-            'id' => $model->getID(),
+        $this->updateItem($model, [
             'power_consumption' => 55,
         ]);
         $this->assertTrue($history->canHistorize($id));
 
         // add a type
         $type = $this->getItem(GlpiMonitorType::class);
-        $monitor->update([
-            'id' => $id,
+        $this->updateItem($monitor, [
             'monitortypes_id' => $type->getID(),
         ]);
         $this->assertTrue($history->canHistorize($id));
 
         // Remove power consumption on model
-        $model->update([
-            'id' => $model->getID(),
+        $this->updateItem($model, [
             'power_consumption' => 0,
         ]);
         $this->assertFalse($history->canHistorize($id));
@@ -293,15 +287,13 @@ class MonitorTest extends CommonAsset
         $this->assertFalse($history->canHistorize($id));
 
         // Set a type power consumption
-        $power_consumption->update([
-            'id' => $power_consumption->getID(),
+        $this->updateItem($power_consumption, [
             'power_consumption' => 55,
         ]);
         $this->assertTrue($history->canHistorize($id));
 
         // Add a power consumption to the model (both model and type have power consumption)
-        $model->update([
-            'id' => $model->getID(),
+        $this->updateItem($model, [
             'power_consumption' => 55,
         ]);
         $this->assertTrue($history->canHistorize($id));
@@ -309,28 +301,24 @@ class MonitorTest extends CommonAsset
         // *** test blocking conditions ***
 
         // Put the asset in the trash bin
-        $monitor->update([
-            'id' => $id,
+        $this->updateItem($monitor, [
             'is_deleted' => 1,
         ]);
         $this->assertFalse($history->canHistorize($id));
 
         // Restore the asset
-        $monitor->update([
-            'id' => $id,
+        $this->updateItem($monitor, [
             'is_deleted' => 0,
         ]);
 
         // Transform the asset into a template
-        $monitor->update([
-            'id' => $id,
+        $this->updateItem($monitor, [
             'is_template' => 1,
         ]);
         $this->assertFalse($history->canHistorize($id));
 
         // Restore the asset
-        $monitor->update([
-            'id' => $id,
+        $this->updateItem($monitor, [
             'is_template' => 0,
         ]);
         $this->assertTrue($history->canHistorize($id));
