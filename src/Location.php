@@ -154,6 +154,12 @@ class Location extends CommonDBChild
         return $geocoder;
     }
 
+    /**
+     * callback when a GLPI location is added
+     *
+     * @param CommonDBTM $item
+     * @return void
+     */
     public static function onGlpiLocationAdd(CommonDBTM $item)
     {
         self::enableCarbonIntensityDownload($item);
@@ -171,11 +177,23 @@ class Location extends CommonDBChild
         self::setBoaviztaZone($item);
     }
 
+    /**
+     * callback when a GLPI location is updated
+     *
+     * @param CommonDBTM $item
+     * @return void
+     */
     public static function onGlpiLocationUpdate(CommonDBTM $item)
     {
         self::enableCarbonIntensityDownload($item);
     }
 
+    /**
+     * callback when a GLPI location is updated
+     *
+     * @param CommonDBTM $item
+     * @return void
+     */
     public static function onGlpiLocationPreUpdate(CommonDBTM $item)
     {
         $enabled = GlpiConfig::getConfigurationValue('plugin:carbon', 'geocoding_enabled');
