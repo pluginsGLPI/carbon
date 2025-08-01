@@ -81,7 +81,7 @@ class NetworkEquipmentTest extends CommonAsset
 
         $model_power = 100;
         $location = $this->getItem(Location::class, [
-            'country' => PLUGIN_CARBON_TEST_FAKE_ZONE_NAME,
+            'state' => 'Quebec',
         ]);
         $model = $this->getItem(NetworkEquipmentModel::class, ['power_consumption' => $model_power]);
         $glpi_type = $this->getItem(GlpiNetworkEquipmentType::class);
@@ -126,14 +126,14 @@ class NetworkEquipmentTest extends CommonAsset
         $output = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
         $this->assertNull($output);
 
-        $asset->update([
+        $this->updateItem($asset, [
             'id' => $asset->getID(),
             'comment' => 'test date_mod',
         ]);
         $output = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
         $this->assertEquals($_SESSION["glpi_currenttime"], $output->format('Y-m-d H:i:s'));
 
-        $asset->update([
+        $this->updateItem($asset, [
             'id' => $asset->getID(),
             'date_creation' => '2019-01-01 00:00:00',
         ]);
@@ -148,21 +148,21 @@ class NetworkEquipmentTest extends CommonAsset
         $output = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
         $this->assertEquals('2019-01-01 00:00:00', $output->format('Y-m-d H:i:s'));
 
-        $infocom->update([
+        $this->updateItem($infocom, [
             'id'       => $infocom->getID(),
             'buy_date' => '2018-01-01 00:00:00',
         ]);
         $output = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
         $this->assertEquals('2018-01-01 00:00:00', $output->format('Y-m-d H:i:s'));
 
-        $infocom->update([
+        $this->updateItem($infocom, [
             'id'            => $infocom->getID(),
             'delivery_date' => '2018-01-01 00:00:00',
         ]);
         $output = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
         $this->assertEquals('2018-01-01 00:00:00', $output->format('Y-m-d H:i:s'));
 
-        $infocom->update([
+        $this->updateItem($infocom, [
             'id'       => $infocom->getID(),
             'use_date' => '2017-01-01 00:00:00',
         ]);
@@ -187,16 +187,15 @@ class NetworkEquipmentTest extends CommonAsset
         $this->assertFalse($history->canHistorize($id));
 
         // Add a date of inventory entry
-        $management->update([
-            'id' => $management->getID(),
+        $this->updateItem($management, [
             'use_date' => '2020-01-01',
         ]);
         $this->assertFalse($history->canHistorize($id));
 
         // Add an empty location
         $location = $this->getItem(Location::class);
-        $network_equipment->update([
-            'id' => $id,
+
+        $this->updateItem($network_equipment, [
             'locations_id' => $location->getID(),
         ]);
         $this->assertFalse($history->canHistorize($id));
@@ -218,16 +217,14 @@ class NetworkEquipmentTest extends CommonAsset
         $this->assertFalse($history->canHistorize($id));
 
         // Add a power consumption to the model
-        $model->update([
-            'id' => $model->getID(),
+        $this->updateItem($model, [
             'power_consumption' => 55,
         ]);
         $this->assertFalse($history->canHistorize($id));
 
         // add a type
         $type = $this->getItem(GlpiNetworkEquipmentType::class);
-        $network_equipment->update([
-            'id' => $id,
+        $this->updateItem($network_equipment, [
             'networkequipmenttypes_id' => $type->getID(),
         ]);
         $this->assertTrue($history->canHistorize($id));
