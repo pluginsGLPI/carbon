@@ -195,6 +195,9 @@ class Monitor extends AbstractAsset
             GlpiMonitorType::getTableField('id as type_id'),
             MonitorType::getTableField('id as plugin_carbon_type_id'),
             MonitorType::getTableField('power_consumption  as type_power_consumption'),
+            Infocom::getTableField('use_date'),
+            Infocom::getTableField('delivery_date'),
+            Infocom::getTableField('buy_date'),
         ];
         // Change inner joins into left joins to identify missing data
         // Warning : the order of the array merge below is important or the resulting SQL query will fail
