@@ -32,6 +32,7 @@
 
 namespace GlpiPlugin\Carbon\Impact\History\Tests;
 
+use CommonDBTM;
 use Computer as GlpiComputer;
 use ComputerModel;
 use Computer_Item;
@@ -41,9 +42,10 @@ use GlpiPlugin\Carbon\Tests\Impact\History\CommonAsset;
 use Infocom;
 use Location;
 use DateTime;
-use MonitorModel;
+use MonitorModel as GlpiMonitorModel;
 use MonitorType as GlpiMonitorType;
 use ComputerType as GlpiComputerType;
+use DBmysql;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
@@ -120,7 +122,7 @@ class MonitorTest extends CommonAsset
             'items_id' => $computer->getID(),
         ]);
 
-        $model = $this->getItem(MonitorModel::class, ['power_consumption' => $model_power]);
+        $model = $this->getItem(GlpiMonitorModel::class, ['power_consumption' => $model_power]);
         $glpi_type = $this->getItem(GlpiMonitorType::class);
         $type = $this->getItem(MonitorType::class, [
             GlpiMonitorType::getForeignKeyField() => $glpi_type->getID(),
@@ -200,127 +202,493 @@ class MonitorTest extends CommonAsset
         }
     }
 
-    public function testCanHistorize()
+    private static function getMonitorLinkedToComputer(?GlpiComputer $computer = null): CommonDBTM
     {
-        $computer = $this->getItem(GlpiComputer::class);
+        $self = new self();
+        if ($computer === null) {
+            $computer = $self->getItem(GlpiComputer::class);
+        }
 
-        $monitor = $this->getItem(GlpiMonitor::class);
-        $id = $monitor->getID();
+        $item = $self->getItem(GlpiMonitor::class);
 
-        $computer_item = $this->getItem(Computer_Item::class, [
+        $computer_item = $self->getItem(Computer_Item::class, [
             'computers_id' => $computer->getID(),
-            'itemtype' => $monitor->getType(),
-            'items_id' => $id,
+            'itemtype' => $item->getType(),
+            'items_id' => $item->getID(),
         ]);
 
-        // Check we cannot historize an empty item
-        $history = new Monitor();
-        $this->assertFalse($history->canHistorize($id));
+        return $item;
+    }
 
-        // Add empty info on the asset
-        $management = $this->getItem(Infocom::class, [
-            'itemtype' => $monitor->getType(),
-            'items_id' => $id,
+    private static function addManagementToMonitor(CommonDBTM $item)
+    {
+        $self = new self();
+        $management = $self->getItem(Infocom::class, [
+            'itemtype' => $item->getType(),
+            'items_id' => $item->getID(),
         ]);
-        $this->assertFalse($history->canHistorize($id));
 
-        // Add a date of inventory entry
-        $this->updateItem($management, [
+        return $management;
+    }
+
+    private static function addDateToManagement(CommonDBTM $item)
+    {
+        $self = new self();
+
+        $management = new Infocom();
+        $management->getFromDBByCrit([
+            'itemtype' => $item->getType(),
+            'items_id' => $item->getID(),
+        ]);
+        $self->assertFalse($management->isNewItem(), "Infocom item not found");
+
+        $self->updateItem($management, [
             'use_date' => '2020-01-01',
         ]);
-        $this->assertFalse($history->canHistorize($id));
+    }
 
-        // Add an empty location
+    public function testEmptyMonitorIsNotHistorizable()
+    {
+        $history = new Monitor();
+
+        $monitor = $this->getItem(GlpiMonitor::class);
+        $result = $history->getHistorizableDiagnosis($monitor);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_computer'                => false,
+            'has_usage_profile'           => false,
+            'has_location'                => false,
+            'has_state_or_country'        => false,
+            'has_model'                   => false,
+            'has_model_power_consumption' => false,
+            'has_type'                    => false,
+            'has_type_power_consumption'  => false,
+            'has_inventory_entry_date'    => false,
+        ];
+        $this->assertEquals($expected, $result);
+        $expected = !in_array(false, $result, true);
+        $result = $history->canHistorize($monitor->getID());
+        $this->assertFalse($result);
+    }
+
+    public function testMonitorLinkedToComputerIsNotHistorizable()
+    {
+        $history = new Monitor();
+
+        $monitor = $this->getItem(GlpiMonitor::class);
+        $computer = $this->getItem(GlpiComputer::class);
+        $computer_item = $this->getItem(Computer_Item::class, [
+            'computers_id' => $computer->getID(),
+            'itemtype'     => $monitor->getType(),
+            'items_id'     => $monitor->getID(),
+        ]);
+        $result = $history->getHistorizableDiagnosis($monitor);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_computer'                => true,
+            'has_usage_profile'           => false,
+            'has_location'                => false,
+            'has_state_or_country'        => false,
+            'has_model'                   => false,
+            'has_model_power_consumption' => false,
+            'has_type'                    => false,
+            'has_type_power_consumption'  => false,
+            'has_inventory_entry_date'    => false,
+        ];
+        $this->assertEquals($expected, $result);
+        $expected = !in_array(false, $result, true);
+        $result = $history->canHistorize($monitor->getID());
+        $this->assertFalse($result);
+    }
+
+    public function testMonitorWithEmptyInfocomIsNotHistorizable()
+    {
+        $history = new Monitor();
+
+        $monitor = $this->getItem(GlpiMonitor::class);
+        $infocom = $this->getItem(Infocom::class, [
+            'itemtype'     => $monitor->getType(),
+            'items_id'     => $monitor->getID(),
+        ]);
+        $result = $history->getHistorizableDiagnosis($monitor);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_computer'                => false,
+            'has_usage_profile'           => false,
+            'has_location'                => false,
+            'has_state_or_country'        => false,
+            'has_model'                   => false,
+            'has_model_power_consumption' => false,
+            'has_type'                    => false,
+            'has_type_power_consumption'  => false,
+            'has_inventory_entry_date'    => false,
+        ];
+        $this->assertEquals($expected, $result);
+        $expected = !in_array(false, $result, true);
+        $result = $history->canHistorize($monitor->getID());
+        $this->assertFalse($result);
+    }
+
+    public function testMonitorWithInfocomIsNotHistorizable()
+    {
+        $history = new Monitor();
+
+        $monitor = $this->getItem(GlpiMonitor::class);
+        $infocom = $this->getItem(Infocom::class, [
+            'itemtype'     => $monitor->getType(),
+            'items_id'     => $monitor->getID(),
+            'buy_date'     => '2024-01-01',
+        ]);
+        $result = $history->getHistorizableDiagnosis($monitor);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_computer'                => false,
+            'has_usage_profile'           => false,
+            'has_location'                => false,
+            'has_state_or_country'        => false,
+            'has_model'                   => false,
+            'has_model_power_consumption' => false,
+            'has_type'                    => false,
+            'has_type_power_consumption'  => false,
+            'has_inventory_entry_date'    => true,
+        ];
+        $this->assertEquals($expected, $result);
+        $expected = !in_array(false, $result, true);
+        $result = $history->canHistorize($monitor->getID());
+        $this->assertFalse($result);
+    }
+
+    public function testMonitorWithEmptyLocationIsNotHistorizable()
+    {
+        $history = new Monitor();
+
+        $monitor = $this->getItem(GlpiMonitor::class);
         $location = $this->getItem(Location::class);
-        $this->updateItem($computer, [
+        $computer = $this->getItem(GlpiComputer::class, [
             'locations_id' => $location->getID(),
         ]);
-        $this->assertFalse($history->canHistorize($id));
+        $computer_item = $this->getItem(Computer_Item::class, [
+            'computers_id' => $computer->getID(),
+            'itemtype'     => $monitor->getType(),
+            'items_id'     => $monitor->getID(),
+        ]);
+        $result = $history->getHistorizableDiagnosis($monitor);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_computer'                => true,
+            'has_usage_profile'           => false,
+            'has_location'                => true,
+            'has_state_or_country'        => false,
+            'has_model'                   => false,
+            'has_model_power_consumption' => false,
+            'has_type'                    => false,
+            'has_type_power_consumption'  => false,
+            'has_inventory_entry_date'    => false,
+        ];
+        $this->assertEquals($expected, $result);
+        $expected = !in_array(false, $result, true);
+        $result = $history->canHistorize($monitor->getID());
+        $this->assertFalse($result);
+    }
 
-        // Add a country to the location
-        $this->updateItem($location, [
+    public function testMonitorWithLocationWithCountryIsNotHistorizable()
+    {
+        $history = new Monitor();
+
+        $monitor = $this->getItem(GlpiMonitor::class);
+        $location = $this->getItem(Location::class, [
             'country' => 'France',
         ]);
-        $this->assertFalse($history->canHistorize($id));
+        $computer = $this->getItem(GlpiComputer::class, [
+            'locations_id' => $location->getID(),
+        ]);
+        $computer_item = $this->getItem(Computer_Item::class, [
+            'computers_id' => $computer->getID(),
+            'itemtype'     => $monitor->getType(),
+            'items_id'     => $monitor->getID(),
+        ]);
 
-        // Add a usage profile
+        $result = $history->getHistorizableDiagnosis($monitor);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_computer'                => true,
+            'has_usage_profile'           => false,
+            'has_location'                => true,
+            'has_state_or_country'        => true,
+            'has_model'                   => false,
+            'has_model_power_consumption' => false,
+            'has_type'                    => false,
+            'has_type_power_consumption'  => false,
+            'has_inventory_entry_date'    => false,
+        ];
+        $this->assertEquals($expected, $result);
+        $expected = !in_array(false, $result, true);
+        $result = $history->canHistorize($monitor->getID());
+        $this->assertFalse($result);
+    }
+
+    public function testMonitorWithLocationWithStateIsNotHistorizable()
+    {
+        $history = new Monitor();
+
+        $location = $this->getItem(Location::class, [
+            'state' => 'Quebec',
+        ]);
+        $monitor = $this->getItem(GlpiMonitor::class);
+        $computer = $this->getItem(GlpiComputer::class, [
+            'locations_id' => $location->getID(),
+        ]);
+        $computer_item = $this->getItem(Computer_Item::class, [
+            'computers_id' => $computer->getID(),
+            'itemtype'     => $monitor->getType(),
+            'items_id'     => $monitor->getID(),
+        ]);
+        $result = $history->getHistorizableDiagnosis($monitor);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_computer'                => true,
+            'has_usage_profile'           => false,
+            'has_location'                => true,
+            'has_state_or_country'        => true,
+            'has_model'                   => false,
+            'has_model_power_consumption' => false,
+            'has_type'                    => false,
+            'has_type_power_consumption'  => false,
+            'has_inventory_entry_date'    => false,
+        ];
+        $this->assertEquals($expected, $result);
+        $expected = !in_array(false, $result, true);
+        $result = $history->canHistorize($monitor->getID());
+        $this->assertFalse($result);
+    }
+
+    public function testMonitorWithUsageProfileIsNotHistorizable()
+    {
+        $history = new Monitor();
+
+        $monitor = $this->getItem(GlpiMonitor::class);
+        $computer = $this->getItem(GlpiComputer::class);
+        $computer_item = $this->getItem(Computer_Item::class, [
+            'computers_id' => $computer->getID(),
+            'itemtype'     => $monitor->getType(),
+            'items_id'     => $monitor->getID(),
+        ]);
         $usage_profile = $this->getItem(ComputerUsageProfile::class);
-        $this->assertFalse($history->canHistorize($id));
         $impact = $this->getItem(UsageInfo::class, [
             $usage_profile->getForeignKeyField() => $usage_profile->getID(),
             'itemtype' => $computer->getType(),
             'items_id' => $computer->getID(),
         ]);
-        $this->assertFalse($history->canHistorize($id));
+        $result = $history->getHistorizableDiagnosis($monitor);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_computer'                => true,
+            'has_usage_profile'           => true,
+            'has_location'                => false,
+            'has_state_or_country'        => false,
+            'has_model'                   => false,
+            'has_model_power_consumption' => false,
+            'has_type'                    => false,
+            'has_type_power_consumption'  => false,
+            'has_inventory_entry_date'    => false,
+        ];
+        $this->assertEquals($expected, $result);
+        $expected = !in_array(false, $result, true);
+        $result = $history->canHistorize($monitor->getID());
+        $this->assertFalse($result);
+    }
 
-        // Add a model
-        $model = $this->getItem(MonitorModel::class);
-        $monitor->update([
-            'id' => $id,
-            'monitormodels_id' => $model->getID(),
+    public function testMonitorWithEmptyModelIsNotHistorizable()
+    {
+        $history = new Monitor();
+
+        $glpi_monitor_model = $this->getItem(GlpiMonitorModel::class);
+        $monitor = $this->getItem(GlpiMonitor::class, [
+            'monitormodels_id' => $glpi_monitor_model->getID(),
         ]);
-        $this->assertFalse($history->canHistorize($id));
+        $result = $history->getHistorizableDiagnosis($monitor);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_computer'                => false,
+            'has_usage_profile'           => false,
+            'has_location'                => false,
+            'has_state_or_country'        => false,
+            'has_model'                   => true,
+            'has_model_power_consumption' => false,
+            'has_type'                    => false,
+            'has_type_power_consumption'  => false,
+            'has_inventory_entry_date'    => false,
+        ];
+        $this->assertEquals($expected, $result);
+        $expected = !in_array(false, $result, true);
+        $result = $history->canHistorize($monitor->getID());
+        $this->assertFalse($result);
+    }
 
-        // Add a power consumption to the model
-        $this->updateItem($model, [
+    public function testMonitorWithModelIsNotHistorizable()
+    {
+        $history = new Monitor();
+
+        $glpi_monitor_model = $this->getItem(GlpiMonitorModel::class, [
+            'power_consumption' => 35,
+        ]);
+        $monitor = $this->getItem(GlpiMonitor::class, [
+            'monitormodels_id' => $glpi_monitor_model->getID(),
+        ]);
+        $result = $history->getHistorizableDiagnosis($monitor);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_computer'                => false,
+            'has_usage_profile'           => false,
+            'has_location'                => false,
+            'has_state_or_country'        => false,
+            'has_model'                   => true,
+            'has_model_power_consumption' => true,
+            'has_type'                    => false,
+            'has_type_power_consumption'  => false,
+            'has_inventory_entry_date'    => false,
+        ];
+        $this->assertEquals($expected, $result);
+        $expected = !in_array(false, $result, true);
+        $result = $history->canHistorize($monitor->getID());
+        $this->assertFalse($result);
+    }
+
+    public function testMonitorWithEmptyTypeIsNotHistorizable()
+    {
+        $history = new Monitor();
+
+        $glpi_monitor_type = $this->getItem(GlpiMonitorType::class);
+        $monitor_type = $this->getItem(MonitorType::class, [
+            'power_consumption' => 55,
+            'monitortypes_id' => $glpi_monitor_type->getID(),
+        ]);
+        $monitor = $this->getItem(GlpiMonitor::class, [
+            'monitortypes_id' => $glpi_monitor_type->getID(),
+        ]);
+        $result = $history->getHistorizableDiagnosis($monitor);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_computer'                => false,
+            'has_usage_profile'           => false,
+            'has_location'                => false,
+            'has_state_or_country'        => false,
+            'has_model'                   => false,
+            'has_model_power_consumption' => false,
+            'has_type'                    => true,
+            'has_type_power_consumption'  => true,
+            'has_inventory_entry_date'    => false,
+        ];
+        $this->assertEquals($expected, $result);
+        $expected = !in_array(false, $result, true);
+        $result = $history->canHistorize($monitor->getID());
+        $this->assertFalse($result);
+    }
+
+    public function testMonitorWithTypeIsNotHistorizable()
+    {
+        $history = new Monitor();
+
+        $glpi_monitor_type = $this->getItem(GlpiMonitorType::class);
+        $monitor_type = $this->getItem(MonitorType::class, [
+            'monitortypes_id'   => $glpi_monitor_type->getID(),
             'power_consumption' => 55,
         ]);
-        $this->assertTrue($history->canHistorize($id));
-
-        // add a type
-        $type = $this->getItem(GlpiMonitorType::class);
-        $this->updateItem($monitor, [
-            'monitortypes_id' => $type->getID(),
+        $monitor = $this->getItem(GlpiMonitor::class, [
+            'monitortypes_id' => $glpi_monitor_type->getID(),
         ]);
-        $this->assertTrue($history->canHistorize($id));
+        $result = $history->getHistorizableDiagnosis($monitor);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_computer'                => false,
+            'has_usage_profile'           => false,
+            'has_location'                => false,
+            'has_state_or_country'        => false,
+            'has_model'                   => false,
+            'has_model_power_consumption' => false,
+            'has_type'                    => true,
+            'has_type_power_consumption'  => true,
+            'has_inventory_entry_date'    => false,
+        ];
+        $this->assertEquals($expected, $result);
+        $expected = !in_array(false, $result, true);
+        $result = $history->canHistorize($monitor->getID());
+        $this->assertFalse($result);
+    }
 
-        // Remove power consumption on model
-        $this->updateItem($model, [
-            'power_consumption' => 0,
+
+    public function testMonitorIsHistorizable()
+    {
+        $history = new Monitor();
+
+        $location = $this->getItem(Location::class, [
+            'country' => 'France',
         ]);
-        $this->assertFalse($history->canHistorize($id));
-
-        // add a type power consumption
-        $power_consumption = $this->getItem(MonitorType::class, [
-            GlpiMonitorType::getForeignKeyField() => $type->getID(),
+        $glpi_monitor_model = $this->getItem(GlpiMonitorModel::class, [
+            'power_consumption' => 35,
         ]);
-        $this->assertFalse($history->canHistorize($id));
-
-        // Set a type power consumption
-        $this->updateItem($power_consumption, [
-            'power_consumption' => 55,
+        $monitor = $this->getItem(GlpiMonitor::class, [
+            'monitormodels_id' => $glpi_monitor_model->getID(),
         ]);
-        $this->assertTrue($history->canHistorize($id));
-
-        // Add a power consumption to the model (both model and type have power consumption)
-        $this->updateItem($model, [
-            'power_consumption' => 55,
+        $computer = $this->getItem(GlpiComputer::class, [
+            'locations_id' => $location->getID(),
         ]);
-        $this->assertTrue($history->canHistorize($id));
-
-        // *** test blocking conditions ***
-
-        // Put the asset in the trash bin
-        $this->updateItem($monitor, [
-            'is_deleted' => 1,
+        $computer_item = $this->getItem(Computer_Item::class, [
+            'computers_id' => $computer->getID(),
+            'itemtype'     => $monitor->getType(),
+            'items_id'     => $monitor->getID(),
         ]);
-        $this->assertFalse($history->canHistorize($id));
-
-        // Restore the asset
-        $this->updateItem($monitor, [
-            'is_deleted' => 0,
+        $infocom = $this->getItem(Infocom::class, [
+            'itemtype'     => $monitor->getType(),
+            'items_id'     => $monitor->getID(),
+            'buy_date'     => '2024-01-01',
+        ]);
+        $usage_profile = $this->getItem(ComputerUsageProfile::class, [
+            'time_start'   => '09:00:00',
+            'time_stop'    => '18:00:00',
+            'day_1'        => '1',
+            'day_2'        => '1',
+            'day_3'        => '1',
+            'day_4'        => '1',
+            'day_5'        => '1',
+            'day_6'        => '0',
+            'day_7'        => '0',
+        ]);
+        $impact = $this->getItem(UsageInfo::class, [
+            $usage_profile->getForeignKeyField() => $usage_profile->getID(),
+            'itemtype' => $computer->getType(),
+            'items_id' => $computer->getID(),
         ]);
 
-        // Transform the asset into a template
-        $this->updateItem($monitor, [
-            'is_template' => 1,
-        ]);
-        $this->assertFalse($history->canHistorize($id));
-
-        // Restore the asset
-        $this->updateItem($monitor, [
-            'is_template' => 0,
-        ]);
-        $this->assertTrue($history->canHistorize($id));
+        $result = $history->getHistorizableDiagnosis($monitor);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_computer'                => true,
+            'has_usage_profile'           => true,
+            'has_location'                => true,
+            'has_state_or_country'        => true,
+            'has_model'                   => true,
+            'has_model_power_consumption' => true,
+            'has_type'                    => false,
+            'has_type_power_consumption'  => false,
+            'has_inventory_entry_date'    => true,
+        ];
+        $this->assertEquals($expected, $result);
+        $expected = !in_array(false, $result, true);
+        $result = $history->canHistorize($monitor->getID());
+        $this->assertTrue($result);
     }
 }
