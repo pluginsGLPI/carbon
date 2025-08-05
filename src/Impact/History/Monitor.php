@@ -42,10 +42,12 @@ use DBmysql;
 use DbUtils;
 use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\ComputerType;
+use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Engine\V1\Monitor as EngineMonitor;
 use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\UsageImpact;
+use GlpiPlugin\Carbon\UsageInfo;
 use Infocom;
 use Location;
 use Monitor as GlpiMonitor;
@@ -187,6 +189,7 @@ class Monitor extends AbstractAsset
             self::$itemtype::getTableField('is_deleted'),
             self::$itemtype::getTableField('is_template'),
             Computer_Item::getTableField('computers_id'),
+            UsageInfo::getTableField('plugin_carbon_computerusageprofiles_id'),
             Location::getTableField('id as location_id'),
             Location::getTableField('state'),
             Location::getTableField('country'),
@@ -216,14 +219,15 @@ class Monitor extends AbstractAsset
 
         // Each state is analyzed, with bool results
         // false means that data is missing or invalid for historization
-        $status['is_deleted'] = ($data['is_deleted'] === 0);
-        $status['is_template'] = ($data['is_template'] === 0);
-        $status['has_computer'] = ($data['computers_id'] !== 0);
-        $status['has_location'] = ($data['location_id'] !== 0);
+        $status['is_deleted'] = ($data['is_deleted'] === 0);   // Actually the result is whether it is "not deleted"
+        $status['is_template'] = ($data['is_template'] === 0); // Actually the result is whether it is "not template"
+        $status['has_computer'] = !GlpiComputer::isNewID($data['computers_id']);
+        $status['has_usage_profile'] = !ComputerUsageProfile::isNewID($data['plugin_carbon_computerusageprofiles_id']);
+        $status['has_location'] = !Location::isNewID($data['location_id']);
         $status['has_state_or_country'] = (strlen($data['state'] ?? '') > 0) || (strlen($data['country'] ?? '') > 0);
-        $status['has_model'] = ($data['model_id'] !== 0);
-        $status['has_model_power_consumption'] = (($data['model_power_consumption'] ?? 0) !== 0);
-        $status['has_type'] = ($data['type_id'] !== 0);
+        $status['has_model'] = !GlpiMonitorModel::isNewID($data['model_id']);
+        $status['has_model_power_consumption'] = !GlpiMonitorType::isNewID($data['model_power_consumption']);
+        $status['has_type'] = !GlpiMonitorType::isNewID($data['type_id']);
         $status['has_type_power_consumption'] = (($data['type_power_consumption'] ?? 0) !== 0);
 
         $item_oldest_date = $data['use_date']
