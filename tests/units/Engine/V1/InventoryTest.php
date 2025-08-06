@@ -54,6 +54,7 @@ class InventoryTest extends DbTestCase
 
     public function testAddItemByCrit()
     {
+        $this->login('glpi', 'glpi');
         $entities_id = $this->isolateInEntity('glpi', 'glpi');
 
         $computers = $this->getItems([
