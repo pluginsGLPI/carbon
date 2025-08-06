@@ -417,7 +417,7 @@ class CommonTestCase extends TestCase
      *
      * @return int
      */
-    protected function isolateInEntity($login, $password): int
+    protected function isolateInEntity(): int
     {
         $entity      = new Entity();
         $rand        = mt_rand();
@@ -426,7 +426,6 @@ class CommonTestCase extends TestCase
             'entities_id' => 0
         ]);
 
-        // $this->login($login, $password);
         $success = Session::changeActiveEntities($entities_id);
         $this->assertTrue($success, 'Failed to change active entity');
 
