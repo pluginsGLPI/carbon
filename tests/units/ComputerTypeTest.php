@@ -32,8 +32,10 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
+use Computer;
 use ComputerType as GlpiComputerType;
 use GlpiPlugin\Carbon\ComputerType;
+use MassiveAction;
 
 class ComputerTypeTest extends DbTestCase
 {
@@ -75,5 +77,78 @@ class ComputerTypeTest extends DbTestCase
             'computertypes_id' => $glpi_computer_type->getID(),
         ]);
         $this->assertEquals(ComputerType::CATEGORY_SERVER, $instance->fields['category']);
+    }
+
+    public function testShowMassiveActionsSubForm()
+    {
+        $massive_action = $this->getMockBuilder(MassiveAction::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $massive_action->method('getAction')->willReturn('MassUpdatePower');
+        $massive_action->method('getItems')->willReturn([
+            ComputerType::class => $this->getItem(GlpiComputerType::class)
+        ]);
+        ob_start(function ($buffer) {
+            return $buffer;
+        });
+        $result = ComputerType::showMassiveActionsSubForm($massive_action);
+        $output = ob_get_clean();
+        $this->assertStringContainsString('<input type="number" name="power_consumption" class="form-control" />', $output);
+        $this->assertStringContainsString('<button type=\'submit\' value=\'Post\' name="massiveaction" class="btn">', $output);
+        $this->assertTrue($result);
+
+        $massive_action = $this->getMockBuilder(MassiveAction::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $massive_action->method('getAction')->willReturn('MassUpdateCategory');
+        $massive_action->method('getItems')->willReturn([
+            ComputerType::class => $this->getItem(GlpiComputerType::class)
+        ]);
+        ob_start(function ($buffer) {
+            return $buffer;
+        });
+        $result = ComputerType::showMassiveActionsSubForm($massive_action);
+        $output = ob_get_clean();
+        $pattern = preg_quote('<select name=\'category\' id=\'dropdown_category');
+        $pattern .= '\d{0,10}';
+        $pattern .= preg_quote('\' class="form-select" size=\'1\'>');
+        $this->assertMatchesRegularExpression('#' . $pattern . '#', $output);
+        $this->assertStringContainsString('<button type=\'submit\' value=\'Post\' name="massiveaction" class="btn">', $output);
+        $this->assertTrue($result);
+    }
+
+    public function testProcessMassiveActionForOneItemtype()
+    {
+        // Test update power consumption
+        $massive_action = $this->getMockBuilder(MassiveAction::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $massive_action->method('getAction')->willReturn('MassUpdatePower');
+        $glpi_computer_type = $this->getItem(GlpiComputerType::class);
+        $computer_type = $this->getItem(ComputerType::class, [
+            'computertypes_id' => $glpi_computer_type->getID(),
+        ]);
+        $massive_action->POST = [
+            'power_consumption' => 55,
+        ];
+        ComputerType::processMassiveActionsForOneItemtype($massive_action, $glpi_computer_type, [$glpi_computer_type->getID()]);
+        $computer_type->getFromDB($computer_type->getID());
+        $this->assertEquals(55, $computer_type->fields['power_consumption']);
+
+        // Test update category
+        $massive_action = $this->getMockBuilder(MassiveAction::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $massive_action->method('getAction')->willReturn('MassUpdateCategory');
+        $glpi_computer_type = $this->getItem(GlpiComputerType::class);
+        $computer_type = $this->getItem(ComputerType::class, [
+            'computertypes_id' => $glpi_computer_type->getID(),
+        ]);
+        $massive_action->POST = [
+            'category' => ComputerType::CATEGORY_SERVER,
+        ];
+        ComputerType::processMassiveActionsForOneItemtype($massive_action, $glpi_computer_type, [$glpi_computer_type->getID()]);
+        $computer_type->getFromDB($computer_type->getID());
+        $this->assertEquals(ComputerType::CATEGORY_SERVER, $computer_type->fields['category']);
     }
 }
