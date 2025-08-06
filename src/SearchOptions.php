@@ -251,7 +251,7 @@ class SearchOptions
                 'name'           => __('Category', 'carbon'),
                 'datatype'       => 'specific',
                 'searchtype'     => ['equals', 'notequals'],
-                'massive_action' => false,
+                'massiveaction'  => false,
                 'joinparams'     => [
                     'jointype'   => 'child'
                 ]
