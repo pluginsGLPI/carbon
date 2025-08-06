@@ -53,7 +53,7 @@ use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\UsageInfo;
 
 /**
- * @covers \GlpiPlugin\Carbon\Impact\History\NetworkEquipment
+ * @covers \GlpiPlugin\Carbon\Impact\History\Monitor
  */
 class MonitorTest extends CommonAsset
 {
