@@ -74,27 +74,6 @@ class CarbonIntensity extends CommonDropdown
         return 'fa-solid fa-solar-panel';
     }
 
-    // public static function getMenuContent()
-    // {
-    //     $menu = [];
-
-    //     if (self::canView()) {
-    //         $menu = [
-    //             'title' => self::getTypeName(0),
-    //             'shortcut' => self::getMenuShorcut(),
-    //             'page' => self::getSearchURL(false),
-    //             'icon' => self::getIcon(),
-    //             'lists_itemtype' => self::getType(),
-    //             'links' => [
-    //                 'search' => self::getSearchURL(),
-    //                 'lists' => '',
-    //             ]
-    //         ];
-    //     }
-
-    //     return $menu;
-    // }
-
     public function rawSearchOptions()
     {
         $tab = parent::rawSearchOptions();
@@ -145,6 +124,41 @@ class CarbonIntensity extends CommonDropdown
         return $tab;
     }
 
+    /**
+     * get carbon intensity dates for a source and a zone
+     *
+     * @param string $zone_name   Zone to examinate
+     * @param string $source_name Source to examinate
+     * @return array
+     */
+    private function getKnownDatesQuery(string $zone_name, string $source_name)
+    {
+        $intensity_table = CarbonIntensity::getTable();
+        $source_table = CarbonIntensitySource::getTable();
+        $zone_table   = Zone::getTable();
+        return [
+            'SELECT' => [$intensity_table => ['id', 'date']],
+            'FROM'   => $intensity_table,
+            'INNER JOIN' => [
+                $source_table => [
+                    'FKEY' => [
+                        $intensity_table => CarbonIntensitySource::getForeignKeyField(),
+                        $source_table => 'id',
+                    ]
+                ],
+                $zone_table => [
+                    'FKEY' => [
+                        $intensity_table => Zone::getForeignKeyField(),
+                        $zone_table => 'id',
+                    ]
+                ]
+            ],
+            'WHERE' => [
+                CarbonIntensitySource::getTableField('name') => $source_name,
+                Zone::getTableField('name') => $zone_name
+            ],
+        ];
+    }
 
     /**
      * Get the last known date of carbon emissiosn
@@ -158,34 +172,10 @@ class CarbonIntensity extends CommonDropdown
         /** @var DBmysql $DB */
         global $DB;
 
-        $intensity_table = CarbonIntensity::getTable();
-        $source_table = CarbonIntensitySource::getTable();
-        $zone_table   = Zone::getTable();
-
-        $result = $DB->request([
-            'SELECT' => [$intensity_table => ['id', 'date']],
-            'FROM'   => $intensity_table,
-            'INNER JOIN' => [
-                $source_table => [
-                    'FKEY' => [
-                        $intensity_table => 'plugin_carbon_carbonintensitysources_id',
-                        $source_table => 'id',
-                    ]
-                ],
-                $zone_table => [
-                    'FKEY' => [
-                        $intensity_table => 'plugin_carbon_zones_id',
-                        $zone_table => 'id',
-                    ]
-                ]
-            ],
-            'WHERE' => [
-                CarbonIntensitySource::getTableField('name') => $source_name,
-                Zone::getTableField('name') => $zone_name
-            ],
-            'ORDER' => CarbonIntensity::getTableField('date') . ' DESC',
-            'LIMIT' => '1'
-        ])->current();
+        $request = $this->getKnownDatesQuery($zone_name, $source_name);
+        $request['ORDER'] = CarbonIntensity::getTableField('date') . ' DESC';
+        $request['LIMIT'] = '1';
+        $result = $DB->request($request)->current();
         if ($result === null) {
             return null;
         }
@@ -204,34 +194,11 @@ class CarbonIntensity extends CommonDropdown
         /** @var DBmysql $DB */
         global $DB;
 
-        $intensity_table = CarbonIntensity::getTable();
-        $source_table = CarbonIntensitySource::getTable();
-        $zone_table   = Zone::getTable();
+        $request = $this->getKnownDatesQuery($zone_name, $source_name);
+        $request['ORDER'] = CarbonIntensity::getTableField('date') . ' ASC';
+        $request['LIMIT'] = '1';
+        $result = $DB->request($request)->current();
 
-        $result = $DB->request([
-            'SELECT' => CarbonIntensity::getTableField('date'),
-            'FROM'   => $intensity_table,
-            'INNER JOIN' => [
-                $source_table => [
-                    'FKEY' => [
-                        $intensity_table => 'plugin_carbon_carbonintensitysources_id',
-                        $source_table => 'id',
-                    ]
-                ],
-                $zone_table => [
-                    'FKEY' => [
-                        $intensity_table => 'plugin_carbon_zones_id',
-                        $zone_table => 'id',
-                    ]
-                ]
-            ],
-            'WHERE' => [
-                CarbonIntensitySource::getTableField('name') => $source_name,
-                Zone::getTableField('name') => $zone_name
-            ],
-            'ORDER' => CarbonIntensity::getTableField('date') . ' ASC',
-            'LIMIT' => '1'
-        ])->current();
         if ($result === null) {
             return null;
         }
@@ -287,7 +254,6 @@ class CarbonIntensity extends CommonDropdown
             $gap_end = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $gap['end']);
             $count = $data_source->fullDownload($zone_name, $gap_start, $gap_end, $this, $limit, $progress_bar);
             $total_count += $count;
-            $limit -= $count;
             if ($total_count >= $limit) {
                 return $total_count;
             }
@@ -299,7 +265,7 @@ class CarbonIntensity extends CommonDropdown
             $incremental = ($start_date >= $first_known_intensity_date);
         }
         if ($first_known_intensity_date !== null && $first_known_intensity_date <= $data_source->getHardStartDate()) {
-            // Cannot download older data, then switch to incremetal mode
+            // Cannot download older data than absolute start date of the source, then switch to incremetal mode
             $incremental = true;
         }
         if ($incremental) {
@@ -310,18 +276,24 @@ class CarbonIntensity extends CommonDropdown
             return $total_count;
         }
 
-        $stop_date  = $this->getDownloadStopDate($zone_name, $data_source);
-        $count = $data_source->fullDownload($zone_name, $start_date, $stop_date, $this, $limit);
-        $total_count += $count;
         return $total_count;
     }
 
+    /**
+     * Get the oldest date where data are required
+     *
+     * @param string                   $zone_name   ignored for now; zone to examine
+     * @param CarbonIntensityInterface $data_source ignored for now; data source
+     * @return DateTimeImmutable|null
+     */
     public function getDownloadStartDate(string $zone_name, CarbonIntensityInterface $data_source): ?DateTimeImmutable
     {
+        // Get the default oldest date od data to download
         $start_date = new DateTime(self::MIN_HISTORY_LENGTH);
         $start_date->setTime(0, 0, 0);
         $start_date = DateTimeImmutable::createFromMutable($start_date);
 
+        // Get the oldest date between the oldest asset in the inventory and the previous one
         $toolbox = new Toolbox();
         $oldest_asset_date = $toolbox->getOldestAssetDate();
         if ($oldest_asset_date !== null) {
@@ -330,6 +302,14 @@ class CarbonIntensity extends CommonDropdown
 
         return $start_date;
     }
+
+    /**
+     * Get date where data download shall end, excluding the incremental download mode for the specified data source
+     *
+     * @param string                   $zone_name   zone to examine
+     * @param CarbonIntensityInterface $data_source data source
+     * @return DateTimeImmutable
+     */
     public function getDownloadStopDate(string $zone_name, CarbonIntensityInterface $data_source): DateTimeImmutable
     {
         $stop_date = $data_source->getMaxIncrementalAge();
