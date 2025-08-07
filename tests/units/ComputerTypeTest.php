@@ -39,6 +39,11 @@ use MassiveAction;
 
 class ComputerTypeTest extends DbTestCase
 {
+    /**
+     * @covers GlpiPlugin\Carbon\ComputerType::updatePowerConsumption
+     *
+     * @return void
+     */
     public function testUpdatePowerConsumption()
     {
         $glpi_computer_type = $this->getItem(GlpiComputerType::class);
@@ -59,6 +64,11 @@ class ComputerTypeTest extends DbTestCase
         $this->assertEquals(42, $instance->fields['power_consumption']);
     }
 
+    /**
+     * @covers GlpiPlugin\Carbon\ComputerType::updateCategory
+     *
+     * @return void
+     */
     public function testUpdateCategory()
     {
         $glpi_computer_type = $this->getItem(GlpiComputerType::class);
@@ -81,6 +91,7 @@ class ComputerTypeTest extends DbTestCase
 
     public function testShowMassiveActionsSubForm()
     {
+        // Test power consumption update form
         $massive_action = $this->getMockBuilder(MassiveAction::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -97,6 +108,7 @@ class ComputerTypeTest extends DbTestCase
         $this->assertStringContainsString('<button type=\'submit\' value=\'Post\' name="massiveaction" class="btn">', $output);
         $this->assertTrue($result);
 
+        // Test category update form
         $massive_action = $this->getMockBuilder(MassiveAction::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -115,25 +127,52 @@ class ComputerTypeTest extends DbTestCase
         $this->assertMatchesRegularExpression('#' . $pattern . '#', $output);
         $this->assertStringContainsString('<button type=\'submit\' value=\'Post\' name="massiveaction" class="btn">', $output);
         $this->assertTrue($result);
+
+        // Test invalid action
+        $massive_action = $this->getMockBuilder(MassiveAction::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $massive_action->method('getAction')->willReturn('');
+        $massive_action->method('getItems')->willReturn([
+            ComputerType::class => $this->getItem(GlpiComputerType::class)
+        ]);
+        ob_start(function ($buffer) {
+            return $buffer;
+        });
+        $result = ComputerType::showMassiveActionsSubForm($massive_action);
+        $output = ob_get_clean();
+        $this->assertEquals('', $output);
+        $this->assertFalse($result);
     }
 
+    /**
+     * @covers GlpiPlugin\Carbon\ComputerType::processMassiveActionsForOneItemtype
+     *
+     * @return void
+     */
     public function testProcessMassiveActionForOneItemtype()
     {
-        // Test update power consumption
+        // Test create power consumption
         $massive_action = $this->getMockBuilder(MassiveAction::class)
             ->disableOriginalConstructor()
             ->getMock();
         $massive_action->method('getAction')->willReturn('MassUpdatePower');
         $glpi_computer_type = $this->getItem(GlpiComputerType::class);
-        $computer_type = $this->getItem(ComputerType::class, [
-            'computertypes_id' => $glpi_computer_type->getID(),
-        ]);
         $massive_action->POST = [
             'power_consumption' => 55,
         ];
         ComputerType::processMassiveActionsForOneItemtype($massive_action, $glpi_computer_type, [$glpi_computer_type->getID()]);
-        $computer_type->getFromDB($computer_type->getID());
+        $computer_type = new ComputerType();
+        $computer_type->getFromDBByCrit(['computertypes_id' => $glpi_computer_type->getID()]);
         $this->assertEquals(55, $computer_type->fields['power_consumption']);
+
+        // Test update power consumption
+        $massive_action->POST = [
+            'power_consumption' => 25,
+        ];
+        ComputerType::processMassiveActionsForOneItemtype($massive_action, $glpi_computer_type, [$glpi_computer_type->getID()]);
+        $computer_type->getFromDB($computer_type->getID());
+        $this->assertEquals(25, $computer_type->fields['power_consumption']);
 
         // Test update category
         $massive_action = $this->getMockBuilder(MassiveAction::class)
@@ -141,14 +180,34 @@ class ComputerTypeTest extends DbTestCase
             ->getMock();
         $massive_action->method('getAction')->willReturn('MassUpdateCategory');
         $glpi_computer_type = $this->getItem(GlpiComputerType::class);
-        $computer_type = $this->getItem(ComputerType::class, [
-            'computertypes_id' => $glpi_computer_type->getID(),
-        ]);
         $massive_action->POST = [
             'category' => ComputerType::CATEGORY_SERVER,
         ];
         ComputerType::processMassiveActionsForOneItemtype($massive_action, $glpi_computer_type, [$glpi_computer_type->getID()]);
-        $computer_type->getFromDB($computer_type->getID());
+        $computer_type->getFromDBByCrit(['computertypes_id' => $glpi_computer_type->getID()]);
         $this->assertEquals(ComputerType::CATEGORY_SERVER, $computer_type->fields['category']);
+
+        $massive_action->POST = [
+            'category' => ComputerType::CATEGORY_TABLET,
+        ];
+        ComputerType::processMassiveActionsForOneItemtype($massive_action, $glpi_computer_type, [$glpi_computer_type->getID()]);
+        $computer_type->getFromDB($computer_type->getID());
+        $this->assertEquals(ComputerType::CATEGORY_TABLET, $computer_type->fields['category']);
+    }
+
+    public function testGetSpecificValueToDisplay()
+    {
+        $result = ComputerType::getSpecificValueToDisplay('category', ['category' => null]);
+        $this->assertEquals('', $result);
+
+        $result = ComputerType::getSpecificValueToDisplay('category', ['category' => ComputerType::CATEGORY_SMARTPHONE]);
+        $this->assertEquals('Smartphone', $result);
+    }
+
+    public function testGetSpecificValueToSelect()
+    {
+        $result = ComputerType::getSpecificValueToSelect('', 'category', ComputerType::CATEGORY_LAPTOP);
+        $this->stringStartsWith('<select ', $result);
+        $this->stringContains('name=\'category\'', $result);
     }
 }
