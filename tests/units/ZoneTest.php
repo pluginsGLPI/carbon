@@ -158,6 +158,11 @@ class ZoneTest extends DbTestCase
         $zone = new Zone();
         $this->assertFalse($zone->hasHistoricalData());
 
+        // Test with a Zone object without the field
+        $zone = $this->getItem(Zone::class);
+        unset($zone->fields['plugin_carbon_carbonintensitysources_id_historical']);
+        $this->assertFalse($zone->hasHistoricalData());
+
         // Test with a Zone object that has no historical data
         /** @var Zone $zone */
         $zone = $this->getItem(Zone::class);
