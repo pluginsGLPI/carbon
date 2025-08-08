@@ -189,23 +189,6 @@ class Config extends GlpiConfig
     }
 
     /**
-     * Get the namespace of the active usage impact engine
-     *
-     * @return string
-     */
-    public static function getGwpUsageImpactEngine(): string
-    {
-        $default_engine = 'Boavizta';
-        $engine = GlpiConfig::getConfigurationValue('plugin:carbon', 'impact_engines');
-        if ($engine === null || $engine === '') {
-            GlpiConfig::setConfigurationValues('plugin:carbon', ['impact_engines' => $default_engine]);
-            $engine = $default_engine;
-        }
-
-        return __NAMESPACE__ . '\\Impact\\History\\' . $engine;
-    }
-
-    /**
      * Get demo mode status
      *
      * @return boolean true if demo mode enabled
