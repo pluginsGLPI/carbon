@@ -52,7 +52,7 @@ $source_id = Install::getOrCreateSource('Ember - Energy Institute', 1);
 
 if ($handle = fopen($data_source, 'r')) {
     $line_number = 0;
-    while (($line = fgetcsv($handle, 255, ',')) !== false) {
+    while (($line = fgetcsv($handle, 255, ',', '"', '\\')) !== false) {
         $line_number++;
         if ($line_number === 1 || count($line) < 4) {
             continue; // Skip header or  lines with insufficient data
