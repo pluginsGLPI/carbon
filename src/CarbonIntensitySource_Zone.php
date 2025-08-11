@@ -159,7 +159,10 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
         }
 
         $renderer = TemplateRenderer::getInstance();
-        $renderer->getEnvironment()->addExtension(new DataHelpersExtension());
+        $extensions = $renderer->getEnvironment()->getExtensions();
+        if (!isset($extensions[DataHelpersExtension::class])) {
+            $renderer->getEnvironment()->addExtension(new DataHelpersExtension());
+        }
         $renderer->display('@carbon/pages/CarbonIntensitySource/tab_zone.html.twig', [
             'is_tab' => true,
             'nopager' => true,
@@ -255,7 +258,10 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
         }
 
         $renderer = TemplateRenderer::getInstance();
-        $renderer->getEnvironment()->addExtension(new DataHelpersExtension());
+        $extensions = $renderer->getEnvironment()->getExtensions();
+        if (!isset($extensions[DataHelpersExtension::class])) {
+            $renderer->getEnvironment()->addExtension(new DataHelpersExtension());
+        }
         $renderer->display('@carbon/components/datatable.html.twig', [
             'is_tab' => true,
             'nopager' => true,
