@@ -83,6 +83,7 @@ class CommonTestCase extends TestCase
 
     protected function setUp(): void
     {
+        $this->setupGLPIFramework();
         $this->resetGLPILogs();
     }
 
@@ -113,6 +114,7 @@ class CommonTestCase extends TestCase
         global $LOADED_PLUGINS, $AJAX_INCLUDE, $PLUGINS_INCLUDED;
 
         if (session_status() == PHP_SESSION_ACTIVE) {
+            Session::destroy();
             session_write_close();
         }
         unset($LOADED_PLUGINS);
@@ -128,7 +130,7 @@ class CommonTestCase extends TestCase
         if (session_status() == PHP_SESSION_ACTIVE) {
             session_write_close();
         }
-        session_start();
+        Session::start();
         $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
     }
 
@@ -140,7 +142,7 @@ class CommonTestCase extends TestCase
         $result = $auth->login($name, $password, $noauto);
         $this->restoreDebug();
         $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
-        $this->setupGLPIFramework();
+        // $this->setupGLPIFramework();
 
         return $result;
     }
