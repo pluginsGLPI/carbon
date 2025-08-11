@@ -43,6 +43,11 @@ use Location;
 
 class ToolboxTest extends DbTestCase
 {
+    /**
+     * @covers GlpiPlugin\Carbon\Toolbox::getOldestAssetDate
+     *
+     * @return void
+     */
     public function testGetOldestAssetDate()
     {
         $toolbox = new Toolbox();
@@ -81,6 +86,11 @@ class ToolboxTest extends DbTestCase
         $this->assertEquals($expected, $output);
     }
 
+    /**
+     * @covers GlpiPlugin\Carbon\Toolbox::getLatestAssetDate
+     *
+     * @return void
+     */
     public function testGetLatestAssetDate()
     {
         $toolbox = new Toolbox();
@@ -104,6 +114,11 @@ class ToolboxTest extends DbTestCase
         $this->assertEquals($expected, $output);
     }
 
+    /**
+     * @covers GlpiPlugin\Carbon\Toolbox::getDefaultCarbonIntensityDownloadDate
+     *
+     * @return void
+     */
     public function testGetDefaultCarbonIntensityDownloadDate()
     {
         $instance = new Toolbox();
@@ -115,6 +130,11 @@ class ToolboxTest extends DbTestCase
         $this->assertEquals($expected, $output);
     }
 
+    /**
+     * @covers GlpiPlugin\Carbon\Toolbox::yearToLastMonth
+     *
+     * @return void
+     */
     public function testYearToLastMonth()
     {
         $end = new DateTimeImmutable('2023-04-09 13:45:17');
@@ -136,6 +156,11 @@ class ToolboxTest extends DbTestCase
         $this->assertEquals($expected, $output);
     }
 
+    /**
+     * @covers GlpiPlugin\Carbon\Toolbox::isLocationExistForZone
+     *
+     * @return void
+     */
     public function testIsLocationExistsForZone()
     {
         $output = Toolbox::isLocationExistForZone('foo');
@@ -151,6 +176,11 @@ class ToolboxTest extends DbTestCase
         $this->assertTrue($output);
     }
 
+    /**
+     * @covers GlpiPlugin\Carbon\Toolbox::getGwpUsageImpactClasses
+     *
+     * @return void
+     */
     public function testGetGwpUsageImpactClasses()
     {
         $output = Toolbox::getGwpUsageImpactClasses();
@@ -162,6 +192,11 @@ class ToolboxTest extends DbTestCase
         ], $output);
     }
 
+    /**
+     * @covers GlpiPlugin\Carbon\Toolbox::getUsageImpactClasses
+     *
+     * @return void
+     */
     public function testGetUsageImpactClasses()
     {
         $output = Toolbox::getUsageImpactClasses();
@@ -173,6 +208,11 @@ class ToolboxTest extends DbTestCase
         ], $output);
     }
 
+    /**
+     * @covers GlpiPlugin\Carbon\Toolbox::getEmbodiedImpactClasses
+     *
+     * @return void
+     */
     public function testGetEmbodiedImpactClasses()
     {
         $output = Toolbox::getEmbodiedImpactClasses();
