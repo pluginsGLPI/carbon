@@ -222,13 +222,13 @@ class Computer extends AbstractAsset
         // false means that data is missing or invalid for historization
         $status['is_deleted'] = ($data['is_deleted'] === 0);
         $status['is_template'] = ($data['is_template'] === 0);
-        $status['has_location'] = ($data['location_id'] !== 0);
+        $status['has_location'] = !Location::isNewID($data['location_id']);
         $status['has_state_or_country'] = (strlen($data['state'] ?? '') > 0) || (strlen($data['country'] ?? '') > 0);
-        $status['has_model'] = ($data['model_id'] !== 0);
+        $status['has_model'] = !GlpiComputerModel::isNewID($data['model_id']);
         $status['has_model_power_consumption'] = (($data['model_power_consumption'] ?? 0) !== 0);
-        $status['has_type'] = ($data['type_id'] !== 0);
+        $status['has_type'] = !GlpiComputerType::isNewID($data['type_id']);
         $status['has_type_power_consumption'] = (($data['type_power_consumption'] ?? 0) !== 0);
-        $status['has_usage_profile'] = ($data['plugin_carbon_computerusageprofiles_id'] !== 0);
+        $status['has_usage_profile'] = !ComputerUsageProfile::isNewID($data['plugin_carbon_computerusageprofiles_id']);
         $status['has_category'] = (($data['category'] ?? 0) !== ComputerType::CATEGORY_UNDEFINED);
 
         $item_oldest_date = $data['use_date']

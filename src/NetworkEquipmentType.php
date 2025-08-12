@@ -85,7 +85,7 @@ class NetworkEquipmentType extends AbstractType
     {
         $monitor_type = new NetworkEquipmentType();
         $core_monitor_type_id = $item->getID();
-        $id = $monitor_type->getFromDBByCrit([
+        $monitor_type->getFromDBByCrit([
             'networkequipmenttypes_id' => $core_monitor_type_id,
         ]);
         if ($monitor_type->isNewItem()) {
@@ -96,7 +96,7 @@ class NetworkEquipmentType extends AbstractType
             return !$monitor_type->isNewId($id);
         } else {
             return $monitor_type->update([
-                'id'                => $id,
+                'id'                => $monitor_type->getID(),
                 'power_consumption' => $power,
             ]);
         }
