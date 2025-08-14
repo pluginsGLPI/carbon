@@ -194,7 +194,6 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
             // enpty string in PHPUnit environment
             $memory_limit = null;
         }
-        $timezone = $DB->guessTimezone();
         foreach ($gaps as $gap) {
             // $date_cursor = DateTime::createFromFormat('U', $gap['start']);
             // $date_cursor->setTimezone(new DateTimeZone($timezone));
