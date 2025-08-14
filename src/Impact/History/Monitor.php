@@ -78,7 +78,6 @@ class Monitor extends AbstractAsset
         $glpi_monitor_types_fk = GlpiMonitorType::getForeignKeyField();
         $monitor_types_table = MonitorType::getTable();
         $infocom_table = Infocom::getTable();
-        $location_table = Location::getTable();
 
         $request = (new Computer())->getEvaluableQuery();
         $computer_inner_joins = $request['INNER JOIN'];

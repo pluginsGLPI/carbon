@@ -793,7 +793,6 @@ class Widget extends GlpiDashboardWidget
 
         $label_color = '#626976';
         $fg_color = GlpiToolbox::getFgColor($p['color']);
-        $icon_color = '#156252';
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/usage-carbon-emission-last-year.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
@@ -835,7 +834,6 @@ class Widget extends GlpiDashboardWidget
 
         $label_color = '#626976';
         $fg_color = GlpiToolbox::getFgColor($p['color']);
-        $icon_color = '#156252';
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/embodied-carbon-emission.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
@@ -872,7 +870,6 @@ class Widget extends GlpiDashboardWidget
 
         $label_color = '#626976';
         $fg_color = GlpiToolbox::getFgColor($p['color']);
-        $icon_color = '#156252';
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/embodied-abiotic-depletion.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
@@ -909,7 +906,6 @@ class Widget extends GlpiDashboardWidget
         ]);
 
         $label_color = '#626976';
-        $icon_color = '#156252';
         $fg_color = GlpiToolbox::getFgColor($p['color']);
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/usage-abiotic-depletion.html.twig', [
             'id' => $p['id'],

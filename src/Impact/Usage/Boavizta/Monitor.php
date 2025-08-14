@@ -95,7 +95,6 @@ class Monitor extends AbstractAsset
         $item_glpi_type_table  = $dbutil->getTableForItemType(static::$type_itemtype);
         $item_model_table = $dbutil->getTableForItemType(static::$model_itemtype);
 
-        $model_power = static::$model_itemtype::getTableField('power_consumption');
         $request = [
             'SELECT' => new QueryExpression('COALESCE() as `power`'),
             'FROM' => $item_table,
