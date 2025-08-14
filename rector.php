@@ -33,6 +33,7 @@
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 use Rector\CodeQuality\Rector as CodeQuality;
 use Rector\Config\RectorConfig;
+use Rector\DeadCode\Rector as DeadCode;
 use Rector\ValueObject\PhpVersion;
 
 return RectorConfig::configure()
@@ -93,5 +94,6 @@ return RectorConfig::configure()
         CodeQuality\LogicalAnd\LogicalToBooleanRector::class,
         CodeQuality\NotEqual\CommonNotEqualRector::class,
         CodeQuality\Ternary\UnnecessaryTernaryExpressionRector::class,
+        DeadCode\Assign\RemoveUnusedVariableAssignRector::class,
     ])
 ;
