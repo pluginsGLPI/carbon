@@ -449,9 +449,9 @@ class Provider
             ],
             'reset'    => 'reset'
         ];
-        $itemtype_table = (new DbUtils())->getTableForItemType($itemtype);
+        // $itemtype_table = (new DbUtils())->getTableForItemType($itemtype);
         // Exploit defaultWhere to inject WHERE criterias from dashboard filters
-        $filter_criteria = self::getFiltersCriteria($itemtype_table, $params['apply_filters'] ?? []);
+        // $filter_criteria = self::getFiltersCriteria($itemtype_table, $params['apply_filters'] ?? []);
         $search_data = Search::prepareDatasForSearch($itemtype, $search_criteria);
         Search::constructSQL($search_data);
         Search::constructData($search_data, true);

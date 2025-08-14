@@ -179,7 +179,7 @@ class CreateTestInventoryCommand extends Command
     private function getComputerType(string $type_name, int $power): CommonDBTM
     {
         $glpi_computer_type = $this->createItemIfNotExist(GlpiComputerType::class, ['name' => $type_name]);
-        $computer_type = $this->createItemIfNotExist(
+        $this->createItemIfNotExist(
             ComputerType::class,
             [
                 GlpiComputerType::getForeignKeyField() => $glpi_computer_type->getID(),
@@ -206,7 +206,7 @@ class CreateTestInventoryCommand extends Command
             'id' => $glpi_computer->getID(),
             'date_creation' => '2021-01-01 00:00:00',
         ]);
-        $impact = $this->createItemIfNotExist(
+        $this->createItemIfNotExist(
             UsageInfo::class,
             [
                 GlpiComputer::getForeignKeyField() => $glpi_computer->getId(),
