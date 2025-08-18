@@ -43,6 +43,7 @@ use GlpiPlugin\Carbon\CarbonIntensity;
 use MonitorType as GlpiMonitorType;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
 use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
+use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
@@ -318,4 +319,29 @@ function plugin_carbon_profileAdd(CommonDBTM $item)
 function plugin_carbon_profileUpdate(CommonDBTM $item)
 {
     plugin_carbon_profileAdd($item);
+}
+
+function plugin_carbon_locationAdd(CommonDBTM $item)
+{
+    $location = new Location();
+    $location->onGlpiLocationAdd($item, Config::getGeocoder());
+}
+
+
+function plugin_carbon_locationPreUpdate(CommonDBTM $item)
+{
+    $location = new Location();
+    $location->onGlpiLocationPreUpdate($item, Config::getGeocoder());
+}
+
+function plugin_carbon_locationUpdate(CommonDBTM $item)
+{
+    $location = new Location();
+    $location->onGlpiLocationUpdate($item);
+}
+
+function plugin_carbon_locationPrePurge(CommonDBTM $item)
+{
+    $location = new Location();
+    $location->onGlpiLocationPrePurge($item);
 }
