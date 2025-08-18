@@ -34,6 +34,7 @@ namespace GlpiPlugin\Carbon\Tests;
 
 use GlpiPlugin\Carbon\Config;
 use Config as GlpiConfig;
+use Geocoder\Geocoder;
 use GlpiPlugin\Carbon\DataSource\LCA\Boavizta;
 use RuleCriteria;
 
@@ -162,5 +163,16 @@ class ConfigTest extends DbTestCase
             'name'    => 'demo',
         ]);
         $this->assertTrue($config->isNewItem());
+    }
+
+    /**
+     * @covers GlpiPlugin\Carbon\Config::getGeocoder
+     *
+     * @return void
+     */
+    public function testGetGeocoder()
+    {
+        $result = Config::getGeocoder();
+        $this->assertInstanceOf(Geocoder::class, $result);
     }
 }
