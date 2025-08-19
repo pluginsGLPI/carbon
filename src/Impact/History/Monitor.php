@@ -78,7 +78,6 @@ class Monitor extends AbstractAsset
         $glpi_monitor_types_fk = GlpiMonitorType::getForeignKeyField();
         $monitor_types_table = MonitorType::getTable();
         $infocom_table = Infocom::getTable();
-        $location_table = Location::getTable();
 
         $request = (new Computer())->getEvaluableQuery();
         $computer_inner_joins = $request['INNER JOIN'];
@@ -204,7 +203,7 @@ class Monitor extends AbstractAsset
         ];
         // Change inner joins into left joins to identify missing data
         // Warning : the order of the array merge below is important or the resulting SQL query will fail
-        $request['LEFT JOIN'] = $request['LEFT JOIN'] + $request['INNER JOIN'];
+        $request['LEFT JOIN'] += $request['INNER JOIN'];
         unset($request['INNER JOIN']);
         // remove where criterias
         unset($request['WHERE']);

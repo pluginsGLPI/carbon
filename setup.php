@@ -115,10 +115,10 @@ function plugin_carbon_setupHooks()
     $PLUGIN_HOOKS[Hooks::POST_ITEM_FORM]['carbon'] = 'plugin_carbon_postItemForm';
 
     // Actions taken on locations events
-    $PLUGIN_HOOKS[Hooks::ITEM_ADD]['carbon'][GlpiLocation::class] = [Location::class, 'onGlpiLocationAdd'];
-    $PLUGIN_HOOKS[Hooks::PRE_ITEM_UPDATE]['carbon'][GlpiLocation::class] = [Location::class, 'onGlpiLocationPreUpdate'];
-    $PLUGIN_HOOKS[Hooks::ITEM_UPDATE]['carbon'][GlpiLocation::class] = [Location::class, 'onGlpiLocationUpdate'];
-    $PLUGIN_HOOKS[Hooks::PRE_ITEM_PURGE]['carbon'][GlpiLocation::class] = [Location::class, 'onGlpiLocationPrePurge'];
+    $PLUGIN_HOOKS[Hooks::ITEM_ADD]['carbon'][GlpiLocation::class] = 'plugin_carbon_locationAdd';
+    $PLUGIN_HOOKS[Hooks::PRE_ITEM_UPDATE]['carbon'][GlpiLocation::class] = 'plugin_carbon_locationPreUpdate';
+    $PLUGIN_HOOKS[Hooks::ITEM_UPDATE]['carbon'][GlpiLocation::class] = 'plugin_carbon_locationUpdate';
+    $PLUGIN_HOOKS[Hooks::PRE_ITEM_PURGE]['carbon'][GlpiLocation::class] = 'plugin_carbon_locationPrePurge';
     // Updating profile rights impacts data for itemtype ProfileRight, then we must use PRE_ITEM_* hooks
     $PLUGIN_HOOKS[Hooks::PRE_ITEM_UPDATE]['carbon'][GlpiProfile::class] = 'plugin_carbon_profileUpdate';
     $PLUGIN_HOOKS[Hooks::PRE_ITEM_ADD]['carbon'][GlpiProfile::class] = 'plugin_carbon_profileAdd';

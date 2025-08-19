@@ -267,11 +267,12 @@ class CronTask
 
         $solved = 0;
         $failure = false;
-        foreach ($result as $glpi_location) {
-            $location = GlpiLocation::getById($glpi_location['id']);
+        foreach ($result as $row) {
+            $glpi_location = GlpiLocation::getById($row['id']);
             // Get the country code from the location
             try {
-                $country_code = Location::getCountryCode($location, $geocoder);
+                $location = new Location();
+                $country_code = $location->getCountryCode($glpi_location, $geocoder);
             } catch (\Geocoder\Exception\QuotaExceeded $e) {
                 // If the quota is exceeded, stop the task
                 break;
@@ -287,8 +288,8 @@ class CronTask
             }
 
             // Set the country code in the location
-            $success = $location->update([
-                'id'             => $location->getID(),
+            $success = $glpi_location->update([
+                'id'             => $glpi_location->getID(),
                 '_boavizta_zone' => $country_code
             ]);
             if (!$success) {

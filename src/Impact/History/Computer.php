@@ -202,10 +202,8 @@ class Computer extends AbstractAsset
             self::$itemtype::getTableField('date_creation'),
             self::$itemtype::getTableField('date_mod'),
         ];
-        $infocom_table = Infocom::getTable();
-        $item_table = self::$itemtype::getTable();
         // Change inner joins into left joins to identify missing data
-        $request['LEFT JOIN'] = $request['LEFT JOIN'] + $request['INNER JOIN'];
+        $request['LEFT JOIN'] += $request['INNER JOIN'];
         unset($request['INNER JOIN']);
         // remove where criterias
         unset($request['WHERE']);
