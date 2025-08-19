@@ -39,6 +39,56 @@ use Symfony\Component\DomCrawler\Crawler;
 
 class MonitorTypeTest extends DbTestCase
 {
+    public function testGetTabNameForItem()
+    {
+        $glpi_monitor_type = $this->getItem(GlpiMonitorType::class);
+        $instance = new MonitorType();
+        $result = $instance->getTabNameForItem($glpi_monitor_type);
+        $this->assertEquals('Carbon', $result);
+
+        $result = $instance->getTabNameForItem($glpi_monitor_type, 1);
+        $this->assertEquals('', $result);
+    }
+
+    /**
+     * @covers GlpiPlugin\Carbon\AbstractType::getOrCreate
+     *
+     * @return void
+     */
+    public function testGetOrCreate()
+    {
+        $computer_type = $this->getItem(GlpiMonitorType::class, ['name' => 'Test Computer Type']);
+        $instance = new MonitorType();
+        $this->callPrivateMethod($instance, 'getOrCreate', $computer_type);
+        $this->assertFalse($instance->isNewItem());
+    }
+
+    /**
+     * @covers GlpiPlugin\Carbon\AbstractType::showForItemType
+     *
+     * @return void
+     */
+    public function testShowForItemType()
+    {
+        $glpi_monitor_type = $this->getItem(GlpiMonitorType::class);
+        $monitor_type = $this->getItem(MonitorType::class, [
+            'monitortypes_id' => $glpi_monitor_type->getID(),
+        ]);
+        $this->login('glpi', 'glpi');
+        ob_start(function ($buffer) {
+            return $buffer;
+        });
+        $monitor_type->showForItemType($glpi_monitor_type);
+        $output = ob_get_clean();
+        $crawler = new Crawler($output);
+        $power = $crawler->filter('input[name="power_consumption"]');
+        $this->assertEquals(1, $power->count());
+        $power->each(function (Crawler $node) {
+            $this->assertEquals(0, $node->attr('value'));
+            $this->assertEquals('number', $node->attr('type'));
+        });
+    }
+
     /**
      * @covers GlpiPlugin\Carbon\MonitorType::updatePowerConsumption
      *
