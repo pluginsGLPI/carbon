@@ -35,6 +35,7 @@ namespace GlpiPlugin\Carbon\Tests;
 use GlpiPlugin\Carbon\MonitorType;
 use MassiveAction;
 use MonitorType as GlpiMonitorType;
+use Symfony\Component\DomCrawler\Crawler;
 
 class MonitorTypeTest extends DbTestCase
 {
@@ -82,8 +83,20 @@ class MonitorTypeTest extends DbTestCase
         });
         $result = MonitorType::showMassiveActionsSubForm($massive_action);
         $output = ob_get_clean();
-        $this->assertStringContainsString('<input type="number" name="power_consumption" class="form-control" />', $output);
-        $this->assertStringContainsString('<button type=\'submit\' value=\'Post\' name="massiveaction" class="btn">', $output);
+        $crawler = new Crawler($output);
+        $input = $crawler->filter('input');
+        $this->assertEquals(1, $input->count());
+        $input->each(function (Crawler $node) {
+            $this->assertEquals('number', $node->attr('type'));
+            $this->assertEquals('power_consumption', $node->attr('name'));
+        });
+        $button = $crawler->filter('button');
+        $this->assertEquals(1, $button->count());
+        $button->each(function (Crawler $node) {
+            $this->assertEquals('submit', $node->attr('type'));
+            $this->assertEquals('Post', $node->attr('value'));
+            $this->assertEquals('massiveaction', $node->attr('name'));
+        });
         $this->assertTrue($result);
 
         $massive_action = $this->getMockBuilder(MassiveAction::class)
