@@ -55,7 +55,7 @@ abstract class AbstractType extends CommonDBChild
         $tabName = '';
         if (!$withtemplate) {
             if ($item->getType() == static::$itemtype) {
-                $tabName = __('Carbon');
+                $tabName = __('Carbon', 'carbon');
             }
         }
         return $tabName;
@@ -72,16 +72,32 @@ abstract class AbstractType extends CommonDBChild
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
         /** @var CommonDBTM $item */
-        if ($item->getType() == static::$itemtype) {
-            $typePower = new static();
-            $typePower->getFromDBByCrit([$item->getForeignKeyField() => $item->getID()]);
-            if ($typePower->isNewItem()) {
-                $typePower->add([
-                    $item->getForeignKeyField() => $item->getID()
-                ]);
-            }
-            $typePower->showForItemType($typePower->getID());
+        if ($item->getType() !== static::$itemtype) {
+            return;
         }
+
+        $type = new static();
+        $type->getOrCreate($item);
+        $type->showForItemType($type->getID());
+    }
+
+    /**
+     * Get the type for the item, creating it if it doesn't exist.
+     *
+     * @param CommonGLPI $item
+     * @return bool
+     */
+    protected function getOrCreate(CommonGLPI $item): bool
+    {
+        /** @var CommonDBTM $item */
+        $item_fk = $item->getForeignKeyField();
+        $this->getFromDBByCrit([$item_fk => $item->getID()]);
+        if ($this->isNewItem()) {
+            $this->add([
+                $item_fk => $item->getID()
+            ]);
+        }
+        return $this->isNewItem();
     }
 
     public function showForItemType($ID, $withtemplate = '')

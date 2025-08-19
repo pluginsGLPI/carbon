@@ -40,6 +40,58 @@ use Symfony\Component\DomCrawler\Crawler;
 
 class ComputerTypeTest extends DbTestCase
 {
+    public function testGetTabNameForItem()
+    {
+        $glpi_computer_type = $this->getItem(GlpiComputerType::class);
+        $instance = new ComputerType();
+        $result = $instance->getTabNameForItem($glpi_computer_type);
+        $this->assertEquals('Carbon', $result);
+
+        $result = $instance->getTabNameForItem($glpi_computer_type, 1);
+        $this->assertEquals('', $result);
+    }
+
+    /**
+     * @covers GlpiPlugin\Carbon\AbstractType::getOrCreate
+     *
+     * @return void
+     */
+    public function testGetOrCreate()
+    {
+        $computer_type = $this->getItem(GlpiComputerType::class, ['name' => 'Test Computer Type']);
+        $instance = new ComputerType();
+        $this->callPrivateMethod($instance, 'getOrCreate', $computer_type);
+        $this->assertFalse($instance->isNewItem());
+    }
+
+    /**
+     * @covers GlpiPlugin\Carbon\AbstractType::showForItemType
+     *
+     * @return void
+     */
+    public function testShowForItemType()
+    {
+        $glpi_computer_type = $this->getItem(GlpiComputerType::class);
+        $computer_type = $this->getItem(ComputerType::class, [
+            'computertypes_id' => $glpi_computer_type->getID(),
+        ]);
+        $this->login('glpi', 'glpi');
+        ob_start(function ($buffer) {
+            return $buffer;
+        });
+        $computer_type->showForItemType($glpi_computer_type);
+        $output = ob_get_clean();
+        $crawler = new Crawler($output);
+        $power = $crawler->filter('input[name="power_consumption"]');
+        $this->assertEquals(1, $power->count());
+        $power->each(function (Crawler $node) {
+            $this->assertEquals(0, $node->attr('value'));
+            $this->assertEquals('number', $node->attr('type'));
+        });
+        $category = $crawler->filter('select[name="category"]');
+        $this->assertEquals(1, $category->count());
+    }
+
     /**
      * @covers GlpiPlugin\Carbon\ComputerType::updatePowerConsumption
      *
