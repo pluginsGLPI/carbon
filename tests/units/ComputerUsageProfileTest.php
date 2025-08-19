@@ -32,6 +32,7 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
+use Computer as GlpiComputer;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 
@@ -119,5 +120,18 @@ class ComputerUsageProfileTest extends DbTestCase
             'time_stop' => '17:00:00',
         ];
         $this->assertEquals($expected, $result);
+    }
+
+    public function testAssignToItem()
+    {
+        $computer = $this->getItem(GlpiComputer::class, ['name' => 'Test Computer']);
+        $usage_profile = $this->getItem(ComputerUsageProfile::class, ['name' => 'Test Usage Profile']);
+
+        $result = ComputerUsageProfile::assignToItem($computer, $usage_profile->getID());
+        $this->assertTrue($result);
+
+        $usage_profile = $this->getItem(ComputerUsageProfile::class, ['name' => 'Test Usage Profile 2']);
+        $result = ComputerUsageProfile::assignToItem($computer, $usage_profile->getID());
+        $this->assertTrue($result);
     }
 }
