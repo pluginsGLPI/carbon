@@ -36,6 +36,7 @@ use Computer;
 use ComputerType as GlpiComputerType;
 use GlpiPlugin\Carbon\ComputerType;
 use MassiveAction;
+use Symfony\Component\DomCrawler\Crawler;
 
 class ComputerTypeTest extends DbTestCase
 {
@@ -104,8 +105,20 @@ class ComputerTypeTest extends DbTestCase
         });
         $result = ComputerType::showMassiveActionsSubForm($massive_action);
         $output = ob_get_clean();
-        $this->assertStringContainsString('<input type="number" name="power_consumption" class="form-control" />', $output);
-        $this->assertStringContainsString('<button type=\'submit\' value=\'Post\' name="massiveaction" class="btn">', $output);
+        $crawler = new Crawler($output);
+        $input_field = $crawler->filter('input[name="power_consumption"]');
+        $this->assertEquals(1, $input_field->count());
+        $input_field->each(function (Crawler $node) {
+            $this->assertEquals('number', $node->attr('type'));
+            $this->assertEquals('power_consumption', $node->attr('name'));
+        });
+        $button = $crawler->filter('button');
+        $this->assertEquals(1, $button->count());
+        $button->each(function (Crawler $node) {
+            $this->assertEquals('submit', $node->attr('type'));
+            $this->assertEquals('Post', $node->attr('value'));
+            $this->assertEquals('massiveaction', $node->attr('name'));
+        });
         $this->assertTrue($result);
 
         // Test category update form
@@ -121,11 +134,19 @@ class ComputerTypeTest extends DbTestCase
         });
         $result = ComputerType::showMassiveActionsSubForm($massive_action);
         $output = ob_get_clean();
-        $pattern = preg_quote('<select name=\'category\' id=\'dropdown_category');
-        $pattern .= '\d{0,10}';
-        $pattern .= preg_quote('\' class="form-select" size=\'1\'>');
-        $this->assertMatchesRegularExpression('#' . $pattern . '#', $output);
-        $this->assertStringContainsString('<button type=\'submit\' value=\'Post\' name="massiveaction" class="btn">', $output);
+        $crawler = new Crawler($output);
+        $select = $crawler->filter('select[name="category"]');
+        $this->assertEquals(1, $select->count());
+        $select->each(function (Crawler $node) {
+            $this->assertEquals('category', $node->attr('name'));
+        });
+        $button = $crawler->filter('button');
+        $this->assertEquals(1, $button->count());
+        $button->each(function (Crawler $node) {
+            $this->assertEquals('submit', $node->attr('type'));
+            $this->assertEquals('Post', $node->attr('value'));
+            $this->assertEquals('massiveaction', $node->attr('name'));
+        });
         $this->assertTrue($result);
 
         // Test invalid action
