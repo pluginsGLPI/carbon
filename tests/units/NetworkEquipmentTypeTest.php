@@ -40,6 +40,62 @@ use Symfony\Component\DomCrawler\Crawler;
 class NetworkEquipmentTypeTest extends DbTestCase
 {
     /**
+     * @covers GlpiPlugin\Carbon\AbstractType::getTabNameForItem
+     *
+     * @return void
+     */
+    public function testGetTabNameForItem()
+    {
+        $glpi_networkequipment_type = $this->getItem(GlpiNetworkEquipmentType::class);
+        $instance = new NetworkEquipmentType();
+        $result = $instance->getTabNameForItem($glpi_networkequipment_type);
+        $this->assertEquals('Carbon', $result);
+
+        $result = $instance->getTabNameForItem($glpi_networkequipment_type, 1);
+        $this->assertEquals('', $result);
+    }
+
+    /**
+     * @covers GlpiPlugin\Carbon\AbstractType::getOrCreate
+     *
+     * @return void
+     */
+    public function testGetOrCreate()
+    {
+        $computer_type = $this->getItem(GlpiNetworkEquipmentType::class, ['name' => 'Test Computer Type']);
+        $instance = new NetworkEquipmentType();
+        $this->callPrivateMethod($instance, 'getOrCreate', $computer_type);
+        $this->assertFalse($instance->isNewItem());
+    }
+
+
+    /**
+     * @covers GlpiPlugin\Carbon\AbstractType::showForItemType
+     *
+     * @return void
+     */
+    public function testShowForItemType()
+    {
+        $glpi_networkequipment_type = $this->getItem(GlpiNetworkEquipmentType::class);
+        $networkequipment_type = $this->getItem(NetworkEquipmentType::class, [
+            'networkequipmenttypes_id' => $glpi_networkequipment_type->getID(),
+        ]);
+        $this->login('glpi', 'glpi');
+        ob_start(function ($buffer) {
+            return $buffer;
+        });
+        $networkequipment_type->showForItemType($glpi_networkequipment_type);
+        $output = ob_get_clean();
+        $crawler = new Crawler($output);
+        $power = $crawler->filter('input[name="power_consumption"]');
+        $this->assertEquals(1, $power->count());
+        $power->each(function (Crawler $node) {
+            $this->assertEquals(0, $node->attr('value'));
+            $this->assertEquals('number', $node->attr('type'));
+        });
+    }
+
+    /**
      * @covers GlpiPlugin\Carbon\NetworkEquipmentType::updatePowerConsumption
      *
      * @return void
