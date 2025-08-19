@@ -38,7 +38,8 @@ use GlpiPlugin\Carbon\Tests\DbTestCase;
 class ComputerUsageProfileTest extends DbTestCase
 {
     /**
-     * @covers \GlpiPlugin\Carbon\ComputerUsageProfile::prepareInputForAdd
+     * @covers GlpiPlugin\Carbon\ComputerUsageProfile::prepareInputForAdd
+     * @covers GlpiPlugin\Carbon\ComputerUsageProfile::inputIntegrityCheck
      *
      * @return void
      */
@@ -79,7 +80,8 @@ class ComputerUsageProfileTest extends DbTestCase
     }
 
     /**
-     * @covers \GlpiPlugin\Carbon\ComputerUsageProfile::prepareInputForUpdate
+     * @covers GlpiPlugin\Carbon\ComputerUsageProfile::prepareInputForUpdate
+     * @covers GlpiPlugin\Carbon\ComputerUsageProfile::inputIntegrityCheck
      *
      * @return void
      */
