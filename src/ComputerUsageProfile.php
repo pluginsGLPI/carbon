@@ -251,17 +251,24 @@ class ComputerUsageProfile extends CommonDropdown
         }
     }
 
-    public static function assignToItem(CommonDBTM $item, int $usage_profile_id)
+    /**
+     * Assign an usage profile to an item
+     *
+     * @param CommonDBTM $item A computer to assign to
+     * @param integer $usage_profile_id usage profile to assign
+     * @return bool
+     */
+    public static function assignToItem(CommonDBTM $item, int $usage_profile_id): bool
     {
-        $environmental_imapct = new UsageInfo();
+        $usage_info = new UsageInfo();
         $computers_id = $item->getID();
         $usage_profile_fk = ComputerUsageProfile::getForeignKeyField();
-        $environmental_imapct->getFromDBByCrit([
+        $usage_info->getFromDBByCrit([
             'itemtype'     => GlpiComputer::class,
             'items_id' => $computers_id,
         ]);
-        if ($environmental_imapct->isNewItem()) {
-            $environmental_imapct->add([
+        if ($usage_info->isNewItem()) {
+            $usage_info->add([
                 'itemtype'     => GlpiComputer::class,
                 'items_id' => $computers_id,
                 $usage_profile_fk => $usage_profile_id,
@@ -269,8 +276,8 @@ class ComputerUsageProfile extends CommonDropdown
             return true;
         }
 
-        return $environmental_imapct->update([
-            'id'              => $environmental_imapct->getID(),
+        return $usage_info->update([
+            'id'              => $usage_info->getID(),
             $usage_profile_fk => $usage_profile_id,
         ]);
     }
