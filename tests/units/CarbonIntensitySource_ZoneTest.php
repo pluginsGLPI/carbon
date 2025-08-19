@@ -39,6 +39,11 @@ use GlpiPlugin\Carbon\Zone;
 
 class CarbonIntensitySource_ZoneTest extends DbTestCase
 {
+    /**
+     * @covers GlpiPlugin\Carbon\CarbonIntensitySource_Zone::showForSource
+     *
+     * @return void
+     */
     public function testShowForSource()
     {
         $source = $this->getItem(CarbonIntensitySource::class, [
@@ -72,6 +77,11 @@ class CarbonIntensitySource_ZoneTest extends DbTestCase
         $this->assertNotEmpty($output);
     }
 
+    /**
+     * @covers GlpiPlugin\Carbon\CarbonIntensitySource_Zone::showForZone
+     *
+     * @return void
+     */
     public function testShowForZone()
     {
         $source = $this->getItem(CarbonIntensitySource::class, [
