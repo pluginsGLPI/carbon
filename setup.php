@@ -35,7 +35,6 @@ use GlpiPlugin\Carbon\Dashboard\Widget;
 use Glpi\Plugin\Hooks;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\UsageInfo;
-use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\Profile;
 use GlpiPlugin\Carbon\Report;
 use Location as GlpiLocation;
