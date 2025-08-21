@@ -67,16 +67,12 @@ if ($handle = fopen($data_source, 'r')) {
         Install::linkSourceZone($source_id, $zone_id);
 
         // Check if the row already exists
-        $existing = $DB->request([
-            'SELECT' => 'id',
-            'FROM' => $table,
-            'WHERE' => [
-                'plugin_carbon_carbonintensitysources_id' => $source_id,
-                'plugin_carbon_zones_id' => $zone_id,
-                'date' => "$year-01-01 00:00:00",
-            ],
+        $row_exists = (new DbUtils())->countElementsInTable($table, [
+            'date' => "$year-01-01 00:00:00",
+            'plugin_carbon_carbonintensitysources_id' => $source_id,
+            'plugin_carbon_zones_id' => $zone_id_quebec,
         ]);
-        if ($existing->numrows() > 0) {
+        if ($row_exists > 0) {
             // Skip if the row already exists
             continue;
         }
@@ -110,13 +106,19 @@ foreach ($quebec_carbon_intensity as $year => $intensity) {
             'plugin_carbon_zones_id' => $zone_id,
         ]
     ]);
-    if ($result->count() === 0) {
-        $success = $DB->insert($table, [
-            'date' => "$year-01-01 00:00:00",
-            'plugin_carbon_carbonintensitysources_id' => $source_id,
-            'plugin_carbon_zones_id' => $zone_id,
-            'intensity' => $intensity,
-            'data_quality' => 2 // constant GlpiPlugin\Carbon\DataTracking::DATA_QUALITY_ESTIMATED
-        ]);
+    $row_exists = (new DbUtils())->countElementsInTable($table, [
+        'date' => "$year-01-01 00:00:00",
+        'plugin_carbon_carbonintensitysources_id' => $source_id,
+        'plugin_carbon_zones_id' => $zone_id,
+    ]);
+    if ($row_exists > 0) {
+        continue;
     }
+    $success = $DB->insert($table, [
+        'date' => "$year-01-01 00:00:00",
+        'plugin_carbon_carbonintensitysources_id' => $source_id,
+        'plugin_carbon_zones_id' => $zone_id,
+        'intensity' => $intensity,
+        'data_quality' => 2 // constant GlpiPlugin\Carbon\DataTracking::DATA_QUALITY_ESTIMATED
+    ]);
 }
