@@ -32,65 +32,53 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
-use GlpiPlugin\Carbon\Report;
-use Session;
+use GlpiPlugin\Carbon\ComputerUsageProfile;
+use GlpiPlugin\Carbon\Profile;
+use GlpiPlugin\Carbon\UsageInfo;
+use Computer as GlpiComputer;
+use Contact;
 use Symfony\Component\DomCrawler\Crawler;
 
-class ReportTest extends DbTestCase
+class UsageInfoTest extends DbTestCase
 {
     /**
-     * @covers GlpiPlugin\Carbon\Report::getTypeName
+     * @covers GlpiPlugin\Carbon\UsageInfo::getTypeName
      *
      * @return void
      */
     public function testGetTypeName()
     {
-        $result = Report::getTypeName(1);
-        $this->assertEquals('Carbon report', $result);
-
-        $result = Report::getTypeName(Session::getPluralNumber());
-        $this->assertEquals('Carbon reports', $result);
+        $usageInfo = new UsageInfo();
+        $typeName = $usageInfo->getTypeName();
+        $this->assertEquals(__('Usage informations', 'Carbon'), $typeName);
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Report::getIcon
+     * @covers GlpiPlugin\Carbon\UsageInfo::getIcon
      *
      * @return void
      */
     public function testGetIcon()
     {
-        $result = Report::getIcon();
-        $this->assertEquals('fa-solid fa-solar-panel', $result);
+        $usageInfo = new UsageInfo();
+        $icon = $usageInfo->getIcon();
+        $this->assertEquals('fa-solid fa-solar-panel', $icon);
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Report::getMenuContent
+     * @covers GlpiPlugin\Carbon\UsageInfo::getTabNameForItem
      *
      * @return void
      */
-    public function testGetMenuContent()
+    public function testGetTabNameForItem()
     {
-        $this->login('glpi', 'glpi');
-        $result = Report::getMenuContent();
-        $this->assertIsArray($result);
-        $this->assertEquals('Carbon reports', $result['title']);
-        $this->assertEquals('fa-solid fa-solar-panel', $result['icon']);
-    }
+        $usageInfo = new UsageInfo();
+        $item = new GlpiComputer();
+        $tabName = $usageInfo->getTabNameForItem($item);
+        $this->assertEquals('Environmental impact', $tabName);
 
-    /**
-     * @covers GlpiPlugin\Carbon\Report::showInstantReport
-     *
-     * @return void
-     */
-    public function testShowInstantReport()
-    {
-        $this->login('glpi', 'glpi');
-        $_SERVER['REQUEST_URI'] = '/ajax/dashboard.php';
-        ob_start();
-        Report::showInstantReport();
-        $output = ob_get_clean();
-        $crawler = new Crawler($output);
-        $this->assertCount(1, $crawler->filter('div.plugin_carbon_quick_report'));
-        $this->assertCount(1, $crawler->filter('div.dashboard.mini'));
+        $item = new Contact();
+        $tabName = $usageInfo->getTabNameForItem($item);
+        $this->assertEquals('', $tabName);
     }
 }

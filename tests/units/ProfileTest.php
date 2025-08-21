@@ -32,24 +32,36 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
+use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Profile;
 use Profile as GlpiProfile;
 use Symfony\Component\DomCrawler\Crawler;
 
 class ProfileTest extends DbTestCase
 {
+    /**
+     * @covers GlpiPlugin\Carbon\Profile::getTabNameForItem
+     *
+     * @return void
+     */
     public function testGetTabNameForItem()
     {
         $profile = new Profile();
-        $item = new \GlpiPlugin\Carbon\ComputerUsageProfile();
+        $item = new GlpiProfile();
         $tabName = $profile->getTabNameForItem($item);
         $this->assertEquals(__('Environmental impact', 'carbon'), $tabName);
     }
 
+    /**
+     * @covers GlpiPlugin\Carbon\Profile::showForm
+     *
+     * @return void
+     */
     public function testShowForm()
     {
         $this->login('glpi', 'glpi');
-        $profile = GlpiProfile::getById(4); // Super admin
+        $glpi_profile = GlpiProfile::getById(4); // Super admin
+        $profile = new Profile();
         $output = '';
         ob_start(function ($buffer) use ($output) {
             $output .= $buffer;
@@ -59,7 +71,7 @@ class ProfileTest extends DbTestCase
         $this->assertTrue($result);
         $crawler = new Crawler($output);
         $checkboxes = $crawler->filter('input[type="checkbox"]');
-        $this->assertCount(3, $checkboxes);
+        $this->assertCount(4, $checkboxes);
 
         $save = $crawler->filter('button[type="submit"]');
         $this->assertCount(1, $save);
