@@ -72,13 +72,29 @@ if ($handle = fopen($data_source, 'r')) {
         Install::linkSourceZone($source_id, $zone_id);
 
         // Insert into the database
-        $success = $DB->insert($table, [
+        $row_exists = (new DbUtils())->countElementsInTable($table, [
             'date' => "$year-01-01 00:00:00",
             'plugin_carbon_carbonintensitysources_id' => $source_id,
-            'plugin_carbon_zones_id' => $zone_id,
-            'intensity' => $intensity,
-            'data_quality' => 2 // constant GlpiPlugin\Carbon\DataTracking::DATA_QUALITY_ESTIMATED
+            'plugin_carbon_zones_id' => $zone_id
         ]);
+        if (!$row_exists) {
+            $success = $DB->insert($table, [
+                'date' => "$year-01-01 00:00:00",
+                'plugin_carbon_carbonintensitysources_id' => $source_id,
+                'plugin_carbon_zones_id' => $zone_id,
+                'intensity' => $intensity,
+                'data_quality' => 2 // constant GlpiPlugin\Carbon\DataTracking::DATA_QUALITY_ESTIMATED
+            ]);
+        } else {
+            $success = $DB->update($table, [
+                'intensity' => $intensity,
+                'data_quality' => 2 // constant GlpiPlugin\Carbon\DataTracking::DATA_QUALITY_ESTIMATED
+            ], [
+                'date' => "$year-01-01 00:00:00",
+                'plugin_carbon_carbonintensitysources_id' => $source_id,
+                'plugin_carbon_zones_id' => $zone_id
+            ]);
+        }
 
         if (!$success) {
             throw new \RuntimeException("Failed to insert data for year $year");
@@ -92,11 +108,27 @@ Install::linkSourceZone($source_id, $zone_id);
 
 $quebec_carbon_intensity = include(dirname(__DIR__) . '/data/carbon_intensity/quebec.php');
 foreach ($quebec_carbon_intensity as $year => $intensity) {
-    $success = $DB->insert($table, [
+    $row_exists = (new DbUtils())->countElementsInTable($table, [
         'date' => "$year-01-01 00:00:00",
         'plugin_carbon_carbonintensitysources_id' => $source_id,
         'plugin_carbon_zones_id' => $zone_id_quebec,
-        'intensity' => $intensity,
-        'data_quality' => 2 // constant GlpiPlugin\Carbon\DataTracking::DATA_QUALITY_ESTIMATED
     ]);
+    if (!$row_exists) {
+        $success = $DB->insert($table, [
+            'date' => "$year-01-01 00:00:00",
+            'plugin_carbon_carbonintensitysources_id' => $source_id,
+            'plugin_carbon_zones_id' => $zone_id_quebec,
+            'intensity' => $intensity,
+            'data_quality' => 2 // constant GlpiPlugin\Carbon\DataTracking::DATA_QUALITY_ESTIMATED
+        ]);
+    } else {
+        $success = $DB->update($table, [
+            'intensity' => $intensity,
+            'data_quality' => 2 // constant GlpiPlugin\Carbon\DataTracking::DATA_QUALITY_ESTIMATED
+        ], [
+            'date' => "$year-01-01 00:00:00",
+            'plugin_carbon_carbonintensitysources_id' => $source_id,
+            'plugin_carbon_zones_id' => $zone_id
+        ]);
+    }
 }
