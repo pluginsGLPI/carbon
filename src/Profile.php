@@ -42,7 +42,7 @@ class Profile extends GlpiProfile
 {
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
-        return self::createTabEntry(__('Environnemental impact', 'carbon'), 0);
+        return self::createTabEntry(__('Environmental impact', 'carbon'), 0);
     }
 
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
