@@ -33,13 +33,11 @@
 namespace GlpiPlugin\Carbon;
 
 use CommonDBTM;
-use DateInterval;
 use DateTime;
 use DateTimeImmutable;
 use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\Dashboard\Provider;
 use Glpi\Dashboard\Grid as DashboardGrid;
-use Html;
 use Plugin;
 
 class Report extends CommonDBTM
