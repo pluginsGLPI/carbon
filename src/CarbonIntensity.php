@@ -368,8 +368,6 @@ class CarbonIntensity extends CommonDropdown
         );
         $stmt = $DB->prepare($query);
 
-        $in_transaction = $DB->inTransaction() || $DB->beginTransaction();
-
         foreach ($data as $intensity) {
             try {
                 $stmt->bind_param(
@@ -386,9 +384,6 @@ class CarbonIntensity extends CommonDropdown
                 $count++;
                 continue;
             }
-        }
-        if ($in_transaction) {
-            $DB->commit();
         }
         $stmt->close();
 
