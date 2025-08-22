@@ -30,45 +30,56 @@
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Carbon\Tests\GlobalFixture;
-
-// fix empty CFG_GLPI on boostrap; see https://github.com/sebastianbergmann/phpunit/issues/325
-global $CFG_GLPI, $PLUGIN_HOOKS;
+use Glpi\Application\Environment;
+use Glpi\Application\ResourcesChecker;
+use Glpi\Cache\CacheManager;
+use Glpi\Cache\SimpleCache;
+use Glpi\Kernel\Kernel;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 define('TEST_PLUGIN_NAME', 'carbon');
 
-if (!$glpiConfigDir = getenv('TEST_GLPI_CONFIG_DIR')) {
-    fwrite(STDOUT, "Environment var TEST_GLPI_CONFIG_DIR is not set, using tests/config in GLPI directory" . PHP_EOL);
-    $glpiConfigDir = 'tests/config';
-}
+define('GLPI_URI', getenv('GLPI_URI') ?: 'http://localhost');
 
-define('GLPI_ROOT', realpath(__DIR__ . '/../../../'));
-fwrite(STDOUT, "GLPI config path: " . $glpiConfigDir . PHP_EOL);
-fwrite(STDOUT, "checking config file " . $glpiConfigDir . '/config_db.php' . PHP_EOL);
-if (!file_exists(GLPI_ROOT . '/' . $glpiConfigDir . '/config_db.php')) {
-    fwrite(STDERR, GLPI_ROOT . "/$glpiConfigDir/config_db.php missing. Faling back to standard config path" . PHP_EOL);
-    $glpiConfigDir = 'config';
-    if (!file_exists(GLPI_ROOT . '/config/config_db.php')) {
-        echo GLPI_ROOT . "/config/config_db.php missing" . PHP_EOL;
-        echo "No config file found in GLPI directory. Please run GLPI install first." . PHP_EOL;
-        exit(1);
-    }
-}
-define("GLPI_CONFIG_DIR", GLPI_ROOT . "/$glpiConfigDir");
-unset($glpiConfigDir);
-
-define('GLPI_LOG_DIR', __DIR__ . '/logs');
-if (!file_exists(GLPI_LOG_DIR)) {
-    if (!mkdir(GLPI_LOG_DIR)) {
-        echo "Failed to create log directory " . GLPI_LOG_DIR . PHP_EOL;
-        exit(1);
-    }
-}
+define('TU_USER', '_test_user');
+define('TU_PASS', 'PhpUnit_4');
 
 ini_set('session.use_cookies', 0); //disable session cookies
-require_once GLPI_ROOT . "/inc/includes.php";
 
-define('PLUGIN_CARBON_TEST_FAKE_SOURCE_NAME', 'Fake source');
-define('PLUGIN_CARBON_TEST_FAKE_ZONE_NAME', 'Fake zone');
+// Check the resources state before trying to be sure that the tests are executed with up-to-date dependencies.
+require_once dirname(__DIR__, 3) . '/src/Glpi/Application/ResourcesChecker.php';
+(new ResourcesChecker(dirname(__DIR__, 3)))->checkResources();
 
-// GlobalFixture::loadDataset();
+global $GLPI_CACHE;
+
+require_once dirname(__DIR__, 3) . '/vendor/autoload.php';
+
+$kernel = new Kernel(Environment::TESTING->value);
+$kernel->boot();
+
+if (!file_exists(GLPI_CONFIG_DIR . '/config_db.php')) {
+    echo("\nConfiguration file for tests not found\n\nrun: php bin/console database:install --env=testing ...\n\n");
+    exit(1);
+}
+if (Update::isUpdateMandatory()) {
+    echo 'The GLPI codebase has been updated. The update of the GLPI database is necessary.' . PHP_EOL;
+    exit(1);
+}
+
+//init cache
+if (file_exists(GLPI_CONFIG_DIR . DIRECTORY_SEPARATOR . CacheManager::CONFIG_FILENAME)) {
+    // Use configured cache for cache tests
+    $cache_manager = new CacheManager();
+    $GLPI_CACHE = $cache_manager->getCoreCacheInstance();
+} else {
+    // Use "in-memory" cache for other tests
+    $GLPI_CACHE = new SimpleCache(new ArrayAdapter());
+}
+
+// To prevent errors caught by `error` asserter to also generate logs, unregister GLPI error handler.
+// Errors that are pushed directly to logs (SQL errors/warnings for instance) will still have to be explicitly
+// validated by `$this->has*LogRecord*()` asserters, otherwise it will make test fails.
+set_error_handler(null);
+
+// include_once dirname(__DIR__, 3) . '/GLPITestCase.php';
+// include_once dirname(__DIR__, 3) . '/DbTestCase.php';

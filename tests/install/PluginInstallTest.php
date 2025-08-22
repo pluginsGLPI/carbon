@@ -106,7 +106,9 @@ class PluginInstallTest extends CommonTestCase
         $this->assertTrue($plugin->isInstalled($plugin_name), $install_output);
 
         // Enable the plugin
-        $plugin->activate($plugin->fields['id']);
+        $success = $plugin->activate($plugin->fields['id']);
+        $this->assertTrue($success);
+        $plugin->bootPlugins();
         $plugin->init();
         $messages = $_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR] ?? [];
         $messages = implode(PHP_EOL, $messages);

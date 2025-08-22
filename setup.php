@@ -45,7 +45,7 @@ define('PLUGIN_CARBON_VERSION', '1.0.0-dev+glpi11');
 define('PLUGIN_CARBON_SCHEMA_VERSION', '1.0.0');
 
 // Minimal GLPI version, inclusive
-define("PLUGIN_CARBON_MIN_GLPI_VERSION", "11.0.0");
+define("PLUGIN_CARBON_MIN_GLPI_VERSION", "11.0.0-beta");
 // Maximum GLPI version, exclusive
 define("PLUGIN_CARBON_MAX_GLPI_VERSION", "12.0.0");
 

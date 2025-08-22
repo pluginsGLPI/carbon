@@ -33,6 +33,8 @@
 namespace GlpiPlugin\Carbon\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Glpi\Application\Environment;
+use Glpi\Kernel\Kernel;
 use Auth;
 use CommonDBTM;
 use Computer;
@@ -40,7 +42,6 @@ use ComputerType as GlpiComputerType;
 use DateTime;
 use DateInterval;
 use DateTimeInterface;
-use DB;
 use Glpi\Inventory\Conf;
 use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
@@ -51,9 +52,7 @@ use GlpiPlugin\Carbon\CarbonIntensity;
 use Entity;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
-use Html;
 use Location;
-use QueryExpression;
 use ReflectionMethod;
 use Session;
 use Ticket;
@@ -89,8 +88,6 @@ class CommonTestCase extends TestCase
 
     protected function tearDown(): void
     {
-        $method = $this->getName();
-
         $logs = ['php-errors.log', 'sql-errors.log'];
         foreach ($logs as $log) {
             if (!file_exists(GLPI_LOG_DIR . '/' . $log)) {
@@ -111,27 +108,33 @@ class CommonTestCase extends TestCase
 
     protected function setupGLPIFramework()
     {
-        global $LOADED_PLUGINS, $AJAX_INCLUDE, $PLUGINS_INCLUDED;
+        // require_once dirname(__DIR__, 4) . '/vendor/autoload.php';
 
-        if (session_status() == PHP_SESSION_ACTIVE) {
-            Session::destroy();
-            session_write_close();
-        }
-        unset($LOADED_PLUGINS);
-        unset($PLUGINS_INCLUDED);
-        unset($AJAX_INCLUDE);
-        $_SESSION = [];
-        require GLPI_ROOT . "/inc/includes.php";
-        //\Toolbox::setDebugMode(Session::DEBUG_MODE);
+        // $kernel = new Kernel(Environment::TESTING->value);
+        // $kernel->boot();
+        return;
 
-        // Security of PHP_SELF
-        $_SERVER['PHP_SELF'] = Html::cleanParametersURL($_SERVER['PHP_SELF']);
+    //     global $LOADED_PLUGINS, $AJAX_INCLUDE, $PLUGINS_INCLUDED;
 
-        if (session_status() == PHP_SESSION_ACTIVE) {
-            session_write_close();
-        }
-        Session::start();
-        $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
+    //     if (session_status() == PHP_SESSION_ACTIVE) {
+    //         Session::destroy();
+    //         session_write_close();
+    //     }
+    //     unset($LOADED_PLUGINS);
+    //     unset($PLUGINS_INCLUDED);
+    //     unset($AJAX_INCLUDE);
+    //     $_SESSION = [];
+    //     require GLPI_ROOT . "/inc/includes.php";
+    //     //\Toolbox::setDebugMode(Session::DEBUG_MODE);
+
+    //     // Security of PHP_SELF
+    //     $_SERVER['PHP_SELF'] = Html::cleanParametersURL($_SERVER['PHP_SELF']);
+
+    //     if (session_status() == PHP_SESSION_ACTIVE) {
+    //         session_write_close();
+    //     }
+    //     Session::start();
+    //     $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
     }
 
     protected function login($name, $password, $noauto = false)
