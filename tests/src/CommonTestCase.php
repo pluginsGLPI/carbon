@@ -147,6 +147,12 @@ class CommonTestCase extends TestCase
         return $result;
     }
 
+    protected function logout()
+    {
+        Session::destroy();
+        Session::start();
+    }
+
     /**
      * Get a unique random string
      */
@@ -169,10 +175,10 @@ class CommonTestCase extends TestCase
     {
         global $DB;
 
+        $this->handleDeprecations($itemtype, $input);
+
         /** @var CommonDBTM */
         $item = new $itemtype();
-
-        $this->handleDeprecations($itemtype, $input);
 
         // set random name if not already set
         if (!isset($item->fields['name']) && $DB->fieldExists($item->getTable(), 'name')) {
