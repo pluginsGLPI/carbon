@@ -42,9 +42,7 @@ use Session;
 class CarbonIntensitySourceTest extends DbTestCase
 {
     /**
-     * @covers \GlpiPlugin\Carbon\CarbonIntensitySource::getTypeName
-     *
-     * @return void
+     * #CoversMethod \GlpiPlugin\Carbon\CarbonIntensitySource::getTypeName
      */
     public function testGetTypeName()
     {
@@ -56,9 +54,7 @@ class CarbonIntensitySourceTest extends DbTestCase
     }
 
     /**
-     * @covers \GlpiPlugin\Carbon\CarbonIntensitySource::canCreate
-     *
-     * @return void
+     * #CoversMethod \GlpiPlugin\Carbon\CarbonIntensitySource::canCreate
      */
     public function testCanCreate()
     {
@@ -68,9 +64,7 @@ class CarbonIntensitySourceTest extends DbTestCase
     }
 
     /**
-     * @covers \GlpiPlugin\Carbon\CarbonIntensitySource::canUpdate
-     *
-     * @return void
+     * #CoversMethod \GlpiPlugin\Carbon\CarbonIntensitySource::canUpdate
      */
     public function testCanUpdate()
     {
@@ -80,9 +74,7 @@ class CarbonIntensitySourceTest extends DbTestCase
     }
 
     /**
-     * @covers \GlpiPlugin\Carbon\CarbonIntensitySource::canDelete
-     *
-     * @return void
+     * #CoversMethod \GlpiPlugin\Carbon\CarbonIntensitySource::canDelete
      */
     public function testCanDelete()
     {
@@ -92,9 +84,7 @@ class CarbonIntensitySourceTest extends DbTestCase
     }
 
     /**
-     * @covers \GlpiPlugin\Carbon\CarbonIntensitySource::canPurge
-     *
-     * @return void
+     * #CoversMethod \GlpiPlugin\Carbon\CarbonIntensitySource::canPurge
      */
     public function testCanPurge()
     {
@@ -104,9 +94,7 @@ class CarbonIntensitySourceTest extends DbTestCase
     }
 
     /**
-     * @covers \GlpiPlugin\Carbon\CarbonIntensitySource::defineTabs
-     *
-     * @return void
+     * #CoversMethod \GlpiPlugin\Carbon\CarbonIntensitySource::defineTabs
      */
     public function testDefineTabs()
     {
@@ -138,9 +126,7 @@ class CarbonIntensitySourceTest extends DbTestCase
     }
 
     /**
-     * @covers \GlpiPlugin\Carbon\CarbonIntensitySource::displayTabContentForItem
-     *
-     * @return void
+     * #CoversMethod \GlpiPlugin\Carbon\CarbonIntensitySource::displayTabContentForItem
      */
     public function testDisplayTabContentForItem()
     {

@@ -289,6 +289,7 @@ class CarbonIntensityRTE extends AbstractCarbonIntensity
     {
         /** @var DBMysql $DB */
         global $DB;
+
         // array sort records, just in case
         usort($response, function ($a, $b) {
             return $a['date_heure'] <=> $b['date_heure'];

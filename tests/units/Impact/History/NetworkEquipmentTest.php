@@ -44,7 +44,7 @@ use Location;
 use NetworkEquipmentModel as GlpiNetworkEquipmentModel;
 
 /**
- * @covers \GlpiPlugin\Carbon\Impact\History\NetworkEquipment
+ * #CoversMethod \GlpiPlugin\Carbon\Impact\History\NetworkEquipment
  */
 class NetworkEquipmentTest extends CommonAsset
 {

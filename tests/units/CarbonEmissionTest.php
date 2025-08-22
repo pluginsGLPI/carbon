@@ -38,11 +38,12 @@ use DateInterval;
 use DateTimeImmutable;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\CarbonEmission;
+use PHPUnit\Framework\Attributes\DataProvider;
 use User;
 
 class CarbonEmissionTest extends DbTestCase
 {
-    public function findGapsProvider()
+    public static function findGapsProvider(): array
     {
         return [
             ['UTC'],
@@ -50,9 +51,7 @@ class CarbonEmissionTest extends DbTestCase
         ];
     }
 
-    /**
-     * @dataProvider findGapsProvider
-     */
+    #[DataProvider('findGapsProvider')]
     public function testFindGaps($timezone)
     {
         $user_id = User::getIdByName('glpi');

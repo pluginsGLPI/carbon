@@ -47,7 +47,7 @@
    {% endif %}
 
    {% set field %}
-      {% do call('Html::showTimeField', [name, {
+      {% do call('GlpiPlugin\\Carbon\\Html::showTimeField', [name, {
          'value': value,
          'rand': options.rand,
          'width': '100%'

@@ -65,8 +65,6 @@ class PluginInstallTest extends CommonTestCase
 
     /**
      * Execute plugin installation in the context if tests
-     *
-     * @return void
      */
     protected function executeInstallation()
     {
