@@ -45,7 +45,7 @@ use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
 use GlpiPlugin\Carbon\DataTracking\TrackedInt;
 use GlpiPlugin\Carbon\Zone;
-use QueryExpression;
+use Glpi\DBAL\QueryExpression;
 
 abstract class AbstractAsset implements EngineInterface
 {

@@ -35,7 +35,7 @@ namespace GlpiPlugin\Carbon;
 use CommonDBTM;
 use DBmysql;
 use DBmysqlIterator;
-use QuerySubQuery;
+use Glpi\DBAL\QuerySubQuery;
 
 /**
  * Embodied impact of assets

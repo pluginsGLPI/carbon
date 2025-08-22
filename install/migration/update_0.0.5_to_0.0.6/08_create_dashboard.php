@@ -33,6 +33,7 @@
 use Glpi\Dashboard\Dashboard;
 use Glpi\Dashboard\Item as DashboardItem;
 use Glpi\Dashboard\Right as DashboardRight;
+use Glpi\DBAL\QueryExpression;
 use GlpiPlugin\Carbon\Report;
 use Ramsey\Uuid\Uuid;
 

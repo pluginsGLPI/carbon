@@ -40,8 +40,8 @@ use DBmysql;
 use Glpi\Dashboard\Dashboard as GlpiDashboard;
 use Infocom;
 use Location;
-use QueryExpression;
-use QuerySubQuery;
+use Glpi\DBAL\QueryExpression;
+use Glpi\DBAL\QuerySubQuery;
 use Mexitek\PHPColors\Color;
 
 class Toolbox

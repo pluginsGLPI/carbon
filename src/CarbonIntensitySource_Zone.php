@@ -262,7 +262,7 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
         if (!isset($extensions[DataHelpersExtension::class])) {
             $renderer->getEnvironment()->addExtension(new DataHelpersExtension());
         }
-        $renderer->display('@carbon/components/datatable.html.twig', [
+        $renderer->display('components/datatable.html.twig', [
             'is_tab' => true,
             'nopager' => true,
             'nofilter' => true,

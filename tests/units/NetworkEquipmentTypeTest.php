@@ -35,15 +35,21 @@ namespace GlpiPlugin\Carbon\Tests;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
 use MassiveAction;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
+use Session;
 use Symfony\Component\DomCrawler\Crawler;
 
+#[CoversClass('GlpiPlugin\Carbon\NetworkEquipmentType')]
+#[CoversClass('GlpiPlugin\Carbon\AbstractType')]
 class NetworkEquipmentTypeTest extends DbTestCase
 {
-    /**
-     * @covers GlpiPlugin\Carbon\AbstractType::getTabNameForItem
-     *
-     * @return void
-     */
+    public function testGetTypeName()
+    {
+        $this->assertEquals('Power', NetworkEquipmentType::getTypeName(1));
+        $this->assertEquals('Powers', NetworkEquipmentType::getTypeName(Session::getPluralNumber()));
+    }
+
     public function testGetTabNameForItem()
     {
         $glpi_networkequipment_type = $this->getItem(GlpiNetworkEquipmentType::class);
@@ -55,11 +61,6 @@ class NetworkEquipmentTypeTest extends DbTestCase
         $this->assertEquals('', $result);
     }
 
-    /**
-     * @covers GlpiPlugin\Carbon\AbstractType::getOrCreate
-     *
-     * @return void
-     */
     public function testGetOrCreate()
     {
         $computer_type = $this->getItem(GlpiNetworkEquipmentType::class, ['name' => 'Test Computer Type']);
@@ -69,11 +70,6 @@ class NetworkEquipmentTypeTest extends DbTestCase
     }
 
 
-    /**
-     * @covers GlpiPlugin\Carbon\AbstractType::showForItemType
-     *
-     * @return void
-     */
     public function testShowForItemType()
     {
         $glpi_networkequipment_type = $this->getItem(GlpiNetworkEquipmentType::class);
@@ -95,11 +91,6 @@ class NetworkEquipmentTypeTest extends DbTestCase
         });
     }
 
-    /**
-     * @covers GlpiPlugin\Carbon\NetworkEquipmentType::updatePowerConsumption
-     *
-     * @return void
-     */
     public function testUpdatePowerConsumption()
     {
         $glpi_networkequipment_type = $this->getItem(GlpiNetworkEquipmentType::class);
@@ -120,11 +111,6 @@ class NetworkEquipmentTypeTest extends DbTestCase
         $this->assertEquals(42, $instance->fields['power_consumption']);
     }
 
-    /**
-     * @covers GlpiPlugin\Carbon\NetworkEquipmentType::showMassiveActionsSubForm
-     *
-     * @return void
-     */
     public function testShowMassiveActionsSubForm()
     {
         $massive_action = $this->getMockBuilder(MassiveAction::class)
@@ -171,11 +157,6 @@ class NetworkEquipmentTypeTest extends DbTestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @covers GlpiPlugin\Carbon\NetworkEquipmentType::processMassiveActionsForOneItemtype
-     *
-     * @return void
-     */
     public function testProcessMassiveActionForOneItemtype()
     {
         // Test update power consumption

@@ -48,14 +48,10 @@ use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\Zone;
-use GlpiPlugin\Carbon\Impact\History\Computer as ComputerHistory;
 use GlpiPlugin\Carbon\SearchOptions;
 use GlpiPlugin\Carbon\UsageImpact;
-use GlpiPlugin\Carbon\UsageInfo;
-use Monitor;
-use NetworkEquipment;
-use QueryExpression; // TODO: when GLPI 11.0 is required, use Glpi\DBAL\QueryExpression instead
-use QuerySubQuery; // TODO: when GLPI 11.0 is required, use Glpi\DBAL\QuerySubQuery instead
+use Glpi\DBAL\QueryExpression;
+use Glpi\DBAL\QuerySubQuery;
 use Search;
 use Session;
 use Toolbox as GlpiToolbox;

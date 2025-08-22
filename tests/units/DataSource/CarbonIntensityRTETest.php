@@ -38,6 +38,7 @@ use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use DateTimeImmutable;
 use GlpiPlugin\Carbon\CarbonIntensity;
+use GlpiPlugin\Carbon\Zone;
 
 class CarbonIntensityRTETest extends DbTestCase
 {
@@ -114,5 +115,37 @@ class CarbonIntensityRTETest extends DbTestCase
         $carbon_intensity = new CarbonIntensity();
         $output = $instance->fullDownload('France', $start_date, $stop_date, $carbon_intensity);
         $this->assertEquals(1, $output);
+    }
+
+    public function testIncrementalDownload()
+    {
+        $zone = new Zone();
+        $zone->getFromDBByCrit(['name' => 'France']);
+        if ($zone->isNewItem()) {
+            $zone = $this->getItem(Zone::class, ['name' => 'France']);
+        }
+        $intensity = $this->createMock(CarbonIntensity::class);
+
+        // 4 calls to fetchRange [3 days ago; today]
+        $intensity->expects($this->exactly(4))->method('save');
+
+        // $instance = $this->getMockBuilder(CarbonIntensityRTE::class)
+        //     ->disableOriginalConstructor()
+        //     ->getMock();
+        // $instance->method('fetchDay')->willReturn(['FR' => []]);
+        $client = $this->createStub(RestApiClientInterface::class);
+        $client->method('request')->willReturn([
+            'results' => [
+                [
+                    'taux_co2'   => 1,
+                    'date_heure' => '2024-10-08T18:00:00+00:00'
+                ]
+            ],
+        ]);
+        $instance = new CarbonIntensityRTE($client);
+        $start_date = new DateTime('3 days ago');
+        $start_date->setTime(0, 0, 0);
+        $start_date = DateTimeImmutable::createFromMutable($start_date);
+        $instance->incrementalDownload('France', $start_date, $intensity);
     }
 }

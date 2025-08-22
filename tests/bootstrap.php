@@ -81,5 +81,5 @@ if (file_exists(GLPI_CONFIG_DIR . DIRECTORY_SEPARATOR . CacheManager::CONFIG_FIL
 // validated by `$this->has*LogRecord*()` asserters, otherwise it will make test fails.
 set_error_handler(null);
 
-// include_once dirname(__DIR__, 3) . '/GLPITestCase.php';
-// include_once dirname(__DIR__, 3) . '/DbTestCase.php';
+define('PLUGIN_CARBON_TEST_FAKE_SOURCE_NAME', 'Fake source');
+define('PLUGIN_CARBON_TEST_FAKE_ZONE_NAME', 'Fake zone');

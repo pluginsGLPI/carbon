@@ -47,7 +47,17 @@ use CommonDBTM;
 use CommonGLPI;
 use DbUtils;
 use Plugin;
+use PHPUnit\Framework\Attributes\CoversMethod;
 
+#[CoversMethod('GlpiPlugin\Carbon\CarbonEmission', 'rawSearchOptions')]
+#[CoversMethod('GlpiPlugin\Carbon\CarbonIntensity', 'rawSearchOptions')]
+#[CoversMethod('GlpiPlugin\Carbon\CarbonIntensitySource', 'rawSearchOptions')]
+#[CoversMethod('GlpiPlugin\Carbon\CarbonIntensitySource_Zone', 'rawSearchOptions')]
+#[CoversMethod('GlpiPlugin\Carbon\ComputerUsageProfile', 'rawSearchOptions')]
+#[CoversMethod('GlpiPlugin\Carbon\EmbodiedImpact', 'rawSearchOptions')]
+#[CoversMethod('GlpiPlugin\Carbon\UsageImpact', 'rawSearchOptions')]
+#[CoversMethod('GlpiPlugin\Carbon\UsageInfo', 'rawSearchOptions')]
+#[CoversMethod('GlpiPlugin\Carbon\Zone', 'rawSearchOptions')]
 class SearchOptionTest extends CommonTestCase
 {
     private array $exceptions = [
@@ -83,19 +93,6 @@ class SearchOptionTest extends CommonTestCase
         ]
     ];
 
-    /**
-     * @covers GlpiPlugin\Carbon\CarbonEmission::rawSearchOptions
-     * @covers GlpiPlugin\Carbon\CarbonIntensity::rawSearchOptions
-     * @covers GlpiPlugin\Carbon\CarbonIntensitySource::rawSearchOptions
-     * @covers GlpiPlugin\Carbon\CarbonIntensitySource_Zone::rawSearchOptions
-     * @covers GlpiPlugin\Carbon\ComputerUsageProfile::rawSearchOptions
-     * @covers GlpiPlugin\Carbon\EmbodiedImpact::rawSearchOptions
-     * @covers GlpiPlugin\Carbon\UsageImpact::rawSearchOptions
-     * @covers GlpiPlugin\Carbon\UsageInfo::rawSearchOptions
-     * @covers GlpiPlugin\Carbon\Zone::rawSearchOptions
-     *
-     * @return void
-     */
     public function testSearchOption()
     {
         global $DB;

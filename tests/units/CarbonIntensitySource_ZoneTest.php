@@ -36,13 +36,12 @@ use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\Zone;
+use PHPUnit\Framework\Attributes\CoversMethod;
 
 class CarbonIntensitySource_ZoneTest extends DbTestCase
 {
     /**
-     * @covers GlpiPlugin\Carbon\CarbonIntensitySource_Zone::showForSource
-     *
-     * @return void
+     * #CoversMethod GlpiPlugin\Carbon\CarbonIntensitySource_Zone::showForSource
      */
     public function testShowForSource()
     {
@@ -59,28 +58,21 @@ class CarbonIntensitySource_ZoneTest extends DbTestCase
             $zone::getForeignKeyField() => $zone->getID(),
         ]);
 
-        $output = '';
-        ob_start(function ($buffer) use ($output) {
-            $output .= $buffer;
-        });
+        $this->logout();
+        ob_start();
         $result = $instance->showForSource($source);
         $output = ob_get_clean();
         $this->assertEquals('', $output);
 
         $this->login('glpi', 'glpi');
-        $output = '';
-        ob_start(function ($buffer) use ($output) {
-            $output .= $buffer;
-        });
+        ob_start();
         $result = $instance->showForSource($source);
         $output = ob_get_clean();
         $this->assertNotEmpty($output);
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\CarbonIntensitySource_Zone::showForZone
-     *
-     * @return void
+     * #CoversMethod GlpiPlugin\Carbon\CarbonIntensitySource_Zone::showForZone
      */
     public function testShowForZone()
     {
@@ -97,19 +89,14 @@ class CarbonIntensitySource_ZoneTest extends DbTestCase
             $zone::getForeignKeyField() => $zone->getID(),
         ]);
 
-        $output = '';
-        ob_start(function ($buffer) use ($output) {
-            $output .= $buffer;
-        });
+        $this->logout();
+        ob_start();
         $result = $instance->showForZone($zone);
         $output = ob_get_clean();
         $this->assertEquals('', $output);
 
         $this->login('glpi', 'glpi');
-        $output = '';
-        ob_start(function ($buffer) use ($output) {
-            $output .= $buffer;
-        });
+        ob_start();
         $result = $instance->showForZone($zone);
         $output = ob_get_clean();
         $this->assertNotEmpty($output);
