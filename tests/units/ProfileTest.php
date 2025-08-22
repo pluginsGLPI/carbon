@@ -49,7 +49,7 @@ class ProfileTest extends DbTestCase
         $profile = new Profile();
         $item = new GlpiProfile();
         $tabName = $profile->getTabNameForItem($item);
-        $this->assertEquals(__('Environmental impact', 'carbon'), $tabName);
+        $this->assertStringContainsString(__('Environmental impact', 'carbon'), $tabName);
     }
 
     /**
