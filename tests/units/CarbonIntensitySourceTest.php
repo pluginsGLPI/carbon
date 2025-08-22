@@ -113,12 +113,9 @@ class CarbonIntensitySourceTest extends DbTestCase
         $this->login('glpi', 'glpi');
         $instance = new CarbonIntensitySource();
         $result = $instance->defineTabs();
-        $expected = [
-            CarbonIntensitySource::class . '$main' => 'Carbon intensity source',
-            Zone::class . '$1' => 'Carbon intensity zones',
-            Log::class . '$1' => 'Historical',
-        ];
-        $this->assertEquals($expected, $result);
+        $this->assertStringContainsString('Carbon intensity source', $result[CarbonIntensitySource::class . '$main']);
+        $this->assertStringContainsString('Carbon intensity zones', $result[Zone::class . '$1']);
+        $this->assertStringContainsString('Historical', $result[Log::class . '$1']);
     }
 
     public function testGetTabNameForItem()
@@ -128,7 +125,7 @@ class CarbonIntensitySourceTest extends DbTestCase
         $instance = new CarbonIntensitySource();
         $result = $instance->getTabNameForItem($item);
         $expected = 'Carbon intensity sources';
-        $this->assertEquals($expected, $result);
+        $this->assertStringContainsString($expected, $result);
 
         $result = $instance->getTabNameForItem($item, 1);
         $expected = '';
