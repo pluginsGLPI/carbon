@@ -43,17 +43,13 @@ use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
 use GlpiPlugin\Carbon\DataSource\AbstractCarbonIntensity;
 use Infocom;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\Output;
 
+#[CoversClass('GlpiPlugin\Carbon\CarbonIntensity')]
 class CarbonIntensityTest extends DbTestCase
 {
-    /**
-     * @covers GlpiPlugin\Carbon\CarbonIntensity::getKnownDatesQuery
-     * @covers GlpiPlugin\Carbon\CarbonIntensity::getLastKnownDate
-     *
-     * @return void
-     */
     public function testGetLastKnownDate()
     {
         $instance = new CarbonIntensity();
@@ -92,12 +88,6 @@ class CarbonIntensityTest extends DbTestCase
         $this->assertEquals($expected, $result->format('Y-m-d H:i:s'));
     }
 
-    /**
-     * @covers GlpiPlugin\Carbon\CarbonIntensity::getKnownDatesQuery
-     * @covers GlpiPlugin\Carbon\CarbonIntensity::getFirstKnownDate
-     *
-     * @return void
-     */
     public function testGetFirstKnownDate()
     {
         $instance = new CarbonIntensity();
@@ -136,11 +126,6 @@ class CarbonIntensityTest extends DbTestCase
         $this->assertEquals($expected, $result->format('Y-m-d H:i:s'));
     }
 
-    /**
-     * @covers GlpiPlugin\Carbon\CarbonIntensity::findGaps
-     *
-     * @return void
-     */
     public function testFindGaps()
     {
         /** @var DBmysql $DB */
@@ -321,11 +306,6 @@ class CarbonIntensityTest extends DbTestCase
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @covers GlpiPlugin\Carbon\CarbonIntensity::getDownloadStopDate
-     *
-     * @return void
-     */
     public function testGetDownloadStopDate()
     {
         $instance = new CarbonIntensity();
@@ -362,11 +342,6 @@ class CarbonIntensityTest extends DbTestCase
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @covers GlpiPlugin\Carbon\CarbonIntensity::downloadOneZone
-     *
-     * @return void
-     */
     public function testDownloadOneZone()
     {
         $instance = new CarbonIntensity();

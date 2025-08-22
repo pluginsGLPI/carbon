@@ -44,7 +44,7 @@ use Location;
 class ToolboxTest extends DbTestCase
 {
     /**
-     * @covers GlpiPlugin\Carbon\Toolbox::getOldestAssetDate
+     * #CoversMethod GlpiPlugin\Carbon\Toolbox::getOldestAssetDate
      *
      * @return void
      */
@@ -87,7 +87,7 @@ class ToolboxTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Toolbox::getLatestAssetDate
+     * #CoversMethod GlpiPlugin\Carbon\Toolbox::getLatestAssetDate
      *
      * @return void
      */
@@ -115,7 +115,7 @@ class ToolboxTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Toolbox::getDefaultCarbonIntensityDownloadDate
+     * #CoversMethod GlpiPlugin\Carbon\Toolbox::getDefaultCarbonIntensityDownloadDate
      *
      * @return void
      */
@@ -131,7 +131,7 @@ class ToolboxTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Toolbox::yearToLastMonth
+     * #CoversMethod GlpiPlugin\Carbon\Toolbox::yearToLastMonth
      *
      * @return void
      */
@@ -157,7 +157,7 @@ class ToolboxTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Toolbox::isLocationExistForZone
+     * #CoversMethod GlpiPlugin\Carbon\Toolbox::isLocationExistForZone
      *
      * @return void
      */
@@ -177,7 +177,7 @@ class ToolboxTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Toolbox::getGwpUsageImpactClasses
+     * #CoversMethod GlpiPlugin\Carbon\Toolbox::getGwpUsageImpactClasses
      *
      * @return void
      */
@@ -193,7 +193,7 @@ class ToolboxTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Toolbox::getUsageImpactClasses
+     * #CoversMethod GlpiPlugin\Carbon\Toolbox::getUsageImpactClasses
      *
      * @return void
      */
@@ -209,7 +209,7 @@ class ToolboxTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Toolbox::getEmbodiedImpactClasses
+     * #CoversMethod GlpiPlugin\Carbon\Toolbox::getEmbodiedImpactClasses
      *
      * @return void
      */

@@ -39,7 +39,7 @@ use CommonDBTM;
 use Monitor as GlpiMonitor;
 use MonitorType as GlpiMonitorType;
 use MonitorModel as GlpiMonitorModel;
-use QueryExpression;
+use Glpi\DBAL\QueryExpression;
 
 class Monitor extends AbstractAsset
 {

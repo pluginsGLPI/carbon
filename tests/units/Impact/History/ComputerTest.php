@@ -49,7 +49,7 @@ use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\Zone;
 
 /**
- * @covers \GlpiPlugin\Carbon\Impact\History\Computer
+ * #CoversMethod \GlpiPlugin\Carbon\Impact\History\Computer
  */
 class ComputerTest extends CommonAsset
 {

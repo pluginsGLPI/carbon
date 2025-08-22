@@ -42,7 +42,7 @@ use Symfony\Component\DomCrawler\Crawler;
 class UsageInfoTest extends DbTestCase
 {
     /**
-     * @covers GlpiPlugin\Carbon\UsageInfo::getTypeName
+     * #CoversMethod GlpiPlugin\Carbon\UsageInfo::getTypeName
      *
      * @return void
      */
@@ -54,7 +54,7 @@ class UsageInfoTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\UsageInfo::getIcon
+     * #CoversMethod GlpiPlugin\Carbon\UsageInfo::getIcon
      *
      * @return void
      */
@@ -66,7 +66,7 @@ class UsageInfoTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\UsageInfo::getTabNameForItem
+     * #CoversMethod GlpiPlugin\Carbon\UsageInfo::getTabNameForItem
      *
      * @return void
      */

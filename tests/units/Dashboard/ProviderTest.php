@@ -46,10 +46,12 @@ use GlpiPlugin\Carbon\Impact\History\Computer as HistoryComputer;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use Infocom;
 use Location;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Session;
 
 use function PHPUnit\Framework\assertEquals;
 
+#[CoversClass('GlpiPlugin\Carbon\Dashboard\Provider')]
 class ProviderTest extends DbTestCase
 {
     public function setUp(): void
@@ -162,11 +164,6 @@ class ProviderTest extends DbTestCase
         return $total_count;
     }
 
-    /**
-     * @covers GlpiPlugin\Carbon\Dashboard\Provider::getHandledAssetCount
-     *
-     * @return void
-     */
     public function testGetHandledComputersCount()
     {
         $total_count = $this->handledComputersCountFixture();
@@ -179,11 +176,6 @@ class ProviderTest extends DbTestCase
         $this->assertEquals(3, $handled_count['number']);
     }
 
-    /**
-     * @covers GlpiPlugin\Carbon\Dashboard\Provider::getHandledAssetCount
-     *
-     * @return void
-     */
     public function testGetUnhandledComputersCount()
     {
         $total_count = $this->handledComputersCountFixture();
@@ -192,9 +184,6 @@ class ProviderTest extends DbTestCase
         $this->assertEquals($total_count - 3, $unhandled_count['number']);
     }
 
-    /**
-     * @covers GlpiPlugin\Carbon\Dashboard\Provider::getHandledAssetsRatio
-     */
     public function testGetHandledAssetsRatio()
     {
         $total_count = $this->handledComputersCountFixture();
@@ -203,11 +192,6 @@ class ProviderTest extends DbTestCase
         $this->assertEquals($expected, $result['data'][0]['number']);
     }
 
-    /**
-     * @covers GlpiPlugin\Carbon\Dashboard\Provider::getSumUsageEmissionsPerModel
-     *
-     * @return void
-     */
     public function testGetSumUsageEmissionsPerModel()
     {
         $entities_id = $this->isolateInEntity('glpi', 'glpi');
@@ -279,11 +263,6 @@ class ProviderTest extends DbTestCase
         $this->assertEquals($expected, $output);
     }
 
-    /**
-     * @covers GlpiPlugin\Carbon\Dashboard\Provider::getSumPowerPerModel
-     *
-     * @return void
-     */
     public function testGetSumPowerPerModel()
     {
         $entities_id = $this->isolateInEntity('glpi', 'glpi');
@@ -345,15 +324,8 @@ class ProviderTest extends DbTestCase
         $this->assertEquals($expected, $output);
     }
 
-    /**
-     * @covers GlpiPlugin\Carbon\Dashboard\Provider::getUsageCarbonEmissionPerMonth
-     *
-     * @return void
-     */
     public function testGetUsageCarbonEmissionPerMonth()
     {
-        $country = $this->getUniqueString();
-        $source  = $this->getUniqueString();
         $usage_profile = [
             'name' => 'Test laptop usage profile',
             'time_start' => "09:00:00",

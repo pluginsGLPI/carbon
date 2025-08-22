@@ -37,7 +37,7 @@ use CommonDBTM;
 use Computer as GlpiComputer;
 use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
-use Computer_Item;
+use Glpi\Asset\Asset_PeripheralAsset;
 use DBmysql;
 use DbUtils;
 use Glpi\Application\View\TemplateRenderer;
@@ -72,7 +72,7 @@ class Monitor extends AbstractAsset
         $item_table = self::$itemtype::getTable();
         $item_model_table = self::$model_itemtype::getTable();
         $computers_table = GlpiComputer::getTable();
-        $computers_items_table = Computer_Item::getTable();
+        $computers_items_table = Asset_PeripheralAsset::getTable();
         $computer_model_table = GlpiComputerModel::getTable();
         $glpi_monitor_types_table = GlpiMonitorType::getTable();
         $glpi_monitor_types_fk = GlpiMonitorType::getForeignKeyField();
@@ -95,15 +95,20 @@ class Monitor extends AbstractAsset
         $request['FROM'] = $item_table;
         $request['LEFT JOIN'][$computers_items_table] = [
             'FKEY' => [
-                $computers_items_table => 'items_id',
+                $computers_items_table => 'items_id_peripheral',
                 $item_table => 'id',
-                ['AND' => [Computer_Item::getTableField('itemtype') => self::$itemtype]],
+                ['AND' => [
+                    Asset_PeripheralAsset::getTableField('itemtype_peripheral') => self::$itemtype,
+                    Asset_PeripheralAsset::getTableField('itemtype_asset') => GlpiComputer::class,
+                ]
+                ],
             ]
         ];
         $request['INNER JOIN'][$computers_table] = [
             'FKEY' => [
                 $computers_table => 'id',
-                $computers_items_table => GlpiComputer::getForeignKeyField(),
+                $computers_items_table => 'items_id_asset',
+                ['AND' => [Asset_PeripheralAsset::getTableField('itemtype_asset') => GlpiComputer::class]]
             ],
         ];
         $request['LEFT JOIN'][$glpi_monitor_types_table] = [
@@ -187,7 +192,7 @@ class Monitor extends AbstractAsset
         $request['SELECT'] = [
             self::$itemtype::getTableField('is_deleted'),
             self::$itemtype::getTableField('is_template'),
-            Computer_Item::getTableField('computers_id'),
+            Asset_PeripheralAsset::getTableField('items_id_asset'),
             UsageInfo::getTableField('plugin_carbon_computerusageprofiles_id'),
             Location::getTableField('id as location_id'),
             Location::getTableField('state'),
@@ -220,7 +225,7 @@ class Monitor extends AbstractAsset
         // false means that data is missing or invalid for historization
         $status['is_deleted'] = ($data['is_deleted'] === 0);   // Actually the result is whether it is "not deleted"
         $status['is_template'] = ($data['is_template'] === 0); // Actually the result is whether it is "not template"
-        $status['has_computer'] = !GlpiComputer::isNewID($data['computers_id']);
+        $status['has_computer'] = !GlpiComputer::isNewID($data['items_id_asset']);
         $status['has_usage_profile'] = !ComputerUsageProfile::isNewID($data['plugin_carbon_computerusageprofiles_id']);
         $status['has_location'] = !Location::isNewID($data['location_id']);
         $status['has_state_or_country'] = (strlen($data['state'] ?? '') > 0) || (strlen($data['country'] ?? '') > 0);

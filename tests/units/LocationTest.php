@@ -49,9 +49,9 @@ use GlpiPlugin\Carbon\Location;
 class LocationTest extends DbTestCase
 {
     /**
-     * @covers GlpiPlugin\Carbon\Location::onGlpiLocationAdd
-     * @covers GlpiPlugin\Carbon\Location::setBoaviztaZone
-     * @covers plugin_carbon_locationAdd
+     * #CoversMethod GlpiPlugin\Carbon\Location::onGlpiLocationAdd
+     * #CoversMethod GlpiPlugin\Carbon\Location::setBoaviztaZone
+     * #CoversMethod plugin_carbon_locationAdd
      *
      * @return void
      */
@@ -106,9 +106,9 @@ class LocationTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Location::onGlpiLocationPreUpdate
-     * @covers GlpiPlugin\Carbon\Location::setBoaviztaZone
-     * @covers plugin_carbon_locationPreUpdate
+     * #CoversMethod GlpiPlugin\Carbon\Location::onGlpiLocationPreUpdate
+     * #CoversMethod GlpiPlugin\Carbon\Location::setBoaviztaZone
+     * #CoversMethod plugin_carbon_locationPreUpdate
      *
      * @return void
      */
@@ -164,8 +164,8 @@ class LocationTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Location::onGlpiLocationPrePurge
-     * @covers plugin_carbon_locationPrePurge
+     * #CoversMethod GlpiPlugin\Carbon\Location::onGlpiLocationPrePurge
+     * #CoversMethod plugin_carbon_locationPrePurge
      *
      * @return void
      */
@@ -190,7 +190,7 @@ class LocationTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Location::getIncompleteLocations
+     * #CoversMethod GlpiPlugin\Carbon\Location::getIncompleteLocations
      *
      * @return void
      */
@@ -214,7 +214,7 @@ class LocationTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Location::getCountryCode
+     * #CoversMethod GlpiPlugin\Carbon\Location::getCountryCode
      *
      * @return void
      */
@@ -257,7 +257,7 @@ class LocationTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Location::enableCarbonIntensityDownload
+     * #CoversMethod GlpiPlugin\Carbon\Location::enableCarbonIntensityDownload
      *
      * @return void
      */

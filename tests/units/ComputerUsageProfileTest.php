@@ -43,12 +43,13 @@ use Ticket;
 class ComputerUsageProfileTest extends DbTestCase
 {
     /**
-     * @covers GlpiPlugin\Carbon\ComputerUsageProfile::canView
+     * #CoversMethod GlpiPlugin\Carbon\ComputerUsageProfile::canView
      *
      * @return void
      */
     public function testCanView()
     {
+        $this->logout();
         $result = ComputerUsageProfile::canView();
         $this->assertFalse($result);
 
@@ -58,8 +59,8 @@ class ComputerUsageProfileTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\ComputerUsageProfile::prepareInputForAdd
-     * @covers GlpiPlugin\Carbon\ComputerUsageProfile::inputIntegrityCheck
+     * #CoversMethod GlpiPlugin\Carbon\ComputerUsageProfile::prepareInputForAdd
+     * #CoversMethod GlpiPlugin\Carbon\ComputerUsageProfile::inputIntegrityCheck
      *
      * @return void
      */
@@ -100,8 +101,8 @@ class ComputerUsageProfileTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\ComputerUsageProfile::prepareInputForUpdate
-     * @covers GlpiPlugin\Carbon\ComputerUsageProfile::inputIntegrityCheck
+     * #CoversMethod GlpiPlugin\Carbon\ComputerUsageProfile::prepareInputForUpdate
+     * #CoversMethod GlpiPlugin\Carbon\ComputerUsageProfile::inputIntegrityCheck
      *
      * @return void
      */
@@ -142,7 +143,7 @@ class ComputerUsageProfileTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\ComputerUsageProfile::assignToItem
+     * #CoversMethod GlpiPlugin\Carbon\ComputerUsageProfile::assignToItem
      *
      * @return void
      */
@@ -226,7 +227,7 @@ class ComputerUsageProfileTest extends DbTestCase
         $massive_action->expects($matcher)->method('itemDone')->willReturnCallback(
             function (...$parameters) use ($matcher, $expected_args) {
                 // TODO: With PHPUnit 10 getInvocationCount becomes numberOfInvocations
-                switch ($matcher->getInvocationCount()) {
+                switch ($matcher->numberOfInvocations()) {
                     case 1:
                         $this->assertEquals($expected_args[1], $parameters);
                         break;

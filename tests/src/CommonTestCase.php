@@ -387,33 +387,20 @@ class CommonTestCase extends TestCase
     /**
      * Handle deprecations in GLPI
      * Helps to make unit tests without deprecations warnings, accross 2 version of GLPI
-     *
-     * @param string $itemtype
-     * @param array $input
-     * @return void
      */
-    private function handleDeprecations($itemtype, &$input): void
+    private function handleDeprecations(&$itemtype, &$input): void
     {
-        switch ($itemtype) {
-            case Ticket::class:
-                if (version_compare(GLPI_VERSION, '10.1') < 0) {
-                    break;
-                }
-                // in GLPI 10.1
-                if (isset($input['users_id_validate'])) {
-                    if (!is_array($input['users_id_validate'])) {
-                        $input['users_id_validate'] = [$input['users_id_validate']];
-                    }
-                    $input['_validation_targets'] = [];
-                    foreach ($input['users_id_validate'] as $validator_user) {
-                        $input['_validation_targets'][] = [
-                            'itemtype_target' => User::class,
-                            'items_id_target' => $validator_user,
-                        ];
-                    }
-                    unset($input['users_id_validate']);
-                }
-                break;
+        if (version_compare(GLPI_VERSION, '11.0.0-beta') >= 0) {
+            if ($itemtype === \Computer_Item::class) {
+                $itemtype = \Glpi\Asset\Asset_PeripheralAsset::class;
+                $input['itemtype_asset'] = Computer::class;
+                $input['items_id_asset'] = $input['computers_id'];
+                $input['itemtype_peripheral'] = $input['itemtype'];
+                $input['items_id_peripheral'] = $input['items_id'];
+                unset($input['computers_id']);
+                unset($input['itemtype']);
+                unset($input['items_id']);
+            }
         }
     }
 

@@ -49,7 +49,7 @@ use Item_DeviceProcessor;
 use Item_Devices;
 use Item_Disk;
 use Infocom;
-use QueryExpression;
+use Glpi\DBAL\QueryExpression;
 
 class Computer extends AbstractAsset
 {
