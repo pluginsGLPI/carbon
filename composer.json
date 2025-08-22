@@ -1,6 +1,6 @@
 {
     "require": {
-        "php": ">=7.4.0",
+        "php": ">=8.2.0",
         "geocoder-php/google-maps-provider": "^4.7",
         "geocoder-php/nominatim-provider": "^5.7",
         "league/iso3166": "^4.3",
@@ -14,7 +14,7 @@
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2.1",
         "phpstan/phpstan-deprecation-rules": "^2.0",
-        "phpunit/phpunit": "^9.6",
+        "phpunit/phpunit": "^11.5",
         "rector/rector": "^2",
         "squizlabs/php_codesniffer": "^3.7",
         "symfony/dom-crawler": "^5.4"
@@ -22,7 +22,7 @@
     "config": {
         "optimize-autoloader": true,
         "platform": {
-            "php": "7.4.0"
+            "php": "8.2.0"
         },
         "sort-packages": true,
         "allow-plugins": {
