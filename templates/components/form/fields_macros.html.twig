@@ -34,7 +34,8 @@
    {% set options = {
       'rand': random(),
       'disabled': false
-      }|merge(options) %}
+      }|merge(options)
+   %}
 
    {% if options.disabled %}
       {% set options = options|merge({specific_tags: {'disabled': 'disabled'}}) %}
@@ -65,8 +66,14 @@
       {% set name = "#{name}[]" %}
    {% endif %}
    {% set options = {
+<<<<<<< HEAD
       'rand': random(),
       'disabled': false}|merge(options) %}
+=======
+      'rand':     random(),
+      'disabled': false}|merge(options)
+   %}
+>>>>>>> 5735992 (test: adapt tests for GLPI 11)
    {% if options.fields_template.isMandatoryField(name)|default(false) %}
       {% set options = {'specific_tags': {'required': true}}|merge(options) %}
    {% endif %}
