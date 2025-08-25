@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-22 01:46+0000\n"
+"POT-Creation-Date: 2025-08-25 01:51+0000\n"
 "PO-Revision-Date: 2025-07-03 13:58+0000\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2025\n"
 "Language-Team: Turkish (Turkey) (https://app.transifex.com/teclib/teams/28042/tr_TR/)\n"
@@ -459,11 +459,11 @@ msgstr "Kod"
 
 #: src/CarbonIntensitySource_Zone.php:148
 msgid "Not downloadable"
-msgstr ""
+msgstr "İndirilebilir değil"
 
 #: src/CarbonIntensitySource_Zone.php:148
 msgid "This is a fallback source, there is no real-time data available"
-msgstr ""
+msgstr "Bu varsayılan bir kaynaktır. Burada gerçek zamanlı veriler bulunmaz"
 
 #: src/CarbonIntensitySource_Zone.php:174
 msgid "Source for historical"
@@ -475,23 +475,23 @@ msgstr "Aç / Kapat"
 
 #: src/ComputerType.php:56
 msgid "Unspecified"
-msgstr ""
+msgstr "Belirtilmemiş"
 
 #: src/ComputerType.php:58
 msgid "Server"
-msgstr ""
+msgstr "Sunucu"
 
 #: src/ComputerType.php:59
 msgid "Laptop"
-msgstr ""
+msgstr "Dizüstü"
 
 #: src/ComputerType.php:60
 msgid "Tablet"
-msgstr ""
+msgstr "Tablet"
 
 #: src/ComputerType.php:61
 msgid "Smartphone"
-msgstr ""
+msgstr "Akıllı telefon"
 
 #: src/ComputerType.php:70 src/SearchOptions.php:142 src/MonitorType.php:50
 #: src/NetworkEquipmentType.php:50
