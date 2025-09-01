@@ -400,7 +400,7 @@ class ProviderTest extends DbTestCase
                 'apply_filters' => [
                     'dates' => [
                         '2024-02-01T00:00:00.000Z',
-                        '2024-05-31T00:00:00.000Z',
+                        '2024-06-01T00:00:00.000Z',
                     ],
                 ],
             ],
@@ -424,7 +424,7 @@ class ProviderTest extends DbTestCase
                     ],
                     3 => [
                         'x' => '2024-05',
-                        'y' => '600.000',
+                        'y' => '620.000',
                     ],
                 ],
                 'name' => 'Carbon emission (gCO₂eq)',
@@ -446,7 +446,7 @@ class ProviderTest extends DbTestCase
                     ],
                     3 => [
                         'x' => '2024-05',
-                        'y' => '30.000',
+                        'y' => '31.000',
                     ],
                 ],
                 'name' => 'Consumed energy (KWh)',
