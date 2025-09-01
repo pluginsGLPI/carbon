@@ -951,7 +951,7 @@ class Provider
         $emissions_table = CarbonEmission::getTable();
 
         $dbUtils = new DbUtils();
-        $entityRestrict = $dbUtils->getEntitiesRestrictCriteria($emissions_table, '', '', 'auto');
+        $entity_restrict = $dbUtils->getEntitiesRestrictCriteria($emissions_table, '', '', 'auto');
         $sql_year_month = "DATE_FORMAT(`date`, '%Y-%m')";
         $request = [
             'SELECT'    => [
@@ -964,7 +964,7 @@ class Provider
             'FROM'    => $emissions_table,
             'GROUPBY' => @new QueryExpression($sql_year_month),
             'ORDER'   => @new QueryExpression($sql_year_month),
-            'WHERE'   => $entityRestrict + $crit,
+            'WHERE'   => array_merge($entity_restrict, $crit),
         ];
         $filter = self::getFiltersCriteria($emissions_table, $params['apply_filters']);
         $request = array_merge_recursive($request, $filter);
