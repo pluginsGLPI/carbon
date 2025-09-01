@@ -426,18 +426,18 @@ class Toolbox
     }
 
     /**
-     * Get an array of 2 dates from the beginning of the current year to yesterday
+     * Get an array of 2 dates matching the 12 complete months before the date argument
      *
      * @param DateTimeImmutable $date
      * @return array
      */
     public function yearToLastMonth(DateTimeImmutable $date): array
     {
-            $end_date = DateTime::createFromImmutable($date);
-            $end_date->setTime(0, 0, 0, 0);
-            $end_date->setDate((int) $end_date->format('Y'), (int) $end_date->format('m'), 1); // First day of current month (excluded)
-            $start_date = clone $end_date;
-            $start_date->setDate((int) $end_date->format('Y') - 1, (int) $end_date->format('m'), 1);
+        $end_date = DateTime::createFromImmutable($date);
+        $end_date->setTime(0, 0, 0, 0);
+        $end_date->setDate((int) $end_date->format('Y'), (int) $end_date->format('m'), 1); // First day of current month (excluded)
+        $start_date = clone $end_date;
+        $start_date->setDate((int) $end_date->format('Y') - 1, (int) $end_date->format('m'), 1);
 
         return [$start_date, $end_date];
     }
