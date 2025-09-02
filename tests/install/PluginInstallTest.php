@@ -118,6 +118,9 @@ class PluginInstallTest extends CommonTestCase
             $this->executeInstallation();
             GlobalFixture::loadDataset();
         }
+        $plugin = new Plugin();
+        $plugin->bootPlugins();
+        $plugin->init();
         $this->assertTrue(Plugin::isPluginActive(TEST_PLUGIN_NAME), 'Plugin not activated');
         $this->checkSchema(PLUGIN_CARBON_VERSION);
 
