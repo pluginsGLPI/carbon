@@ -43,7 +43,7 @@ class CommonAsset extends DbTestCase
 
     public function testGetStartDate()
     {
-        $asset = $this->getItem($this->asset_type, ['date_creation' => null, 'date_mod' => null]);
+        $asset = $this->createItem($this->asset_type, ['date_creation' => null, 'date_mod' => null]);
         $instance = new $this->history_type();
         $output = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
         $this->assertNull($output);
@@ -62,7 +62,7 @@ class CommonAsset extends DbTestCase
         $output = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
         $this->assertEquals('2019-01-01 00:00:00', $output->format('Y-m-d H:i:s'));
 
-        $infocom = $this->getItem(Infocom::class, [
+        $infocom = $this->createItem(Infocom::class, [
             'itemtype' => $asset->getType(),
             'items_id' => $asset->getID(),
         ]);

@@ -80,15 +80,15 @@ class NetworkEquipmentTest extends CommonAsset
         $entities_id = $this->isolateInEntity('glpi', 'glpi');
 
         $model_power = 100;
-        $location = $this->getItem(Location::class, [
+        $location = $this->createItem(Location::class, [
             'state' => 'Quebec',
         ]);
-        $model = $this->getItem(GlpiNetworkEquipmentModel::class, ['power_consumption' => $model_power]);
-        $glpi_type = $this->getItem(GlpiNetworkEquipmentType::class);
-        $type = $this->getItem(NetworkEquipmentType::class, [
+        $model = $this->createItem(GlpiNetworkEquipmentModel::class, ['power_consumption' => $model_power]);
+        $glpi_type = $this->createItem(GlpiNetworkEquipmentType::class);
+        $type = $this->createItem(NetworkEquipmentType::class, [
             GlpiNetworkEquipmentType::getForeignKeyField() => $glpi_type->getID(),
         ]);
-        $asset = $this->getItem(GlpiNetworkEquipment::class, [
+        $asset = $this->createItem(GlpiNetworkEquipment::class, [
             'networkequipmenttypes_id'  => $glpi_type->getID(),
             'networkequipmentmodels_id' => $model->getID(),
             'locations_id'              => $location->getID(),
@@ -121,7 +121,7 @@ class NetworkEquipmentTest extends CommonAsset
 
     public function testGetStartDate()
     {
-        $asset = $this->getItem(GlpiNetworkEquipment::class, ['date_creation' => null, 'date_mod' => null]);
+        $asset = $this->createItem(GlpiNetworkEquipment::class, ['date_creation' => null, 'date_mod' => null]);
         $instance = new $this->history_type();
         $output = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
         $this->assertNull($output);
@@ -140,7 +140,7 @@ class NetworkEquipmentTest extends CommonAsset
         $output = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
         $this->assertEquals('2019-01-01 00:00:00', $output->format('Y-m-d H:i:s'));
 
-        $infocom = $this->getItem(Infocom::class, [
+        $infocom = $this->createItem(Infocom::class, [
             'itemtype' => $asset->getType(),
             'items_id' => $asset->getID(),
         ]);
@@ -174,7 +174,7 @@ class NetworkEquipmentTest extends CommonAsset
     {
         $history = new NetworkEquipment();
 
-        $network_equipment = $this->getItem(GlpiNetworkEquipment::class);
+        $network_equipment = $this->createItem(GlpiNetworkEquipment::class);
         $result = $history->getHistorizableDiagnosis($network_equipment);
         $expected = [
             'is_deleted'                  => true,
@@ -197,8 +197,8 @@ class NetworkEquipmentTest extends CommonAsset
     {
         $history = new NetworkEquipment();
 
-        $network_equipment = $this->getItem(GlpiNetworkEquipment::class);
-        $infocom = $this->getItem(Infocom::class, [
+        $network_equipment = $this->createItem(GlpiNetworkEquipment::class);
+        $infocom = $this->createItem(Infocom::class, [
             'itemtype'     => $network_equipment->getType(),
             'items_id'     => $network_equipment->getID(),
         ]);
@@ -224,8 +224,8 @@ class NetworkEquipmentTest extends CommonAsset
     {
         $history = new NetworkEquipment();
 
-        $network_equipment = $this->getItem(GlpiNetworkEquipment::class);
-        $infocom = $this->getItem(Infocom::class, [
+        $network_equipment = $this->createItem(GlpiNetworkEquipment::class);
+        $infocom = $this->createItem(Infocom::class, [
             'itemtype'     => $network_equipment->getType(),
             'items_id'     => $network_equipment->getID(),
             'buy_date'     => '2024-01-01',
@@ -252,8 +252,8 @@ class NetworkEquipmentTest extends CommonAsset
     {
         $history = new NetworkEquipment();
 
-        $location = $this->getItem(Location::class);
-        $network_equipment = $this->getItem(GlpiNetworkEquipment::class, [
+        $location = $this->createItem(Location::class);
+        $network_equipment = $this->createItem(GlpiNetworkEquipment::class, [
             'locations_id' => $location->getID(),
         ]);
         $result = $history->getHistorizableDiagnosis($network_equipment);
@@ -278,10 +278,10 @@ class NetworkEquipmentTest extends CommonAsset
     {
         $history = new NetworkEquipment();
 
-        $location = $this->getItem(Location::class, [
+        $location = $this->createItem(Location::class, [
             'country' => 'France',
         ]);
-        $network_equipment = $this->getItem(GlpiNetworkEquipment::class, [
+        $network_equipment = $this->createItem(GlpiNetworkEquipment::class, [
             'locations_id' => $location->getID(),
         ]);
         $result = $history->getHistorizableDiagnosis($network_equipment);
@@ -306,10 +306,10 @@ class NetworkEquipmentTest extends CommonAsset
     {
         $history = new NetworkEquipment();
 
-        $location = $this->getItem(Location::class, [
+        $location = $this->createItem(Location::class, [
             'state' => 'Quebec',
         ]);
-        $network_equipment = $this->getItem(GlpiNetworkEquipment::class, [
+        $network_equipment = $this->createItem(GlpiNetworkEquipment::class, [
             'locations_id' => $location->getID(),
         ]);
         $result = $history->getHistorizableDiagnosis($network_equipment);
@@ -334,8 +334,8 @@ class NetworkEquipmentTest extends CommonAsset
     {
         $history = new NetworkEquipment();
 
-        $glpi_model = $this->getItem(GlpiNetworkEquipmentModel::class);
-        $network_equipment = $this->getItem(GlpiNetworkEquipment::class, [
+        $glpi_model = $this->createItem(GlpiNetworkEquipmentModel::class);
+        $network_equipment = $this->createItem(GlpiNetworkEquipment::class, [
             'networkequipmentmodels_id' => $glpi_model->getID(),
         ]);
         $result = $history->getHistorizableDiagnosis($network_equipment);
@@ -360,10 +360,10 @@ class NetworkEquipmentTest extends CommonAsset
     {
         $history = new NetworkEquipment();
 
-        $glpi_model = $this->getItem(GlpiNetworkEquipmentModel::class, [
+        $glpi_model = $this->createItem(GlpiNetworkEquipmentModel::class, [
             'power_consumption' => 60,
         ]);
-        $network_equipment = $this->getItem(GlpiNetworkEquipment::class, [
+        $network_equipment = $this->createItem(GlpiNetworkEquipment::class, [
             'networkequipmentmodels_id' => $glpi_model->getID(),
         ]);
         $result = $history->getHistorizableDiagnosis($network_equipment);
@@ -388,8 +388,8 @@ class NetworkEquipmentTest extends CommonAsset
     {
         $history = new NetworkEquipment();
 
-        $glpi_type = $this->getItem(GlpiNetworkEquipmentType::class);
-        $network_equipment = $this->getItem(GlpiNetworkEquipment::class, [
+        $glpi_type = $this->createItem(GlpiNetworkEquipmentType::class);
+        $network_equipment = $this->createItem(GlpiNetworkEquipment::class, [
             'networkequipmenttypes_id' => $glpi_type->getID(),
         ]);
         $result = $history->getHistorizableDiagnosis($network_equipment);
@@ -414,12 +414,12 @@ class NetworkEquipmentTest extends CommonAsset
     {
         $history = new NetworkEquipment();
 
-        $glpi_type = $this->getItem(GlpiNetworkEquipmentType::class);
-        $network_equipment_type = $this->getItem(NetworkEquipmentType::class, [
+        $glpi_type = $this->createItem(GlpiNetworkEquipmentType::class);
+        $network_equipment_type = $this->createItem(NetworkEquipmentType::class, [
             'power_consumption' => 55,
             'networkequipmenttypes_id' => $glpi_type->getID(),
         ]);
-        $network_equipment = $this->getItem(GlpiNetworkEquipment::class, [
+        $network_equipment = $this->createItem(GlpiNetworkEquipment::class, [
             'networkequipmenttypes_id' => $glpi_type->getID(),
         ]);
         $result = $history->getHistorizableDiagnosis($network_equipment);

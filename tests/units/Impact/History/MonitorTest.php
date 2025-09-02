@@ -90,22 +90,22 @@ class MonitorTest extends CommonAsset
         $entities_id = $this->isolateInEntity('glpi', 'glpi');
 
         $model_power = 55;
-        $location = $this->getItem(Location::class, [
+        $location = $this->createItem(Location::class, [
             'state' => 'Quebec',
         ]);
 
         $computer_model_power = 80;
-        $computer_model = $this->getItem(ComputerModel::class, ['power_consumption' => $computer_model_power]);
-        $glpi_computer_type = $this->getItem(GlpiComputerType::class);
-        $computer_type = $this->getItem(ComputerType::class, [
+        $computer_model = $this->createItem(ComputerModel::class, ['power_consumption' => $computer_model_power]);
+        $glpi_computer_type = $this->createItem(GlpiComputerType::class);
+        $computer_type = $this->createItem(ComputerType::class, [
             GlpiComputerType::getForeignKeyField() => $glpi_computer_type->getID(),
         ]);
-        $computer = $this->getItem(GlpiComputer::class, [
+        $computer = $this->createItem(GlpiComputer::class, [
             'computertypes_id'  => $glpi_computer_type->getID(),
             'computermodels_id' => $computer_model->getID(),
             'locations_id'      => $location->getID(),
         ]);
-        $usage_profile = $this->getItem(ComputerUsageProfile::class, [
+        $usage_profile = $this->createItem(ComputerUsageProfile::class, [
             'time_start'   => '09:00:00',
             'time_stop'    => '18:00:00',
             'day_1'        => '1',
@@ -116,25 +116,25 @@ class MonitorTest extends CommonAsset
             'day_6'        => '0',
             'day_7'        => '0',
         ]);
-        $impact = $this->getItem(UsageInfo::class, [
+        $impact = $this->createItem(UsageInfo::class, [
             $usage_profile->getForeignKeyField() => $usage_profile->getID(),
             'itemtype' => $computer->getType(),
             'items_id' => $computer->getID(),
         ]);
 
-        $model = $this->getItem(GlpiMonitorModel::class, ['power_consumption' => $model_power]);
-        $glpi_type = $this->getItem(GlpiMonitorType::class);
-        $type = $this->getItem(MonitorType::class, [
+        $model = $this->createItem(GlpiMonitorModel::class, ['power_consumption' => $model_power]);
+        $glpi_type = $this->createItem(GlpiMonitorType::class);
+        $type = $this->createItem(MonitorType::class, [
             GlpiMonitorType::getForeignKeyField() => $glpi_type->getID(),
         ]);
-        $asset = $this->getItem(GlpiMonitor::class, [
+        $asset = $this->createItem(GlpiMonitor::class, [
             'monitortypes_id'   => $glpi_type->getID(),
             'monitormodels_id'  => $model->getID(),
             'locations_id'      => $location->getID(),
             'date_creation'     => '2024-01-01',
             'date_mod'          => null,
         ]);
-        $computer_asset = $this->getItem(Computer_Item::class, [
+        $computer_asset = $this->createItem(Computer_Item::class, [
             'computers_id' => $computer->getID(),
             'itemtype' => $asset->getType(),
             'items_id' => $asset->getID(),
@@ -251,7 +251,7 @@ class MonitorTest extends CommonAsset
     {
         $history = new Monitor();
 
-        $monitor = $this->getItem(GlpiMonitor::class);
+        $monitor = $this->createItem(GlpiMonitor::class);
         $result = $history->getHistorizableDiagnosis($monitor);
         $expected = [
             'is_deleted'                  => true,
@@ -276,9 +276,9 @@ class MonitorTest extends CommonAsset
     {
         $history = new Monitor();
 
-        $monitor = $this->getItem(GlpiMonitor::class);
-        $computer = $this->getItem(GlpiComputer::class);
-        $computer_item = $this->getItem(Computer_Item::class, [
+        $monitor = $this->createItem(GlpiMonitor::class);
+        $computer = $this->createItem(GlpiComputer::class);
+        $computer_item = $this->createItem(Computer_Item::class, [
             'computers_id' => $computer->getID(),
             'itemtype'     => $monitor->getType(),
             'items_id'     => $monitor->getID(),
@@ -307,8 +307,8 @@ class MonitorTest extends CommonAsset
     {
         $history = new Monitor();
 
-        $monitor = $this->getItem(GlpiMonitor::class);
-        $infocom = $this->getItem(Infocom::class, [
+        $monitor = $this->createItem(GlpiMonitor::class);
+        $infocom = $this->createItem(Infocom::class, [
             'itemtype'     => $monitor->getType(),
             'items_id'     => $monitor->getID(),
         ]);
@@ -336,8 +336,8 @@ class MonitorTest extends CommonAsset
     {
         $history = new Monitor();
 
-        $monitor = $this->getItem(GlpiMonitor::class);
-        $infocom = $this->getItem(Infocom::class, [
+        $monitor = $this->createItem(GlpiMonitor::class);
+        $infocom = $this->createItem(Infocom::class, [
             'itemtype'     => $monitor->getType(),
             'items_id'     => $monitor->getID(),
             'buy_date'     => '2024-01-01',
@@ -366,12 +366,12 @@ class MonitorTest extends CommonAsset
     {
         $history = new Monitor();
 
-        $monitor = $this->getItem(GlpiMonitor::class);
-        $location = $this->getItem(Location::class);
-        $computer = $this->getItem(GlpiComputer::class, [
+        $monitor = $this->createItem(GlpiMonitor::class);
+        $location = $this->createItem(Location::class);
+        $computer = $this->createItem(GlpiComputer::class, [
             'locations_id' => $location->getID(),
         ]);
-        $computer_item = $this->getItem(Computer_Item::class, [
+        $computer_item = $this->createItem(Computer_Item::class, [
             'computers_id' => $computer->getID(),
             'itemtype'     => $monitor->getType(),
             'items_id'     => $monitor->getID(),
@@ -400,14 +400,14 @@ class MonitorTest extends CommonAsset
     {
         $history = new Monitor();
 
-        $monitor = $this->getItem(GlpiMonitor::class);
-        $location = $this->getItem(Location::class, [
+        $monitor = $this->createItem(GlpiMonitor::class);
+        $location = $this->createItem(Location::class, [
             'country' => 'France',
         ]);
-        $computer = $this->getItem(GlpiComputer::class, [
+        $computer = $this->createItem(GlpiComputer::class, [
             'locations_id' => $location->getID(),
         ]);
-        $computer_item = $this->getItem(Computer_Item::class, [
+        $computer_item = $this->createItem(Computer_Item::class, [
             'computers_id' => $computer->getID(),
             'itemtype'     => $monitor->getType(),
             'items_id'     => $monitor->getID(),
@@ -437,14 +437,14 @@ class MonitorTest extends CommonAsset
     {
         $history = new Monitor();
 
-        $location = $this->getItem(Location::class, [
+        $location = $this->createItem(Location::class, [
             'state' => 'Quebec',
         ]);
-        $monitor = $this->getItem(GlpiMonitor::class);
-        $computer = $this->getItem(GlpiComputer::class, [
+        $monitor = $this->createItem(GlpiMonitor::class);
+        $computer = $this->createItem(GlpiComputer::class, [
             'locations_id' => $location->getID(),
         ]);
-        $computer_item = $this->getItem(Computer_Item::class, [
+        $computer_item = $this->createItem(Computer_Item::class, [
             'computers_id' => $computer->getID(),
             'itemtype'     => $monitor->getType(),
             'items_id'     => $monitor->getID(),
@@ -473,15 +473,15 @@ class MonitorTest extends CommonAsset
     {
         $history = new Monitor();
 
-        $monitor = $this->getItem(GlpiMonitor::class);
-        $computer = $this->getItem(GlpiComputer::class);
-        $computer_item = $this->getItem(Computer_Item::class, [
+        $monitor = $this->createItem(GlpiMonitor::class);
+        $computer = $this->createItem(GlpiComputer::class);
+        $computer_item = $this->createItem(Computer_Item::class, [
             'computers_id' => $computer->getID(),
             'itemtype'     => $monitor->getType(),
             'items_id'     => $monitor->getID(),
         ]);
-        $usage_profile = $this->getItem(ComputerUsageProfile::class);
-        $impact = $this->getItem(UsageInfo::class, [
+        $usage_profile = $this->createItem(ComputerUsageProfile::class);
+        $impact = $this->createItem(UsageInfo::class, [
             $usage_profile->getForeignKeyField() => $usage_profile->getID(),
             'itemtype' => $computer->getType(),
             'items_id' => $computer->getID(),
@@ -510,8 +510,8 @@ class MonitorTest extends CommonAsset
     {
         $history = new Monitor();
 
-        $glpi_monitor_model = $this->getItem(GlpiMonitorModel::class);
-        $monitor = $this->getItem(GlpiMonitor::class, [
+        $glpi_monitor_model = $this->createItem(GlpiMonitorModel::class);
+        $monitor = $this->createItem(GlpiMonitor::class, [
             'monitormodels_id' => $glpi_monitor_model->getID(),
         ]);
         $result = $history->getHistorizableDiagnosis($monitor);
@@ -538,10 +538,10 @@ class MonitorTest extends CommonAsset
     {
         $history = new Monitor();
 
-        $glpi_monitor_model = $this->getItem(GlpiMonitorModel::class, [
+        $glpi_monitor_model = $this->createItem(GlpiMonitorModel::class, [
             'power_consumption' => 35,
         ]);
-        $monitor = $this->getItem(GlpiMonitor::class, [
+        $monitor = $this->createItem(GlpiMonitor::class, [
             'monitormodels_id' => $glpi_monitor_model->getID(),
         ]);
         $result = $history->getHistorizableDiagnosis($monitor);
@@ -568,12 +568,12 @@ class MonitorTest extends CommonAsset
     {
         $history = new Monitor();
 
-        $glpi_monitor_type = $this->getItem(GlpiMonitorType::class);
-        $monitor_type = $this->getItem(MonitorType::class, [
+        $glpi_monitor_type = $this->createItem(GlpiMonitorType::class);
+        $monitor_type = $this->createItem(MonitorType::class, [
             'power_consumption' => 55,
             'monitortypes_id' => $glpi_monitor_type->getID(),
         ]);
-        $monitor = $this->getItem(GlpiMonitor::class, [
+        $monitor = $this->createItem(GlpiMonitor::class, [
             'monitortypes_id' => $glpi_monitor_type->getID(),
         ]);
         $result = $history->getHistorizableDiagnosis($monitor);
@@ -600,12 +600,12 @@ class MonitorTest extends CommonAsset
     {
         $history = new Monitor();
 
-        $glpi_monitor_type = $this->getItem(GlpiMonitorType::class);
-        $monitor_type = $this->getItem(MonitorType::class, [
+        $glpi_monitor_type = $this->createItem(GlpiMonitorType::class);
+        $monitor_type = $this->createItem(MonitorType::class, [
             'monitortypes_id'   => $glpi_monitor_type->getID(),
             'power_consumption' => 55,
         ]);
-        $monitor = $this->getItem(GlpiMonitor::class, [
+        $monitor = $this->createItem(GlpiMonitor::class, [
             'monitortypes_id' => $glpi_monitor_type->getID(),
         ]);
         $result = $history->getHistorizableDiagnosis($monitor);
@@ -633,29 +633,29 @@ class MonitorTest extends CommonAsset
     {
         $history = new Monitor();
 
-        $location = $this->getItem(Location::class, [
+        $location = $this->createItem(Location::class, [
             'country' => 'France',
         ]);
-        $glpi_monitor_model = $this->getItem(GlpiMonitorModel::class, [
+        $glpi_monitor_model = $this->createItem(GlpiMonitorModel::class, [
             'power_consumption' => 35,
         ]);
-        $monitor = $this->getItem(GlpiMonitor::class, [
+        $monitor = $this->createItem(GlpiMonitor::class, [
             'monitormodels_id' => $glpi_monitor_model->getID(),
         ]);
-        $computer = $this->getItem(GlpiComputer::class, [
+        $computer = $this->createItem(GlpiComputer::class, [
             'locations_id' => $location->getID(),
         ]);
-        $computer_item = $this->getItem(Computer_Item::class, [
+        $computer_item = $this->createItem(Computer_Item::class, [
             'computers_id' => $computer->getID(),
             'itemtype'     => $monitor->getType(),
             'items_id'     => $monitor->getID(),
         ]);
-        $infocom = $this->getItem(Infocom::class, [
+        $infocom = $this->createItem(Infocom::class, [
             'itemtype'     => $monitor->getType(),
             'items_id'     => $monitor->getID(),
             'buy_date'     => '2024-01-01',
         ]);
-        $usage_profile = $this->getItem(ComputerUsageProfile::class, [
+        $usage_profile = $this->createItem(ComputerUsageProfile::class, [
             'time_start'   => '09:00:00',
             'time_stop'    => '18:00:00',
             'day_1'        => '1',
@@ -666,7 +666,7 @@ class MonitorTest extends CommonAsset
             'day_6'        => '0',
             'day_7'        => '0',
         ]);
-        $impact = $this->getItem(UsageInfo::class, [
+        $impact = $this->createItem(UsageInfo::class, [
             $usage_profile->getForeignKeyField() => $usage_profile->getID(),
             'itemtype' => $computer->getType(),
             'items_id' => $computer->getID(),

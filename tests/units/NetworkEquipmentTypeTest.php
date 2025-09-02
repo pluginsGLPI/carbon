@@ -52,7 +52,7 @@ class NetworkEquipmentTypeTest extends DbTestCase
 
     public function testGetTabNameForItem()
     {
-        $glpi_networkequipment_type = $this->getItem(GlpiNetworkEquipmentType::class);
+        $glpi_networkequipment_type = $this->createItem(GlpiNetworkEquipmentType::class);
         $instance = new NetworkEquipmentType();
         $result = $instance->getTabNameForItem($glpi_networkequipment_type);
         $this->assertEquals('Carbon', $result);
@@ -63,7 +63,7 @@ class NetworkEquipmentTypeTest extends DbTestCase
 
     public function testGetOrCreate()
     {
-        $computer_type = $this->getItem(GlpiNetworkEquipmentType::class, ['name' => 'Test Computer Type']);
+        $computer_type = $this->createItem(GlpiNetworkEquipmentType::class, ['name' => 'Test Computer Type']);
         $instance = new NetworkEquipmentType();
         $this->callPrivateMethod($instance, 'getOrCreate', $computer_type);
         $this->assertFalse($instance->isNewItem());
@@ -72,8 +72,8 @@ class NetworkEquipmentTypeTest extends DbTestCase
 
     public function testShowForItemType()
     {
-        $glpi_networkequipment_type = $this->getItem(GlpiNetworkEquipmentType::class);
-        $networkequipment_type = $this->getItem(NetworkEquipmentType::class, [
+        $glpi_networkequipment_type = $this->createItem(GlpiNetworkEquipmentType::class);
+        $networkequipment_type = $this->createItem(NetworkEquipmentType::class, [
             'networkequipmenttypes_id' => $glpi_networkequipment_type->getID(),
         ]);
         $this->login('glpi', 'glpi');
@@ -93,7 +93,7 @@ class NetworkEquipmentTypeTest extends DbTestCase
 
     public function testUpdatePowerConsumption()
     {
-        $glpi_networkequipment_type = $this->getItem(GlpiNetworkEquipmentType::class);
+        $glpi_networkequipment_type = $this->createItem(GlpiNetworkEquipmentType::class);
 
         NetworkEquipmentType::updatePowerConsumption($glpi_networkequipment_type, 10);
         $instance = new NetworkEquipmentType();
@@ -118,7 +118,7 @@ class NetworkEquipmentTypeTest extends DbTestCase
             ->getMock();
         $massive_action->method('getAction')->willReturn('MassUpdatePower');
         $massive_action->method('getItems')->willReturn([
-            NetworkEquipmentType::class => $this->getItem(GlpiNetworkEquipmentType::class)
+            NetworkEquipmentType::class => $this->createItem(GlpiNetworkEquipmentType::class)
         ]);
         ob_start(function ($buffer) {
             return $buffer;
@@ -146,7 +146,7 @@ class NetworkEquipmentTypeTest extends DbTestCase
             ->getMock();
         $massive_action->method('getAction')->willReturn('');
         $massive_action->method('getItems')->willReturn([
-            NetworkEquipmentType::class => $this->getItem(GlpiNetworkEquipmentType::class)
+            NetworkEquipmentType::class => $this->createItem(GlpiNetworkEquipmentType::class)
         ]);
         ob_start(function ($buffer) {
             return $buffer;
@@ -164,8 +164,8 @@ class NetworkEquipmentTypeTest extends DbTestCase
             ->disableOriginalConstructor()
             ->getMock();
         $massive_action->method('getAction')->willReturn('MassUpdatePower');
-        $glpi_networkequipment_type = $this->getItem(GlpiNetworkEquipmentType::class);
-        $networkequipment_type = $this->getItem(NetworkEquipmentType::class, [
+        $glpi_networkequipment_type = $this->createItem(GlpiNetworkEquipmentType::class);
+        $networkequipment_type = $this->createItem(NetworkEquipmentType::class, [
             'networkequipmenttypes_id' => $glpi_networkequipment_type->getID(),
         ]);
         $massive_action->POST = [

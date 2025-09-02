@@ -55,20 +55,20 @@ class ToolboxTest extends DbTestCase
         $expected = null;
         $this->assertEquals($expected, $output);
 
-        $computer = $this->getItem(Computer::class);
+        $computer = $this->createItem(Computer::class);
         $output = $toolbox->getLatestAssetDate();
         $expected = null;
         $this->assertEquals($expected, $output);
 
         $expected = new DateTime('1980-01-01 00:00:00');
-        $computer = $this->getItem(Computer::class, [
+        $computer = $this->createItem(Computer::class, [
             'date_creation' => $expected->format('Y-m-d H:i:s'),
         ]);
         $output = $toolbox->getOldestAssetDate();
         $this->assertEquals($expected, $output);
 
         $expected = new DateTime('2000-01-01 00:00:00');
-        $infocom = $this->getItem(Infocom::class, [
+        $infocom = $this->createItem(Infocom::class, [
             'itemtype'    => $computer->getType(),
             'items_id'    => $computer->getID(),
             'entities_id' => $computer->fields['entities_id'],
@@ -98,14 +98,14 @@ class ToolboxTest extends DbTestCase
         $expected = null;
         $this->assertEquals($expected, $output);
 
-        $computer = $this->getItem(Computer::class);
+        $computer = $this->createItem(Computer::class);
         $output = $toolbox->getLatestAssetDate();
         $expected = null;
         $this->assertEquals($expected, $output);
 
 
         $expected = new DateTime('2024-06-15 00:00:00');
-        $infocom = $this->getItem(Infocom::class, [
+        $infocom = $this->createItem(Infocom::class, [
             'itemtype' => $computer->getType(),
             'items_id' => $computer->getID(),
             'decommission_date' => $expected->format('Y-m-d H:i:s'),
@@ -166,10 +166,10 @@ class ToolboxTest extends DbTestCase
         $output = Toolbox::isLocationExistForZone('foo');
         $this->assertFalse($output);
 
-        $this->getItem(Zone::class, [
+        $this->createItem(Zone::class, [
             'name' => 'foo',
         ]);
-        $this->getItem(Location::class, [
+        $this->createItem(Location::class, [
             'country' => 'foo'
         ]);
         $output = Toolbox::isLocationExistForZone('foo');
