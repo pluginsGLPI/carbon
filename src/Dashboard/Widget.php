@@ -304,7 +304,7 @@ class Widget extends GlpiDashboardWidget
 
     //     $palette_style = "";
     //     if (!$p['multiple'] || $p['use_gradient']) {
-    //         $palette_style = self::getCssGradientPalette($p['color'], $nb_series, "#{$chart_id}");
+    //         $palette_style = self::getGradientPalette($p['color'], $nb_series);
     //     }
 
     //     $chart_id = 'chart_' . $p['cache_key'];
@@ -414,10 +414,9 @@ class Widget extends GlpiDashboardWidget
 
     //     $palette_style = "";
     //     if ($p['use_gradient']) {
-    //         $palette_style = self::getCssGradientPalette(
+    //         $palette_style = self::getGradientPalette(
     //             $p['color'],
-    //             $nb_series,
-    //             "#{$chart_id}"
+    //             $nb_series
     //         );
     //     }
 
@@ -1055,10 +1054,6 @@ class Widget extends GlpiDashboardWidget
         $p = array_merge($default, $params);
 
         $icon_url = $CFG_GLPI['root_doc'] . '/plugins/carbon/images/ecology-icon-light.png';
-        /** @phpstan-ignore-next-line */
-        if (version_compare(GLPI_VERSION, '11.0', '<')) {
-            $icon_url = Plugin::getWebDir('carbon') . '/public/images/ecology-icon-light.png';
-        }
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/information-block.html.twig', [
             'id'              => $p['id'],
             'color'           => $p['color'],
@@ -1156,10 +1151,9 @@ class Widget extends GlpiDashboardWidget
         $nb_series = count($series);
         $palette_style = "";
         if ($p['use_gradient']) {
-            $palette_style = self::getCssGradientPalette(
+            $palette_style = self::getGradientPalette(
                 $p['color'],
                 $nb_series,
-                ".dashboard #{$chart_id}",
                 false
             );
         }

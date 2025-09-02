@@ -70,7 +70,6 @@ class ExportDashboardCommand extends Command
         $this->output->writeln("<info>$message</info>");
 
         $dashboard = new Dashboard();
-        /** @phpstan-ignore argument.type */
         if (!$dashboard->getFromDB('plugin_carbon_board')) {
             $message = __('Dashboard not found', 'carbon');
             $this->output->writeln("<error>$message</error>");

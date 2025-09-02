@@ -112,7 +112,6 @@ class Uninstall
     {
         $dashboard_key = 'plugin_carbon_board';
         $dashboard = new Dashboard();
-        /** @phpstan-ignore argument.type */
         $dashboard->getFromDB($dashboard_key);
         if ($dashboard->isNewItem()) {
             return;

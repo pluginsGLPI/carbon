@@ -42,7 +42,6 @@ global $DB;
 
 $dashboard = new Dashboard();
 $dashboard_key = 'plugin_carbon_board';
-/** @phpstan-ignore argument.type */
 if ($dashboard->getFromDB($dashboard_key) === false) {
     // The dashboard already exists, nothing to create
     $dashboard->add([

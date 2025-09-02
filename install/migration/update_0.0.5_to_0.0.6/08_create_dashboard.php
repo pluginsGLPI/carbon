@@ -51,7 +51,6 @@ if (($args['reset-report-dashboard'] ?? false)) {
     ]);
 }
 
-/** @phpstan-ignore argument.type */
 if ($dashboard->getFromDB($dashboard_key) === false) {
     // The dashboard already exists, nothing to create
     $dashboard->add([
