@@ -58,7 +58,6 @@ class PluginUpgradeTest extends PluginInstallTest
 
         // $this->markTestSkipped('There is no upgrade to test yet');
 
-        $this->setupGLPIFramework();
         $this->assertTrue($DB->connected);
 
         $success = $DB->runFile(__DIR__ . "/../../install/mysql/plugin_carbon_{$this->old_version}_empty.sql");
