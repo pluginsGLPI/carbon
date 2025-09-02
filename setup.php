@@ -72,8 +72,6 @@ function plugin_init_carbon()
      /** @var array $PLUGIN_HOOKS */
     global $CFG_GLPI, $PLUGIN_HOOKS;
 
-    $PLUGIN_HOOKS[Hooks::CSRF_COMPLIANT]['carbon'] = true;
-
     if (!Plugin::isPluginActive('carbon')) {
         return;
     }

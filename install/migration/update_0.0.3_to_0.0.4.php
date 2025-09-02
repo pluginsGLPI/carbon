@@ -41,7 +41,7 @@ function update003to004(Migration $migration)
     $update_dir = __DIR__ . "/update_{$from_version}_to_{$to_version}/";
 
     //TRANS: %s is the number of new version
-    $migration->displayTitle(sprintf(__('Update to %s'), $to_version));
+    $migration->addInfoMessage(sprintf(__('Update to %s'), $to_version));
     $migration->setVersion($to_version);
 
     // New tables from enpty.sql file after the migration
@@ -57,7 +57,7 @@ function update003to004(Migration $migration)
 
     $dbFile = plugin_carbon_getSchemaPath($to_version);
     if ($dbFile === null || !$DB->runFile($dbFile)) {
-        $migration->displayWarning("Error creating tables : " . $DB->error(), true);
+        $migration->addWarningMessage("Error creating tables : " . $DB->error());
         $updateresult = false;
     }
 

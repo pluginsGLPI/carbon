@@ -30,13 +30,14 @@
  * -------------------------------------------------------------------------
  */
 
+use Glpi\Exception\Http\NotFoundHttpException;
 use GlpiPlugin\Carbon\Zone;
 
 include(__DIR__ . '/../../../inc/includes.php');
 
 // Check if plugin is activated
 if (!Plugin::isPluginActive('carbon')) {
-    Html::displayNotFoundError();
+    throw new NotFoundHttpException();
 }
 
 $dropdown = new Zone();

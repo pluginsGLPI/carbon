@@ -31,11 +31,12 @@
  */
 
 use Config as GlpiConfig;
+use Glpi\Exception\Http\NotFoundHttpException;
 
 include(__DIR__ . "/../../../inc/includes.php");
 
 if (!Plugin::isPluginActive('carbon')) {
-    Html::displayNotFoundError();
+    throw new NotFoundHttpException();
 }
 
 // Requires URL encoded backslashes or Html::redirect will double them
