@@ -54,19 +54,19 @@ abstract class EngineTestCase extends DbTestCase
 
     public function getPowerProvider(): \Generator
     {
-        $item = $this->getItem(static::$itemtype_class);
+        $item = $this->createItem(static::$itemtype_class);
         $engine = new static::$engine_class($item);
         yield 'item without model nor type' => [
             $engine,
             0
         ];
 
-        $model = $this->getItem(static::$model_class);
-        $glpi_type = $this->getItem(static::$glpi_type_class);
-        $type = $this->getItem(static::$type_class, [
+        $model = $this->createItem(static::$model_class);
+        $glpi_type = $this->createItem(static::$glpi_type_class);
+        $type = $this->createItem(static::$type_class, [
             static::$glpi_type_class::getForeignKeyField() => $glpi_type->getID(),
         ]);
-        $item = $this->getItem(static::$itemtype_class, [
+        $item = $this->createItem(static::$itemtype_class, [
             static::$glpi_type_class::getForeignKeyField() => $glpi_type->getID(),
             static::$model_class::getForeignKeyField() => $model->getID(),
         ]);
@@ -76,8 +76,8 @@ abstract class EngineTestCase extends DbTestCase
             0
         ];
 
-        $model = $this->getItem(static::$model_class, ['power_consumption' => 20]);
-        $item = $this->getItem(static::$itemtype_class, [
+        $model = $this->createItem(static::$model_class, ['power_consumption' => 20]);
+        $item = $this->createItem(static::$itemtype_class, [
             static::$glpi_type_class::getForeignKeyField() => $glpi_type->getID(),
             static::$model_class::getForeignKeyField() => $model->getID(),
         ]);
@@ -87,13 +87,13 @@ abstract class EngineTestCase extends DbTestCase
             20
         ];
 
-        $model = $this->getItem(static::$model_class);
-        $glpi_type = $this->getItem(static::$glpi_type_class);
-        $type = $this->getItem(static::$type_class, [
+        $model = $this->createItem(static::$model_class);
+        $glpi_type = $this->createItem(static::$glpi_type_class);
+        $type = $this->createItem(static::$type_class, [
             static::$glpi_type_class::getForeignKeyField() => $glpi_type->getID(),
             'power_consumption' => 40
         ]);
-        $item = $this->getItem(static::$itemtype_class, [
+        $item = $this->createItem(static::$itemtype_class, [
             static::$glpi_type_class::getForeignKeyField() => $glpi_type->getID(),
             static::$model_class::getForeignKeyField() => $model->getID(),
         ]);
@@ -103,8 +103,8 @@ abstract class EngineTestCase extends DbTestCase
             40
         ];
 
-        $model = $this->getItem(static::$model_class, ['power_consumption' => 20]);
-        $item = $this->getItem(static::$itemtype_class, [
+        $model = $this->createItem(static::$model_class, ['power_consumption' => 20]);
+        $item = $this->createItem(static::$itemtype_class, [
             static::$glpi_type_class::getForeignKeyField() => $glpi_type->getID(),
             static::$model_class::getForeignKeyField() => $model->getID(),
         ]);

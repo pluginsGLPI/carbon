@@ -47,7 +47,7 @@ class InventoryTest extends DbTestCase
         $success = $inventory->addItem(Plugin::class, 1);
         $this->assertFalse($success);
 
-        $computer = $this->getItem(Computer::class);
+        $computer = $this->createItem(Computer::class);
         $success = $inventory->addItem($computer->getType(), $computer->getId());
         $this->assertTrue($success);
     }

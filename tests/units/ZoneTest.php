@@ -46,47 +46,47 @@ class ZoneTest extends DbTestCase
         $this->assertNull($output);
 
         // Test with a Location object that has no country or state
-        $location = $this->getItem(Location::class);
+        $location = $this->createItem(Location::class);
         $output = Zone::getByLocation($location);
         $this->assertNull($output);
 
         // Test with a Location object that has a country
-        $location = $this->getItem(Location::class, [
+        $location = $this->createItem(Location::class, [
             'country' => 'foo'
         ]);
         $output = Zone::getByLocation($location);
         $this->assertNull($output);
 
         // Test with a Location object that has a country and a zoone exists for this location
-        $zone = $this->getItem(Zone::class, [
+        $zone = $this->createItem(Zone::class, [
             'name' => 'foo'
         ]);
         $output = Zone::getByLocation($location);
         $this->assertEquals($output->getID(), $zone->getID());
 
         // Test with a Location object that has a state
-        $location = $this->getItem(Location::class, [
+        $location = $this->createItem(Location::class, [
             'state' => 'bar'
         ]);
         $output = Zone::getByLocation($location);
         $this->assertNull($output);
 
         // Test with a Location object that has a state and a zone exists for this location
-        $zone = $this->getItem(Zone::class, [
+        $zone = $this->createItem(Zone::class, [
             'name' => 'bar'
         ]);
         $output = Zone::getByLocation($location);
         $this->assertEquals($output->getID(), $zone->getID());
 
         // Test with a Location object that has both country and state
-        $location = $this->getItem(Location::class, [
+        $location = $this->createItem(Location::class, [
             'country' => 'fooo',
             'state' => 'baz'
         ]);
         $output = Zone::getByLocation($location);
         $this->assertNull($output);
         // Test with a Location object that has both country and state and a zone exists for this location
-        $zone = $this->getItem(Zone::class, [
+        $zone = $this->createItem(Zone::class, [
             'name' => 'baz'
         ]);
         $output = Zone::getByLocation($location);
@@ -100,52 +100,52 @@ class ZoneTest extends DbTestCase
         $this->assertNull($output);
 
         // Test with a Computer object that has a location with country and no matching zone
-        $location = $this->getItem(Location::class, [
+        $location = $this->createItem(Location::class, [
             'country' => 'foo'
         ]);
-        $computer = $this->getItem(Computer::class, [
+        $computer = $this->createItem(Computer::class, [
             'locations_id' => $location->getID(),
         ]);
         $output = Zone::getByAsset($computer);
         $this->assertNull($output);
 
         // Test with a Computer object that has a location with country and a matching zone
-        $zone = $this->getItem(Zone::class, [
+        $zone = $this->createItem(Zone::class, [
             'name' => 'foo'
         ]);
         $output = Zone::getByAsset($computer);
         $this->assertEquals($output->getID(), $zone->getID());
 
         // Test with a Computer object that has a location with state and no matching zone
-        $location = $this->getItem(Location::class, [
+        $location = $this->createItem(Location::class, [
             'state' => 'bar'
         ]);
-        $computer = $this->getItem(Computer::class, [
+        $computer = $this->createItem(Computer::class, [
             'locations_id' => $location->getID(),
         ]);
         $output = Zone::getByAsset($computer);
         $this->assertNull($output);
 
         // Test with a Computer object that has a location with state and a matching zone
-        $zone = $this->getItem(Zone::class, [
+        $zone = $this->createItem(Zone::class, [
             'name' => 'bar'
         ]);
         $output = Zone::getByAsset($computer);
         $this->assertEquals($output->getID(), $zone->getID());
 
         // Test with a Computer object that has a location with both country and state and no matching zone
-        $location = $this->getItem(Location::class, [
+        $location = $this->createItem(Location::class, [
             'country' => 'fooo',
             'state' => 'baz'
         ]);
-        $computer = $this->getItem(Computer::class, [
+        $computer = $this->createItem(Computer::class, [
             'locations_id' => $location->getID(),
         ]);
         $output = Zone::getByAsset($computer);
         $this->assertNull($output);
 
         // Test with a Computer object that has a location with both country and state and a matching zone
-        $zone = $this->getItem(Zone::class, [
+        $zone = $this->createItem(Zone::class, [
             'name' => 'baz'
         ]);
         $output = Zone::getByAsset($computer);
@@ -159,16 +159,16 @@ class ZoneTest extends DbTestCase
         $this->assertFalse($zone->hasHistoricalData());
 
         // Test with a Zone object without the field
-        $zone = $this->getItem(Zone::class);
+        $zone = $this->createItem(Zone::class);
         unset($zone->fields['plugin_carbon_carbonintensitysources_id_historical']);
         $this->assertFalse($zone->hasHistoricalData());
 
         // Test with a Zone object that has no historical data
         /** @var Zone $zone */
-        $zone = $this->getItem(Zone::class);
+        $zone = $this->createItem(Zone::class);
         $this->assertFalse($zone->hasHistoricalData());
 
-        $source = $this->getItem(CarbonIntensitySource::class, [
+        $source = $this->createItem(CarbonIntensitySource::class, [
             'name' => 'foo'
         ]);
         $zone->update(array_merge($zone->fields, [
@@ -185,12 +185,12 @@ class ZoneTest extends DbTestCase
         $this->assertFalse($zone->getByItem($item));
 
         // Test with a Computer object that has no location
-        $item = $this->getItem(Computer::class);
+        $item = $this->createItem(Computer::class);
         $zone = new Zone();
         $this->assertFalse($zone->getByItem($item));
 
         // Test with a Computer object that has a location with country and no matching zone
-        $location = $this->getItem(Location::class, [
+        $location = $this->createItem(Location::class, [
             'country' => 'foo'
         ]);
         $item->update(['id' => $item->getID(), 'locations_id' => $location->getID()]);
@@ -198,7 +198,7 @@ class ZoneTest extends DbTestCase
         $this->assertFalse($zone->getByItem($item));
 
         // Test with a Computer object that has a location with country and a matching zone
-        $expected_zone = $this->getItem(Zone::class, [
+        $expected_zone = $this->createItem(Zone::class, [
             'name' => 'foo'
         ]);
         $zone = new Zone();
@@ -206,7 +206,7 @@ class ZoneTest extends DbTestCase
         $this->assertEquals($zone->getID(), $expected_zone->getID());
 
         // Test with a Computer object that has a location with state and no matching zone
-        $location = $this->getItem(Location::class, [
+        $location = $this->createItem(Location::class, [
             'state' => 'bar'
         ]);
         $item->update(['id' => $item->getID(), 'locations_id' => $location->getID()]);
@@ -214,7 +214,7 @@ class ZoneTest extends DbTestCase
         $this->assertFalse($zone->getByItem($item));
 
         // Test with a Computer object that has a location with state and a matching zone
-        $expected_zone = $this->getItem(Zone::class, [
+        $expected_zone = $this->createItem(Zone::class, [
             'name' => 'bar'
         ]);
         $zone = new Zone();
@@ -222,7 +222,7 @@ class ZoneTest extends DbTestCase
         $this->assertEquals($zone->getID(), $expected_zone->getID());
 
         // Test with a Computer object that has a location with both country and state and no matching zone
-        $location = $this->getItem(Location::class, [
+        $location = $this->createItem(Location::class, [
             'country' => 'fooo',
             'state' => 'baz'
         ]);
@@ -231,7 +231,7 @@ class ZoneTest extends DbTestCase
         $this->assertFalse($zone->getByItem($item));
 
         // Test with a Computer object that has a location with both country and state and a matching zone for state
-        $expected_zone = $this->getItem(Zone::class, [
+        $expected_zone = $this->createItem(Zone::class, [
             'name' => 'baz'
         ]);
         $zone = new Zone();
@@ -239,7 +239,7 @@ class ZoneTest extends DbTestCase
         $this->assertEquals($zone->getID(), $expected_zone->getID());
 
         // Test with a Computer object that has a location with both country and state and a matching zone for state and country
-        $location = $this->getItem(Location::class, [
+        $location = $this->createItem(Location::class, [
             'country' => 'foo',
             'state' => 'baz'
         ]);

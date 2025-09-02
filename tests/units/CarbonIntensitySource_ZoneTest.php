@@ -45,15 +45,15 @@ class CarbonIntensitySource_ZoneTest extends DbTestCase
      */
     public function testShowForSource()
     {
-        $source = $this->getItem(CarbonIntensitySource::class, [
+        $source = $this->createItem(CarbonIntensitySource::class, [
             'name' => 'foo'
         ]);
 
-        $zone = $this->getItem(Zone::class, [
+        $zone = $this->createItem(Zone::class, [
             'name' => 'bar'
         ]);
 
-        $instance = $this->getItem(CarbonIntensitySource_Zone::class, [
+        $instance = $this->createItem(CarbonIntensitySource_Zone::class, [
             $source::getForeignKeyField() => $source->getID(),
             $zone::getForeignKeyField() => $zone->getID(),
         ]);
@@ -76,15 +76,15 @@ class CarbonIntensitySource_ZoneTest extends DbTestCase
      */
     public function testShowForZone()
     {
-        $source = $this->getItem(CarbonIntensitySource::class, [
+        $source = $this->createItem(CarbonIntensitySource::class, [
             'name' => 'foo'
         ]);
 
-        $zone = $this->getItem(Zone::class, [
+        $zone = $this->createItem(Zone::class, [
             'name' => 'bar'
         ]);
 
-        $instance = $this->getItem(CarbonIntensitySource_Zone::class, [
+        $instance = $this->createItem(CarbonIntensitySource_Zone::class, [
             $source::getForeignKeyField() => $source->getID(),
             $zone::getForeignKeyField() => $zone->getID(),
         ]);
