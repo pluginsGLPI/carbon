@@ -82,7 +82,6 @@ class CommonTestCase extends TestCase
 
     protected function setUp(): void
     {
-        $this->setupGLPIFramework();
         $this->resetGLPILogs();
     }
 
@@ -106,35 +105,14 @@ class CommonTestCase extends TestCase
         file_put_contents(GLPI_LOG_DIR . "/php-errors.log", '');
     }
 
-    protected function setupGLPIFramework()
+    /**
+     * @deprecated not replaced
+     *
+     * @return void
+     */
+    protected function setupGLPIFramework():void
     {
-        // require_once dirname(__DIR__, 4) . '/vendor/autoload.php';
-
-        // $kernel = new Kernel(Environment::TESTING->value);
-        // $kernel->boot();
         return;
-
-    //     global $LOADED_PLUGINS, $AJAX_INCLUDE, $PLUGINS_INCLUDED;
-
-    //     if (session_status() == PHP_SESSION_ACTIVE) {
-    //         Session::destroy();
-    //         session_write_close();
-    //     }
-    //     unset($LOADED_PLUGINS);
-    //     unset($PLUGINS_INCLUDED);
-    //     unset($AJAX_INCLUDE);
-    //     $_SESSION = [];
-    //     require GLPI_ROOT . "/inc/includes.php";
-    //     //\Toolbox::setDebugMode(Session::DEBUG_MODE);
-
-    //     // Security of PHP_SELF
-    //     $_SERVER['PHP_SELF'] = Html::cleanParametersURL($_SERVER['PHP_SELF']);
-
-    //     if (session_status() == PHP_SESSION_ACTIVE) {
-    //         session_write_close();
-    //     }
-    //     Session::start();
-    //     $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
     }
 
     protected function login($name, $password, $noauto = false)
@@ -145,7 +123,6 @@ class CommonTestCase extends TestCase
         $result = $auth->login($name, $password, $noauto);
         $this->restoreDebug();
         $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
-        // $this->setupGLPIFramework();
 
         return $result;
     }
@@ -168,13 +145,21 @@ class CommonTestCase extends TestCase
     }
 
     /**
+     * @deprecated use createItem instead
+     */
+    protected function getItem(string $itemtype, array $input = []): CommonDBTM
+    {
+        return $this->createItem($itemtype, $input);
+    }
+
+    /**
      * Create an item of the given itemtype
      *
      * @param string $itemtype itemtype to create
      * @param array $input
      * @return CommonDBTM
      */
-    protected function getItem(string $itemtype, array $input = []): CommonDBTM
+    protected function createItem(string $itemtype, array $input = []): CommonDBTM
     {
         global $DB;
 
@@ -220,7 +205,18 @@ class CommonTestCase extends TestCase
         return $item;
     }
 
-    public function getItems(array $batch)
+    /**
+     * @deprecated use createItems insteaad
+     *
+     * @param array $batch
+     * @return array
+     */
+    public function getItems(array $batch): array
+    {
+        return $this->createItems($batch);
+    }
+
+    public function createItems(array $batch): array
     {
         $output = [];
 

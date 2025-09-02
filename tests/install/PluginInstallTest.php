@@ -35,6 +35,7 @@ namespace GlpiPlugin\Carbon\Tests;
 use Session;
 use Config;
 use CronTask as GLPICronTask;
+use DBmysql;
 use DbUtils;
 use Glpi\Dashboard\Dashboard;
 use DisplayPreference;
@@ -68,11 +69,11 @@ class PluginInstallTest extends CommonTestCase
      */
     protected function executeInstallation()
     {
+        /** @var DBmysql */
         global $DB;
 
         $plugin_name = TEST_PLUGIN_NAME;
 
-        $this->setupGLPIFramework();
         $this->assertTrue($DB->connected);
 
         //Drop plugin configuration if exists
@@ -95,12 +96,9 @@ class PluginInstallTest extends CommonTestCase
         $this->assertFalse($plugin->isNewItem());
 
         // Install the plugin
-        ob_start(function ($in) {
-            return $in;
-        });
+        ob_start();
         $plugin->install($plugin->fields['id']);
-        $install_output = ob_get_contents();
-        ob_end_clean();
+        $install_output = ob_get_clean();
         $this->assertTrue($plugin->isInstalled($plugin_name), $install_output);
 
         // Enable the plugin
@@ -119,7 +117,6 @@ class PluginInstallTest extends CommonTestCase
             // For unit test script which expects that installation runs in the tests context
             $this->executeInstallation();
             GlobalFixture::loadDataset();
-            $this->setupGLPIFramework();
         }
         $this->assertTrue(Plugin::isPluginActive(TEST_PLUGIN_NAME), 'Plugin not activated');
         $this->checkSchema(PLUGIN_CARBON_VERSION);
@@ -154,6 +151,7 @@ class PluginInstallTest extends CommonTestCase
         bool $ignore_dynamic_row_format_migration = false,
         bool $ignore_unsigned_keys_migration = false
     ): bool {
+        /** @var DBmysql */
         global $DB;
 
         $schemaFile = plugin_carbon_getSchemaPath($version);
@@ -292,6 +290,7 @@ class PluginInstallTest extends CommonTestCase
 
     private function checkRight(string $rightname, array $profiles)
     {
+        /** @var DBmysql */
         global $DB;
 
         $profile_table = Profile::getTable();
@@ -387,6 +386,7 @@ class PluginInstallTest extends CommonTestCase
 
     private function checkInitialCarbonIntensities()
     {
+        /** @var DBmysql */
         global $DB;
 
         // Find the source for Ember - Energy Institute
