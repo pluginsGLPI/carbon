@@ -62,6 +62,7 @@ $file->seek(PHP_INT_MAX); // Go to the end of the file
 $rows_count = $file->key() - 1; // Get the line number ignoring headers line (aka count rows)
 $file->rewind();
 $file->setFlags(SplFileObject::READ_CSV);
+$progress_bar = null;
 if (isCommandLine()) {
     $output = new ConsoleOutput();
     $output->writeln("Writing fallback carbon intensity data");
@@ -70,7 +71,9 @@ if (isCommandLine()) {
 $line_number = 0;
 while (($line = $file->fgetcsv(',', '"', '\\')) !== false) {
     $line_number++;
-    $progress_bar->advance();
+    if ($progress_bar) {
+        $progress_bar->advance();
+    }
     if ($line_number === 1 || count($line) < 4) {
         continue; // Skip header or  lines with insufficient data
     }
@@ -118,7 +121,9 @@ while (($line = $file->fgetcsv(',', '"', '\\')) !== false) {
         throw new \RuntimeException("Failed to insert data for year $year");
     }
 }
-$progress_bar->setProgress($rows_count);
+if ($progress_bar) {
+    $progress_bar->setProgress($rows_count);
+}
 $file = null; // close the file
 
 $source_id = Install::getOrCreateSource('Hydro Quebec');

@@ -44,6 +44,7 @@ $data_source = dirname(__DIR__, 2) . '/data/carbon_intensity/carbon-intensity-el
 
 // Create data source in DB
 $source_id = Install::getOrCreateSource('Ember - Energy Institute', 1);
+$zone_id_quebec = Install::getOrCreateZone('Quebec', $source_id);
 
 if ($handle = fopen($data_source, 'r')) {
     $line_number = 0;
@@ -70,7 +71,7 @@ if ($handle = fopen($data_source, 'r')) {
         $row_exists = (new DbUtils())->countElementsInTable($table, [
             'date' => "$year-01-01 00:00:00",
             'plugin_carbon_carbonintensitysources_id' => $source_id,
-            'plugin_carbon_zones_id' => $zone_id_quebec,
+            'plugin_carbon_zones_id' => $zone_id,
         ]);
         if ($row_exists > 0) {
             // Skip if the row already exists

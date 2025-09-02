@@ -341,7 +341,7 @@ class PluginInstallTest extends CommonTestCase
         foreach ($sources as $source_name) {
             $source = new CarbonIntensitySource();
             $source->getFromDBByCrit([
-                'name' => Sanitizer::sanitize($source_name),
+                'name' => $source_name,
                 'is_fallback' => 0
             ]);
             $this->assertFalse($source->isNewItem(), "Source '$source_name' not found");
@@ -351,7 +351,7 @@ class PluginInstallTest extends CommonTestCase
         foreach ($sources as $source_name) {
             $source = new CarbonIntensitySource();
             $source->getFromDBByCrit([
-                'name' => Sanitizer::sanitize($source_name),
+                'name' => $source_name,
                 'is_fallback' => 1
             ]);
             $this->assertFalse($source->isNewItem(), "Source '$source_name' not found");
@@ -368,7 +368,7 @@ class PluginInstallTest extends CommonTestCase
         foreach ($zones as $zone_name) {
             $zone = new Zone();
             $zone->getFromDBByCrit([
-                'name' => Sanitizer::sanitize($zone_name)
+                'name' => $zone_name,
             ]);
             $this->assertFalse($zone->isNewItem(), "Zone '$zone_name' not found");
         }
@@ -378,7 +378,7 @@ class PluginInstallTest extends CommonTestCase
         foreach ($this->zones as $zone_name) {
             $zone = new Zone();
             $zone->getFromDBByCrit([
-                'name' => Sanitizer::sanitize($zone_name)
+                'name' => $zone_name,
             ]);
             $this->assertFalse($zone->isNewItem());
         }
@@ -393,7 +393,7 @@ class PluginInstallTest extends CommonTestCase
         $source_name = 'Ember - Energy Institute';
         $source = new CarbonIntensitySource();
         $source->getFromDBByCrit([
-            'name' => Sanitizer::sanitize($source_name)
+            'name' => $source_name,
         ]);
         if ($source->isNewItem()) {
             $this->fail("$source_name not found");
