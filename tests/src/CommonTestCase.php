@@ -110,7 +110,7 @@ class CommonTestCase extends TestCase
      *
      * @return void
      */
-    protected function setupGLPIFramework():void
+    protected function setupGLPIFramework(): void
     {
         return;
     }
