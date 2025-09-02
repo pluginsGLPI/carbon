@@ -66,40 +66,40 @@ class ProviderTest extends DbTestCase
         // Switch to an empty entity
         $entities_id = $this->isolateInEntity('glpi', 'glpi');
 
-        $glpi_computer_type_empty = $this->getItem(GlpiComputerType::class);
+        $glpi_computer_type_empty = $this->createItem(GlpiComputerType::class);
 
-        $glpi_computer_type = $this->getItem(GlpiComputerType::class);
+        $glpi_computer_type = $this->createItem(GlpiComputerType::class);
 
-        $computer_type_empty = $this->getItem(ComputerType::class, [
+        $computer_type_empty = $this->createItem(ComputerType::class, [
             'computertypes_id' => $glpi_computer_type_empty->getID(),
             'power_consumption' => 0,
         ]);
 
-        $computer_type = $this->getItem(ComputerType::class, [
+        $computer_type = $this->createItem(ComputerType::class, [
             'computertypes_id' => $glpi_computer_type->getID(),
             'power_consumption' => 90,
         ]);
 
-        $computer_model_empty = $this->getItem(ComputerModel::class, [
+        $computer_model_empty = $this->createItem(ComputerModel::class, [
             'power_consumption' => 0,
         ]);
 
-        $computer_model = $this->getItem(ComputerModel::class, [
+        $computer_model = $this->createItem(ComputerModel::class, [
             'power_consumption' => 150,
         ]);
 
-        $location_empty = $this->getItem(Location::class);
-        // $location_empty_2 = $this->getItem(Location::class, [
+        $location_empty = $this->createItem(Location::class);
+        // $location_empty_2 = $this->createItem(Location::class, [
         //     'latitude' => 1,
         // ]);
-        // $location_empty_3 = $this->getItem(Location::class, [
+        // $location_empty_3 = $this->createItem(Location::class, [
         //     'longitude' => 1,
         // ]);
-        $location = $this->getItem(Location::class, [
+        $location = $this->createItem(Location::class, [
             'country' => 'France',
         ]);
 
-        $usage_profile = $this->getItem(ComputerUsageProfile::class);
+        $usage_profile = $this->createItem(ComputerUsageProfile::class);
 
         $total_count = 0;
         $computers_definition = [
@@ -154,7 +154,7 @@ class ProviderTest extends DbTestCase
         $computers = $this->getItems($computers_definition);
         $total_count += count($computers[Computer::class]);
         foreach ($computers[Computer::class] as $computers_id => $computer) {
-            $impact = $this->getItem(UsageInfo::class, [
+            $impact = $this->createItem(UsageInfo::class, [
                 'itemtype' => Computer::class,
                 'items_id' => $computers_id,
                 'plugin_carbon_computerusageprofiles_id' => $usage_profile->getID(),
@@ -196,16 +196,16 @@ class ProviderTest extends DbTestCase
     {
         $entities_id = $this->isolateInEntity('glpi', 'glpi');
 
-        $computer_type    = $this->getItem(GlpiComputerType::class);
-        $computer_model_1 = $this->getItem(ComputerModel::class);
-        $computer_model_2 = $this->getItem(ComputerModel::class);
-        $location = $this->getItem(Location::class, [
+        $computer_type    = $this->createItem(GlpiComputerType::class);
+        $computer_model_1 = $this->createItem(ComputerModel::class);
+        $computer_model_2 = $this->createItem(ComputerModel::class);
+        $location = $this->createItem(Location::class, [
             'latitude'  => '48.864716',
             'longitude' => '2.349014',
             'country'   => 'France'
         ]);
-        $computer_1 = $this->getItem(Computer::class);
-        $computer_2 = $this->getItem(Computer::class);
+        $computer_1 = $this->createItem(Computer::class);
+        $computer_2 = $this->createItem(Computer::class);
 
         // Create carbon emissions for the assets
         // $date = new DateTime('now');
@@ -285,10 +285,10 @@ class ProviderTest extends DbTestCase
         $computer_3 = $this->createComputerUsageProfilePowerLocation($usage_profile, 60, $country);
         $computer_4 = $this->createComputerUsageProfilePowerLocation($usage_profile, 60, $country);
 
-        $computer_model_1 = $this->getItem(ComputerModel::class, [
+        $computer_model_1 = $this->createItem(ComputerModel::class, [
             'power_consumption' => 10
         ]);
-        $computer_model_2 = $this->getItem(ComputerModel::class, [
+        $computer_model_2 = $this->createItem(ComputerModel::class, [
             'power_consumption' => 40
         ]);
 
@@ -339,7 +339,7 @@ class ProviderTest extends DbTestCase
             'day_7' => 1,
         ];
         $computer_1 = $this->createComputerUsageProfilePowerLocation($usage_profile, 60, PLUGIN_CARBON_TEST_FAKE_ZONE_NAME);
-        $infocom = $this->getItem(Infocom::class, [
+        $infocom = $this->createItem(Infocom::class, [
             'itemtype' => $computer_1->getType(),
             'items_id' => $computer_1->getID(),
             'buy_date' => '2024-01-01',

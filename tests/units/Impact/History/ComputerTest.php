@@ -85,22 +85,22 @@ class ComputerTest extends CommonAsset
         $entities_id = $this->isolateInEntity('glpi', 'glpi');
 
         $model_power = 55;
-        $location = $this->getItem(Location::class, [
+        $location = $this->createItem(Location::class, [
             'state' => 'Quebec',
         ]);
-        $model = $this->getItem(GlpiComputerModel::class, ['power_consumption' => $model_power]);
-        $glpi_type = $this->getItem(GlpiComputerType::class);
-        $type = $this->getItem(ComputerType::class, [
+        $model = $this->createItem(GlpiComputerModel::class, ['power_consumption' => $model_power]);
+        $glpi_type = $this->createItem(GlpiComputerType::class);
+        $type = $this->createItem(ComputerType::class, [
             GlpiComputerType::getForeignKeyField() => $glpi_type->getID(),
         ]);
-        $asset = $this->getItem(GlpiComputer::class, [
+        $asset = $this->createItem(GlpiComputer::class, [
             'computertypes_id'  => $glpi_type->getID(),
             'computermodels_id' => $model->getID(),
             'locations_id'      => $location->getID(),
             'date_creation'     => '2024-01-01',
             'date_mod'          => null,
         ]);
-        $usage_profile = $this->getItem(ComputerUsageProfile::class, [
+        $usage_profile = $this->createItem(ComputerUsageProfile::class, [
             'time_start'   => '09:00:00',
             'time_stop'    => '18:00:00',
             'day_1'        => '1',
@@ -111,7 +111,7 @@ class ComputerTest extends CommonAsset
             'day_6'        => '0',
             'day_7'        => '0',
         ]);
-        $impact = $this->getItem(UsageInfo::class, [
+        $impact = $this->createItem(UsageInfo::class, [
             $usage_profile->getForeignKeyField() => $usage_profile->getID(),
             'itemtype' => $asset->getType(),
             'items_id' => $asset->getID(),
@@ -181,7 +181,7 @@ class ComputerTest extends CommonAsset
 
     public function testCanHistorize()
     {
-        $computer = $this->getItem(GlpiComputer::class);
+        $computer = $this->createItem(GlpiComputer::class);
         $id = $computer->getID();
 
         // Check we cannot historize an empty item
@@ -189,7 +189,7 @@ class ComputerTest extends CommonAsset
         $this->assertFalse($history->canHistorize($id));
 
         // Add empty info on the asset
-        $management = $this->getItem(Infocom::class, [
+        $management = $this->createItem(Infocom::class, [
             'itemtype' => $computer->getType(),
             'items_id' => $id,
         ]);
@@ -203,7 +203,7 @@ class ComputerTest extends CommonAsset
         $this->assertFalse($history->canHistorize($id));
 
         // Add an empty location
-        $location = $this->getItem(Location::class);
+        $location = $this->createItem(Location::class);
         $computer->update([
             'id' => $id,
             'locations_id' => $location->getID(),
@@ -218,9 +218,9 @@ class ComputerTest extends CommonAsset
         $this->assertFalse($history->canHistorize($id));
 
         // Add a usage profile
-        $usage_profile = $this->getItem(ComputerUsageProfile::class);
+        $usage_profile = $this->createItem(ComputerUsageProfile::class);
         $this->assertFalse($history->canHistorize($id));
-        $impact = $this->getItem(UsageInfo::class, [
+        $impact = $this->createItem(UsageInfo::class, [
             $usage_profile->getForeignKeyField() => $usage_profile->getID(),
             'itemtype' => $computer->getType(),
             'items_id' => $id,
@@ -228,7 +228,7 @@ class ComputerTest extends CommonAsset
         $this->assertFalse($history->canHistorize($id));
 
         // Add a model
-        $model = $this->getItem(GlpiComputerModel::class);
+        $model = $this->createItem(GlpiComputerModel::class);
         $computer->update([
             'id' => $id,
             'computermodels_id' => $model->getID(),
@@ -243,7 +243,7 @@ class ComputerTest extends CommonAsset
         $this->assertTrue($history->canHistorize($id));
 
         // add a type
-        $type = $this->getItem(GlpiComputerType::class);
+        $type = $this->createItem(GlpiComputerType::class);
         $computer->update([
             'id' => $id,
             'computertypes_id' => $type->getID(),
@@ -258,7 +258,7 @@ class ComputerTest extends CommonAsset
         $this->assertFalse($history->canHistorize($id));
 
         // add a type power consumption
-        $power_consumption = $this->getItem(ComputerType::class, [
+        $power_consumption = $this->createItem(ComputerType::class, [
             GlpiComputerType::getForeignKeyField() => $type->getID(),
         ]);
         $this->assertFalse($history->canHistorize($id));
@@ -311,7 +311,7 @@ class ComputerTest extends CommonAsset
     {
         $history = new Computer();
 
-        $computer = $this->getItem(GlpiComputer::class);
+        $computer = $this->createItem(GlpiComputer::class);
         $expected = [
             'is_deleted'                  => true,
             'is_template'                 => true,
@@ -336,8 +336,8 @@ class ComputerTest extends CommonAsset
     {
         $history = new Computer();
 
-        $computer = $this->getItem(GlpiComputer::class);
-        $management = $this->getItem(Infocom::class, [
+        $computer = $this->createItem(GlpiComputer::class);
+        $management = $this->createItem(Infocom::class, [
             'itemtype' => $computer->getType(),
             'items_id' => $computer->getID(),
         ]);
@@ -364,8 +364,8 @@ class ComputerTest extends CommonAsset
     {
         $history = new Computer();
 
-        $computer = $this->getItem(GlpiComputer::class);
-        $management = $this->getItem(Infocom::class, [
+        $computer = $this->createItem(GlpiComputer::class);
+        $management = $this->createItem(Infocom::class, [
             'itemtype' => $computer->getType(),
             'items_id' => $computer->getID(),
             'use_date' => '2020-01-01',
@@ -394,8 +394,8 @@ class ComputerTest extends CommonAsset
     {
         $history = new Computer();
 
-        $location = $this->getItem(Location::class);
-        $computer = $this->getItem(GlpiComputer::class, [
+        $location = $this->createItem(Location::class);
+        $computer = $this->createItem(GlpiComputer::class, [
             'locations_id' => $location->getID(),
         ]);
         $expected = [
@@ -421,10 +421,10 @@ class ComputerTest extends CommonAsset
     {
         $history = new Computer();
 
-        $location = $this->getItem(Location::class, [
+        $location = $this->createItem(Location::class, [
             'country' => 'France'
         ]);
-        $computer = $this->getItem(GlpiComputer::class, [
+        $computer = $this->createItem(GlpiComputer::class, [
             'locations_id' => $location->getID(),
         ]);
         $expected = [
@@ -450,10 +450,10 @@ class ComputerTest extends CommonAsset
     {
         $history = new Computer();
 
-        $location = $this->getItem(Location::class, [
+        $location = $this->createItem(Location::class, [
             'state' => 'Quebec'
         ]);
-        $computer = $this->getItem(GlpiComputer::class, [
+        $computer = $this->createItem(GlpiComputer::class, [
             'locations_id' => $location->getID(),
         ]);
         $expected = [
@@ -479,9 +479,9 @@ class ComputerTest extends CommonAsset
     {
         $history = new Computer();
 
-        $computer = $this->getItem(GlpiComputer::class);
-        $usage_profile = $this->getItem(ComputerUsageProfile::class);
-        $impact = $this->getItem(UsageInfo::class, [
+        $computer = $this->createItem(GlpiComputer::class);
+        $usage_profile = $this->createItem(ComputerUsageProfile::class);
+        $impact = $this->createItem(UsageInfo::class, [
             $usage_profile->getForeignKeyField() => $usage_profile->getID(),
             'itemtype' => $computer->getType(),
             'items_id' => $computer->getID(),
@@ -509,8 +509,8 @@ class ComputerTest extends CommonAsset
     {
         $history = new Computer();
 
-        $model = $this->getItem(GlpiComputerModel::class);
-        $computer = $this->getItem(GlpiComputer::class, [
+        $model = $this->createItem(GlpiComputerModel::class);
+        $computer = $this->createItem(GlpiComputer::class, [
             'computermodels_id' => $model->getID(),
         ]);
         $expected = [
@@ -536,10 +536,10 @@ class ComputerTest extends CommonAsset
     {
         $history = new Computer();
 
-        $model = $this->getItem(GlpiComputerModel::class, [
+        $model = $this->createItem(GlpiComputerModel::class, [
             'power_consumption' => 55,
         ]);
-        $computer = $this->getItem(GlpiComputer::class, [
+        $computer = $this->createItem(GlpiComputer::class, [
             'computermodels_id' => $model->getID(),
         ]);
         $expected = [
@@ -565,8 +565,8 @@ class ComputerTest extends CommonAsset
     {
         $history = new Computer();
 
-        $glpi_computer_type = $this->getItem(GlpiComputerType::class);
-        $computer = $this->getItem(GlpiComputer::class, [
+        $glpi_computer_type = $this->createItem(GlpiComputerType::class);
+        $computer = $this->createItem(GlpiComputer::class, [
             'computertypes_id' => $glpi_computer_type->getID(),
         ]);
         $expected = [
@@ -592,12 +592,12 @@ class ComputerTest extends CommonAsset
     {
         $history = new Computer();
 
-        $glpi_computer_type = $this->getItem(GlpiComputerType::class);
-        $computer_type = $this->getItem(ComputerType::class, [
+        $glpi_computer_type = $this->createItem(GlpiComputerType::class);
+        $computer_type = $this->createItem(ComputerType::class, [
             'power_consumption' => 55,
             'computertypes_id' => $glpi_computer_type->getID(),
         ]);
-        $computer = $this->getItem(GlpiComputer::class, [
+        $computer = $this->createItem(GlpiComputer::class, [
             'computertypes_id' => $glpi_computer_type->getID(),
         ]);
         $expected = [
@@ -623,12 +623,12 @@ class ComputerTest extends CommonAsset
     {
         $history = new Computer();
 
-        $glpi_computer_type = $this->getItem(GlpiComputerType::class);
-        $computer_type = $this->getItem(ComputerType::class, [
+        $glpi_computer_type = $this->createItem(GlpiComputerType::class);
+        $computer_type = $this->createItem(ComputerType::class, [
             'category' => ComputerType::CATEGORY_DESKTOP,
             'computertypes_id' => $glpi_computer_type->getID(),
         ]);
-        $computer = $this->getItem(GlpiComputer::class, [
+        $computer = $this->createItem(GlpiComputer::class, [
             'computertypes_id' => $glpi_computer_type->getID(),
         ]);
         $expected = [
@@ -654,25 +654,25 @@ class ComputerTest extends CommonAsset
     {
         $history = new Computer();
 
-        $location = $this->getItem(Location::class, [
+        $location = $this->createItem(Location::class, [
             'country' => 'France'
         ]);
-        $glpi_computer_type = $this->getItem(GlpiComputerType::class);
-        $computer_type = $this->getItem(ComputerType::class, [
+        $glpi_computer_type = $this->createItem(GlpiComputerType::class);
+        $computer_type = $this->createItem(ComputerType::class, [
             'power_consumption' => 55,
             'computertypes_id' => $glpi_computer_type->getID(),
         ]);
-        $computer = $this->getItem(GlpiComputer::class, [
+        $computer = $this->createItem(GlpiComputer::class, [
             'locations_id' => $location->getID(),
             'computertypes_id' => $glpi_computer_type->getID(),
         ]);
-        $management = $this->getItem(Infocom::class, [
+        $management = $this->createItem(Infocom::class, [
             'itemtype' => $computer->getType(),
             'items_id' => $computer->getID(),
             'use_date' => '2020-01-01',
         ]);
-        $usage_profile = $this->getItem(ComputerUsageProfile::class);
-        $impact = $this->getItem(UsageInfo::class, [
+        $usage_profile = $this->createItem(ComputerUsageProfile::class);
+        $impact = $this->createItem(UsageInfo::class, [
             $usage_profile->getForeignKeyField() => $usage_profile->getID(),
             'itemtype' => $computer->getType(),
             'items_id' => $computer->getID(),

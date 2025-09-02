@@ -222,7 +222,7 @@ class CommonTestCase extends TestCase
 
         foreach ($batch as $itemtype => $items) {
             foreach ($items as $data) {
-                $item = $this->getItem($itemtype, $data);
+                $item = $this->createItem($itemtype, $data);
                 $output[$itemtype][$item->getID()] = $item;
             }
         }
@@ -239,9 +239,9 @@ class CommonTestCase extends TestCase
 
     protected function createComputerUsageProfile(array $usage_profile_params): Computer
     {
-        $usage_profile = $this->getItem(ComputerUsageProfile::class, $usage_profile_params);
-        $glpi_computer = $this->getItem(Computer::class);
-        $impact = $this->getItem(UsageInfo::class, [
+        $usage_profile = $this->createItem(ComputerUsageProfile::class, $usage_profile_params);
+        $glpi_computer = $this->createItem(Computer::class);
+        $impact = $this->createItem(UsageInfo::class, [
             'itemtype' => Computer::class,
             'items_id' => $glpi_computer->getId(),
             ComputerUsageProfile::getForeignKeyField() => $usage_profile->getID(),
@@ -253,8 +253,8 @@ class CommonTestCase extends TestCase
     protected function createComputerUsageProfilePower(array $usage_profile_params, int $type_power): Computer
     {
         $glpi_computer = $this->createComputerUsageProfile($usage_profile_params);
-        $glpiComputerType = $this->getItem(GlpiComputerType::class);
-        $carbonComputerType = $this->getItem(ComputerType::class, [
+        $glpiComputerType = $this->createItem(GlpiComputerType::class);
+        $carbonComputerType = $this->createItem(ComputerType::class, [
             GlpiComputerType::getForeignKeyField() => $glpiComputerType->getID(),
             'power_consumption'                    => $type_power,
         ]);
@@ -270,7 +270,7 @@ class CommonTestCase extends TestCase
     {
         $glpi_computer = $this->createComputerUsageProfilePower($usage_profile_params, $type_power);
 
-        $location = $this->getItem(
+        $location = $this->createItem(
             Location::class,
             [
                 'country' => $country,
@@ -289,7 +289,7 @@ class CommonTestCase extends TestCase
         $source = new CarbonIntensitySource();
         $source->getFromDBByCrit(['name' => $source_name]);
         if ($source->isNewItem()) {
-            $source = $this->getItem(CarbonIntensitySource::class, [
+            $source = $this->createItem(CarbonIntensitySource::class, [
                 'name' => $source_name
             ]);
         }
@@ -297,7 +297,7 @@ class CommonTestCase extends TestCase
         $zone = new Zone();
         $zone->getFromDBByCrit(['name' => $country]);
         if ($zone->isNewItem()) {
-            $zone = $this->getItem(Zone::class, [
+            $zone = $this->createItem(Zone::class, [
                 'name' => $country,
                 'plugin_carbon_carbonintensitysources_id_historical' => $source->getID()
             ]);
@@ -315,7 +315,7 @@ class CommonTestCase extends TestCase
                 'date' => $current_date->format('Y-m-d H:00:00'),
                 'intensity' => $intensity,
             ];
-            $item = $this->getItem(
+            $item = $this->createItem(
                 CarbonIntensity::class,
                 $crit + [
                     'data_quality' => AbstractTracked::DATA_QUALITY_MANUAL
@@ -342,7 +342,7 @@ class CommonTestCase extends TestCase
         while ($date_current < $date_stop) {
             $itemtype = $item->getType();
             $items_id = $item->getID();
-            $this->getItem(CarbonEmission::class, [
+            $this->createItem(CarbonEmission::class, [
                 'itemtype'         => $itemtype,
                 'items_id'         => $items_id,
                 'entities_id'      => Session::getActiveEntity(),

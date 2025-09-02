@@ -67,7 +67,7 @@ class CarbonEmissionTest extends DbTestCase
         $itemtype = Computer::class;
         $start_date = '2019-01-01 00:00:00';
         $stop_date  = '2023-12-31 00:00:00';
-        $asset = $this->getItem($itemtype, [
+        $asset = $this->createItem($itemtype, [
             'date_creation' => $start_date,
         ]);
         $emission_start = new DateTime('2020-01-01 00:00:00');

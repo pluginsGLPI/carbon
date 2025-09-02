@@ -122,7 +122,7 @@ class CarbonIntensityRTETest extends DbTestCase
         $zone = new Zone();
         $zone->getFromDBByCrit(['name' => 'France']);
         if ($zone->isNewItem()) {
-            $zone = $this->getItem(Zone::class, ['name' => 'France']);
+            $zone = $this->createItem(Zone::class, ['name' => 'France']);
         }
         $intensity = $this->createMock(CarbonIntensity::class);
 

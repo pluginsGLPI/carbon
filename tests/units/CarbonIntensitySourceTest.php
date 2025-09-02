@@ -109,7 +109,7 @@ class CarbonIntensitySourceTest extends DbTestCase
     public function testGetTabNameForItem()
     {
         $this->login('glpi', 'glpi');
-        $item = $this->getItem(Zone::class);
+        $item = $this->createItem(Zone::class);
         $instance = new CarbonIntensitySource();
         $result = $instance->getTabNameForItem($item);
         $expected = 'Carbon intensity sources';
@@ -119,7 +119,7 @@ class CarbonIntensitySourceTest extends DbTestCase
         $expected = '';
         $this->assertEquals($expected, $result);
 
-        $item = $this->getItem(Computer::class);
+        $item = $this->createItem(Computer::class);
         $result = $instance->getTabNameForItem($item);
         $expected = '';
         $this->assertEquals($expected, $result);
@@ -131,7 +131,7 @@ class CarbonIntensitySourceTest extends DbTestCase
     public function testDisplayTabContentForItem()
     {
         $this->login('glpi', 'glpi');
-        $item = $this->getItem(Computer::class);
+        $item = $this->createItem(Computer::class);
         ob_start(function ($buffer) {
             return $buffer;
         });
@@ -140,9 +140,9 @@ class CarbonIntensitySourceTest extends DbTestCase
         $this->assertEquals('', $output);
         $this->assertTrue($result);
 
-        $item = $this->getItem(Zone::class);
-        $source = $this->getItem(CarbonIntensitySource::class);
-        $source_zone = $this->getItem(CarbonIntensitySource_Zone::class, [
+        $item = $this->createItem(Zone::class);
+        $source = $this->createItem(CarbonIntensitySource::class);
+        $source_zone = $this->createItem(CarbonIntensitySource_Zone::class, [
             $item::getForeignKeyField() => $item->getID(),
             $source::getForeignKeyField() => $source->getID()
         ]);

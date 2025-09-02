@@ -49,7 +49,7 @@ class ComputerTypeTest extends DbTestCase
 
     public function testGetTabNameForItem()
     {
-        $glpi_computer_type = $this->getItem(GlpiComputerType::class);
+        $glpi_computer_type = $this->createItem(GlpiComputerType::class);
         $instance = new ComputerType();
         $result = $instance->getTabNameForItem($glpi_computer_type);
         $this->assertEquals('Carbon', $result);
@@ -63,7 +63,7 @@ class ComputerTypeTest extends DbTestCase
      */
     public function testGetOrCreate()
     {
-        $computer_type = $this->getItem(GlpiComputerType::class, ['name' => 'Test Computer Type']);
+        $computer_type = $this->createItem(GlpiComputerType::class, ['name' => 'Test Computer Type']);
         $instance = new ComputerType();
         $this->callPrivateMethod($instance, 'getOrCreate', $computer_type);
         $this->assertFalse($instance->isNewItem());
@@ -74,8 +74,8 @@ class ComputerTypeTest extends DbTestCase
      */
     public function testShowForItemType()
     {
-        $glpi_computer_type = $this->getItem(GlpiComputerType::class);
-        $computer_type = $this->getItem(ComputerType::class, [
+        $glpi_computer_type = $this->createItem(GlpiComputerType::class);
+        $computer_type = $this->createItem(ComputerType::class, [
             'computertypes_id' => $glpi_computer_type->getID(),
         ]);
         $this->login('glpi', 'glpi');
@@ -100,7 +100,7 @@ class ComputerTypeTest extends DbTestCase
      */
     public function testUpdatePowerConsumption()
     {
-        $glpi_computer_type = $this->getItem(GlpiComputerType::class);
+        $glpi_computer_type = $this->createItem(GlpiComputerType::class);
 
         ComputerType::updatePowerConsumption($glpi_computer_type, 10);
         $instance = new ComputerType();
@@ -123,7 +123,7 @@ class ComputerTypeTest extends DbTestCase
      */
     public function testUpdateCategory()
     {
-        $glpi_computer_type = $this->getItem(GlpiComputerType::class);
+        $glpi_computer_type = $this->createItem(GlpiComputerType::class);
 
         ComputerType::updateCategory($glpi_computer_type, ComputerType::CATEGORY_LAPTOP);
         $instance = new ComputerType();
@@ -152,7 +152,7 @@ class ComputerTypeTest extends DbTestCase
             ->getMock();
         $massive_action->method('getAction')->willReturn('MassUpdatePower');
         $massive_action->method('getItems')->willReturn([
-            ComputerType::class => $this->getItem(GlpiComputerType::class)
+            ComputerType::class => $this->createItem(GlpiComputerType::class)
         ]);
         ob_start(function ($buffer) {
             return $buffer;
@@ -181,7 +181,7 @@ class ComputerTypeTest extends DbTestCase
             ->getMock();
         $massive_action->method('getAction')->willReturn('MassUpdateCategory');
         $massive_action->method('getItems')->willReturn([
-            ComputerType::class => $this->getItem(GlpiComputerType::class)
+            ComputerType::class => $this->createItem(GlpiComputerType::class)
         ]);
         ob_start(function ($buffer) {
             return $buffer;
@@ -209,7 +209,7 @@ class ComputerTypeTest extends DbTestCase
             ->getMock();
         $massive_action->method('getAction')->willReturn('');
         $massive_action->method('getItems')->willReturn([
-            ComputerType::class => $this->getItem(GlpiComputerType::class)
+            ComputerType::class => $this->createItem(GlpiComputerType::class)
         ]);
         ob_start(function ($buffer) {
             return $buffer;
@@ -230,7 +230,7 @@ class ComputerTypeTest extends DbTestCase
             ->disableOriginalConstructor()
             ->getMock();
         $massive_action->method('getAction')->willReturn('MassUpdatePower');
-        $glpi_computer_type = $this->getItem(GlpiComputerType::class);
+        $glpi_computer_type = $this->createItem(GlpiComputerType::class);
         $massive_action->POST = [
             'power_consumption' => 55,
         ];
@@ -252,7 +252,7 @@ class ComputerTypeTest extends DbTestCase
             ->disableOriginalConstructor()
             ->getMock();
         $massive_action->method('getAction')->willReturn('MassUpdateCategory');
-        $glpi_computer_type = $this->getItem(GlpiComputerType::class);
+        $glpi_computer_type = $this->createItem(GlpiComputerType::class);
         $massive_action->POST = [
             'category' => ComputerType::CATEGORY_SERVER,
         ];
