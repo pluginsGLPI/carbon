@@ -33,8 +33,7 @@
 {% import '@carbon/components/form/fields_macros.html.twig' as carbonFields %}
 
 {{ fields.smallTitle(__('Environmental impact', 'carbon')) }}
-{{ carbonFields.dropdownBoaviztaZone(
-    '_boavizta_zone',
+{{ carbonFields.dropdownBoaviztaZone('_boavizta_zone',
     item.fields['boavizta_zone'] ?? '',
     __('Boavizta zone', 'carbon'),
     {

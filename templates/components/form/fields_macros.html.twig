@@ -29,15 +29,12 @@
  # -------------------------------------------------------------------------
  #}
 
-{% import 'components/form/fields_macros.html.twig' as fields %}
-
 {% macro timeField(name, value, label = '', options = {}) %}
    {% import 'components/form/fields_macros.html.twig' as fields %}
    {% set options = {
       'rand': random(),
       'disabled': false
-      }|merge(options)
-   %}
+      }|merge(options) %}
 
    {% if options.disabled %}
       {% set options = options|merge({specific_tags: {'disabled': 'disabled'}}) %}
@@ -68,9 +65,8 @@
       {% set name = "#{name}[]" %}
    {% endif %}
    {% set options = {
-      'rand':     random(),
-      'disabled': false}|merge(options)
-   %}
+      'rand': random(),
+      'disabled': false}|merge(options) %}
    {% if options.fields_template.isMandatoryField(name)|default(false) %}
       {% set options = {'specific_tags': {'required': true}}|merge(options) %}
    {% endif %}
