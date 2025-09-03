@@ -134,7 +134,7 @@
                          {% endif %}
                     </tr>
                 {% endif %}
-                {% if filters|length > 0  %}
+                {% if filters|length > 0 %}
                     <tr class="filter_row">
                         {% if showmassiveactions %}
                             <td></td>
@@ -251,7 +251,7 @@
                                         {% elseif formatter == "raw_html" %}
                                             {{ entry[colkey]|raw }}
                                         {% elseif formatter == 'avatar' %}
-                                            {#  Note: Does not support anonymization currently #}
+                                            {# Note: Does not support anonymization currently #}
                                             {% set entry_data = entry[colkey] %}
                                             {% set avatar_size = entry_data['avatar_size'] ?? 'avatar-md' %}
                                             {% set img = entry_data['picture'] %}
