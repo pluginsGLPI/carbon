@@ -63,11 +63,11 @@
             </div>
             <div class="row">
                 <div class="col align-items-center">
-                    {% set totalNetworkEquipments = handled.number + unhandled.number %}
-                    {% if totalNetworkEquipments == 0 %}
-                        {% set totalNetworkEquipments = 1 %}
+                    {% set total_network_equipments = handled.number + unhandled.number %}
+                    {% if total_network_equipments == 0 %}
+                        {% set total_network_equipments = 1 %}
                     {% endif %}
-                    {% set ratio = 100 * unhandled.number / totalNetworkEquipments %}
+                    {% set ratio = 100 * unhandled.number / total_network_equipments %}
                     <div class="text-secondary p-3">
                         {{ __("It represents %s percent of your parc that contains %s network equipments.", "carbon")|format(ratio|round(2, 'common'), totalNetworkEquipments) }}
                     </div>
