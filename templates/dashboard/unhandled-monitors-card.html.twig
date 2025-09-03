@@ -63,11 +63,11 @@
             </div>
             <div class="row">
                 <div class="col align-items-center">
-                    {% set totalMonitors = handled.number + unhandled.number %}
-                    {% if totalMonitors == 0 %}
-                        {% set totalMonitors = 1 %}
+                    {% set total_monitors = handled.number + unhandled.number %}
+                    {% if total_monitors == 0 %}
+                        {% set total_monitors = 1 %}
                     {% endif %}
-                    {% set ratio = 100 * unhandled.number / totalMonitors %}
+                    {% set ratio = 100 * unhandled.number / total_monitors %}
                     <div class="text-secondary p-3">
                         {{ __("It represents %s percent of your parc that contains %s monitors.", "carbon")|format(ratio|round(2, 'common'), totalMonitors) }}
                     </div>
