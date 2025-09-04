@@ -106,8 +106,13 @@ function plugin_carbon_setupHooks()
 
     $PLUGIN_HOOKS[Hooks::POST_SHOW_TAB]['carbon'] = 'plugin_carbon_postShowTab';
     foreach (PLUGIN_CARBON_TYPES as $itemtype) {
+        // Asset itself
         $PLUGIN_HOOKS[Hooks::ITEM_ADD]['carbon'][$itemtype] = 'plugin_carbon_hook_add_asset';
         $PLUGIN_HOOKS[Hooks::ITEM_UPDATE]['carbon'][$itemtype] = 'plugin_carbon_hook_update_asset';
+        $PLUGIN_HOOKS[Hooks::PRE_ITEM_PURGE]['carbon'][$itemtype] = 'plugin_carbon_hook_pre_purge_asset';
+
+        // asset's type
+        $PLUGIN_HOOKS[Hooks::PRE_ITEM_PURGE]['carbon'][$itemtype . 'Type'] = 'plugin_carbon_hook_pre_purge_assettype';
     }
     $PLUGIN_HOOKS[Hooks::POST_ITEM_FORM]['carbon'] = 'plugin_carbon_postItemForm';
 
@@ -130,13 +135,7 @@ function plugin_carbon_setupHooks()
     $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][] = $js_file;
 
     // Import CSS
-    $css_file = 'main.css';
-    /** @phpstan-ignore-next-line */
-    if (version_compare(GLPI_VERSION, '11.0', '<')) {
-        // For GLPI < 11.0, we need to add resource the old way
-        $css_file = 'css/main.css';
-    }
-    $PLUGIN_HOOKS[Hooks::ADD_CSS]['carbon'][] = $css_file;
+    $PLUGIN_HOOKS[Hooks::ADD_CSS]['carbon'][] = 'main.css';
 
     $PLUGIN_HOOKS['add_default_where']['carbon'] = 'plugin_carbon_add_default_where';
 
