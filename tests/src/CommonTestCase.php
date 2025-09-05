@@ -173,6 +173,18 @@ class CommonTestCase extends TestCase
      */
     protected function getItem(string $itemtype, array $input = []): CommonDBTM
     {
+        return $this->createItem($itemtype, $input);
+    }
+
+    /**
+     * Create an item of the given itemtype
+     *
+     * @param string $itemtype itemtype to create
+     * @param array $input
+     * @return CommonDBTM
+     */
+    protected function createItem(string $itemtype, array $input = []): CommonDBTM
+    {
         global $DB;
 
         $this->handleDeprecations($itemtype, $input);
@@ -217,7 +229,12 @@ class CommonTestCase extends TestCase
         return $item;
     }
 
-    public function getItems(array $batch)
+    public function getItems(array $batch): array
+    {
+        return $this->createItems($batch);
+    }
+
+    public function createItems(array $batch): array
     {
         $output = [];
 
