@@ -42,7 +42,7 @@ use GlpiPlugin\Carbon\UsageInfo;
 
 class HookTest extends DbTestCase
 {
-    public function testCarbonEmissionsArePuegedOnAssetPurge()
+    public function testRelationsArePuegedOnAssetPurge()
     {
         $computer = $this->createItem(Computer::class);
         $carbon_emission = $this->createItem(CarbonEmission::class, [
@@ -70,7 +70,11 @@ class HookTest extends DbTestCase
             'items_id' => $computer->getID()
         ]);
         $this->assertEquals(1, $count);
-
+        $count = (new DbUtils())->countElementsInTable($usage_info::getTable(), [
+            'itemtype' => $computer->getType(),
+            'items_id' => $computer->getID()
+        ]);
+        $this->assertEquals(1, $count);
         // Data must be dropped fron DB after a purge
         $computer->delete($computer->fields, true);
         $count = (new DbUtils())->countElementsInTable($carbon_emission::getTable(), [
