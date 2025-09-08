@@ -31,7 +31,6 @@
 
 {% extends "generic_show_form.html.twig" %}
 {% import "components/form/fields_macros.html.twig" as fields %}
-{% import '@carbon/components/form/fields_macros.html.twig' as carbonFields %}
 
 {% block form_fields %}
     {{ fields.textField(
@@ -46,13 +45,13 @@
         input_class: 'col-xxl-8',
     }) }}
 
-    {{ carbonFields.timeField(
+    {{ fields.dropdownHoursField(
         'time_start',
         item.fields['time_start'],
         __('Start time', 'carbon')
     ) }}
 
-    {{ carbonFields.timeField(
+    {{ fields.dropdownHoursField(
         'time_stop',
         item.fields['time_stop'],
         __('Stop time', 'carbon')

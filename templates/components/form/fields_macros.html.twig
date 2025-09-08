@@ -29,31 +29,6 @@
  # -------------------------------------------------------------------------
  #}
 
-{% macro timeField(name, value, label = '', options = {}) %}
-   {% import 'components/form/fields_macros.html.twig' as fields %}
-   {% set options = {
-      'rand': random(),
-      'disabled': false
-      }|merge(options)
-   %}
-
-   {% if options.disabled %}
-      {% set options = options|merge({specific_tags: {'disabled': 'disabled'}}) %}
-   {% endif %}
-   {% if options.fields_template.isMandatoryField(name)|default(false) %}
-      {% set options = {'specific_tags': {'required': true}}|merge(options) %}
-   {% endif %}
-
-   {% set field %}
-      {% do call('GlpiPlugin\\Carbon\\Html::showTimeField', [name, {
-         'value': value,
-         'rand': options.rand,
-         'width': '100%'
-      }|merge(options)]) %}
-   {% endset %}
-   {{ fields.field(name, field, label, options) }}
-{% endmacro %}
-
 {% macro dropdownBoaviztaZone(name, value, label = '', options = {}) %}
    {% import 'components/form/fields_macros.html.twig' as fields %}
 
