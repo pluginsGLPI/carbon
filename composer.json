@@ -9,7 +9,7 @@
     },
     "require-dev": {
         "friendsoftwig/twigcs": "^6.1",
-        "glpi-project/tools": "^0.8",
+        "glpi-project/tools": "^0.8.1",
         "marcocesarato/php-conventional-changelog": "^1.17",
         "php-parallel-lint/php-parallel-lint": "^1.3",
         "phpstan/extension-installer": "^1.4",
