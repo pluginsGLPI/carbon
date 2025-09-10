@@ -13,9 +13,10 @@
 
 ## Description
 
-Carbon is a plugin that aims to assess the environmental impact of your IT infrastructure.
-It provides a dashboard to visualize the carbon footprint of your assets, including computers, servers, monitors, and network devices.
-It calculates the carbon footprint based on the energy consumption of these devices. It also calculates other environmental impacts such as abiotic depletion potential.
+The estimated environmental impact of IT is 3% to 4% share of GHG emissions of all human activities. This ratio tells that IT is one of the most impacting activities and is still growing. It is necessary to go towards a more sustainable IT usage if we want to reach carbon neutrality by 2050. However, environmental impact has multiple forms like raw material depletion, thus we also need to evaluate them. This requires to analyze the life cycle of your IT park, based on an accurate inventory. Thanks to GLPI by Teclib', you can automatically maintain it.
+
+The Carbon plugin for GLPI aims to analyze the life cycle of your park inventory and show key values of environmental impact with ease. Check the inventory completion of your assets, describe their power consumption and their uptime, and you'll get an evaluation for greenhouse gas emissions, abiotic depletion potential and primary energy. The results are divided into manufacturing and usage scopes. With this information, identify the most impacting assets to apply the best solutions to make your activity more sustainable.
+
 
 ## Documentation
 
