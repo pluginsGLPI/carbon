@@ -67,7 +67,7 @@ class Install
      *
      * @var string
      */
-    private const OLDEST_UPGRADABLE_VERSION = '0.0.0';
+    private const OLDEST_UPGRADABLE_VERSION = '1.0.0';
 
     /**
      * Regular expression for semver version : 3 numbers separated wit a dot
