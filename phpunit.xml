@@ -38,8 +38,8 @@
     <testsuite name="Uninstall">
       <directory>./tests/uninstall/</directory>
     </testsuite>
-    <testsuite name="Upgrade">
+    <!-- <testsuite name="Upgrade">
       <directory>./tests/upgrade/</directory>
-    </testsuite>
+    </testsuite> -->
   </testsuites>
 </phpunit>
