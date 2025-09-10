@@ -1,14 +1,22 @@
-# carbon plugin for GLPI
+# Carbon plugin for GLPI
 
 ![GLPI Banner](https://user-images.githubusercontent.com/29282308/31666160-8ad74b1a-b34b-11e7-839b-043255af4f58.png)
 
 [![License GPL 3.0](https://img.shields.io/badge/License-GPL%203.0-blue.svg)](https://github.com/pluginsGLPI/carbon/blob/main/LICENSE)
-[![Telegram GLPI](https://img.shields.io/badge/Telegram-GLPI-blue.svg)](https://t.me/glpien)
-[![Follow Twitter](https://img.shields.io/badge/Twitter-GLPI%20Project-26A2FA.svg)](https://twitter.com/GLPI_PROJECT)
 [![Project Status: Active](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 [![Docs](https://img.shields.io/badge/docs-readthedocs-brightgreen)](https://glpi-plugins.readthedocs.io/en/latest/carbon/index.html)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 [![GitHub All Releases](https://img.shields.io/github/downloads/PluginsGLPI/carbon/total)](https://github.com/pluginsGLPI/carbon/releases)
+
+
+## Social medias
+
+[![Facebook GLPI](https://img.shields.io/badge/Facebook-GLPI-1877F2.svg)](https://www.facebook.com/glpiproject/)
+[![X (formerly Twitter)](https://img.shields.io/badge/Twitter-GLPI%20Project-26A2FA.svg)](https://x.com/GLPI_PROJECT)
+[![Youtube GLPI](https://img.shields.io/badge/Youtube-GLPI-FF0033.svg)](https://www.youtube.com/channel/UCoIMi7aKeIvQRxi7ggd6VNA)
+[![Instagram GLPI](https://img.shields.io/badge/Instagram-GLPI-E1306C.svg)](https://www.instagram.com/glpi_project/)
+[![Linkedin GLPI](https://img.shields.io/badge/Linkedin-GLPI-0A66C2.svg)](https://www.linkedin.com/products/teclib-glpi/)
+[![Telegram GLPI](https://img.shields.io/badge/Telegram-GLPI-blue.svg)](https://t.me/glpien)
 
 
 ## Description
@@ -26,15 +34,19 @@ It describes how to install and use the plugin.
 
 You may contribute to this documentation by opening a pull request on the [documentation repository](https://github.com/pluginsGLPI/doc).
 
+
 ## Translation
 
 The plugin is currently available in English and French. If you want to contribute to the translation, you can do so by submitting translations on Transifex at [https://www.transifex.com/pluginsglpi/carbon/](https://www.transifex.com/pluginsglpi/carbon/).
 
+
 ## Contributing
+
 
 ### Bug reporting / Feature request
 
 * Open a ticket for each bug/feature so it can be discussed
+
 
 ### Contributing code
 
