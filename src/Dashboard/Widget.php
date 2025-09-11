@@ -1057,7 +1057,7 @@ class Widget extends GlpiDashboardWidget
         $icon_url = $CFG_GLPI['root_doc'] . '/plugins/carbon/images/ecology-icon-light.png';
         /** @phpstan-ignore-next-line */
         if (version_compare(GLPI_VERSION, '11.0', '<')) {
-            $icon_url = Plugin::getWebDir('carbon') . '/public/images/ecology-icon-light.png';
+            $icon_url = Plugin::getWebDir('carbon') . '/pics/ecology-icon-light.png';
         }
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/information-block.html.twig', [
             'id'              => $p['id'],
