@@ -42,7 +42,7 @@ use Plugin;
 require_once(__DIR__ . '/../install/PluginInstallTest.php');
 class PluginUpgradeTest extends PluginInstallTest
 {
-    private string $old_version = '0.0.1';
+    private string $old_version = '1.0.0';
 
     /**
      * Install an old schema and configuration of the plugin
@@ -60,10 +60,10 @@ class PluginUpgradeTest extends PluginInstallTest
 
         $this->assertTrue($DB->connected);
 
-        $success = $DB->runFile(__DIR__ . "/../../install/mysql/plugin_carbon_{$this->old_version}_empty.sql");
+        $success = $DB->runFile(realpath(__DIR__ . "/../../install/mysql/plugin_carbon_{$this->old_version}_empty.sql"));
         $this->assertTrue($success, 'Failed to install old version schema');
 
-        $success = $this->runSqlFile(__DIR__ . "/../fixtures/version_{$this->old_version}_data.sql");
+        $success = $this->runSqlFile(realpath(__DIR__ . "/../fixtures/version_{$this->old_version}_data.sql"));
         $this->assertTrue($success, 'Failed to install old version data');
 
         // Ignore SQL warnings which may occur when installing an old schema
