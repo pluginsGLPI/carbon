@@ -151,16 +151,19 @@ class ComputerUsageProfileTest extends DbTestCase
     {
         $invalid_item = new class extends CommonDBTM {
         };
+        /** @var ComputerUsageProfile $usage_profile */
         $usage_profile = $this->createItem(ComputerUsageProfile::class, ['name' => 'Test Usage Profile']);
         $result = $usage_profile->assignToItem($invalid_item);
         $this->assertFalse($result);
 
         $computer = $this->createItem(GlpiComputer::class, ['name' => 'Test Computer']);
+        /** @var ComputerUsageProfile $usage_profile */
         $usage_profile = $this->createItem(ComputerUsageProfile::class, ['name' => 'Test Usage Profile']);
 
         $result = $usage_profile->assignToItem($computer);
         $this->assertTrue($result);
 
+        /** @var ComputerUsageProfile $usage_profile */
         $usage_profile = $this->createItem(ComputerUsageProfile::class, ['name' => 'Test Usage Profile 2']);
         $result = $usage_profile->assignToItem($computer);
         $this->assertTrue($result);
@@ -263,9 +266,9 @@ class ComputerUsageProfileTest extends DbTestCase
         $crawler = new Crawler($output);
         $name_field = $crawler->filter('input[name="name"]');
         $this->assertEquals(1, $name_field->count());
-        $start_time_field = $crawler->filter('input[name="time_start"]');
+        $start_time_field = $crawler->filter('select[name="time_start"]');
         $this->assertEquals(1, $start_time_field->count());
-        $end_time_field = $crawler->filter('input[name="time_stop"]');
+        $end_time_field = $crawler->filter('select[name="time_stop"]');
         $this->assertEquals(1, $end_time_field->count());
         for ($i = 1; $i <= 7; $i++) {
             $field = $crawler->filter('input[name="day_' . $i . '"]');
