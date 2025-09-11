@@ -69,8 +69,7 @@ define('PLUGIN_CARBON_TYPES', [
 function plugin_init_carbon()
 {
     /** @var array $CFG_GLPI */
-     /** @var array $PLUGIN_HOOKS */
-    global $CFG_GLPI, $PLUGIN_HOOKS;
+    global $CFG_GLPI;
 
     if (!Plugin::isPluginActive('carbon')) {
         return;
