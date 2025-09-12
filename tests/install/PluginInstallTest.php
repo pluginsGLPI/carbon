@@ -507,7 +507,7 @@ class PluginInstallTest extends CommonTestCase
                 'itemtype'                 => $profile_itemtype,
                 'items_id'                 => $profile['id']
             ]);
-            if (($profile_right->fields['rights'] && READ + UPDATE) != READ + UPDATE) {
+            if (($profile_right->fields['rights'] & READ + UPDATE) !== READ + UPDATE) {
                 $this->assertCount(0, $rows);
             } else {
                 $this->assertCount(1, $rows);
