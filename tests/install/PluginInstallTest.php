@@ -45,6 +45,7 @@ use Profile;
 use ProfileRight;
 use Glpi\Dashboard\Item;
 use Glpi\Dashboard\Right;
+use Glpi\DBAL\QueryExpression as QueryExpression;
 use Glpi\System\Diagnostic\DatabaseSchemaIntegrityChecker;
 use Glpi\Toolbox\Sanitizer;
 use GlpiPlugin\Carbon\CarbonIntensity;
@@ -481,6 +482,9 @@ class PluginInstallTest extends CommonTestCase
 
     public function checkDashboard()
     {
+        /** @var DBmysql $DB */
+        global $DB;
+
         // Check the dashboard exists
         $dashboard_key = 'plugin_carbon_board';
         $dashboard = new Dashboard();
@@ -488,30 +492,40 @@ class PluginInstallTest extends CommonTestCase
         $this->assertFalse($dashboard->isNewItem());
 
         // Check rights on the dashboard
-        $right = new Right();
-        $profile = new Profile();
-        $profiles = $profile->find();
-        $profile_itemtype = Profile::getType();
-        foreach ($profiles as $profile) {
-            $profile_right = new ProfileRight();
-            $profile_right->getFromDBByCrit([
-                'profiles_id' => $profile['id'],
-                'name'        => 'config',
-            ]);
-            if ($profile_right->isNewItem()) {
-                continue;
-            }
+        $rights = DBmysql::quoteName(ProfileRight::getTableField('rights'));
+        $right_mask = READ + UPDATE;
+        $rights = "{$rights} AND ({$right_mask})";
+        $profile_table = Profile::getTable();
+        $profile_right_table = ProfileRight::getTable();
+        $iterator = $DB->request([
+            'SELECT' => [
+                Profile::getTableField('id'),
+            ],
+            'FROM' => $profile_table,
+            'INNER JOIN' => [
+                $profile_right_table => [
+                    'FKEY' => [
+                        $profile_table => 'id',
+                        $profile_right_table => 'profiles_id',
+                        [
+                            'AND' => [ProfileRight::getTableField('name') => [Config::$rightname, Report::$rightname]],
+                        ]
+                    ]
+                ]
+            ],
+            'WHERE' => [
+                new QueryExpression($rights),
+            ]
+        ]);
 
-            $rows = $right->find([
+        foreach ($iterator as $profile) {
+            $dashboard_right = new Right();
+            $dashboard_right->getFromDBByCrit([
                 'dashboards_dashboards_id' => $dashboard->fields['id'],
-                'itemtype'                 => $profile_itemtype,
-                'items_id'                 => $profile['id']
+                'itemtype'                 => Profile::class,
+                'items_id'                 => $profile['id'],
             ]);
-            if (($profile_right->fields['rights'] & READ + UPDATE) !== READ + UPDATE) {
-                $this->assertCount(0, $rows);
-            } else {
-                $this->assertCount(1, $rows);
-            }
+            $this->assertFalse($dashboard_right->isNewItem());
         }
 
         // Check there is widgets in the dashboard

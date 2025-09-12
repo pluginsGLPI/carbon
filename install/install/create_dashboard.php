@@ -97,7 +97,7 @@ $iterator = $DB->request([
     'SELECT' => [
         Profile::getTableField('id'),
     ],
-    'FROM' => Profile::getTable(),
+    'FROM' => $profile_table,
     'INNER JOIN' => [
         $profile_right_table => [
             'FKEY' => [
