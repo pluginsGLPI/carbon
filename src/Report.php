@@ -108,8 +108,8 @@ class Report extends CommonDBTM
             ];
         }
 
-        $header_pic_url = $CFG_GLPI['root_doc'] . '/plugins/carbon/pics/illustration_bridge.png';
-        $footer_pic_url = $CFG_GLPI['root_doc'] . '/plugins/carbon/pics/illustration-footer.png';
+        $header_pic_url = $CFG_GLPI['root_doc'] . '/plugins/carbon/images/illustration_bridge.png';
+        $footer_pic_url = $CFG_GLPI['root_doc'] . '/plugins/carbon/images/illustration-footer.png';
         TemplateRenderer::getInstance()->display('@carbon/quick-report.html.twig', [
             'dashboard' => $dashboard_html,
             'messages'  => $messages,
