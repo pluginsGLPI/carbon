@@ -34,6 +34,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const { globSync } = require('glob');
 const libOutputPath = 'public/lib';
+const picsOutputPath = 'public/images';
 
 const config = {
     plugins: [new MiniCssExtractPlugin()],
@@ -79,7 +80,7 @@ const config = {
 const copyPatterns = [];
 copyPatterns.push({
     from:   path.resolve(__dirname, 'pics'),
-    to:     path.resolve(__dirname, 'public/images'),
+    to:     path.resolve(__dirname, picsOutputPath),
     filter: (resourcePath) => {
         return /\.(svg|png|gif|jpe?g)$/i.test(path.basename(resourcePath));
     },
