@@ -62,6 +62,8 @@ class ComputerUsageProfile extends CommonDropdown
         $this->initForm($ID, $options);
         $new_item = static::isNewID($ID);
         $in_modal = (bool) ($_GET['_in_modal'] ?? false);
+        $this->fields['time_start'] = $this->fields['time_start'] ?? '00:00:00';
+        $this->fields['time_stop'] = $this->fields['time_stop'] ?? '00:00:00';
         TemplateRenderer::getInstance()->display('@carbon/computerusageprofile.html.twig', [
             'item'   => $this,
             'params' => $options,
