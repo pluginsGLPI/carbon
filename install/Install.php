@@ -180,6 +180,20 @@ class Install
             }
         }
 
+        // Cherry pick install sub tasts to run
+        // Useful to rewrite missing data in DB
+        $install_dir = __DIR__ . '/install/';
+        $update_scripts = scandir($install_dir);
+        $whitelist = [
+            'init_datasources.php'
+        ];
+        foreach ($update_scripts as $update_script) {
+            if (!in_array($update_script, $whitelist)) {
+                continue;
+            }
+            require $install_dir . $update_script;
+        }
+
         // If no migration was ran, we still set the version to the current one
         Config::setConfigurationValues('plugin:carbon', ['dbversion' => PLUGIN_CARBON_SCHEMA_VERSION]);
 
