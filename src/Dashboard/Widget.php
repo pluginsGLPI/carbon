@@ -1068,7 +1068,7 @@ class Widget extends GlpiDashboardWidget
         ];
         $p = array_merge($default, $params);
 
-        $icon_url = $CFG_GLPI['root_doc'] . '/plugins/carbon/pics/ecology-icon-light.png';
+        $icon_url = $CFG_GLPI['root_doc'] . '/plugins/carbon/images/ecology-icon-light.png';
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/information-block.html.twig', [
             'id'              => $p['id'],
             'color'           => $p['color'],
