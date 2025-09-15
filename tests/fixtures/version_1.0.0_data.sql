@@ -62,6 +62,7 @@ INSERT INTO `glpi_dashboards_items` (`dashboards_dashboards_id`, `gridstack_id`,
 -- Table glpi_dashboards_rights
 
 INSERT INTO `glpi_dashboards_rights` (`dashboards_dashboards_id`, `itemtype`, `items_id`) VALUES (99, "Profile", 4);
+INSERT INTO `glpi_dashboards_rights` (`dashboards_dashboards_id`, `itemtype`, `items_id`) VALUES (99, "Profile", 8);
 
 -- Table glpi_displaypreferences
 
