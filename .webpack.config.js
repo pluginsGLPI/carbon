@@ -89,4 +89,29 @@ copyPatterns.push({
 
 config.plugins.push(new CopyWebpackPlugin({patterns:copyPatterns}));
 
-module.exports = config;
+const cssConfig = {
+    mode: 'production',
+    entry: {
+        'main': path.resolve(__dirname, 'css/main.css'),
+    },
+    output: {
+        path: path.resolve(__dirname, 'public'),
+        publicPath: '',
+        clean: false,
+    },
+    module: {
+        rules: [
+            {
+                test: /\.css$/,
+                use: [MiniCssExtractPlugin.loader, 'css-loader']
+            }
+        ]
+    },
+    plugins: [
+        new MiniCssExtractPlugin({
+            filename: 'main.css'
+        })
+    ]
+};
+
+module.exports = [config, cssConfig];
