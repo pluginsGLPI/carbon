@@ -155,7 +155,7 @@ class PluginInstallTest extends CommonTestCase
         bool $ignore_dynamic_row_format_migration = false,
         bool $ignore_unsigned_keys_migration = false
     ): bool {
-        /** @var DBmysql */
+        /** @var DBmysql $DB */
         global $DB;
 
         $schemaFile = plugin_carbon_getSchemaPath($version);
