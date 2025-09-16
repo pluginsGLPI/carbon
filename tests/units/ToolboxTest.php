@@ -33,6 +33,7 @@
 namespace GlpiPlugin\Carbon\Tests;
 
 use Computer;
+use DateInterval;
 use DateTime;
 use DateTimeImmutable;
 use GlpiPlugin\Carbon\Zone;
@@ -223,5 +224,36 @@ class ToolboxTest extends DbTestCase
             'GlpiPlugin\\Carbon\\Impact\\Embodied\\Boavizta\\Monitor',
             // 'GlpiPlugin\\Carbon\\Impact\\Embodied\\Boavizta\\NetworkEquipment',
         ], $output);
+    }
+
+    public function testDateIntervalToMySQLInterval()
+    {
+        $interval = new DateInterval('P3Y');
+        $result = Toolbox::dateIntervalToMySQLInterval($interval);
+        $this->assertEquals('INTERVAL 3 YEAR', $result);
+
+        $interval = new DateInterval('P2M');
+        $result = Toolbox::dateIntervalToMySQLInterval($interval);
+        $this->assertEquals('INTERVAL 2 MONTH', $result);
+
+        $interval = new DateInterval('P12D');
+        $result = Toolbox::dateIntervalToMySQLInterval($interval);
+        $this->assertEquals('INTERVAL 12 DAY', $result);
+
+        $interval = new DateInterval('PT5H');
+        $result = Toolbox::dateIntervalToMySQLInterval($interval);
+        $this->assertEquals('INTERVAL 5 HOUR', $result);
+
+        $interval = new DateInterval('PT34M');
+        $result = Toolbox::dateIntervalToMySQLInterval($interval);
+        $this->assertEquals('INTERVAL 34 MINUTE', $result);
+
+        $interval = new DateInterval('PT14S');
+        $result = Toolbox::dateIntervalToMySQLInterval($interval);
+        $this->assertEquals('INTERVAL 14 SECOND', $result);
+
+        $interval = new DateInterval('P3YT40M');
+        $result = Toolbox::dateIntervalToMySQLInterval($interval);
+        $this->assertEquals('INTERVAL 3 YEAR + INTERVAL 40 MINUTE', $result);
     }
 }
