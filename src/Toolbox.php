@@ -603,6 +603,11 @@ class Toolbox
         return implode(' + ', $parts);
     }
 
+    /**
+     * Get the dashboard ID of the Carbon dashboard
+     *
+     * @return int|null
+     */
     public static function getDashboardId(): ?int
     {
         $dashboard = new GlpiDashboard();
@@ -645,6 +650,12 @@ class Toolbox
         return '#' . Color::hslToHex($hsl);
     }
 
+    /**
+     * Calculate the relative luminance of a color
+     *
+     * @param Color $color
+     * @return float
+     */
     protected static function relative_luminance(Color $color): float
     {
         $rgb = array_map(function ($rgb_component) {
@@ -654,7 +665,14 @@ class Toolbox
         return 0.2126 * $rgb['R'] + 0.7152 * $rgb['G'] + 0.0722 * $rgb['B'];
     }
 
-    protected static function contrastRatio(Color $color_1, Color $color_2)
+    /**
+     * Calculate the contrast ratio between two colors
+     *
+     * @param Color $color_1
+     * @param Color $color_2
+     * @return float
+     */
+    protected static function contrastRatio(Color $color_1, Color $color_2): float
     {
         $l1 = self::relative_luminance($color_1);
         $l2 = self::relative_luminance($color_2);
