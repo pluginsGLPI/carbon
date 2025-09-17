@@ -127,7 +127,7 @@ function plugin_carbon_setupHooks()
     $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][] = 'lib/apexcharts.js';
 
     // Import CSS
-    $PLUGIN_HOOKS[Hooks::ADD_CSS]['carbon'][] = 'main.css';
+    $PLUGIN_HOOKS[Hooks::ADD_CSS]['carbon'][] = 'lib/carbon.css';
 
     $PLUGIN_HOOKS['add_default_where']['carbon'] = 'plugin_carbon_add_default_where';
 
