@@ -84,34 +84,18 @@ copyPatterns.push({
     filter: (resourcePath) => {
         return /\.(svg|png|gif|jpe?g)$/i.test(path.basename(resourcePath));
     },
+});
 
+copyPatterns.push({
+    from: path.resolve(__dirname, 'js/carbon.js'),
+    to: path.resolve(__dirname, 'public/lib/carbon.js')
+});
+
+copyPatterns.push({
+    from: path.resolve(__dirname, 'css/carbon.css'),
+    to: path.resolve(__dirname, 'public/lib/carbon.css')
 });
 
 config.plugins.push(new CopyWebpackPlugin({patterns:copyPatterns}));
 
-const cssConfig = {
-    mode: 'production',
-    entry: {
-        'main': path.resolve(__dirname, 'css/main.css'),
-    },
-    output: {
-        path: path.resolve(__dirname, 'public'),
-        publicPath: '',
-        clean: false,
-    },
-    module: {
-        rules: [
-            {
-                test: /\.css$/,
-                use: [MiniCssExtractPlugin.loader, 'css-loader']
-            }
-        ]
-    },
-    plugins: [
-        new MiniCssExtractPlugin({
-            filename: 'main.css'
-        })
-    ]
-};
-
-module.exports = [config, cssConfig];
+module.exports = [config];
