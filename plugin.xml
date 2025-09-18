@@ -2,7 +2,7 @@
    <name>Carbon</name>
    <key>carbon</key>
    <state>stable</state>
-   <logo>https://raw.githubusercontent.com/pluginsGLPI/carbon/master/icon.png</logo>
+   <logo>https://raw.githubusercontent.com/pluginsGLPI/carbon/master/icon.svg</logo>
    <description>
       <short>
          <en>Carbon aims to assess the environmental impact of your IT infrastructure.</en>
