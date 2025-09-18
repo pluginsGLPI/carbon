@@ -204,6 +204,10 @@ class UsageInfo extends CommonDBChild
             // TODO: decide if we show or not this impact.
             unset($usage_impact->fields['pe']);
         }
+        $usage_carbon_emission_count = countElementsInTable(CarbonEmission::getTable(), [
+            'itemtype' => $asset->getType(),
+            'items_id' => $asset->getID(),
+        ]);
 
         $data = Provider::getUsageCarbonEmissionPerMonth([
             'itemtype' => $asset->getType(),
@@ -248,6 +252,7 @@ class UsageInfo extends CommonDBChild
         TemplateRenderer::getInstance()->display('@carbon/environmentalimpact-item.html.twig', [
             'usage_info'      => $usage_info,
             'asset'           => $asset,
+            'usage_carbon_emission_count' => $usage_carbon_emission_count,
             'embodied_impact' => $embodied_impact,
             'usage_impact'    => $usage_impact,
             'usage_carbon_emission_graph' => Widget::DisplayGraphUsageCarbonEmissionPerMonth($data),

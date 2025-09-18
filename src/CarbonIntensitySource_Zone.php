@@ -117,7 +117,8 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
             'SELECT' => [
                 $zone_table => 'name',
                 $source_zone_table => ['id', 'is_download_enabled'],
-                CarbonIntensitySource::getTableField('name') . ' AS historical_source_name'
+                CarbonIntensitySource::getTableField('name') . ' AS historical_source_name',
+                $source_table => 'is_fallback'
             ],
             'FROM' => $source_zone_table,
             'INNER JOIN' => [
@@ -144,17 +145,24 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
 
         $entries = [];
         foreach ($iterator as $data) {
+            $is_download_enabled = __('Not downloadable', 'carbon') . Html::showToolTip(__('This is a fallback source, there is no real-time data available', 'carbon'), ['display' => false]);
+            if ($data['is_fallback'] == 0) {
+                $is_download_enabled = self::getToggleLink($data['id'], $data['is_download_enabled']);
+            }
             $entries[] = [
                 'itemtype'               => CarbonIntensitySource::class,
                 'id'                     => $item->getID(),
                 'name'                   => $data['name'],
                 'historical_source_name' => $data['historical_source_name'],
-                'is_download_enabled'    => self::getToggleLink($data['id'], $data['is_download_enabled']),
+                'is_download_enabled'    => $is_download_enabled,
             ];
         }
 
         $renderer = TemplateRenderer::getInstance();
-        $renderer->getEnvironment()->addExtension(new DataHelpersExtension());
+        $extensions = $renderer->getEnvironment()->getExtensions();
+        if (!isset($extensions[DataHelpersExtension::class])) {
+            $renderer->getEnvironment()->addExtension(new DataHelpersExtension());
+        }
         $renderer->display('@carbon/pages/CarbonIntensitySource/tab_zone.html.twig', [
             'is_tab' => true,
             'nopager' => true,
@@ -250,7 +258,10 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
         }
 
         $renderer = TemplateRenderer::getInstance();
-        $renderer->getEnvironment()->addExtension(new DataHelpersExtension());
+        $extensions = $renderer->getEnvironment()->getExtensions();
+        if (!isset($extensions[DataHelpersExtension::class])) {
+            $renderer->getEnvironment()->addExtension(new DataHelpersExtension());
+        }
         $renderer->display('@carbon/components/datatable.html.twig', [
             'is_tab' => true,
             'nopager' => true,
@@ -344,6 +355,13 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
 
     public function toggleZone(?bool $state = null): bool
     {
+        // Check if the source is a fallback source
+        $source = new CarbonIntensitySource();
+        $source->getFromDB($this->fields['plugin_carbon_carbonintensitysources_id']);
+        if ($source->fields['is_fallback'] === 1) {
+            // Fallback sources cannot be toggled
+            return false;
+        }
         if ($state === null) {
             $state = $this->fields['is_download_enabled'];
             $state = $state == 0 ? 1 : 0;

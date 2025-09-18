@@ -36,10 +36,15 @@ use Config as GlpiConfig;
 use CommonDBTM;
 use CommonGLPI;
 use Computer as GlpiComputer;
+use Geocoder\Geocoder;
+use Geocoder\Provider\Nominatim\Nominatim;
+use Geocoder\StatefulGeocoder;
 use Monitor as GlpiMonitor;
 use NetworkEquipment as GlpiNetworkEquipment;
 use Glpi\Application\View\TemplateRenderer;
+use GLPINetwork;
 use GlpiPlugin\Carbon\Impact\Embodied\Engine;
+use GuzzleHttp\Client;
 use Session;
 
 class Config extends GlpiConfig
@@ -189,23 +194,6 @@ class Config extends GlpiConfig
     }
 
     /**
-     * Get the namespace of the active usage impact engine
-     *
-     * @return string
-     */
-    public static function getGwpUsageImpactEngine(): string
-    {
-        $default_engine = 'Boavizta';
-        $engine = GlpiConfig::getConfigurationValue('plugin:carbon', 'impact_engines');
-        if ($engine === null || $engine === '') {
-            GlpiConfig::setConfigurationValues('plugin:carbon', ['impact_engines' => $default_engine]);
-            $engine = $default_engine;
-        }
-
-        return __NAMESPACE__ . '\\Impact\\History\\' . $engine;
-    }
-
-    /**
      * Get demo mode status
      *
      * @return boolean true if demo mode enabled
@@ -225,5 +213,24 @@ class Config extends GlpiConfig
     public static function exitDemoMode()
     {
         GlpiConfig::deleteConfigurationValues('plugin:carbon', ['demo']);
+    }
+
+    /**
+     * Get an instance of a geocoder
+     *
+     * @return Geocoder
+     */
+    public static function getGeocoder(): Geocoder
+    {
+        $locale = null;
+        $language = Session::getLanguage();
+        if ($language !== null) {
+            $locale = substr($language, 0, 2);
+        }
+
+        $user_agent = GLPINetwork::getGlpiUserAgent();
+        $provider = Nominatim::withOpenStreetMapServer(new Client(), $user_agent);
+        $geocoder = new StatefulGeocoder($provider, $locale);
+        return $geocoder;
     }
 }

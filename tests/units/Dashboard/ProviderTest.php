@@ -48,6 +48,8 @@ use Infocom;
 use Location;
 use Session;
 
+use function PHPUnit\Framework\assertEquals;
+
 class ProviderTest extends DbTestCase
 {
     public function setUp(): void
@@ -160,6 +162,11 @@ class ProviderTest extends DbTestCase
         return $total_count;
     }
 
+    /**
+     * @covers GlpiPlugin\Carbon\Dashboard\Provider::getHandledAssetCount
+     *
+     * @return void
+     */
     public function testGetHandledComputersCount()
     {
         $total_count = $this->handledComputersCountFixture();
@@ -172,6 +179,11 @@ class ProviderTest extends DbTestCase
         $this->assertEquals(3, $handled_count['number']);
     }
 
+    /**
+     * @covers GlpiPlugin\Carbon\Dashboard\Provider::getHandledAssetCount
+     *
+     * @return void
+     */
     public function testGetUnhandledComputersCount()
     {
         $total_count = $this->handledComputersCountFixture();
@@ -180,6 +192,22 @@ class ProviderTest extends DbTestCase
         $this->assertEquals($total_count - 3, $unhandled_count['number']);
     }
 
+    /**
+     * @covers GlpiPlugin\Carbon\Dashboard\Provider::getHandledAssetsRatio
+     */
+    public function testGetHandledAssetsRatio()
+    {
+        $total_count = $this->handledComputersCountFixture();
+        $result = Provider::getHandledAssetsRatio([Computer::class]);
+        $expected = 19; // This is a percentage
+        $this->assertEquals($expected, $result['data'][0]['number']);
+    }
+
+    /**
+     * @covers GlpiPlugin\Carbon\Dashboard\Provider::getSumUsageEmissionsPerModel
+     *
+     * @return void
+     */
     public function testGetSumUsageEmissionsPerModel()
     {
         $entities_id = $this->isolateInEntity('glpi', 'glpi');
@@ -251,6 +279,11 @@ class ProviderTest extends DbTestCase
         $this->assertEquals($expected, $output);
     }
 
+    /**
+     * @covers GlpiPlugin\Carbon\Dashboard\Provider::getSumPowerPerModel
+     *
+     * @return void
+     */
     public function testGetSumPowerPerModel()
     {
         $entities_id = $this->isolateInEntity('glpi', 'glpi');
@@ -312,6 +345,11 @@ class ProviderTest extends DbTestCase
         $this->assertEquals($expected, $output);
     }
 
+    /**
+     * @covers GlpiPlugin\Carbon\Dashboard\Provider::getUsageCarbonEmissionPerMonth
+     *
+     * @return void
+     */
     public function testGetUsageCarbonEmissionPerMonth()
     {
         $country = $this->getUniqueString();
@@ -337,11 +375,6 @@ class ProviderTest extends DbTestCase
 
         $start_date = new DateTime('now');
         $start_date->modify('-5 month');
-        $duration = 'P4M';
-        // $this->createCarbonIntensityData($country, $source, $start_date, 1, $duration);
-        // $this->createCarbonEmissionData($computer_1, $start_date, new DateInterval($duration), 1, 2);
-        $history = new HistoryComputer();
-        // $history->evaluateItem($computer_1->getID(), new DateTime('2024-02-01'), new DateTime('2024-05-31'));
         $date_cursor = new DateTime('2024-02-01');
         $end_date = new DateTime('2024-05-31');
         $emission = new CarbonEmission();
@@ -361,18 +394,66 @@ class ProviderTest extends DbTestCase
             ]);
             $date_cursor->add(new DateInterval('P1D'));
         }
-        $output = Provider::getUsageCarbonEmissionPerMonth([
-            [
-                'date' => ['<=', '2024-05-31'],
-            ],
-            [
-                'date' => ['>=', '2024-02-01'],
-            ]
+        $result = Provider::getUsageCarbonEmissionPerMonth([
         ], [
+            'args' => [
+                'apply_filters' => [
+                    'dates' => [
+                        '2024-02-01T00:00:00.000Z',
+                        '2024-06-01T00:00:00.000Z',
+                    ],
+                ],
+            ],
             'label' => '',
             'icon' => '',
         ]);
+        $expected = [
+            0 => [
+                'data' => [
+                    0 => [
+                        'x' => '2024-02',
+                        'y' => '580.000',
+                    ],
+                    1 => [
+                        'x' => '2024-03',
+                        'y' => '620.000',
+                    ],
+                    2 => [
+                        'x' => '2024-04',
+                        'y' => '600.000',
+                    ],
+                    3 => [
+                        'x' => '2024-05',
+                        'y' => '620.000',
+                    ],
+                ],
+                'name' => 'Carbon emission (gCO₂eq)',
+                'unit' => 'gCO₂eq',
+            ],
+            1 => [
+                'data' => [
+                    0 => [
+                        'x' => '2024-02',
+                        'y' => '29.000',
+                    ],
+                    1 => [
+                        'x' => '2024-03',
+                        'y' => '31.000',
+                    ],
+                    2 => [
+                        'x' => '2024-04',
+                        'y' => '30.000',
+                    ],
+                    3 => [
+                        'x' => '2024-05',
+                        'y' => '31.000',
+                    ],
+                ],
+                'name' => 'Consumed energy (KWh)',
+                'unit' => 'KWh',
+            ],
+        ];
 
-        // TODO: check all values
+        $this->assertEquals($expected, $result['data']['series']);
     }
 }

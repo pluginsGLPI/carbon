@@ -105,14 +105,14 @@ class ComputerTest extends EngineTestCase
     {
         $laptop_glpi_computer = $this->createComputerUsageProfile(self::TEST_LAPTOP_USAGE_PROFILE);
         yield 'Computer with laptop usage profile' => [
-            new Computer($laptop_glpi_computer->getID()),
+            new Computer($laptop_glpi_computer),
             self::TEST_LAPTOP_USAGE_PROFILE,
         ];
 
         $country = $this->getUniqueString();
         $server_glpi_computer = $this->createComputerUsageProfilePowerLocation(self::TEST_SERVER_USAGE_PROFILE, 150, $country);
         yield 'Computer with server usage profile' => [
-            new Computer($server_glpi_computer->getID()),
+            new Computer($server_glpi_computer),
             self::TEST_SERVER_USAGE_PROFILE,
         ];
     }
@@ -135,14 +135,14 @@ class ComputerTest extends EngineTestCase
     {
         $laptop_glpi_computer = $this->createComputerUsageProfilePower(self::TEST_LAPTOP_USAGE_PROFILE, self::TEST_LAPTOP_POWER);
         yield 'Computer with laptop usage profile and type' => [
-            new Computer($laptop_glpi_computer->getID()),
+            new Computer($laptop_glpi_computer),
             new DateTime('2024-01-01 00:00:00'),
             self::TEST_LAPTOP_ENERGY_PER_DAY,
         ];
 
         $server_glpi_computer = $this->createComputerUsageProfilePower(self::TEST_SERVER_USAGE_PROFILE, self::TEST_SERVER_POWER);
         yield 'Computer with server usage profile and type' => [
-            new Computer($server_glpi_computer->getID()),
+            new Computer($server_glpi_computer),
             new DateTime('2024-01-01 00:00:00'),
             self::TEST_SERVER_ENERGY_PER_DAY,
         ];
@@ -159,7 +159,7 @@ class ComputerTest extends EngineTestCase
         $zone->getFromDBByCrit(['name' => $country]);
 
         $laptop_glpi_computer = $this->createComputerUsageProfilePowerLocation(self::TEST_LAPTOP_USAGE_PROFILE, self::TEST_LAPTOP_POWER, $country);
-        $laptop_computer = new Computer($laptop_glpi_computer->getID());
+        $laptop_computer = new Computer($laptop_glpi_computer);
 
         yield 'Computer with laptop usage profile and type on a Thursday' => [
             $laptop_computer,
@@ -182,7 +182,7 @@ class ComputerTest extends EngineTestCase
         ];
         $laptop_glpi_computer_2 = $this->createComputerUsageProfilePowerLocation($profile, self::TEST_LAPTOP_POWER, $country);
         yield 'Computer with laptop usage profile starting at half hour' => [
-            new Computer($laptop_glpi_computer_2->getID()),
+            new Computer($laptop_glpi_computer_2),
             $thursday,
             $zone,
             self::TEST_LAPTOP_POWER * 7.5 / 1000,
@@ -202,7 +202,7 @@ class ComputerTest extends EngineTestCase
         ];
         $laptop_glpi_computer_2 = $this->createComputerUsageProfilePowerLocation($profile, self::TEST_LAPTOP_POWER, $country);
         yield 'Computer with laptop usage profile ending at quarter hour' => [
-            new Computer($laptop_glpi_computer_2->getID()),
+            new Computer($laptop_glpi_computer_2),
             $thursday,
             $zone,
             self::TEST_LAPTOP_POWER * 8.25 / 1000,
@@ -222,14 +222,14 @@ class ComputerTest extends EngineTestCase
         ];
         $laptop_glpi_computer_3 = $this->createComputerUsageProfilePowerLocation($profile, self::TEST_LAPTOP_POWER, $country);
         yield 'Computer with laptop usage profile a few minutes in a single hour' => [
-            new Computer($laptop_glpi_computer_3->getID()),
+            new Computer($laptop_glpi_computer_3),
             $thursday,
             $zone,
             self::TEST_LAPTOP_POWER * 0.5 / 1000,
         ];
 
         $server_glpi_computer = $this->createComputerUsageProfilePowerLocation(self::TEST_SERVER_USAGE_PROFILE, self::TEST_SERVER_POWER, $country);
-        $server_computer = new Computer($server_glpi_computer->getID());
+        $server_computer = new Computer($server_glpi_computer);
         yield 'Computer with server usage profile and type on a Thursday' => [
             $server_computer,
             $thursday,
@@ -284,26 +284,26 @@ class ComputerTest extends EngineTestCase
     {
         // computer with no model and no type
         $computer_no_model_no_type = $this->getItem(GlpiComputer::class);
-        $engine = new Computer($computer_no_model_no_type->getID());
+        $engine = new Computer($computer_no_model_no_type);
         yield 'Computer with no model and no type' => [$engine, 0];
 
         // computer with a model and no type
         $computer_model_no_type = $this->getItem(GlpiComputer::class);
         $this->computerSetModelWithPower($computer_model_no_type, self::MODEL_NO_TYPE_POWER);
-        $engine = new Computer($computer_model_no_type->getID());
+        $engine = new Computer($computer_model_no_type);
         yield 'Computer with a model and no type' => [$engine, self::MODEL_NO_TYPE_POWER];
 
         // computer with no model and a type
         $computer_no_model_type = $this->getItem(GlpiComputer::class);
         $this->computerSetTypeWithPower($computer_no_model_type, self::NO_MODEL_TYPE_POWER);
-        $engine = new Computer($computer_no_model_type->getID());
+        $engine = new Computer($computer_no_model_type);
         yield 'Computer with no model and a type' => [$engine, self::NO_MODEL_TYPE_POWER];
 
         // computer with a model and a type: model have priority
         $computer_model_type = $this->getItem(GlpiComputer::class);
         $this->computerSetModelWithPower($computer_model_type, self::MODEL_TYPE_POWER);
         $this->computerSetTypeWithPower($computer_model_type, 0);
-        $engine = new Computer($computer_model_type->getID());
+        $engine = new Computer($computer_model_type);
         yield 'Computer with a model and a type' => [$engine, self::MODEL_TYPE_POWER];
     }
 }

@@ -194,7 +194,6 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
             // enpty string in PHPUnit environment
             $memory_limit = null;
         }
-        $timezone = $DB->guessTimezone();
         foreach ($gaps as $gap) {
             // $date_cursor = DateTime::createFromFormat('U', $gap['start']);
             // $date_cursor->setTimezone(new DateTimeZone($timezone));
@@ -235,9 +234,9 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     protected function evaluateItemPerDay(CommonDBTM $item, EngineInterface $engine, DateTimeInterface $day): bool
     {
         $energy = $engine->getEnergyPerDay($day);
-        $item_id = $item->getID();
-        $zone = $this->getZone($item_id /* ,$date_cursor */);
-        if ($zone === null) {
+        $zone = new Zone();
+        $zone->getByItem($item /* ,$date_cursor */);
+        if ($zone->isNewItem()) {
             return false;
         }
 
@@ -254,7 +253,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         $model_fk = static::$model_itemtype::getForeignKeyField();
         $id = $entry->add([
             'itemtype'          => $item->getType(),
-            'items_id'          => $item_id,
+            'items_id'          => $item->getID(),
             'engine'            => $this->engine,
             'engine_version'    => $this->engine_version,
             'entities_id'       => $item->fields['entities_id'],
@@ -329,59 +328,6 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     }
 
     /**
-     * Get the zone the asset belongs to
-     * Location's country must match a zone name
-     *
-     * @param integer $items_id
-     * @param null|DateTime $date Date for which the zone must be found
-     * @return Zone|null
-     */
-    protected function getZone(int $items_id, ?DateTime $date = null): ?Zone
-    {
-        // TODO: use date to find where was the asset at the given date
-        if ($date === null) {
-            $item_table = (new DbUtils())->getTableForItemType(static::$itemtype);
-            $location_table = GlpiLocation::getTable();
-            $zone_table = Zone::getTable();
-
-            $zone = new Zone();
-            $request = [
-                'INNER JOIN' => [
-                    $location_table => [
-                        'FKEY' => [
-                            $zone_table => 'name',
-                            $location_table => 'state',
-                        ],
-                    ],
-                    $item_table => [
-                        'FKEY' => [
-                            $item_table => GlpiLocation::getForeignKeyField(),
-                            $location_table => 'id',
-                        ],
-                    ]
-                ],
-                'WHERE' => [
-                    $item_table . '.id' => $items_id
-                ]
-            ];
-            $found = $zone->getFromDBByRequest($request);
-            if ($found === false) {
-                // no state found, fallback to country
-                $request['INNER JOIN'][$location_table]['FKEY'][$location_table] = 'country';
-                $found = $zone->getFromDBByRequest($request);
-                if ($found === false) {
-                    // Give up
-                    return null;
-                }
-            }
-
-            return $zone;
-        }
-
-        throw new LogicException('Not implemented yet');
-    }
-
-    /**
      * Ddelete all calculated usage impact for an asset
      *
      * @param integer $items_id
@@ -415,7 +361,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         } catch (\Exception $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
             Session::addMessageAfterRedirect(
-                sprintf(__('Error while calculating impact', 'carbon')),
+                __('Error while calculating impact', 'carbon'),
                 false,
                 ERROR
             );

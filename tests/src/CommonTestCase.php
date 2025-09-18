@@ -83,6 +83,7 @@ class CommonTestCase extends TestCase
 
     protected function setUp(): void
     {
+        $this->setupGLPIFramework();
         $this->resetGLPILogs();
     }
 
@@ -113,13 +114,14 @@ class CommonTestCase extends TestCase
         global $LOADED_PLUGINS, $AJAX_INCLUDE, $PLUGINS_INCLUDED;
 
         if (session_status() == PHP_SESSION_ACTIVE) {
+            Session::destroy();
             session_write_close();
         }
-        $LOADED_PLUGINS = null;
-        $PLUGINS_INCLUDED = null;
-        $AJAX_INCLUDE = null;
+        unset($LOADED_PLUGINS);
+        unset($PLUGINS_INCLUDED);
+        unset($AJAX_INCLUDE);
         $_SESSION = [];
-        require_once GLPI_ROOT . "/inc/includes.php";
+        require GLPI_ROOT . "/inc/includes.php";
         //\Toolbox::setDebugMode(Session::DEBUG_MODE);
 
         // Security of PHP_SELF
@@ -128,7 +130,7 @@ class CommonTestCase extends TestCase
         if (session_status() == PHP_SESSION_ACTIVE) {
             session_write_close();
         }
-        session_start();
+        Session::start();
         $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
     }
 
@@ -140,9 +142,15 @@ class CommonTestCase extends TestCase
         $result = $auth->login($name, $password, $noauto);
         $this->restoreDebug();
         $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
-        $this->setupGLPIFramework();
+        // $this->setupGLPIFramework();
 
         return $result;
+    }
+
+    protected function logout()
+    {
+        Session::destroy();
+        Session::start();
     }
 
     /**
@@ -165,12 +173,24 @@ class CommonTestCase extends TestCase
      */
     protected function getItem(string $itemtype, array $input = []): CommonDBTM
     {
+        return $this->createItem($itemtype, $input);
+    }
+
+    /**
+     * Create an item of the given itemtype
+     *
+     * @param string $itemtype itemtype to create
+     * @param array $input
+     * @return CommonDBTM
+     */
+    protected function createItem(string $itemtype, array $input = []): CommonDBTM
+    {
         global $DB;
+
+        $this->handleDeprecations($itemtype, $input);
 
         /** @var CommonDBTM */
         $item = new $itemtype();
-
-        $this->handleDeprecations($itemtype, $input);
 
         // set random name if not already set
         if (!isset($item->fields['name']) && $DB->fieldExists($item->getTable(), 'name')) {
@@ -209,7 +229,12 @@ class CommonTestCase extends TestCase
         return $item;
     }
 
-    public function getItems(array $batch)
+    public function getItems(array $batch): array
+    {
+        return $this->createItems($batch);
+    }
+
+    public function createItems(array $batch): array
     {
         $output = [];
 
@@ -417,7 +442,7 @@ class CommonTestCase extends TestCase
      *
      * @return int
      */
-    protected function isolateInEntity($login, $password): int
+    protected function isolateInEntity(): int
     {
         $entity      = new Entity();
         $rand        = mt_rand();
@@ -426,7 +451,6 @@ class CommonTestCase extends TestCase
             'entities_id' => 0
         ]);
 
-        // $this->login($login, $password);
         $success = Session::changeActiveEntities($entities_id);
         $this->assertTrue($success, 'Failed to change active entity');
 

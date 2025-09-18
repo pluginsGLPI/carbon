@@ -32,11 +32,20 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
+use Config;
 use GlpiPlugin\Carbon\CronTask;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\CarbonIntensity;
+use GlpiPlugin\Carbon\Location;
 use CronTask as GlpiCronTask;
+use Geocoder\Geocoder;
+use Geocoder\Model\AddressCollection;
+use Geocoder\Model\AdminLevel;
+use Geocoder\Model\AdminLevelCollection;
+use Geocoder\Model\Country;
+use Geocoder\Provider\Nominatim\Model\NominatimAddress;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensityInterface;
+use Location as GlpiLocation;
 
 class CronTaskTest extends DbTestCase
 {
@@ -84,5 +93,75 @@ class CronTaskTest extends DbTestCase
 
             $this->assertEquals($expected, $output);
         }
+    }
+
+    public function testFillIncompleteLocations()
+    {
+        $cron_task = new CronTask();
+        $glpi_cron_task = new GlpiCronTask();
+        $glpi_cron_task->getFromDBByCrit([
+            'itemtype' => get_class($cron_task),
+            'name'     => 'LocationCountryCode',
+        ]);
+
+        // Mock the getGeocoder method to return a callable that simulates geocoding
+        $geocoder_collection = new AddressCollection([
+            new NominatimAddress(
+                '',
+                new AdminLevelCollection([
+                    new AdminLevel(1, 'Île-de-France', 'IDF'),
+                    new AdminLevel(2, 'Paris', '75'),
+                ]),
+                null,
+                null,
+                null,
+                null,
+                '75000',
+                'Paris',
+                null,
+                new Country(
+                    'France',
+                    'FR'
+                ),
+            ),
+        ]);
+        $geocoder = $this->createStub(Geocoder::class);
+        $geocoder->method('geocodeQuery')->willReturn($geocoder_collection);
+        $cron_task->setGeocoder(function () use ($geocoder) {
+            return $geocoder;
+        });
+
+        // Disable geocoding while preparing the test
+        Config::setConfigurationValues('plugin:carbon', [
+            'geocoding_enabled' => '0',
+        ]);
+
+        // Test a single
+        $glpi_locations = $this->getItems([
+            GlpiLocation::class => [
+                [
+                    'name' => 'Valid Location',
+                    'town' => 'Valid Town',
+                    'country' => 'Valid Country',
+                ],
+            ],
+        ]);
+
+        Config::setConfigurationValues('plugin:carbon', [
+            'geocoding_enabled' => '1',
+        ]);
+        $result = $cron_task->fillIncompleteLocations($glpi_cron_task);
+        $this->assertEquals(1, $result);
+
+        // Try again to geocode the location
+        $result = $cron_task->fillIncompleteLocations($glpi_cron_task);
+        $this->assertEquals(0, $result);
+
+        $geocoder->method('geocodeQuery')->willThrowException(new \Geocoder\Exception\QuotaExceeded("Quota exceeded"));
+        $result = $cron_task->fillIncompleteLocations($glpi_cron_task);
+        $this->assertEquals(0, $result);
+
+        // Check that the result is as expected
+        $this->assertGreaterThanOrEqual(0, $result);
     }
 }

@@ -215,7 +215,7 @@ class Toolbox
             if ($weight < $multiple) {
                 break;
             }
-            $weight = $weight / 1000;
+            $weight /= 1000;
         }
 
         $weight = self::dynamicRound($weight);
@@ -263,7 +263,7 @@ class Toolbox
             if ($p < $multiple) {
                 break;
             }
-            $p = $p / 1000;
+            $p /= 1000;
         }
 
         $p = self::dynamicRound($p);
@@ -298,7 +298,7 @@ class Toolbox
             if ($p < $multiple) {
                 break;
             }
-            $p = $p / 1000;
+            $p /= 1000;
         }
 
         $p = self::dynamicRound($p);
@@ -340,7 +340,7 @@ class Toolbox
             if ($average < $multiple) {
                 break;
             }
-            $average = $average / $multiple;
+            $average /= $multiple;
             $power++;
         }
 
@@ -426,18 +426,18 @@ class Toolbox
     }
 
     /**
-     * Get an array of 2 dates from the beginning of the current year to yesterday
+     * Get an array of 2 dates matching the 12 complete months before the date argument
      *
      * @param DateTimeImmutable $date
      * @return array
      */
     public function yearToLastMonth(DateTimeImmutable $date): array
     {
-            $end_date = DateTime::createFromImmutable($date);
-            $end_date->setTime(0, 0, 0, 0);
-            $end_date->setDate((int) $end_date->format('Y'), (int) $end_date->format('m'), 1); // First day of current month (excluded)
-            $start_date = clone $end_date;
-            $start_date->setDate((int) $end_date->format('Y') - 1, (int) $end_date->format('m'), 1);
+        $end_date = DateTime::createFromImmutable($date);
+        $end_date->setTime(0, 0, 0, 0);
+        $end_date->setDate((int) $end_date->format('Y'), (int) $end_date->format('m'), 1); // First day of current month (excluded)
+        $start_date = clone $end_date;
+        $start_date->setDate((int) $end_date->format('Y') - 1, (int) $end_date->format('m'), 1);
 
         return [$start_date, $end_date];
     }
@@ -603,6 +603,11 @@ class Toolbox
         return implode(' + ', $parts);
     }
 
+    /**
+     * Get the dashboard ID of the Carbon dashboard
+     *
+     * @return int|null
+     */
     public static function getDashboardId(): ?int
     {
         $dashboard = new GlpiDashboard();
@@ -645,16 +650,29 @@ class Toolbox
         return '#' . Color::hslToHex($hsl);
     }
 
+    /**
+     * Calculate the relative luminance of a color
+     *
+     * @param Color $color
+     * @return float
+     */
     protected static function relative_luminance(Color $color): float
     {
         $rgb = array_map(function ($rgb_component) {
-            $rgb_component = $rgb_component / 255.0;
+            $rgb_component /= 255.0;
             return ($rgb_component <= 0.03928) ? ($rgb_component / 12.92) : pow(($rgb_component + 0.055) / 1.055, 2.4);
         }, $color->getRGB());
         return 0.2126 * $rgb['R'] + 0.7152 * $rgb['G'] + 0.0722 * $rgb['B'];
     }
 
-    protected static function contrastRatio(Color $color_1, Color $color_2)
+    /**
+     * Calculate the contrast ratio between two colors
+     *
+     * @param Color $color_1
+     * @param Color $color_2
+     * @return float
+     */
+    protected static function contrastRatio(Color $color_1, Color $color_2): float
     {
         $l1 = self::relative_luminance($color_1);
         $l2 = self::relative_luminance($color_2);

@@ -85,8 +85,8 @@ class MonitorType extends AbstractType
     {
         $monitor_type = new MonitorType();
         $core_monitor_type_id = $item->getID();
-        $id = $monitor_type->getFromDBByCrit([
-            'computertypes_id' => $core_monitor_type_id,
+        $monitor_type->getFromDBByCrit([
+            'monitortypes_id' => $core_monitor_type_id,
         ]);
         if ($monitor_type->isNewItem()) {
             $id = $monitor_type->add([
@@ -96,7 +96,7 @@ class MonitorType extends AbstractType
             return !$monitor_type->isNewId($id);
         } else {
             return $monitor_type->update([
-                'id'                => $id,
+                'id'                => $monitor_type->getID(),
                 'power_consumption' => $power,
             ]);
         }

@@ -34,9 +34,17 @@ namespace GlpiPlugin\Carbon\Tests;
 
 use GlpiPlugin\Carbon\Config;
 use Config as GlpiConfig;
+use Geocoder\Geocoder;
+use GlpiPlugin\Carbon\DataSource\LCA\Boavizta;
+use RuleCriteria;
 
 class ConfigTest extends DbTestCase
 {
+    /**
+     * @covers GlpiPlugin\Carbon\Config::getEmbodiedImpactEngine
+     *
+     * @return void
+     */
     public function testGetEmbodiedImpactEngine()
     {
         $configuration_key = 'impact_engines';
@@ -56,6 +64,11 @@ class ConfigTest extends DbTestCase
         $this->assertEquals('GlpiPlugin\\Carbon\\Impact\\Embodied\\Boavizta', $output);
     }
 
+    /**
+     * @covers GlpiPlugin\Carbon\Config::getUsageImpactEngine
+     *
+     * @return void
+     */
     public function testGetUsageImpactEngine()
     {
         $configuration_key = 'impact_engines';
@@ -73,5 +86,93 @@ class ConfigTest extends DbTestCase
         GlpiConfig::setConfigurationValues('plugin:carbon', [$configuration_key => 'Boavizta']);
         $output = Config::getUsageImpactEngine();
         $this->assertEquals('GlpiPlugin\\Carbon\\Impact\\Usage\\Boavizta', $output);
+    }
+
+    public static function configUpdateProvider()
+    {
+        yield [
+            [
+                'electricitymap_api_key' => '',
+            ], [
+            ]
+        ];
+
+        yield [
+            [
+                'electricitymap_api_key' => 'foo',
+            ], [
+                'electricitymap_api_key' => 'foo',
+            ]
+        ];
+
+        yield [
+            [
+                'boaviztapi_base_url' => '',
+            ], [
+                'boaviztapi_base_url' => '',
+            ]
+        ];
+
+        // TODO: requires code change to test boaviztapi_base_url with a not-empty value
+        // this triggers creation of an object then HTTP request, should be avoided in tests context
+    }
+
+    /**
+     * @dataProvider configUpdateProvider
+     * @covers GlpiPlugin\Carbon\Config::configUpdate
+     *
+     * @param array $input
+     * @param array $expected
+     * @return void
+     */
+    public function testConfigUpdate(array $input, array $expected)
+    {
+        $result = Config::configUpdate($input);
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @covers GlpiPlugin\Carbon\Config::isDemoMode
+     *
+     * @return void
+     */
+    public function testIsDemoMode()
+    {
+        Config::setConfigurationValues('plugin:carbon', ['demo' => 0]);
+        $result = Config::isDemoMode();
+        $this->assertFalse($result);
+
+        Config::setConfigurationValues('plugin:carbon', ['demo' => 1]);
+        $result = Config::isDemoMode();
+        $this->assertTrue($result);
+    }
+
+    public function testExitDemoMode()
+    {
+        $config = new GlpiConfig();
+        $config->getFromDBByCrit([
+            'context' => 'plugin:carbon',
+            'name'    => 'demo',
+        ]);
+        $this->assertFalse($config->isNewItem());
+
+        Config::exitDemoMode();
+        $config = new GlpiConfig();
+        $config->getFromDBByCrit([
+            'context' => 'plugin:carbon',
+            'name'    => 'demo',
+        ]);
+        $this->assertTrue($config->isNewItem());
+    }
+
+    /**
+     * @covers GlpiPlugin\Carbon\Config::getGeocoder
+     *
+     * @return void
+     */
+    public function testGetGeocoder()
+    {
+        $result = Config::getGeocoder();
+        $this->assertInstanceOf(Geocoder::class, $result);
     }
 }

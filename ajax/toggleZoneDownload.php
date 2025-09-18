@@ -33,7 +33,7 @@
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
 
-include('../../../inc/includes.php');
+include(__DIR__ . '/../../../inc/includes.php');
 
 // Check if plugin is activated...
 if (!Plugin::isPluginActive('carbon')) {

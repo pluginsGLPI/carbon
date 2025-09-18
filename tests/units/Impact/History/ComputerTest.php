@@ -32,12 +32,13 @@
 
 namespace GlpiPlugin\Carbon\Impact\History\Tests;
 
+use CommonDBTM;
 use Computer as GlpiComputer;
 use DateInterval;
 use GlpiPlugin\Carbon\Impact\History\Computer;
 use GlpiPlugin\Carbon\Tests\Impact\History\CommonAsset;
 use Location;
-use ComputerModel;
+use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
 use DateTime;
 use Infocom;
@@ -45,6 +46,7 @@ use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\UsageInfo;
+use GlpiPlugin\Carbon\Zone;
 
 /**
  * @covers \GlpiPlugin\Carbon\Impact\History\Computer
@@ -84,9 +86,9 @@ class ComputerTest extends CommonAsset
 
         $model_power = 55;
         $location = $this->getItem(Location::class, [
-            'country' => PLUGIN_CARBON_TEST_FAKE_ZONE_NAME,
+            'state' => 'Quebec',
         ]);
-        $model = $this->getItem(ComputerModel::class, ['power_consumption' => $model_power]);
+        $model = $this->getItem(GlpiComputerModel::class, ['power_consumption' => $model_power]);
         $glpi_type = $this->getItem(GlpiComputerType::class);
         $type = $this->getItem(ComputerType::class, [
             GlpiComputerType::getForeignKeyField() => $glpi_type->getID(),
@@ -139,16 +141,15 @@ class ComputerTest extends CommonAsset
         ]);
         $this->assertEquals(7, count($emissions));
 
-        // Values from the fake carbon intensities added in global fixtures
         $expected = [
             [
                 'date'             => '2024-02-01 00:00:00',
                 'energy_per_day'   => 0.495,
-                'emission_per_day' => 14.245,
+                'emission_per_day' => 234.138,
             ],[
                 'date' => '2024-02-02 00:00:00',
                 'energy_per_day'   => 0.495,
-                'emission_per_day' => 14.025,
+                'emission_per_day' => 234.138,
             ], [
                 'date' => '2024-02-03 00:00:00',
                 'energy_per_day'   => 0,
@@ -160,15 +161,15 @@ class ComputerTest extends CommonAsset
             ], [
                 'date' => '2024-02-05 00:00:00',
                 'energy_per_day'   => 0.495,
-                'emission_per_day' => 14.41,
+                'emission_per_day' => 234.138,
             ], [
                 'date' => '2024-02-06 00:00:00',
                 'energy_per_day'   => 0.495,
-                'emission_per_day' => 15.895,
+                'emission_per_day' => 234.138,
             ], [
                 'date' => '2024-02-07 00:00:00',
                 'energy_per_day'   => 0.495,
-                'emission_per_day' => 12.98,
+                'emission_per_day' => 234.138,
             ],
         ];
         foreach ($emissions as $emission) {
@@ -227,7 +228,7 @@ class ComputerTest extends CommonAsset
         $this->assertFalse($history->canHistorize($id));
 
         // Add a model
-        $model = $this->getItem(ComputerModel::class);
+        $model = $this->getItem(GlpiComputerModel::class);
         $computer->update([
             'id' => $id,
             'computermodels_id' => $model->getID(),
@@ -304,5 +305,394 @@ class ComputerTest extends CommonAsset
             'is_template' => 0,
         ]);
         $this->assertTrue($history->canHistorize($id));
+    }
+
+    public function testEmptyComputerIsNotHistorizable()
+    {
+        $history = new Computer();
+
+        $computer = $this->getItem(GlpiComputer::class);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_location'                => false,
+            'has_state_or_country'        => false,
+            'has_model'                   => false,
+            'has_model_power_consumption' => false,
+            'has_type'                    => false,
+            'has_type_power_consumption'  => false,
+            'has_usage_profile'           => false,
+            'has_category'                => false,
+            'has_inventory_entry_date'    => false,
+        ];
+
+        $result = $history->getHistorizableDiagnosis($computer);
+        $this->assertEquals($expected, $result);
+        $result = $history->canHistorize($computer->getID());
+        $this->assertFalse($result);
+    }
+
+    public function testComputerWithEmptyInfocomIsNotHistorizable()
+    {
+        $history = new Computer();
+
+        $computer = $this->getItem(GlpiComputer::class);
+        $management = $this->getItem(Infocom::class, [
+            'itemtype' => $computer->getType(),
+            'items_id' => $computer->getID(),
+        ]);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_location'                => false,
+            'has_state_or_country'        => false,
+            'has_model'                   => false,
+            'has_model_power_consumption' => false,
+            'has_type'                    => false,
+            'has_type_power_consumption'  => false,
+            'has_usage_profile'           => false,
+            'has_category'                => false,
+            'has_inventory_entry_date'    => false,
+        ];
+        $result = $history->getHistorizableDiagnosis($computer);
+        $this->assertEquals($expected, $result);
+        $result = $history->canHistorize($computer->getID());
+        $this->assertFalse($result);
+    }
+
+    public function testComputerWithEntryDateIsNotHistorizable()
+    {
+        $history = new Computer();
+
+        $computer = $this->getItem(GlpiComputer::class);
+        $management = $this->getItem(Infocom::class, [
+            'itemtype' => $computer->getType(),
+            'items_id' => $computer->getID(),
+            'use_date' => '2020-01-01',
+        ]);
+
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_location'                => false,
+            'has_state_or_country'        => false,
+            'has_model'                   => false,
+            'has_model_power_consumption' => false,
+            'has_type'                    => false,
+            'has_type_power_consumption'  => false,
+            'has_usage_profile'           => false,
+            'has_category'                => false,
+            'has_inventory_entry_date'    => true,
+        ];
+        $result = $history->getHistorizableDiagnosis($computer);
+        $this->assertEquals($expected, $result);
+        $result = $history->canHistorize($computer->getID());
+        $this->assertFalse($result);
+    }
+
+    public function testComputerWithEmptyLocationIsNotHistorizable()
+    {
+        $history = new Computer();
+
+        $location = $this->getItem(Location::class);
+        $computer = $this->getItem(GlpiComputer::class, [
+            'locations_id' => $location->getID(),
+        ]);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_location'                => true,
+            'has_state_or_country'        => false,
+            'has_model'                   => false,
+            'has_model_power_consumption' => false,
+            'has_type'                    => false,
+            'has_type_power_consumption'  => false,
+            'has_usage_profile'           => false,
+            'has_category'                => false,
+            'has_inventory_entry_date'    => false,
+        ];
+        $result = $history->getHistorizableDiagnosis($computer);
+        $this->assertEquals($expected, $result);
+        $result = $history->canHistorize($computer->getID());
+        $this->assertFalse($result);
+    }
+
+    public function testComputerWithLocationAndCountryIsNotHistorizable()
+    {
+        $history = new Computer();
+
+        $location = $this->getItem(Location::class, [
+            'country' => 'France'
+        ]);
+        $computer = $this->getItem(GlpiComputer::class, [
+            'locations_id' => $location->getID(),
+        ]);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_location'                => true,
+            'has_state_or_country'        => true,
+            'has_model'                   => false,
+            'has_model_power_consumption' => false,
+            'has_type'                    => false,
+            'has_type_power_consumption'  => false,
+            'has_usage_profile'           => false,
+            'has_category'                => false,
+            'has_inventory_entry_date'    => false,
+        ];
+        $result = $history->getHistorizableDiagnosis($computer);
+        $this->assertEquals($expected, $result);
+        $result = $history->canHistorize($computer->getID());
+        $this->assertFalse($result);
+    }
+
+    public function testComputerWithLocationAndStateIsNotHistorizable()
+    {
+        $history = new Computer();
+
+        $location = $this->getItem(Location::class, [
+            'state' => 'Quebec'
+        ]);
+        $computer = $this->getItem(GlpiComputer::class, [
+            'locations_id' => $location->getID(),
+        ]);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_location'                => true,
+            'has_state_or_country'        => true,
+            'has_model'                   => false,
+            'has_model_power_consumption' => false,
+            'has_type'                    => false,
+            'has_type_power_consumption'  => false,
+            'has_usage_profile'           => false,
+            'has_category'                => false,
+            'has_inventory_entry_date'    => false,
+        ];
+        $result = $history->getHistorizableDiagnosis($computer);
+        $this->assertEquals($expected, $result);
+        $result = $history->canHistorize($computer->getID());
+        $this->assertFalse($result);
+    }
+
+    public function testComputerWithUsageProfileIsNotHistorizable()
+    {
+        $history = new Computer();
+
+        $computer = $this->getItem(GlpiComputer::class);
+        $usage_profile = $this->getItem(ComputerUsageProfile::class);
+        $impact = $this->getItem(UsageInfo::class, [
+            $usage_profile->getForeignKeyField() => $usage_profile->getID(),
+            'itemtype' => $computer->getType(),
+            'items_id' => $computer->getID(),
+        ]);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_location'                => false,
+            'has_state_or_country'        => false,
+            'has_model'                   => false,
+            'has_model_power_consumption' => false,
+            'has_type'                    => false,
+            'has_type_power_consumption'  => false,
+            'has_usage_profile'           => true,
+            'has_category'                => false,
+            'has_inventory_entry_date'    => false,
+        ];
+        $result = $history->getHistorizableDiagnosis($computer);
+        $this->assertEquals($expected, $result);
+        $result = $history->canHistorize($computer->getID());
+        $this->assertFalse($result);
+    }
+
+    public function testComputerWithEmptyModelIsNotHistorizable()
+    {
+        $history = new Computer();
+
+        $model = $this->getItem(GlpiComputerModel::class);
+        $computer = $this->getItem(GlpiComputer::class, [
+            'computermodels_id' => $model->getID(),
+        ]);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_location'                => false,
+            'has_state_or_country'        => false,
+            'has_model'                   => true,
+            'has_model_power_consumption' => false,
+            'has_type'                    => false,
+            'has_type_power_consumption'  => false,
+            'has_usage_profile'           => false,
+            'has_category'                => false,
+            'has_inventory_entry_date'    => false,
+        ];
+        $result = $history->getHistorizableDiagnosis($computer);
+        $this->assertEquals($expected, $result);
+        $result = $history->canHistorize($computer->getID());
+        $this->assertFalse($result);
+    }
+
+    public function testComputerWithModelIsNotHistorizable()
+    {
+        $history = new Computer();
+
+        $model = $this->getItem(GlpiComputerModel::class, [
+            'power_consumption' => 55,
+        ]);
+        $computer = $this->getItem(GlpiComputer::class, [
+            'computermodels_id' => $model->getID(),
+        ]);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_location'                => false,
+            'has_state_or_country'        => false,
+            'has_model'                   => true,
+            'has_model_power_consumption' => true,
+            'has_type'                    => false,
+            'has_type_power_consumption'  => false,
+            'has_usage_profile'           => false,
+            'has_category'                => false,
+            'has_inventory_entry_date'    => false,
+        ];
+        $result = $history->getHistorizableDiagnosis($computer);
+        $this->assertEquals($expected, $result);
+        $result = $history->canHistorize($computer->getID());
+        $this->assertFalse($result);
+    }
+
+    public function testComputerWithEmptyTypeIsNotHistorizable()
+    {
+        $history = new Computer();
+
+        $glpi_computer_type = $this->getItem(GlpiComputerType::class);
+        $computer = $this->getItem(GlpiComputer::class, [
+            'computertypes_id' => $glpi_computer_type->getID(),
+        ]);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_location'                => false,
+            'has_state_or_country'        => false,
+            'has_model'                   => false,
+            'has_model_power_consumption' => false,
+            'has_type'                    => true,
+            'has_type_power_consumption'  => false,
+            'has_usage_profile'           => false,
+            'has_category'                => false,
+            'has_inventory_entry_date'    => false,
+        ];
+        $result = $history->getHistorizableDiagnosis($computer);
+        $this->assertEquals($expected, $result);
+        $result = $history->canHistorize($computer->getID());
+        $this->assertFalse($result);
+    }
+
+    public function testComputerWithTypeIsNotHistorizable()
+    {
+        $history = new Computer();
+
+        $glpi_computer_type = $this->getItem(GlpiComputerType::class);
+        $computer_type = $this->getItem(ComputerType::class, [
+            'power_consumption' => 55,
+            'computertypes_id' => $glpi_computer_type->getID(),
+        ]);
+        $computer = $this->getItem(GlpiComputer::class, [
+            'computertypes_id' => $glpi_computer_type->getID(),
+        ]);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_location'                => false,
+            'has_state_or_country'        => false,
+            'has_model'                   => false,
+            'has_model_power_consumption' => false,
+            'has_type'                    => true,
+            'has_type_power_consumption'  => true,
+            'has_usage_profile'           => false,
+            'has_category'                => false,
+            'has_inventory_entry_date'    => false,
+        ];
+        $result = $history->getHistorizableDiagnosis($computer);
+        $this->assertEquals($expected, $result);
+        $result = $history->canHistorize($computer->getID());
+        $this->assertFalse($result);
+    }
+
+    public function testComputerWithCategoryIsNotHistorizable()
+    {
+        $history = new Computer();
+
+        $glpi_computer_type = $this->getItem(GlpiComputerType::class);
+        $computer_type = $this->getItem(ComputerType::class, [
+            'category' => ComputerType::CATEGORY_DESKTOP,
+            'computertypes_id' => $glpi_computer_type->getID(),
+        ]);
+        $computer = $this->getItem(GlpiComputer::class, [
+            'computertypes_id' => $glpi_computer_type->getID(),
+        ]);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_location'                => false,
+            'has_state_or_country'        => false,
+            'has_model'                   => false,
+            'has_model_power_consumption' => false,
+            'has_type'                    => true,
+            'has_type_power_consumption'  => false,
+            'has_usage_profile'           => false,
+            'has_category'                => true,
+            'has_inventory_entry_date'    => false,
+        ];
+        $result = $history->getHistorizableDiagnosis($computer);
+        $this->assertEquals($expected, $result);
+        $result = $history->canHistorize($computer->getID());
+        $this->assertFalse($result);
+    }
+
+    public function testComputerWithEverythingIsHistorizable()
+    {
+        $history = new Computer();
+
+        $location = $this->getItem(Location::class, [
+            'country' => 'France'
+        ]);
+        $glpi_computer_type = $this->getItem(GlpiComputerType::class);
+        $computer_type = $this->getItem(ComputerType::class, [
+            'power_consumption' => 55,
+            'computertypes_id' => $glpi_computer_type->getID(),
+        ]);
+        $computer = $this->getItem(GlpiComputer::class, [
+            'locations_id' => $location->getID(),
+            'computertypes_id' => $glpi_computer_type->getID(),
+        ]);
+        $management = $this->getItem(Infocom::class, [
+            'itemtype' => $computer->getType(),
+            'items_id' => $computer->getID(),
+            'use_date' => '2020-01-01',
+        ]);
+        $usage_profile = $this->getItem(ComputerUsageProfile::class);
+        $impact = $this->getItem(UsageInfo::class, [
+            $usage_profile->getForeignKeyField() => $usage_profile->getID(),
+            'itemtype' => $computer->getType(),
+            'items_id' => $computer->getID(),
+        ]);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_location'                => true,
+            'has_state_or_country'        => true,
+            'has_model'                   => false,
+            'has_model_power_consumption' => false,
+            'has_type'                    => true,
+            'has_type_power_consumption'  => true,
+            'has_usage_profile'           => true,
+            'has_category'                => false,
+            'has_inventory_entry_date'    => true,
+        ];
+        $result = $history->getHistorizableDiagnosis($computer);
+        $this->assertEquals($expected, $result);
+        $result = $history->canHistorize($computer->getID());
+        $this->assertTrue($result);
     }
 }

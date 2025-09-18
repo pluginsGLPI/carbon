@@ -61,7 +61,7 @@ class NetworkEquipmentTest extends EngineTestCase
         $item = $this->getItem(static::$itemtype_class, [
             static::$model_class::getForeignKeyField() => $model->getID(),
         ]);
-        $engine = new static::$engine_class($item->getID());
+        $engine = new static::$engine_class($item);
         yield 'item' => [
             $engine,
             new DateTime('2024-01-01 00:00:00'),
@@ -90,7 +90,7 @@ class NetworkEquipmentTest extends EngineTestCase
         $item = $this->getItem(static::$itemtype_class, [
             $model::getForeignKeyField() => $model->getID(),
         ]);
-        $engine = new static::$engine_class($item->getID());
+        $engine = new static::$engine_class($item);
         yield 'Item' => [
             $engine,
             $thursday,
@@ -109,15 +109,15 @@ class NetworkEquipmentTest extends EngineTestCase
             static::$model_class::getForeignKeyField() => $model->getID(),
         ]);
 
-        $engine = new static::$engine_class($item->getID());
+        $engine = new static::$engine_class($item);
         $output = $engine->getCarbonEmissionPerDay(
-            new DateTime('2024-01-01 00:00:00'),
+            new DateTime('2024-02-01 00:00:00'),
             $zone
         );
 
         // Expects to use World carbon intensity as fallback
         $this->assertEqualsWithDelta(
-            4616.15,
+            4540.867,
             $output->getValue(),
             static::EPSILON
         );

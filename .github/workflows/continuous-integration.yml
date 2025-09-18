@@ -5,7 +5,7 @@ on:
     branches:
       - "main"
       - "support/*"
-      - "feature/ci"
+      - "feature/code_quality_rector"
     tags:
        - "*"
   pull_request:

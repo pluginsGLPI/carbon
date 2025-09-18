@@ -32,13 +32,9 @@
 
 namespace GlpiPlugin\Carbon;
 
-use DBmysql;
 use CronTask as GlpiCronTask;
 use Config as GlpiConfig;
-use DBmysqlIterator;
 use Geocoder\Geocoder;
-use Geocoder\Provider\Nominatim\Nominatim;
-use Geocoder\StatefulGeocoder;
 use GlpiPlugin\Carbon\DataSource\RestApiClient;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensityRTE;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensityElectricityMap;
@@ -47,13 +43,12 @@ use GlpiPlugin\Carbon\Impact\Embodied\Engine as EmbodiedEngine;
 use GlpiPlugin\Carbon\Impact\Usage\UsageImpactInterface as UsageImpactInterface;
 use GlpiPlugin\Carbon\Impact\Usage\Engine as UsageEngine;
 use GlpiPlugin\Carbon\Toolbox;
-use GLPINetwork;
-use GuzzleHttp\Client;
 use Location as GlpiLocation;
-use Session;
 
 class CronTask
 {
+    private $getGeocoder = [Location::class, 'getGeocoder'];
+
     /**
      * Get description of an automatic action
      *
@@ -241,57 +236,81 @@ class CronTask
 
     public static function cronLocationCountryCode(GlpiCronTask $task): int
     {
-         $task->setVolume(0); // start with zero
+        $task->setVolume(0); // start with zero
+        $plugin_task = new self();
+        $solved = $plugin_task->fillIncompleteLocations($task);
 
-        //Cehck if geocoding is enabled
+        $task->addVolume($solved);
+        return 1;
+    }
+
+    /**
+     * Fill incomplete locations with country code
+     *
+     * @param GlpiCronTask $task
+     * @return int
+     */
+    public function fillIncompleteLocations(GlpiCronTask $task): int
+    {
+        // Check if geocoding is enabled
         $enabled = GlpiConfig::getConfigurationValue('plugin:carbon', 'geocoding_enabled');
         if (!$enabled) {
             // If geocoding is not enabled, disable the task
             return 0;
         }
 
-        $limit = $task->fields['param'];
-
         $result = Location::getIncompleteLocations([
-            'LIMIT' => $limit,
+            'LIMIT' => $task->fields['param'],
         ]);
 
-        if ($result->count() === 0) {
-            return 1;
-        }
-
-        $geocoder = Location::getGeocoder();
+        $geocoder = call_user_func($this->getGeocoder);
 
         $solved = 0;
-        foreach ($result as $glpi_location) {
-            $location = new GlpiLocation();
-            if (!$location->getFromDB($glpi_location['id'])) {
-                // If the location does not exist, skip it
-                continue;
-            }
-
+        $failure = false;
+        foreach ($result as $row) {
+            $glpi_location = GlpiLocation::getById($row['id']);
             // Get the country code from the location
             try {
-                $country_code = Location::getCountryCode($location, $geocoder);
+                $location = new Location();
+                $country_code = $location->getCountryCode($glpi_location, $geocoder);
             } catch (\Geocoder\Exception\QuotaExceeded $e) {
                 // If the quota is exceeded, stop the task
                 break;
+            } catch (\RuntimeException $e) {
+                // If there is a runtime exception, log it and continue
+                $failure = true;
+                trigger_error($e->getMessage(), E_USER_WARNING);
+                continue;
             }
             if (empty($country_code)) {
+                $failure = true;
                 continue;
             }
 
             // Set the country code in the location
-            $location->update([
-                'id'             => $location->getID(),
+            $success = $glpi_location->update([
+                'id'             => $glpi_location->getID(),
                 '_boavizta_zone' => $country_code
             ]);
+            if (!$success) {
+                $failure = true;
+                continue;
+            }
             $solved++;
 
             sleep(1); // Sleep to avoid too many requests in a short time (Nominatim fait use)
         }
 
-        $task->addVolume($solved);
-        return 1;
+        return ($failure ? -$solved : $solved);
+    }
+
+    /**
+     * Set the geocoder callable. Required for unit tests to mock the geocoder.
+     *
+     * @param callable $geocoder
+     */
+    public function setGeocoder(callable $geocoder): void
+    {
+        $this->getGeocoder = $geocoder;
     }
 }

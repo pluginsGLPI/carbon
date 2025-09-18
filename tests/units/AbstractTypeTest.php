@@ -30,36 +30,22 @@
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Carbon\CronTask;
-use CronTask as GlpiCronTask;
+namespace GlpiPlugin\Carbon\Tests;
 
-$automatic_actions = [
-    [
-        'itemtype'  => CronTask::class,
-        'name'      => 'LocationCountryCode',
-        'frequency' => DAY_TIMESTAMP,
-        'options'   => [
-            'mode' => GlpiCronTask::MODE_EXTERNAL,
-            'allowmode' => GlpiCronTask::MODE_INTERNAL + GlpiCronTask::MODE_EXTERNAL,
-            'logs_lifetime' => 30,
-            'comment' => __('Find the Alpha3 country code (ISO3166) of locations', 'carbon'),
-            'param'   => 10, // Maximum rows to generate per execution
-        ]
-    ],
-];
+use GlpiPlugin\Carbon\AbstractType;
+use Session;
 
-foreach ($automatic_actions as $action) {
-    $task = new GlpiCronTask();
-    if ($task->getFromDBByCrit(['name' => $action['name']]) !== false) {
-        $task->delete(['id' => $task->getID()]);
-    }
-    $success = GlpiCronTask::Register(
-        $action['itemtype'],
-        $action['name'],
-        $action['frequency'],
-        $action['options']
-    );
-    if (!$success) {
-        throw new \RuntimeException('Error while creating automatic action: ' . $action['name']);
+class AbstractTypeTest extends DbTestCase
+{
+    /**
+     * @covers GlpiPlugin\Carbon\AbstractType::getTypeName
+     *
+     * @return void
+     */
+    public function testGetTypeName()
+    {
+        $instance = $this->getMockForAbstractClass(AbstractType::class);
+        $this->assertEquals('Power', $instance->getTypeName(1));
+        $this->assertEquals('Powers', $instance->getTypeName(Session::getPluralNumber()));
     }
 }

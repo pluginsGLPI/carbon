@@ -55,7 +55,7 @@ class NetworkEquipment extends AbstractAsset
 
     public static function getEngine(CommonDBTM $item): EngineInterface
     {
-        return new EngineNetworkEquipment($item->getID());
+        return new EngineNetworkEquipment($item);
     }
 
     public function getEvaluableQuery(array $crit = [], bool $entity_restrict = true): array
@@ -203,17 +203,17 @@ class NetworkEquipment extends AbstractAsset
         // false means that data is missing or invalid for historization
         $status['is_deleted'] = ($data['is_deleted'] === 0);
         $status['is_template'] = ($data['is_template'] === 0);
-        $status['has_location'] = ($data['location_id'] !== 0);
+        $status['has_location'] = !Location::isNewId($data['location_id']);
         $status['has_state_or_country'] = (strlen($data['state'] ?? '') > 0) || (strlen($data['country'] ?? '') > 0);
-        $status['has_model'] = ($data['model_id'] !== 0);
+        $status['has_model'] = !GlpiNetworkEquipmentModel::isNewId($data['model_id']);
         $status['has_model_power_consumption'] = (($data['model_power_consumption'] ?? 0) !== 0);
-        $status['has_type'] = ($data['type_id'] !== 0);
+        $status['has_type'] = !GlpiNetworkEquipmentType::isNewId($data['type_id']);
         $status['has_type_power_consumption'] = (($data['type_power_consumption'] ?? 0) !== 0);
 
         $item_oldest_date = $data['use_date']
             ?? $data['delivery_date']
             ?? $data['buy_date']
-            ?? $data['date_creation']
+            // ?? $data['date_creation']
             // ?? $data['date_mod']
             ?? null;
         $status['has_inventory_entry_date'] = ($item_oldest_date !== null);

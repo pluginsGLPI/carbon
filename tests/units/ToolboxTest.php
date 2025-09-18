@@ -33,6 +33,7 @@
 namespace GlpiPlugin\Carbon\Tests;
 
 use Computer;
+use DateInterval;
 use DateTime;
 use DateTimeImmutable;
 use GlpiPlugin\Carbon\Zone;
@@ -43,6 +44,11 @@ use Location;
 
 class ToolboxTest extends DbTestCase
 {
+    /**
+     * @covers GlpiPlugin\Carbon\Toolbox::getOldestAssetDate
+     *
+     * @return void
+     */
     public function testGetOldestAssetDate()
     {
         $toolbox = new Toolbox();
@@ -81,6 +87,11 @@ class ToolboxTest extends DbTestCase
         $this->assertEquals($expected, $output);
     }
 
+    /**
+     * @covers GlpiPlugin\Carbon\Toolbox::getLatestAssetDate
+     *
+     * @return void
+     */
     public function testGetLatestAssetDate()
     {
         $toolbox = new Toolbox();
@@ -104,6 +115,11 @@ class ToolboxTest extends DbTestCase
         $this->assertEquals($expected, $output);
     }
 
+    /**
+     * @covers GlpiPlugin\Carbon\Toolbox::getDefaultCarbonIntensityDownloadDate
+     *
+     * @return void
+     */
     public function testGetDefaultCarbonIntensityDownloadDate()
     {
         $instance = new Toolbox();
@@ -115,6 +131,11 @@ class ToolboxTest extends DbTestCase
         $this->assertEquals($expected, $output);
     }
 
+    /**
+     * @covers GlpiPlugin\Carbon\Toolbox::yearToLastMonth
+     *
+     * @return void
+     */
     public function testYearToLastMonth()
     {
         $end = new DateTimeImmutable('2023-04-09 13:45:17');
@@ -136,6 +157,11 @@ class ToolboxTest extends DbTestCase
         $this->assertEquals($expected, $output);
     }
 
+    /**
+     * @covers GlpiPlugin\Carbon\Toolbox::isLocationExistForZone
+     *
+     * @return void
+     */
     public function testIsLocationExistsForZone()
     {
         $output = Toolbox::isLocationExistForZone('foo');
@@ -151,6 +177,11 @@ class ToolboxTest extends DbTestCase
         $this->assertTrue($output);
     }
 
+    /**
+     * @covers GlpiPlugin\Carbon\Toolbox::getGwpUsageImpactClasses
+     *
+     * @return void
+     */
     public function testGetGwpUsageImpactClasses()
     {
         $output = Toolbox::getGwpUsageImpactClasses();
@@ -162,6 +193,11 @@ class ToolboxTest extends DbTestCase
         ], $output);
     }
 
+    /**
+     * @covers GlpiPlugin\Carbon\Toolbox::getUsageImpactClasses
+     *
+     * @return void
+     */
     public function testGetUsageImpactClasses()
     {
         $output = Toolbox::getUsageImpactClasses();
@@ -173,6 +209,11 @@ class ToolboxTest extends DbTestCase
         ], $output);
     }
 
+    /**
+     * @covers GlpiPlugin\Carbon\Toolbox::getEmbodiedImpactClasses
+     *
+     * @return void
+     */
     public function testGetEmbodiedImpactClasses()
     {
         $output = Toolbox::getEmbodiedImpactClasses();
@@ -183,5 +224,36 @@ class ToolboxTest extends DbTestCase
             'GlpiPlugin\\Carbon\\Impact\\Embodied\\Boavizta\\Monitor',
             // 'GlpiPlugin\\Carbon\\Impact\\Embodied\\Boavizta\\NetworkEquipment',
         ], $output);
+    }
+
+    public function testDateIntervalToMySQLInterval()
+    {
+        $interval = new DateInterval('P3Y');
+        $result = Toolbox::dateIntervalToMySQLInterval($interval);
+        $this->assertEquals('INTERVAL 3 YEAR', $result);
+
+        $interval = new DateInterval('P2M');
+        $result = Toolbox::dateIntervalToMySQLInterval($interval);
+        $this->assertEquals('INTERVAL 2 MONTH', $result);
+
+        $interval = new DateInterval('P12D');
+        $result = Toolbox::dateIntervalToMySQLInterval($interval);
+        $this->assertEquals('INTERVAL 12 DAY', $result);
+
+        $interval = new DateInterval('PT5H');
+        $result = Toolbox::dateIntervalToMySQLInterval($interval);
+        $this->assertEquals('INTERVAL 5 HOUR', $result);
+
+        $interval = new DateInterval('PT34M');
+        $result = Toolbox::dateIntervalToMySQLInterval($interval);
+        $this->assertEquals('INTERVAL 34 MINUTE', $result);
+
+        $interval = new DateInterval('PT14S');
+        $result = Toolbox::dateIntervalToMySQLInterval($interval);
+        $this->assertEquals('INTERVAL 14 SECOND', $result);
+
+        $interval = new DateInterval('P3YT40M');
+        $result = Toolbox::dateIntervalToMySQLInterval($interval);
+        $this->assertEquals('INTERVAL 3 YEAR + INTERVAL 40 MINUTE', $result);
     }
 }

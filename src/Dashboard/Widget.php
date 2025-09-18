@@ -793,7 +793,6 @@ class Widget extends GlpiDashboardWidget
 
         $label_color = '#626976';
         $fg_color = GlpiToolbox::getFgColor($p['color']);
-        $icon_color = '#156252';
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/usage-carbon-emission-last-year.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
@@ -835,7 +834,6 @@ class Widget extends GlpiDashboardWidget
 
         $label_color = '#626976';
         $fg_color = GlpiToolbox::getFgColor($p['color']);
-        $icon_color = '#156252';
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/embodied-carbon-emission.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
@@ -872,7 +870,6 @@ class Widget extends GlpiDashboardWidget
 
         $label_color = '#626976';
         $fg_color = GlpiToolbox::getFgColor($p['color']);
-        $icon_color = '#156252';
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/embodied-abiotic-depletion.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
@@ -909,7 +906,6 @@ class Widget extends GlpiDashboardWidget
         ]);
 
         $label_color = '#626976';
-        $icon_color = '#156252';
         $fg_color = GlpiToolbox::getFgColor($p['color']);
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/usage-abiotic-depletion.html.twig', [
             'id' => $p['id'],
@@ -1061,7 +1057,7 @@ class Widget extends GlpiDashboardWidget
         $icon_url = $CFG_GLPI['root_doc'] . '/plugins/carbon/images/ecology-icon-light.png';
         /** @phpstan-ignore-next-line */
         if (version_compare(GLPI_VERSION, '11.0', '<')) {
-            $icon_url = Plugin::getWebDir('carbon') . '/public/images/ecology-icon-light.png';
+            $icon_url = Plugin::getWebDir('carbon') . '/pics/ecology-icon-light.png';
         }
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/information-block.html.twig', [
             'id'              => $p['id'],

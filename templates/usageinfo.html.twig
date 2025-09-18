@@ -39,12 +39,10 @@
     ) }}
 
     {% if item.fields['itemtype'] == 'Computer' %}
-        {{ fields.dropdownField(
-            '\\GlpiPlugin\\Carbon\\ComputerUsageProfile',
+        {{ fields.dropdownField('\\GlpiPlugin\\Carbon\\ComputerUsageProfile',
             'plugin_carbon_computerusageprofiles_id',
             item.fields['plugin_carbon_computerusageprofiles_id'],
-            _n('Usage profile', 'Usage profiles', 1, 'carbon'))
-        }}
+            _n('Usage profile', 'Usage profiles', 1, 'carbon')) }}
     {% endif %}
 {#
     {{ fields.numberField(

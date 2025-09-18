@@ -32,7 +32,7 @@
 
 use Config as GlpiConfig;
 
-include("../../../inc/includes.php");
+include(__DIR__ . "/../../../inc/includes.php");
 
 if (!Plugin::isPluginActive('carbon')) {
     Html::displayNotFoundError();

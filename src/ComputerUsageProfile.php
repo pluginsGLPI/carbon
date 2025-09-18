@@ -57,15 +57,6 @@ class ComputerUsageProfile extends CommonDropdown
         return Entity::canView();
     }
 
-    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
-    {
-        $env       = new self();
-        /** @var \CommonDBTM $item */
-        $found_env = $env->find([static::getForeignKeyField() => $item->getID()]);
-        $nb        = $_SESSION['glpishow_count_on_tabs'] ? count($found_env) : 0;
-        return self::createTabEntry(self::getTypeName($nb), $nb);
-    }
-
     public function showForm($ID, array $options = [])
     {
         $this->initForm($ID, $options);
@@ -238,40 +229,62 @@ class ComputerUsageProfile extends CommonDropdown
         switch ($ma->getAction()) {
             case 'MassAssociateItems':
                 $usage_profile_fk = ComputerUsageProfile::getForeignKeyField();
-                $usage_profile_id = $ma->POST[$usage_profile_fk];
+                $usage_profile_id = (int) $ma->POST[$usage_profile_fk];
                 foreach ($ids as $id) {
-                    if ($item->getFromDB($id) && self::assignToItem($item, $usage_profile_id)) {
-                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
-                    } else {
-                        // Example of ko count
+                    $usage_profile = self::getById($usage_profile_id);
+                    if ($usage_profile === false) {
                         $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
+                        continue;
                     }
+
+                    $computer = GlpiComputer::getById($id);
+                    if ($computer === false) {
+                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
+                        continue;
+                    }
+
+                    if (!$usage_profile->assignToItem($computer)) {
+                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
+                        continue;
+                    }
+
+                    $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
                 }
                 return;
         }
     }
 
-    public static function assignToItem(CommonDBTM $item, int $usage_profile_id)
+    /**
+     * Assign an usage profile to an item
+     *
+     * @param CommonDBTM $item A computer to assign to
+     * @return bool
+     */
+    public function assignToItem(CommonDBTM $item): bool
     {
-        $environmental_imapct = new UsageInfo();
+        if ($item->getType() !== GlpiComputer::class) {
+            return false;
+        }
+        $usage_info = new UsageInfo();
         $computers_id = $item->getID();
-        $usage_profile_fk = ComputerUsageProfile::getForeignKeyField();
-        $environmental_imapct->getFromDBByCrit([
+        $usage_profile_fk = self::getForeignKeyField();
+        $usage_info->getFromDBByCrit([
             'itemtype'     => GlpiComputer::class,
             'items_id' => $computers_id,
         ]);
-        if ($environmental_imapct->isNewItem()) {
-            $environmental_imapct->add([
+        if ($usage_info->isNewItem()) {
+            $usage_info->add([
                 'itemtype'     => GlpiComputer::class,
                 'items_id' => $computers_id,
-                $usage_profile_fk => $usage_profile_id,
+                $usage_profile_fk => $this->getID(),
             ]);
-            return true;
+            /** @phpstan-ignore booleanNot.alwaysFalse  */
+            return !$usage_info->isNewItem();
         }
 
-        return $environmental_imapct->update([
-            'id'              => $environmental_imapct->getID(),
-            $usage_profile_fk => $usage_profile_id,
+        return $usage_info->update([
+            'id'              => $usage_info->getID(),
+            $usage_profile_fk => $this->getID(),
         ]);
     }
 }

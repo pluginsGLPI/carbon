@@ -33,13 +33,11 @@
 namespace GlpiPlugin\Carbon;
 
 use CommonDBTM;
-use DateInterval;
 use DateTime;
 use DateTimeImmutable;
 use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\Dashboard\Provider;
 use Glpi\Dashboard\Grid as DashboardGrid;
-use Html;
 use Plugin;
 
 class Report extends CommonDBTM
@@ -82,7 +80,7 @@ class Report extends CommonDBTM
     {
         $values = parent::getRights();
 
-        return array_intersect_key($values, [READ => true, PURGE => true]);
+        return array_intersect_key($values, [READ => true, UPDATE => true, PURGE => true]);
     }
 
     public static function showInstantReport(): void

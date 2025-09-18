@@ -71,4 +71,4 @@ require_once GLPI_ROOT . "/inc/includes.php";
 define('PLUGIN_CARBON_TEST_FAKE_SOURCE_NAME', 'Fake source');
 define('PLUGIN_CARBON_TEST_FAKE_ZONE_NAME', 'Fake zone');
 
-GlobalFixture::loadDataset();
+// GlobalFixture::loadDataset();

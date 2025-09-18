@@ -35,14 +35,13 @@ use GlpiPlugin\Carbon\Dashboard\Widget;
 use Glpi\Plugin\Hooks;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\UsageInfo;
-use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\Profile;
 use GlpiPlugin\Carbon\Report;
 use Location as GlpiLocation;
 use Profile as GlpiProfile;
 use GlpiPlugin\Carbon\Dashboard\Grid;
 
-define('PLUGIN_CARBON_VERSION', '1.0.0-beta.2');
+define('PLUGIN_CARBON_VERSION', '1.0.0');
 define('PLUGIN_CARBON_SCHEMA_VERSION', '1.0.0');
 
 // Minimal GLPI version, inclusive
@@ -109,16 +108,21 @@ function plugin_carbon_setupHooks()
 
     $PLUGIN_HOOKS[Hooks::POST_SHOW_TAB]['carbon'] = 'plugin_carbon_postShowTab';
     foreach (PLUGIN_CARBON_TYPES as $itemtype) {
+        // Asset itself
         $PLUGIN_HOOKS[Hooks::ITEM_ADD]['carbon'][$itemtype] = 'plugin_carbon_hook_add_asset';
         $PLUGIN_HOOKS[Hooks::ITEM_UPDATE]['carbon'][$itemtype] = 'plugin_carbon_hook_update_asset';
+        $PLUGIN_HOOKS[Hooks::PRE_ITEM_PURGE]['carbon'][$itemtype] = 'plugin_carbon_hook_pre_purge_asset';
+
+        // asset's type
+        $PLUGIN_HOOKS[Hooks::PRE_ITEM_PURGE]['carbon'][$itemtype . 'Type'] = 'plugin_carbon_hook_pre_purge_assettype';
     }
     $PLUGIN_HOOKS[Hooks::POST_ITEM_FORM]['carbon'] = 'plugin_carbon_postItemForm';
 
     // Actions taken on locations events
-    $PLUGIN_HOOKS[Hooks::ITEM_ADD]['carbon'][GlpiLocation::class] = [Location::class, 'onGlpiLocationAdd'];
-    $PLUGIN_HOOKS[Hooks::PRE_ITEM_UPDATE]['carbon'][GlpiLocation::class] = [Location::class, 'onGlpiLocationPreUpdate'];
-    $PLUGIN_HOOKS[Hooks::ITEM_UPDATE]['carbon'][GlpiLocation::class] = [Location::class, 'onGlpiLocationUpdate'];
-    $PLUGIN_HOOKS[Hooks::PRE_ITEM_PURGE]['carbon'][GlpiLocation::class] = [Location::class, 'onGlpiLocationPrePurge'];
+    $PLUGIN_HOOKS[Hooks::ITEM_ADD]['carbon'][GlpiLocation::class] = 'plugin_carbon_locationAdd';
+    $PLUGIN_HOOKS[Hooks::PRE_ITEM_UPDATE]['carbon'][GlpiLocation::class] = 'plugin_carbon_locationPreUpdate';
+    $PLUGIN_HOOKS[Hooks::ITEM_UPDATE]['carbon'][GlpiLocation::class] = 'plugin_carbon_locationUpdate';
+    $PLUGIN_HOOKS[Hooks::PRE_ITEM_PURGE]['carbon'][GlpiLocation::class] = 'plugin_carbon_locationPrePurge';
     // Updating profile rights impacts data for itemtype ProfileRight, then we must use PRE_ITEM_* hooks
     $PLUGIN_HOOKS[Hooks::PRE_ITEM_UPDATE]['carbon'][GlpiProfile::class] = 'plugin_carbon_profileUpdate';
     $PLUGIN_HOOKS[Hooks::PRE_ITEM_ADD]['carbon'][GlpiProfile::class] = 'plugin_carbon_profileAdd';
@@ -133,13 +137,7 @@ function plugin_carbon_setupHooks()
     $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][] = $js_file;
 
     // Import CSS
-    $css_file = 'main.css';
-    /** @phpstan-ignore-next-line */
-    if (version_compare(GLPI_VERSION, '11.0', '<')) {
-        // For GLPI < 11.0, we need to add resource the old way
-        $css_file = 'css/main.css';
-    }
-    $PLUGIN_HOOKS[Hooks::ADD_CSS]['carbon'][] = $css_file;
+    $PLUGIN_HOOKS[Hooks::ADD_CSS]['carbon'][] = 'public/main.css';
 
     $PLUGIN_HOOKS['add_default_where']['carbon'] = 'plugin_carbon_add_default_where';
 

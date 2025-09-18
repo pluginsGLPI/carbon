@@ -39,10 +39,13 @@ use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\Zone;
 use ComputerType as GlpiComputerType;
+use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use MonitorType as GlpiMonitorType;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
 use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
+use GlpiPlugin\Carbon\Config;
+use GlpiPlugin\Carbon\EmbodiedImpact;
 use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
@@ -247,6 +250,65 @@ function plugin_carbon_hook_update_asset(CommonDBTM $item)
     $source_zone->toggleZone(true);
 }
 
+/**
+ * Callback when an asset is being purged from the database
+ *
+ * @param CommonDBTM $item
+ * @return void
+ */
+function plugin_carbon_hook_pre_purge_asset(CommonDBTM $item)
+{
+    if (!in_array($item::getType(), PLUGIN_CARBON_TYPES)) {
+        return;
+    }
+
+    $itemtype = $item->getType();
+    $item_id = $item->getID();
+    $carbon_emission = new CarbonEmission();
+    $carbon_emission->deleteByCriteria([
+        'itemtype' => $itemtype,
+        'items_id' => $item_id
+    ]);
+
+    $embodied_impact = new EmbodiedImpact();
+    $embodied_impact->deleteByCriteria([
+        'itemtype' => $itemtype,
+        'items_id' => $item_id
+    ]);
+
+    $usage_info = new UsageInfo();
+    $usage_info->deleteByCriteria([
+        'itemtype' => $itemtype,
+        'items_id' => $item_id
+    ]);
+}
+
+/**
+ * Delete plugin's data linked to asset types
+ *
+ * @param CommonDBTM $item
+ * @return void
+ */
+function plugin_carbon_hook_pre_purge_assettype(CommonDBTM $item)
+{
+    $itemtype = $item->getType();
+    $pos = strrpos($itemtype, 'Type');
+    if ($pos !== strlen($itemtype) - 4) { // 4 is length of 'Type'
+        return;
+    }
+
+    $asset_itemtype = substr($itemtype, 0, $pos);
+    if (!in_array($asset_itemtype, PLUGIN_CARBON_TYPES)) {
+        return;
+    }
+
+    $carbon_type_itemtype = 'GlpiPlugin\\Carbon\\' . $itemtype;
+    $carbon_type = new $carbon_type_itemtype();
+    $carbon_type->deleteByCriteria([
+        $item->getForeignKeyField() => $item->getID(),
+    ]);
+}
+
 function plugin_carbon_MassiveActions($itemtype)
 {
     switch ($itemtype) {
@@ -318,4 +380,29 @@ function plugin_carbon_profileAdd(CommonDBTM $item)
 function plugin_carbon_profileUpdate(CommonDBTM $item)
 {
     plugin_carbon_profileAdd($item);
+}
+
+function plugin_carbon_locationAdd(CommonDBTM $item)
+{
+    $location = new Location();
+    $location->onGlpiLocationAdd($item, Config::getGeocoder());
+}
+
+
+function plugin_carbon_locationPreUpdate(CommonDBTM $item)
+{
+    $location = new Location();
+    $location->onGlpiLocationPreUpdate($item, Config::getGeocoder());
+}
+
+function plugin_carbon_locationUpdate(CommonDBTM $item)
+{
+    $location = new Location();
+    $location->onGlpiLocationUpdate($item);
+}
+
+function plugin_carbon_locationPrePurge(CommonDBTM $item)
+{
+    $location = new Location();
+    $location->onGlpiLocationPrePurge($item);
 }

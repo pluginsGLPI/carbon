@@ -145,60 +145,69 @@ class Location extends CommonDBChild
         return Boaviztapi::dropdownBoaviztaZone($name, $options);
     }
 
-    public static function getGeocoder(): Geocoder
+    /**
+     * callback when a GLPI location is added
+     *
+     * @param CommonDBTM $item
+     * @param Geocoder $geocoder
+     * @return void
+     */
+    public function onGlpiLocationAdd(CommonDBTM $item, Geocoder $geocoder)
     {
-        $locale = substr(Session::getLanguage(), 0, 2);
-        $user_agent = GLPINetwork::getGlpiUserAgent();
-        $provider = Nominatim::withOpenStreetMapServer(new Client(), $user_agent);
-        $geocoder = new StatefulGeocoder($provider, $locale);
-        return $geocoder;
-    }
-
-    public static function onGlpiLocationAdd(CommonDBTM $item)
-    {
-        self::enableCarbonIntensityDownload($item);
+        $this->enableCarbonIntensityDownload($item);
         $enabled = GlpiConfig::getConfigurationValue('plugin:carbon', 'geocoding_enabled');
         if (!empty($enabled)) {
-            if (!isset($item->input['_boavizta_zone']) || $item->input['_boavizta_zone'] == '0') {
+            if (!isset($item->input['_boavizta_zone']) || $item->input['_boavizta_zone'] == '' || $item->input['_boavizta_zone'] == '0') {
                 try {
-                    $geocoder = self::getGeocoder();
-                    $item->input['_boavizta_zone'] = self::getCountryCode($item, $geocoder);
+                    $item->input['_boavizta_zone'] = $this->getCountryCode($item, $geocoder);
                 } catch (\Geocoder\Exception\QuotaExceeded $e) {
                     trigger_error($e->getMessage(), E_USER_WARNING);
                 }
             }
         }
-        self::setBoaviztaZone($item);
+        $this->setBoaviztaZone($item);
     }
 
-    public static function onGlpiLocationUpdate(CommonDBTM $item)
+    /**
+     * callback when a GLPI location is updated
+     *
+     * @param CommonDBTM $item
+     * @return void
+     */
+    public function onGlpiLocationUpdate(CommonDBTM $item)
     {
-        self::enableCarbonIntensityDownload($item);
+        $this->enableCarbonIntensityDownload($item);
     }
 
-    public static function onGlpiLocationPreUpdate(CommonDBTM $item)
+    /**
+     * callback when a GLPI location is updated
+     *
+     * @param CommonDBTM $item
+     * @param Geocoder $geocoder
+     * @return void
+     */
+    public function onGlpiLocationPreUpdate(CommonDBTM $item, Geocoder $geocoder)
     {
         $enabled = GlpiConfig::getConfigurationValue('plugin:carbon', 'geocoding_enabled');
         if (!empty($enabled)) {
             if (!isset($item->input['_boavizta_zone']) ||  $item->input['_boavizta_zone'] == '0') {
-                // Boavizta zone already set
                 try {
-                    $geocoder = self::getGeocoder();
-                    $item->input['_boavizta_zone'] = self::getCountryCode($item, $geocoder);
+                    $item->input['_boavizta_zone'] = $this->getCountryCode($item, $geocoder);
                 } catch (\Geocoder\Exception\QuotaExceeded $e) {
                     trigger_error($e->getMessage(), E_USER_WARNING);
                 }
             }
         }
-        self::setBoaviztaZone($item);
+        $this->setBoaviztaZone($item);
     }
 
     /**
      * Enable download of carbon intensity data for a location
      *
+     * @param CommonDBTM $item Location
      * @return bool true if a zone download has been enabled
      */
-    protected static function enableCarbonIntensityDownload(CommonDBTM $item): bool
+    protected function enableCarbonIntensityDownload(CommonDBTM $item): bool
     {
         $input = $item->fields;
         if (!in_array('country', array_keys($input))) {
@@ -210,7 +219,7 @@ class Location extends CommonDBChild
         }
         $source_zone = new CarbonIntensitySource_Zone();
         $source_zone->getFromDBByCrit([
-            $zone->getForeignKeyField() => $zone->fields['id'],
+            Zone::getForeignKeyField() => $zone->fields['id'],
             CarbonIntensitySource::getForeignKeyField() => $zone->fields['plugin_carbon_carbonintensitysources_id_historical'],
         ]);
         if ($source_zone->isNewItem()) {
@@ -225,42 +234,40 @@ class Location extends CommonDBChild
      * @param CommonDBTM $item
      * @return bool true if a zone has been set
      */
-    protected static function setBoaviztaZone(CommonDBTM $item): bool
+    protected function setBoaviztaZone(CommonDBTM $item): bool
     {
         if (!isset($item->input['_boavizta_zone'])) {
             return false;
         }
 
-        $location = new self();
-        $location->getFromDBByCrit([
+        $this->getFromDBByCrit([
             'locations_id' => $item->getID(),
         ]);
 
-        if ($location->isNewItem()) {
-            return false !== $location->add([
+        if ($this->isNewItem()) {
+            return false !== $this->add([
                 'locations_id' => $item->getID(),
                 'boavizta_zone' => $item->input['_boavizta_zone'],
             ]);
         }
 
-        return $location->update([
-            'id'            => $location->getID(),
+        return $this->update([
+            'id'            => $this->getID(),
             'boavizta_zone' => $item->input['_boavizta_zone'],
         ]);
     }
 
-    public static function onGlpiLocationPrePurge(CommonDBTM $item): bool
+    public function onGlpiLocationPrePurge(CommonDBTM $item): bool
     {
-        $location = new self();
-        $location->getFromDBByCrit([
+        $this->getFromDBByCrit([
             'locations_id' => $item->getID(),
         ]);
 
-        if ($location->isNewItem()) {
+        if ($this->isNewItem()) {
             return true;
         }
 
-        return $location->delete($location->fields, true);
+        return $this->delete($this->fields, true);
     }
 
     /**
@@ -272,7 +279,7 @@ class Location extends CommonDBChild
      *
      * @throws \Geocoder\Exception\Exception
      */
-    public static function getCountryCode(CommonDBTM $item, Geocoder $geocoder): string
+    public function getCountryCode(CommonDBTM $item, Geocoder $geocoder): string
     {
         $location_elements = [
             // $item->input['address'] ?? $item->fields['address'],
@@ -281,7 +288,7 @@ class Location extends CommonDBChild
             $item->input['country'] ?? $item->fields['country'],
         ];
         $location_elements = array_filter($location_elements);
-        if (empty($location_elements)) {
+        if ($location_elements === []) {
             return '';
         }
         $location_string = implode(', ', $location_elements);

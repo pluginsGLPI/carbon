@@ -398,4 +398,25 @@ class DemoProvider
             'data' => $data
         ];
     }
+
+    /**
+     * Get usage CO2 emissions
+     *
+     * @param array $params
+     * @return array
+     */
+    public static function getUsageCarbonEmission(array $params = []): array
+    {
+        $default_params = [
+            'label' => __('plugin carbon - Usage carbon emission', 'carbon'),
+            'icon'  => 'fa-solid fa-temperature-arrow-up',
+        ];
+        $params = array_merge($default_params, $params);
+        $gwp = Toolbox::getWeight(176483) . __('CO₂eq', 'carbon');
+        return [
+            'number' => $gwp,
+            'label'  => $params['label'],
+            'icon'   => $params['icon'],
+        ];
+    }
 }
