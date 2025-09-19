@@ -191,7 +191,7 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
             // At least 1 entry then add JS to toggle the state of zones
             echo Html::scriptBlock('
                 var plugin_carbon_toggleZone = function (id) {
-                    fetch(CFG_GLPI["root_doc"] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/toggleZoneDownload.php?id=" + id).then(response => {
+                    fetch(CFG_GLPI["root_doc"] + "/plugins/carbon/ajax/toggleZoneDownload.php?id=" + id).then(response => {
                         if (response.status === 200) {
                             reloadTab();
                         }
@@ -284,7 +284,7 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
             // At least 1 entry then add JS to toggle the state of zones
             echo Html::scriptBlock('
                 var plugin_carbon_toggleZone = function (id) {
-                    fetch(CFG_GLPI["root_doc"] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/toggleZoneDownload.php?id=" + id).then(response => {
+                    fetch(CFG_GLPI["root_doc"] + "/plugins/carbon/ajax/toggleZoneDownload.php?id=" + id).then(response => {
                         if (response.status === 200) {
                             reloadTab();
                         }
