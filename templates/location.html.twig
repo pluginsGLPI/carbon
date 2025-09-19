@@ -32,7 +32,11 @@
 {% import 'components/form/fields_macros.html.twig' as fields %}
 {% import '@carbon/components/form/fields_macros.html.twig' as carbonFields %}
 
-{{ fields.smallTitle(__('Environmental impact', 'carbon')) }}
+<div class="hr-text">
+    <i class="ti ti-list"></i>
+    <span>{{ __('Boavizta', 'carbon') }}</span>
+</div>
+
 {{ carbonFields.dropdownBoaviztaZone('_boavizta_zone',
     item.fields['boavizta_zone'] ?? '',
     __('Boavizta zone', 'carbon'),
@@ -40,3 +44,30 @@
         'display_emptychoice': true,
     })
 }}
+
+<div class="hr-text">
+    <i class="ti ti-list"></i>
+    <span>{{ __('Carbon intensity', 'carbon') }}</span>
+</div>
+
+{{ fields.dropdownField('GlpiPlugin\\Carbon\\Source',
+    'plugin_carbon_sources_id',
+    item.fields['plugin_carbon_sources_id'] ?? '',
+    __('Source', 'carbon'),
+    {
+        display_emptychoice: true,
+        multiple: false,
+        disabled: false,
+        condition: {
+            is_fallback: 0
+        }
+    })
+}}
+
+{# {{ fields.dropdownField('plugin_carbon_zones_id',
+    item.fields['boavizta_zone'] ?? '',
+    __('Carbon intensity source', 'carbon'),
+    {
+        'display_emptychoice': true,
+    })
+}} #}

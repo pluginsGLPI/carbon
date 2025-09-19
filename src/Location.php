@@ -34,6 +34,7 @@ namespace GlpiPlugin\Carbon;
 
 use CommonDBChild;
 use CommonDBTM;
+use CommonGLPI;
 use Config as GlpiConfig;
 use DBmysql;
 use DBmysqlIterator;
@@ -52,13 +53,34 @@ use League\ISO3166\ISO3166;
 use Session;
 
 /**
- * Additional data for a location
+ * Additional data for a location. Extends the Location object from GLPI with aditional fields
  */
 class Location extends CommonDBChild
 {
     // From CommonDBRelation
     public static $itemtype       = GlpiLocation::class;
     public static $items_id       = 'locations_id';
+
+    public static function getIcon()
+    {
+        return 'ti ti-map-2';
+    }
+
+    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    {
+        if (!is_a($item, GlpiLocation::class)) {
+            return '';
+        }
+        return self::createTabEntry(__('Environmental impact', 'carbon'), 0);
+    }
+
+    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
+    {
+        /** @var CommonDBTM $item */
+        $location = new self();
+        $location->showForm($item->getID());
+        return true;
+    }
 
     public function showForm($ID, array $options = [])
     {
