@@ -213,6 +213,7 @@ abstract class AbstractAsset implements EngineInterface
             ],
             'WHERE' => [
                 CarbonIntensitySource::getTableField('is_fallback') => 1,
+                'NOT' => [CarbonIntensitySource::getTableField('name') => 'Ember - Energy Institute'],
                 CarbonIntensitySource_Zone::getTableField('plugin_carbon_zones_id') => $zone->getID(),
                 CarbonIntensity::getTableField('date') => ['<=', $day->format('Y-m-d H:i:s')],
             ],
