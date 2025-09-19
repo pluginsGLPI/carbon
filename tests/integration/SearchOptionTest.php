@@ -51,8 +51,8 @@ use PHPUnit\Framework\Attributes\CoversMethod;
 
 #[CoversMethod('GlpiPlugin\Carbon\CarbonEmission', 'rawSearchOptions')]
 #[CoversMethod('GlpiPlugin\Carbon\CarbonIntensity', 'rawSearchOptions')]
-#[CoversMethod('GlpiPlugin\Carbon\CarbonIntensitySource', 'rawSearchOptions')]
-#[CoversMethod('GlpiPlugin\Carbon\CarbonIntensitySource_Zone', 'rawSearchOptions')]
+#[CoversMethod('GlpiPlugin\Carbon\Source', 'rawSearchOptions')]
+#[CoversMethod('GlpiPlugin\Carbon\Source_Zone', 'rawSearchOptions')]
 #[CoversMethod('GlpiPlugin\Carbon\ComputerUsageProfile', 'rawSearchOptions')]
 #[CoversMethod('GlpiPlugin\Carbon\EmbodiedImpact', 'rawSearchOptions')]
 #[CoversMethod('GlpiPlugin\Carbon\UsageImpact', 'rawSearchOptions')]
@@ -85,11 +85,11 @@ class SearchOptionTest extends CommonTestCase
 
     private array $mapping = [
         CarbonIntensity::class => [
-            'plugin_carbon_carbonintensitysources_id' => 'name',
+            'plugin_carbon_sources_id' => 'name',
             'plugin_carbon_zones_id'   => 'name',
         ],
         Zone::class => [
-            'plugin_carbon_carbonintensitysources_id_historical' => 'name',
+            'plugin_carbon_sources_id_historical' => 'name',
         ]
     ];
 

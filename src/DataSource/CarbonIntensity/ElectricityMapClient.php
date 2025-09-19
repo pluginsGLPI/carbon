@@ -38,9 +38,9 @@ use DateTimeInterface;
 use DateTimeZone;
 use DateTimeImmutable;
 use GlpiPlugin\Carbon\CarbonIntensity;
-use GlpiPlugin\Carbon\CarbonIntensitySource;
+use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Zone;
-use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
+use GlpiPlugin\Carbon\Source_Zone;
 use Config as GlpiConfig;
 use GLPIKey;
 use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
@@ -120,16 +120,16 @@ class ElectricityMapClient extends AbstractClient
             $zone = new Zone();
             if ($zone->getFromDbByCrit($zone_input) === false) {
                 if ($this->enableHistorical($zone_spec['zoneName'])) {
-                    $zone_input['plugin_carbon_carbonintensitysources_id_historical'] = $source_id;
+                    $zone_input['plugin_carbon_sources_id_historical'] = $source_id;
                 }
                 if ($zone->add($zone_input) === false) {
                     $failed = true;
                     continue;
                 }
             }
-            $source_zone = new CarbonIntensitySource_Zone();
+            $source_zone = new Source_Zone();
             $source_zone->add([
-                CarbonIntensitySource::getForeignKeyField() => $source_id,
+                Source::getForeignKeyField() => $source_id,
                 Zone::getForeignKeyField() => $zone->getID(),
                 'code' => $zone_key,
                 'is_download_enabled' => Toolbox::isLocationExistForZone($zone->fields['name']),
@@ -212,7 +212,7 @@ class ElectricityMapClient extends AbstractClient
      */
     public function fetchDay(DateTimeImmutable $day, string $zone): array
     {
-        $source_zone = new CarbonIntensitySource_Zone();
+        $source_zone = new Source_Zone();
         $zone_code = $source_zone->getFromDbBySourceAndZone($this->getSourceName(), $zone);
 
         if ($zone_code === null) {

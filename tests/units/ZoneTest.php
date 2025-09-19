@@ -33,7 +33,7 @@
 namespace GlpiPlugin\Carbon\Tests;
 
 use Computer;
-use GlpiPlugin\Carbon\CarbonIntensitySource;
+use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Zone;
 use Location;
 
@@ -160,7 +160,7 @@ class ZoneTest extends DbTestCase
 
         // Test with a Zone object without the field
         $zone = $this->createItem(Zone::class);
-        unset($zone->fields['plugin_carbon_carbonintensitysources_id_historical']);
+        unset($zone->fields['plugin_carbon_sources_id_historical']);
         $this->assertFalse($zone->hasHistoricalData());
 
         // Test with a Zone object that has no historical data
@@ -168,11 +168,11 @@ class ZoneTest extends DbTestCase
         $zone = $this->createItem(Zone::class);
         $this->assertFalse($zone->hasHistoricalData());
 
-        $source = $this->createItem(CarbonIntensitySource::class, [
+        $source = $this->createItem(Source::class, [
             'name' => 'foo'
         ]);
         $zone->update(array_merge($zone->fields, [
-            'plugin_carbon_carbonintensitysources_id_historical' => $source->getID(),
+            'plugin_carbon_sources_id_historical' => $source->getID(),
         ]));
         $this->assertTrue($zone->hasHistoricalData());
     }

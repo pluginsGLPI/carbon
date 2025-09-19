@@ -38,9 +38,9 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
 use DBmysql;
-use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
 use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\Toolbox;
@@ -118,21 +118,21 @@ class RteClient extends AbstractClient
             'name' => 'France',
         ];
         if ($zone->getFromDBByCrit($input) === false) {
-            $input['plugin_carbon_carbonintensitysources_id_historical'] = $source_id;
+            $input['plugin_carbon_sources_id_historical'] = $source_id;
             if (!$zone->add($input)) {
                 return -1;
             }
         } else {
-            if ($zone->fields['plugin_carbon_carbonintensitysources_id_historical'] == 0) {
-                $input['plugin_carbon_carbonintensitysources_id_historical'] = $source_id;
+            if ($zone->fields['plugin_carbon_sources_id_historical'] == 0) {
+                $input['plugin_carbon_sources_id_historical'] = $source_id;
                 $input['id'] = $zone->getID();
             }
             $zone->update($input);
         }
 
-        $source_zone = new CarbonIntensitySource_Zone();
+        $source_zone = new Source_Zone();
         $source_zone->add([
-            CarbonIntensitySource::getForeignKeyField() => $source_id,
+            Source::getForeignKeyField() => $source_id,
             Zone::getForeignKeyField() => $zone->getID(),
             'is_download_enabled' => Toolbox::isLocationExistForZone($zone->fields['name']),
         ]);

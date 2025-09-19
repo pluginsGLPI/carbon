@@ -41,8 +41,8 @@ use DBmysqlIterator;
 use DbUtils;
 use DBmysql;
 use GlpiPlugin\Carbon\CarbonIntensity;
-use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\DataTracking\TrackedInt;
 use GlpiPlugin\Carbon\Zone;
 use Glpi\DBAL\QueryExpression;
@@ -112,7 +112,7 @@ abstract class AbstractAsset implements EngineInterface
             'WHERE' => [
                 'AND' => [
                     CarbonIntensity::getTableField('plugin_carbon_zones_id') => $zone->getID(),
-                    CarbonIntensity::getTableField('plugin_carbon_carbonintensitysources_id') => $zone->fields['plugin_carbon_carbonintensitysources_id_historical'],
+                    CarbonIntensity::getTableField('plugin_carbon_sources_id') => $zone->fields['plugin_carbon_sources_id_historical'],
                     [CarbonIntensity::getTableField('date') => ['>=', $start_date_s]],
                     [CarbonIntensity::getTableField('date') => ['<', $stop_date_s]],
                 ],
@@ -192,8 +192,8 @@ abstract class AbstractAsset implements EngineInterface
         global $DB;
 
         $carbon_intensity_table = CarbonIntensity::getTable();
-        $carbon_intensity_source_zone_table = CarbonIntensitySource_Zone::getTable();
-        $carbon_intensity_source_table = CarbonIntensitySource::getTable();
+        $carbon_intensity_source_zone_table = Source_Zone::getTable();
+        $carbon_intensity_source_table = Source::getTable();
         $request = [
             'SELECT' => "$carbon_intensity_table.*",
             'FROM' => $carbon_intensity_table,
@@ -206,15 +206,15 @@ abstract class AbstractAsset implements EngineInterface
                 ],
                 $carbon_intensity_source_table => [
                     'FKEY'   => [
-                        $carbon_intensity_source_zone_table => 'plugin_carbon_carbonintensitysources_id',
+                        $carbon_intensity_source_zone_table => 'plugin_carbon_sources_id',
                         $carbon_intensity_source_table => 'id',
                     ]
                 ]
             ],
             'WHERE' => [
-                CarbonIntensitySource::getTableField('is_fallback') => 1,
-                'NOT' => [CarbonIntensitySource::getTableField('name') => 'Ember - Energy Institute'],
-                CarbonIntensitySource_Zone::getTableField('plugin_carbon_zones_id') => $zone->getID(),
+                Source::getTableField('is_fallback') => 1,
+                'NOT' => [Source::getTableField('name') => 'Ember - Energy Institute'],
+                Source_Zone::getTableField('plugin_carbon_zones_id') => $zone->getID(),
                 CarbonIntensity::getTableField('date') => ['<=', $day->format('Y-m-d H:i:s')],
             ],
             'ORDER' => CarbonIntensity::getTableField('date') . ' DESC',
@@ -237,8 +237,8 @@ abstract class AbstractAsset implements EngineInterface
         global $DB;
 
         $carbon_intensity_table = CarbonIntensity::getTable();
-        $carbon_intensity_source_zone_table = CarbonIntensitySource_Zone::getTable();
-        $carbon_intensity_source_table = CarbonIntensitySource::getTable();
+        $carbon_intensity_source_zone_table = Source_Zone::getTable();
+        $carbon_intensity_source_table = Source::getTable();
         $request = [
             'SELECT' => "$carbon_intensity_table.*",
             'FROM' => $carbon_intensity_table,
@@ -251,15 +251,15 @@ abstract class AbstractAsset implements EngineInterface
                 ],
                 $carbon_intensity_source_table => [
                     'FKEY'   => [
-                        $carbon_intensity_source_zone_table => 'plugin_carbon_carbonintensitysources_id',
+                        $carbon_intensity_source_zone_table => 'plugin_carbon_sources_id',
                         $carbon_intensity_source_table => 'id',
                     ]
                 ]
             ],
             'WHERE' => [
-                CarbonIntensitySource::getTableField('is_fallback') => 1,
-                CarbonIntensitySource::getTableField('name') => 'Ember - Energy Institute',
-                CarbonIntensitySource_Zone::getTableField('plugin_carbon_zones_id') => $zone->getID(),
+                Source::getTableField('is_fallback') => 1,
+                Source::getTableField('name') => 'Ember - Energy Institute',
+                Source_Zone::getTableField('plugin_carbon_zones_id') => $zone->getID(),
                 CarbonIntensity::getTableField('date') => ['<=', $day->format('Y-m-d H:i:s')],
             ],
             'ORDER' => CarbonIntensity::getTableField('date') . ' DESC',
@@ -288,8 +288,8 @@ abstract class AbstractAsset implements EngineInterface
         global $DB;
 
         $carbon_intensity_table = CarbonIntensity::getTable();
-        $carbon_intensity_source_zone_table = CarbonIntensitySource_Zone::getTable();
-        $carbon_intensity_source_table = CarbonIntensitySource::getTable();
+        $carbon_intensity_source_zone_table = Source_Zone::getTable();
+        $carbon_intensity_source_table = Source::getTable();
         $carbon_intensity_zone_table = Zone::getTable();
         $request = [
             'SELECT' => "$carbon_intensity_table.*",
@@ -303,7 +303,7 @@ abstract class AbstractAsset implements EngineInterface
                 ],
                 $carbon_intensity_source_table => [
                     'FKEY'   => [
-                        $carbon_intensity_source_zone_table => 'plugin_carbon_carbonintensitysources_id',
+                        $carbon_intensity_source_zone_table => 'plugin_carbon_sources_id',
                         $carbon_intensity_source_table => 'id',
                     ]
                 ],
@@ -315,14 +315,14 @@ abstract class AbstractAsset implements EngineInterface
                 ],
                 $carbon_intensity_source_table => [
                     'FKEY'   => [
-                        $carbon_intensity_table => 'plugin_carbon_carbonintensitysources_id',
+                        $carbon_intensity_table => 'plugin_carbon_sources_id',
                         $carbon_intensity_source_table => 'id',
                     ]
                 ],
             ],
             'WHERE' => [
-                CarbonIntensitySource::getTableField('is_fallback') => 1,
-                CarbonIntensitySource::getTableField('name') => 'Ember - Energy Institute',
+                Source::getTableField('is_fallback') => 1,
+                Source::getTableField('name') => 'Ember - Energy Institute',
                 Zone::getTableField('name') => 'World',
                 CarbonIntensity::getTableField('date') => ['<=', $day->format('Y-m-d H:i:s')],
             ],

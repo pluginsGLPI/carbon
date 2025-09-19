@@ -30,14 +30,14 @@
  * -------------------------------------------------------------------------
  */
 
-function update001to100(Migration $migration)
+function update110to120(Migration $migration)
 {
     /** @var DBmysql $DB */
     global $DB;
 
     $updateresult       = true;
-    $from_version       = '0.0.1';
-    $to_version         = '1.0.0';
+    $from_version       = '1.1.0';
+    $to_version         = '1.2.0';
     $update_dir = __DIR__ . "/update_{$from_version}_to_{$to_version}/";
 
     //TRANS: %s is the number of new version

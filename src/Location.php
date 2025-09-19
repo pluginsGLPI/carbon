@@ -216,10 +216,10 @@ class Location extends CommonDBChild
         if ($zone === null) {
             return false;
         }
-        $source_zone = new CarbonIntensitySource_Zone();
+        $source_zone = new Source_Zone();
         $source_zone->getFromDBByCrit([
             Zone::getForeignKeyField() => $zone->fields['id'],
-            CarbonIntensitySource::getForeignKeyField() => $zone->fields['plugin_carbon_carbonintensitysources_id_historical'],
+            Source::getForeignKeyField() => $zone->fields['plugin_carbon_sources_id_historical'],
         ]);
         if ($source_zone->isNewItem()) {
             return false;
@@ -239,10 +239,10 @@ class Location extends CommonDBChild
         if ($zone === null) {
             return false;
         }
-        $source_zone = new CarbonIntensitySource_Zone();
+        $source_zone = new Source_Zone();
         $source_zone->getFromDBByCrit([
             Zone::getForeignKeyField() => $zone->fields['id'],
-            CarbonIntensitySource::getForeignKeyField() => $zone->fields['plugin_carbon_carbonintensitysources_id_historical'],
+            Source::getForeignKeyField() => $zone->fields['plugin_carbon_carbonintensitysources_id_historical'],
         ]);
         if ($source_zone->isNewItem()) {
             return false;
@@ -266,8 +266,8 @@ class Location extends CommonDBChild
             return false;
         }
         $carbon_intensity_table = CarbonIntensity::getTable();
-        $carbon_intensity_source_zone_table = CarbonIntensitySource_Zone::getTable();
-        $carbon_intensity_source_table = CarbonIntensitySource::getTable();
+        $carbon_intensity_source_zone_table = Source_Zone::getTable();
+        $carbon_intensity_source_table = Source::getTable();
         $request = [
             'COUNT' => 'count',
             'FROM' => $carbon_intensity_table,
@@ -286,8 +286,8 @@ class Location extends CommonDBChild
                 ]
             ],
             'WHERE' => [
-                CarbonIntensitySource::getTableField('is_fallback') => 1,
-                CarbonIntensitySource_Zone::getTableField('plugin_carbon_zones_id') => $zone->getID(),
+                Source::getTableField('is_fallback') => 1,
+                Source_Zone::getTableField('plugin_carbon_zones_id') => $zone->getID(),
             ],
             'ORDER' => CarbonIntensity::getTableField('date') . ' DESC',
             'LIMIT' => 1,
