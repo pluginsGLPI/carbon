@@ -40,6 +40,7 @@ use GlpiPlugin\Carbon\Report;
 use Location as GlpiLocation;
 use Profile as GlpiProfile;
 use GlpiPlugin\Carbon\Dashboard\Grid;
+use GlpiPlugin\Carbon\Location;
 
 define('PLUGIN_CARBON_VERSION', '1.2.0-dev');
 define('PLUGIN_CARBON_SCHEMA_VERSION', '1.1.0');
@@ -138,6 +139,7 @@ function plugin_carbon_registerClasses()
 {
     Plugin::registerClass(Config::class, ['addtabon' => GlpiConfig::class]);
     Plugin::registerClass(Profile::class, ['addtabon' => GlpiProfile::class]);
+    Plugin::registerClass(Location::class, ['addtabon' => GlpiLocation::class]);
 
     foreach (PLUGIN_CARBON_TYPES as $itemtype) {
         $item_type_class = 'GlpiPlugin\\Carbon\\' . $itemtype . 'Type';

@@ -234,7 +234,6 @@ class Boaviztapi
      */
     public static function dropdownBoaviztaZone(string $name, array $options = [])
     {
-
         return Dropdown::showFromArray($name, self::getZones(), $options);
     }
 }

@@ -38,7 +38,6 @@ use CommonGLPI;
 use DateTime;
 use DBmysql;
 use DbUtils;
-use Glpi\Toolbox\Sanitizer;
 use Location;
 use LogicException;
 use Session;
