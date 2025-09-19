@@ -39,8 +39,8 @@ use DBmysql;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\Zone;
-use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\DataSource\AbstractCarbonIntensity;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\AbstractClient;
 use Infocom;
@@ -60,10 +60,10 @@ class CarbonIntensityTest extends DbTestCase
         $zone = $this->createItem(Zone::class, [
             'name' => 'foo',
         ]);
-        $source = $this->createItem(CarbonIntensitySource::class, [
+        $source = $this->createItem(Source::class, [
             'name' => 'bar'
         ]);
-        $source_zone = $this->createItem(CarbonIntensitySource_Zone::class, [
+        $source_zone = $this->createItem(Source_Zone::class, [
             $source::getForeignKeyField() => $source->getID(),
             $zone::getForeignKeyField() => $zone->getID()
         ]);
@@ -98,10 +98,10 @@ class CarbonIntensityTest extends DbTestCase
         $zone = $this->createItem(Zone::class, [
             'name' => 'foo',
         ]);
-        $source = $this->createItem(CarbonIntensitySource::class, [
+        $source = $this->createItem(Source::class, [
             'name' => 'bar'
         ]);
-        $source_zone = $this->createItem(CarbonIntensitySource_Zone::class, [
+        $source_zone = $this->createItem(Source_Zone::class, [
             $source::getForeignKeyField() => $source->getID(),
             $zone::getForeignKeyField() => $zone->getID()
         ]);
@@ -147,15 +147,15 @@ class CarbonIntensityTest extends DbTestCase
 
         $this->login('glpi', 'glpi');
 
-        $source = $this->createItem(CarbonIntensitySource::class, [
+        $source = $this->createItem(Source::class, [
             'name' => 'test_source',
         ]);
         $zone = $this->createItem(Zone::class, [
             'name' => 'test_zone',
-            'plugin_carbon_carbonintensitysources_id_historical' => $source->getID(),
+            'plugin_carbon_sources_id_historical' => $source->getID(),
         ]);
-        $source_zone = $this->createItem(CarbonIntensitySource_Zone::class, [
-            'plugin_carbon_carbonintensitysources_id' => $source->getID(),
+        $source_zone = $this->createItem(Source_Zone::class, [
+            'plugin_carbon_sources_id' => $source->getID(),
             'plugin_carbon_zones_id' => $zone->getID(),
         ]);
 
@@ -167,7 +167,7 @@ class CarbonIntensityTest extends DbTestCase
         while ($cursor_date < $end_date) {
             $DB->insert($table, [
                 'date' => $cursor_date->format('Y-m-d H:i:s'),
-                'plugin_carbon_carbonintensitysources_id' => $source->getID(),
+                'plugin_carbon_sources_id' => $source->getID(),
                 'plugin_carbon_zones_id' => $zone->getID(),
                 'intensity' => 1,
             ]);
@@ -181,7 +181,7 @@ class CarbonIntensityTest extends DbTestCase
         // delete some samples at the beginning
         $delete_before_date = new DateTime('2024-01-03 12:00:00');
         $DB->delete($table, [
-            'plugin_carbon_carbonintensitysources_id' => $source->getID(),
+            'plugin_carbon_sources_id' => $source->getID(),
             'plugin_carbon_zones_id' => $zone->getID(),
             'date' => ['<', $delete_before_date->format('Y-m-d H:i:s')],
         ]);
@@ -197,7 +197,7 @@ class CarbonIntensityTest extends DbTestCase
         // delete some samples at the end
         $delete_after_date = new DateTime('2024-02-17 09:00:00');
         $DB->delete($table, [
-            'plugin_carbon_carbonintensitysources_id' => $source->getID(),
+            'plugin_carbon_sources_id' => $source->getID(),
             'plugin_carbon_zones_id' => $zone->getID(),
             'date' => ['>=', $delete_after_date->format('Y-m-d H:i:s')],
         ]);
@@ -217,7 +217,7 @@ class CarbonIntensityTest extends DbTestCase
         $delete_middle_start_date = new DateTime('2024-01-29 06:00:00');
         $delete_middle_end_date = new DateTime('2024-02-05 18:00:00');
         $DB->delete($table, [
-            'plugin_carbon_carbonintensitysources_id' => $source->getID(),
+            'plugin_carbon_sources_id' => $source->getID(),
             'plugin_carbon_zones_id' => $zone->getID(),
             'AND' => [
                 ['date' => ['>=', $delete_middle_start_date->format('Y-m-d H:i:s')]],
@@ -245,7 +245,7 @@ class CarbonIntensityTest extends DbTestCase
         while ($cursor_date < $delete_before_date) {
             $DB->insert($table, [
                 'date' => $cursor_date->format('Y-m-d H:i:s'),
-                'plugin_carbon_carbonintensitysources_id' => $source->getID(),
+                'plugin_carbon_sources_id' => $source->getID(),
                 'plugin_carbon_zones_id' => $zone->getID(),
                 'intensity' => 1,
             ]);
@@ -269,7 +269,7 @@ class CarbonIntensityTest extends DbTestCase
         while ($cursor_date < $delete_middle_end_date) {
             $DB->insert($table, [
                 'date' => $cursor_date->format('Y-m-d H:i:s'),
-                'plugin_carbon_carbonintensitysources_id' => $source->getID(),
+                'plugin_carbon_sources_id' => $source->getID(),
                 'plugin_carbon_zones_id' => $zone->getID(),
                 'intensity' => 1,
             ]);
@@ -324,11 +324,11 @@ class CarbonIntensityTest extends DbTestCase
         $zone = $this->createItem(Zone::class, [
             'name' => 'foo',
         ]);
-        $source = $this->createItem(CarbonIntensitySource::class, [
+        $source = $this->createItem(Source::class, [
             'name' => 'bar'
         ]);
         $expected = new DateTimeImmutable('2019-01-31 23:00:00');
-        $source_zone = $this->createItem(CarbonIntensitySource_Zone::class, [
+        $source_zone = $this->createItem(Source_Zone::class, [
             $source::getForeignKeyField() => $source->getID(),
             $zone::getForeignKeyField() => $zone->getID(),
         ]);
@@ -352,10 +352,10 @@ class CarbonIntensityTest extends DbTestCase
         $zone = $this->createItem(Zone::class, [
             'name' => 'foo',
         ]);
-        $source = $this->createItem(CarbonIntensitySource::class, [
+        $source = $this->createItem(Source::class, [
             'name' => 'bar'
         ]);
-        $source_zone = $this->createItem(CarbonIntensitySource_Zone::class, [
+        $source_zone = $this->createItem(Source_Zone::class, [
             $source::getForeignKeyField() => $source->getID(),
             $zone::getForeignKeyField() => $zone->getID()
         ]);

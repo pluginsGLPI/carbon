@@ -46,7 +46,7 @@ use GlpiPlugin\Carbon\EmbodiedImpact;
 use GlpiPlugin\Carbon\Toolbox;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\CarbonIntensity;
-use GlpiPlugin\Carbon\CarbonIntensitySource;
+use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\SearchOptions;
 use GlpiPlugin\Carbon\UsageImpact;
@@ -590,7 +590,7 @@ class Provider
         /** @var DBmysql $DB */
         global $DB;
 
-        $source = new CarbonIntensitySource();
+        $source = new Source();
         $zone = new Zone();
         $source->getFromDBByCrit([
             'name' => 'RTE'
@@ -606,7 +606,7 @@ class Provider
             // ],
             'FROM'  => CarbonIntensity::getTable(),
             'WHERE' => [
-                CarbonIntensitySource::getForeignKeyField() => $source->getID(),
+                Source::getForeignKeyField() => $source->getID(),
                 Zone::getForeignKeyField() => $zone->getID(),
             ],
         ];

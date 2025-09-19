@@ -39,27 +39,19 @@ $old_table = 'glpi_plugin_carbon_carbonintensitysources';
 $new_table = 'glpi_plugin_carbon_sources';
 $migration->renameTable($old_table, $new_table);
 
-$old_itemtype = '\\GlpiPlugin\\Carbon\\CarbonIntensitySource';
-$new_itemtype = '\\GlpiPlugin\\Carbon\\Source';
-
-// Update display preferences
-$DB->update(DisplayPreference::getTable(), [
-    'itemtype' => $new_itemtype
-], [
-    'itemtype' => $old_itemtype
-]);
-
 // Rename CarbonIntensitySource_Zone
 $old_table = 'glpi_plugin_carbon_carbonintensitysources_zones';
 $new_table = 'glpi_plugin_carbon_sources_zones';
 $migration->renameTable($old_table, $new_table);
 
-$old_itemtype = '\\GlpiPlugin\\Carbon\\CarbonIntensitySource_Zone';
-$new_itemtype = '\\GlpiPlugin\\Carbon\\Source_Zone';
+$table = 'glpi_plugin_carbon_carbonintensities';
+$migration->changeField($table, 'plugin_carbon_carbonintensitysources_id', 'plugin_carbon_sources_id', 'fkey');
 
-// Update display preferences
-$DB->update(DisplayPreference::getTable(), [
-    'itemtype' => $new_itemtype
-], [
-    'itemtype' => $old_itemtype
-]);
+$table = 'glpi_plugin_carbon_zones';
+$migration->changeField($table, 'plugin_carbon_carbonintensitysources_id_historical', 'plugin_carbon_sources_id_historical', 'fkey');
+$migration->dropKey($table, 'plugin_carbon_carbonintensitysources_id_historical');
+$migration->addKey($table, 'plugin_carbon_sources_id_historical', 'plugin_carbon_sources_id_historical');
+
+
+$table = 'glpi_plugin_carbon_sources_zones';
+$migration->changeField($table, 'plugin_carbon_carbonintensitysources_id', 'plugin_carbon_sources_id', 'fkey');

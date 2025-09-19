@@ -35,8 +35,6 @@ namespace GlpiPlugin\Carbon;
 use Config;
 use DBmysql;
 use DirectoryIterator;
-use Glpi\Message\MessageType;
-use Glpi\Toolbox\Sanitizer;
 use Migration;
 use Plugin;
 
@@ -251,7 +249,7 @@ class Install
      */
     public static function getOrCreateSource(string $name, int $is_fallback = 1): int
     {
-        $source = new CarbonIntensitySource();
+        $source = new Source();
         $source->getFromDBByCrit(['name' => $name]);
         if ($source->isNewItem()) {
             $source->add([
@@ -280,7 +278,7 @@ class Install
         if ($zone->isNewItem()) {
             $zone->add([
                 'name' => $name,
-                'plugin_carbon_carbonintensitysources_id_historical' => $source_id,
+                'plugin_carbon_sources_id_historical' => $source_id,
             ]);
             /** @phpstan-ignore if.alwaysTrue */
             if ($zone->isNewItem()) {
@@ -300,15 +298,15 @@ class Install
      */
     public static function linkSourceZone(int $source_id, int $zone_id): int
     {
-        $source_zone = new CarbonIntensitySource_Zone();
+        $source_zone = new Source_Zone();
         $source_zone->getFromDBByCrit([
-            'plugin_carbon_carbonintensitysources_id' => $source_id,
-            'plugin_carbon_zones_id'                  => $zone_id,
+            'plugin_carbon_sources_id' => $source_id,
+            'plugin_carbon_zones_id'   => $zone_id,
         ]);
         if ($source_zone->isNewItem()) {
             $source_zone->add([
-                'plugin_carbon_carbonintensitysources_id' => $source_id,
-                'plugin_carbon_zones_id'                  => $zone_id,
+                'plugin_carbon_sources_id' => $source_id,
+                'plugin_carbon_zones_id'   => $zone_id,
             ]);
         }
 

@@ -36,14 +36,14 @@ use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Install;
 use GlpiPlugin\Carbon\Uninstall;
 use GlpiPlugin\Carbon\UsageInfo;
-use GlpiPlugin\Carbon\CarbonIntensitySource;
+use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Zone;
 use ComputerType as GlpiComputerType;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use MonitorType as GlpiMonitorType;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
-use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\EmbodiedImpact;
 use GlpiPlugin\Carbon\Location;
@@ -144,7 +144,7 @@ function plugin_carbon_getDropdown()
 {
     return [
         ComputerUsageProfile::class  => ComputerUsageProfile::getTypeName(),
-        CarbonIntensitySource::class => CarbonIntensitySource::getTypeName(),
+        Source::class => Source::getTypeName(),
         Zone::class   => Zone::getTypeName(),
         CarbonIntensity::class       => CarbonIntensity::getTypeName(),
     ];
@@ -212,10 +212,10 @@ function plugin_carbon_hook_add_asset(CommonDBTM $item)
     if ($zone === null) {
         return;
     }
-    $source_zone = new CarbonIntensitySource_Zone();
+    $source_zone = new Source_Zone();
     $source_zone->getFromDBByCrit([
         $zone->getForeignKeyField() => $zone->fields['id'],
-        CarbonIntensitySource::getForeignKeyField() => $zone->fields['plugin_carbon_carbonintensitysources_id_historical'],
+        Source::getForeignKeyField() => $zone->fields['plugin_carbon_sources_id_historical'],
     ]);
     if ($source_zone->isNewItem()) {
         return;
@@ -239,10 +239,10 @@ function plugin_carbon_hook_update_asset(CommonDBTM $item)
     if ($zone === null) {
         return;
     }
-    $source_zone = new CarbonIntensitySource_Zone();
+    $source_zone = new Source_Zone();
     $source_zone->getFromDBByCrit([
         $zone->getForeignKeyField() => $zone->fields['id'],
-        CarbonIntensitySource::getForeignKeyField() => $zone->fields['plugin_carbon_carbonintensitysources_id_historical'],
+        Source::getForeignKeyField() => $zone->fields['plugin_carbon_sources_id_historical'],
     ]);
     if ($source_zone->isNewItem()) {
         return;

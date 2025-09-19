@@ -41,10 +41,10 @@ use GlpiPlugin\Carbon\Application\View\Extension\DataHelpersExtension;
 use Glpi\Application\View\TemplateRenderer;
 use Html;
 
-class CarbonIntensitySource_Zone extends CommonDBRelation
+class Source_Zone extends CommonDBRelation
 {
-    public static $itemtype_1 = CarbonIntensitySource::class; // Type ref or field name (must start with itemtype)
-    public static $items_id_1 = 'plugin_carbon_carbonintensitysources_id'; // Field name
+    public static $itemtype_1 = Source::class; // Type ref or field name (must start with itemtype)
+    public static $items_id_1 = 'plugin_carbon_sources_id'; // Field name
     public static $checkItem_1_Rights = self::HAVE_SAME_RIGHT_ON_ITEM;
 
     public static $itemtype_2 = Zone::class; // Type ref or field name (must start with itemtype)
@@ -53,10 +53,10 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
 
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
-        if ($item->getType() === CarbonIntensitySource::class) {
+        if ($item->getType() === Source::class) {
             return self::createTabEntry(Zone::getTypeName(), 0);
         }
-        return self::createTabEntry(CarbonIntensitySource::getTypeName(), 0);
+        return self::createTabEntry(Source::getTypeName(), 0);
     }
 
     public function rawSearchOptions()
@@ -65,7 +65,7 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
 
         $tab[] = [
             'id'          => '5',
-            'table'       => CarbonIntensitySource::getTable(),
+            'table'       => Source::getTable(),
             'field'       => 'name',
             'name'        => __('Source name', 'carbon'),
             'datatype'    => 'dropdown',
@@ -81,7 +81,7 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
 
         $tab[] = [
             'id'          => '7',
-            'table'       => CarbonIntensitySource::getTable(),
+            'table'       => Source::getTable(),
             'field'       => 'is_download_enabled',
             'name'        => __('Download enabled', 'carbon'),
             'datatype'    => 'bool',
@@ -110,21 +110,21 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
         }
         $canedit = $item->canEdit($item_id);
 
-        $source_table = CarbonIntensitySource::getTable();
+        $source_table = Source::getTable();
         $zone_table = Zone::getTable();
         $source_zone_table = self::getTable();
         $iterator = $DB->request([
             'SELECT' => [
                 $zone_table => 'name',
                 $source_zone_table => ['id', 'is_download_enabled'],
-                CarbonIntensitySource::getTableField('name') . ' AS historical_source_name',
+                Source::getTableField('name') . ' AS historical_source_name',
                 $source_table => 'is_fallback'
             ],
             'FROM' => $source_zone_table,
             'INNER JOIN' => [
                 $source_table => [
                     'FKEY' => [
-                        $source_zone_table => 'plugin_carbon_carbonintensitysources_id',
+                        $source_zone_table => 'plugin_carbon_sources_id',
                         $source_table => 'id',
                     ],
                 ],
@@ -136,7 +136,7 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
                 ],
             ],
             'WHERE' => [
-                CarbonIntensitySource::getTableField('id') => $item_id,
+                Source::getTableField('id') => $item_id,
             ],
             'ORDER'     => ['name ASC'],
         ]);
@@ -150,7 +150,7 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
                 $is_download_enabled = self::getToggleLink($data['id'], $data['is_download_enabled']);
             }
             $entries[] = [
-                'itemtype'               => CarbonIntensitySource::class,
+                'itemtype'               => Source::class,
                 'id'                     => $item->getID(),
                 'name'                   => $data['name'],
                 'historical_source_name' => $data['historical_source_name'],
@@ -213,8 +213,10 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
         }
         $canedit = $item->canEdit($item_id);
 
-        $source_table = CarbonIntensitySource::getTable();
+        $source_table = Source::getTable();
+        $source_fk = Source::getForeignKeyField();
         $zone_table = Zone::getTable();
+        $zone_fk = Zone::getForeignKeyField();
         $source_zone_table = self::getTable();
         $iterator = $DB->request([
             'SELECT' => [
@@ -225,13 +227,13 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
             'INNER JOIN' => [
                 $source_table => [
                     'FKEY' => [
-                        $source_zone_table => 'plugin_carbon_carbonintensitysources_id',
+                        $source_zone_table => $source_fk,
                         $source_table => 'id',
                     ],
                 ],
                 $zone_table => [
                     'FKEY' => [
-                        $source_zone_table => 'plugin_carbon_zones_id',
+                        $source_zone_table => $zone_fk,
                         $zone_table => 'id',
                     ],
                 ],
@@ -246,7 +248,7 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
         $entries = [];
         foreach ($iterator as $data) {
             $entries[] = [
-                'itemtype'   => CarbonIntensitySource::class,
+                'itemtype'   => Source::class,
                 'id'         => $item->getID(),
                 'name'       => $data['name'],
                 'is_download_enabled' => self::getToggleLink($data['id'], $data['is_download_enabled']),
@@ -307,16 +309,16 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
         global $DB;
 
         $zone_table = Zone::getTable();
-        $source_table = CarbonIntensitySource::getTable();
+        $source_table = Source::getTable();
         $source_zone_table = self::getTable();
         $request = [
-            'SELECT' => CarbonIntensitySource_Zone::getTableField('code'),
+            'SELECT' => Source_Zone::getTableField('code'),
             'FROM'   => $source_zone_table,
             'INNER JOIN' => [
                 $source_table => [
                     'ON' => [
                         $source_table => 'id',
-                        $source_zone_table => CarbonIntensitySource::getForeignKeyField(),
+                        $source_zone_table => Source::getForeignKeyField(),
                     ]
                 ],
                 $zone_table => [
@@ -327,7 +329,7 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
                 ]
             ],
             'WHERE' => [
-                CarbonIntensitySource::getTableField('name') => $source_name,
+                Source::getTableField('name') => $source_name,
                 Zone::getTableField('name') => $zone_name,
             ],
             'LIMIT' => '1'
@@ -348,8 +350,8 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
     public function toggleZone(?bool $state = null): bool
     {
         // Check if the source is a fallback source
-        $source = new CarbonIntensitySource();
-        $source->getFromDB($this->fields['plugin_carbon_carbonintensitysources_id']);
+        $source = new Source();
+        $source->getFromDB($this->fields['plugin_carbon_sources_id']);
         if ($source->fields['is_fallback'] === 1) {
             // Fallback sources cannot be toggled
             return false;

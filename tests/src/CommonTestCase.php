@@ -46,7 +46,7 @@ use Glpi\Inventory\Conf;
 use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\ComputerType;
-use GlpiPlugin\Carbon\CarbonIntensitySource;
+use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use Entity;
@@ -286,10 +286,10 @@ class CommonTestCase extends TestCase
 
     protected function createCarbonIntensityData(string $country, string $source_name, DateTimeInterface $begin_date, float $intensity, string $length = 'P2D')
     {
-        $source = new CarbonIntensitySource();
+        $source = new Source();
         $source->getFromDBByCrit(['name' => $source_name]);
         if ($source->isNewItem()) {
-            $source = $this->createItem(CarbonIntensitySource::class, [
+            $source = $this->createItem(Source::class, [
                 'name' => $source_name
             ]);
         }
@@ -299,7 +299,7 @@ class CommonTestCase extends TestCase
         if ($zone->isNewItem()) {
             $zone = $this->createItem(Zone::class, [
                 'name' => $country,
-                'plugin_carbon_carbonintensitysources_id_historical' => $source->getID()
+                'plugin_carbon_sources_id_historical' => $source->getID()
             ]);
         }
 
@@ -310,7 +310,7 @@ class CommonTestCase extends TestCase
         $one_hour = new DateInterval('PT1H');
         while ($current_date < $end_date) {
             $crit = [
-                CarbonIntensitySource::getForeignKeyField()  => $source->getID(),
+                Source::getForeignKeyField()  => $source->getID(),
                 Zone::getForeignKeyField() => $zone->getID(),
                 'date' => $current_date->format('Y-m-d H:00:00'),
                 'intensity' => $intensity,

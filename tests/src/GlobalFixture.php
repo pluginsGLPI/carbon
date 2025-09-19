@@ -71,7 +71,7 @@ class GlobalFixture
         Config::setConfigurationValues('core', ['timezone' => 'Europe/Paris']);
         $DB->beginTransaction();
 
-        $source_table = 'glpi_plugin_carbon_carbonintensitysources';
+        $source_table = 'glpi_plugin_carbon_sources';
         $fake_source_name = 'Fake source';
         $iterator = $DB->request([
             'SELECT' => ['id'],
@@ -101,24 +101,24 @@ class GlobalFixture
         if ($iterator->count() === 0) {
             $result = $DB->insert($zone_table, [
                 'name' => $fake_zone_name,
-                'plugin_carbon_carbonintensitysources_id_historical' => $source_id,
+                'plugin_carbon_sources_id_historical' => $source_id,
             ]);
             $zone_id = $DB->insertId();
         } else {
             $zone_id = $iterator->current()['id'];
         }
-        $source_zone_table = 'glpi_plugin_carbon_carbonintensitysources_zones';
+        $source_zone_table = 'glpi_plugin_carbon_sources_zones';
         $iterator = $DB->request([
             'SELECT' => ['id'],
             'FROM' => $source_zone_table,
             'WHERE' => [
-                'plugin_carbon_carbonintensitysources_id' => $source_id,
+                'plugin_carbon_sources_id' => $source_id,
                 'plugin_carbon_zones_id'   => $zone_id,
             ],
         ]);
         if ($iterator->count() === 0) {
             $result = $DB->insert($source_zone_table, [
-                'plugin_carbon_carbonintensitysources_id' => $source_id,
+                'plugin_carbon_sources_id' => $source_id,
                 'plugin_carbon_zones_id'   => $zone_id,
                 'code'                                    => 'FZ',
             ]);
@@ -135,7 +135,7 @@ class GlobalFixture
         }
         while (($row = fgetcsv($handle, 256, ',', '"', '\\')) !== false) {
             $DB->insert($intensity_table, [
-                'plugin_carbon_carbonintensitysources_id' => $source_id,
+                'plugin_carbon_sources_id' => $source_id,
                 'plugin_carbon_zones_id'   => $zone_id,
                 'date' => $row[0],
                 'intensity' => $row[1],
@@ -143,7 +143,7 @@ class GlobalFixture
         }
         // ini_set('auto_detect_line_endings', $line_ending_mode);
         $condition = [
-            'plugin_carbon_carbonintensitysources_id' => $source_id,
+            'plugin_carbon_sources_id' => $source_id,
             'plugin_carbon_zones_id'   => $zone_id,
         ];
         $count = (new DbUtils())->countElementsInTable($intensity_table, $condition);

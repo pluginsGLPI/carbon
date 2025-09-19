@@ -30,8 +30,8 @@
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
 
 include(__DIR__ . '/../../../inc/includes.php');
 
@@ -41,7 +41,7 @@ if (!Plugin::isPluginActive('carbon')) {
     die();
 }
 
-if (!CarbonIntensitySource::canView()) {
+if (!Source::canView()) {
     // Will die
     http_response_code(403);
     die();
@@ -52,7 +52,7 @@ if (!isset($_GET['id'])) {
     die();
 }
 
-$source_zone = new CarbonIntensitySource_Zone();
+$source_zone = new Source_Zone();
 if (!$source_zone->getFromDB($_GET['id'])) {
     http_response_code(403);
     die();

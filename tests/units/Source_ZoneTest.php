@@ -32,20 +32,20 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
-use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\Zone;
 use PHPUnit\Framework\Attributes\CoversMethod;
 
-class CarbonIntensitySource_ZoneTest extends DbTestCase
+class Source_ZoneTest extends DbTestCase
 {
     /**
-     * #CoversMethod GlpiPlugin\Carbon\CarbonIntensitySource_Zone::showForSource
+     * #CoversMethod GlpiPlugin\Carbon\Source_Zone::showForSource
      */
     public function testShowForSource()
     {
-        $source = $this->createItem(CarbonIntensitySource::class, [
+        $source = $this->createItem(Source::class, [
             'name' => 'foo'
         ]);
 
@@ -53,7 +53,7 @@ class CarbonIntensitySource_ZoneTest extends DbTestCase
             'name' => 'bar'
         ]);
 
-        $instance = $this->createItem(CarbonIntensitySource_Zone::class, [
+        $instance = $this->createItem(Source_Zone::class, [
             $source::getForeignKeyField() => $source->getID(),
             $zone::getForeignKeyField() => $zone->getID(),
         ]);
@@ -72,11 +72,11 @@ class CarbonIntensitySource_ZoneTest extends DbTestCase
     }
 
     /**
-     * #CoversMethod GlpiPlugin\Carbon\CarbonIntensitySource_Zone::showForZone
+     * #CoversMethod GlpiPlugin\Carbon\Source_Zone::showForZone
      */
     public function testShowForZone()
     {
-        $source = $this->createItem(CarbonIntensitySource::class, [
+        $source = $this->createItem(Source::class, [
             'name' => 'foo'
         ]);
 
@@ -84,7 +84,7 @@ class CarbonIntensitySource_ZoneTest extends DbTestCase
             'name' => 'bar'
         ]);
 
-        $instance = $this->createItem(CarbonIntensitySource_Zone::class, [
+        $instance = $this->createItem(Source_Zone::class, [
             $source::getForeignKeyField() => $source->getID(),
             $zone::getForeignKeyField() => $zone->getID(),
         ]);
