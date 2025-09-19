@@ -33,9 +33,19 @@
 use GlpiPlugin\Carbon\Install;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
+use GlpiPlugin\Carbon\Zone;
 
 /** @var DBmysql $DB */
 global $DB;
+
+// This file ys executed at the end of an upgrade.
+// Upgrade to 1.2.0 changed the tables modified by this code
+// then we need to reset DB columns cache
+$DB->listFields(getTableForItemType(Source::class), false);
+$DB->listFields(getTableForItemType(Source_Zone::class), false);
+$DB->listFields(getTableForItemType(Zone::class), false);
 
 $source_id = Install::getOrCreateSource('RTE', 0);
 $zone_id = Install::getOrCreateZone('France', $source_id);
@@ -97,7 +107,7 @@ while (($line = $file->fgetcsv(',', '"', '\\')) !== false) {
         'data_quality' => 2 // constant GlpiPlugin\Carbon\DataTracking::DATA_QUALITY_ESTIMATED
     ], [
         'date' => "$year-01-01 00:00:00",
-        'plugin_carbon_carbonintensitysources_id' => $source_id,
+        'plugin_carbon_sources_id' => $source_id,
         'plugin_carbon_zones_id' => $zone_id
     ]);
 
@@ -122,7 +132,7 @@ foreach ($quebec_carbon_intensity as $year => $intensity) {
         'data_quality' => 2 // constant GlpiPlugin\Carbon\DataTracking::DATA_QUALITY_ESTIMATED
     ], [
         'date' => "$year-01-01 00:00:00",
-        'plugin_carbon_carbonintensitysources_id' => $source_id,
+        'plugin_carbon_sources_id' => $source_id,
         'plugin_carbon_zones_id' => $zone_id_quebec,
     ]);
 

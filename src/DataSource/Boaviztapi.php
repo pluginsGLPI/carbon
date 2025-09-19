@@ -35,8 +35,8 @@ namespace GlpiPlugin\Carbon\DataSource;
 use Config;
 use DBmysql;
 use Dropdown;
-use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 
 class Boaviztapi
@@ -99,8 +99,8 @@ class Boaviztapi
     public function createSource(): bool
     {
         $source_name = $this->getSourceName();
-        // create a source in CarbonIntensitySource
-        $source = new CarbonIntensitySource();
+        // create a source in Source
+        $source = new Source();
         $source->getFromDBByCrit([
             'name' => $source_name,
         ]);
@@ -136,7 +136,7 @@ class Boaviztapi
      */
     public function saveZones(array $zones): void
     {
-        $source = new CarbonIntensitySource();
+        $source = new Source();
         $source->getFromDBByCrit([
             'name' => $this->getSourceName(),
         ]);
@@ -161,14 +161,14 @@ class Boaviztapi
             } else {
                 $zone_id = $zone->getID();
             }
-            $source_zone = new CarbonIntensitySource_Zone();
+            $source_zone = new Source_Zone();
             $source_zone_id = $source_zone->getFromDBByCrit([
-                'plugin_carbon_carbonintensitysources_id' => $source_id,
+                'plugin_carbon_sources_id' => $source_id,
                 'plugin_carbon_zones_id' => $zone_id,
             ]);
             if ($source_zone_id === false) {
                 $source_zone_id = $source_zone->add([
-                    'plugin_carbon_carbonintensitysources_id' => $source_id,
+                    'plugin_carbon_sources_id' => $source_id,
                     'plugin_carbon_zones_id' => $zone_id,
                 ]);
                 if ($source_zone_id === false) {
@@ -190,12 +190,12 @@ class Boaviztapi
         global $DB;
 
         $zone_table = Zone::getTable();
-        $source_table = CarbonIntensitySource::getTable();
-        $source_zone_table = CarbonIntensitySource_Zone::getTable();
+        $source_table = Source::getTable();
+        $source_zone_table = Source_Zone::getTable();
         $result = $DB->request([
             'SELECT' => [
                 Zone::getTableField('name'),
-                CarbonIntensitySource_Zone::getTableField('code'),
+                Source_Zone::getTableField('code'),
             ],
             'FROM'   => Zone::getTable(),
             'INNER JOIN' => [
@@ -207,13 +207,13 @@ class Boaviztapi
                 ],
                 $source_table => [
                     'FKEY' => [
-                        $source_zone_table => 'plugin_carbon_carbonintensitysources_id',
-                        CarbonIntensitySource::getTable() => 'id',
+                        $source_zone_table => 'plugin_carbon_sources_id',
+                        Source::getTable() => 'id',
                     ],
                 ],
             ],
             'WHERE' => [
-                CarbonIntensitySource::getTableField('name') => self::$source_name,
+                Source::getTableField('name') => self::$source_name,
             ],
             'ORDER'  => Zone::getTableField('name'),
         ]);

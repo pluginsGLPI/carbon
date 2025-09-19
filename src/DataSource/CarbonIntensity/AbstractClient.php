@@ -39,8 +39,8 @@ use DateTime;
 use DateTimeImmutable;
 use Toolbox as GlpiToolbox;
 use GlpiPlugin\Carbon\CarbonIntensity;
-use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 use Symfony\Component\Console\Helper\ProgressBar;
 
@@ -58,11 +58,11 @@ abstract class AbstractClient implements ClientInterface
      * Create the source in the database
      * Should not be called as it shall be created at plugin installation
      *
-     * @return CarbonIntensitySource
+     * @return Source
      */
-    protected function getOrCreateSource(): ?CarbonIntensitySource
+    protected function getOrCreateSource(): ?Source
     {
-        $source = new CarbonIntensitySource();
+        $source = new Source();
         if (!$source->getFromDBByCrit(['name' => $this->getSourceName()])) {
             $source->add([
                 'name' => $this->getSourceName(),
@@ -146,11 +146,11 @@ abstract class AbstractClient implements ClientInterface
         /** @var DBmysql $DB */
         global $DB;
 
-        $source_table = CarbonIntensitySource::getTable();
-        $source_fk = CarbonIntensitySource::getForeignKeyField();
+        $source_table = Source::getTable();
+        $source_fk = Source::getForeignKeyField();
         $zone_table = Zone::getTable();
         $zone_fk = Zone::getForeignKeyField();
-        $source_zone_table = CarbonIntensitySource_Zone::getTable();
+        $source_zone_table = Source_Zone::getTable();
         $iterator = $DB->request([
             'SELECT' => Zone::getTableField('name'),
             'FROM' => $zone_table,
@@ -169,7 +169,7 @@ abstract class AbstractClient implements ClientInterface
                 ],
             ],
             'WHERE' => [
-                CarbonIntensitySource::getTableField('name') => $this->getSourceName(),
+                Source::getTableField('name') => $this->getSourceName(),
             ] + $crit,
         ]);
 
@@ -310,9 +310,9 @@ abstract class AbstractClient implements ClientInterface
         }
     }
 
-    protected function toggleZoneDownload(Zone $zone, CarbonIntensitySource $source, ?bool $state): bool
+    protected function toggleZoneDownload(Zone $zone, Source $source, ?bool $state): bool
     {
-        $source_zone = new CarbonIntensitySource_Zone();
+        $source_zone = new Source_Zone();
         $source_zone->getFromDBByCrit([
             $zone->getForeignKeyField() => $zone->getID(),
             $source->getForeignKeyField() => $source->getID(),

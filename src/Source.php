@@ -39,7 +39,7 @@ use DbUtils;
 use DBmysql;
 use Session;
 
-class CarbonIntensitySource extends CommonDropdown
+class Source extends CommonDropdown
 {
     public static function getTypeName($nb = 0)
     {
@@ -82,7 +82,7 @@ class CarbonIntensitySource extends CommonDropdown
                 case Zone::class:
                     if ($_SESSION['glpishow_count_on_tabs']) {
                         $nb = (new DbUtils())->countElementsInTable(
-                            CarbonIntensitySource_Zone::getTable(),
+                            Source_Zone::getTable(),
                             [self::getForeignKeyField() => $item->getID()]
                         );
                     }
@@ -98,7 +98,7 @@ class CarbonIntensitySource extends CommonDropdown
         /** @var CommonDBTM $item */
         switch ($item->getType()) {
             case Zone::class:
-                CarbonIntensitySource_Zone::showForZone($item);
+                Source_Zone::showForZone($item);
         }
 
         return true;
