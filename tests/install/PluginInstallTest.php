@@ -49,8 +49,8 @@ use Glpi\DBAL\QueryExpression as QueryExpression;
 use Glpi\System\Diagnostic\DatabaseSchemaIntegrityChecker;
 use Glpi\Toolbox\Sanitizer;
 use GlpiPlugin\Carbon\CarbonIntensity;
-use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\CronTask;
@@ -343,7 +343,7 @@ class PluginInstallTest extends CommonTestCase
     {
         $sources = ['RTE', 'ElectricityMap'];
         foreach ($sources as $source_name) {
-            $source = new CarbonIntensitySource();
+            $source = new Source();
             $source->getFromDBByCrit([
                 'name' => $source_name,
                 'is_fallback' => 0
@@ -353,7 +353,7 @@ class PluginInstallTest extends CommonTestCase
 
         $sources = ['Ember - Energy Institute', 'Hydro Quebec'];
         foreach ($sources as $source_name) {
-            $source = new CarbonIntensitySource();
+            $source = new Source();
             $source->getFromDBByCrit([
                 'name' => $source_name,
                 'is_fallback' => 1
@@ -395,7 +395,7 @@ class PluginInstallTest extends CommonTestCase
 
         // Find the source for Ember - Energy Institute
         $source_name = 'Ember - Energy Institute';
-        $source = new CarbonIntensitySource();
+        $source = new Source();
         $source->getFromDBByCrit([
             'name' => $source_name,
         ]);
@@ -422,7 +422,7 @@ class PluginInstallTest extends CommonTestCase
 
         // Find the source for Hydro Quebec
         $source_name = 'Hydro Quebec';
-        $source = new CarbonIntensitySource();
+        $source = new Source();
         $source->getFromDBByCrit([
             'name' => $source_name
         ]);
@@ -439,10 +439,10 @@ class PluginInstallTest extends CommonTestCase
         $this->assertEquals(1, $count);
 
         // Check all sources and zones are linked together via source_zone table
-        $source_zone_table = getTableForItemType(CarbonIntensitySource_Zone::class);
+        $source_zone_table = getTableForItemType(Source_Zone::class);
         $zone_table = $dbUtils->getTableForItemType(Zone::class);
-        $source_table = $dbUtils->getTableForItemType(CarbonIntensitySource::class);
-        $source_fk = getForeignKeyFieldForItemType(CarbonIntensitySource::class);
+        $source_table = $dbUtils->getTableForItemType(Source::class);
+        $source_fk = getForeignKeyFieldForItemType(Source::class);
         $zone_fk = getForeignKeyFieldForItemType(Zone::class);
         $iterator = $DB->request([
             'SELECT' => '*',

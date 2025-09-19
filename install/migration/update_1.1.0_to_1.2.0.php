@@ -30,34 +30,40 @@
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Carbon\Source;
-use GlpiPlugin\Carbon\Source_Zone;
+function update110to120(Migration $migration)
+{
+    /** @var DBmysql $DB */
+    global $DB;
 
-include(__DIR__ . '/../../../inc/includes.php');
+    $updateresult       = true;
+    $from_version       = '1.1.0';
+    $to_version         = '1.2.0';
+    $update_dir = __DIR__ . "/update_{$from_version}_to_{$to_version}/";
 
-// Check if plugin is activated...
-if (!Plugin::isPluginActive('carbon')) {
-    http_response_code(404);
-    die();
-}
+    //TRANS: %s is the number of new version
+    $migration->addInfoMessage(sprintf(__('Update to %s'), $to_version));
+    $migration->setVersion($to_version);
 
-if (!Source::canView()) {
-    // Will die
-    http_response_code(403);
-    die();
-}
+    // New tables from enpty.sql file after the migration
+    // If a script requires a new table, it may create it by itself
 
-if (!isset($_GET['id'])) {
-    http_response_code(400);
-    die();
-}
+    $update_scripts = scandir($update_dir);
+    natcasesort($update_scripts);
+    foreach ($update_scripts as $update_script) {
+        if (preg_match('/\.php$/', $update_script) !== 1) {
+            continue;
+        }
+        require $update_dir . $update_script;
+    }
 
-$source_zone = new Source_Zone();
-if (!$source_zone->getFromDB($_GET['id'])) {
-    http_response_code(403);
-    die();
-}
-if (!$source_zone->toggleZone()) {
-    http_response_code(500);
-    die();
+    $dbFile = plugin_carbon_getSchemaPath($to_version);
+    if ($dbFile === null || !$DB->runFile($dbFile)) {
+        $migration->addWarningMessage("Error creating tables : " . $DB->error());
+        $updateresult = false;
+    }
+
+    // ************ Keep it at the end **************
+    $migration->executeMigration();
+
+    return $updateresult;
 }

@@ -36,10 +36,10 @@ use Config as GlpiConfig;
 use DateTimeImmutable;
 use Glpi\Console\AbstractCommand;
 use GlpiPlugin\Carbon\CarbonIntensity;
-use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientFactory;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientInterface;
+use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Zone;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -76,7 +76,7 @@ class CollectCarbonIntensityCommand extends AbstractCommand
         // Set data source argument if not provided
         if (is_null($input->getArgument('source'))) {
             $question_helper = new QuestionHelper();
-            $choices = (new CarbonIntensitySource())->getDownloadableSources();
+            $choices = (new Source())->getDownloadableSources();
             $choices = ClientFactory::getClientNames();
             $question = new ChoiceQuestion(__('Source:', 'carbon'), array_values($choices));
             $value = $question_helper->ask($input, $output, $question);
@@ -118,7 +118,7 @@ class CollectCarbonIntensityCommand extends AbstractCommand
         $output->writeln("<info>$message</info>");
 
         // Create the source if it does not exist
-        $data_source = new CarbonIntensitySource();
+        $data_source = new Source();
         $source_name = $input->getArgument('source');
         if (!$data_source->getFromDBByCrit(['name' => $source_name])) {
             $data_source->add([
@@ -150,7 +150,7 @@ class CollectCarbonIntensityCommand extends AbstractCommand
         $carbon_intensity = new CarbonIntensity();
 
         // Create relation between source and zone if t does not exist
-        $source_zone = new CarbonIntensitySource_Zone();
+        $source_zone = new Source_Zone();
         $input = [
             'code' => $zone_code,
             $data_source::getForeignKeyField() => $data_source->getID(),

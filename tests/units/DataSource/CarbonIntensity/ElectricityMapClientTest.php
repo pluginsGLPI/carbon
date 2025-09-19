@@ -34,11 +34,11 @@ namespace GlpiPlugin\Carbon\DataSource\Tests;
 
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ElectricityMapClient;
 use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
-use GlpiPlugin\Carbon\CarbonIntensitySource;
+use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use DateTimeImmutable;
-use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
+use GlpiPlugin\Carbon\Source_Zone;
 
 class ElectricityMapClientTest extends DbTestCase
 {
@@ -75,14 +75,14 @@ class ElectricityMapClientTest extends DbTestCase
 
         /** @var RestApiClientInterface $client */
         $data_source = new ElectricityMapClient($client);
-        $source = new CarbonIntensitySource();
+        $source = new Source();
         $source->getFromDBByCrit(['name' => $data_source->getSourceName()]);
         $this->assertFalse($source->isNewItem());
         $zone = new Zone();
         $zone->getFromDbByCrit(['name' => 'France']);
         $this->assertFalse($zone->isNewItem());
-        $source_zone = $this->createItem(CarbonIntensitySource_Zone::class, [
-            CarbonIntensitySource::getForeignKeyField() => $source->getID(),
+        $source_zone = $this->createItem(Source_Zone::class, [
+            Source::getForeignKeyField() => $source->getID(),
             Zone::getForeignKeyField() => $zone->getID(),
             'code' => 'FR'
         ]);

@@ -76,7 +76,7 @@ class Zone extends CommonDropdown
     public function defineTabs($options = [])
     {
         $tabs = parent::defineTabs($options);
-        $this->addStandardTab(CarbonIntensitySource::class, $tabs, $options);
+        $this->addStandardTab(Source::class, $tabs, $options);
         return $tabs;
     }
 
@@ -86,11 +86,11 @@ class Zone extends CommonDropdown
             $nb = 0;
             /** @var CommonDBTM $item */
             switch ($item->getType()) {
-                case CarbonIntensitySource::class:
+                case Source::class:
                     if ($_SESSION['glpishow_count_on_tabs']) {
                         $nb = (new DbUtils())->countElementsInTable(
-                            CarbonIntensitySource_Zone::getTable(),
-                            [CarbonIntensitySource::getForeignKeyField() => $item->getID()]
+                            Source_Zone::getTable(),
+                            [Source::getForeignKeyField() => $item->getID()]
                         );
                     }
                     return self::createTabEntry(self::getTypeName(Session::getPluralNumber()), $nb);
@@ -111,8 +111,8 @@ class Zone extends CommonDropdown
     {
         /** @var CommonDBTM $item  */
         switch ($item->getType()) {
-            case CarbonIntensitySource::class:
-                CarbonIntensitySource_Zone::showForSource($item);
+            case Source::class:
+                Source_Zone::showForSource($item);
         }
 
         return true;
@@ -122,7 +122,7 @@ class Zone extends CommonDropdown
     {
         return [
             [
-                'name'   => 'plugin_carbon_carbonintensitysources_id_historical',
+                'name'   => 'plugin_carbon_sources_id_historical',
                 'label'  => __('Data source for historical calculation', 'carbon'),
                 'type'   => 'dropdownValue',
                 'list'   => true
@@ -136,13 +136,13 @@ class Zone extends CommonDropdown
 
         $tab[] = [
             'id'            => SearchOptions::HISTORICAL_DATA_SOURCE,
-            'table'         => CarbonIntensitySource::getTable(),
+            'table'         => Source::getTable(),
             'field'         => 'name',
             'name'          => __('Data source for historical calculation', 'carbon'),
             'datatype'      => 'dropdown',
             'joinparams'         => [
                 'beforejoin'    => [
-                    'table'         => CarbonIntensitySource_Zone::getTable(),
+                    'table'         => Source_Zone::getTable(),
                     'joinparams'    => [
                         'jointype'      => 'child',
                     ],
@@ -152,7 +152,7 @@ class Zone extends CommonDropdown
 
         $tab[] = [
             'id'            => SearchOptions::HISTORICAL_DATA_DL_ENABLED,
-            'table'         => CarbonIntensitySource_Zone::getTable(),
+            'table'         => Source_Zone::getTable(),
             'field'         => 'is_download_enabled',
             'name'          => __('Download enabled', 'carbon'),
             'datatype'      => 'bool',
@@ -298,11 +298,11 @@ class Zone extends CommonDropdown
         if ($this->isNewItem()) {
             return false;
         }
-        if (!isset($this->fields['plugin_carbon_carbonintensitysources_id_historical'])) {
+        if (!isset($this->fields['plugin_carbon_sources_id_historical'])) {
             return false;
         }
-        $source = new CarbonIntensitySource();
-        if (!$source->getFromDB($this->fields['plugin_carbon_carbonintensitysources_id_historical'])) {
+        $source = new Source();
+        if (!$source->getFromDB($this->fields['plugin_carbon_sources_id_historical'])) {
             // source does not exists
             return false;
         }

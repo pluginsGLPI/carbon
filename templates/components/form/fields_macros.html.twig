@@ -41,9 +41,8 @@
       {% set name = "#{name}[]" %}
    {% endif %}
    {% set options = {
-      'rand':     random(),
-      'disabled': false}|merge(options)
-   %}
+      'rand': random(),
+      'disabled': false}|merge(options) %}
    {% if options.fields_template.isMandatoryField(name)|default(false) %}
       {% set options = {'specific_tags': {'required': true}}|merge(options) %}
    {% endif %}

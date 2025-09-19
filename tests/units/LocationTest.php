@@ -40,8 +40,8 @@ use Geocoder\Model\AdminLevel;
 use Geocoder\Model\AdminLevelCollection;
 use Geocoder\Model\Country;
 use Geocoder\Provider\Nominatim\Model\NominatimAddress;
-use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 use Location as GlpiLocation;
 use GlpiPlugin\Carbon\Location;
@@ -277,14 +277,14 @@ class LocationTest extends DbTestCase
         $this->assertFalse($result);
 
         // Test when the zone does not matchs a source
-        $source = $this->createItem(CarbonIntensitySource::class, [
+        $source = $this->createItem(Source::class, [
             'name' => 'bar',
         ]);
         $zone = $this->createItem(Zone::class, [
             'name' => 'foo',
-            'plugin_carbon_carbonintensitysources_id_historical' => 0,
+            'plugin_carbon_sources_id_historical' => 0,
         ]);
-        $source_zone = $this->createItem(CarbonIntensitySource_Zone::class, [
+        $source_zone = $this->createItem(Source_Zone::class, [
             $zone::getForeignKeyField() => $zone->getID(),
             $source::getForeignKeyField() => $source->getID(),
             'is_download_enabled' => 0,
@@ -296,14 +296,14 @@ class LocationTest extends DbTestCase
         $this->assertFalse($result);
 
         // Test when the zone matches a source and download switches to enabled
-        $source = $this->createItem(CarbonIntensitySource::class, [
+        $source = $this->createItem(Source::class, [
             'name' => 'baz',
         ]);
         $zone = $this->createItem(Zone::class, [
             'name' => 'baz',
-            'plugin_carbon_carbonintensitysources_id_historical' => $source->getID(),
+            'plugin_carbon_sources_id_historical' => $source->getID(),
         ]);
-        $source_zone = $this->createItem(CarbonIntensitySource_Zone::class, [
+        $source_zone = $this->createItem(Source_Zone::class, [
             $zone::getForeignKeyField() => $zone->getID(),
             $source::getForeignKeyField() => $source->getID(),
             'is_download_enabled' => 0,
