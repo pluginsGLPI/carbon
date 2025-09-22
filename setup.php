@@ -137,7 +137,7 @@ function plugin_carbon_setupHooks()
     $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][] = $js_file;
 
     // Import CSS
-    $PLUGIN_HOOKS[Hooks::ADD_CSS]['carbon'][] = 'public/main.css';
+    $PLUGIN_HOOKS[Hooks::ADD_CSS]['carbon'][] = 'public/lib/carbon.css';
 
     $PLUGIN_HOOKS['add_default_where']['carbon'] = 'plugin_carbon_add_default_where';
 
