@@ -44,6 +44,7 @@ use Profile;
 use ProfileRight;
 use Glpi\Dashboard\Item;
 use Glpi\Dashboard\Right;
+use Glpi\Plugin\Hooks;
 use Glpi\System\Diagnostic\DatabaseSchemaIntegrityChecker;
 use Glpi\Toolbox\Sanitizer;
 use GlpiPlugin\Carbon\CarbonIntensity;
@@ -133,6 +134,7 @@ class PluginInstallTest extends CommonTestCase
         $this->checkInitialCarbonIntensities();
         $this->checkDisplayPrefs();
         $this->checkPredefinedUsageProfiles();
+        $this->checkBuitFiles();
     }
 
     public function testConfigurationExists()
@@ -476,6 +478,18 @@ class PluginInstallTest extends CommonTestCase
         $this->assertEquals(2, count($rows));
     }
 
+    public function checkBuitFiles()
+    {
+        global $PLUGIN_HOOKS;
+
+        $plugin_dir = dirname(__DIR__, 2);
+        $this->assertTrue(file_exists($plugin_dir . '/public/lib/carbon.css'));
+        $this->assertTrue(file_exists($plugin_dir . '/public/lib/carbon.js'));
+        $this->assertTrue(file_exists($plugin_dir . '/public/lib/apexcharts.js'));
+
+        $this->assertTrue(in_array('public/lib/carbon.css', $PLUGIN_HOOKS[Hooks::ADD_CSS]['carbon']));
+        $this->assertTrue(in_array('public/lib/apexcharts.js', $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon']));
+    }
 
     public function checkDashboard()
     {
