@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-01 01:57+0000\n"
-"PO-Revision-Date: 2025-09-01 01:57+0000\n"
+"POT-Creation-Date: 2025-09-22 01:48+0000\n"
+"PO-Revision-Date: 2025-09-22 01:48+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: en_GB\n"
@@ -346,7 +346,7 @@ msgstr ""
 "This power value is used as default when the power of a network equipment "
 "model is unknown"
 
-#: setup.php:274
+#: setup.php:273
 msgid "Environmental Impact"
 msgstr "Environmental Impact"
 
@@ -359,7 +359,6 @@ msgid "Office hours"
 msgstr "Office hours"
 
 #: install/install/create_automatic_actions.php:45
-#: install/migration/update_0.0.6_to_1.0.0/02_create_automatic_actions.php:45
 msgid "Find the Alpha3 country code (ISO3166) of locations"
 msgstr "Find the Alpha3 country code (ISO3166) of locations"
 
@@ -376,7 +375,6 @@ msgid "Collect carbon intensities from ElectricityMap"
 msgstr "Collect carbon intensities from ElectricityMap"
 
 #: install/install/create_automatic_actions.php:93
-#: install/migration/update_0.0.3_to_0.0.4/add_automatic_action.php:60
 msgid "Compute embodied impact of assets"
 msgstr "Compute embodied impact of assets"
 
@@ -1062,19 +1060,19 @@ msgstr "YW"
 msgid "Wh"
 msgstr "Wh"
 
-#: hook.php:256
+#: hook.php:317
 msgid "Associate to an usage profile"
 msgstr "Associate to an usage profile"
 
-#: hook.php:260 hook.php:265 hook.php:269
+#: hook.php:321 hook.php:326 hook.php:330
 msgid "Update type power consumption"
 msgstr "Update type power consumption"
 
-#: hook.php:261
+#: hook.php:322
 msgid "Update category"
 msgstr "Update category"
 
-#: hook.php:273
+#: hook.php:334
 msgid "Update zone for Boavizta engine"
 msgstr "Update zone for Boavizta engine"
 
