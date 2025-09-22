@@ -167,9 +167,20 @@
 
                         {{ fields.smallTitle(__('Legend', 'carbon')) }}
 
-                        {{ fields.field('', ok_field, __('Satisfied requirement', 'carbon')) }}
-                        {{ fields.field('', nok_field, __('Missing requirement', 'carbon')) }}
-                        {{ fields.field('', warning_field, __('Optional missing data', 'carbon')) }}
+                        <div class="legend-grid">
+                            <div class="legend-item">
+                                <i class="fa fa-check-circle ok"></i>
+                                <span class="legend-label">Satisfied requirement</span>
+                            </div>
+                            <div class="legend-item">
+                                <i class="fa fa-xmark-circle disabled"></i>
+                                <span class="legend-label">Missing requirement</span>
+                            </div>
+                            <div class="legend-item">
+                                <i class="fa fa-xmark-circle missing"></i>
+                                <span class="legend-label">Optional missing data</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
