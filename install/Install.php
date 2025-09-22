@@ -34,6 +34,7 @@ namespace GlpiPlugin\Carbon;
 
 use Config;
 use DBmysql;
+use DbUtils;
 use DirectoryIterator;
 use Glpi\Toolbox\Sanitizer;
 use Migration;
@@ -298,5 +299,51 @@ class Install
         }
 
         return $source_zone->getID();
+    }
+
+    /**
+     * Insert or update a carbon intensity
+     *
+     * @param string $date
+     * @param integer $source_id
+     * @param integer $zone_id
+     * @param float $intensity
+     * @param integer $quality
+     * @return void
+     */
+    public static function insertOrUpdateCarbonIntensity(string $date, int $source_id, int $zone_id, float $intensity, int $quality): void
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        $table = (new DbUtils())->getTableForItemType(CarbonIntensity::class);
+
+        $row_exists = (new DbUtils())->countElementsInTable($table, [
+            'date' => $date,
+            'plugin_carbon_carbonintensitysources_id' => $source_id,
+            'plugin_carbon_zones_id' => $zone_id
+        ]);
+        if (!$row_exists) {
+            $success = $DB->insert($table, [
+                'date' => $date,
+                'plugin_carbon_carbonintensitysources_id' => $source_id,
+                'plugin_carbon_zones_id' => $zone_id,
+                'intensity' => $intensity,
+                'data_quality' => $quality // constant GlpiPlugin\Carbon\DataTracking::DATA_QUALITY_*
+            ]);
+        } else {
+            $success = $DB->update($table, [
+                'intensity' => $intensity,
+                'data_quality' => $quality // constant GlpiPlugin\Carbon\DataTracking::DATA_QUALITY_*
+            ], [
+                'date' => $date,
+                'plugin_carbon_carbonintensitysources_id' => $source_id,
+                'plugin_carbon_zones_id' => $zone_id
+            ]);
+        }
+
+        if (!$success) {
+            throw new \RuntimeException("Failed to insert data for date $date");
+        }
     }
 }
