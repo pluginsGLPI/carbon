@@ -574,6 +574,8 @@ class Widget extends GlpiDashboardWidget
         $apex_data['labels'] = $data['labels'];
         $apex_data['xaxis']['categories'] = $data['labels'];
 
+        $apex_data['yaxis'][1]['min'] = 0.8 * min(array_column($apex_data['series'][1]['data'], 'y'));
+
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/graph-carbon-emission-per-month.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
