@@ -32,6 +32,7 @@
 
 use Glpi\Exception\Http\NotFoundHttpException;
 use GlpiPlugin\Carbon\ComputerType;
+use ComputerType as GlpiComputerType;
 
 include(__DIR__ . '/../../../inc/includes.php');
 
@@ -39,13 +40,12 @@ if (!Plugin::isPluginActive('carbon')) {
     throw new NotFoundHttpException();
 }
 
-Session::checkRight('config', UPDATE);
+Session::checkRight(GlpiComputerType::$rightname, UPDATE);
 
 $item = new ComputerType();
 
 if (isset($_POST['update'])) {
-    // Add a new Form
-    Session::checkRight('entity', UPDATE);
+    Session::checkRight(GlpiComputerType::$rightname, UPDATE);
     $item->update($_POST);
     Html::back();
 }
