@@ -81,33 +81,9 @@ function plugin_carbon_install(array $args = []): bool
         ob_start();
     }
     if ($version === '0.0.0') {
-        try {
-            $success = $install->install($args);
-        } catch (\Exception $e) {
-            trigger_error($e->getMessage(), E_USER_WARNING);
-            if (!isCommandLine()) {
-                Session::addMessageAfterRedirect(
-                    $e->getMessage(),
-                    false,
-                    ERROR
-                );
-            }
-            $success = false;
-        }
+        $success = $install->install($args);
     } else {
-        try {
-            $success = $install->upgrade($version, $args);
-        } catch (\Exception $e) {
-            trigger_error($e->getMessage(), E_USER_WARNING);
-            if (!isCommandLine()) {
-                Session::addMessageAfterRedirect(
-                    $e->getMessage(),
-                    false,
-                    ERROR
-                );
-            }
-            $success = false;
-        }
+        $success = $install->upgrade($version, $args);
     }
 
     if ($silent) {
