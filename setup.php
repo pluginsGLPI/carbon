@@ -41,7 +41,7 @@ use Location as GlpiLocation;
 use Profile as GlpiProfile;
 use GlpiPlugin\Carbon\Dashboard\Grid;
 
-define('PLUGIN_CARBON_VERSION', '1.1.0-dev');
+define('PLUGIN_CARBON_VERSION', '1.1.0');
 define('PLUGIN_CARBON_SCHEMA_VERSION', '1.1.0');
 
 // Minimal GLPI version, inclusive
