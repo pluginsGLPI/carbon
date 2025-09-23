@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-22 01:48+0000\n"
+"POT-Creation-Date: 2025-09-23 01:40+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -120,18 +120,6 @@ msgstr ""
 
 #: templates/history/status-item.html.twig
 msgid "Legend"
-msgstr ""
-
-#: templates/history/status-item.html.twig
-msgid "Satisfied requirement"
-msgstr ""
-
-#: templates/history/status-item.html.twig
-msgid "Missing requirement"
-msgstr ""
-
-#: templates/history/status-item.html.twig
-msgid "Optional missing data"
 msgstr ""
 
 #: templates/usageinfo.html.twig
@@ -397,20 +385,20 @@ msgstr ""
 msgid "Usage informations"
 msgstr ""
 
-#: src/UsageInfo.php:218 src/Dashboard/Widget.php:828
+#: src/UsageInfo.php:218 src/Dashboard/Widget.php:830
 #, php-format
 msgid "Evaluates the carbon emission in CO₂ equivalent. %s More information %s"
 msgstr ""
 
-#: src/UsageInfo.php:226 src/Dashboard/Widget.php:864
-#: src/Dashboard/Widget.php:901
+#: src/UsageInfo.php:226 src/Dashboard/Widget.php:866
+#: src/Dashboard/Widget.php:903
 #, php-format
 msgid ""
 "Evaluates the consumption of non renewable resources in Antimony equivalent. "
 "%s More information %s"
 msgstr ""
 
-#: src/UsageInfo.php:238 src/Dashboard/Widget.php:1086
+#: src/UsageInfo.php:238 src/Dashboard/Widget.php:1088
 #, php-format
 msgid "Evaluates the primary energy consumed. %s More information %s"
 msgstr ""
@@ -728,7 +716,7 @@ msgid "Usage global warming potential chart"
 msgstr ""
 
 #: src/Dashboard/Grid.php:275 src/Dashboard/Widget.php:83
-#: src/Dashboard/Widget.php:579
+#: src/Dashboard/Widget.php:581
 msgid "Biggest monthly averaged carbon emission per model"
 msgstr ""
 
@@ -784,25 +772,25 @@ msgstr ""
 msgid "Radar chart"
 msgstr ""
 
-#: src/Dashboard/Widget.php:721
+#: src/Dashboard/Widget.php:723
 #, php-format
 msgid ""
 "Evaluates the usage carbon emission in CO₂ equivalent during the last 2 "
 "months. %s More information %s"
 msgstr ""
 
-#: src/Dashboard/Widget.php:787
+#: src/Dashboard/Widget.php:789
 #, php-format
 msgid ""
 "Evaluates the usage carbon emission in CO₂ equivalent during the last 12 "
 "elapsed months. %s More information %s"
 msgstr ""
 
-#: src/Dashboard/Widget.php:1076
+#: src/Dashboard/Widget.php:1078
 msgid "Total embodied primary energy"
 msgstr ""
 
-#: src/Dashboard/Widget.php:1145
+#: src/Dashboard/Widget.php:1147
 msgid "Handled percentage"
 msgstr ""
 

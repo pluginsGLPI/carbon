@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-22 01:48+0000\n"
+"POT-Creation-Date: 2025-09-23 01:40+0000\n"
 "PO-Revision-Date: 2025-07-03 13:58+0000\n"
 "Last-Translator: Thierry Bugier <tbugier@teclib.com>, 2025\n"
 "Language-Team: Turkish (Turkey) (https://app.transifex.com/teclib/teams/28042/tr_TR/)\n"
@@ -125,18 +125,6 @@ msgstr "Varlık envanter kaydı tarihi şu olan"
 #: templates/history/status-item.html.twig
 msgid "Legend"
 msgstr "İşaret"
-
-#: templates/history/status-item.html.twig
-msgid "Satisfied requirement"
-msgstr "Gereksinim karşılanıyor"
-
-#: templates/history/status-item.html.twig
-msgid "Missing requirement"
-msgstr "Gereksinim eksik"
-
-#: templates/history/status-item.html.twig
-msgid "Optional missing data"
-msgstr "İsteğe bağlı eksik veriler"
 
 #: templates/usageinfo.html.twig
 msgid "Asset usage"
@@ -424,7 +412,7 @@ msgstr "Sahte veriler oluşturuluyor..."
 msgid "Usage informations"
 msgstr "Kullanım bilgileri"
 
-#: src/UsageInfo.php:218 src/Dashboard/Widget.php:828
+#: src/UsageInfo.php:218 src/Dashboard/Widget.php:830
 #, php-format
 msgid ""
 "Evaluates the carbon emission in CO₂ equivalent. %s More information %s"
@@ -432,8 +420,8 @@ msgstr ""
 "Karbon emisyonunu CO₂ eşdeğeri olarak değerlendirir. %s Ayrıntılı bilgi alın"
 " %s"
 
-#: src/UsageInfo.php:226 src/Dashboard/Widget.php:864
-#: src/Dashboard/Widget.php:901
+#: src/UsageInfo.php:226 src/Dashboard/Widget.php:866
+#: src/Dashboard/Widget.php:903
 #, php-format
 msgid ""
 "Evaluates the consumption of non renewable resources in Antimony equivalent."
@@ -442,7 +430,7 @@ msgstr ""
 "Yenilenebilir olmayan kaynakların tüketimini antimon eşdeğeri olarak "
 "değerlendirir. %s Ayrıntılı bilgi alın %s"
 
-#: src/UsageInfo.php:238 src/Dashboard/Widget.php:1086
+#: src/UsageInfo.php:238 src/Dashboard/Widget.php:1088
 #, php-format
 msgid "Evaluates the primary energy consumed. %s More information %s"
 msgstr "Birincil enerji tüketimini değerlendirir. %s Ayrıntılı bilgi alın %s"
@@ -760,7 +748,7 @@ msgid "Usage global warming potential chart"
 msgstr "Kullanım küresel ısınma potansiyeli çizelgesi"
 
 #: src/Dashboard/Grid.php:275 src/Dashboard/Widget.php:83
-#: src/Dashboard/Widget.php:579
+#: src/Dashboard/Widget.php:581
 msgid "Biggest monthly averaged carbon emission per model"
 msgstr "Her model için en büyük aylık ortalama karbon emisyonu"
 
@@ -816,7 +804,7 @@ msgstr "İşlenmeyen ağ aygıtları"
 msgid "Radar chart"
 msgstr "Radar çizelge"
 
-#: src/Dashboard/Widget.php:721
+#: src/Dashboard/Widget.php:723
 #, php-format
 msgid ""
 "Evaluates the usage carbon emission in CO₂ equivalent during the last 2 "
@@ -825,7 +813,7 @@ msgstr ""
 "Son 2 aylık karbon emisyonunu kullanımını CO₂ eşdeğeri olarak değerlendirir."
 " %s Ayrıntılı bilgi alın %s"
 
-#: src/Dashboard/Widget.php:787
+#: src/Dashboard/Widget.php:789
 #, php-format
 msgid ""
 "Evaluates the usage carbon emission in CO₂ equivalent during the last 12 "
@@ -834,11 +822,11 @@ msgstr ""
 "Son 12 aylık karbon emisyonunu kullanımını CO₂ eşdeğeri olarak "
 "değerlendirir. %s Ayrıntılı bilgi alın %s"
 
-#: src/Dashboard/Widget.php:1076
+#: src/Dashboard/Widget.php:1078
 msgid "Total embodied primary energy"
 msgstr "Toplam gerçekleşen birincil enerji"
 
-#: src/Dashboard/Widget.php:1145
+#: src/Dashboard/Widget.php:1147
 msgid "Handled percentage"
 msgstr "İşlenen yüzde"
 
