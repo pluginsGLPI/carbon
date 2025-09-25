@@ -17,7 +17,7 @@ Carbon est un plugin permettant d'évaluer l'impact environnemental de votre inf
          </fr>
       </long>
    </description>
-   <homepage>https://pluginsglpi.github.io/carbon/</homepage>
+   <homepage>https://github.com/pluginsGLPI/carbon/</homepage>
    <download>https://github.com/pluginsGLPI/carbon/releases</download>
    <issues>https://github.com/pluginsGLPI/carbon/issues</issues>
    <readme>https://help.glpi-project.org/doc-plugins/carbon</readme>
