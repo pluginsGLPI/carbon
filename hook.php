@@ -152,13 +152,13 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
     return SearchOptions::getCoreSearchOptions($itemtype);
 }
 
-/**
- * Callback before showing save / update button on an item form
- *
- * @param array $params 'item' => CommonDBTM
- *                       'options => array
- * @return void
- */
+// /**
+//  * Callback before showing save / update button on an item form
+//  *
+//  * @param array $params 'item' => CommonDBTM
+//  *                       'options => array
+//  * @return void
+//  */
 // function plugin_carbon_postItemForm(array $params)
 // {
 //     switch ($params['item']->getType()) {
