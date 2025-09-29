@@ -33,6 +33,7 @@
 namespace GlpiPlugin\Carbon\Tests;
 
 use Computer;
+use DBmysql;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Zone;
 use Location;

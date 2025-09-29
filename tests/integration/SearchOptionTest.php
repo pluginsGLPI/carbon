@@ -45,6 +45,7 @@ use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
 use CommonDBTM;
 use CommonGLPI;
+use DBmysql;
 use DbUtils;
 use Plugin;
 use PHPUnit\Framework\Attributes\CoversMethod;
@@ -95,6 +96,7 @@ class SearchOptionTest extends CommonTestCase
 
     public function testSearchOption()
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         // Find each .php file in /src directory and subdirectories

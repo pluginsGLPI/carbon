@@ -45,6 +45,7 @@ use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 use Location as GlpiLocation;
 use GlpiPlugin\Carbon\Location;
+use Locale;
 
 class LocationTest extends DbTestCase
 {
@@ -411,5 +412,64 @@ class LocationTest extends DbTestCase
         $location = new Location();
         $result = $location->hasFallbackCarbonIntensityData($glpi_location);
         $this->assertTrue($result);
+    }
+
+    public function testGetSourceZoneId()
+    {
+        // Test an unitialized location
+        $location = new Location();
+        $result = $location->getSourceZoneId();
+        $this->assertEquals(0, $result);
+
+        // Test a location without a relation to a source and a zone
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $location = $this->createItem(Location::class, ['locations_id' => $glpi_location->getID()]);
+        $result = $location->getSourceZoneId();
+        $this->assertEquals(0, $result);
+
+        // Test a location associated to a source_zone
+        $source = $this->createItem(Source::class);
+        $zone = $this->createItem(Zone::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            Source::getForeignKeyField() => $source->getID(),
+            Zone::getForeignKeyField() => $zone->getID(),
+        ]);
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $location = $this->createItem(Location::class, [
+            'locations_id' => $glpi_location->getID(),
+            'plugin_carbon_sources_zones_id' => $source_zone->getID(),
+        ]);
+        $result = $location->getSourceZoneId();
+        $this->assertEquals($source_zone->getID(), $result);
+
+        // Test a source_zone associated to the parent of the location
+        $glpi_location_ancestor = $this->createItem(GlpiLocation::class);
+        $glpi_location = $this->createItem(GlpiLocation::class, [
+            'locations_id' => $glpi_location_ancestor->getID(),
+        ]);
+        $location = $this->createItem(Location::class, [
+            'locations_id' => $glpi_location_ancestor->getID(),
+            'plugin_carbon_sources_zones_id' => $source_zone->getID(),
+        ]);
+        $result = $location->getSourceZoneId();
+        $this->assertEquals($source_zone->getID(), $result);
+
+        // Test a source_zone associated to the gand-parent of the location
+        $glpi_location_grand_ancestor = $this->createItem(GlpiLocation::class);
+        $glpi_location_ancestor = $this->createItem(GlpiLocation::class, [
+            'locations_id' => $glpi_location_grand_ancestor->getID()
+        ]);
+        $glpi_location = $this->createItem(GlpiLocation::class, [
+            'locations_id' => $glpi_location_ancestor->getID(),
+        ]);
+        $location_grand_ancestor = $this->createItem(Location::class, [
+            'locations_id' => $glpi_location_grand_ancestor->getID(),
+            'plugin_carbon_sources_zones_id' => $source_zone->getID(),
+        ]);
+        $location = $this->createItem(Location::class, [
+            'locations_id' => $glpi_location->getID(),
+        ]);
+        $result = $location->getSourceZoneId();
+        $this->assertEquals($source_zone->getID(), $result);
     }
 }

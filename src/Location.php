@@ -38,19 +38,15 @@ use CommonGLPI;
 use Config as GlpiConfig;
 use DBmysql;
 use DBmysqlIterator;
+use DbUtils;
 use Geocoder\Geocoder;
-use Geocoder\Provider\Nominatim\Nominatim;
 use Geocoder\Query\GeocodeQuery;
-use Geocoder\StatefulGeocoder;
-use GuzzleHttp\Client;
 use Html;
 use Location as GlpiLocation;
 use MassiveAction;
 use Glpi\Application\View\TemplateRenderer;
-use GLPINetwork;
 use GlpiPlugin\Carbon\DataSource\Boaviztapi;
 use League\ISO3166\ISO3166;
-use Session;
 
 /**
  * Additional data for a location. Extends the Location object from GLPI with aditional fields
@@ -68,25 +64,102 @@ class Location extends CommonDBChild
 
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
-        if (!is_a($item, GlpiLocation::class)) {
-            return '';
+        if (is_a($item, GlpiLocation::class)) {
+            return self::createTabEntry(__('Environmental impact', 'carbon'), 0);
         }
-        return self::createTabEntry(__('Environmental impact', 'carbon'), 0);
+        return '';
     }
 
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
-        /** @var CommonDBTM $item */
-        $location = new self();
-        $location->showForm($item->getID());
+        if (is_a($item, GlpiLocation::class)) {
+            /** @var GlpiLocation $item */
+            $location = new self();
+            $location->showForLocation($item);
+        }
         return true;
     }
 
-    public function showForm($ID, array $options = [])
+    public function prepareInputForAdd($input)
     {
-        $this->getFromDB($ID);
+        if (isset($input['plugin_carbon_sources_id']) && isset($input['plugin_carbon_zones_id'])) {
+            $source_zone = new Source_Zone();
+            $source_zone->getFromDBByCrit([
+                'plugin_carbon_sources_id' => $input['plugin_carbon_sources_id'],
+                'plugin_carbon_zones_id' => $input['plugin_carbon_zones_id'],
+            ]);
+            if (!$source_zone->isNewItem()) {
+                $input['plugin_carbon_sources_zones_id'] = $source_zone->getID();
+            }
+        }
+
+        return $input;
+    }
+
+    public function prepareInputForUpdate($input)
+    {
+        if (isset($input['plugin_carbon_sources_id']) && isset($input['plugin_carbon_zones_id'])) {
+            $source_zone = new Source_Zone();
+            $source_zone->getFromDBByCrit([
+                'plugin_carbon_sources_id' => $input['plugin_carbon_sources_id'],
+                'plugin_carbon_zones_id' => $input['plugin_carbon_zones_id'],
+            ]);
+            if (!$source_zone->isNewItem()) {
+                $input['plugin_carbon_sources_zones_id'] = $source_zone->getID();
+            } else {
+                $input['plugin_carbon_sources_zones_id'] = 0;
+            }
+        }
+
+        return $input;
+    }
+
+    public function showForLocation(GlpiLocation $item, array $options = [])
+    {
+        global $DB;
+
+        $this->getFromDBByCrit(['locations_id' => $item->getID()]);
+        if ($this->isNewItem()) {
+            $this->add(['locations_id' => $item->getID()]);
+        }
+
+        $source_zone_table = Source_Zone::getTable();
+        $source_table = Source::getTable();
+        $iterator = $DB->request([
+            'SELECT' => [
+                Source_Zone::getTableField('plugin_carbon_sources_id') . ' AS sources_id',
+                Source_Zone::getTableField('plugin_carbon_zones_id') . ' AS zones_id',
+            ],
+            'FROM' => $source_table,
+            'LEFT JOIN' => [
+                $source_zone_table => [
+                    'FKEY' => [
+                        $source_zone_table => 'plugin_carbon_sources_id',
+                        $source_table => 'id',
+                    ]
+                ]
+            ],
+            'WHERE' => [
+                'is_fallback' => 0,
+                'is_carbon_intensity_source' => 1,
+                Source_Zone::getTableField('id') => $this->fields['plugin_carbon_sources_zones_id'],
+            ]
+        ]);
+        $row = $iterator->current();
+        $source_id = $row['sources_id'] ?? 0;
+        $zone_id = $row['zones_id'] ?? 0;
+        if ($source_id === 0) {
+            $zone_id = 0;
+        }
+
         TemplateRenderer::getInstance()->display('@carbon/location.html.twig', [
             'item' => $this,
+            'params' => [
+                'candel' => false,
+            ],
+            'source_id' => $source_id,
+            'zone_id'   => $zone_id,
+            'zone_condition' => Zone::getRestrictBySourceCondition($source_id),
         ]);
 
         return true;
@@ -449,5 +522,52 @@ class Location extends CommonDBChild
         $result = $DB->request($request);
 
         return $result;
+    }
+
+    public function getSourceZoneId(): int
+    {
+        /** @var DBmysql */
+        global $DB;
+
+        if ($this->isNewItem()) {
+            return 0;
+        }
+
+        if (!Source_Zone::isNewID($this->fields['plugin_carbon_sources_zones_id'])) {
+            return $this->fields['plugin_carbon_sources_zones_id'];
+        }
+
+        $location_table = self::getTable();
+        $glpi_location_table = GlpiLocation::getTable();
+        $ancestors = (new DbUtils())->getAncestorsOf($glpi_location_table, $this->fields['locations_id']);
+        if (count($ancestors) === 0) {
+            return 0;
+        }
+
+        $ancestors = array_values($ancestors); // Drop keys
+        $request = [
+            'SELECT' => self::getTableField('plugin_carbon_sources_zones_id'),
+            'FROM' => $glpi_location_table,
+            'INNER JOIN' => [
+                $location_table => [
+                    'FKEY' => [
+                        $glpi_location_table => 'id',
+                        $location_table => 'locations_id',
+                    ]
+                ]
+            ],
+            'WHERE' => [
+                GlpiLocation::getTableField('id') => $ancestors,
+                self::getTableField('plugin_carbon_sources_zones_id') => ['>', 0]
+            ],
+            'ORDER' => 'level DESC',
+            'LIMIT' => '1'
+        ];
+        $iterator = $DB->request($request);
+        if ($iterator->count() === 0) {
+            return 0;
+        }
+
+        return $iterator->current()['plugin_carbon_sources_zones_id'];
     }
 }

@@ -31,21 +31,21 @@
  */
 
 use Glpi\Exception\Http\NotFoundHttpException;
-use GlpiPlugin\Carbon\NetworkEquipmentType;
-use NetworkEquipmentType as GlpiNetworkEquipmentType;
+use GlpiPlugin\Carbon\Location;
+use Location as GlpiLocation;
 
-include(__DIR__ . '/../../../inc/includes.php');
+include(__DIR__ . "/../../../inc/includes.php");
 
 if (!Plugin::isPluginActive('carbon')) {
     throw new NotFoundHttpException();
 }
 
-Session::checkRight(GlpiNetworkEquipmentType::$rightname, UPDATE);
+Session::checkRight(GlpiLocation::$rightname, UPDATE);
 
-$item = new NetworkEquipmentType();
+$item = new Location();
 
 if (isset($_POST['update'])) {
-    Session::checkRight(GlpiNetworkEquipmentType::$rightname, UPDATE);
+    Session::checkRight(GlpiLocation::$rightname, UPDATE);
     $item->update($_POST);
     Html::back();
 }

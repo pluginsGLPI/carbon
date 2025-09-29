@@ -30,24 +30,25 @@
  * -------------------------------------------------------------------------
  */
 
-use Glpi\Exception\Http\NotFoundHttpException;
-use GlpiPlugin\Carbon\NetworkEquipmentType;
-use NetworkEquipmentType as GlpiNetworkEquipmentType;
+use GlpiPlugin\Carbon\Source_Zone;
+use GlpiPlugin\Carbon\Zone;
 
 include(__DIR__ . '/../../../inc/includes.php');
 
+// Check if plugin is activated...
 if (!Plugin::isPluginActive('carbon')) {
-    throw new NotFoundHttpException();
+    http_response_code(404);
+    die();
 }
 
-Session::checkRight(GlpiNetworkEquipmentType::$rightname, UPDATE);
+// throw new RuntimeException('Required argument missing or incorrect!');
 
-$item = new NetworkEquipmentType();
-
-if (isset($_POST['update'])) {
-    Session::checkRight(GlpiNetworkEquipmentType::$rightname, UPDATE);
-    $item->update($_POST);
-    Html::back();
-}
-
-Html::back();
+$source_zone_table = Source_Zone::getTable();
+$zone_table = Zone::getTable();
+$source_id = (int) $_POST['plugin_carbon_sources_id'];
+Zone::dropdown([
+    'rand' => (int) $_POST['dom_id'],
+    'condition' => Zone::getRestrictBySourceCondition($source_id),
+    // 'disabled'  => ($source_id === 0),
+    'specific_tags' => ($source_id === 0 ? ['disabled' => 'disabled'] : []),
+]);

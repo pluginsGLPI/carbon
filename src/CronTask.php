@@ -171,7 +171,7 @@ class CronTask
      */
     public static function cronDownloadRte(GlpiCronTask $task): int
     {
-        $client = ClientFactory::create('rte');
+        $client = ClientFactory::create('Rte');
         return self::downloadCarbonIntensityFromSource($task, $client, new CarbonIntensity());
     }
 
@@ -182,7 +182,7 @@ class CronTask
      */
     public static function cronDownloadElectricityMap(GlpiCronTask $task): int
     {
-        $client = ClientFactory::create('electricitymap');
+        $client = ClientFactory::create('ElectricityMap');
         return self::downloadCarbonIntensityFromSource($task, $client, new CarbonIntensity());
     }
 
@@ -193,7 +193,7 @@ class CronTask
      */
     public static function cronDownloadWatttime(GlpiCronTask $task): int
     {
-        $client = ClientFactory::create('watttime');
+        $client = ClientFactory::create('Watttime');
         return self::downloadCarbonIntensityFromSource($task, $client, new CarbonIntensity());
     }
 

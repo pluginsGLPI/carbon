@@ -159,18 +159,18 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
  *                       'options => array
  * @return void
  */
-function plugin_carbon_postItemForm(array $params)
-{
-    switch ($params['item']->getType()) {
-        case GlpiLocation::class:
-            $location = new Location();
-            $location->getFromDBByCrit([
-                GlpiLocation::getForeignKeyField() => $params['item']->getID(),
-            ]);
-            $location->showForm($location->getID());
-            break;
-    }
-}
+// function plugin_carbon_postItemForm(array $params)
+// {
+//     switch ($params['item']->getType()) {
+//         case GlpiLocation::class:
+//             $location = new Location();
+//             $location->getFromDBByCrit([
+//                 GlpiLocation::getForeignKeyField() => $params['item']->getID(),
+//             ]);
+//             $location->showForm($location->getID());
+//             break;
+//     }
+// }
 
 function plugin_carbon_hook_add_asset(CommonDBTM $item)
 {
