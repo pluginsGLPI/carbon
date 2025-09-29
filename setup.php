@@ -114,7 +114,7 @@ function plugin_carbon_setupHooks()
         // asset's type
         $PLUGIN_HOOKS[Hooks::PRE_ITEM_PURGE]['carbon'][$itemtype . 'Type'] = 'plugin_carbon_hook_pre_purge_assettype';
     }
-    $PLUGIN_HOOKS[Hooks::POST_ITEM_FORM]['carbon'] = 'plugin_carbon_postItemForm';
+    // $PLUGIN_HOOKS[Hooks::POST_ITEM_FORM]['carbon'] = 'plugin_carbon_postItemForm';
 
     // Actions taken on locations events
     $PLUGIN_HOOKS[Hooks::ITEM_ADD]['carbon'][GlpiLocation::class] = 'plugin_carbon_locationAdd';
@@ -126,6 +126,7 @@ function plugin_carbon_setupHooks()
     $PLUGIN_HOOKS[Hooks::PRE_ITEM_ADD]['carbon'][GlpiProfile::class] = 'plugin_carbon_profileAdd';
 
     $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][] = 'lib/apexcharts.js';
+    $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][] = 'lib/carbon.js';
 
     // Import CSS
     $PLUGIN_HOOKS[Hooks::ADD_CSS]['carbon'][] = 'lib/carbon.css';

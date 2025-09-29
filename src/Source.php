@@ -108,11 +108,22 @@ class Source extends CommonDropdown
     {
         $tab = parent::rawSearchOptions();
 
+        $table = self::getTable();
+
         $tab[] = [
             'id'                 => '3',
-            'table'              => $this->getTable(),
+            'table'              => $table,
             'field'              => 'is_fallback',
             'name'               => __('Is a fallback source'),
+            'massiveaction'      => false,
+            'datatype'           => 'boolean',
+        ];
+
+        $tab[] = [
+            'id'                 => '4',
+            'table'              => $table,
+            'field'              => 'is_carbon_intensity_source',
+            'name'               => __('Is a carbon intensity source'),
             'massiveaction'      => false,
             'datatype'           => 'boolean',
         ];

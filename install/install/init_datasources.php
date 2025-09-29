@@ -121,7 +121,7 @@ if ($progress_bar) {
 }
 $file = null; // close the file
 
-$source_id = Install::getOrCreateSource('Hydro Quebec');
+$source_id = Install::getOrCreateSource('Hydro Quebec', 1, 0);
 $zone_id_quebec = Install::getOrCreateZone('Quebec', $source_id);
 Install::linkSourceZone($source_id, $zone_id_quebec);
 

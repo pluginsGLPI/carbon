@@ -27,3 +27,17 @@
  *
  * -------------------------------------------------------------------------
  */
+
+window.GLPIPlugin = window.GLPIPlugin || {};
+
+window.GLPIPlugin.Carbon = {
+    onSourceChange: function() {
+        var value = document.querySelector("select[name='plugin_carbon_sources_id']").value;
+        var zoneDropdown = document.querySelector("select[name='plugin_carbon_zones_id']").closest('div.form-field');
+        if (value == 0 && !zoneDropdown.classList.contains('d-none')) {
+            zoneDropdown.classList.add('d-none');
+        } else if (value != 0 && zoneDropdown.classList.contains('d-none')) {
+            zoneDropdown.classList.remove('d-none');
+        }
+    }
+};

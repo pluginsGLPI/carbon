@@ -30,24 +30,30 @@
  * -------------------------------------------------------------------------
  */
 
-use Glpi\Exception\Http\NotFoundHttpException;
-use GlpiPlugin\Carbon\NetworkEquipmentType;
-use NetworkEquipmentType as GlpiNetworkEquipmentType;
+use GlpiPlugin\Carbon\Location;
+use GlpiPlugin\Carbon\Source;
 
-include(__DIR__ . '/../../../inc/includes.php');
+/** @var DBmysql $DB */
+/** @var Migration $migration */
 
-if (!Plugin::isPluginActive('carbon')) {
-    throw new NotFoundHttpException();
-}
+$table = (new DbUtils())->getTableForItemType(Source::class);
+$migration->addField(
+    $table,
+    'is_carbon_intensity_source',
+    'bool',
+    [
+        'after'     => 'is_fallback',
+        'update'    => 1,
+        'condition' => "WHERE `name` IN ('RTE', 'ElectricityMap', 'Ember - Energy Institute', 'Hydro Quebec')"
+    ]
+);
 
-Session::checkRight(GlpiNetworkEquipmentType::$rightname, UPDATE);
-
-$item = new NetworkEquipmentType();
-
-if (isset($_POST['update'])) {
-    Session::checkRight(GlpiNetworkEquipmentType::$rightname, UPDATE);
-    $item->update($_POST);
-    Html::back();
-}
-
-Html::back();
+$table = (new DbUtils())->getTableForItemType(Location::class);
+$migration->addField(
+    $table,
+    'plugin_carbon_sources_zones_id',
+    'fkey',
+    [
+        'after'     => 'boavizta_zone'
+    ]
+);

@@ -146,6 +146,10 @@ class CommonTestCase extends TestCase
 
     /**
      * @deprecated use createItem instead
+     *
+     * @param class-string<T> $itemtype itemtype to create
+     * @param array $input
+     * @return T
      */
     protected function getItem(string $itemtype, array $input = []): CommonDBTM
     {
@@ -155,9 +159,10 @@ class CommonTestCase extends TestCase
     /**
      * Create an item of the given itemtype
      *
-     * @param string $itemtype itemtype to create
+     * @template T of CommonDBTM
+     * @param class-string<T> $itemtype itemtype to create
      * @param array $input
-     * @return CommonDBTM
+     * @return T
      */
     protected function createItem(string $itemtype, array $input = []): CommonDBTM
     {

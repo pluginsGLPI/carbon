@@ -365,4 +365,23 @@ class Zone extends CommonDropdown
 
         throw new LogicException('Not implemented yet');
     }
+
+    public static function getRestrictBySourceCondition(int $source_id)
+    {
+        $source_zone_table = Source_Zone::getTable();
+        $zone_table = Zone::getTable();
+        return [
+            'LEFT JOIN' => [
+                $source_zone_table => [
+                    'FKEY' => [
+                        $source_zone_table => 'plugin_carbon_zones_id',
+                        $zone_table => 'id',
+                    ]
+                ]
+            ],
+            'WHERE' => [
+                Source_Zone::getTableField('plugin_carbon_sources_id') => $source_id,
+            ]
+        ];
+    }
 }

@@ -29,45 +29,69 @@
  # -------------------------------------------------------------------------
  #}
 
+{% extends "generic_show_form.html.twig" %}
+
 {% import 'components/form/fields_macros.html.twig' as fields %}
 {% import '@carbon/components/form/fields_macros.html.twig' as carbonFields %}
 
-<div class="hr-text">
-    <i class="ti ti-list"></i>
-    <span>{{ __('Boavizta', 'carbon') }}</span>
-</div>
+{% block form_fields %}
+    <div class="hr-text">
+        <i class="ti ti-list"></i>
+        <span>{{ __('Boavizta', 'carbon') }}</span>
+    </div>
 
-{{ carbonFields.dropdownBoaviztaZone('_boavizta_zone',
-    item.fields['boavizta_zone'] ?? '',
-    __('Boavizta zone', 'carbon'),
-    {
-        'display_emptychoice': true,
-    })
-}}
+    {{ carbonFields.dropdownBoaviztaZone('boavizta_zone',
+        item.fields['boavizta_zone'] ?? '',
+        __('Boavizta zone', 'carbon'),
+        {
+            'display_emptychoice': true,
+        })
+    }}
 
-<div class="hr-text">
-    <i class="ti ti-list"></i>
-    <span>{{ __('Carbon intensity', 'carbon') }}</span>
-</div>
+    <div class="hr-text">
+        <i class="ti ti-list"></i>
+        <span>{{ __('Carbon intensity', 'carbon') }}</span>
+    </div>
 
-{{ fields.dropdownField('GlpiPlugin\\Carbon\\Source',
-    'plugin_carbon_sources_id',
-    item.fields['plugin_carbon_sources_id'] ?? '',
-    __('Source', 'carbon'),
-    {
-        display_emptychoice: true,
-        multiple: false,
-        disabled: false,
-        condition: {
-            is_fallback: 0
-        }
-    })
-}}
+    {% set plugin_carbon_zones_rand = random() %}
+    {{ fields.dropdownField('GlpiPlugin\\Carbon\\Source',
+        'plugin_carbon_sources_id',
+        source_id,
+        __('Source', 'carbon'),
+        {
+            display_emptychoice: true,
+            multiple: false,
+            disabled: false,
+            condition: {
+                is_fallback: 0,
+                is_carbon_intensity_source: 1
+            },
+        })
+    }}
 
-{# {{ fields.dropdownField('plugin_carbon_zones_id',
-    item.fields['boavizta_zone'] ?? '',
-    __('Carbon intensity source', 'carbon'),
-    {
-        'display_emptychoice': true,
-    })
-}} #}
+    <script type="text/javascript">
+        $(function() {
+            $('select[name="plugin_carbon_sources_id"]').on("change", function () {
+                var zone_dom_id = $('select[name="plugin_carbon_zones_id"]').prop('id').replace(/\D+/g,'');
+                $('select[name="plugin_carbon_zones_id"]').closest('.btn-group').load(
+                    '{{ config('root_doc') }}/plugins/carbon/ajax/dropdownZone.php', {
+                        plugin_carbon_sources_id: document.querySelector('select[name="plugin_carbon_sources_id"]').value,
+                        dom_id: zone_dom_id
+                    }
+                );
+            })
+        })
+    </script>
+
+    {{ fields.dropdownField('GlpiPlugin\\Carbon\\Zone',
+        'plugin_carbon_zones_id',
+        zone_id,
+        __('Carbon intensity zone', 'carbon'),
+        {
+            rand: plugin_carbon_zones_rand,
+            display_emptychoice: true,
+            condition: zone_condition,
+            disabled: (source_id == 0)
+        })
+    }}
+{% endblock %}

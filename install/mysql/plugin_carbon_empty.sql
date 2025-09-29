@@ -73,9 +73,10 @@ CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_zones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_sources` (
-  `id`               int unsigned NOT NULL AUTO_INCREMENT,
-  `name`             varchar(255) DEFAULT NULL,
-  `is_fallback`      tinyint      NOT NULL DEFAULT '0' COMMENT 'Fallback source for carbon intensity',
+  `id`                         int unsigned NOT NULL AUTO_INCREMENT,
+  `name`                       varchar(255) DEFAULT NULL,
+  `is_fallback`                tinyint      NOT NULL DEFAULT '0' COMMENT 'Fallback source for carbon intensity',
+  `is_carbon_intensity_source` tinyint      NOT NULL DEFAULT '0' COMMENT 'provides carbon intensity',
   PRIMARY KEY (`id`),
   UNIQUE KEY `unicity` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -156,9 +157,10 @@ CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_networkequipmenttypes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_locations` (
-  `id`                       int unsigned NOT NULL AUTO_INCREMENT,
-  `locations_id`             int unsigned NOT NULL DEFAULT '0',
-  `boavizta_zone`            varchar(255) DEFAULT NULL,
+  `id`                             int unsigned NOT NULL AUTO_INCREMENT,
+  `locations_id`                   int unsigned NOT NULL DEFAULT '0',
+  `boavizta_zone`                  varchar(255) DEFAULT NULL,
+  `plugin_carbon_sources_zones_id` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `unicity` (`locations_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
