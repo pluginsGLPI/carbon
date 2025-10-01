@@ -147,11 +147,11 @@ class ProviderTest extends DbTestCase
                 ],
             ]
         ];
-        $computers = $this->getItems($computers_definition);
+        $computers = $this->createItems($computers_definition);
         $total_count += count($computers[Computer::class]);
 
         // computers with a usage profile; 3 of them are complete
-        $computers = $this->getItems($computers_definition);
+        $computers = $this->createItems($computers_definition);
         $total_count += count($computers[Computer::class]);
         foreach ($computers[Computer::class] as $computers_id => $computer) {
             $impact = $this->createItem(UsageInfo::class, [
@@ -239,7 +239,7 @@ class ProviderTest extends DbTestCase
                 ]
             ];
 
-            $items = $this->getItems($rows);
+            $items = $this->createItems($rows);
         }
 
         $output = Provider::getSumUsageEmissionsPerModel();
