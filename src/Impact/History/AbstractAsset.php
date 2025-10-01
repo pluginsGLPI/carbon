@@ -38,15 +38,12 @@ use DateInterval;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
-use DateTimeZone;
 use DBmysql;
-use DbUtils;
 use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Toolbox;
-use Location as GlpiLocation;
 use LogicException;
 use Session;
 use Toolbox as GlpiToolbox;
@@ -190,7 +187,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
          */
         $memory_limit = GlpiToolbox::getMemoryLimit() - 8 * 1024 * 1024;
         if ($memory_limit < 0) {
-            // May happen in test seems that ini_get("memory_limits") returns
+            // May happen in test; seems that ini_get("memory_limits") returns
             // enpty string in PHPUnit environment
             $memory_limit = null;
         }
