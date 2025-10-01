@@ -38,7 +38,7 @@ use CommonGLPI;
 use DateTime;
 use DBmysql;
 use DbUtils;
-use Location;
+use Location as GlpiLocation;
 use LogicException;
 use Session;
 
@@ -180,28 +180,28 @@ class Zone extends CommonDropdown
         }
 
         // TODO: support translations
-        $location_table = Location::getTable();
+        $glpi_location_table = GlpiLocation::getTable();
         $zone_table = Zone::getTable();
         $request = [
             'SELECT' => Zone::getTableField('id'),
             'FROM'   => $zone_table,
             'INNER JOIN' => [
-                $location_table => [
+                $glpi_location_table => [
                     'FKEY' => [
-                        $location_table => 'state',
+                        $glpi_location_table => 'state',
                         $zone_table => 'name',
                     ],
                 ],
             ],
             'WHERE'  => [
-                Location::getTableField('id') => $item->getID(),
+                GlpiLocation::getTableField('id') => $item->getID(),
             ]
         ];
         $iterator = $DB->request($request);
 
         if ($iterator->count() !== 1) {
             // no state found, fallback to country
-            $request['INNER JOIN'][$location_table]['FKEY'][$location_table] = 'country';
+            $request['INNER JOIN'][$glpi_location_table]['FKEY'][$glpi_location_table] = 'country';
             $iterator = $DB->request($request);
             if ($iterator->count() !== 1) {
                 // Give up
@@ -229,7 +229,7 @@ class Zone extends CommonDropdown
         /** @var DBmysql $DB */
         global $DB;
 
-        if (!isset($item->fields[Location::getForeignKeyField()])) {
+        if (!isset($item->fields[GlpiLocation::getForeignKeyField()])) {
             return null;
         }
 
@@ -238,24 +238,24 @@ class Zone extends CommonDropdown
         }
 
         // TODO: support translations
-        $location_table = Location::getTable();
+        $glpi_location_table = GlpiLocation::getTable();
         $zone_table = Zone::getTable();
         $item_table = $item::getTable();
-        $state_field = Location::getTableField('state');
+        $state_field = GlpiLocation::getTableField('state');
         $request = [
             'SELECT' => Zone::getTableField('id'),
             'FROM'   => $zone_table,
             'INNER JOIN' => [
-                $location_table => [
+                $glpi_location_table => [
                     'FKEY' => [
-                        $location_table => 'state',
+                        $glpi_location_table => 'state',
                         $zone_table => 'name',
                     ],
                 ],
                 $item_table => [
                     'FKEY' => [
                         $item_table => 'locations_id',
-                        $location_table => 'id',
+                        $glpi_location_table => 'id',
                     ],
                 ],
             ],
@@ -268,9 +268,9 @@ class Zone extends CommonDropdown
 
         if ($iterator->count() !== 1) {
             // no state found, fallback to country
-            $request['INNER JOIN'][$location_table]['FKEY'][$location_table] = 'country';
+            $request['INNER JOIN'][$glpi_location_table]['FKEY'][$glpi_location_table] = 'country';
             unset($request['WHERE'][$state_field]);
-            $request['WHERE'][Location::getTableField('country')] = ['<>', ''];
+            $request['WHERE'][GlpiLocation::getTableField('country')] = ['<>', ''];
             $iterator = $DB->request($request);
             if ($iterator->count() !== 1) {
                 // Give up
@@ -327,21 +327,21 @@ class Zone extends CommonDropdown
         // TODO: use date to find where was the asset at the given date
         if ($date === null) {
             $item_table = $item->getTable();
-            $location_table = Location::getTable();
+            $glpi_location_table = GlpiLocation::getTable();
             $zone_table = Zone::getTable();
 
             $request = [
                 'INNER JOIN' => [
-                    $location_table => [
+                    $glpi_location_table => [
                         'FKEY' => [
                             $zone_table => 'name',
-                            $location_table => 'state',
+                            $glpi_location_table => 'state',
                         ],
                     ],
                     $item_table => [
                         'FKEY' => [
-                            $item_table => Location::getForeignKeyField(),
-                            $location_table => 'id',
+                            $item_table => GlpiLocation::getForeignKeyField(),
+                            $glpi_location_table => 'id',
                         ],
                     ]
                 ],
@@ -359,7 +359,7 @@ class Zone extends CommonDropdown
             }
 
             // no state found, fallback to country
-            $request['INNER JOIN'][$location_table]['FKEY'][$location_table] = 'country';
+            $request['INNER JOIN'][$glpi_location_table]['FKEY'][$glpi_location_table] = 'country';
             return $this->getFromDBByRequest($request);
         }
 
