@@ -57,7 +57,7 @@ class InventoryTest extends DbTestCase
         $this->login('glpi', 'glpi');
         $entities_id = $this->isolateInEntity('glpi', 'glpi');
 
-        $computers = $this->getItems([
+        $computers = $this->createItems([
             Computer::class => [
                 [],
                 [],

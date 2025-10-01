@@ -206,12 +206,12 @@ class MonitorTest extends CommonAsset
     {
         $self = new self();
         if ($computer === null) {
-            $computer = $self->getItem(GlpiComputer::class);
+            $computer = $self->createItem(GlpiComputer::class);
         }
 
-        $item = $self->getItem(GlpiMonitor::class);
+        $item = $self->createItem(GlpiMonitor::class);
 
-        $computer_item = $self->getItem(Computer_Item::class, [
+        $computer_item = $self->createItem(Computer_Item::class, [
             'computers_id' => $computer->getID(),
             'itemtype' => $item->getType(),
             'items_id' => $item->getID(),
@@ -223,7 +223,7 @@ class MonitorTest extends CommonAsset
     private static function addManagementToMonitor(CommonDBTM $item)
     {
         $self = new self();
-        $management = $self->getItem(Infocom::class, [
+        $management = $self->createItem(Infocom::class, [
             'itemtype' => $item->getType(),
             'items_id' => $item->getID(),
         ]);
