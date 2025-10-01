@@ -200,6 +200,11 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
             $date_cursor = DateTime::createFromFormat('Y-m-d H:i:s', $gap['start'])->setTime(0, 0, 0, 0);
             $end_date    = DateTime::createFromFormat('Y-m-d H:i:s', $gap['end'])->setTime(0, 0, 0, 0);
             while ($date_cursor < $end_date) {
+                if ($memory_limit && $memory_limit < memory_get_usage()) {
+                    // 8 MB memory left, emergency exit
+                    $this->limit_reached = true;
+                    break 2;
+                }
                 $success = $this->evaluateItemPerDay($item, $engine, $date_cursor);
                 if ($success) {
                     $count++;
@@ -207,11 +212,6 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
                         $this->limit_reached = true;
                         break 2;
                     }
-                }
-                if ($memory_limit && $memory_limit < memory_get_usage()) {
-                    // 8 MB memory left, emergency exit
-                    $this->limit_reached = true;
-                    break 2;
                 }
                 $date_cursor = $date_cursor->add(new DateInterval(static::$date_increment));
             }
