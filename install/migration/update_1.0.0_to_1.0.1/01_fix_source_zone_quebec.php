@@ -35,7 +35,7 @@ use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
 use GlpiPlugin\Carbon\Zone;
 
-/** @var DBmysql */
+/** @var DBmysql $DB */
 global $DB;
 
 $db_utils = new DbUtils();

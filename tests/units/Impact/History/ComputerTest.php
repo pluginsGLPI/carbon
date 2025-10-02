@@ -145,11 +145,11 @@ class ComputerTest extends CommonAsset
             [
                 'date'             => '2024-02-01 00:00:00',
                 'energy_per_day'   => 0.495,
-                'emission_per_day' => 234.138,
+                'emission_per_day' => 17.0775,
             ],[
                 'date' => '2024-02-02 00:00:00',
                 'energy_per_day'   => 0.495,
-                'emission_per_day' => 234.138,
+                'emission_per_day' => 17.0775,
             ], [
                 'date' => '2024-02-03 00:00:00',
                 'energy_per_day'   => 0,
@@ -161,15 +161,15 @@ class ComputerTest extends CommonAsset
             ], [
                 'date' => '2024-02-05 00:00:00',
                 'energy_per_day'   => 0.495,
-                'emission_per_day' => 234.138,
+                'emission_per_day' => 17.0775,
             ], [
                 'date' => '2024-02-06 00:00:00',
                 'energy_per_day'   => 0.495,
-                'emission_per_day' => 234.138,
+                'emission_per_day' => 17.0775,
             ], [
                 'date' => '2024-02-07 00:00:00',
                 'energy_per_day'   => 0.495,
-                'emission_per_day' => 234.138,
+                'emission_per_day' => 17.0775,
             ],
         ];
         foreach ($emissions as $emission) {

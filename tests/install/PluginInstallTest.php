@@ -773,17 +773,21 @@ class PluginInstallTest extends CommonTestCase
             'INNER JOIN' => [
                 $source_table => [
                     'FKEY' => [
-                        $source_zone_table => 'plugin_carbon_carbonintensity_sources_id',
+                        $source_zone_table => 'plugin_carbon_carbonintensitysources_id',
                         $source_table => 'id'
                     ]
                 ],
-                $zone_table = [
+                $zone_table => [
                     'FKEY' => [
                         $source_zone_table => 'plugin_carbon_zones_id',
                         $zone_table => 'id'
                     ]
                 ]
-            ]
+            ],
+            'WHERE' => [
+                $source_table . '.name' => 'Hydro Quebec',
+                $zone_table . '.name'   => 'Quebec',
+            ],
         ]);
         $this->assertEquals(1, $iterator->count());
     }
