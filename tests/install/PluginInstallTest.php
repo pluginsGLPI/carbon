@@ -35,6 +35,7 @@ namespace GlpiPlugin\Carbon\Tests;
 use Session;
 use Config;
 use CronTask as GLPICronTask;
+use DBmysql;
 use DbUtils;
 use Glpi\Dashboard\Dashboard;
 use DisplayPreference;
@@ -135,6 +136,7 @@ class PluginInstallTest extends CommonTestCase
         $this->checkDisplayPrefs();
         $this->checkPredefinedUsageProfiles();
         $this->checkBuitFiles();
+        $this->checkSourceZoneRelation();
     }
 
     public function testConfigurationExists()
@@ -755,4 +757,34 @@ class PluginInstallTest extends CommonTestCase
         'Montenegro',
         'South Sudan'
     ];
+
+    public function checkSourceZoneRelation()
+    {
+        /** @var DBmysql */
+        global $DB;
+
+        $source_table = CarbonIntensitySource::getTable();
+        $zone_table = Zone::getTable();
+        $source_zone_table = CarbonIntensitySource_Zone::getTable();
+
+        $iterator = $DB->request([
+            'SELECT' => $source_zone_table . '.id',
+            'FROM' => $source_zone_table,
+            'INNER JOIN' => [
+                $source_table => [
+                    'FKEY' => [
+                        $source_zone_table => 'plugin_carbon_carbonintensity_sources_id',
+                        $source_table => 'id'
+                    ]
+                ],
+                $zone_table = [
+                    'FKEY' => [
+                        $source_zone_table => 'plugin_carbon_zones_id',
+                        $zone_table => 'id'
+                    ]
+                ]
+            ]
+        ]);
+        $this->assertEquals(1, $iterator->count());
+    }
 }
