@@ -40,7 +40,7 @@ use GlpiPlugin\Carbon\Zone;
 /** @var DBmysql $DB */
 global $DB;
 
-// This file ys executed at the end of an upgrade.
+// This file is executed at the end of an upgrade.
 // Upgrade to 1.2.0 changed the tables modified by this code
 // then we need to reset DB columns cache
 $DB->listFields(getTableForItemType(Source::class), false);
@@ -55,7 +55,7 @@ $source_id = Install::getOrCreateSource('ElectricityMap', 0);
 $dbUtil = new DbUtils();
 $table = $dbUtil->getTableForItemType(GlpiPlugin\Carbon\CarbonIntensity::class);
 
-// Expected columns are Entity;Code; Year; Carbon intensity of electricity - gCO2/kWh
+// Expected columns are Entity; Code; Year; Carbon intensity of electricity - gCO2/kWh
 $data_source = dirname(__DIR__) . '/data/carbon_intensity/carbon-intensity-electricity.csv';
 
 // Create data source in DB
@@ -99,7 +99,7 @@ while (($line = $file->fgetcsv(',', '"', '\\')) !== false) {
     }
 
     $zone_id = Install::getOrCreateZone($entity, $source_id);
-    Install::linkSourceZone($source_id, $zone_id);
+    Install::linkSourceZone($source_id, $zone_id, $code);
 
     // Insert into the database
     $success = $DB->updateOrInsert($table, [
@@ -108,7 +108,7 @@ while (($line = $file->fgetcsv(',', '"', '\\')) !== false) {
     ], [
         'date' => "$year-01-01 00:00:00",
         'plugin_carbon_sources_id' => $source_id,
-        'plugin_carbon_zones_id' => $zone_id
+        'plugin_carbon_zones_id'   => $zone_id,
     ]);
 
     if ($success === false) {

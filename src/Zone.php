@@ -165,53 +165,20 @@ class Zone extends CommonDropdown
      *
      * @param CommonDBTM $item
      * @return Zone|null
+     * @todo : de-staticify the method
      */
     public static function getByLocation(CommonDBTM $item): ?Zone
     {
-        /** @var DBmysql $DB */
-        global $DB;
-
         if ($item->isNewItem()) {
             return null;
         }
 
-        if (($item->fields['country'] ?? '') == '' && ($item->fields['state'] ?? '') == '') {
-            return null;
-        }
-
-        // TODO: support translations
-        $glpi_location_table = GlpiLocation::getTable();
-        $zone_table = Zone::getTable();
-        $request = [
-            'SELECT' => Zone::getTableField('id'),
-            'FROM'   => $zone_table,
-            'INNER JOIN' => [
-                $glpi_location_table => [
-                    'FKEY' => [
-                        $glpi_location_table => 'state',
-                        $zone_table => 'name',
-                    ],
-                ],
-            ],
-            'WHERE'  => [
-                GlpiLocation::getTableField('id') => $item->getID(),
-            ]
+        $request = self::getByLocationRequest();
+        $request['WHERE'] = [
+            Location::getTableField('locations_id') => $item->getID(),
         ];
-        $iterator = $DB->request($request);
-
-        if ($iterator->count() !== 1) {
-            // no state found, fallback to country
-            $request['INNER JOIN'][$glpi_location_table]['FKEY'][$glpi_location_table] = 'country';
-            $iterator = $DB->request($request);
-            if ($iterator->count() !== 1) {
-                // Give up
-                return null;
-            }
-        }
-
-        $zone_id = $iterator->current()['id'];
-        $zone = Zone::getById($zone_id);
-        if ($zone === false) {
+        $zone = new self();
+        if (!$zone->getFromDBByRequest($request)) {
             return null;
         }
 
@@ -219,16 +186,64 @@ class Zone extends CommonDropdown
     }
 
     /**
+     * Get the request fragment to find a zone by location
+     *
+     * @return array Request fragment
+     */
+    private static function getByLocationRequest(): array
+    {
+        $location_table = Location::getTable();
+        $source_zone_table = Source_Zone::getTable();
+        $zone_table = Zone::getTable();
+        return [
+            'INNER JOIN' => [
+                $source_zone_table => [
+                    'FKEY' => [
+                        $zone_table => 'id',
+                        $source_zone_table => 'plugin_carbon_zones_id',
+                    ]
+                ],
+                $location_table => [
+                    'FKEY' => [
+                        $location_table => 'plugin_carbon_sources_zones_id',
+                        $source_zone_table => 'id'
+                    ]
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Get the request fragment to find a zone by asset
+     *
+     * @param class-string $itemtype asset type
+     * @return array Request fragment
+     */
+    private static function getByAssetRequest(string $itemtype): array
+    {
+        $glpi_location_table = GlpiLocation::getTable();
+        $location_table = Location::getTable();
+        $itemtype_table = (new DbUtils())->getTableForItemType($itemtype);
+        $request = self::getByLocationRequest();
+        $request['INNER JOIN'][$itemtype_table] = [
+            'FKEY' => [
+                $itemtype_table => 'locations_id',
+                $location_table => 'locations_id',
+            ]
+        ];
+
+        return $request;
+    }
+
+    /**
      * Get a zone by an asset criteria
      *
      * @param CommonDBTM $item
      * @return Zone|null
+     * @todo : de-staticify the method
      */
     public static function getByAsset(CommonDBTM $item): ?Zone
     {
-        /** @var DBmysql $DB */
-        global $DB;
-
         if (!isset($item->fields[GlpiLocation::getForeignKeyField()])) {
             return null;
         }
@@ -237,50 +252,13 @@ class Zone extends CommonDropdown
             return null;
         }
 
-        // TODO: support translations
-        $glpi_location_table = GlpiLocation::getTable();
-        $zone_table = Zone::getTable();
-        $item_table = $item::getTable();
-        $state_field = GlpiLocation::getTableField('state');
-        $request = [
-            'SELECT' => Zone::getTableField('id'),
-            'FROM'   => $zone_table,
-            'INNER JOIN' => [
-                $glpi_location_table => [
-                    'FKEY' => [
-                        $glpi_location_table => 'state',
-                        $zone_table => 'name',
-                    ],
-                ],
-                $item_table => [
-                    'FKEY' => [
-                        $item_table => 'locations_id',
-                        $glpi_location_table => 'id',
-                    ],
-                ],
-            ],
-            'WHERE'  => [
-                $state_field => ['<>', ''],
-                $item::getTableField('id') => $item->getID(),
-            ]
+        $request = self::getByAssetRequest($item->getType());
+        $request['WHERE'] = [
+            $item::getTableField('id') => $item->getID(),
         ];
-        $iterator = $DB->request($request);
 
-        if ($iterator->count() !== 1) {
-            // no state found, fallback to country
-            $request['INNER JOIN'][$glpi_location_table]['FKEY'][$glpi_location_table] = 'country';
-            unset($request['WHERE'][$state_field]);
-            $request['WHERE'][GlpiLocation::getTableField('country')] = ['<>', ''];
-            $iterator = $DB->request($request);
-            if ($iterator->count() !== 1) {
-                // Give up
-                return null;
-            }
-        }
-
-        $zone_id = $iterator->current()['id'];
-        $zone = Zone::getById($zone_id);
-        if ($zone === false) {
+        $zone = new self();
+        if (!$zone->getFromDBByRequest($request)) {
             return null;
         }
 
@@ -316,7 +294,7 @@ class Zone extends CommonDropdown
      * @param CommonDBTM $item
      * @param null|DateTime $date Date for which the zone must be found
      * @param bool $use_country Do not search by state first
-     * @return bool
+     * @return bool true if found in DB, false otherwise
      */
     public function getByItem(CommonDBTM $item, ?DateTime $date = null, bool $use_country = false): bool
     {
@@ -366,7 +344,13 @@ class Zone extends CommonDropdown
         throw new LogicException('Not implemented yet');
     }
 
-    public static function getRestrictBySourceCondition(int $source_id)
+    /**
+     * Undocumented function
+     *
+     * @param integer $source_id
+     * @return array a request fragment
+     */
+    public static function getRestrictBySourceCondition(int $source_id): array
     {
         $source_zone_table = Source_Zone::getTable();
         $zone_table = Zone::getTable();

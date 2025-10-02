@@ -154,9 +154,6 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      */
     public function evaluateItem(int $id, ?DateTime $start_date = null, ?DateTime $end_date = null): int
     {
-        /** @var DBmysql $DB */
-        global $DB;
-
         $itemtype = static::$itemtype;
         $item = $itemtype::getById($id);
         if ($item === false) {
@@ -185,11 +182,9 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
          * We NEED to check memory usage to avoid running out of memory
          * @see DbMysql::doQuery()
          */
-        $memory_limit = GlpiToolbox::getMemoryLimit() - 8 * 1024 * 1024;
-        if ($memory_limit < 0) {
-            // May happen in test; seems that ini_get("memory_limits") returns
-            // enpty string in PHPUnit environment
-            $memory_limit = null;
+        $memory_limit = GlpiToolbox::getMemoryLimit();
+        if ($memory_limit) {
+            $memory_limit -=  8 * 1024 * 1024;
         }
         foreach ($gaps as $gap) {
             // $date_cursor = DateTime::createFromFormat('U', $gap['start']);
@@ -231,9 +226,8 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     protected function evaluateItemPerDay(CommonDBTM $item, EngineInterface $engine, DateTimeInterface $day): bool
     {
         $energy = $engine->getEnergyPerDay($day);
-        $zone = new Zone();
-        $zone->getByItem($item /* ,$date_cursor */);
-        if ($zone->isNewItem()) {
+        $zone = Zone::getByAsset($item);
+        if ($zone === null) {
             return false;
         }
 
