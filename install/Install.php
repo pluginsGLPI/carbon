@@ -294,11 +294,12 @@ class Install
     /**
      * Link a carbon intensity source to a zone
      *
-     * @param int $source_id ID of the carbon intensity source
-     * @param int $zone_id ID of the zone
-     * @return int ID of the link
+     * @param int    $source_id ID of the carbon intensity source
+     * @param int    $zone_id ID of the zone
+     * @param string $code Identifier of the zone used by the source
+     * @return int   ID of the link
      */
-    public static function linkSourceZone(int $source_id, int $zone_id): int
+    public static function linkSourceZone(int $source_id, int $zone_id, string $code = ''): int
     {
         $source_zone = new Source_Zone();
         $source_zone->getFromDBByCrit([
@@ -309,7 +310,15 @@ class Install
             $source_zone->add([
                 'plugin_carbon_sources_id' => $source_id,
                 'plugin_carbon_zones_id'   => $zone_id,
+                'code'                     => $code
             ]);
+        } else {
+            if ($source_zone->fields['code'] !== $code) {
+                $source_zone->update([
+                    'id'   => $source_zone->getID(),
+                    'code' => $code,
+                ]);
+            }
         }
 
         return $source_zone->getID();

@@ -32,12 +32,10 @@
 
 namespace GlpiPlugin\Carbon\Impact\History\Tests;
 
-use CommonDBTM;
 use Computer as GlpiComputer;
-use DateInterval;
 use GlpiPlugin\Carbon\Impact\History\Computer;
 use GlpiPlugin\Carbon\Tests\Impact\History\CommonAsset;
-use Location;
+use Location as GlpiLocation;
 use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
 use DateTime;
@@ -45,6 +43,9 @@ use Infocom;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
+use GlpiPlugin\Carbon\Location;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\Zone;
 
@@ -85,8 +86,25 @@ class ComputerTest extends CommonAsset
         $entities_id = $this->isolateInEntity('glpi', 'glpi');
 
         $model_power = 55;
-        $location = $this->createItem(Location::class, [
+        $glpi_location = $this->createItem(GlpiLocation::class, [
             'state' => 'Quebec',
+        ]);
+        $source = new Source(); // This source exists after a fresh install
+        $source->getFromDBByCrit([
+            'name' => 'Hydro Quebec'
+        ]);
+        $zone = new Zone(); // This zone  exists after a fresh install
+        $zone->getFromDBByCrit([
+            'name' => 'Quebec'
+        ]);
+        $source_zone = new Source_Zone(); // the relation source / zone also exists after a fresh install
+        $source_zone->getFromDBByCrit([
+            $source::getForeignKeyField() => $source->getID(),
+            $zone::getForeignKeyField() => $zone->getID()
+        ]);
+        $location = $this->createItem(Location::class, [
+            'locations_id' => $glpi_location->getID(),
+            'plugin_carbon_sources_zones_id' => $source_zone->getID()
         ]);
         $model = $this->createItem(GlpiComputerModel::class, ['power_consumption' => $model_power]);
         $glpi_type = $this->createItem(GlpiComputerType::class);
@@ -96,7 +114,7 @@ class ComputerTest extends CommonAsset
         $asset = $this->createItem(GlpiComputer::class, [
             'computertypes_id'  => $glpi_type->getID(),
             'computermodels_id' => $model->getID(),
-            'locations_id'      => $location->getID(),
+            'locations_id'      => $glpi_location->getID(),
             'date_creation'     => '2024-01-01',
             'date_mod'          => null,
         ]);
@@ -203,16 +221,16 @@ class ComputerTest extends CommonAsset
         $this->assertFalse($history->canHistorize($id));
 
         // Add an empty location
-        $location = $this->createItem(Location::class);
+        $glpi_location = $this->createItem(GlpiLocation::class);
         $computer->update([
             'id' => $id,
-            'locations_id' => $location->getID(),
+            'locations_id' => $glpi_location->getID(),
         ]);
         $this->assertFalse($history->canHistorize($id));
 
         // Add a country to the location
-        $location->update([
-            'id' => $location->getID(),
+        $glpi_location->update([
+            'id' => $glpi_location->getID(),
             'country' => 'France',
         ]);
         $this->assertFalse($history->canHistorize($id));
@@ -400,9 +418,9 @@ class ComputerTest extends CommonAsset
     {
         $history = new Computer();
 
-        $location = $this->createItem(Location::class);
+        $glpi_location = $this->createItem(GlpiLocation::class);
         $computer = $this->createItem(GlpiComputer::class, [
-            'locations_id' => $location->getID(),
+            'locations_id' => $glpi_location->getID(),
         ]);
         $expected = [
             'is_deleted'                  => true,
@@ -429,11 +447,11 @@ class ComputerTest extends CommonAsset
     {
         $history = new Computer();
 
-        $location = $this->createItem(Location::class, [
+        $glpi_location = $this->createItem(GlpiLocation::class, [
             'country' => 'France'
         ]);
         $computer = $this->createItem(GlpiComputer::class, [
-            'locations_id' => $location->getID(),
+            'locations_id' => $glpi_location->getID(),
         ]);
         $expected = [
             'is_deleted'                  => true,
@@ -460,11 +478,11 @@ class ComputerTest extends CommonAsset
     {
         $history = new Computer();
 
-        $location = $this->createItem(Location::class, [
+        $glpi_location = $this->createItem(GlpiLocation::class, [
             'state' => 'Quebec'
         ]);
         $computer = $this->createItem(GlpiComputer::class, [
-            'locations_id' => $location->getID(),
+            'locations_id' => $glpi_location->getID(),
         ]);
         $expected = [
             'is_deleted'                  => true,
@@ -678,7 +696,7 @@ class ComputerTest extends CommonAsset
     {
         $history = new Computer();
 
-        $location = $this->createItem(Location::class, [
+        $glpi_location = $this->createItem(GlpiLocation::class, [
             'country' => 'France'
         ]);
         $glpi_computer_type = $this->createItem(GlpiComputerType::class);
@@ -687,7 +705,7 @@ class ComputerTest extends CommonAsset
             'computertypes_id' => $glpi_computer_type->getID(),
         ]);
         $computer = $this->createItem(GlpiComputer::class, [
-            'locations_id' => $location->getID(),
+            'locations_id' => $glpi_location->getID(),
             'computertypes_id' => $glpi_computer_type->getID(),
         ]);
         $management = $this->createItem(Infocom::class, [

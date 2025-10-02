@@ -297,11 +297,8 @@ class LocationTest extends DbTestCase
         $this->assertFalse($result);
 
         // Test when the zone matches a source and download switches to enabled
-        $source = $this->createItem(Source::class, [
-            'name' => 'baz',
-        ]);
+        $source = $this->createItem(Source::class);
         $zone = $this->createItem(Zone::class, [
-            'name' => 'baz',
             'plugin_carbon_sources_id_historical' => $source->getID(),
         ]);
         $source_zone = $this->createItem(Source_Zone::class, [
@@ -309,8 +306,10 @@ class LocationTest extends DbTestCase
             $source::getForeignKeyField() => $source->getID(),
             'is_download_enabled' => 0,
         ]);
-        $glpi_location = $this->createItem(GlpiLocation::class, [
-            'country' => 'baz'
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $location = $this->createItem(Location::class, [
+            $glpi_location::getForeignKeyField() => $glpi_location->getID(),
+            $source_zone::getForeignKeyField() => $source_zone->getID(),
         ]);
         $result = $this->callPrivateMethod($instance, 'enableCarbonIntensityDownload', $glpi_location);
         $this->assertTrue($result);

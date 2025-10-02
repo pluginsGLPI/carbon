@@ -272,7 +272,7 @@ abstract class AbstractAsset implements EngineInterface
 
         // No result, try to find a zone by country
         $zone = new Zone();
-        $zone->getByItem($this->item, null, true);
+        $zone->getByAsset($this->item);
         $result = $DB->request($request);
         if ($result->count() === 1) {
             return $result->current();
