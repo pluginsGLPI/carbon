@@ -36,11 +36,15 @@ use DateTime;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\Tests\Impact\History\CommonAsset;
 use GlpiPlugin\Carbon\Impact\History\NetworkEquipment;
+use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
+use GlpiPlugin\Carbon\Zone;
 use Infocom;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
 use NetworkEquipment as GlpiNetworkEquipment;
-use Location;
+use Location as GlpiLocation;
 use NetworkEquipmentModel as GlpiNetworkEquipmentModel;
 
 /**
@@ -80,8 +84,25 @@ class NetworkEquipmentTest extends CommonAsset
         $entities_id = $this->isolateInEntity('glpi', 'glpi');
 
         $model_power = 100;
-        $location = $this->createItem(Location::class, [
+        $glpi_location = $this->createItem(GlpiLocation::class, [
             'state' => 'Quebec',
+        ]);
+        $source = new Source(); // This source exists after a fresh install
+        $source->getFromDBByCrit([
+            'name' => 'Hydro Quebec'
+        ]);
+        $zone = new Zone(); // This zone  exists after a fresh install
+        $zone->getFromDBByCrit([
+            'name' => 'Quebec'
+        ]);
+        $source_zone = new Source_Zone(); // the relation source / zone also exists after a fresh install
+        $source_zone->getFromDBByCrit([
+            $source::getForeignKeyField() => $source->getID(),
+            $zone::getForeignKeyField() => $zone->getID()
+        ]);
+        $location = $this->createItem(Location::class, [
+            'locations_id' => $glpi_location->getID(),
+            'plugin_carbon_sources_zones_id' => $source_zone->getID()
         ]);
         $model = $this->createItem(GlpiNetworkEquipmentModel::class, ['power_consumption' => $model_power]);
         $glpi_type = $this->createItem(GlpiNetworkEquipmentType::class);
@@ -91,7 +112,7 @@ class NetworkEquipmentTest extends CommonAsset
         $asset = $this->createItem(GlpiNetworkEquipment::class, [
             'networkequipmenttypes_id'  => $glpi_type->getID(),
             'networkequipmentmodels_id' => $model->getID(),
-            'locations_id'              => $location->getID(),
+            'locations_id'              => $glpi_location->getID(),
             'date_creation'             => '2024-01-01',
             'date_mod'                  => null,
         ]);
@@ -258,9 +279,9 @@ class NetworkEquipmentTest extends CommonAsset
     {
         $history = new NetworkEquipment();
 
-        $location = $this->createItem(Location::class);
+        $glpi_location = $this->createItem(GlpiLocation::class);
         $network_equipment = $this->createItem(GlpiNetworkEquipment::class, [
-            'locations_id' => $location->getID(),
+            'locations_id' => $glpi_location->getID(),
         ]);
         $result = $history->getHistorizableDiagnosis($network_equipment);
         $expected = [
@@ -286,11 +307,11 @@ class NetworkEquipmentTest extends CommonAsset
     {
         $history = new NetworkEquipment();
 
-        $location = $this->createItem(Location::class, [
+        $glpi_location = $this->createItem(GlpiLocation::class, [
             'country' => 'France',
         ]);
         $network_equipment = $this->createItem(GlpiNetworkEquipment::class, [
-            'locations_id' => $location->getID(),
+            'locations_id' => $glpi_location->getID(),
         ]);
         $result = $history->getHistorizableDiagnosis($network_equipment);
         $expected = [
@@ -316,11 +337,11 @@ class NetworkEquipmentTest extends CommonAsset
     {
         $history = new NetworkEquipment();
 
-        $location = $this->createItem(Location::class, [
+        $glpi_location = $this->createItem(GlpiLocation::class, [
             'state' => 'Quebec',
         ]);
         $network_equipment = $this->createItem(GlpiNetworkEquipment::class, [
-            'locations_id' => $location->getID(),
+            'locations_id' => $glpi_location->getID(),
         ]);
         $result = $history->getHistorizableDiagnosis($network_equipment);
         $expected = [
