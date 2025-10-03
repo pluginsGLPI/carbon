@@ -387,7 +387,7 @@ class PluginInstallTest extends CommonTestCase
             $zone->getFromDBByCrit([
                 'name' => $zone_name,
             ]);
-            $this->assertFalse($zone->isNewItem());
+            $this->assertFalse($zone->isNewItem(), "Zone '$zone_name' not found");
         }
     }
 
