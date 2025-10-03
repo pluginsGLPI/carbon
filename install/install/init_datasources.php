@@ -128,7 +128,7 @@ $file = null; // close the file
 
 $source_id = Install::getOrCreateSource('Hydro Quebec');
 $zone_id_quebec = Install::getOrCreateZone('Quebec', $source_id);
-Install::linkSourceZone($source_id, $zone_id);
+Install::linkSourceZone($source_id, $zone_id_quebec);
 
 $quebec_carbon_intensity = include(dirname(__DIR__) . '/data/carbon_intensity/quebec.php');
 foreach ($quebec_carbon_intensity as $year => $intensity) {
