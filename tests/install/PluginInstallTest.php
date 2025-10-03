@@ -777,9 +777,9 @@ class PluginInstallTest extends CommonTestCase
         /** @var DBmysql */
         global $DB;
 
-        $source_table = CarbonIntensitySource::getTable();
+        $source_table = Source::getTable();
         $zone_table = Zone::getTable();
-        $source_zone_table = CarbonIntensitySource_Zone::getTable();
+        $source_zone_table = Source_Zone::getTable();
 
         $iterator = $DB->request([
             'SELECT' => $source_zone_table . '.id',
