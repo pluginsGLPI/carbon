@@ -52,6 +52,8 @@ use Glpi\Toolbox\Sanitizer;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\CronTask;
@@ -777,9 +779,9 @@ class PluginInstallTest extends CommonTestCase
         /** @var DBmysql */
         global $DB;
 
-        $source_table = Source::getTable();
+        $source_table = CarbonIntensitySource::getTable();
         $zone_table = Zone::getTable();
-        $source_zone_table = Source_Zone::getTable();
+        $source_zone_table = CarbonIntensitySource_Zone::getTable();
 
         $iterator = $DB->request([
             'SELECT' => $source_zone_table . '.id',
