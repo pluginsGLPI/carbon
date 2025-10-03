@@ -35,23 +35,27 @@ namespace GlpiPlugin\Carbon\Impact\History\Tests;
 use CommonDBTM;
 use Computer as GlpiComputer;
 use ComputerModel;
-use Computer_Item;
 use Monitor as GlpiMonitor;
 use GlpiPlugin\Carbon\Impact\History\Monitor;
 use GlpiPlugin\Carbon\Tests\Impact\History\CommonAsset;
 use Infocom;
-use Location;
+use Location as GlpiLocation;
 use DateTime;
 use MonitorModel as GlpiMonitorModel;
 use MonitorType as GlpiMonitorType;
 use ComputerType as GlpiComputerType;
 use DBmysql;
 use Glpi\Asset\Asset_PeripheralAsset;
+use Computer_Item;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
+use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\MonitorType;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\UsageInfo;
+use GlpiPlugin\Carbon\Zone;
 
 /**
  * #CoversMethod \GlpiPlugin\Carbon\Impact\History\Monitor
@@ -91,8 +95,25 @@ class MonitorTest extends CommonAsset
         $entities_id = $this->isolateInEntity('glpi', 'glpi');
 
         $model_power = 55;
-        $location = $this->createItem(Location::class, [
+        $glpi_location = $this->createItem(GlpiLocation::class, [
             'state' => 'Quebec',
+        ]);
+        $source = new Source(); // This source exists after a fresh install
+        $source->getFromDBByCrit([
+            'name' => 'Hydro Quebec'
+        ]);
+        $zone = new Zone(); // This zone  exists after a fresh install
+        $zone->getFromDBByCrit([
+            'name' => 'Quebec'
+        ]);
+        $source_zone = new Source_Zone(); // the relation source / zone also exists after a fresh install
+        $source_zone->getFromDBByCrit([
+            $source::getForeignKeyField() => $source->getID(),
+            $zone::getForeignKeyField() => $zone->getID()
+        ]);
+        $location = $this->createItem(Location::class, [
+            'locations_id' => $glpi_location->getID(),
+            'plugin_carbon_sources_zones_id' => $source_zone->getID()
         ]);
 
         $computer_model_power = 80;
@@ -104,7 +125,7 @@ class MonitorTest extends CommonAsset
         $computer = $this->createItem(GlpiComputer::class, [
             'computertypes_id'  => $glpi_computer_type->getID(),
             'computermodels_id' => $computer_model->getID(),
-            'locations_id'      => $location->getID(),
+            'locations_id'      => $glpi_location->getID(),
         ]);
         $usage_profile = $this->createItem(ComputerUsageProfile::class, [
             'time_start'   => '09:00:00',
@@ -131,11 +152,11 @@ class MonitorTest extends CommonAsset
         $asset = $this->createItem(GlpiMonitor::class, [
             'monitortypes_id'   => $glpi_type->getID(),
             'monitormodels_id'  => $model->getID(),
-            'locations_id'      => $location->getID(),
+            'locations_id'      => $glpi_location->getID(),
             'date_creation'     => '2024-01-01',
             'date_mod'          => null,
         ]);
-        $computer_asset = $this->createItem(Asset_PeripheralAsset::class, [
+        $computer_asset = $this->createItem(Computer_Item::class, [
             'computers_id' => $computer->getID(),
             'itemtype' => $asset->getType(),
             'items_id' => $asset->getID(),
@@ -376,9 +397,9 @@ class MonitorTest extends CommonAsset
         $history = new Monitor();
 
         $monitor = $this->createItem(GlpiMonitor::class);
-        $location = $this->createItem(Location::class);
+        $glpi_location = $this->createItem(GlpiLocation::class);
         $computer = $this->createItem(GlpiComputer::class, [
-            'locations_id' => $location->getID(),
+            'locations_id' => $glpi_location->getID(),
         ]);
         $computer_item = $this->createItem(Computer_Item::class, [
             'computers_id' => $computer->getID(),
@@ -412,11 +433,11 @@ class MonitorTest extends CommonAsset
         $history = new Monitor();
 
         $monitor = $this->createItem(GlpiMonitor::class);
-        $location = $this->createItem(Location::class, [
+        $glpi_location = $this->createItem(GlpiLocation::class, [
             'country' => 'France',
         ]);
         $computer = $this->createItem(GlpiComputer::class, [
-            'locations_id' => $location->getID(),
+            'locations_id' => $glpi_location->getID(),
         ]);
         $computer_item = $this->createItem(Computer_Item::class, [
             'computers_id' => $computer->getID(),
@@ -450,12 +471,12 @@ class MonitorTest extends CommonAsset
     {
         $history = new Monitor();
 
-        $location = $this->createItem(Location::class, [
+        $glpi_location = $this->createItem(GlpiLocation::class, [
             'state' => 'Quebec',
         ]);
         $monitor = $this->createItem(GlpiMonitor::class);
         $computer = $this->createItem(GlpiComputer::class, [
-            'locations_id' => $location->getID(),
+            'locations_id' => $glpi_location->getID(),
         ]);
         $computer_item = $this->createItem(Computer_Item::class, [
             'computers_id' => $computer->getID(),
@@ -658,7 +679,7 @@ class MonitorTest extends CommonAsset
     {
         $history = new Monitor();
 
-        $location = $this->createItem(Location::class, [
+        $glpi_location = $this->createItem(GlpiLocation::class, [
             'country' => 'France',
         ]);
         $glpi_monitor_model = $this->createItem(GlpiMonitorModel::class, [
@@ -668,7 +689,7 @@ class MonitorTest extends CommonAsset
             'monitormodels_id' => $glpi_monitor_model->getID(),
         ]);
         $computer = $this->createItem(GlpiComputer::class, [
-            'locations_id' => $location->getID(),
+            'locations_id' => $glpi_location->getID(),
         ]);
         $computer_item = $this->createItem(Computer_Item::class, [
             'computers_id' => $computer->getID(),
