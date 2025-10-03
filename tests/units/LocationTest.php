@@ -195,7 +195,7 @@ class LocationTest extends DbTestCase
      *
      * @return void
      */
-    public function testgetIncompleteLocations()
+    public function testGetIncompleteLocations()
     {
         $iterator = Location::getIncompleteLocations();
         $output = $iterator->count();
