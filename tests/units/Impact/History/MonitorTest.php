@@ -46,6 +46,7 @@ use MonitorModel as GlpiMonitorModel;
 use MonitorType as GlpiMonitorType;
 use ComputerType as GlpiComputerType;
 use DBmysql;
+use Glpi\Asset\Asset_PeripheralAsset;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
@@ -134,7 +135,7 @@ class MonitorTest extends CommonAsset
             'date_creation'     => '2024-01-01',
             'date_mod'          => null,
         ]);
-        $computer_asset = $this->createItem(Computer_Item::class, [
+        $computer_asset = $this->createItem(Asset_PeripheralAsset::class, [
             'computers_id' => $computer->getID(),
             'itemtype' => $asset->getType(),
             'items_id' => $asset->getID(),
