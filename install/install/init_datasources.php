@@ -92,31 +92,16 @@ while (($line = $file->fgetcsv(',', '"', '\\')) !== false) {
     Install::linkSourceZone($source_id, $zone_id);
 
     // Insert into the database
-    $row_exists = (new DbUtils())->countElementsInTable($table, [
+    $success = $DB->updateOrInsert($table, [
+        'intensity' => $intensity,
+        'data_quality' => 2 // constant GlpiPlugin\Carbon\DataTracking::DATA_QUALITY_ESTIMATED
+    ], [
         'date' => "$year-01-01 00:00:00",
         'plugin_carbon_carbonintensitysources_id' => $source_id,
         'plugin_carbon_zones_id' => $zone_id
     ]);
-    if (!$row_exists) {
-        $success = $DB->insert($table, [
-            'date' => "$year-01-01 00:00:00",
-            'plugin_carbon_carbonintensitysources_id' => $source_id,
-            'plugin_carbon_zones_id' => $zone_id,
-            'intensity' => $intensity,
-            'data_quality' => 2 // constant GlpiPlugin\Carbon\DataTracking::DATA_QUALITY_ESTIMATED
-        ]);
-    } else {
-        $success = $DB->update($table, [
-            'intensity' => $intensity,
-            'data_quality' => 2 // constant GlpiPlugin\Carbon\DataTracking::DATA_QUALITY_ESTIMATED
-        ], [
-            'date' => "$year-01-01 00:00:00",
-            'plugin_carbon_carbonintensitysources_id' => $source_id,
-            'plugin_carbon_zones_id' => $zone_id
-        ]);
-    }
 
-    if (!$success) {
+    if ($success === false) {
         $file = null; // close the file
         throw new \RuntimeException("Failed to insert data for year $year");
     }
@@ -132,27 +117,17 @@ Install::linkSourceZone($source_id, $zone_id_quebec);
 
 $quebec_carbon_intensity = include(dirname(__DIR__) . '/data/carbon_intensity/quebec.php');
 foreach ($quebec_carbon_intensity as $year => $intensity) {
-    $row_exists = (new DbUtils())->countElementsInTable($table, [
+    $success = $DB->updateOrInsert($table, [
+        'intensity' => $intensity,
+        'data_quality' => 2 // constant GlpiPlugin\Carbon\DataTracking::DATA_QUALITY_ESTIMATED
+    ], [
         'date' => "$year-01-01 00:00:00",
         'plugin_carbon_carbonintensitysources_id' => $source_id,
         'plugin_carbon_zones_id' => $zone_id_quebec,
     ]);
-    if (!$row_exists) {
-        $success = $DB->insert($table, [
-            'date' => "$year-01-01 00:00:00",
-            'plugin_carbon_carbonintensitysources_id' => $source_id,
-            'plugin_carbon_zones_id' => $zone_id_quebec,
-            'intensity' => $intensity,
-            'data_quality' => 2 // constant GlpiPlugin\Carbon\DataTracking::DATA_QUALITY_ESTIMATED
-        ]);
-    } else {
-        $success = $DB->update($table, [
-            'intensity' => $intensity,
-            'data_quality' => 2 // constant GlpiPlugin\Carbon\DataTracking::DATA_QUALITY_ESTIMATED
-        ], [
-            'date' => "$year-01-01 00:00:00",
-            'plugin_carbon_carbonintensitysources_id' => $source_id,
-            'plugin_carbon_zones_id' => $zone_id
-        ]);
+
+    if ($success === false) {
+        $file = null; // close the file
+        throw new \RuntimeException("Failed to insert data for year $year");
     }
 }
