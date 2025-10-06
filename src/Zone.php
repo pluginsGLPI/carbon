@@ -221,7 +221,6 @@ class Zone extends CommonDropdown
      */
     private static function getByAssetRequest(string $itemtype): array
     {
-        $glpi_location_table = GlpiLocation::getTable();
         $location_table = Location::getTable();
         $itemtype_table = (new DbUtils())->getTableForItemType($itemtype);
         $request = self::getByLocationRequest();
