@@ -228,10 +228,23 @@ class ComputerTest extends CommonAsset
         ]);
         $this->assertFalse($history->canHistorize($id));
 
-        // Add a country to the location
-        $glpi_location->update([
-            'id' => $glpi_location->getID(),
-            'country' => 'France',
+        // Add a zone to the location
+        $source = new Source(); // This source exists after a fresh install
+        $source->getFromDBByCrit([
+            'name' => 'RTE'
+        ]);
+        $zone = new Zone(); // This zone  exists after a fresh install
+        $zone->getFromDBByCrit([
+            'name' => 'France'
+        ]);
+        $source_zone = new Source_Zone(); // the relation source / zone also exists after a fresh install
+        $source_zone->getFromDBByCrit([
+            $source::getForeignKeyField() => $source->getID(),
+            $zone::getForeignKeyField() => $zone->getID()
+        ]);
+        $location = $this->createItem(Location::class, [
+            'locations_id' => $glpi_location->getID(),
+            'plugin_carbon_sources_zones_id' => $source_zone->getID(),
         ]);
         $this->assertFalse($history->canHistorize($id));
 
@@ -334,7 +347,7 @@ class ComputerTest extends CommonAsset
             'is_deleted'                  => true,
             'is_template'                 => true,
             'has_location'                => false,
-            'has_state_or_country'        => false,
+            'has_carbon_intensity_zone'   => false,
             'has_model'                   => false,
             'has_model_power_consumption' => false,
             'has_type'                    => false,
@@ -365,7 +378,7 @@ class ComputerTest extends CommonAsset
             'is_deleted'                  => true,
             'is_template'                 => true,
             'has_location'                => false,
-            'has_state_or_country'        => false,
+            'has_carbon_intensity_zone'   => false,
             'has_model'                   => false,
             'has_model_power_consumption' => false,
             'has_type'                    => false,
@@ -397,7 +410,7 @@ class ComputerTest extends CommonAsset
             'is_deleted'                  => true,
             'is_template'                 => true,
             'has_location'                => false,
-            'has_state_or_country'        => false,
+            'has_carbon_intensity_zone'   => false,
             'has_model'                   => false,
             'has_model_power_consumption' => false,
             'has_type'                    => false,
@@ -426,7 +439,7 @@ class ComputerTest extends CommonAsset
             'is_deleted'                  => true,
             'is_template'                 => true,
             'has_location'                => true,
-            'has_state_or_country'        => false,
+            'has_carbon_intensity_zone'   => false,
             'has_model'                   => false,
             'has_model_power_consumption' => false,
             'has_type'                    => false,
@@ -443,12 +456,27 @@ class ComputerTest extends CommonAsset
         $this->assertFalse($result);
     }
 
-    public function testComputerWithLocationAndCountryIsNotHistorizable()
+    public function testComputerWithLocationAndZoneIsNotHistorizable()
     {
         $history = new Computer();
 
-        $glpi_location = $this->createItem(GlpiLocation::class, [
-            'country' => 'France'
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $source = new Source(); // This source exists after a fresh install
+        $source->getFromDBByCrit([
+            'name' => 'RTE'
+        ]);
+        $zone = new Zone(); // This zone  exists after a fresh install
+        $zone->getFromDBByCrit([
+            'name' => 'France'
+        ]);
+        $source_zone = new Source_Zone(); // the relation source / zone also exists after a fresh install
+        $source_zone->getFromDBByCrit([
+            $source::getForeignKeyField() => $source->getID(),
+            $zone::getForeignKeyField() => $zone->getID()
+        ]);
+        $location = $this->createItem(Location::class, [
+            'locations_id' => $glpi_location->getID(),
+            'plugin_carbon_sources_zones_id' => $source_zone->getID(),
         ]);
         $computer = $this->createItem(GlpiComputer::class, [
             'locations_id' => $glpi_location->getID(),
@@ -457,7 +485,7 @@ class ComputerTest extends CommonAsset
             'is_deleted'                  => true,
             'is_template'                 => true,
             'has_location'                => true,
-            'has_state_or_country'        => true,
+            'has_carbon_intensity_zone'   => true,
             'has_model'                   => false,
             'has_model_power_consumption' => false,
             'has_type'                    => false,
@@ -465,38 +493,7 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => false,
             'has_category'                => false,
             'has_inventory_entry_date'    => false,
-            'ci_download_enabled'         => false,
-            'ci_fallback_available'       => true,
-        ];
-        $result = $history->getHistorizableDiagnosis($computer);
-        $this->assertEquals($expected, $result);
-        $result = $history->canHistorize($computer->getID());
-        $this->assertFalse($result);
-    }
-
-    public function testComputerWithLocationAndStateIsNotHistorizable()
-    {
-        $history = new Computer();
-
-        $glpi_location = $this->createItem(GlpiLocation::class, [
-            'state' => 'Quebec'
-        ]);
-        $computer = $this->createItem(GlpiComputer::class, [
-            'locations_id' => $glpi_location->getID(),
-        ]);
-        $expected = [
-            'is_deleted'                  => true,
-            'is_template'                 => true,
-            'has_location'                => true,
-            'has_state_or_country'        => true,
-            'has_model'                   => false,
-            'has_model_power_consumption' => false,
-            'has_type'                    => false,
-            'has_type_power_consumption'  => false,
-            'has_usage_profile'           => false,
-            'has_category'                => false,
-            'has_inventory_entry_date'    => false,
-            'ci_download_enabled'         => false,
+            'ci_download_enabled'         => true,
             'ci_fallback_available'       => true,
         ];
         $result = $history->getHistorizableDiagnosis($computer);
@@ -520,7 +517,7 @@ class ComputerTest extends CommonAsset
             'is_deleted'                  => true,
             'is_template'                 => true,
             'has_location'                => false,
-            'has_state_or_country'        => false,
+            'has_carbon_intensity_zone'   => false,
             'has_model'                   => false,
             'has_model_power_consumption' => false,
             'has_type'                    => false,
@@ -541,15 +538,15 @@ class ComputerTest extends CommonAsset
     {
         $history = new Computer();
 
-        $model = $this->createItem(GlpiComputerModel::class);
+        $glpi_model = $this->createItem(GlpiComputerModel::class);
         $computer = $this->createItem(GlpiComputer::class, [
-            'computermodels_id' => $model->getID(),
+            'computermodels_id' => $glpi_model->getID(),
         ]);
         $expected = [
             'is_deleted'                  => true,
             'is_template'                 => true,
             'has_location'                => false,
-            'has_state_or_country'        => false,
+            'has_carbon_intensity_zone'   => false,
             'has_model'                   => true,
             'has_model_power_consumption' => false,
             'has_type'                    => false,
@@ -580,7 +577,7 @@ class ComputerTest extends CommonAsset
             'is_deleted'                  => true,
             'is_template'                 => true,
             'has_location'                => false,
-            'has_state_or_country'        => false,
+            'has_carbon_intensity_zone'   => false,
             'has_model'                   => true,
             'has_model_power_consumption' => true,
             'has_type'                    => false,
@@ -609,7 +606,7 @@ class ComputerTest extends CommonAsset
             'is_deleted'                  => true,
             'is_template'                 => true,
             'has_location'                => false,
-            'has_state_or_country'        => false,
+            'has_carbon_intensity_zone'   => false,
             'has_model'                   => false,
             'has_model_power_consumption' => false,
             'has_type'                    => true,
@@ -642,7 +639,7 @@ class ComputerTest extends CommonAsset
             'is_deleted'                  => true,
             'is_template'                 => true,
             'has_location'                => false,
-            'has_state_or_country'        => false,
+            'has_carbon_intensity_zone'   => false,
             'has_model'                   => false,
             'has_model_power_consumption' => false,
             'has_type'                    => true,
@@ -675,7 +672,7 @@ class ComputerTest extends CommonAsset
             'is_deleted'                  => true,
             'is_template'                 => true,
             'has_location'                => false,
-            'has_state_or_country'        => false,
+            'has_carbon_intensity_zone'   => false,
             'has_model'                   => false,
             'has_model_power_consumption' => false,
             'has_type'                    => true,
@@ -696,8 +693,23 @@ class ComputerTest extends CommonAsset
     {
         $history = new Computer();
 
-        $glpi_location = $this->createItem(GlpiLocation::class, [
-            'country' => 'France'
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $source = new Source(); // This source exists after a fresh install
+        $source->getFromDBByCrit([
+            'name' => 'RTE'
+        ]);
+        $zone = new Zone(); // This zone  exists after a fresh install
+        $zone->getFromDBByCrit([
+            'name' => 'France'
+        ]);
+        $source_zone = new Source_Zone(); // the relation source / zone also exists after a fresh install
+        $source_zone->getFromDBByCrit([
+            $source::getForeignKeyField() => $source->getID(),
+            $zone::getForeignKeyField() => $zone->getID()
+        ]);
+        $location = $this->createItem(Location::class, [
+            'locations_id' => $glpi_location->getID(),
+            'plugin_carbon_sources_zones_id' => $source_zone->getID()
         ]);
         $glpi_computer_type = $this->createItem(GlpiComputerType::class);
         $computer_type = $this->createItem(ComputerType::class, [
@@ -723,7 +735,7 @@ class ComputerTest extends CommonAsset
             'is_deleted'                  => true,
             'is_template'                 => true,
             'has_location'                => true,
-            'has_state_or_country'        => true,
+            'has_carbon_intensity_zone'   => true,
             'has_model'                   => false,
             'has_model_power_consumption' => false,
             'has_type'                    => true,
@@ -731,7 +743,7 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => true,
             'has_category'                => false,
             'has_inventory_entry_date'    => true,
-            'ci_download_enabled'         => false,
+            'ci_download_enabled'         => true,
             'ci_fallback_available'       => true,
         ];
         $result = $history->getHistorizableDiagnosis($computer);

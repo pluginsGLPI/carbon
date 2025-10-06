@@ -281,7 +281,7 @@ class MonitorTest extends CommonAsset
             'has_computer'                => false,
             'has_usage_profile'           => false,
             'has_location'                => false,
-            'has_state_or_country'        => false,
+            'has_carbon_intensity_zone'   => false,
             'has_model'                   => false,
             'has_model_power_consumption' => false,
             'has_type'                    => false,
@@ -314,7 +314,7 @@ class MonitorTest extends CommonAsset
             'has_computer'                => true,
             'has_usage_profile'           => false,
             'has_location'                => false,
-            'has_state_or_country'        => false,
+            'has_carbon_intensity_zone'   => false,
             'has_model'                   => false,
             'has_model_power_consumption' => false,
             'has_type'                    => false,
@@ -345,7 +345,7 @@ class MonitorTest extends CommonAsset
             'has_computer'                => false,
             'has_usage_profile'           => false,
             'has_location'                => false,
-            'has_state_or_country'        => false,
+            'has_carbon_intensity_zone'   => false,
             'has_model'                   => false,
             'has_model_power_consumption' => false,
             'has_type'                    => false,
@@ -377,7 +377,7 @@ class MonitorTest extends CommonAsset
             'has_computer'                => false,
             'has_usage_profile'           => false,
             'has_location'                => false,
-            'has_state_or_country'        => false,
+            'has_carbon_intensity_zone'   => false,
             'has_model'                   => false,
             'has_model_power_consumption' => false,
             'has_type'                    => false,
@@ -413,7 +413,7 @@ class MonitorTest extends CommonAsset
             'has_computer'                => true,
             'has_usage_profile'           => false,
             'has_location'                => true,
-            'has_state_or_country'        => false,
+            'has_carbon_intensity_zone'   => false,
             'has_model'                   => false,
             'has_model_power_consumption' => false,
             'has_type'                    => false,
@@ -428,13 +428,28 @@ class MonitorTest extends CommonAsset
         $this->assertFalse($result);
     }
 
-    public function testMonitorWithLocationWithCountryIsNotHistorizable()
+    public function testMonitorWithLocationWithZoneIsNotHistorizable()
     {
         $history = new Monitor();
 
         $monitor = $this->createItem(GlpiMonitor::class);
-        $glpi_location = $this->createItem(GlpiLocation::class, [
-            'country' => 'France',
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $source = new Source(); // This source exists after a fresh install
+        $source->getFromDBByCrit([
+            'name' => 'RTE'
+        ]);
+        $zone = new Zone(); // This zone  exists after a fresh install
+        $zone->getFromDBByCrit([
+            'name' => 'France'
+        ]);
+        $source_zone = new Source_Zone(); // the relation source / zone also exists after a fresh install
+        $source_zone->getFromDBByCrit([
+            $source::getForeignKeyField() => $source->getID(),
+            $zone::getForeignKeyField() => $zone->getID()
+        ]);
+        $location = $this->createItem(Location::class, [
+            'locations_id' => $glpi_location->getID(),
+            'plugin_carbon_sources_zones_id' => $source_zone->getID()
         ]);
         $computer = $this->createItem(GlpiComputer::class, [
             'locations_id' => $glpi_location->getID(),
@@ -452,45 +467,7 @@ class MonitorTest extends CommonAsset
             'has_computer'                => true,
             'has_usage_profile'           => false,
             'has_location'                => true,
-            'has_state_or_country'        => true,
-            'has_model'                   => false,
-            'has_model_power_consumption' => false,
-            'has_type'                    => false,
-            'has_type_power_consumption'  => false,
-            'has_inventory_entry_date'    => false,
-            'ci_download_enabled'         => false,
-            'ci_fallback_available'       => false,
-        ];
-        $this->assertEquals($expected, $result);
-        $expected = !in_array(false, $result, true);
-        $result = $history->canHistorize($monitor->getID());
-        $this->assertFalse($result);
-    }
-
-    public function testMonitorWithLocationWithStateIsNotHistorizable()
-    {
-        $history = new Monitor();
-
-        $glpi_location = $this->createItem(GlpiLocation::class, [
-            'state' => 'Quebec',
-        ]);
-        $monitor = $this->createItem(GlpiMonitor::class);
-        $computer = $this->createItem(GlpiComputer::class, [
-            'locations_id' => $glpi_location->getID(),
-        ]);
-        $computer_item = $this->createItem(Computer_Item::class, [
-            'computers_id' => $computer->getID(),
-            'itemtype'     => $monitor->getType(),
-            'items_id'     => $monitor->getID(),
-        ]);
-        $result = $history->getHistorizableDiagnosis($monitor);
-        $expected = [
-            'is_deleted'                  => true,
-            'is_template'                 => true,
-            'has_computer'                => true,
-            'has_usage_profile'           => false,
-            'has_location'                => true,
-            'has_state_or_country'        => true,
+            'has_carbon_intensity_zone'   => true,
             'has_model'                   => false,
             'has_model_power_consumption' => false,
             'has_type'                    => false,
@@ -529,7 +506,7 @@ class MonitorTest extends CommonAsset
             'has_computer'                => true,
             'has_usage_profile'           => true,
             'has_location'                => false,
-            'has_state_or_country'        => false,
+            'has_carbon_intensity_zone'   => false,
             'has_model'                   => false,
             'has_model_power_consumption' => false,
             'has_type'                    => false,
@@ -559,7 +536,7 @@ class MonitorTest extends CommonAsset
             'has_computer'                => false,
             'has_usage_profile'           => false,
             'has_location'                => false,
-            'has_state_or_country'        => false,
+            'has_carbon_intensity_zone'   => false,
             'has_model'                   => true,
             'has_model_power_consumption' => false,
             'has_type'                    => false,
@@ -591,7 +568,7 @@ class MonitorTest extends CommonAsset
             'has_computer'                => false,
             'has_usage_profile'           => false,
             'has_location'                => false,
-            'has_state_or_country'        => false,
+            'has_carbon_intensity_zone'   => false,
             'has_model'                   => true,
             'has_model_power_consumption' => true,
             'has_type'                    => false,
@@ -625,7 +602,7 @@ class MonitorTest extends CommonAsset
             'has_computer'                => false,
             'has_usage_profile'           => false,
             'has_location'                => false,
-            'has_state_or_country'        => false,
+            'has_carbon_intensity_zone'   => false,
             'has_model'                   => false,
             'has_model_power_consumption' => false,
             'has_type'                    => true,
@@ -659,7 +636,7 @@ class MonitorTest extends CommonAsset
             'has_computer'                => false,
             'has_usage_profile'           => false,
             'has_location'                => false,
-            'has_state_or_country'        => false,
+            'has_carbon_intensity_zone'   => false,
             'has_model'                   => false,
             'has_model_power_consumption' => false,
             'has_type'                    => true,
@@ -679,8 +656,23 @@ class MonitorTest extends CommonAsset
     {
         $history = new Monitor();
 
-        $glpi_location = $this->createItem(GlpiLocation::class, [
-            'country' => 'France',
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $source = new Source(); // This source exists after a fresh install
+        $source->getFromDBByCrit([
+            'name' => 'RTE'
+        ]);
+        $zone = new Zone(); // This zone  exists after a fresh install
+        $zone->getFromDBByCrit([
+            'name' => 'France'
+        ]);
+        $source_zone = new Source_Zone(); // the relation source / zone also exists after a fresh install
+        $source_zone->getFromDBByCrit([
+            $source::getForeignKeyField() => $source->getID(),
+            $zone::getForeignKeyField() => $zone->getID()
+        ]);
+        $location = $this->createItem(Location::class, [
+            'locations_id' => $glpi_location->getID(),
+            'plugin_carbon_sources_zones_id' => $source_zone->getID()
         ]);
         $glpi_monitor_model = $this->createItem(GlpiMonitorModel::class, [
             'power_consumption' => 35,
@@ -718,14 +710,13 @@ class MonitorTest extends CommonAsset
             'items_id' => $computer->getID(),
         ]);
 
-        $result = $history->getHistorizableDiagnosis($monitor);
         $expected = [
             'is_deleted'                  => true,
             'is_template'                 => true,
             'has_computer'                => true,
             'has_usage_profile'           => true,
             'has_location'                => true,
-            'has_state_or_country'        => true,
+            'has_carbon_intensity_zone'   => true,
             'has_model'                   => true,
             'has_model_power_consumption' => true,
             'has_type'                    => false,
@@ -734,6 +725,7 @@ class MonitorTest extends CommonAsset
             'ci_download_enabled'         => false,
             'ci_fallback_available'       => false,
         ];
+        $result = $history->getHistorizableDiagnosis($monitor);
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);
         $result = $history->canHistorize($monitor->getID());

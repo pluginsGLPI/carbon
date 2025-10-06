@@ -45,12 +45,12 @@ use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Engine\V1\Monitor as EngineMonitor;
-use GlpiPlugin\Carbon\Location as CarbonLocation;
+use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\UsageImpact;
 use GlpiPlugin\Carbon\UsageInfo;
 use Infocom;
-use Location;
+use Location as GlpiLocation;
 use Monitor as GlpiMonitor;
 use MonitorType as GlpiMonitorType;
 use MonitorModel as GlpiMonitorModel;
@@ -153,18 +153,7 @@ class Monitor extends AbstractAsset
                 self::$itemtype::getTableField('is_template') => 0,
                 // Check the monitor is located the same place as the attached computer
                 // self::$itemtype::getTableField('locations_id') => new QueryExpression(DBmysql::quoteName(GlpiComputer::getTableField('locations_id'))),
-                [
-                    'OR' => [
-                        [
-                            ['NOT' => [Location::getTableField('country') => '']],
-                            ['NOT' => [Location::getTableField('country') => null]],
-                        ],
-                        [
-                            ['NOT' => [Location::getTableField('state') => '']],
-                            ['NOT' => [Location::getTableField('state') => null]],
-                        ]
-                    ]
-                ],
+                Location::getTableField('plugin_carbon_sources_zones_id') => ['>', 0],
                 [
                     'OR' => [
                         MonitorType::getTableField('power_consumption') => ['>', 0],
@@ -195,9 +184,8 @@ class Monitor extends AbstractAsset
             self::$itemtype::getTableField('is_template'),
             Asset_PeripheralAsset::getTableField('items_id_asset'),
             UsageInfo::getTableField('plugin_carbon_computerusageprofiles_id'),
-            Location::getTableField('id as location_id'),
-            Location::getTableField('state'),
-            Location::getTableField('country'),
+            GlpiLocation::getTableField('id as location_id'),
+            Location::getTableField('plugin_carbon_sources_zones_id'),
             GlpiMonitorModel::getTableField('id as model_id'),
             GlpiMonitorModel::getTableField('power_consumption as model_power_consumption'),
             GlpiMonitorType::getTableField('id as type_id'),
@@ -222,9 +210,9 @@ class Monitor extends AbstractAsset
             return null;
         }
 
-        $glpi_location = new Location();
+        $glpi_location = new GlpiLocation();
         $glpi_location->getFromDB($item->fields['locations_id']);
-        $location = new CarbonLocation();
+        $location = new Location();
         $is_carbon_intensity_download_enabled = $location->isCarbonIntensityDownloadEnabled($glpi_location);
         $is_carbon_intensity_fallback_available = $location->hasFallbackCarbonIntensityData($glpi_location);
 
@@ -234,8 +222,9 @@ class Monitor extends AbstractAsset
         $status['is_template'] = ($data['is_template'] === 0); // Actually the result is whether it is "not template"
         $status['has_computer'] = !GlpiComputer::isNewID($data['items_id_asset']);
         $status['has_usage_profile'] = !ComputerUsageProfile::isNewID($data['plugin_carbon_computerusageprofiles_id']);
-        $status['has_location'] = !Location::isNewID($data['location_id']);
-        $status['has_state_or_country'] = (strlen($data['state'] ?? '') > 0) || (strlen($data['country'] ?? '') > 0);
+        $status['has_location'] = !GlpiLocation::isNewID($data['location_id']);
+        // $status['has_state_or_country'] = (strlen($data['state'] ?? '') > 0) || (strlen($data['country'] ?? '') > 0);
+        $status['has_carbon_intensity_zone'] = (($data['plugin_carbon_sources_zones_id'] ?? 0) !== 0);
         $status['has_model'] = !GlpiMonitorModel::isNewID($data['model_id']);
         $status['has_model_power_consumption'] = !GlpiMonitorType::isNewID($data['model_power_consumption']);
         $status['has_type'] = !GlpiMonitorType::isNewID($data['type_id']);

@@ -782,6 +782,32 @@ class PluginInstallTest extends CommonTestCase
         $zone_table = Zone::getTable();
         $source_zone_table = Source_Zone::getTable();
 
+        // Test that France and RTE are associated
+        $iterator = $DB->request([
+            'SELECT' => $source_zone_table . '.id',
+            'FROM' => $source_zone_table,
+            'INNER JOIN' => [
+                $source_table => [
+                    'FKEY' => [
+                        $source_zone_table => 'plugin_carbon_sources_id',
+                        $source_table => 'id'
+                    ]
+                ],
+                $zone_table => [
+                    'FKEY' => [
+                        $source_zone_table => 'plugin_carbon_zones_id',
+                        $zone_table => 'id'
+                    ]
+                ]
+            ],
+            'WHERE' => [
+                $source_table . '.name' => 'RTE',
+                $zone_table . '.name'   => 'France',
+            ],
+        ]);
+        $this->assertEquals(1, $iterator->count());
+
+        // Test that Quebec and Hydroquebec are associated
         $iterator = $DB->request([
             'SELECT' => $source_zone_table . '.id',
             'FROM' => $source_zone_table,
