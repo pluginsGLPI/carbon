@@ -201,7 +201,7 @@ class NetworkEquipmentTest extends CommonAsset
             'is_deleted'                  => true,
             'is_template'                 => true,
             'has_location'                => false,
-            'has_state_or_country'        => false,
+            'has_carbon_intensity_zone'   => false,
             'has_model'                   => false,
             'has_model_power_consumption' => false,
             'has_type'                    => false,
@@ -230,7 +230,7 @@ class NetworkEquipmentTest extends CommonAsset
             'is_deleted'                  => true,
             'is_template'                 => true,
             'has_location'                => false,
-            'has_state_or_country'        => false,
+            'has_carbon_intensity_zone'   => false,
             'has_model'                   => false,
             'has_model_power_consumption' => false,
             'has_type'                    => false,
@@ -260,7 +260,7 @@ class NetworkEquipmentTest extends CommonAsset
             'is_deleted'                  => true,
             'is_template'                 => true,
             'has_location'                => false,
-            'has_state_or_country'        => false,
+            'has_carbon_intensity_zone'   => false,
             'has_model'                   => false,
             'has_model_power_consumption' => false,
             'has_type'                    => false,
@@ -288,7 +288,7 @@ class NetworkEquipmentTest extends CommonAsset
             'is_deleted'                  => true,
             'is_template'                 => true,
             'has_location'                => true,
-            'has_state_or_country'        => false,
+            'has_carbon_intensity_zone'   => false,
             'has_model'                   => false,
             'has_model_power_consumption' => false,
             'has_type'                    => false,
@@ -303,12 +303,27 @@ class NetworkEquipmentTest extends CommonAsset
         $this->assertFalse($result);
     }
 
-    public function testNetDeviceWithLocationWithCountryIsNotHistorizable()
+    public function testNetDeviceWithLocationWithZoneIsNotHistorizable()
     {
         $history = new NetworkEquipment();
 
-        $glpi_location = $this->createItem(GlpiLocation::class, [
-            'country' => 'France',
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $source = new Source(); // This source exists after a fresh install
+        $source->getFromDBByCrit([
+            'name' => 'RTE'
+        ]);
+        $zone = new Zone(); // This zone  exists after a fresh install
+        $zone->getFromDBByCrit([
+            'name' => 'France'
+        ]);
+        $source_zone = new Source_Zone(); // the relation source / zone also exists after a fresh install
+        $source_zone->getFromDBByCrit([
+            $source::getForeignKeyField() => $source->getID(),
+            $zone::getForeignKeyField() => $zone->getID()
+        ]);
+        $location = $this->createItem(Location::class, [
+            'locations_id' => $glpi_location->getID(),
+            'plugin_carbon_sources_zones_id' => $source_zone->getID()
         ]);
         $network_equipment = $this->createItem(GlpiNetworkEquipment::class, [
             'locations_id' => $glpi_location->getID(),
@@ -318,43 +333,13 @@ class NetworkEquipmentTest extends CommonAsset
             'is_deleted'                  => true,
             'is_template'                 => true,
             'has_location'                => true,
-            'has_state_or_country'        => true,
+            'has_carbon_intensity_zone'   => true,
             'has_model'                   => false,
             'has_model_power_consumption' => false,
             'has_type'                    => false,
             'has_type_power_consumption'  => false,
             'has_inventory_entry_date'    => false,
-            'ci_download_enabled'         => false,
-            'ci_fallback_available'       => true,
-        ];
-        $this->assertEquals($expected, $result);
-        $expected = !in_array(false, $result, true);
-        $result = $history->canHistorize($network_equipment->getID());
-        $this->assertFalse($result);
-    }
-
-    public function testNetDeviceWithLocationWithStateIsNotHistorizable()
-    {
-        $history = new NetworkEquipment();
-
-        $glpi_location = $this->createItem(GlpiLocation::class, [
-            'state' => 'Quebec',
-        ]);
-        $network_equipment = $this->createItem(GlpiNetworkEquipment::class, [
-            'locations_id' => $glpi_location->getID(),
-        ]);
-        $result = $history->getHistorizableDiagnosis($network_equipment);
-        $expected = [
-            'is_deleted'                  => true,
-            'is_template'                 => true,
-            'has_location'                => true,
-            'has_state_or_country'        => true,
-            'has_model'                   => false,
-            'has_model_power_consumption' => false,
-            'has_type'                    => false,
-            'has_type_power_consumption'  => false,
-            'has_inventory_entry_date'    => false,
-            'ci_download_enabled'         => false,
+            'ci_download_enabled'         => true,
             'ci_fallback_available'       => true,
         ];
         $this->assertEquals($expected, $result);
@@ -371,12 +356,11 @@ class NetworkEquipmentTest extends CommonAsset
         $network_equipment = $this->createItem(GlpiNetworkEquipment::class, [
             'networkequipmentmodels_id' => $glpi_model->getID(),
         ]);
-        $result = $history->getHistorizableDiagnosis($network_equipment);
         $expected = [
             'is_deleted'                  => true,
             'is_template'                 => true,
             'has_location'                => false,
-            'has_state_or_country'        => false,
+            'has_carbon_intensity_zone'   => false,
             'has_model'                   => true,
             'has_model_power_consumption' => false,
             'has_type'                    => false,
@@ -385,6 +369,7 @@ class NetworkEquipmentTest extends CommonAsset
             'ci_download_enabled'         => false,
             'ci_fallback_available'       => false,
         ];
+        $result = $history->getHistorizableDiagnosis($network_equipment);
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);
         $result = $history->canHistorize($network_equipment->getID());
@@ -406,7 +391,7 @@ class NetworkEquipmentTest extends CommonAsset
             'is_deleted'                  => true,
             'is_template'                 => true,
             'has_location'                => false,
-            'has_state_or_country'        => false,
+            'has_carbon_intensity_zone'   => false,
             'has_model'                   => true,
             'has_model_power_consumption' => true,
             'has_type'                    => false,
@@ -434,7 +419,7 @@ class NetworkEquipmentTest extends CommonAsset
             'is_deleted'                  => true,
             'is_template'                 => true,
             'has_location'                => false,
-            'has_state_or_country'        => false,
+            'has_carbon_intensity_zone'   => false,
             'has_model'                   => false,
             'has_model_power_consumption' => false,
             'has_type'                    => true,
@@ -466,7 +451,7 @@ class NetworkEquipmentTest extends CommonAsset
             'is_deleted'                  => true,
             'is_template'                 => true,
             'has_location'                => false,
-            'has_state_or_country'        => false,
+            'has_carbon_intensity_zone'   => false,
             'has_model'                   => false,
             'has_model_power_consumption' => false,
             'has_type'                    => true,

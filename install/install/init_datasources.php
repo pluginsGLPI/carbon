@@ -49,6 +49,7 @@ $DB->listFields(getTableForItemType(Zone::class), false);
 
 $source_id = Install::getOrCreateSource('RTE', 0);
 $zone_id = Install::getOrCreateZone('France', $source_id);
+Install::linkSourceZone($source_id, $zone_id);
 
 $source_id = Install::getOrCreateSource('ElectricityMap', 0);
 

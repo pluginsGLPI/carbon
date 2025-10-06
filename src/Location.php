@@ -338,7 +338,7 @@ class Location extends CommonDBChild
         $source_zone = new Source_Zone();
         $source_zone->getFromDBByCrit([
             Zone::getForeignKeyField() => $zone->fields['id'],
-            Source::getForeignKeyField() => $zone->fields['plugin_carbon_carbonintensitysources_id_historical'],
+            Source::getForeignKeyField() => $zone->fields['plugin_carbon_sources_id_historical'],
         ]);
         if ($source_zone->isNewItem()) {
             return false;
@@ -376,7 +376,7 @@ class Location extends CommonDBChild
                 ],
                 $carbon_intensity_source_table => [
                     'FKEY'   => [
-                        $carbon_intensity_source_zone_table => 'plugin_carbon_carbonintensitysources_id',
+                        $carbon_intensity_source_zone_table => 'plugin_carbon_sources_id',
                         $carbon_intensity_source_table => 'id',
                     ]
                 ]

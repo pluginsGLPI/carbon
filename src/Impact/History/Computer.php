@@ -45,10 +45,10 @@ use DbUtils;
 use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
-use GlpiPlugin\Carbon\Location as CarbonLocation;
+use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\UsageImpact;
 use Infocom;
-use Location;
+use Location as GlpiLocation;
 
 class Computer extends AbstractAsset
 {
@@ -67,6 +67,7 @@ class Computer extends AbstractAsset
         $item_model_table = self::$model_itemtype::getTable();
         $glpi_computertypes_table = GlpiComputerType::getTable();
         $computertypes_table = ComputerType::getTable();
+        $glpi_location_table = GlpiLocation::getTable();
         $location_table = Location::getTable();
         $usage_table = UsageInfo::getTable();
         $computerUsageProfile_table = ComputerUsageProfile::getTable();
@@ -78,10 +79,16 @@ class Computer extends AbstractAsset
             ],
             'FROM' => $item_table,
             'INNER JOIN' => [
-                $location_table => [
+                $glpi_location_table => [
                     'FKEY'   => [
                         $item_table  => 'locations_id',
-                        $location_table => 'id',
+                        $glpi_location_table => 'id',
+                    ]
+                ],
+                $location_table => [
+                    'FKEY' => [
+                        $location_table => 'locations_id',
+                        $glpi_location_table => 'id',
                     ]
                 ],
                 $usage_table => [
@@ -138,18 +145,7 @@ class Computer extends AbstractAsset
                 'AND' => [
                     self::$itemtype::getTableField('is_deleted') => 0,
                     self::$itemtype::getTableField('is_template') => 0,
-                    [
-                        'OR' => [
-                            [
-                                ['NOT' => [Location::getTableField('country') => '']],
-                                ['NOT' => [Location::getTableField('country') => null]],
-                            ],
-                            [
-                                ['NOT' => [Location::getTableField('state') => '']],
-                                ['NOT' => [Location::getTableField('state') => null]],
-                            ]
-                        ]
-                    ],
+                    Location::getTableField('plugin_carbon_sources_zones_id') => ['>', 0],
                     [
                         'OR' => [
                             ComputerType::getTableField('power_consumption') => ['>', 0],
@@ -187,9 +183,8 @@ class Computer extends AbstractAsset
         $request['SELECT'] = [
             self::$itemtype::getTableField('is_deleted'),
             self::$itemtype::getTableField('is_template'),
-            Location::getTableField('id as location_id'),
-            Location::getTableField('state'),
-            Location::getTableField('country'),
+            GlpiLocation::getTableField('id as location_id'),
+            Location::getTableField('plugin_carbon_sources_zones_id'),
             GlpiComputerModel::getTableField('id as model_id'),
             GlpiComputerModel::getTableField('power_consumption as model_power_consumption'),
             GlpiComputerType::getTableField('id as type_id'),
@@ -217,9 +212,9 @@ class Computer extends AbstractAsset
             return null;
         }
 
-        $glpi_location = new Location();
+        $glpi_location = new GlpiLocation();
         $glpi_location->getFromDB($item->fields['locations_id']);
-        $location = new CarbonLocation();
+        $location = new Location();
         $is_carbon_intensity_download_enabled = $location->isCarbonIntensityDownloadEnabled($glpi_location);
         $is_carbon_intensity_fallback_available = $location->hasFallbackCarbonIntensityData($glpi_location);
 
@@ -227,8 +222,9 @@ class Computer extends AbstractAsset
         // false means that data is missing or invalid for historization
         $status['is_deleted'] = ($data['is_deleted'] === 0);
         $status['is_template'] = ($data['is_template'] === 0);
-        $status['has_location'] = !Location::isNewID($data['location_id']);
-        $status['has_state_or_country'] = (strlen($data['state'] ?? '') > 0) || (strlen($data['country'] ?? '') > 0);
+        $status['has_location'] = !GlpiLocation::isNewID($data['location_id']);
+        // $status['has_state_or_country'] = (strlen($data['state'] ?? '') > 0) || (strlen($data['country'] ?? '') > 0);
+        $status['has_carbon_intensity_zone'] = (($data['plugin_carbon_sources_zones_id'] ?? 0) !== 0);
         $status['has_model'] = !GlpiComputerModel::isNewID($data['model_id']);
         $status['has_model_power_consumption'] = (($data['model_power_consumption'] ?? 0) !== 0);
         $status['has_type'] = !GlpiComputerType::isNewID($data['type_id']);

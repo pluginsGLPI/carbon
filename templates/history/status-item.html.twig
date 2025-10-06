@@ -91,12 +91,12 @@
                             {{ fields.field('', field, __('Has a location', 'carbon')) }}
                         {% endif %}
 
-                        {% if status.has_state_or_country is defined %}
+                        {% if status.has_carbon_intensity_zone is defined %}
                             {% set field = nok_field %}
-                            {% if status.has_state_or_country %}
+                            {% if status.has_carbon_intensity_zone %}
                                 {% set field = ok_field %}
                             {% endif %}
-                            {{ fields.field('', field, __('The location has a state or a country', 'carbon')) }}
+                            {{ fields.field('', field, __('The location has carbon intensity data', 'carbon')) }}
                         {% endif %}
 
                         {% if status.ci_download_enabled is defined %}
