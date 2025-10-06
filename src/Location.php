@@ -116,6 +116,7 @@ class Location extends CommonDBChild
 
     public function showForLocation(GlpiLocation $item, array $options = [])
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $this->getFromDBByCrit(['locations_id' => $item->getID()]);
@@ -482,7 +483,7 @@ class Location extends CommonDBChild
      */
     public static function getIncompleteLocations(array $where = []): DBmysqlIterator
     {
-        /** @var  DBmysql $DB */
+        /** @var DBmysql $DB */
         global $DB;
 
         $where = array_diff_key($where, [
@@ -526,7 +527,7 @@ class Location extends CommonDBChild
 
     public function getSourceZoneId(): int
     {
-        /** @var DBmysql */
+        /** @var DBmysql $DB */
         global $DB;
 
         if ($this->isNewItem()) {
