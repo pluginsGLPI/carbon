@@ -30,13 +30,10 @@
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Carbon\Location;
-use GlpiPlugin\Carbon\Source;
-
 /** @var DBmysql $DB */
 /** @var Migration $migration */
 
-$table = (new DbUtils())->getTableForItemType(Source::class);
+$table = 'glpi_plugin_carbon_sources';
 $migration->addField(
     $table,
     'is_carbon_intensity_source',
@@ -48,7 +45,7 @@ $migration->addField(
     ]
 );
 
-$table = (new DbUtils())->getTableForItemType(Location::class);
+$table = 'glpi_plugin_carbon_locations';
 $migration->addField(
     $table,
     'plugin_carbon_sources_zones_id',

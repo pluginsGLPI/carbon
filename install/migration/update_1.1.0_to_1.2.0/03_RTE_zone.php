@@ -32,9 +32,11 @@
 
 use GlpiPlugin\Carbon\Install;
 
-/** @var DbMysql $DB */
-global $DB;
+/** @var Migration $migration */
+/** @var DBmysql $DB */
 
+// Force immediate migration of this table to let the subsequent code work
+// with the up to date schema
 $rte_source = Install::getOrCreateSource('RTE', 0, 1);
 $france_zone = Install::getOrCreateZone('France', $rte_source);
 Install::linkSourceZone($rte_source, $france_zone);
