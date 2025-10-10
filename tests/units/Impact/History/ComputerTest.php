@@ -324,6 +324,8 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => false,
             'has_category'                => false,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
 
         $result = $history->getHistorizableDiagnosis($computer);
@@ -353,6 +355,8 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => false,
             'has_category'                => false,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $result = $history->getHistorizableDiagnosis($computer);
         $this->assertEquals($expected, $result);
@@ -383,6 +387,8 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => false,
             'has_category'                => false,
             'has_inventory_entry_date'    => true,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $result = $history->getHistorizableDiagnosis($computer);
         $this->assertEquals($expected, $result);
@@ -410,6 +416,8 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => false,
             'has_category'                => false,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $result = $history->getHistorizableDiagnosis($computer);
         $this->assertEquals($expected, $result);
@@ -439,6 +447,8 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => false,
             'has_category'                => false,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => true,
         ];
         $result = $history->getHistorizableDiagnosis($computer);
         $this->assertEquals($expected, $result);
@@ -468,6 +478,8 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => false,
             'has_category'                => false,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => true,
         ];
         $result = $history->getHistorizableDiagnosis($computer);
         $this->assertEquals($expected, $result);
@@ -498,6 +510,8 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => true,
             'has_category'                => false,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $result = $history->getHistorizableDiagnosis($computer);
         $this->assertEquals($expected, $result);
@@ -525,6 +539,8 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => false,
             'has_category'                => false,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $result = $history->getHistorizableDiagnosis($computer);
         $this->assertEquals($expected, $result);
@@ -554,6 +570,8 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => false,
             'has_category'                => false,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $result = $history->getHistorizableDiagnosis($computer);
         $this->assertEquals($expected, $result);
@@ -581,6 +599,8 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => false,
             'has_category'                => false,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $result = $history->getHistorizableDiagnosis($computer);
         $this->assertEquals($expected, $result);
@@ -612,6 +632,8 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => false,
             'has_category'                => false,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $result = $history->getHistorizableDiagnosis($computer);
         $this->assertEquals($expected, $result);
@@ -643,6 +665,8 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => false,
             'has_category'                => true,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $result = $history->getHistorizableDiagnosis($computer);
         $this->assertEquals($expected, $result);
@@ -689,6 +713,8 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => true,
             'has_category'                => false,
             'has_inventory_entry_date'    => true,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => true,
         ];
         $result = $history->getHistorizableDiagnosis($computer);
         $this->assertEquals($expected, $result);
