@@ -265,6 +265,8 @@ class MonitorTest extends CommonAsset
             'has_type'                    => false,
             'has_type_power_consumption'  => false,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);
@@ -296,6 +298,8 @@ class MonitorTest extends CommonAsset
             'has_type'                    => false,
             'has_type_power_consumption'  => false,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);
@@ -325,6 +329,8 @@ class MonitorTest extends CommonAsset
             'has_type'                    => false,
             'has_type_power_consumption'  => false,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);
@@ -355,6 +361,8 @@ class MonitorTest extends CommonAsset
             'has_type'                    => false,
             'has_type_power_consumption'  => false,
             'has_inventory_entry_date'    => true,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);
@@ -389,6 +397,8 @@ class MonitorTest extends CommonAsset
             'has_type'                    => false,
             'has_type_power_consumption'  => false,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);
@@ -426,6 +436,8 @@ class MonitorTest extends CommonAsset
             'has_type'                    => false,
             'has_type_power_consumption'  => false,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);
@@ -462,6 +474,8 @@ class MonitorTest extends CommonAsset
             'has_type'                    => false,
             'has_type_power_consumption'  => false,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);
@@ -499,6 +513,8 @@ class MonitorTest extends CommonAsset
             'has_type'                    => false,
             'has_type_power_consumption'  => false,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);
@@ -527,6 +543,8 @@ class MonitorTest extends CommonAsset
             'has_type'                    => false,
             'has_type_power_consumption'  => false,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);
@@ -557,6 +575,8 @@ class MonitorTest extends CommonAsset
             'has_type'                    => false,
             'has_type_power_consumption'  => false,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);
@@ -589,6 +609,8 @@ class MonitorTest extends CommonAsset
             'has_type'                    => true,
             'has_type_power_consumption'  => true,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);
@@ -621,6 +643,8 @@ class MonitorTest extends CommonAsset
             'has_type'                    => true,
             'has_type_power_consumption'  => true,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);
@@ -685,6 +709,8 @@ class MonitorTest extends CommonAsset
             'has_type'                    => false,
             'has_type_power_consumption'  => false,
             'has_inventory_entry_date'    => true,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);
