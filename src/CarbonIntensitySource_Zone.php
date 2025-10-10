@@ -338,6 +338,13 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
         return $zone_code;
     }
 
+    /**
+     * Get HTML link to enable / disable the download of carbon intensity data for a source and a zone
+     *
+     * @param integer $zone_id
+     * @param string|null $state
+     * @return void
+     */
     protected static function getToggleLink(int $zone_id, ?string $state)
     {
         $state = $state == 0 ? __('No') : __('Yes');
@@ -345,6 +352,12 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
         return $link;
     }
 
+    /**
+     * Sets or toggles the download for a zone
+     *
+     * @param boolean|null $state if not null, don't toggle and force the state of the download
+     * @return boolean true if the update succeeded
+     */
     public function toggleZone(?bool $state = null): bool
     {
         // Check if the source is a fallback source

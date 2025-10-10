@@ -44,6 +44,7 @@ use NetworkEquipmentType as GlpiNetworkEquipmentType;
 use NetworkEquipmentModel as GlpiNetworkEquipmentModel;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Engine\V1\NetworkEquipment as EngineNetworkEquipment;
+use GlpiPlugin\Carbon\Location as CarbonLocation;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
 use GlpiPlugin\Carbon\UsageImpact;
 
@@ -199,6 +200,13 @@ class NetworkEquipment extends AbstractAsset
         if ($data === null) {
             return null;
         }
+
+        $glpi_location = new Location();
+        $glpi_location->getFromDB($item->fields['locations_id']);
+        $location = new CarbonLocation();
+        $is_carbon_intensity_download_enabled = $location->isCarbonIntensityDownloadEnabled($glpi_location);
+        $is_carbon_intensity_fallback_available = $location->hasFallbackCarbonIntensityData($glpi_location);
+
         // Each state is analyzed, with bool results
         // false means that data is missing or invalid for historization
         $status['is_deleted'] = ($data['is_deleted'] === 0);
@@ -209,6 +217,8 @@ class NetworkEquipment extends AbstractAsset
         $status['has_model_power_consumption'] = (($data['model_power_consumption'] ?? 0) !== 0);
         $status['has_type'] = !GlpiNetworkEquipmentType::isNewId($data['type_id']);
         $status['has_type_power_consumption'] = (($data['type_power_consumption'] ?? 0) !== 0);
+        $status['ci_download_enabled'] = $is_carbon_intensity_download_enabled;
+        $status['ci_fallback_available'] = $is_carbon_intensity_fallback_available;
 
         $item_oldest_date = $data['use_date']
             ?? $data['delivery_date']
