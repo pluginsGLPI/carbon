@@ -82,7 +82,7 @@ class ComputerTest extends CommonAsset
         }
 
         $this->login('glpi', 'glpi');
-        $entities_id = $this->isolateInEntity('glpi', 'glpi');
+        $this->isolateInEntity('glpi', 'glpi');
 
         $model_power = 55;
         $location = $this->createItem(Location::class, [
@@ -90,7 +90,7 @@ class ComputerTest extends CommonAsset
         ]);
         $model = $this->createItem(GlpiComputerModel::class, ['power_consumption' => $model_power]);
         $glpi_type = $this->createItem(GlpiComputerType::class);
-        $type = $this->createItem(ComputerType::class, [
+        $this->createItem(ComputerType::class, [
             GlpiComputerType::getForeignKeyField() => $glpi_type->getID(),
         ]);
         $asset = $this->createItem(GlpiComputer::class, [
@@ -111,7 +111,7 @@ class ComputerTest extends CommonAsset
             'day_6'        => '0',
             'day_7'        => '0',
         ]);
-        $impact = $this->createItem(UsageInfo::class, [
+        $this->createItem(UsageInfo::class, [
             $usage_profile->getForeignKeyField() => $usage_profile->getID(),
             'itemtype' => $asset->getType(),
             'items_id' => $asset->getID(),
@@ -220,7 +220,7 @@ class ComputerTest extends CommonAsset
         // Add a usage profile
         $usage_profile = $this->createItem(ComputerUsageProfile::class);
         $this->assertFalse($history->canHistorize($id));
-        $impact = $this->createItem(UsageInfo::class, [
+        $this->createItem(UsageInfo::class, [
             $usage_profile->getForeignKeyField() => $usage_profile->getID(),
             'itemtype' => $computer->getType(),
             'items_id' => $id,
@@ -337,7 +337,7 @@ class ComputerTest extends CommonAsset
         $history = new Computer();
 
         $computer = $this->createItem(GlpiComputer::class);
-        $management = $this->createItem(Infocom::class, [
+        $this->createItem(Infocom::class, [
             'itemtype' => $computer->getType(),
             'items_id' => $computer->getID(),
         ]);
@@ -365,7 +365,7 @@ class ComputerTest extends CommonAsset
         $history = new Computer();
 
         $computer = $this->createItem(GlpiComputer::class);
-        $management = $this->createItem(Infocom::class, [
+        $this->createItem(Infocom::class, [
             'itemtype' => $computer->getType(),
             'items_id' => $computer->getID(),
             'use_date' => '2020-01-01',
@@ -481,7 +481,7 @@ class ComputerTest extends CommonAsset
 
         $computer = $this->createItem(GlpiComputer::class);
         $usage_profile = $this->createItem(ComputerUsageProfile::class);
-        $impact = $this->createItem(UsageInfo::class, [
+        $this->createItem(UsageInfo::class, [
             $usage_profile->getForeignKeyField() => $usage_profile->getID(),
             'itemtype' => $computer->getType(),
             'items_id' => $computer->getID(),
@@ -593,7 +593,7 @@ class ComputerTest extends CommonAsset
         $history = new Computer();
 
         $glpi_computer_type = $this->createItem(GlpiComputerType::class);
-        $computer_type = $this->createItem(ComputerType::class, [
+        $this->createItem(ComputerType::class, [
             'power_consumption' => 55,
             'computertypes_id' => $glpi_computer_type->getID(),
         ]);
@@ -624,7 +624,7 @@ class ComputerTest extends CommonAsset
         $history = new Computer();
 
         $glpi_computer_type = $this->createItem(GlpiComputerType::class);
-        $computer_type = $this->createItem(ComputerType::class, [
+        $this->createItem(ComputerType::class, [
             'category' => ComputerType::CATEGORY_DESKTOP,
             'computertypes_id' => $glpi_computer_type->getID(),
         ]);
@@ -658,7 +658,7 @@ class ComputerTest extends CommonAsset
             'country' => 'France'
         ]);
         $glpi_computer_type = $this->createItem(GlpiComputerType::class);
-        $computer_type = $this->createItem(ComputerType::class, [
+        $this->createItem(ComputerType::class, [
             'power_consumption' => 55,
             'computertypes_id' => $glpi_computer_type->getID(),
         ]);
@@ -666,13 +666,13 @@ class ComputerTest extends CommonAsset
             'locations_id' => $location->getID(),
             'computertypes_id' => $glpi_computer_type->getID(),
         ]);
-        $management = $this->createItem(Infocom::class, [
+        $this->createItem(Infocom::class, [
             'itemtype' => $computer->getType(),
             'items_id' => $computer->getID(),
             'use_date' => '2020-01-01',
         ]);
         $usage_profile = $this->createItem(ComputerUsageProfile::class);
-        $impact = $this->createItem(UsageInfo::class, [
+        $this->createItem(UsageInfo::class, [
             $usage_profile->getForeignKeyField() => $usage_profile->getID(),
             'itemtype' => $computer->getType(),
             'items_id' => $computer->getID(),

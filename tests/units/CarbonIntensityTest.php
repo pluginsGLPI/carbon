@@ -63,7 +63,7 @@ class CarbonIntensityTest extends DbTestCase
         $source = $this->createItem(CarbonIntensitySource::class, [
             'name' => 'bar'
         ]);
-        $source_zone = $this->createItem(CarbonIntensitySource_Zone::class, [
+        $this->createItem(CarbonIntensitySource_Zone::class, [
             $source::getForeignKeyField() => $source->getID(),
             $zone::getForeignKeyField() => $zone->getID()
         ]);
@@ -78,7 +78,7 @@ class CarbonIntensityTest extends DbTestCase
             'data_quality' => 2,
         ]);
         $expected = '2024-02-01 00:00:00';
-        $intensity = $this->createItem(CarbonIntensity::class, [
+        $this->createItem(CarbonIntensity::class, [
             'date' => $expected,
             $source::getForeignKeyField() => $source->getID(),
             $zone::getForeignKeyField() => $zone->getID(),
@@ -101,7 +101,7 @@ class CarbonIntensityTest extends DbTestCase
         $source = $this->createItem(CarbonIntensitySource::class, [
             'name' => 'bar'
         ]);
-        $source_zone = $this->createItem(CarbonIntensitySource_Zone::class, [
+        $this->createItem(CarbonIntensitySource_Zone::class, [
             $source::getForeignKeyField() => $source->getID(),
             $zone::getForeignKeyField() => $zone->getID()
         ]);
@@ -116,7 +116,7 @@ class CarbonIntensityTest extends DbTestCase
             'data_quality' => 2,
         ]);
         $expected = '2024-02-01 00:00:00';
-        $intensity = $this->createItem(CarbonIntensity::class, [
+        $this->createItem(CarbonIntensity::class, [
             'date' => $expected,
             $source::getForeignKeyField() => $source->getID(),
             $zone::getForeignKeyField() => $zone->getID(),
@@ -154,7 +154,7 @@ class CarbonIntensityTest extends DbTestCase
             'name' => 'test_zone',
             'plugin_carbon_carbonintensitysources_id_historical' => $source->getID(),
         ]);
-        $source_zone = $this->createItem(CarbonIntensitySource_Zone::class, [
+        $this->createItem(CarbonIntensitySource_Zone::class, [
             'plugin_carbon_carbonintensitysources_id' => $source->getID(),
             'plugin_carbon_zones_id' => $zone->getID(),
         ]);
@@ -296,7 +296,7 @@ class CarbonIntensityTest extends DbTestCase
         $this->assertEquals($expected, $result);
 
         $computer = $this->createItem(Computer::class);
-        $infocom = $this->createItem(Infocom::class, [
+        $this->createItem(Infocom::class, [
             'itemtype' => $computer->getType(),
             'items_id' => $computer->getID(),
             'buy_date' => '2022-02-01',
@@ -328,11 +328,11 @@ class CarbonIntensityTest extends DbTestCase
             'name' => 'bar'
         ]);
         $expected = new DateTimeImmutable('2019-01-31 23:00:00');
-        $source_zone = $this->createItem(CarbonIntensitySource_Zone::class, [
+        $this->createItem(CarbonIntensitySource_Zone::class, [
             $source::getForeignKeyField() => $source->getID(),
             $zone::getForeignKeyField() => $zone->getID(),
         ]);
-        $intensity = $this->createItem(CarbonIntensity::class, [
+        $this->createItem(CarbonIntensity::class, [
             'date' => '2019-02-01',
             $source::getForeignKeyField() => $source->getID(),
             $zone::getForeignKeyField() => $zone->getID(),
@@ -355,7 +355,7 @@ class CarbonIntensityTest extends DbTestCase
         $source = $this->createItem(CarbonIntensitySource::class, [
             'name' => 'bar'
         ]);
-        $source_zone = $this->createItem(CarbonIntensitySource_Zone::class, [
+        $this->createItem(CarbonIntensitySource_Zone::class, [
             $source::getForeignKeyField() => $source->getID(),
             $zone::getForeignKeyField() => $zone->getID()
         ]);

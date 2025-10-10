@@ -60,7 +60,7 @@ class ProfileTest extends DbTestCase
     public function testShowForm()
     {
         $this->login('glpi', 'glpi');
-        $glpi_profile = GlpiProfile::getById(4); // Super admin
+        GlpiProfile::getById(4); // Super admin
         $profile = new Profile();
         $output = '';
         ob_start(function ($buffer) use ($output) {

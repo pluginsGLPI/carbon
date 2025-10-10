@@ -106,7 +106,7 @@ class ToolboxTest extends DbTestCase
 
 
         $expected = new DateTime('2024-06-15 00:00:00');
-        $infocom = $this->createItem(Infocom::class, [
+        $this->createItem(Infocom::class, [
             'itemtype' => $computer->getType(),
             'items_id' => $computer->getID(),
             'decommission_date' => $expected->format('Y-m-d H:i:s'),

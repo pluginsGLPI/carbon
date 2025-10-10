@@ -205,7 +205,7 @@ class LocationTest extends DbTestCase
         $output = $iterator->count();
         $this->assertEquals(1, $output);
 
-        $glpi_location = $this->createItem(GlpiLocation::class, [
+        $this->createItem(GlpiLocation::class, [
             '_boavizta_zone' => 'FRA',
         ]);
         $iterator = Location::getIncompleteLocations();
@@ -303,7 +303,7 @@ class LocationTest extends DbTestCase
             'name' => 'baz',
             'plugin_carbon_carbonintensitysources_id_historical' => $source->getID(),
         ]);
-        $source_zone = $this->createItem(CarbonIntensitySource_Zone::class, [
+        $this->createItem(CarbonIntensitySource_Zone::class, [
             $zone::getForeignKeyField() => $zone->getID(),
             $source::getForeignKeyField() => $source->getID(),
             'is_download_enabled' => 0,

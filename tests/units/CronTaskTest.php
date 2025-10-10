@@ -137,7 +137,7 @@ class CronTaskTest extends DbTestCase
         ]);
 
         // Test a single
-        $glpi_locations = $this->getItems([
+        $this->getItems([
             GlpiLocation::class => [
                 [
                     'name' => 'Valid Location',

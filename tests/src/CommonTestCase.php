@@ -241,7 +241,7 @@ class CommonTestCase extends TestCase
     {
         $usage_profile = $this->createItem(ComputerUsageProfile::class, $usage_profile_params);
         $glpi_computer = $this->createItem(Computer::class);
-        $impact = $this->createItem(UsageInfo::class, [
+        $this->createItem(UsageInfo::class, [
             'itemtype' => Computer::class,
             'items_id' => $glpi_computer->getId(),
             ComputerUsageProfile::getForeignKeyField() => $usage_profile->getID(),
@@ -254,7 +254,7 @@ class CommonTestCase extends TestCase
     {
         $glpi_computer = $this->createComputerUsageProfile($usage_profile_params);
         $glpiComputerType = $this->createItem(GlpiComputerType::class);
-        $carbonComputerType = $this->createItem(ComputerType::class, [
+        $this->createItem(ComputerType::class, [
             GlpiComputerType::getForeignKeyField() => $glpiComputerType->getID(),
             'power_consumption'                    => $type_power,
         ]);

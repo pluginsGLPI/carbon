@@ -142,7 +142,7 @@ class CarbonIntensitySourceTest extends DbTestCase
 
         $item = $this->createItem(Zone::class);
         $source = $this->createItem(CarbonIntensitySource::class);
-        $source_zone = $this->createItem(CarbonIntensitySource_Zone::class, [
+        $this->createItem(CarbonIntensitySource_Zone::class, [
             $item::getForeignKeyField() => $item->getID(),
             $source::getForeignKeyField() => $source->getID()
         ]);

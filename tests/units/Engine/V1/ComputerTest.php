@@ -269,7 +269,7 @@ class ComputerTest extends EngineTestCase
     private function computerSetTypeWithPower(GlpiComputer $computer, int $power)
     {
         $glpi_computer_type = $this->createItem(GlpiComputerType::class);
-        $carbonComputerType = $this->createItem(ComputerType::class, [
+        $this->createItem(ComputerType::class, [
             GlpiComputerType::getForeignKeyField() => $glpi_computer_type->getID(),
             'power_consumption'                    => $power,
         ]);

@@ -89,7 +89,7 @@ abstract class EngineTestCase extends DbTestCase
 
         $model = $this->createItem(static::$model_class);
         $glpi_type = $this->createItem(static::$glpi_type_class);
-        $type = $this->createItem(static::$type_class, [
+        $this->createItem(static::$type_class, [
             static::$glpi_type_class::getForeignKeyField() => $glpi_type->getID(),
             'power_consumption' => 40
         ]);

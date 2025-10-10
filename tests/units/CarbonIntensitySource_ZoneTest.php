@@ -66,7 +66,7 @@ class CarbonIntensitySource_ZoneTest extends DbTestCase
 
         $this->login('glpi', 'glpi');
         ob_start();
-        $result = $instance->showForSource($source);
+        $instance->showForSource($source);
         $output = ob_get_clean();
         $this->assertNotEmpty($output);
     }
@@ -97,7 +97,7 @@ class CarbonIntensitySource_ZoneTest extends DbTestCase
 
         $this->login('glpi', 'glpi');
         ob_start();
-        $result = $instance->showForZone($zone);
+        $instance->showForZone($zone);
         $output = ob_get_clean();
         $this->assertNotEmpty($output);
     }

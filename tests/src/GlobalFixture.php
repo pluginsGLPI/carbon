@@ -130,7 +130,7 @@ class GlobalFixture
         // ini_set('auto_detect_line_endings', true);
         $file = dirname(__DIR__) . '/fixtures/carbon_intensity.csv';
         if (($handle = fopen($file, 'r')) === false) {
-            fwrite(STDOUT, sprintf('Failed to open carbon intensity dataset CSV file' . PHP_EOL));
+            fwrite(STDOUT, 'Failed to open carbon intensity dataset CSV file' . PHP_EOL);
             exit(1);
         }
         while (($row = fgetcsv($handle, 256, ',', '"', '\\')) !== false) {
@@ -148,7 +148,7 @@ class GlobalFixture
         ];
         $count = (new DbUtils())->countElementsInTable($intensity_table, $condition);
         if ($count !== 3648) {
-            fwrite(STDOUT, sprintf('Failed to load carbon intensity dataset' . PHP_EOL));
+            fwrite(STDOUT, 'Failed to load carbon intensity dataset' . PHP_EOL);
             exit(1);
         }
 

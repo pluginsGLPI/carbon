@@ -64,13 +64,13 @@ class MonitorTest extends EngineTestCase
     {
         $computer = $this->createItem(GlpiComputer::class);
         $profile  = $this->createItem(ComputerUsageProfile::class);
-        $impact   = $this->createItem(UsageInfo::class, [
+        $this->createItem(UsageInfo::class, [
             'itemtype' => GlpiComputer::class,
             'items_id' => $computer->getID(),
             'plugin_carbon_computerusageprofiles_id' => $profile->getID(),
         ]);
         $monitor = $this->createItem(GlpiMonitor::class);
-        $computer_item = $this->createItem(Computer_Item::class, [
+        $this->createItem(Computer_Item::class, [
             'computers_id' => $computer->getID(),
             'itemtype'     => $monitor->getType(),
             'items_id'     => $monitor->getID(),
@@ -130,7 +130,7 @@ class MonitorTest extends EngineTestCase
         $item = $this->createItem(static::$itemtype_class, [
             static::$model_class::getForeignKeyField() => $model->getID(),
         ]);
-        $computer_item = $this->createItem(Computer_Item::class, [
+        $this->createItem(Computer_Item::class, [
             'computers_id' => $computer->getID(),
             'itemtype' => $item->getType(),
             'items_id' => $item->getID(),
@@ -166,7 +166,7 @@ class MonitorTest extends EngineTestCase
         ];
         $computer = $this->createComputerUsageProfilePowerLocation($usage_profile, 40, $country);
         $glpi_monitor_type = $this->createItem(GlpiMonitorType::class);
-        $monitory_type = $this->createItem(MonitorType::class, [
+        $this->createItem(MonitorType::class, [
             'monitortypes_id'   => $glpi_monitor_type->getID(),
             'power_consumption' => 31,
         ]);
@@ -174,7 +174,7 @@ class MonitorTest extends EngineTestCase
             'locations_id' => $computer->fields['locations_id'],
             'monitortypes_id' => $glpi_monitor_type->getID(),
         ]);
-        $computer_item = $this->createItem(Computer_Item::class, [
+        $this->createItem(Computer_Item::class, [
             'computers_id' => $computer->getID(),
             'itemtype'     => $monitor->getType(),
             'items_id'     => $monitor->getID(),

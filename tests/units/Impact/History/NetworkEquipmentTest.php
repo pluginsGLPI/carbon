@@ -77,7 +77,7 @@ class NetworkEquipmentTest extends CommonAsset
         }
 
         $this->login('glpi', 'glpi');
-        $entities_id = $this->isolateInEntity('glpi', 'glpi');
+        $this->isolateInEntity('glpi', 'glpi');
 
         $model_power = 100;
         $location = $this->createItem(Location::class, [
@@ -85,7 +85,7 @@ class NetworkEquipmentTest extends CommonAsset
         ]);
         $model = $this->createItem(GlpiNetworkEquipmentModel::class, ['power_consumption' => $model_power]);
         $glpi_type = $this->createItem(GlpiNetworkEquipmentType::class);
-        $type = $this->createItem(NetworkEquipmentType::class, [
+        $this->createItem(NetworkEquipmentType::class, [
             GlpiNetworkEquipmentType::getForeignKeyField() => $glpi_type->getID(),
         ]);
         $asset = $this->createItem(GlpiNetworkEquipment::class, [
@@ -188,7 +188,6 @@ class NetworkEquipmentTest extends CommonAsset
             'has_inventory_entry_date'    => false,
         ];
         $this->assertEquals($expected, $result);
-        $expected = !in_array(false, $result, true);
         $result = $history->canHistorize($network_equipment->getID());
         $this->assertFalse($result);
     }
@@ -198,7 +197,7 @@ class NetworkEquipmentTest extends CommonAsset
         $history = new NetworkEquipment();
 
         $network_equipment = $this->createItem(GlpiNetworkEquipment::class);
-        $infocom = $this->createItem(Infocom::class, [
+        $this->createItem(Infocom::class, [
             'itemtype'     => $network_equipment->getType(),
             'items_id'     => $network_equipment->getID(),
         ]);
@@ -215,7 +214,6 @@ class NetworkEquipmentTest extends CommonAsset
             'has_inventory_entry_date'    => false,
         ];
         $this->assertEquals($expected, $result);
-        $expected = !in_array(false, $result, true);
         $result = $history->canHistorize($network_equipment->getID());
         $this->assertFalse($result);
     }
@@ -225,7 +223,7 @@ class NetworkEquipmentTest extends CommonAsset
         $history = new NetworkEquipment();
 
         $network_equipment = $this->createItem(GlpiNetworkEquipment::class);
-        $infocom = $this->createItem(Infocom::class, [
+        $this->createItem(Infocom::class, [
             'itemtype'     => $network_equipment->getType(),
             'items_id'     => $network_equipment->getID(),
             'buy_date'     => '2024-01-01',
@@ -243,7 +241,6 @@ class NetworkEquipmentTest extends CommonAsset
             'has_inventory_entry_date'    => true,
         ];
         $this->assertEquals($expected, $result);
-        $expected = !in_array(false, $result, true);
         $result = $history->canHistorize($network_equipment->getID());
         $this->assertFalse($result);
     }
@@ -269,7 +266,6 @@ class NetworkEquipmentTest extends CommonAsset
             'has_inventory_entry_date'    => false,
         ];
         $this->assertEquals($expected, $result);
-        $expected = !in_array(false, $result, true);
         $result = $history->canHistorize($network_equipment->getID());
         $this->assertFalse($result);
     }
@@ -297,7 +293,6 @@ class NetworkEquipmentTest extends CommonAsset
             'has_inventory_entry_date'    => false,
         ];
         $this->assertEquals($expected, $result);
-        $expected = !in_array(false, $result, true);
         $result = $history->canHistorize($network_equipment->getID());
         $this->assertFalse($result);
     }
@@ -325,7 +320,6 @@ class NetworkEquipmentTest extends CommonAsset
             'has_inventory_entry_date'    => false,
         ];
         $this->assertEquals($expected, $result);
-        $expected = !in_array(false, $result, true);
         $result = $history->canHistorize($network_equipment->getID());
         $this->assertFalse($result);
     }
@@ -351,7 +345,6 @@ class NetworkEquipmentTest extends CommonAsset
             'has_inventory_entry_date'    => false,
         ];
         $this->assertEquals($expected, $result);
-        $expected = !in_array(false, $result, true);
         $result = $history->canHistorize($network_equipment->getID());
         $this->assertFalse($result);
     }
@@ -379,7 +372,6 @@ class NetworkEquipmentTest extends CommonAsset
             'has_inventory_entry_date'    => false,
         ];
         $this->assertEquals($expected, $result);
-        $expected = !in_array(false, $result, true);
         $result = $history->canHistorize($network_equipment->getID());
         $this->assertFalse($result);
     }
@@ -405,7 +397,6 @@ class NetworkEquipmentTest extends CommonAsset
             'has_inventory_entry_date'    => false,
         ];
         $this->assertEquals($expected, $result);
-        $expected = !in_array(false, $result, true);
         $result = $history->canHistorize($network_equipment->getID());
         $this->assertFalse($result);
     }
@@ -415,7 +406,7 @@ class NetworkEquipmentTest extends CommonAsset
         $history = new NetworkEquipment();
 
         $glpi_type = $this->createItem(GlpiNetworkEquipmentType::class);
-        $network_equipment_type = $this->createItem(NetworkEquipmentType::class, [
+        $this->createItem(NetworkEquipmentType::class, [
             'power_consumption' => 55,
             'networkequipmenttypes_id' => $glpi_type->getID(),
         ]);
@@ -435,7 +426,6 @@ class NetworkEquipmentTest extends CommonAsset
             'has_inventory_entry_date'    => false,
         ];
         $this->assertEquals($expected, $result);
-        $expected = !in_array(false, $result, true);
         $result = $history->canHistorize($network_equipment->getID());
         $this->assertFalse($result);
     }

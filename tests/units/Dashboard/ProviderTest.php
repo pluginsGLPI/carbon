@@ -64,18 +64,18 @@ class ProviderTest extends DbTestCase
     protected function handledComputersCountFixture(): int
     {
         // Switch to an empty entity
-        $entities_id = $this->isolateInEntity('glpi', 'glpi');
+        $this->isolateInEntity('glpi', 'glpi');
 
         $glpi_computer_type_empty = $this->createItem(GlpiComputerType::class);
 
         $glpi_computer_type = $this->createItem(GlpiComputerType::class);
 
-        $computer_type_empty = $this->createItem(ComputerType::class, [
+        $this->createItem(ComputerType::class, [
             'computertypes_id' => $glpi_computer_type_empty->getID(),
             'power_consumption' => 0,
         ]);
 
-        $computer_type = $this->createItem(ComputerType::class, [
+        $this->createItem(ComputerType::class, [
             'computertypes_id' => $glpi_computer_type->getID(),
             'power_consumption' => 90,
         ]);
@@ -166,7 +166,7 @@ class ProviderTest extends DbTestCase
 
     public function testGetHandledComputersCount()
     {
-        $total_count = $this->handledComputersCountFixture();
+        $this->handledComputersCountFixture();
 
         // 3 computers are complete
         // 1 having both power_consumption from computer type and computer model
@@ -186,7 +186,7 @@ class ProviderTest extends DbTestCase
 
     public function testGetHandledAssetsRatio()
     {
-        $total_count = $this->handledComputersCountFixture();
+        $this->handledComputersCountFixture();
         $result = Provider::getHandledAssetsRatio([Computer::class]);
         $expected = 19; // This is a percentage
         $this->assertEquals($expected, $result['data'][0]['number']);
@@ -265,7 +265,7 @@ class ProviderTest extends DbTestCase
 
     public function testGetSumPowerPerModel()
     {
-        $entities_id = $this->isolateInEntity('glpi', 'glpi');
+        $this->isolateInEntity('glpi', 'glpi');
 
         $country = $this->getUniqueString();
         $usage_profile = [
@@ -339,7 +339,7 @@ class ProviderTest extends DbTestCase
             'day_7' => 1,
         ];
         $computer_1 = $this->createComputerUsageProfilePowerLocation($usage_profile, 60, PLUGIN_CARBON_TEST_FAKE_ZONE_NAME);
-        $infocom = $this->createItem(Infocom::class, [
+        $this->createItem(Infocom::class, [
             'itemtype' => $computer_1->getType(),
             'items_id' => $computer_1->getID(),
             'buy_date' => '2024-01-01',

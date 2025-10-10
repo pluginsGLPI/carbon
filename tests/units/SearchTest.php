@@ -83,7 +83,6 @@ class SearchTest extends DbTestCase
         ];
 
         $data = Search::getDatas(Monitor::class, $criterias);
-        $sql = $data['sql']['search'];
         $this->assertIsArray($data);
     }
 }

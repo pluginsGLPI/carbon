@@ -182,7 +182,7 @@ class ComputerUsageProfileTest extends DbTestCase
         ob_start(function ($buffer) {
             return $buffer;
         });
-        $result = ComputerUsageProfile::showMassiveActionsSubForm($massive_action);
+        ComputerUsageProfile::showMassiveActionsSubForm($massive_action);
         $output = ob_get_clean();
         $crawler = new Crawler($output);
         $selector = $crawler->filter('select[name="plugin_carbon_computerusageprofiles_id"]');
