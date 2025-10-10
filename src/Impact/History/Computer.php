@@ -45,6 +45,7 @@ use DbUtils;
 use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
+use GlpiPlugin\Carbon\Location as CarbonLocation;
 use GlpiPlugin\Carbon\UsageImpact;
 use Infocom;
 use Location;
@@ -216,6 +217,12 @@ class Computer extends AbstractAsset
             return null;
         }
 
+        $glpi_location = new Location();
+        $glpi_location->getFromDB($item->fields['locations_id']);
+        $location = new CarbonLocation();
+        $is_carbon_intensity_download_enabled = $location->isCarbonIntensityDownloadEnabled($glpi_location);
+        $is_carbon_intensity_fallback_available = $location->hasFallbackCarbonIntensityData($glpi_location);
+
         // Each state is analyzed, with bool results
         // false means that data is missing or invalid for historization
         $status['is_deleted'] = ($data['is_deleted'] === 0);
@@ -228,6 +235,8 @@ class Computer extends AbstractAsset
         $status['has_type_power_consumption'] = (($data['type_power_consumption'] ?? 0) !== 0);
         $status['has_usage_profile'] = !ComputerUsageProfile::isNewID($data['plugin_carbon_computerusageprofiles_id']);
         $status['has_category'] = (($data['category'] ?? 0) !== ComputerType::CATEGORY_UNDEFINED);
+        $status['ci_download_enabled'] = $is_carbon_intensity_download_enabled;
+        $status['ci_fallback_available'] = $is_carbon_intensity_fallback_available;
 
         $item_oldest_date = $data['use_date']
             ?? $data['delivery_date']
