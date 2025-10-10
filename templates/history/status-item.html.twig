@@ -99,6 +99,32 @@
                             {{ fields.field('', field, __('The location has a state or a country', 'carbon')) }}
                         {% endif %}
 
+                        {% if status.ci_download_enabled is defined %}
+                            {% set field = nok_field %}
+                            {% if status.ci_fallback_available is defined %}
+                                {% if status.ci_fallback_available %}
+                                    {% set field = warning_field %}
+                                {% endif %}
+                            {% endif %}
+                            {% if status.ci_download_enabled %}
+                                {% set field = ok_field %}
+                            {% endif %}
+                            {{ fields.field('', field, __('Real time carbon intensity enabled', 'carbon')) }}
+                        {% endif %}
+
+                        {% if status.ci_fallback_available is defined %}
+                            {% set field = nok_field %}
+                            {% if status.ci_download_enabled is defined %}
+                                {% if status.ci_download_enabled %}
+                                    {% set field = warning_field %}
+                                {% endif %}
+                            {% endif %}
+                            {% if status.ci_fallback_available %}
+                                {% set field = ok_field %}
+                            {% endif %}
+                            {{ fields.field('', field, __('The location has yearly carbon intensity data', 'carbon')) }}
+                        {% endif %}
+
                         {% if status.has_model is defined %}
                             {% set field = nok_field %}
                             {% if status.has_model %}

@@ -45,6 +45,7 @@ use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Engine\V1\Monitor as EngineMonitor;
+use GlpiPlugin\Carbon\Location as CarbonLocation;
 use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\UsageImpact;
 use GlpiPlugin\Carbon\UsageInfo;
@@ -216,6 +217,12 @@ class Monitor extends AbstractAsset
             return null;
         }
 
+        $glpi_location = new Location();
+        $glpi_location->getFromDB($item->fields['locations_id']);
+        $location = new CarbonLocation();
+        $is_carbon_intensity_download_enabled = $location->isCarbonIntensityDownloadEnabled($glpi_location);
+        $is_carbon_intensity_fallback_available = $location->hasFallbackCarbonIntensityData($glpi_location);
+
         // Each state is analyzed, with bool results
         // false means that data is missing or invalid for historization
         $status['is_deleted'] = ($data['is_deleted'] === 0);   // Actually the result is whether it is "not deleted"
@@ -228,6 +235,8 @@ class Monitor extends AbstractAsset
         $status['has_model_power_consumption'] = !GlpiMonitorType::isNewID($data['model_power_consumption']);
         $status['has_type'] = !GlpiMonitorType::isNewID($data['type_id']);
         $status['has_type_power_consumption'] = (($data['type_power_consumption'] ?? 0) !== 0);
+        $status['ci_download_enabled'] = $is_carbon_intensity_download_enabled;
+        $status['ci_fallback_available'] = $is_carbon_intensity_fallback_available;
 
         $item_oldest_date = $data['use_date']
             ?? $data['delivery_date']
