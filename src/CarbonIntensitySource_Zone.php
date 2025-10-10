@@ -343,9 +343,9 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
      *
      * @param integer $zone_id
      * @param string|null $state
-     * @return void
+     * @return string
      */
-    protected static function getToggleLink(int $zone_id, ?string $state)
+    protected static function getToggleLink(int $zone_id, ?string $state): string
     {
         $state = $state == 0 ? __('No') : __('Yes');
         $link = '<a href="javascript:void(0)" onclick="plugin_carbon_toggleZone(' . $zone_id . ')" title="' . __('Enable / Disable', 'carbon') . '">' . $state . '</a>';
