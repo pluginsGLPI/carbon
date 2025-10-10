@@ -44,6 +44,7 @@ return RectorConfig::configure()
         __DIR__ . '/public',
         __DIR__ . '/src',
         __DIR__ . '/tools',
+        __DIR__ . '/tests',
     ])
     ->withPhpVersion(PhpVersion::PHP_82)
     ->withCache(

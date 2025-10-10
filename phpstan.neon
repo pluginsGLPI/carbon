@@ -12,6 +12,7 @@ parameters:
         - install
         - hook.php
         - setup.php
+        - tests
     scanDirectories:
         - ../../inc
         - ../../src
