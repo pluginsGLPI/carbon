@@ -37,7 +37,7 @@ use CommonGLPI;
 use CommonDBTM;
 use CronTask;
 use DBmysql;
-use GlpiPlugin\Carbon\Application\View\Extension\DataHelpersExtension;
+use Location as GlpiLocation;
 use Glpi\Application\View\TemplateRenderer;
 use Html;
 
@@ -379,5 +379,36 @@ class Source_Zone extends CommonDBRelation
             'is_download_enabled' => $state
         ];
         return $this->update($input) !== false;
+    }
+
+    /**
+     * Get a source_zone by a location criteria
+     *
+     * @param GlpiLocation $item
+     * @return bool
+     */
+    public function getFromDbByLocation(GlpiLocation $item): bool
+    {
+        if ($item->isNewItem()) {
+            return false;
+        }
+
+        $location_table = Location::getTable();
+        $source_zone_table = Source_Zone::getTable();
+        $request = [
+            'INNER JOIN' => [
+                $location_table => [
+                    'FKEY' => [
+                        $location_table => 'plugin_carbon_sources_zones_id',
+                        $source_zone_table => 'id'
+                    ]
+                ],
+            ],
+            'WHERE' => [
+                Location::getTableField('locations_id') => $item->getID(),
+            ],
+        ];
+
+        return $this->getFromDBByRequest($request);
     }
 }

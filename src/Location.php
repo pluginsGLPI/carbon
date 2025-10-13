@@ -305,18 +305,9 @@ class Location extends CommonDBChild
      */
     protected function enableCarbonIntensityDownload(CommonDBTM $item): bool
     {
-        if (!in_array('country', array_keys($item->fields))) {
-            return false;
-        }
-        $zone = Zone::getByLocation($item);
-        if ($zone === null) {
-            return false;
-        }
         $source_zone = new Source_Zone();
-        $source_zone->getFromDBByCrit([
-            Zone::getForeignKeyField() => $zone->fields['id'],
-            Source::getForeignKeyField() => $zone->fields['plugin_carbon_sources_id_historical'],
-        ]);
+        /** @var GlpiLocation $item */
+        $source_zone->getFromDbByLocation($item);
         if ($source_zone->isNewItem()) {
             return false;
         }
@@ -331,65 +322,61 @@ class Location extends CommonDBChild
      */
     public function isCarbonIntensityDownloadEnabled(CommonDBTM $item): bool
     {
-        $zone = Zone::getByLocation($item);
-        if ($zone === null) {
-            return false;
-        }
         $source_zone = new Source_Zone();
-        $source_zone->getFromDBByCrit([
-            Zone::getForeignKeyField() => $zone->fields['id'],
-            Source::getForeignKeyField() => $zone->fields['plugin_carbon_sources_id_historical'],
-        ]);
-        if ($source_zone->isNewItem()) {
+        /** @var GlpiLocation $item */
+        if (!$source_zone->getFromDbByLocation($item)) {
             return false;
         }
         return $source_zone->fields['is_download_enabled'] === 1;
     }
 
     /**
-     * Tells id a location has fallback carbon intensity data
+     * Tells if a location has fallback carbon intensity data
      *
-     * @param CommonDBTM $item
+     * @param GlpiLocation $item
      * @return boolean
      */
-    public function hasFallbackCarbonIntensityData(CommonDBTM $item): bool
+    public function hasFallbackCarbonIntensityData(GlpiLocation $item): bool
     {
         /** @var DBmysql $DB */
         global $DB;
 
-        $zone = Zone::getByLocation($item);
-        if ($zone === null) {
-            return false;
-        }
         $carbon_intensity_table = CarbonIntensity::getTable();
-        $carbon_intensity_source_zone_table = Source_Zone::getTable();
-        $carbon_intensity_source_table = Source::getTable();
+        $source_zone_table = Source_Zone::getTable();
+        $source_table = Source::getTable();
+        $location_table = Location::getTable();
         $request = [
             'COUNT' => 'count',
             'FROM' => $carbon_intensity_table,
             'INNER JOIN' => [
-                $carbon_intensity_source_zone_table => [
+                $source_zone_table => [
                     'FKEY'   => [
                         $carbon_intensity_table => 'plugin_carbon_zones_id',
-                        $carbon_intensity_source_zone_table => 'plugin_carbon_zones_id',
+                        $source_zone_table => 'plugin_carbon_zones_id',
                     ]
                 ],
-                $carbon_intensity_source_table => [
-                    'FKEY'   => [
-                        $carbon_intensity_source_zone_table => 'plugin_carbon_sources_id',
-                        $carbon_intensity_source_table => 'id',
+                $location_table => [
+                    'FKEY' => [
+                        $location_table => 'plugin_carbon_sources_zones_id',
+                        $source_zone_table => 'id'
                     ]
-                ]
+                ],
+                $source_table => [
+                    'FKEY'   => [
+                        $source_zone_table => 'plugin_carbon_sources_id',
+                        $source_table => 'id',
+                    ]
+                ],
             ],
             'WHERE' => [
                 Source::getTableField('is_fallback') => 1,
-                Source_Zone::getTableField('plugin_carbon_zones_id') => $zone->getID(),
+                Location::getTableField('locations_id') => $item->getID(),
             ],
             'ORDER' => CarbonIntensity::getTableField('date') . ' DESC',
             'LIMIT' => 1,
         ];
         $result = $DB->request($request);
-        return ($result->count() > 0);
+        return ($result->current()['count'] > 0);
     }
 
     /**

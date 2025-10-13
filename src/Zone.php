@@ -160,42 +160,73 @@ class Zone extends CommonDropdown
         return $tab;
     }
 
+    // /**
+    //  * Get a zone by a location criteria
+    //  *
+    //  * @param CommonDBTM $item
+    //  * @return Zone|null
+    //  * @todo : de-staticify the method
+    //  */
+    // public static function getByLocation(CommonDBTM $item): ?Zone
+    // {
+    //     if ($item->isNewItem()) {
+    //         return null;
+    //     }
+
+    //     $request = self::getByLocationRequest();
+    //     $request['WHERE'] = [
+    //         Location::getTableField('locations_id') => $item->getID(),
+    //     ];
+    //     $zone = new self();
+    //     if (!$zone->getFromDBByRequest($request)) {
+    //         return null;
+    //     }
+
+    //     return $zone;
+    // }
+
+    // /**
+    //  * Get the request fragment to find a zone by location
+    //  *
+    //  * @return array Request fragment
+    //  */
+    // private static function getByLocationRequest(): array
+    // {
+        // $location_table = Location::getTable();
+        // $source_zone_table = Source_Zone::getTable();
+        // $zone_table = Zone::getTable();
+        // return [
+        //     'INNER JOIN' => [
+        //         $source_zone_table => [
+        //             'FKEY' => [
+        //                 $zone_table => 'id',
+        //                 $source_zone_table => 'plugin_carbon_zones_id',
+        //             ]
+        //         ],
+        //         $location_table => [
+        //             'FKEY' => [
+        //                 $location_table => 'plugin_carbon_sources_zones_id',
+        //                 $source_zone_table => 'id'
+        //             ]
+        //         ],
+        //     ],
+        // ];
+    // }
+
     /**
-     * Get a zone by a location criteria
+     * Get the request fragment to find a zone by asset
      *
-     * @param CommonDBTM $item
-     * @return Zone|null
-     * @todo : de-staticify the method
-     */
-    public static function getByLocation(CommonDBTM $item): ?Zone
-    {
-        if ($item->isNewItem()) {
-            return null;
-        }
-
-        $request = self::getByLocationRequest();
-        $request['WHERE'] = [
-            Location::getTableField('locations_id') => $item->getID(),
-        ];
-        $zone = new self();
-        if (!$zone->getFromDBByRequest($request)) {
-            return null;
-        }
-
-        return $zone;
-    }
-
-    /**
-     * Get the request fragment to find a zone by location
-     *
+     * @param class-string $itemtype asset type
      * @return array Request fragment
      */
-    private static function getByLocationRequest(): array
+    private static function getByAssetRequest(string $itemtype): array
     {
-        $location_table = Location::getTable();
-        $source_zone_table = Source_Zone::getTable();
-        $zone_table = Zone::getTable();
-        return [
+        $dbUtil = new DbUtils();
+        $location_table = $dbUtil->getTableForItemType(Location::class);
+        $source_zone_table = $dbUtil->getTableForItemType(Source_Zone::class);
+        $zone_table = $dbUtil->getTableForItemType(Zone::class);
+        $itemtype_table = $dbUtil->getTableForItemType($itemtype);
+        $request = [
             'INNER JOIN' => [
                 $source_zone_table => [
                     'FKEY' => [
@@ -209,26 +240,13 @@ class Zone extends CommonDropdown
                         $source_zone_table => 'id'
                     ]
                 ],
+                $itemtype_table => [
+                    'FKEY' => [
+                        $itemtype_table => 'locations_id',
+                        $location_table => 'locations_id',
+                    ]
+                ]
             ],
-        ];
-    }
-
-    /**
-     * Get the request fragment to find a zone by asset
-     *
-     * @param class-string $itemtype asset type
-     * @return array Request fragment
-     */
-    private static function getByAssetRequest(string $itemtype): array
-    {
-        $location_table = Location::getTable();
-        $itemtype_table = (new DbUtils())->getTableForItemType($itemtype);
-        $request = self::getByLocationRequest();
-        $request['INNER JOIN'][$itemtype_table] = [
-            'FKEY' => [
-                $itemtype_table => 'locations_id',
-                $location_table => 'locations_id',
-            ]
         ];
 
         return $request;

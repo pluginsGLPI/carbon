@@ -220,6 +220,7 @@ class Computer extends AbstractAsset
 
         // Each state is analyzed, with bool results
         // false means that data is missing or invalid for historization
+        // TODO : rename is_deleted, is_template into is_not_deleted is_not_template
         $status['is_deleted'] = ($data['is_deleted'] === 0);
         $status['is_template'] = ($data['is_template'] === 0);
         $status['has_location'] = !GlpiLocation::isNewID($data['location_id']);
