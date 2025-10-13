@@ -32,11 +32,13 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
+use GlpiPlugin\Carbon\CarbonIntensity;
+use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\Zone;
-use PHPUnit\Framework\Attributes\CoversMethod;
+use Location as GlpiLocation;
 
 class Source_ZoneTest extends DbTestCase
 {
@@ -100,5 +102,39 @@ class Source_ZoneTest extends DbTestCase
         $result = $instance->showForZone($zone);
         $output = ob_get_clean();
         $this->assertNotEmpty($output);
+    }
+
+    public function testGetByLocation()
+    {
+        // Test a location having a source_zone relation
+        $zone = $this->createItem(Zone::class);
+        $source = $this->createItem(Source::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            $zone::getForeignKeyField() => $zone->getID(),
+            $source::getForeignKeyField() => $source->getID(),
+        ]);
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $this->createItem(Location::class, [
+            'locations_id' => $glpi_location->getID(),
+            'plugin_carbon_sources_zones_id' => $source_zone->getID(),
+        ]);
+        $source_zone = new Source_Zone();
+        $output = $source_zone->getFromDbByLocation($glpi_location);
+        $this->assertTrue($output);
+
+        // Test a location without source_zone
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $this->createItem(Location::class, [
+            'locations_id' => $glpi_location->getID(),
+        ]);
+        $source_zone = new Source_Zone();
+        $output = $source_zone->getFromDbByLocation($glpi_location);
+        $this->assertFalse($output);
+
+        // Test a location without additional plugin data
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $source_zone = new Source_Zone();
+        $output = $source_zone->getFromDbByLocation($glpi_location);
+        $this->assertFalse($output);
     }
 }

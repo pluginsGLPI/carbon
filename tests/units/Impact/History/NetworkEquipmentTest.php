@@ -307,7 +307,6 @@ class NetworkEquipmentTest extends CommonAsset
     {
         $history = new NetworkEquipment();
 
-        $glpi_location = $this->createItem(GlpiLocation::class);
         $source = new Source(); // This source exists after a fresh install
         $source->getFromDBByCrit([
             'name' => 'RTE'
@@ -321,6 +320,7 @@ class NetworkEquipmentTest extends CommonAsset
             $source::getForeignKeyField() => $source->getID(),
             $zone::getForeignKeyField() => $zone->getID()
         ]);
+        $glpi_location = $this->createItem(GlpiLocation::class);
         $location = $this->createItem(Location::class, [
             'locations_id' => $glpi_location->getID(),
             'plugin_carbon_sources_zones_id' => $source_zone->getID()
@@ -340,7 +340,7 @@ class NetworkEquipmentTest extends CommonAsset
             'has_type_power_consumption'  => false,
             'has_inventory_entry_date'    => false,
             'ci_download_enabled'         => true,
-            'ci_fallback_available'       => true,
+            'ci_fallback_available'       => false,
         ];
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);

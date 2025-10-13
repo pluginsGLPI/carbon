@@ -41,39 +41,6 @@ use Location as GlpiLocation;
 
 class ZoneTest extends DbTestCase
 {
-    public function testGetByLocation()
-    {
-        // Test with a new Location object
-        $output = Zone::getByLocation(new GlpiLocation());
-        $this->assertNull($output);
-
-        // Test with a core location without plugin location child item
-        $location = $this->createItem(GlpiLocation::class);
-        $output = Zone::getByLocation($location);
-        $this->assertNull($output);
-
-        // Test with a core location which has a location child without source_zone
-        $glpi_location = $this->createItem(GlpiLocation::class);
-        $location = $this->createItem(Location::class, [
-            'locations_id' => $location->getID()
-        ]);
-        $output = Zone::getByLocation($glpi_location);
-        $this->assertNull($output);
-
-        // Test with a location which is associated to a source_zone
-        $zone = $this->createItem(Zone::class);
-        $source = $this->createItem(Source::class);
-        $source_zone = $this->createItem(Source_Zone::class, [
-            $zone::getForeignKeyField() => $zone->getID(),
-            $source::getForeignKeyField() => $source->getID(),
-        ]);
-        $glpi_location = $this->createItem(GlpiLocation::class);
-        $location = $this->createItem(Location::class, [
-            'locations_id' => $location->getID(),
-            'plugin_carbon_sources_zones_id' => $source_zone->getID(),
-        ]);
-    }
-
     public function testGetByAsset()
     {
         // Test with a new Computer object
