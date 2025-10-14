@@ -42,5 +42,8 @@
     <testsuite name="Upgrade">
       <directory>./tests/upgrade/</directory>
     </testsuite>
+    <testsuite name="Migration">
+      <directory>./tests/migration/</directory>
+    </testsuite>
   </testsuites>
 </phpunit>
