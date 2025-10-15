@@ -226,8 +226,9 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     protected function evaluateItemPerDay(CommonDBTM $item, EngineInterface $engine, DateTimeInterface $day): bool
     {
         $energy = $engine->getEnergyPerDay($day);
-        $zone = Zone::getByAsset($item);
-        if ($zone === null) {
+        $zone = new Zone();
+
+        if ($zone->getByAsset($item) === false) {
             return false;
         }
 

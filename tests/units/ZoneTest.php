@@ -44,16 +44,18 @@ class ZoneTest extends DbTestCase
     public function testGetByAsset()
     {
         // Test with a new Computer object
-        $output = Zone::getByAsset(new Computer());
-        $this->assertNull($output);
+        $zone = new Zone();
+        $output = $zone->getByAsset(new Computer());
+        $this->assertFalse($output);
 
         // Test with a Computer object that has a location without child location data
         $glpi_location = $this->createItem(GlpiLocation::class);
         $computer = $this->createItem(Computer::class, [
             'locations_id' => $glpi_location->getID(),
         ]);
-        $output = Zone::getByAsset($computer);
-        $this->assertNull($output);
+        $zone = new Zone();
+        $output = $zone->getByAsset($computer);
+        $this->assertFalse($output);
 
         // Test with a Computer object that has a location with child location data
         $zone = $this->createItem(Zone::class);
@@ -69,8 +71,9 @@ class ZoneTest extends DbTestCase
         $computer = $this->createItem(Computer::class, [
             'locations_id' => $glpi_location->getID(),
         ]);
-        $output = Zone::getByAsset($computer);
-        $this->assertEquals(null, $output);
+        $zone = new Zone();
+        $output = $zone->getByAsset($computer);
+        $this->assertFalse($output);
 
         // Test with a Computer object that has a location matching a source_zone
         $zone = $this->createItem(Zone::class);
@@ -87,8 +90,9 @@ class ZoneTest extends DbTestCase
         $computer = $this->createItem(Computer::class, [
             'locations_id' => $glpi_location->getID(),
         ]);
-        $output = Zone::getByAsset($computer);
-        $this->assertEquals($zone->getID(), $output->getID());
+        $zone = new Zone();
+        $output = $zone->getByAsset($computer);
+        $this->assertTrue($output);
     }
 
     public function testHasHistoricalData()

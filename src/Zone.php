@@ -256,17 +256,16 @@ class Zone extends CommonDropdown
      * Get a zone by an asset criteria
      *
      * @param CommonDBTM $item
-     * @return Zone|null
-     * @todo : de-staticify the method
+     * @return bool
      */
-    public static function getByAsset(CommonDBTM $item): ?Zone
+    public function getByAsset(CommonDBTM $item): bool
     {
         if (!isset($item->fields[GlpiLocation::getForeignKeyField()])) {
-            return null;
+            return false;
         }
 
         if ($item->isNewItem()) {
-            return null;
+            return false;
         }
 
         $request = self::getByAssetRequest($item->getType());
@@ -274,12 +273,7 @@ class Zone extends CommonDropdown
             $item::getTableField('id') => $item->getID(),
         ];
 
-        $zone = new self();
-        if (!$zone->getFromDBByRequest($request)) {
-            return null;
-        }
-
-        return $zone;
+        return $this->getFromDBByRequest($request);
     }
 
     /**

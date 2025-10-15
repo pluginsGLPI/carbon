@@ -152,26 +152,12 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
     return SearchOptions::getCoreSearchOptions($itemtype);
 }
 
-// /**
-//  * Callback before showing save / update button on an item form
-//  *
-//  * @param array $params 'item' => CommonDBTM
-//  *                       'options => array
-//  * @return void
-//  */
-// function plugin_carbon_postItemForm(array $params)
-// {
-//     switch ($params['item']->getType()) {
-//         case GlpiLocation::class:
-//             $location = new Location();
-//             $location->getFromDBByCrit([
-//                 GlpiLocation::getForeignKeyField() => $params['item']->getID(),
-//             ]);
-//             $location->showForm($location->getID());
-//             break;
-//     }
-// }
-
+/**
+ * Callback when an object is added into the database
+ *
+ * @param CommonDBTM $item item being added
+ * @return void
+ */
 function plugin_carbon_hook_add_asset(CommonDBTM $item)
 {
     if (!in_array($item::getType(), PLUGIN_CARBON_TYPES)) {
@@ -184,21 +170,20 @@ function plugin_carbon_hook_add_asset(CommonDBTM $item)
     if (GlpiLocation::isNewID($item->fields[$location_fk])) {
         return;
     }
-    $zone = Zone::getByAsset($item);
-    if ($zone === null) {
-        return;
-    }
+
     $source_zone = new Source_Zone();
-    $source_zone->getFromDBByCrit([
-        $zone->getForeignKeyField() => $zone->fields['id'],
-        Source::getForeignKeyField() => $zone->fields['plugin_carbon_sources_id_historical'],
-    ]);
-    if ($source_zone->isNewItem()) {
+    if ($source_zone->getFromDbByItem($item) === false) {
         return;
     }
     $source_zone->toggleZone(true);
 }
 
+/**
+ * Callback when an item is being updated in the database
+ *
+ * @param CommonDBTM $item item being updated
+ * @return void
+ */
 function plugin_carbon_hook_update_asset(CommonDBTM $item)
 {
     if (!in_array($item::getType(), PLUGIN_CARBON_TYPES)) {
@@ -211,8 +196,8 @@ function plugin_carbon_hook_update_asset(CommonDBTM $item)
     if (GlpiLocation::isNewID($item->fields[$location_fk])) {
         return;
     }
-    $zone = Zone::getByAsset($item);
-    if ($zone === null) {
+    $zone = new Zone();
+    if ($zone->getByAsset($item) === false) {
         return;
     }
     $source_zone = new Source_Zone();
