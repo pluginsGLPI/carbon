@@ -32,6 +32,7 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
+use Computer;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\Source;
@@ -104,7 +105,7 @@ class Source_ZoneTest extends DbTestCase
         $this->assertNotEmpty($output);
     }
 
-    public function testGetByLocation()
+    public function testFromDbByItem()
     {
         // Test a location having a source_zone relation
         $zone = $this->createItem(Zone::class);
@@ -119,7 +120,7 @@ class Source_ZoneTest extends DbTestCase
             'plugin_carbon_sources_zones_id' => $source_zone->getID(),
         ]);
         $source_zone = new Source_Zone();
-        $output = $source_zone->getFromDbByLocation($glpi_location);
+        $output = $source_zone->getFromDbByItem($glpi_location);
         $this->assertTrue($output);
 
         // Test a location without source_zone
@@ -128,13 +129,65 @@ class Source_ZoneTest extends DbTestCase
             'locations_id' => $glpi_location->getID(),
         ]);
         $source_zone = new Source_Zone();
-        $output = $source_zone->getFromDbByLocation($glpi_location);
+        $output = $source_zone->getFromDbByItem($glpi_location);
         $this->assertFalse($output);
 
         // Test a location without additional plugin data
         $glpi_location = $this->createItem(GlpiLocation::class);
         $source_zone = new Source_Zone();
-        $output = $source_zone->getFromDbByLocation($glpi_location);
+        $output = $source_zone->getFromDbByItem($glpi_location);
         $this->assertFalse($output);
+
+        // Test an unitialized asset
+        $computer = new Computer();
+        $source_zone = new Source_Zone();
+        $output = $source_zone->getFromDbByItem($glpi_location);
+        $this->assertFalse($output);
+
+        // Test an asset
+        $computer = $this->createItem(Computer::class);
+        $source_zone = new Source_Zone();
+        $output = $source_zone->getFromDbByItem($glpi_location);
+        $this->assertFalse($output);
+
+        // Test an asset with a location
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $computer = $this->createItem(Computer::class, [
+            'locations_id' => $glpi_location->getID(),
+        ]);
+        $source_zone = new Source_Zone();
+        $output = $source_zone->getFromDbByItem($glpi_location);
+        $this->assertFalse($output);
+
+        // Test an asset with plugin location data
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $location = $this->createItem(Location::class, [
+            'locations_id' => $glpi_location->getID(),
+        ]);
+        $computer = $this->createItem(Computer::class, [
+            'locations_id' => $glpi_location->getID(),
+        ]);
+        $source_zone = new Source_Zone();
+        $output = $source_zone->getFromDbByItem($glpi_location);
+        $this->assertFalse($output);
+
+        // Test an asset with plugin location data linked to a source_zone
+        $zone = $this->createItem(Zone::class);
+        $source = $this->createItem(Source::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            $zone::getForeignKeyField() => $zone->getID(),
+            $source::getForeignKeyField() => $source->getID(),
+        ]);
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $location = $this->createItem(Location::class, [
+            'locations_id' => $glpi_location->getID(),
+            'plugin_carbon_sources_zones_id' => $source_zone->getID(),
+        ]);
+        $computer = $this->createItem(Computer::class, [
+            'locations_id' => $glpi_location->getID(),
+        ]);
+        $source_zone = new Source_Zone();
+        $output = $source_zone->getFromDbByItem($glpi_location);
+        $this->assertTrue($output);
     }
 }

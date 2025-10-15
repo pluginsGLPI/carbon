@@ -40,6 +40,8 @@ use DBmysql;
 use Location as GlpiLocation;
 use Glpi\Application\View\TemplateRenderer;
 use Html;
+use InvalidArgumentException;
+use RuntimeException;
 
 class Source_Zone extends CommonDBRelation
 {
@@ -382,15 +384,31 @@ class Source_Zone extends CommonDBRelation
     }
 
     /**
-     * Get a source_zone by a location criteria
+     * Get a source_zone by a item criteria.
+     * If the item is a location, get the source_zone by location relation
+     * If the item is something else, get the source_zone by its associated location
      *
-     * @param GlpiLocation $item
+     * @param CommonDBTM $item
      * @return bool
      */
-    public function getFromDbByLocation(GlpiLocation $item): bool
+    public function getFromDbByItem(CommonDBTM $item): bool
     {
         if ($item->isNewItem()) {
             return false;
+        }
+
+        // Prepare WHERE clause dependingof the type of the item
+        $where = [];
+        if ($item->getType() === GlpiLocation::class) {
+            $where = [
+                Location::getTableField('locations_id') => $item->getID(),
+            ];
+        } elseif (isset($item->fields['locations_id'])) {
+            $where = [
+                Location::getTableField('locations_id') => $item->fields['locations_id'],
+            ];
+        } else {
+            throw new InvalidArgumentException('Invalid item');
         }
 
         $location_table = Location::getTable();
@@ -404,9 +422,7 @@ class Source_Zone extends CommonDBRelation
                     ]
                 ],
             ],
-            'WHERE' => [
-                Location::getTableField('locations_id') => $item->getID(),
-            ],
+            'WHERE' => $where,
         ];
 
         return $this->getFromDBByRequest($request);

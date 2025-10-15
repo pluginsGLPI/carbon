@@ -307,7 +307,7 @@ class Location extends CommonDBChild
     {
         $source_zone = new Source_Zone();
         /** @var GlpiLocation $item */
-        $source_zone->getFromDbByLocation($item);
+        $source_zone->getFromDbByItem($item);
         if ($source_zone->isNewItem()) {
             return false;
         }
@@ -324,7 +324,7 @@ class Location extends CommonDBChild
     {
         $source_zone = new Source_Zone();
         /** @var GlpiLocation $item */
-        if (!$source_zone->getFromDbByLocation($item)) {
+        if (!$source_zone->getFromDbByItem($item)) {
             return false;
         }
         return $source_zone->fields['is_download_enabled'] === 1;
