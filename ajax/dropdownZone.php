@@ -41,14 +41,11 @@ if (!Plugin::isPluginActive('carbon')) {
     die();
 }
 
-// throw new RuntimeException('Required argument missing or incorrect!');
-
 $source_zone_table = Source_Zone::getTable();
 $zone_table = Zone::getTable();
 $source_id = (int) $_POST['plugin_carbon_sources_id'];
 Zone::dropdown([
     'rand' => (int) $_POST['dom_id'],
     'condition' => Zone::getRestrictBySourceCondition($source_id),
-    // 'disabled'  => ($source_id === 0),
     'specific_tags' => ($source_id === 0 ? ['disabled' => 'disabled'] : []),
 ]);
