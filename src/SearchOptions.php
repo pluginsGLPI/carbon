@@ -179,10 +179,9 @@ class SearchOptions
                 ]
             ];
 
-            $computation = "IF(`glpi_computers_id_e1f6cdb2d63e8a0252da5d4cb339a927`.`is_deleted` = 0
-            AND `glpi_computers_id_e1f6cdb2d63e8a0252da5d4cb339a927`.`is_template` = 0
-            AND NOT `glpi_locations`.`country`  = ''
-            AND NOT `glpi_locations`.`country` IS NULL
+            $computation = "IF(`glpi_computers_id_963cd5e903dddc7ab00a3b70933369df`.`is_deleted` = 0
+            AND `glpi_computers_id_963cd5e903dddc7ab00a3b70933369df`.`is_template` = 0
+            AND `glpi_plugin_carbon_locations_3d6da7fccf9233a3f1a4e41183391a41`.`plugin_carbon_sources_zones_id` > 0
             AND `glpi_plugin_carbon_computerusageprofiles_09f8403aa14af64cd70f350288a0331b`.`id` > 0
             AND (
                 `glpi_plugin_carbon_computertypes_a643ab3ffd70abf99533ed214da87d60`.`power_consumption` > 0
@@ -200,10 +199,16 @@ class SearchOptions
                     'jointype' => 'empty',
                     'beforejoin' => [
                         [
-                            'table' => GlpiLocation::getTable(),
+                            'table' => Location::getTable(),
                             'joinparams' => [
-                                'jointype' => 'empty',
+                                'jointype' => 'child',
                                 'nolink'   => true,
+                                'beforejoin' => [
+                                    'table' => GlpiLocation::getTable(),
+                                    'joinparams' => [
+                                        'jointype' => 'empty',
+                                    ]
+                                ]
                             ]
                         ],
                         [
@@ -257,10 +262,9 @@ class SearchOptions
                 ]
             ];
         } else if ($itemtype === Monitor::class && in_array($itemtype, PLUGIN_CARBON_TYPES)) {
-            $computation = "IF(`glpi_monitors_id_fd9c1a8262e8f3b6e96bc8948f2a6226`.`is_deleted` = 0
-            AND `glpi_monitors_id_fd9c1a8262e8f3b6e96bc8948f2a6226`.`is_template` = 0
-            AND NOT `glpi_locations_fad8b1764dcda16e3822068239df73f2`.`country`  = ''
-            AND NOT `glpi_locations_fad8b1764dcda16e3822068239df73f2`.`country` IS NULL
+            $computation = "IF(`glpi_monitors_id_b24d2115745b49f0b5cdaf2ebb5e9ffe`.`is_deleted` = 0
+            AND `glpi_monitors_id_b24d2115745b49f0b5cdaf2ebb5e9ffe`.`is_template` = 0
+            AND `glpi_plugin_carbon_locations_3d6da7fccf9233a3f1a4e41183391a41`.`plugin_carbon_sources_zones_id` > 0
             AND (
                 `glpi_plugin_carbon_monitortypes_54b036337d1b9bbf4f13db0e1ae93bc9`.`power_consumption` > 0
                 OR `glpi_monitormodels`.`power_consumption` > 0
@@ -277,28 +281,33 @@ class SearchOptions
                     'jointype' => 'empty',
                     'beforejoin' => [
                         [
-                            'table' => GlpiLocation::getTable(),
+                            'table' => Location::getTable(),
                             'joinparams' => [
-                                'jointype' => 'empty',
-                                'nolink'   => true,
+                                'jointype' => 'child',
                                 'beforejoin' => [
-                                    'table' => Computer::getTable(),
-                                    'linkfield' => 'items_id_peripheral',
+                                    'table' => GlpiLocation::getTable(),
                                     'joinparams' => [
                                         'jointype' => 'empty',
                                         'beforejoin' => [
-                                            'table' => Asset_PeripheralAsset::getTable(),
+                                            'table' => Computer::getTable(),
+                                            'linkfield' => 'items_id_peripheral',
                                             'joinparams' => [
-                                                'jointype' => 'custom_condition_only',
-                                                'condition' => [
-                                                    'ON' => [
-                                                        'NEWTABLE' => 'items_id_peripheral',
-                                                        'REFTABLE' => 'id',
-                                                    ],
-                                                    'AND' => [
-                                                        'itemtype_peripheral' => Monitor::getType(),
+                                                'jointype' => 'empty',
+                                                'beforejoin' => [
+                                                    'table' => Asset_PeripheralAsset::getTable(),
+                                                    'joinparams' => [
+                                                        'jointype' => 'custom_condition_only',
+                                                        'condition' => [
+                                                            'ON' => [
+                                                                'NEWTABLE' => 'items_id_peripheral',
+                                                                'REFTABLE' => 'id',
+                                                            ],
+                                                            'AND' => [
+                                                                'itemtype_peripheral' => Monitor::getType(),
+                                                            ]
+                                                        ],
                                                     ]
-                                                ],
+                                                ]
                                             ]
                                         ]
                                     ]
@@ -309,7 +318,6 @@ class SearchOptions
                             'table' => MonitorType::getTable(),
                             'joinparams' => [
                                 'jointype' => 'child',
-                                'nolink'   => true,
                                 'beforejoin' => [
                                     'table' => GlpiMonitorType::getTable(),
                                     'joinparams' => [
@@ -322,7 +330,6 @@ class SearchOptions
                             'table' => MonitorModel::getTable(),
                             'joinparams' => [
                                 'jointype' => 'empty',
-                                'nolink'   => true,
                             ]
                         ],
                     ],
@@ -330,10 +337,9 @@ class SearchOptions
                 'computation' => $computation,
             ];
         } else if ($itemtype === NetworkEquipment::class && in_array($itemtype, PLUGIN_CARBON_TYPES)) {
-            $computation = "IF(`glpi_networkequipments_id_aef00423a27f97ae31ca50f63fb1a6fb`.`is_deleted` = 0
-            AND `glpi_networkequipments_id_aef00423a27f97ae31ca50f63fb1a6fb`.`is_template` = 0
-            AND NOT `glpi_locations`.`country`  = ''
-            AND NOT `glpi_locations`.`country` IS NULL
+            $computation = "IF(`glpi_networkequipments_id_401e18dd2eaa15834dcd21d0f6fc677c`.`is_deleted` = 0
+            AND `glpi_networkequipments_id_401e18dd2eaa15834dcd21d0f6fc677c`.`is_template` = 0
+            AND `glpi_plugin_carbon_locations_3d6da7fccf9233a3f1a4e41183391a41`.`plugin_carbon_sources_zones_id` > 0
             AND (
                 `glpi_plugin_carbon_networkequipmenttypes_640a9703b62363e5d254356fb4df69ef`.`power_consumption` > 0
                 OR `glpi_networkequipmentmodels`.`power_consumption` > 0
@@ -350,10 +356,16 @@ class SearchOptions
                     'jointype' => 'empty',
                     'beforejoin' => [
                         [
-                            'table' => GlpiLocation::getTable(),
+                            'table' => Location::getTable(),
                             'joinparams' => [
-                                'jointype' => 'empty',
+                                'jointype' => 'child',
                                 'nolink'   => true,
+                                'beforejoin' => [
+                                    'table' => GlpiLocation::getTable(),
+                                    'joinparams' => [
+                                        'jointype' => 'empty',
+                                    ]
+                                ]
                             ]
                         ],
                         [
