@@ -41,11 +41,14 @@ use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Dashboard\Provider;
+use GlpiPlugin\Carbon\Location;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\UsageInfo;
-use GlpiPlugin\Carbon\Impact\History\Computer as HistoryComputer;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
+use GlpiPlugin\Carbon\Zone;
 use Infocom;
-use Location;
+use Location as GlpiLocation;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Session;
 
@@ -88,15 +91,17 @@ class ProviderTest extends DbTestCase
             'power_consumption' => 150,
         ]);
 
-        $location_empty = $this->createItem(Location::class);
-        // $location_empty_2 = $this->createItem(Location::class, [
-        //     'latitude' => 1,
-        // ]);
-        // $location_empty_3 = $this->createItem(Location::class, [
-        //     'longitude' => 1,
-        // ]);
+        $glpi_location_empty = $this->createItem(GlpiLocation::class);
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $source = $this->createItem(Source::class);
+        $zone = $this->createItem(Zone::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            'plugin_carbon_sources_id' => $source->getID(),
+            'plugin_carbo_zones_id'    => $zone->getID(),
+        ]);
         $location = $this->createItem(Location::class, [
-            'country' => 'France',
+            'locations_id' => $glpi_location->getID(),
+            $source_zone::getForeignKeyField() => $source_zone->getID(),
         ]);
 
         $usage_profile = $this->createItem(ComputerUsageProfile::class);
@@ -107,43 +112,43 @@ class ProviderTest extends DbTestCase
                 [
                     'computermodels_id' => $computer_model_empty->getID(),
                     'computertypes_id'  => $glpi_computer_type_empty->getID(),
-                    'locations_id'      => $location_empty->getID(),
+                    'locations_id'      => $glpi_location_empty->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model->getID(),
                     'computertypes_id'  => $glpi_computer_type_empty->getID(),
-                    'locations_id'      => $location_empty->getID(),
+                    'locations_id'      => $glpi_location_empty->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model_empty->getID(),
                     'computertypes_id'  => $glpi_computer_type->getID(),
-                    'locations_id'      => $location_empty->getID(),
+                    'locations_id'      => $glpi_location_empty->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model->getID(),
                     'computertypes_id'  => $glpi_computer_type->getID(),
-                    'locations_id'      => $location_empty->getID(),
+                    'locations_id'      => $glpi_location_empty->getID(),
                 ],
 
                 [
                     'computermodels_id' => $computer_model_empty->getID(),
                     'computertypes_id'  => $glpi_computer_type_empty->getID(),
-                    'locations_id'      => $location->getID(),
+                    'locations_id'      => $glpi_location->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model->getID(),
                     'computertypes_id'  => $glpi_computer_type_empty->getID(),
-                    'locations_id'      => $location->getID(),
+                    'locations_id'      => $glpi_location->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model_empty->getID(),
                     'computertypes_id'  => $glpi_computer_type->getID(),
-                    'locations_id'      => $location->getID(),
+                    'locations_id'      => $glpi_location->getID(),
                 ],
                 [
                     'computermodels_id' => $computer_model->getID(),
                     'computertypes_id'  => $glpi_computer_type->getID(),
-                    'locations_id'      => $location->getID(),
+                    'locations_id'      => $glpi_location->getID(),
                 ],
             ]
         ];
@@ -199,10 +204,16 @@ class ProviderTest extends DbTestCase
         $computer_type    = $this->createItem(GlpiComputerType::class);
         $computer_model_1 = $this->createItem(ComputerModel::class);
         $computer_model_2 = $this->createItem(ComputerModel::class);
+        $source = $this->createItem(Source::class);
+        $zone = $this->createItem(Zone::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            'plugin_carbon_sources_id' => $source->getID(),
+            'plugin_carbo_zones_id'    => $zone->getID(),
+        ]);
+        $glpi_location = $this->createItem(GlpiLocation::class);
         $location = $this->createItem(Location::class, [
-            'latitude'  => '48.864716',
-            'longitude' => '2.349014',
-            'country'   => 'France'
+            'locations_id' => $glpi_location->getID(),
+            $source_zone::getForeignKeyField() => $source_zone->getID(),
         ]);
         $computer_1 = $this->createItem(Computer::class);
         $computer_2 = $this->createItem(Computer::class);
@@ -221,7 +232,7 @@ class ProviderTest extends DbTestCase
                         'entities_id'      => $entities_id,
                         'types_id'         => $computer_type->getID(),
                         'models_id'        => $computer_model_1->getID(),
-                        'locations_id'     => $location->getID(),
+                        'locations_id'     => $glpi_location->getID(),
                         'energy_per_day'   => 0.5,
                         'emission_per_day' => 1,
                         'date'             => $date->format('Y-m-d'),
@@ -231,7 +242,7 @@ class ProviderTest extends DbTestCase
                         'entities_id'      => $entities_id,
                         'types_id'         => $computer_type->getID(),
                         'models_id'        => $computer_model_2->getID(),
-                        'locations_id'     => $location->getID(),
+                        'locations_id'     => $glpi_location->getID(),
                         'energy_per_day'   => 1,
                         'emission_per_day' => 2,
                         'date'             => $date->format('Y-m-d'),
