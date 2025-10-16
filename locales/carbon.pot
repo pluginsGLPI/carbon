@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-14 01:42+0000\n"
+"POT-Creation-Date: 2025-10-16 01:44+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -606,20 +606,20 @@ msgstr ""
 msgid "Usage informations"
 msgstr ""
 
-#: src/UsageInfo.php:218 src/Dashboard/Widget.php:830
+#: src/UsageInfo.php:218 src/Dashboard/Widget.php:834
 #, php-format
 msgid "Evaluates the carbon emission in CO₂ equivalent. %s More information %s"
 msgstr ""
 
-#: src/UsageInfo.php:226 src/Dashboard/Widget.php:866
-#: src/Dashboard/Widget.php:903
+#: src/UsageInfo.php:226 src/Dashboard/Widget.php:870
+#: src/Dashboard/Widget.php:907
 #, php-format
 msgid ""
 "Evaluates the consumption of non renewable resources in Antimony equivalent. "
 "%s More information %s"
 msgstr ""
 
-#: src/UsageInfo.php:238 src/Dashboard/Widget.php:1088
+#: src/UsageInfo.php:238 src/Dashboard/Widget.php:1092
 #, php-format
 msgid "Evaluates the primary energy consumed. %s More information %s"
 msgstr ""
@@ -654,7 +654,7 @@ msgstr ""
 msgid "Monthly Carbon Emission"
 msgstr ""
 
-#: src/Dashboard/Widget.php:83 src/Dashboard/Widget.php:581
+#: src/Dashboard/Widget.php:83 src/Dashboard/Widget.php:585
 #: src/Dashboard/Grid.php:275
 msgid "Biggest monthly averaged carbon emission per model"
 msgstr ""
@@ -699,25 +699,25 @@ msgstr ""
 msgid "Consumed energy"
 msgstr ""
 
-#: src/Dashboard/Widget.php:723
+#: src/Dashboard/Widget.php:727
 #, php-format
 msgid ""
 "Evaluates the usage carbon emission in CO₂ equivalent during the last 2 "
 "months. %s More information %s"
 msgstr ""
 
-#: src/Dashboard/Widget.php:789
+#: src/Dashboard/Widget.php:793
 #, php-format
 msgid ""
 "Evaluates the usage carbon emission in CO₂ equivalent during the last 12 "
 "elapsed months. %s More information %s"
 msgstr ""
 
-#: src/Dashboard/Widget.php:1078
+#: src/Dashboard/Widget.php:1082
 msgid "Total embodied primary energy"
 msgstr ""
 
-#: src/Dashboard/Widget.php:1147
+#: src/Dashboard/Widget.php:1151
 msgid "Handled percentage"
 msgstr ""
 

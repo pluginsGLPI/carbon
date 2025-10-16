@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-13 01:48+0000\n"
+"POT-Creation-Date: 2025-10-16 01:44+0000\n"
 "PO-Revision-Date: 2025-07-03 13:58+0000\n"
 "Last-Translator: Milo Ivir <mail@milotype.de>, 2025\n"
 "Language-Team: Croatian (Croatia) (https://app.transifex.com/teclib/teams/28042/hr_HR/)\n"
@@ -639,14 +639,14 @@ msgstr "Preuzimanje aktivirano"
 msgid "Usage informations"
 msgstr "Informacije o korištenju"
 
-#: src/UsageInfo.php:218 src/Dashboard/Widget.php:830
+#: src/UsageInfo.php:218 src/Dashboard/Widget.php:834
 #, php-format
 msgid ""
 "Evaluates the carbon emission in CO₂ equivalent. %s More information %s"
 msgstr "Evaluira emisiju ugljika u ekvivalentu CO₂. %s Više informacija %s"
 
-#: src/UsageInfo.php:226 src/Dashboard/Widget.php:866
-#: src/Dashboard/Widget.php:903
+#: src/UsageInfo.php:226 src/Dashboard/Widget.php:870
+#: src/Dashboard/Widget.php:907
 #, php-format
 msgid ""
 "Evaluates the consumption of non renewable resources in Antimony equivalent."
@@ -655,7 +655,7 @@ msgstr ""
 "Evaluira potrošnju neobnovljivih resursa u ekvivalentu antimona. %s Više "
 "informacija %s"
 
-#: src/UsageInfo.php:238 src/Dashboard/Widget.php:1088
+#: src/UsageInfo.php:238 src/Dashboard/Widget.php:1092
 #, php-format
 msgid "Evaluates the primary energy consumed. %s More information %s"
 msgstr "Evaluira potrošenu primarnu energiju. %s Više informacija %s"
@@ -691,7 +691,7 @@ msgstr "Ukupna emisija ugljika"
 msgid "Monthly Carbon Emission"
 msgstr "Mjesečna emisija ugljika"
 
-#: src/Dashboard/Widget.php:83 src/Dashboard/Widget.php:581
+#: src/Dashboard/Widget.php:83 src/Dashboard/Widget.php:585
 #: src/Dashboard/Grid.php:275
 msgid "Biggest monthly averaged carbon emission per model"
 msgstr "Najveća prosječna mjesečna emisija ugljika po modelu"
@@ -736,7 +736,7 @@ msgstr "Emisija ugljika"
 msgid "Consumed energy"
 msgstr "Potrošena energija"
 
-#: src/Dashboard/Widget.php:723
+#: src/Dashboard/Widget.php:727
 #, php-format
 msgid ""
 "Evaluates the usage carbon emission in CO₂ equivalent during the last 2 "
@@ -745,7 +745,7 @@ msgstr ""
 "Evaluira emisiju ugljika u ekvivalentu CO₂ tijekom zadnja 2 mjeseca. %s Više"
 " informacija %s"
 
-#: src/Dashboard/Widget.php:789
+#: src/Dashboard/Widget.php:793
 #, php-format
 msgid ""
 "Evaluates the usage carbon emission in CO₂ equivalent during the last 12 "
@@ -754,11 +754,11 @@ msgstr ""
 "Evaluira emisiju ugljika u ekvivalentu CO₂ tijekom zadnjih 12 mjeseci. %s "
 "Više informacija %s"
 
-#: src/Dashboard/Widget.php:1078
+#: src/Dashboard/Widget.php:1082
 msgid "Total embodied primary energy"
 msgstr "Ukupna ugrađena primarna energija"
 
-#: src/Dashboard/Widget.php:1147
+#: src/Dashboard/Widget.php:1151
 msgid "Handled percentage"
 msgstr "Postotak upravljanih"
 
