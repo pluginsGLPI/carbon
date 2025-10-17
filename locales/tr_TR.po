@@ -4,17 +4,17 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 # Translators:
-# Thierry Bugier <tbugier@teclib.com>, 2025
 # Kaya Zeren <kayazeren@gmail.com>, 2025
+# Thierry Bugier <tbugier@teclib.com>, 2025
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-14 01:42+0000\n"
+"POT-Creation-Date: 2025-10-17 01:43+0000\n"
 "PO-Revision-Date: 2025-07-03 13:58+0000\n"
-"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2025\n"
+"Last-Translator: Thierry Bugier <tbugier@teclib.com>, 2025\n"
 "Language-Team: Turkish (Turkey) (https://app.transifex.com/teclib/teams/28042/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -635,7 +635,7 @@ msgstr "İndirme açık"
 msgid "Usage informations"
 msgstr "Kullanım bilgileri"
 
-#: src/UsageInfo.php:218 src/Dashboard/Widget.php:830
+#: src/UsageInfo.php:218 src/Dashboard/Widget.php:834
 #, php-format
 msgid ""
 "Evaluates the carbon emission in CO₂ equivalent. %s More information %s"
@@ -643,8 +643,8 @@ msgstr ""
 "Karbon emisyonunu CO₂ eşdeğeri olarak değerlendirir. %s Ayrıntılı bilgi alın"
 " %s"
 
-#: src/UsageInfo.php:226 src/Dashboard/Widget.php:866
-#: src/Dashboard/Widget.php:903
+#: src/UsageInfo.php:226 src/Dashboard/Widget.php:870
+#: src/Dashboard/Widget.php:907
 #, php-format
 msgid ""
 "Evaluates the consumption of non renewable resources in Antimony equivalent."
@@ -653,7 +653,7 @@ msgstr ""
 "Yenilenebilir olmayan kaynakların tüketimini antimon eşdeğeri olarak "
 "değerlendirir. %s Ayrıntılı bilgi alın %s"
 
-#: src/UsageInfo.php:238 src/Dashboard/Widget.php:1088
+#: src/UsageInfo.php:238 src/Dashboard/Widget.php:1092
 #, php-format
 msgid "Evaluates the primary energy consumed. %s More information %s"
 msgstr "Birincil enerji tüketimini değerlendirir. %s Ayrıntılı bilgi alın %s"
@@ -688,7 +688,7 @@ msgstr "Toplam karbon emisyonu"
 msgid "Monthly Carbon Emission"
 msgstr "Aylık karbon emisyonu"
 
-#: src/Dashboard/Widget.php:83 src/Dashboard/Widget.php:581
+#: src/Dashboard/Widget.php:83 src/Dashboard/Widget.php:585
 #: src/Dashboard/Grid.php:275
 msgid "Biggest monthly averaged carbon emission per model"
 msgstr "Her model için en büyük aylık ortalama karbon emisyonu"
@@ -733,7 +733,7 @@ msgstr "Karbon emisyonu"
 msgid "Consumed energy"
 msgstr "Enerji tüketimi"
 
-#: src/Dashboard/Widget.php:723
+#: src/Dashboard/Widget.php:727
 #, php-format
 msgid ""
 "Evaluates the usage carbon emission in CO₂ equivalent during the last 2 "
@@ -742,7 +742,7 @@ msgstr ""
 "Son 2 aylık karbon emisyonunu kullanımını CO₂ eşdeğeri olarak değerlendirir."
 " %s Ayrıntılı bilgi alın %s"
 
-#: src/Dashboard/Widget.php:789
+#: src/Dashboard/Widget.php:793
 #, php-format
 msgid ""
 "Evaluates the usage carbon emission in CO₂ equivalent during the last 12 "
@@ -751,11 +751,11 @@ msgstr ""
 "Son 12 aylık karbon emisyonunu kullanımını CO₂ eşdeğeri olarak "
 "değerlendirir. %s Ayrıntılı bilgi alın %s"
 
-#: src/Dashboard/Widget.php:1078
+#: src/Dashboard/Widget.php:1082
 msgid "Total embodied primary energy"
 msgstr "Toplam gerçekleşen birincil enerji"
 
-#: src/Dashboard/Widget.php:1147
+#: src/Dashboard/Widget.php:1151
 msgid "Handled percentage"
 msgstr "İşlenen yüzde"
 
