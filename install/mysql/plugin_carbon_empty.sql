@@ -94,6 +94,7 @@ CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_computertypes` (
   `computertypes_id`  int unsigned NOT NULL DEFAULT '0',
   `power_consumption` int          DEFAULT '0',
   `category`          int          NOT NULL DEFAULT '0' COMMENT 'ComputerType::CATEGORY_* constants',
+  `is_ignore`         tinyint      NOT NULL DEFAULT '0' COMMENT 'Ignored from calculations',
   PRIMARY KEY (`id`),
   UNIQUE KEY `unicity` (`computertypes_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -142,6 +143,7 @@ CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_monitortypes` (
   `id`                int unsigned NOT NULL AUTO_INCREMENT,
   `monitortypes_id`   int unsigned NOT NULL DEFAULT '0',
   `power_consumption` int          DEFAULT '0',
+  `is_ignore`         tinyint      NOT NULL DEFAULT '0' COMMENT 'Ignored from calculations',
   PRIMARY KEY (`id`),
   UNIQUE KEY `unicity` (`monitortypes_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -150,6 +152,7 @@ CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_networkequipmenttypes` (
   `id`                       int unsigned NOT NULL AUTO_INCREMENT,
   `networkequipmenttypes_id` int unsigned NOT NULL DEFAULT '0',
   `power_consumption`        int          DEFAULT '0',
+  `is_ignore`                tinyint      NOT NULL DEFAULT '0' COMMENT 'Ignored from calculations',
   PRIMARY KEY (`id`),
   UNIQUE KEY `unicity` (`networkequipmenttypes_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

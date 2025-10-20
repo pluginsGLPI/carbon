@@ -52,6 +52,9 @@ use GlpiPlugin\Carbon\SearchOptions;
 use GlpiPlugin\Carbon\UsageImpact;
 use Glpi\DBAL\QueryExpression;
 use Glpi\DBAL\QuerySubQuery;
+use Monitor;
+use Network;
+use NetworkEquipment;
 use Search;
 use Session;
 use Toolbox as GlpiToolbox;
@@ -393,6 +396,7 @@ class Provider
 
             $handled = self::getHandledAssetCount($itemtype, true, $params);
             $unhandled = self::getHandledAssetCount($itemtype, false, $params);
+            $ignored = self::getIgnoredAssetCount($itemtype, $params);
 
             $data['labels'][] = $itemtype_name;
             $data['series'][0]['name'] = __('Handled', 'carbon');
@@ -404,6 +408,11 @@ class Provider
             $data['series'][1]['data'][] = [
                 'value' => $unhandled['number'],
                 'url'   => $unhandled['url'],
+            ];
+            $data['series'][2]['name'] = __('Ignored', 'carbon');
+            $data['series'][2]['data'][] = [
+                'value' => $ignored['number'],
+                'url'   => $ignored['url'],
             ];
         }
 
@@ -441,6 +450,61 @@ class Provider
                     'field'      => SearchOptions::IS_HISTORIZABLE,
                     'searchtype' => 'equals',
                     'value'      => $handled ? 1 : 0
+                ],
+            ],
+            'reset'    => 'reset'
+        ];
+        if ($handled === false) {
+            // If we count unhandled assets, we must exclude ighored assets from the count
+            $search_criteria['criteria'][] = [
+                'field'      => SearchOptions::IS_IGNORED,
+                'searchtype' => 'equals',
+                'value'      => 0
+            ];
+        }
+        // $itemtype_table = (new DbUtils())->getTableForItemType($itemtype);
+        // Exploit defaultWhere to inject WHERE criterias from dashboard filters
+        // $filter_criteria = self::getFiltersCriteria($itemtype_table, $params['apply_filters'] ?? []);
+        $search_data = Search::prepareDatasForSearch($itemtype, $search_criteria);
+        Search::constructSQL($search_data);
+        Search::constructData($search_data, true);
+
+        $search_url = GlpiToolbox::getItemTypeSearchURL($itemtype);
+        $count = $search_data['data']['totalcount'] ?? null;
+        $url = $search_url . '?' . GlpiToolbox::append_params($search_criteria);
+
+        return [
+            'number' => $count,
+            'url'    => $url,
+            'label'  => $params['label'],
+            'icon'   => $params['icon'],
+        ];
+    }
+
+    /**
+     * Count the assets having all required data to compute carbon intensity
+     *
+     * @param string $itemtype the itemtype to count
+     * @param array  $params
+     * @return array count of items
+     */
+    public static function getIgnoredAssetCount(string $itemtype, array $params = []): array
+    {
+        $itemtype_name = $itemtype::getTypeName(Session::getPluralNumber());
+        $itemtype_name = strtolower($itemtype_name);
+        $label = __("plugin carbon - ignored %s", 'carbon');
+        $default_params = [
+            'label' => sprintf($label, $itemtype_name),
+            'icon'  => '',
+        ];
+        $params = array_merge($default_params, $params);
+
+        $search_criteria = [
+            'criteria' => [
+                [
+                    'field'      => SearchOptions::IS_IGNORED,
+                    'searchtype' => 'equals',
+                    'value'      => 1
                 ],
             ],
             'reset'    => 'reset'

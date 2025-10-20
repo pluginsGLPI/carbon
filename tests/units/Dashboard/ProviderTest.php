@@ -37,11 +37,14 @@ use ComputerModel;
 use ComputerType as GlpiComputerType;
 use DateInterval;
 use DateTime;
+use Glpi\Asset\Asset_PeripheralAsset;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Dashboard\Provider;
 use GlpiPlugin\Carbon\Location;
+use GlpiPlugin\Carbon\MonitorType;
+use GlpiPlugin\Carbon\NetworkEquipmentType;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\UsageInfo;
@@ -49,10 +52,11 @@ use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\Zone;
 use Infocom;
 use Location as GlpiLocation;
+use Monitor;
+use MonitorType as GlpiMonitorType;
+use NetworkEquipment;
+use NetworkEquipmentType as GlpiNetworkEquipmentType;
 use PHPUnit\Framework\Attributes\CoversClass;
-use Session;
-
-use function PHPUnit\Framework\assertEquals;
 
 #[CoversClass('GlpiPlugin\Carbon\Dashboard\Provider')]
 class ProviderTest extends DbTestCase
@@ -456,5 +460,241 @@ class ProviderTest extends DbTestCase
         ];
 
         $this->assertEquals($expected, $result['data']['series']);
+    }
+
+    public function testGetIgnoredAssetCount()
+    {
+        // General guideline for this test
+        // To avoid repeated calls to isolateInEntity,
+        // For a given itemtype, we first test an item which shall be not ignored
+        // Then we test an item which shall be ignored
+
+        $entities_id = $this->isolateInEntity('glpi', 'glpi');
+
+        // Test with a computer which must be taken into account
+        $source = $this->createItem(Source::class);
+        $zone = $this->createItem(Zone::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            'plugin_carbon_sources_id' => $source->getID(),
+            'plugin_carbo_zones_id'    => $zone->getID(),
+        ]);
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $location = $this->createItem(Location::class, [
+            'locations_id' => $glpi_location->getID(),
+            $source_zone::getForeignKeyField() => $source_zone->getID(),
+        ]);
+        $usage_profile = $this->createItem(ComputerUsageProfile::class);
+        $glpi_computer_type = $this->createItem(GlpiComputerType::class);
+        $computer_type = $this->createItem(ComputerType::class, [
+            'computertypes_id' => $glpi_computer_type->getID(),
+            'power_consumption' => 90,
+            'is_ignore' => 0,
+        ]);
+        $computer = $this->createItem(Computer::class, [
+            'locations_id' => $glpi_location->getID(),
+            'computertypes_id' => $glpi_computer_type->getID(),
+        ]);
+        $infocom = $this->createItem(Infocom::class, [
+            'itemtype' => $computer->getType(),
+            'items_id' => $computer->getID(),
+            'buy_date' => '2024-01-01',
+        ]);
+        $impact = $this->createItem(UsageInfo::class, [
+            'itemtype' => Computer::class,
+            'items_id' => $computer->getID(),
+            'plugin_carbon_computerusageprofiles_id' => $usage_profile->getID(),
+        ]);
+        $handled_count = Provider::getIgnoredAssetCount(Computer::class);
+        $this->assertEquals(0, $handled_count['number']);
+
+        // Test with a computer which must be ignored
+        $source = $this->createItem(Source::class);
+        $zone = $this->createItem(Zone::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            'plugin_carbon_sources_id' => $source->getID(),
+            'plugin_carbo_zones_id'    => $zone->getID(),
+        ]);
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $location = $this->createItem(Location::class, [
+            'locations_id' => $glpi_location->getID(),
+            $source_zone::getForeignKeyField() => $source_zone->getID(),
+        ]);
+        $usage_profile = $this->createItem(ComputerUsageProfile::class);
+        $glpi_computer_type = $this->createItem(GlpiComputerType::class);
+        $computer_type = $this->createItem(ComputerType::class, [
+            'computertypes_id' => $glpi_computer_type->getID(),
+            'power_consumption' => 90,
+            'is_ignore' => 1,
+        ]);
+        $computer = $this->createItem(Computer::class, [
+            'locations_id' => $glpi_location->getID(),
+            'computertypes_id' => $glpi_computer_type->getID(),
+        ]);
+        $infocom = $this->createItem(Infocom::class, [
+            'itemtype' => $computer->getType(),
+            'items_id' => $computer->getID(),
+            'buy_date' => '2024-01-01',
+        ]);
+        $impact = $this->createItem(UsageInfo::class, [
+            'itemtype' => Computer::class,
+            'items_id' => $computer->getID(),
+            'plugin_carbon_computerusageprofiles_id' => $usage_profile->getID(),
+        ]);
+        $handled_count = Provider::getIgnoredAssetCount(Computer::class);
+        $this->assertEquals(1, $handled_count['number']);
+
+        // Test with a monitor which must be taken into account
+        $source = $this->createItem(Source::class);
+        $zone = $this->createItem(Zone::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            'plugin_carbon_sources_id' => $source->getID(),
+            'plugin_carbo_zones_id'    => $zone->getID(),
+        ]);
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $location = $this->createItem(Location::class, [
+            'locations_id' => $glpi_location->getID(),
+            $source_zone::getForeignKeyField() => $source_zone->getID(),
+        ]);
+        $usage_profile = $this->createItem(ComputerUsageProfile::class);
+        $glpi_computer_type = $this->createItem(GlpiComputerType::class);
+        $computer_type = $this->createItem(ComputerType::class, [
+            'computertypes_id' => $glpi_computer_type->getID(),
+            'power_consumption' => 90,
+            'is_ignore' => 0,
+        ]);
+        $computer = $this->createItem(Computer::class, [
+            'locations_id' => $glpi_location->getID(),
+            'computertypes_id' => $glpi_computer_type->getID(),
+        ]);
+        $glpi_monitor_type = $this->createItem(GlpiMonitorType::class);
+        $monitor_type = $this->createItem(MonitorType::class, [
+            'monitortypes_id' => $glpi_monitor_type->getID(),
+            'power_consumption' => 50,
+            'is_ignore' => 0,
+        ]);
+        $monitor = $this->createItem(Monitor::class, [
+            'locations_id' => $glpi_location->getID(),
+            'monitortypes_id' => $glpi_monitor_type->getID(),
+        ]);
+        $infocom = $this->createItem(Infocom::class, [
+            'itemtype' => $monitor->getType(),
+            'items_id' => $monitor->getID(),
+            'buy_date' => '2024-01-01',
+        ]);
+        $asset_peripheralasset = $this->createItem(Asset_PeripheralAsset::class, [
+            'itemtype_asset' => $computer->getType(),
+            'items_id_asset' => $computer->getID(),
+            'itemtype_peripheral' => $monitor->getType(),
+            'items_id_peripheral' => $monitor->getID(),
+        ]);
+        $handled_count = Provider::getIgnoredAssetCount(Monitor::class);
+        $this->assertEquals(0, $handled_count['number']);
+
+        // Test with a monitor which must be ignored
+        $source = $this->createItem(Source::class);
+        $zone = $this->createItem(Zone::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            'plugin_carbon_sources_id' => $source->getID(),
+            'plugin_carbo_zones_id'    => $zone->getID(),
+        ]);
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $location = $this->createItem(Location::class, [
+            'locations_id' => $glpi_location->getID(),
+            $source_zone::getForeignKeyField() => $source_zone->getID(),
+        ]);
+        $usage_profile = $this->createItem(ComputerUsageProfile::class);
+        $glpi_computer_type = $this->createItem(GlpiComputerType::class);
+        $computer_type = $this->createItem(ComputerType::class, [
+            'computertypes_id' => $glpi_computer_type->getID(),
+            'power_consumption' => 90,
+            'is_ignore' => 0,
+        ]);
+        $computer = $this->createItem(Computer::class, [
+            'locations_id' => $glpi_location->getID(),
+            'computertypes_id' => $glpi_computer_type->getID(),
+        ]);
+        $glpi_monitor_type = $this->createItem(GlpiMonitorType::class);
+        $monitor_type = $this->createItem(MonitorType::class, [
+            'monitortypes_id' => $glpi_monitor_type->getID(),
+            'power_consumption' => 50,
+            'is_ignore' => 1,
+        ]);
+        $monitor = $this->createItem(Monitor::class, [
+            'locations_id' => $glpi_location->getID(),
+            'monitortypes_id' => $glpi_monitor_type->getID(),
+        ]);
+        $infocom = $this->createItem(Infocom::class, [
+            'itemtype' => $monitor->getType(),
+            'items_id' => $monitor->getID(),
+            'buy_date' => '2024-01-01',
+        ]);
+        $asset_peripheralasset = $this->createItem(Asset_PeripheralAsset::class, [
+            'itemtype_asset' => $computer->getType(),
+            'items_id_asset' => $computer->getID(),
+            'itemtype_peripheral' => $monitor->getType(),
+            'items_id_peripheral' => $monitor->getID(),
+        ]);
+        $handled_count = Provider::getIgnoredAssetCount(Monitor::class);
+        $this->assertEquals(1, $handled_count['number']);
+
+        // Test with a network equipment which must be taken into account
+        $source = $this->createItem(Source::class);
+        $zone = $this->createItem(Zone::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            'plugin_carbon_sources_id' => $source->getID(),
+            'plugin_carbo_zones_id'    => $zone->getID(),
+        ]);
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $location = $this->createItem(Location::class, [
+            'locations_id' => $glpi_location->getID(),
+            $source_zone::getForeignKeyField() => $source_zone->getID(),
+        ]);
+        $glpi_network_equipment_type = $this->createItem(GlpiNetworkEquipmentType::class);
+        $network_equipment_type = $this->createItem(NetworkEquipmentType::class, [
+            'networkequipmenttypes_id' => $glpi_network_equipment_type->getID(),
+            'power_consumption' => 90,
+            'is_ignore' => 0,
+        ]);
+        $network_equipment = $this->createItem(NetworkEquipment::class, [
+            'locations_id' => $glpi_location->getID(),
+            'networkequipmenttypes_id' => $glpi_computer_type->getID(),
+        ]);
+        $infocom = $this->createItem(Infocom::class, [
+            'itemtype' => $network_equipment->getType(),
+            'items_id' => $network_equipment->getID(),
+            'buy_date' => '2024-01-01',
+        ]);
+        $handled_count = Provider::getIgnoredAssetCount(NetworkEquipment::class);
+        $this->assertEquals(0, $handled_count['number']);
+
+        // Test with a network equipment which must be ignored
+        $source = $this->createItem(Source::class);
+        $zone = $this->createItem(Zone::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            'plugin_carbon_sources_id' => $source->getID(),
+            'plugin_carbo_zones_id'    => $zone->getID(),
+        ]);
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $location = $this->createItem(Location::class, [
+            'locations_id' => $glpi_location->getID(),
+            $source_zone::getForeignKeyField() => $source_zone->getID(),
+        ]);
+        $glpi_network_equipment_type = $this->createItem(GlpiNetworkEquipmentType::class);
+        $network_equipment_type = $this->createItem(NetworkEquipmentType::class, [
+            'networkequipmenttypes_id' => $glpi_network_equipment_type->getID(),
+            'power_consumption' => 90,
+            'is_ignore' => 1,
+        ]);
+        $network_equipment = $this->createItem(NetworkEquipment::class, [
+            'locations_id' => $glpi_location->getID(),
+            'networkequipmenttypes_id' => $glpi_network_equipment_type->getID(),
+        ]);
+        $infocom = $this->createItem(Infocom::class, [
+            'itemtype' => $network_equipment->getType(),
+            'items_id' => $network_equipment->getID(),
+            'buy_date' => '2024-01-01',
+        ]);
+        $handled_count = Provider::getIgnoredAssetCount(NetworkEquipment::class);
+        $this->assertEquals(1, $handled_count['number']);
     }
 }

@@ -159,6 +159,14 @@
                             {{ fields.field('', field, __('The asset has a type', 'carbon')) }}
                         {% endif %}
 
+                        {% if status.not_is_ignore is defined %}
+                            {% set field = nok_field %}
+                            {% if status.not_is_ignore %}
+                                {% set field = ok_field %}
+                            {% endif %}
+                            {{ fields.field('', field, __('Type is not ignored', 'carbon')) }}
+                        {% endif %}
+
                         {% if status.has_type_power_consumption is defined %}
                             {% set field = nok_field %}
                             {% if status.has_model_power_consumption is defined %}

@@ -122,6 +122,10 @@ class NetworkEquipment extends AbstractAsset
                 self::$itemtype::getTableField('is_deleted') => 0,
                 self::$itemtype::getTableField('is_template') => 0,
                 Location::getTableField('plugin_carbon_sources_zones_id') => ['>', 0],
+                'OR' => [
+                    [NetworkEquipmentType::getTableField('is_ignore') => 0],
+                    [NetworkEquipmentType::getTableField('is_ignore') => null],
+                ],
                 [
                     'OR' => [
                         NetworkEquipmentType::getTableField('power_consumption') => ['>', 0],
@@ -167,6 +171,7 @@ class NetworkEquipment extends AbstractAsset
             GlpiNetworkEquipmentType::getTableField('id as type_id'),
             NetworkEquipmentType::getTableField('id as plugin_carbon_type_id'),
             NetworkEquipmentType::getTableField('power_consumption  as type_power_consumption'),
+            NetworkEquipmentType::getTableField('is_ignore'),
             Infocom::getTableField('use_date'),
             Infocom::getTableField('delivery_date'),
             Infocom::getTableField('buy_date'),
@@ -215,6 +220,7 @@ class NetworkEquipment extends AbstractAsset
         $status['has_type_power_consumption'] = (($data['type_power_consumption'] ?? 0) !== 0);
         $status['ci_download_enabled'] = $is_carbon_intensity_download_enabled;
         $status['ci_fallback_available'] = $is_carbon_intensity_fallback_available;
+        $status['not_is_ignore'] = (($data['is_ignore'] ?? 0) === 0);
 
         $item_oldest_date = $data['use_date']
             ?? $data['delivery_date']

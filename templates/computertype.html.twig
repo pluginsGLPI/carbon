@@ -47,4 +47,10 @@
             display_emptychoice: true
         }
     ) }}
+
+    {{ fields.dropdownYesNo(
+        'is_ignore',
+        item.fields['is_ignore'],
+        __('Do not evaluate', 'carbon'),
+    ) }}
 {% endblock %}

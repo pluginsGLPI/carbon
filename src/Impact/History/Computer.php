@@ -146,6 +146,10 @@ class Computer extends AbstractAsset
                     self::$itemtype::getTableField('is_deleted') => 0,
                     self::$itemtype::getTableField('is_template') => 0,
                     Location::getTableField('plugin_carbon_sources_zones_id') => ['>', 0],
+                    'OR' => [
+                        [ComputerType::getTableField('is_ignore') => 0],
+                        [ComputerType::getTableField('is_ignore') => null],
+                    ],
                     [
                         'OR' => [
                             ComputerType::getTableField('power_consumption') => ['>', 0],
@@ -191,6 +195,7 @@ class Computer extends AbstractAsset
             ComputerType::getTableField('id as plugin_carbon_type_id'),
             ComputerType::getTableField('power_consumption  as type_power_consumption'),
             ComputerType::getTableField('category'),
+            ComputerType::getTableField('is_ignore'),
             UsageInfo::getTableField('plugin_carbon_computerusageprofiles_id'),
             Infocom::getTableField('use_date'),
             Infocom::getTableField('delivery_date'),
@@ -234,6 +239,7 @@ class Computer extends AbstractAsset
         $status['has_category'] = (($data['category'] ?? 0) !== ComputerType::CATEGORY_UNDEFINED);
         $status['ci_download_enabled'] = $is_carbon_intensity_download_enabled;
         $status['ci_fallback_available'] = $is_carbon_intensity_fallback_available;
+        $status['not_is_ignore'] = (($data['is_ignore'] ?? 0) === 0);
 
         $item_oldest_date = $data['use_date']
             ?? $data['delivery_date']
