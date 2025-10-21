@@ -45,7 +45,8 @@ class ComputerTypeTest extends DbTestCase
         $glpi_computer_type = $this->getItem(GlpiComputerType::class);
         $instance = new ComputerType();
         $result = $instance->getTabNameForItem($glpi_computer_type);
-        $this->assertEquals('Carbon', $result);
+        $crawler = new Crawler($result);
+        $this->assertEquals('Carbon', $crawler->text());
 
         $result = $instance->getTabNameForItem($glpi_computer_type, 1);
         $this->assertEquals('', $result);
