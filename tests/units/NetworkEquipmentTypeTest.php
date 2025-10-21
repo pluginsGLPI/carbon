@@ -49,7 +49,8 @@ class NetworkEquipmentTypeTest extends DbTestCase
         $glpi_networkequipment_type = $this->getItem(GlpiNetworkEquipmentType::class);
         $instance = new NetworkEquipmentType();
         $result = $instance->getTabNameForItem($glpi_networkequipment_type);
-        $this->assertEquals('Carbon', $result);
+        $crawler = new Crawler($result);
+        $this->assertEquals('Carbon', $crawler->text());
 
         $result = $instance->getTabNameForItem($glpi_networkequipment_type, 1);
         $this->assertEquals('', $result);
