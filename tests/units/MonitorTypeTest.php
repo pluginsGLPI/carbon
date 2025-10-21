@@ -54,7 +54,8 @@ class MonitorTypeTest extends DbTestCase
         $glpi_monitor_type = $this->createItem(GlpiMonitorType::class);
         $instance = new MonitorType();
         $result = $instance->getTabNameForItem($glpi_monitor_type);
-        $this->assertEquals('Carbon', $result);
+        $crawler = new Crawler($result);
+        $this->assertEquals('Carbon', $crawler->text());
 
         $result = $instance->getTabNameForItem($glpi_monitor_type, 1);
         $this->assertEquals('', $result);
