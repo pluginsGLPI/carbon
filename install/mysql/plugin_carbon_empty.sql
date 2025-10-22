@@ -89,6 +89,22 @@ CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_sources_zones` (
   UNIQUE KEY `unicity` (`plugin_carbon_sources_id`, `plugin_carbon_zones_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_computermodels` (
+  `id`                int unsigned NOT NULL AUTO_INCREMENT,
+  `computermodels_id` int unsigned NOT NULL DEFAULT '0',
+  `gwp`               int          DEFAULT '0'  COMMENT '(unit gCO2eq) Global warming potential',
+  `gwp_source`        mediumtext   DEFAULT NULL COMMENT 'any information to describe the source, URL preferred',
+  `gwp_quality`       int          DEFAULT '0'  COMMENT 'DataTtacking\\AbstractTracked::DATA_QUALITY_* constants',
+  `adp`               int          DEFAULT '0'  COMMENT '(unit gSbEq) Abiotic depletion potential',
+  `adp_source`        mediumtext   DEFAULT NULL COMMENT 'any information to describe the source, URL preferred',
+  `adp_quality`       int          DEFAULT '0'  COMMENT 'DataTtacking\\AbstractTracked::DATA_QUALITY_* constants',
+  `pe`                int          DEFAULT '0'  COMMENT '(unit J) Primary energy',
+  `pe_source`         mediumtext   DEFAULT NULL COMMENT 'any information to describe the source, URL preferred',
+  `pe_quality`        int          DEFAULT '0'  COMMENT 'DataTtacking\\AbstractTracked::DATA_QUALITY_* constants',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unicity` (`computermodels_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_computertypes` (
   `id`                int unsigned NOT NULL AUTO_INCREMENT,
   `computertypes_id`  int unsigned NOT NULL DEFAULT '0',
@@ -139,6 +155,22 @@ CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_environmentalimpacts` (
   UNIQUE KEY `unicity` (`computers_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_monitormodels` (
+  `id`               int unsigned NOT NULL AUTO_INCREMENT,
+  `monitormodels_id` int unsigned NOT NULL DEFAULT '0',
+  `gwp`              int          DEFAULT '0'  COMMENT '(unit gCO2eq) Global warming potential',
+  `gwp_source`       mediumtext   DEFAULT NULL COMMENT 'any information to describe the source, URL preferred',
+  `gwp_quality`      int          DEFAULT '0'  COMMENT 'DataTtacking\\AbstractTracked::DATA_QUALITY_* constants',
+  `adp`               int          DEFAULT '0'  COMMENT '(unit gSbEq) Abiotic depletion potential',
+  `adp_source`        mediumtext   DEFAULT NULL COMMENT 'any information to describe the source, URL preferred',
+  `adp_quality`       int          DEFAULT '0'  COMMENT 'DataTtacking\\AbstractTracked::DATA_QUALITY_* constants',
+  `pe`                int          DEFAULT '0'  COMMENT '(unit J) Primary energy',
+  `pe_source`         mediumtext   DEFAULT NULL COMMENT 'any information to describe the source, URL preferred',
+  `pe_quality`        int          DEFAULT '0'  COMMENT 'DataTtacking\\AbstractTracked::DATA_QUALITY_* constants',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unicity` (`monitormodels_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_monitortypes` (
   `id`                int unsigned NOT NULL AUTO_INCREMENT,
   `monitortypes_id`   int unsigned NOT NULL DEFAULT '0',
@@ -146,6 +178,22 @@ CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_monitortypes` (
   `is_ignore`         tinyint      NOT NULL DEFAULT '0' COMMENT 'Ignored from calculations',
   PRIMARY KEY (`id`),
   UNIQUE KEY `unicity` (`monitortypes_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_networkequipmentmodels` (
+  `id`                        int unsigned NOT NULL AUTO_INCREMENT,
+  `networkequipmentmodels_id` int unsigned NOT NULL DEFAULT '0',
+  `gwp`                       int          DEFAULT '0'  COMMENT '(unit gCO2eq) Global warming potential',
+  `gwp_source`                mediumtext   DEFAULT NULL COMMENT 'any information to describe the source, URL preferred',
+  `gwp_quality`               int          DEFAULT '0'  COMMENT 'DataTtacking\\AbstractTracked::DATA_QUALITY_* constants',
+  `adp`                       int          DEFAULT '0'  COMMENT '(unit gSbEq) Abiotic depletion potential',
+  `adp_source`                mediumtext   DEFAULT NULL COMMENT 'any information to describe the source, URL preferred',
+  `adp_quality`               int          DEFAULT '0'  COMMENT 'DataTtacking\\AbstractTracked::DATA_QUALITY_* constants',
+  `pe`                        int          DEFAULT '0'  COMMENT '(unit J) Primary energy',
+  `pe_source`                 mediumtext   DEFAULT NULL COMMENT 'any information to describe the source, URL preferred',
+  `pe_quality`                int          DEFAULT '0'  COMMENT 'DataTtacking\\AbstractTracked::DATA_QUALITY_* constants',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unicity` (`networkequipmentmodels_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_networkequipmenttypes` (

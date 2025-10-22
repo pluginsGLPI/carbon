@@ -35,10 +35,10 @@ namespace GlpiPlugin\Carbon;
 use CommonDBChild;
 use CommonDBTM;
 use CommonGLPI;
-use Session;
 use Glpi\Application\View\TemplateRenderer;
+use Session;
 
-abstract class AbstractType extends CommonDBChild
+class AbstractModel extends CommonDBChild
 {
     public static $rightname = 'dropdown';
 
@@ -47,12 +47,9 @@ abstract class AbstractType extends CommonDBChild
         return 'fa-solid fa-solar-panel';
     }
 
-    /**
-     * @todo fix type name
-     */
     public static function getTypeName($nb = 0)
     {
-        return _n('Environmental impact', 'Environmental impacts', $nb, 'carbon');
+        return _n('Environmental impact', 'Environmental impact', $nb, 'carbon');
     }
 
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
@@ -115,10 +112,30 @@ abstract class AbstractType extends CommonDBChild
             'can_edit' => $canedit,
         ];
         $this->initForm($this->getID(), $options);
+
+        $criterias = [
+            'gwp' => [
+                'title' => __('Global warming potential', 'carbon'),
+                'label' => __('Emissions of CO2 (KgCO2eq)', 'carbon'),
+                'icon'  => '', // 'fa-solid fa-temperature-three-quarters'
+            ],
+            'adp' => [
+                'title' => __('Abiotic depletion potential', 'carbon'),
+                'label' => __('Abiotic depletion potential (gSbEq)', 'carbon'),
+                'icon'  => '', // @todo : find an icon
+            ],
+            'pe' => [
+                'title' => __('Primary energy', 'carbon'),
+                'label' => __('Primary energy (J)', 'carbon'),
+                'icon'  => '', // @todo : find an icon
+            ],
+        ];
+
         $template = strtolower(basename(str_replace('\\', '/', static::class))) . '.html.twig';
         TemplateRenderer::getInstance()->display('@carbon/' . $template, [
-            'params'   => $options,
-            'item'     => $this,
+            'params'    => $options,
+            'item'      => $this,
+            'criterias' => $criterias,
         ]);
     }
 }

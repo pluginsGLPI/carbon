@@ -45,8 +45,8 @@ class MonitorTypeTest extends DbTestCase
 {
     public function testGetTypeName()
     {
-        $this->assertEquals('Power', MonitorType::getTypeName(1));
-        $this->assertEquals('Powers', MonitorType::getTypeName(Session::getPluralNumber()));
+        $this->assertEquals('Environmental impact', MonitorType::getTypeName(1));
+        $this->assertEquals('Environmental impacts', MonitorType::getTypeName(Session::getPluralNumber()));
     }
 
     public function testGetTabNameForItem()

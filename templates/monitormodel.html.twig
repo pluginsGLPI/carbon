@@ -1,0 +1,60 @@
+{#
+ # -------------------------------------------------------------------------
+ # Carbon plugin for GLPI
+ #
+ # @copyright Copyright (C) 2024-2025 Teclib' and contributors.
+ # @license   https://www.gnu.org/licenses/gpl-3.0.txt GPLv3+
+ # @license   MIT https://opensource.org/licenses/mit-license.php
+ # @link      https://github.com/pluginsGLPI/carbon
+ #
+ # -------------------------------------------------------------------------
+ #
+ # LICENSE
+ #
+ # This file is part of Carbon plugin for GLPI.
+ #
+ # This program is free software: you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+ # the Free Software Foundation, either version 3 of the License, or
+ # (at your option) any later version.
+ #
+ # This program is distributed in the hope that it will be useful,
+ # but WITHOUT ANY WARRANTY; without even the implied warranty of
+ # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ # GNU General Public License for more details.
+ #
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ #
+ # -------------------------------------------------------------------------
+ #}
+
+{% extends "generic_show_form.html.twig" %}
+{% import "components/form/fields_macros.html.twig" as fields %}
+{% import "@carbon/components/form/fields_macros.html.twig" as carbonFields %}
+
+{% block form_fields %}
+    {% for key, field_description in criterias %}
+        {% set criteria = key %}
+        {% set criteria_source = key ~ '_source' %}
+        {% set criteria_quality = key ~ '_quality' %}
+
+        {{ fields.smallTitle(field_description.title, field_description.icon) }}
+
+        {{ fields.numberField(criteria,
+            item.fields[criteria],
+            field_description.label, {
+                min: 0
+        }) }}
+
+        {{ fields.textfield(criteria_source,
+            item.fields[criteria_source],
+            __('Data source', 'carbon'), {}) }}
+
+        {{ carbonFields.dropdownDataQuaity(criteria_quality,
+            item.fields[criteria_quality],
+            __('Data quality', 'carbon'), {
+                min: 0
+        }) }}
+    {% endfor %}
+{% endblock %}

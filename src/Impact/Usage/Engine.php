@@ -36,6 +36,7 @@ use CommonGLPI;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\DataSource\Boaviztapi;
 use GlpiPlugin\Carbon\DataSource\RestApiClient;
+use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
 
 class Engine extends CommonGLPI
 {
@@ -55,9 +56,10 @@ class Engine extends CommonGLPI
      * Returns null if no engine found
      *
      * @param string $itemtype itemtype of assets to analyze
+     * @param ?RestApiClientInterface $client
      * @return AbstractUsageImpact|null an instance if an embodied impact calculation object or null on error
      */
-    public static function getEngineFromItemtype(string $itemtype): ?AbstractUsageImpact
+    public static function getEngineFromItemtype(string $itemtype, ?RestApiClientInterface $client = null): ?AbstractUsageImpact
     {
         $usage_impact_namespace = Config::getUsageImpactEngine();
         $usage_impact_class = $usage_impact_namespace . '\\' . $itemtype;
@@ -68,23 +70,7 @@ class Engine extends CommonGLPI
         /** @var AbstractUsageImpact $usage_impact */
         $usage_impact = new $usage_impact_class();
         try {
-            return self::configureEngine($usage_impact);
-        } catch (\RuntimeException $e) {
-            return null;
-        }
-    }
-
-    public static function getEngine(string $engine_class): ?AbstractUsageImpact
-    {
-        if (!is_subclass_of($engine_class, AbstractUsageImpact::class)) {
-            return null;
-        }
-
-        /** @var AbstractUsageImpact $usage_impact */
-        $usage_impact = new $engine_class();
-
-        try {
-            return self::configureEngine($usage_impact);
+            return self::configureEngine($usage_impact, $client);
         } catch (\RuntimeException $e) {
             return null;
         }
@@ -94,15 +80,16 @@ class Engine extends CommonGLPI
      * Configure the engine depending on its specificities
      *
      * @param AbstractUsageImpact $engine the engine to configure
+     * @param ?RestApiClientInterface $client
      * @return AbstractUsageImpact the configured engine
      */
-    protected static function configureEngine(AbstractUsageImpact $engine): AbstractUsageImpact
+    protected static function configureEngine(AbstractUsageImpact $engine, ?RestApiClientInterface $client = null): AbstractUsageImpact
     {
         $embodied_impact_namespace = explode('\\', get_class($engine));
         switch (array_slice($embodied_impact_namespace, -2, 1)[0]) {
             case 'Boavizta':
                 /** @var Boavizta\AbstractAsset $engine  */
-                $engine->setClient(new Boaviztapi(new RestApiClient()));
+                $engine->setClient(new Boaviztapi($client));
         }
 
         return $engine;

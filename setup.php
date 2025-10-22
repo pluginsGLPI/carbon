@@ -43,7 +43,7 @@ use GlpiPlugin\Carbon\Dashboard\Grid;
 use GlpiPlugin\Carbon\Location;
 
 define('PLUGIN_CARBON_VERSION', '1.2.0-dev');
-define('PLUGIN_CARBON_SCHEMA_VERSION', '1.1.0');
+define('PLUGIN_CARBON_SCHEMA_VERSION', '1.2.0');
 
 // Minimal GLPI version, inclusive
 define("PLUGIN_CARBON_MIN_GLPI_VERSION", "11.0.0-beta");
@@ -143,10 +143,15 @@ function plugin_carbon_registerClasses()
     Plugin::registerClass(Location::class, ['addtabon' => GlpiLocation::class]);
 
     foreach (PLUGIN_CARBON_TYPES as $itemtype) {
-        $item_type_class = 'GlpiPlugin\\Carbon\\' . $itemtype . 'Type';
         $core_type_class = $itemtype . 'Type';
+        $item_type_class = 'GlpiPlugin\\Carbon\\' . $core_type_class;
         Plugin::registerClass($item_type_class, ['addtabon' => $core_type_class]);
+
         Plugin::registerClass(UsageInfo::class, ['addtabon' => $itemtype]);
+
+        $core_model_class = $itemtype . 'Model';
+        $item_model_class = 'GlpiPlugin\\Carbon\\' . $core_model_class;
+        Plugin::registerClass($item_model_class, ['addtabon' => $core_model_class]);
     }
 }
 

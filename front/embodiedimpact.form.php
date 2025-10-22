@@ -32,9 +32,7 @@
 
 use Glpi\Event;
 use Glpi\Exception\Http\NotFoundHttpException;
-use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\EmbodiedImpact;
-use GlpiPlugin\Carbon\Impact\Embodied\AbstractEmbodiedImpact;
 use GlpiPlugin\Carbon\Impact\Embodied\Engine;
 
 include(__DIR__ . '/../../../inc/includes.php');

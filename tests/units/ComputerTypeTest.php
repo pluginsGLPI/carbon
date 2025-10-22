@@ -43,8 +43,8 @@ class ComputerTypeTest extends DbTestCase
 {
     public function testGetTypeName()
     {
-        $this->assertEquals('Power', ComputerType::getTypeName(1));
-        $this->assertEquals('Powers', ComputerType::getTypeName(Session::getPluralNumber()));
+        $this->assertEquals('Environmental impact', ComputerType::getTypeName(1));
+        $this->assertEquals('Environmental impacts', ComputerType::getTypeName(Session::getPluralNumber()));
     }
 
     public function testGetTabNameForItem()

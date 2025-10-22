@@ -37,6 +37,7 @@ use Config as GlpiConfig;
 use Geocoder\Geocoder;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientFactory;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientInterface;
+use GlpiPlugin\Carbon\DataSource\RestApiClient;
 use GlpiPlugin\Carbon\Impact\Embodied\Engine as EmbodiedEngine;
 use GlpiPlugin\Carbon\Impact\Usage\UsageImpactInterface as UsageImpactInterface;
 use GlpiPlugin\Carbon\Impact\Usage\Engine as UsageEngine;
@@ -122,10 +123,9 @@ class CronTask
         }
 
         // Calculate other impacts
-        $usage_impacts = Toolbox::getUsageImpactClasses();
-        foreach ($usage_impacts as $usage_impact_type) {
+        foreach (PLUGIN_CARBON_TYPES as $itemtype) {
             /** @ar UsageImpactInterface $usage_impact */
-            $usage_impact = UsageEngine::getEngine($usage_impact_type);
+            $usage_impact = UsageEngine::getEngineFromItemtype($itemtype, new RestApiClient());
             if ($usage_impact === null) {
                 continue;
             }
@@ -146,13 +146,12 @@ class CronTask
     public static function cronEmbodiedImpact(GlpiCronTask $task): int
     {
         $count = 0;
-
         $embodied_impacts = Toolbox::getEmbodiedImpactClasses();
         $task->setVolume(0); // start with zero
         $remaining = $task->fields['param'];
         $limit_per_type = max(1, floor(($remaining) / count($embodied_impacts)));
-        foreach ($embodied_impacts as $embodied_impact_type) {
-            $embodied_impact = EmbodiedEngine::getEngine($embodied_impact_type);
+        foreach (PLUGIN_CARBON_TYPES as $itemtype) {
+            $embodied_impact = EmbodiedEngine::getEngineFromItemtype($itemtype, new RestApiClient());
             if ($embodied_impact === null) {
                 // An error occured while configuring the engine
                 continue;
