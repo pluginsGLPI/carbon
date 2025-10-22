@@ -35,7 +35,6 @@ namespace GlpiPlugin\Carbon\DataSource;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7;
-use Session;
 use Toolbox;
 
 class RestApiClient implements RestApiClientInterface

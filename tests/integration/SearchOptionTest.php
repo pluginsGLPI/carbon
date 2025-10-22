@@ -47,6 +47,9 @@ use CommonDBTM;
 use CommonGLPI;
 use DBmysql;
 use DbUtils;
+use GlpiPlugin\Carbon\ComputerModel;
+use GlpiPlugin\Carbon\MonitorModel;
+use GlpiPlugin\Carbon\NetworkEquipmentModel;
 use Plugin;
 use PHPUnit\Framework\Attributes\CoversMethod;
 
@@ -68,6 +71,7 @@ class SearchOptionTest extends CommonTestCase
         ],
         ComputerType::class => [],
         MonitorType::class => [],
+        NetworkEquipmentType::class => [],
         UsageInfo::class => [],
         CarbonIntensity::class => [
             'data_quality'
@@ -77,11 +81,13 @@ class SearchOptionTest extends CommonTestCase
             'adp_quality',
             'pe_quality',
         ],
-        NetworkEquipmentType::class => [],
         Location::class => [],
         Zone::class => [
             'entities_id',
         ],
+        ComputerModel::class => [],
+        MonitorModel::class => [],
+        NetworkEquipmentModel::class => [],
     ];
 
     private array $mapping = [

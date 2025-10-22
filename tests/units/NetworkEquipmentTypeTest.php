@@ -36,7 +36,6 @@ use GlpiPlugin\Carbon\NetworkEquipmentType;
 use MassiveAction;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversMethod;
 use Session;
 use Symfony\Component\DomCrawler\Crawler;
 
@@ -46,8 +45,8 @@ class NetworkEquipmentTypeTest extends DbTestCase
 {
     public function testGetTypeName()
     {
-        $this->assertEquals('Power', NetworkEquipmentType::getTypeName(1));
-        $this->assertEquals('Powers', NetworkEquipmentType::getTypeName(Session::getPluralNumber()));
+        $this->assertEquals('Environmental impact', NetworkEquipmentType::getTypeName(1));
+        $this->assertEquals('Environmental impacts', NetworkEquipmentType::getTypeName(Session::getPluralNumber()));
     }
 
     public function testGetTabNameForItem()
