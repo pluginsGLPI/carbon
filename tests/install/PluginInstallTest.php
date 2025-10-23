@@ -32,6 +32,10 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
+use CommonGLPI;
+use Computer;
+use ComputerModel;
+use ComputerType;
 use Session;
 use Config;
 use CronTask as GLPICronTask;
@@ -49,14 +53,19 @@ use Glpi\DBAL\QueryExpression as QueryExpression;
 use Glpi\Plugin\Hooks;
 use Glpi\System\Diagnostic\DatabaseSchemaIntegrityChecker;
 use GlpiPlugin\Carbon\CarbonIntensity;
-use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\CronTask;
 use GlpiPlugin\Carbon\Report;
+use Location;
+use Monitor;
+use MonitorModel;
+use MonitorType;
+use NetworkEquipment;
+use NetworkEquipmentModel;
+use NetworkEquipmentType;
 
 class PluginInstallTest extends CommonTestCase
 {
@@ -137,6 +146,7 @@ class PluginInstallTest extends CommonTestCase
         $this->checkDisplayPrefs();
         $this->checkPredefinedUsageProfiles();
         $this->checkSourceZoneRelation();
+        $this->checkRegisteredClasses();
     }
 
     public function testConfigurationExists()
@@ -841,5 +851,56 @@ class PluginInstallTest extends CommonTestCase
             ],
         ]);
         $this->assertEquals(1, $iterator->count());
+    }
+
+    public function checkRegisteredClasses()
+    {
+        $result = CommonGLPI::getOtherTabs(Config::class);
+        $expected = ['GlpiPlugin\Carbon\Config'];
+        $this->assertEquals($expected, $result);
+
+        $result = CommonGLPI::getOtherTabs(Profile::class);
+        $expected = ['GlpiPlugin\Carbon\Profile'];
+        $this->assertEquals($expected, $result);
+
+        $result = CommonGLPI::getOtherTabs(Location::class);
+        $expected = ['GlpiPlugin\Carbon\Location'];
+        $this->assertEquals($expected, $result);
+
+        $result = CommonGLPI::getOtherTabs(Computer::class);
+        $expected = ['GlpiPlugin\Carbon\UsageInfo'];
+        $this->assertEquals($expected, $result);
+
+        $result = CommonGLPI::getOtherTabs(Monitor::class);
+        $expected = ['GlpiPlugin\Carbon\UsageInfo'];
+        $this->assertEquals($expected, $result);
+
+        $result = CommonGLPI::getOtherTabs(NetworkEquipment::class);
+        $expected = ['GlpiPlugin\Carbon\UsageInfo'];
+        $this->assertEquals($expected, $result);
+
+        $result = CommonGLPI::getOtherTabs(ComputerType::class);
+        $expected = ['GlpiPlugin\Carbon\ComputerType'];
+        $this->assertEquals($expected, $result);
+
+        $result = CommonGLPI::getOtherTabs(MonitorType::class);
+        $expected = ['GlpiPlugin\Carbon\MonitorType'];
+        $this->assertEquals($expected, $result);
+
+        $result = CommonGLPI::getOtherTabs(NetworkEquipmentType::class);
+        $expected = ['GlpiPlugin\Carbon\NetworkEquipmentType'];
+        $this->assertEquals($expected, $result);
+
+        $result = CommonGLPI::getOtherTabs(ComputerModel::class);
+        $expected = ['GlpiPlugin\Carbon\ComputerModel'];
+        $this->assertEquals($expected, $result);
+
+        $result = CommonGLPI::getOtherTabs(MonitorModel::class);
+        $expected = ['GlpiPlugin\Carbon\MonitorModel'];
+        $this->assertEquals($expected, $result);
+
+        $result = CommonGLPI::getOtherTabs(NetworkEquipmentModel::class);
+        $expected = ['GlpiPlugin\Carbon\NetworkEquipmentModel'];
+        $this->assertEquals($expected, $result);
     }
 }
