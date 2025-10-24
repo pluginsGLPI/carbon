@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-21 01:44+0000\n"
-"PO-Revision-Date: 2025-10-21 01:44+0000\n"
+"POT-Creation-Date: 2025-10-24 01:40+0000\n"
+"PO-Revision-Date: 2025-10-24 01:40+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: en_GB\n"
@@ -133,7 +133,7 @@ msgstr ""
 "unknown"
 
 #: templates/monitortype.html.twig templates/computertype.html.twig
-#: templates/networkequipmenttype.html.twig src/AbstractType.php:50
+#: templates/networkequipmenttype.html.twig src/AbstractType.php:56
 msgid "Power"
 msgid_plural "Powers"
 msgstr[0] "Power"
@@ -433,7 +433,7 @@ msgstr "Always on"
 msgid "Office hours"
 msgstr "Office hours"
 
-#: src/AbstractType.php:58 src/Dashboard/Grid.php:62 src/Dashboard/Grid.php:127
+#: src/AbstractType.php:64 src/Dashboard/Grid.php:62 src/Dashboard/Grid.php:127
 #: src/Dashboard/Grid.php:228
 msgid "Carbon"
 msgstr "Carbon"
