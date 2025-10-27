@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-21 01:44+0000\n"
+"POT-Creation-Date: 2025-10-27 01:55+0000\n"
 "PO-Revision-Date: 2025-07-03 13:58+0000\n"
 "Last-Translator: Milo Ivir <mail@milotype.de>, 2025\n"
 "Language-Team: Croatian (Croatia) (https://app.transifex.com/teclib/teams/28042/hr_HR/)\n"
@@ -137,7 +137,7 @@ msgstr ""
 "monitora nepoznata"
 
 #: templates/monitortype.html.twig templates/computertype.html.twig
-#: templates/networkequipmenttype.html.twig src/AbstractType.php:50
+#: templates/networkequipmenttype.html.twig src/AbstractType.php:56
 msgid "Power"
 msgid_plural "Powers"
 msgstr[0] "Struja"
@@ -437,7 +437,7 @@ msgstr "Uvijek uključeno"
 msgid "Office hours"
 msgstr "Radno vrijeme"
 
-#: src/AbstractType.php:58 src/Dashboard/Grid.php:62
+#: src/AbstractType.php:64 src/Dashboard/Grid.php:62
 #: src/Dashboard/Grid.php:127 src/Dashboard/Grid.php:228
 msgid "Carbon"
 msgstr "Ugljik"
