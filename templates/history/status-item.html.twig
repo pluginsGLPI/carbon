@@ -148,6 +148,11 @@
 
                         {% if status.has_type is defined %}
                             {% set field = nok_field %}
+                            {% if status.has_model is defined %}
+                                {% if status.has_model %}
+                                    {% set field = warning_field %}
+                                {% endif %}
+                            {% endif %}
                             {% if status.has_type %}
                                 {% set field = ok_field %}
                             {% endif %}
