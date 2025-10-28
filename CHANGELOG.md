@@ -4,6 +4,205 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [1.1.1](https://github.com/pluginsGLPI/carbon/compare/1.1.0...1.1.1) (2025-10-29)
+
+### Features
+
+* Better distinctin between legend and completion indicators ([d67c1c](https://github.com/pluginsGLPI/carbon/commit/d67c1c3ff1a4bf00b17f7d654d06a946fdc06ec1))
+* Show diagnosis about carbon intensity data sources ([bbde25](https://github.com/pluginsGLPI/carbon/commit/bbde25b29adc3bb3a67b3b066abc3360d85f50bb))
+
+##### Abstract Type
+
+* Show icon along name in tab ([ae16c3](https://github.com/pluginsGLPI/carbon/commit/ae16c3d3372d33c1d51fab3aa60637d6101a4dbf))
+
+### Bug Fixes
+
+* Invalid homepage URL in xml file ([5b501d](https://github.com/pluginsGLPI/carbon/commit/5b501dff2677600c97bb4833c40d9a1066c4b837))
+
+##### Carbon Intensity Source Zone
+
+* Method return type ([218965](https://github.com/pluginsGLPI/carbon/commit/218965653b1b2e019fddc80ec1c8e5409d8437f3))
+
+##### Computer, Monitor, Metwork Equipment
+
+* Properly show status of asset type in diagnosis view ([f0006d](https://github.com/pluginsGLPI/carbon/commit/f0006d2cdb37fc32e6e94196ada4f3df0ea1105e))
+
+##### Dashboard\ Grid
+
+* Loss of other plugins cards for dashboard ([0bd618](https://github.com/pluginsGLPI/carbon/commit/0bd6187cbae7fa55dd42cdcc4367d1e2503969fe))
+
+##### Dashboard\ Widget
+
+* Fix bad argument when computing Y scale ([f2fa87](https://github.com/pluginsGLPI/carbon/commit/f2fa87272385947e55fa3b1294ff49f6f6f356c2))
+
+##### Engine\V1\ Abstract Asset
+
+* Fallback carbon intensity may be picked from wrong source ([d54028](https://github.com/pluginsGLPI/carbon/commit/d54028c5ed51d8209e2205b87c24f4203c1ffbb3))
+
+##### Impact\ Usage\ Computer
+
+* SQL error due to bad relation expression ([e56c02](https://github.com/pluginsGLPI/carbon/commit/e56c0226f012e9248c21c4ef8535dbaf5bad1043))
+
+##### Install
+
+* Bad relation between Quebec and Hydro Quebec ([fdee8a](https://github.com/pluginsGLPI/carbon/commit/fdee8aaef063842cbea95eb908f773f9de048f36))
+* Port of fix #76 ([361093](https://github.com/pluginsGLPI/carbon/commit/361093c887814deff88eb7fb22031fa157b33c79))
+* Remove exception handling on install / upgrade ([826ee3](https://github.com/pluginsGLPI/carbon/commit/826ee32293fd53a08ed2cf7b41da5f303088d29c))
+
+
+---
+
+## [1.0.1](https://github.com/pluginsGLPI/carbon/compare/1.0.0...1.0.1) (2025-10-28)
+
+### Features
+
+* Better distinctin between legend and completion indicators ([c6e4d4](https://github.com/pluginsGLPI/carbon/commit/c6e4d4935ae8f8f6f91824a476a1dd5c9fd78758))
+* Show diagnosis about carbon intensity data sources ([f922e9](https://github.com/pluginsGLPI/carbon/commit/f922e9d405ff75cb8169a7b18ab6c8407a1ddd6e))
+
+##### Abstract Type
+
+* Show icon along name in tab ([087bee](https://github.com/pluginsGLPI/carbon/commit/087bee7d9a0009285900bf3b97ba40c7d484f1c4))
+
+### Bug Fixes
+
+* Invalid homepage URL in xml file ([6c92b3](https://github.com/pluginsGLPI/carbon/commit/6c92b301e223da9a120c57750161b4ae9ed7f42d))
+
+##### Carbon Intensity Source Zone
+
+* Method return type ([1d15a4](https://github.com/pluginsGLPI/carbon/commit/1d15a41581d566eb11e13adf11fa86d1be4e50f9))
+
+##### Computer, Monitor, Metwork Equipment
+
+* Properly show status of asset type in diagnosis view ([92fda3](https://github.com/pluginsGLPI/carbon/commit/92fda398b341211b81fdfc7c07e15d9f5f5d9c95))
+
+##### Dashboard\ Grid
+
+* Loss of other plugins cards for dashboard ([1f6c50](https://github.com/pluginsGLPI/carbon/commit/1f6c5085aab31b7db191865f83eebfaa16c3da42))
+
+##### Dashboard\ Widget
+
+* Fix bad argument when computing Y scale ([e0ee08](https://github.com/pluginsGLPI/carbon/commit/e0ee0822ff0499e1fe4d8698c3d4c9fdbf8d0fbc))
+
+##### Docs
+
+* Icon path in metadata ([2bae7e](https://github.com/pluginsGLPI/carbon/commit/2bae7ed0fbc17a084f1ed046dc6efedbf398d278))
+
+##### Impact\ Embodied\ Boavizta
+
+* Improve RAM and HDD description prior query ([9d2496](https://github.com/pluginsGLPI/carbon/commit/9d24960f8309341f10cc0fac2cb7cf43735552b1))
+
+##### Impact\ Usage\ Computer
+
+* SQL error due to bad relation expression ([6de1c6](https://github.com/pluginsGLPI/carbon/commit/6de1c64266cc24c5ee8f21c2fd7dde75f59b50ba))
+
+##### Install
+
+* Bad relation between Quebec and Hydro Quebec ([9ab010](https://github.com/pluginsGLPI/carbon/commit/9ab01058d5d65527b798c2a1024d32d9e5e23c2e))
+
+##### Widget
+
+* Better choice for energy scale min value ([15864b](https://github.com/pluginsGLPI/carbon/commit/15864b4fcaceaf67518d74d0f77e910f385d2208))
+* Unset variable ([3cfd01](https://github.com/pluginsGLPI/carbon/commit/3cfd01b567a7ee1c722e2aac3ff1b2eb2af8f3b8))
+
+
+---
+
+## [1.0.0](https://github.com/pluginsGLPI/carbon/compare/1.0.0-beta.3...1.0.0) (2025-10-28)
+
+### Features
+
+
+##### Carbon Intensity
+
+* Add yearly intensity for most countries ([e6b9ef](https://github.com/pluginsGLPI/carbon/commit/e6b9efa528d27aae3d5fa592a3dd4dc023713fc4), [4719e8](https://github.com/pluginsGLPI/carbon/commit/4719e8da8bf5bc832a28dfab5b4721233ddde226))
+
+##### Carbon Intensity Source Zone
+
+* Add tooltip for not downloadable zone ([c06caa](https://github.com/pluginsGLPI/carbon/commit/c06caa1b8827627b473aa0aa80499116c1a5a688))
+
+##### Install
+
+* Remove upgrade from previous dev versions ([77ff1d](https://github.com/pluginsGLPI/carbon/commit/77ff1dd05b4a991463447cb59230fd06b6115516))
+
+### Bug Fixes
+
+* Css file path ([7cbc0b](https://github.com/pluginsGLPI/carbon/commit/7cbc0b0f3aae186c0293ef8342c805bf793f9215))
+* Data completion diagnosis inconsistency ([8083fd](https://github.com/pluginsGLPI/carbon/commit/8083fde32b7ea62c50cb636f95e657cda6523210))
+* Templates code style ([2961f8](https://github.com/pluginsGLPI/carbon/commit/2961f82d7a6d520853098a9ab18e6c1e48773147))
+
+##### Carbon Emission, Computer Type, Monitor Type, Network Equipment Type
+
+* Delete data for purged assets ([a646a0](https://github.com/pluginsGLPI/carbon/commit/a646a0fcae2bf694cb7c580b2976050b46ea89e7))
+
+##### Carbon Intensity Source Zone
+
+* Do not toggle download for fallback sources ([26e3be](https://github.com/pluginsGLPI/carbon/commit/26e3be8e50ce2bbfa2278c7d6561c70b18efe0f0))
+* Server-side check when changing download state of a zone ([7d85ca](https://github.com/pluginsGLPI/carbon/commit/7d85ca026c89d029334af93a3b2eb489ac27a276))
+
+##### Compputer Type
+
+* Prevent update massive action on computer typenative Update massive action cannot perform the change on the field Category. The user must use the specific action 'Update category' ([71679a](https://github.com/pluginsGLPI/carbon/commit/71679a91ef748344218235f56f7e4f3cc2c781e7))
+
+##### Dashboard
+
+* Path to image resource ([debd5e](https://github.com/pluginsGLPI/carbon/commit/debd5e35e4f291fb29f0f9d8f4d408fb10928d9b))
+
+##### Dashboard\ Demo Provider
+
+* Add missing method provider for demo mode ([f4956b](https://github.com/pluginsGLPI/carbon/commit/f4956b5cda5654c7ec67b881d6c6222027b8f4b9))
+
+##### Dashboard\ Provider
+
+* Arra merge may produce incorrect merged criterias ([9eaa39](https://github.com/pluginsGLPI/carbon/commit/9eaa391cd3da9c4df7baf04f175a23b74eb2a655))
+
+##### Data Source\ Carbon Intensity RTE
+
+* Better data source selection ([d365db](https://github.com/pluginsGLPI/carbon/commit/d365db976874734b1781426bcc8ee1efae2f0f81))
+* Consolidated data may have step of 15 min ([faaea6](https://github.com/pluginsGLPI/carbon/commit/faaea61018415561af7a8cceb4f58a53942bbac7))
+* Use timezone of GLPI ([a39c03](https://github.com/pluginsGLPI/carbon/commit/a39c03c6cea91dc75d96bc65d3ffb87e4828f62c))
+* Var not replaced with property ([bd4335](https://github.com/pluginsGLPI/carbon/commit/bd43359828d3777f198742686db7a27dc4965c88))
+
+##### Datasource\ Carbon Intensity RTE
+
+* Fix again winter time switching detection ([1ba6b1](https://github.com/pluginsGLPI/carbon/commit/1ba6b1628f7fee7212c4101edc40d843fd7c9d49))
+* Generalize DST switch to winter time ([cd17dc](https://github.com/pluginsGLPI/carbon/commit/cd17dce64b806f687bdde745d40ee5766dd26fbb))
+
+##### Engine\V1\ Abstract Asset
+
+* Search carbon intensity by contry after by state ([4c09c4](https://github.com/pluginsGLPI/carbon/commit/4c09c43cd0aa43a107c803d5232462f538c058e7))
+
+##### Engine\V1\ Abstract Asset, Zone
+
+* Fix fallback carbon intensity ([c81902](https://github.com/pluginsGLPI/carbon/commit/c81902ddb2e65fee8c775e94f4b21978a67b7979))
+
+##### Impact\ Embodied\ Boavizta
+
+* Hardware independant evaluation ([ebe625](https://github.com/pluginsGLPI/carbon/commit/ebe62568c06be3573a20a63b626b0cc031d27a2f))
+
+##### Impact\ History
+
+* Swap 2 historizable status items ([dc7362](https://github.com/pluginsGLPI/carbon/commit/dc7362cf2c7eba6f61d633937d0beea432076aa3))
+
+##### Impact\ History\ Monitor
+
+* Incomplete SQL SELECT statement ([7e4dff](https://github.com/pluginsGLPI/carbon/commit/7e4dff171baa83780e4379a44fe67b5acd3150db))
+
+##### Install
+
+* Add parameters to fgetcsv ([1ce506](https://github.com/pluginsGLPI/carbon/commit/1ce506f58f0a25672311015a582e8731cef69524))
+* Link initial sources and zones on fresh install ([1e3800](https://github.com/pluginsGLPI/carbon/commit/1e3800155b62c47a38358c762901083c2b7677d6))
+* More robust inserts in DB ([50b91b](https://github.com/pluginsGLPI/carbon/commit/50b91bb8aa11d767a3c25d4b1bf4b76e242dfe37))
+
+##### Report
+
+* Show update right ([3c906c](https://github.com/pluginsGLPI/carbon/commit/3c906c8d8d7ccbfd7e26139038e5a32d76aaff55))
+
+##### Usage Impact
+
+* Allow reset if only gwp was calculated ([4e771c](https://github.com/pluginsGLPI/carbon/commit/4e771ca3c6c7422f1d02ef5b2f37e97084a6d5ee))
+
+---
+
 ## [1.0.0-beta.3](https://github.com/pluginsGLPI/carbon/compare/668e7b68956c8fe6decff7563bc64b8057eaa25e...v1.0.0-beta.3) (2025-07-22)
 
 ### Features
@@ -670,4 +869,3 @@ All notable changes to this project will be documented in this file.
 
 
 ---
-
