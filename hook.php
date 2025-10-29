@@ -80,10 +80,16 @@ function plugin_carbon_install(array $args = []): bool
         // do not output messages
         ob_start();
     }
-    if ($version === '0.0.0') {
-        $success = $install->install($args);
-    } else {
-        $success = $install->upgrade($version, $args);
+    try {
+        if ($version === '0.0.0') {
+            $success = $install->install($args);
+        } else {
+            $success = $install->upgrade($version, $args);
+        }
+    } catch (\RuntimeException $e) {
+        $error_footer = '<br />' . __('Please check the logs for more details. Fill an issue in the repository of the plugin.', 'carbon');
+        Session::addMessageAfterRedirect($e->getMessage() . $error_footer, false, ERROR);
+        $success = false;
     }
 
     if ($silent) {
