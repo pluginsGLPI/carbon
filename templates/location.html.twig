@@ -84,7 +84,7 @@
     {{ fields.dropdownField('GlpiPlugin\\Carbon\\Zone',
         'plugin_carbon_zones_id',
         zone_id,
-        __('Carbon intensity zone', 'carbon'),
+        _n('Carbon intensity zone', 'Carbon intensity zones', 1, 'carbon'),
         {
             rand: plugin_carbon_zones_rand,
             display_emptychoice: true,
