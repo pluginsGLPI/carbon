@@ -219,12 +219,19 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
     {
         $itemtype = static::$itemtype;
         $item_table = $itemtype::getTable();
+        $glpi_item_type_table = getTableForItemType($itemtype . 'Type');
+        $glpi_item_type_fk = getForeignKeyFieldForTable($glpi_item_type_table);
+        $item_type_table = getTableForItemType('GlpiPlugin\\Carbon\\' . $itemtype . 'Type');
         $embodied_impact_table = EmbodiedImpact::getTable();
 
         // $where = [];
         // if (!$recalculate) {
         //     $where = [EmbodiedImpact::getTableField('id') => null];
         // }
+
+        $crit[] = [
+            $item_type_table . '.is_ignore' => false,
+        ];
 
         $request = [
             'SELECT' => [
@@ -240,6 +247,14 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
                             [
                                 EmbodiedImpact::getTableField('itemtype') => $itemtype,
                             ]
+                        ],
+                    ],
+                ],
+                $item_type_table => [
+                     [
+                        'FKEY' => [
+                            $item_type_table => $glpi_item_type_fk,
+                            $item_table => $glpi_item_type_fk,
                         ],
                     ],
                 ],
