@@ -134,7 +134,7 @@ class migration_to_1_2_0_Test extends DbTestCase
             'plugin_carbon_zones_id'   => $zone_id,
         ]);
         $source_zone_id = $DB->insertId();
-        $migration_file = __DIR__ . '/../../install/migration/update_1.1.0_to_1.2.0/04_update_location_zone_relation.php';
+        $migration_file = __DIR__ . '/../../install/migration/update_1.1.1_to_1.2.0/04_update_location_zone_relation.php';
         $migration_file = realpath($migration_file);
         require($migration_file);
 
