@@ -313,7 +313,7 @@ class Grid
             'plugin_carbon_report_methodology_information' => [
                 'widgettype'   => ['methodology_information'],
                 'group'        => $group,
-                'label'        => __('Environmental impact methodology_information', 'carbon'),
+                'label'        => __('Environmental impact methodology information', 'carbon'),
             ],
         ];
 
