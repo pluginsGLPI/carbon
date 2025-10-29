@@ -65,6 +65,7 @@ class Engine extends CommonGLPI
             return null;
         }
 
+        /** @var EmbodiedImpactInterface $embodied_impact */
         $embodied_impact = new $embodied_impact_class();
         try {
             return self::configureEngine($embodied_impact);
