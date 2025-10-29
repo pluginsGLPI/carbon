@@ -4,17 +4,17 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 # Translators:
-# Kaya Zeren <kayazeren@gmail.com>, 2025
 # Thierry Bugier <tbugier@teclib.com>, 2025
+# Kaya Zeren <kayazeren@gmail.com>, 2025
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-27 01:55+0000\n"
+"POT-Creation-Date: 2025-10-28 15:18+0000\n"
 "PO-Revision-Date: 2025-07-03 13:58+0000\n"
-"Last-Translator: Thierry Bugier <tbugier@teclib.com>, 2025\n"
+"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2025\n"
 "Language-Team: Turkish (Turkey) (https://app.transifex.com/teclib/teams/28042/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -41,7 +41,7 @@ msgstr "Gerçekleşen birincil enerji"
 
 #: templates/dashboard/usage-abiotic-depletion.html.twig
 #: src/Dashboard/Widget.php:96 src/Dashboard/DemoProvider.php:95
-#: src/Dashboard/Grid.php:178 src/Dashboard/Grid.php:281
+#: src/Dashboard/Grid.php:184 src/Dashboard/Grid.php:287
 #: src/Dashboard/Provider.php:816
 msgid "Usage abiotic depletion potential"
 msgstr "Kullanım abiyotik tükenme potansiyeli"
@@ -125,7 +125,7 @@ msgstr "Parkınızın yüzde %s kadarındaki %s bilgisayarı gösterir."
 
 #: templates/dashboard/embodied-abiotic-depletion.html.twig
 #: src/Dashboard/Widget.php:110 src/Dashboard/DemoProvider.php:77
-#: src/Dashboard/Grid.php:198 src/Dashboard/Grid.php:295
+#: src/Dashboard/Grid.php:204 src/Dashboard/Grid.php:301
 #: src/Dashboard/Provider.php:782 src/Dashboard/Provider.php:866
 msgid "Embodied abiotic depletion potential"
 msgstr "Gerçekleşen abiyotik tükenme potansiyeli"
@@ -437,8 +437,8 @@ msgstr "Her zaman açık"
 msgid "Office hours"
 msgstr "Çalışma saatleri"
 
-#: src/AbstractType.php:64 src/Dashboard/Grid.php:62
-#: src/Dashboard/Grid.php:127 src/Dashboard/Grid.php:228
+#: src/AbstractType.php:64 src/Dashboard/Grid.php:68
+#: src/Dashboard/Grid.php:133 src/Dashboard/Grid.php:234
 msgid "Carbon"
 msgstr "Karbon"
 
@@ -672,7 +672,7 @@ msgstr "Başlangıç zamanı geçersiz"
 msgid "Stop time is invalid"
 msgstr "Bitiş zamanı geçersiz"
 
-#: src/Dashboard/Widget.php:57 src/Dashboard/Grid.php:311
+#: src/Dashboard/Widget.php:57 src/Dashboard/Grid.php:317
 msgid "Environmental impact information video"
 msgstr "Çevresel etki bilgilendirme videosu"
 
@@ -689,7 +689,7 @@ msgid "Monthly Carbon Emission"
 msgstr "Aylık karbon emisyonu"
 
 #: src/Dashboard/Widget.php:83 src/Dashboard/Widget.php:585
-#: src/Dashboard/Grid.php:275
+#: src/Dashboard/Grid.php:281
 msgid "Biggest monthly averaged carbon emission per model"
 msgstr "Her model için en büyük aylık ortalama karbon emisyonu"
 
@@ -807,67 +807,67 @@ msgstr "Carbon eklentisi - Kullanım karbon emisyonu"
 msgid "Carbon dioxyde intensity"
 msgstr "Karbondioksit yoğunluğu"
 
-#: src/Dashboard/Grid.php:67 src/Dashboard/Provider.php:379
+#: src/Dashboard/Grid.php:73 src/Dashboard/Provider.php:379
 msgid "Handled assets ratio"
 msgstr "İşlenen varlık oranı"
 
-#: src/Dashboard/Grid.php:76
+#: src/Dashboard/Grid.php:82
 msgid "Handled assets count"
 msgstr "İşlenen varlık sayısı"
 
-#: src/Dashboard/Grid.php:139
+#: src/Dashboard/Grid.php:145
 #, php-format
 msgid "Handled %s"
 msgstr "İşlenen %s"
 
-#: src/Dashboard/Grid.php:150
+#: src/Dashboard/Grid.php:156
 #, php-format
 msgid "Unhandled %s"
 msgstr "İşlenmeyen %s"
 
-#: src/Dashboard/Grid.php:166
+#: src/Dashboard/Grid.php:172
 msgid "Usage power consumption"
 msgstr "Kullanım güç tüketimi"
 
-#: src/Dashboard/Grid.php:172
+#: src/Dashboard/Grid.php:178
 msgid "Usage carbon emission"
 msgstr "Kullanım karbon emisyonu"
 
-#: src/Dashboard/Grid.php:186 src/Dashboard/Grid.php:289
+#: src/Dashboard/Grid.php:192 src/Dashboard/Grid.php:295
 #: src/Dashboard/Provider.php:897
 msgid "Embodied global warming potential"
 msgstr "Gerçekleşen küresel ısınma potansiyeli"
 
-#: src/Dashboard/Grid.php:192 src/Dashboard/Grid.php:301
+#: src/Dashboard/Grid.php:198 src/Dashboard/Grid.php:307
 msgid "Embodied primary energy consumed"
 msgstr "Gerçekleşen birincil enerji tüketimi"
 
-#: src/Dashboard/Grid.php:206 src/UsageImpact.php:105
+#: src/Dashboard/Grid.php:212 src/UsageImpact.php:105
 msgid "Global warming potential"
 msgstr "Küresel ısınma potansiyeli"
 
-#: src/Dashboard/Grid.php:212 src/UsageImpact.php:119
+#: src/Dashboard/Grid.php:218 src/UsageImpact.php:119
 msgid "Abiotic depletion potential"
 msgstr "Abiyotik tükenme potansiyeli"
 
-#: src/Dashboard/Grid.php:239
+#: src/Dashboard/Grid.php:245
 #, php-format
 msgid "Unhandled %s ratio"
 msgstr "İşlenmeyen %s oranı"
 
-#: src/Dashboard/Grid.php:251
+#: src/Dashboard/Grid.php:257
 msgid "Usage carbon emission year to date"
 msgstr "Yıl başından bugüne kadar kullanım karbon emisyonu"
 
-#: src/Dashboard/Grid.php:257
+#: src/Dashboard/Grid.php:263
 msgid "Monthly carbon emission"
 msgstr "Aylık karbon emisyonu"
 
-#: src/Dashboard/Grid.php:266
+#: src/Dashboard/Grid.php:272
 msgid "Usage global warming potential chart"
 msgstr "Kullanım küresel ısınma potansiyeli çizelgesi"
 
-#: src/Dashboard/Grid.php:316
+#: src/Dashboard/Grid.php:322
 msgid "Environmental impact methodology_information"
 msgstr "Çevresel etki yöntemi bilgileri"
 
