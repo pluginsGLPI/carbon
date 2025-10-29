@@ -79,12 +79,12 @@ class CronTask
 
             case 'UsageImpact':
                 return [
-                    'description' => __('Compute usage environnemental impact for all assets', 'carbon'),
+                    'description' => __('Compute usage environmental impact for all assets', 'carbon'),
                     'parameter' => __('Maximum number of entries to calculate', 'carbon'),
                 ];
             case 'EmbodiedImpact':
                 return [
-                    'description' => __('Compute embodied environnemental impact for all assets', 'carbon'),
+                    'description' => __('Compute embodied environmental impact for all assets', 'carbon'),
                     'parameter' => __('Maximum number of entries to calculate', 'carbon'),
                 ];
         }
