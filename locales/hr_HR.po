@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-27 01:55+0000\n"
+"POT-Creation-Date: 2025-10-28 15:18+0000\n"
 "PO-Revision-Date: 2025-07-03 13:58+0000\n"
 "Last-Translator: Milo Ivir <mail@milotype.de>, 2025\n"
 "Language-Team: Croatian (Croatia) (https://app.transifex.com/teclib/teams/28042/hr_HR/)\n"
@@ -41,7 +41,7 @@ msgstr "Ugrađena primarna energija"
 
 #: templates/dashboard/usage-abiotic-depletion.html.twig
 #: src/Dashboard/Widget.php:96 src/Dashboard/DemoProvider.php:95
-#: src/Dashboard/Grid.php:178 src/Dashboard/Grid.php:281
+#: src/Dashboard/Grid.php:184 src/Dashboard/Grid.php:287
 #: src/Dashboard/Provider.php:816
 msgid "Usage abiotic depletion potential"
 msgstr "Potencijal abiotskog iscrpljivanja zbog korištenja"
@@ -123,7 +123,7 @@ msgstr "Predstavlja %s posto tvojeg sustava koji sadrži %s računala."
 
 #: templates/dashboard/embodied-abiotic-depletion.html.twig
 #: src/Dashboard/Widget.php:110 src/Dashboard/DemoProvider.php:77
-#: src/Dashboard/Grid.php:198 src/Dashboard/Grid.php:295
+#: src/Dashboard/Grid.php:204 src/Dashboard/Grid.php:301
 #: src/Dashboard/Provider.php:782 src/Dashboard/Provider.php:866
 msgid "Embodied abiotic depletion potential"
 msgstr "Ugrađeni potencijal abiotskog iscrpljivanja"
@@ -437,8 +437,8 @@ msgstr "Uvijek uključeno"
 msgid "Office hours"
 msgstr "Radno vrijeme"
 
-#: src/AbstractType.php:64 src/Dashboard/Grid.php:62
-#: src/Dashboard/Grid.php:127 src/Dashboard/Grid.php:228
+#: src/AbstractType.php:64 src/Dashboard/Grid.php:68
+#: src/Dashboard/Grid.php:133 src/Dashboard/Grid.php:234
 msgid "Carbon"
 msgstr "Ugljik"
 
@@ -675,7 +675,7 @@ msgstr "Vrijeme početka nije valjano"
 msgid "Stop time is invalid"
 msgstr "Vrijeme prekida nije valjano"
 
-#: src/Dashboard/Widget.php:57 src/Dashboard/Grid.php:311
+#: src/Dashboard/Widget.php:57 src/Dashboard/Grid.php:317
 msgid "Environmental impact information video"
 msgstr "Video s informacijama o utjecaju na okoliš"
 
@@ -692,7 +692,7 @@ msgid "Monthly Carbon Emission"
 msgstr "Mjesečna emisija ugljika"
 
 #: src/Dashboard/Widget.php:83 src/Dashboard/Widget.php:585
-#: src/Dashboard/Grid.php:275
+#: src/Dashboard/Grid.php:281
 msgid "Biggest monthly averaged carbon emission per model"
 msgstr "Najveća prosječna mjesečna emisija ugljika po modelu"
 
@@ -810,67 +810,67 @@ msgstr "dodatak ugljik – Emisija ugljika korištenja"
 msgid "Carbon dioxyde intensity"
 msgstr "Intenzitet ugljičnog dioksida"
 
-#: src/Dashboard/Grid.php:67 src/Dashboard/Provider.php:379
+#: src/Dashboard/Grid.php:73 src/Dashboard/Provider.php:379
 msgid "Handled assets ratio"
 msgstr "Omjer upravljanih sredstva"
 
-#: src/Dashboard/Grid.php:76
+#: src/Dashboard/Grid.php:82
 msgid "Handled assets count"
 msgstr "Broj upravljanih sredstva"
 
-#: src/Dashboard/Grid.php:139
+#: src/Dashboard/Grid.php:145
 #, php-format
 msgid "Handled %s"
 msgstr "Upravljani %s"
 
-#: src/Dashboard/Grid.php:150
+#: src/Dashboard/Grid.php:156
 #, php-format
 msgid "Unhandled %s"
 msgstr "Neupravljani %s"
 
-#: src/Dashboard/Grid.php:166
+#: src/Dashboard/Grid.php:172
 msgid "Usage power consumption"
 msgstr "Potrošnja energije zbog korištenja"
 
-#: src/Dashboard/Grid.php:172
+#: src/Dashboard/Grid.php:178
 msgid "Usage carbon emission"
 msgstr "Emisija ugljika zbog korištenja"
 
-#: src/Dashboard/Grid.php:186 src/Dashboard/Grid.php:289
+#: src/Dashboard/Grid.php:192 src/Dashboard/Grid.php:295
 #: src/Dashboard/Provider.php:897
 msgid "Embodied global warming potential"
 msgstr "Ugrađeni potencijal globalnog zagrijavanja"
 
-#: src/Dashboard/Grid.php:192 src/Dashboard/Grid.php:301
+#: src/Dashboard/Grid.php:198 src/Dashboard/Grid.php:307
 msgid "Embodied primary energy consumed"
 msgstr "Potrošena ugrađenia primarna energija"
 
-#: src/Dashboard/Grid.php:206 src/UsageImpact.php:105
+#: src/Dashboard/Grid.php:212 src/UsageImpact.php:105
 msgid "Global warming potential"
 msgstr "Potencijal globalnog zagrijavanja"
 
-#: src/Dashboard/Grid.php:212 src/UsageImpact.php:119
+#: src/Dashboard/Grid.php:218 src/UsageImpact.php:119
 msgid "Abiotic depletion potential"
 msgstr "Potencijal abiotskog iscrpljivanja"
 
-#: src/Dashboard/Grid.php:239
+#: src/Dashboard/Grid.php:245
 #, php-format
 msgid "Unhandled %s ratio"
 msgstr "Neupravljana %s omjer"
 
-#: src/Dashboard/Grid.php:251
+#: src/Dashboard/Grid.php:257
 msgid "Usage carbon emission year to date"
 msgstr "Godina emisija ugljika do danas zbog korištenja"
 
-#: src/Dashboard/Grid.php:257
+#: src/Dashboard/Grid.php:263
 msgid "Monthly carbon emission"
 msgstr "Mjesečna emisija ugljika"
 
-#: src/Dashboard/Grid.php:266
+#: src/Dashboard/Grid.php:272
 msgid "Usage global warming potential chart"
 msgstr "Dijagram potencijala globalnog zagrijavanje zbog korištenja"
 
-#: src/Dashboard/Grid.php:316
+#: src/Dashboard/Grid.php:322
 msgid "Environmental impact methodology_information"
 msgstr "Informacije o metodologiji za utjecaj na okoliš"
 

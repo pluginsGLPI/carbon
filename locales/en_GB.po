@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-27 01:55+0000\n"
-"PO-Revision-Date: 2025-10-27 01:55+0000\n"
+"POT-Creation-Date: 2025-10-29 01:52+0000\n"
+"PO-Revision-Date: 2025-10-29 01:52+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: en_GB\n"
@@ -36,7 +36,7 @@ msgstr "Embodied primary energy"
 
 #: templates/dashboard/usage-abiotic-depletion.html.twig
 #: src/Dashboard/Widget.php:96 src/Dashboard/DemoProvider.php:95
-#: src/Dashboard/Grid.php:178 src/Dashboard/Grid.php:281
+#: src/Dashboard/Grid.php:184 src/Dashboard/Grid.php:287
 #: src/Dashboard/Provider.php:816
 msgid "Usage abiotic depletion potential"
 msgstr "Usage abiotic depletion potential"
@@ -119,7 +119,7 @@ msgstr "It represents %s percent of your parc that contains %s computers."
 
 #: templates/dashboard/embodied-abiotic-depletion.html.twig
 #: src/Dashboard/Widget.php:110 src/Dashboard/DemoProvider.php:77
-#: src/Dashboard/Grid.php:198 src/Dashboard/Grid.php:295
+#: src/Dashboard/Grid.php:204 src/Dashboard/Grid.php:301
 #: src/Dashboard/Provider.php:782 src/Dashboard/Provider.php:866
 msgid "Embodied abiotic depletion potential"
 msgstr "Embodied abiotic depletion potential"
@@ -433,8 +433,8 @@ msgstr "Always on"
 msgid "Office hours"
 msgstr "Office hours"
 
-#: src/AbstractType.php:64 src/Dashboard/Grid.php:62 src/Dashboard/Grid.php:127
-#: src/Dashboard/Grid.php:228
+#: src/AbstractType.php:64 src/Dashboard/Grid.php:68 src/Dashboard/Grid.php:133
+#: src/Dashboard/Grid.php:234
 msgid "Carbon"
 msgstr "Carbon"
 
@@ -666,7 +666,7 @@ msgstr "Start time is invalid"
 msgid "Stop time is invalid"
 msgstr "Stop time is invalid"
 
-#: src/Dashboard/Widget.php:57 src/Dashboard/Grid.php:311
+#: src/Dashboard/Widget.php:57 src/Dashboard/Grid.php:317
 msgid "Environmental impact information video"
 msgstr "Environmental impact information video"
 
@@ -683,7 +683,7 @@ msgid "Monthly Carbon Emission"
 msgstr "Monthly Carbon Emission"
 
 #: src/Dashboard/Widget.php:83 src/Dashboard/Widget.php:585
-#: src/Dashboard/Grid.php:275
+#: src/Dashboard/Grid.php:281
 msgid "Biggest monthly averaged carbon emission per model"
 msgstr "Biggest monthly averaged carbon emission per model"
 
@@ -801,67 +801,67 @@ msgstr "plugin carbon - Usage carbon emission"
 msgid "Carbon dioxyde intensity"
 msgstr "Carbon dioxyde intensity"
 
-#: src/Dashboard/Grid.php:67 src/Dashboard/Provider.php:379
+#: src/Dashboard/Grid.php:73 src/Dashboard/Provider.php:379
 msgid "Handled assets ratio"
 msgstr "Handled assets ratio"
 
-#: src/Dashboard/Grid.php:76
+#: src/Dashboard/Grid.php:82
 msgid "Handled assets count"
 msgstr "Handled assets count"
 
-#: src/Dashboard/Grid.php:139
+#: src/Dashboard/Grid.php:145
 #, php-format
 msgid "Handled %s"
 msgstr "Handled %s"
 
-#: src/Dashboard/Grid.php:150
+#: src/Dashboard/Grid.php:156
 #, php-format
 msgid "Unhandled %s"
 msgstr "Unhandled %s"
 
-#: src/Dashboard/Grid.php:166
+#: src/Dashboard/Grid.php:172
 msgid "Usage power consumption"
 msgstr "Usage power consumption"
 
-#: src/Dashboard/Grid.php:172
+#: src/Dashboard/Grid.php:178
 msgid "Usage carbon emission"
 msgstr "Usage carbon emission"
 
-#: src/Dashboard/Grid.php:186 src/Dashboard/Grid.php:289
+#: src/Dashboard/Grid.php:192 src/Dashboard/Grid.php:295
 #: src/Dashboard/Provider.php:897
 msgid "Embodied global warming potential"
 msgstr "Embodied global warming potential"
 
-#: src/Dashboard/Grid.php:192 src/Dashboard/Grid.php:301
+#: src/Dashboard/Grid.php:198 src/Dashboard/Grid.php:307
 msgid "Embodied primary energy consumed"
 msgstr "Embodied primary energy consumed"
 
-#: src/Dashboard/Grid.php:206 src/UsageImpact.php:105
+#: src/Dashboard/Grid.php:212 src/UsageImpact.php:105
 msgid "Global warming potential"
 msgstr "Global warming potential"
 
-#: src/Dashboard/Grid.php:212 src/UsageImpact.php:119
+#: src/Dashboard/Grid.php:218 src/UsageImpact.php:119
 msgid "Abiotic depletion potential"
 msgstr "Abiotic depletion potential"
 
-#: src/Dashboard/Grid.php:239
+#: src/Dashboard/Grid.php:245
 #, php-format
 msgid "Unhandled %s ratio"
 msgstr "Unhandled %s ratio"
 
-#: src/Dashboard/Grid.php:251
+#: src/Dashboard/Grid.php:257
 msgid "Usage carbon emission year to date"
 msgstr "Usage carbon emission year to date"
 
-#: src/Dashboard/Grid.php:257
+#: src/Dashboard/Grid.php:263
 msgid "Monthly carbon emission"
 msgstr "Monthly carbon emission"
 
-#: src/Dashboard/Grid.php:266
+#: src/Dashboard/Grid.php:272
 msgid "Usage global warming potential chart"
 msgstr "Usage global warming potential chart"
 
-#: src/Dashboard/Grid.php:316
+#: src/Dashboard/Grid.php:322
 msgid "Environmental impact methodology_information"
 msgstr "Environmental impact methodology_information"
 
