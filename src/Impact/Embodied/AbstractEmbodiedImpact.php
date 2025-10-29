@@ -39,7 +39,6 @@ use CommonDBTM;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\EmbodiedImpact;
 use GlpiPlugin\Carbon\Impact\Type;
-use GlpiPlugin\Carbon\UsageImpact;
 use Toolbox as GlpiToolbox;
 
 abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
