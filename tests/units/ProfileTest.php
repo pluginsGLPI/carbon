@@ -40,7 +40,7 @@ use Symfony\Component\DomCrawler\Crawler;
 class ProfileTest extends DbTestCase
 {
     /**
-     * @covers GlpiPlugin\Carbon\Profile::getTabNameForItem
+     * #CoversMethod GlpiPlugin\Carbon\Profile::getTabNameForItem
      *
      * @return void
      */
@@ -53,7 +53,7 @@ class ProfileTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Profile::showForm
+     * #CoversMethod GlpiPlugin\Carbon\Profile::showForm
      *
      * @return void
      */

@@ -49,7 +49,7 @@ interface AssetInterface
     /**
      * Get detailed info to tell if the item is historizable
      *
-     * @param CommonDBTM $item
+     * @param CommonDBTM $item an asset to analyze
      * @return array|null
      */
     public static function getHistorizableDiagnosis(CommonDBTM $item): ?array;

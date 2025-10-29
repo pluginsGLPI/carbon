@@ -40,8 +40,8 @@ use DBmysql;
 use Glpi\Dashboard\Dashboard as GlpiDashboard;
 use Infocom;
 use Location;
-use QueryExpression;
-use QuerySubQuery;
+use Glpi\DBAL\QueryExpression;
+use Glpi\DBAL\QuerySubQuery;
 use Mexitek\PHPColors\Color;
 
 class Toolbox
@@ -612,7 +612,6 @@ class Toolbox
     {
         $dashboard = new GlpiDashboard();
         $dashboard_key = 'plugin_carbon_board';
-        /** @phpstan-ignore argument.type */
         if ($dashboard->getFromDB($dashboard_key) === false) {
             return null;
         }

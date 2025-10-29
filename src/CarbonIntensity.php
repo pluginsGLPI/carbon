@@ -38,13 +38,10 @@ use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DBmysql;
-use DBmysqlIterator;
 use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensityInterface;
-use QueryParam;
-use QuerySubQuery;
-use QueryExpression;
+use Glpi\DBAL\QueryParam;
 use Symfony\Component\Console\Helper\ProgressBar;
 
 /**

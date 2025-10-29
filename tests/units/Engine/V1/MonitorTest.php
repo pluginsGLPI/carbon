@@ -62,15 +62,15 @@ class MonitorTest extends EngineTestCase
 
     public function testGetUsageProfile()
     {
-        $computer = $this->getItem(GlpiComputer::class);
-        $profile  = $this->getItem(ComputerUsageProfile::class);
-        $impact   = $this->getItem(UsageInfo::class, [
+        $computer = $this->createItem(GlpiComputer::class);
+        $profile  = $this->createItem(ComputerUsageProfile::class);
+        $impact   = $this->createItem(UsageInfo::class, [
             'itemtype' => GlpiComputer::class,
             'items_id' => $computer->getID(),
             'plugin_carbon_computerusageprofiles_id' => $profile->getID(),
         ]);
-        $monitor = $this->getItem(GlpiMonitor::class);
-        $computer_item = $this->getItem(Computer_Item::class, [
+        $monitor = $this->createItem(GlpiMonitor::class);
+        $computer_item = $this->createItem(Computer_Item::class, [
             'computers_id' => $computer->getID(),
             'itemtype'     => $monitor->getType(),
             'items_id'     => $monitor->getID(),
@@ -97,11 +97,11 @@ class MonitorTest extends EngineTestCase
             'day_7' => 0,
         ];
         $computer = $this->createComputerUsageProfile($profile);
-        $model = $this->getItem(static::$model_class, ['power_consumption' => 20]);
-        $item = $this->getItem(static::$itemtype_class, [
+        $model = $this->createItem(static::$model_class, ['power_consumption' => 20]);
+        $item = $this->createItem(static::$itemtype_class, [
             static::$model_class::getForeignKeyField() => $model->getID(),
         ]);
-        $computer_item = $this->getItem(Computer_Item::class, [
+        $computer_item = $this->createItem(Computer_Item::class, [
             'computers_id' => $computer->getID(),
             'itemtype' => $item->getType(),
             'items_id' => $item->getID(),
@@ -126,11 +126,11 @@ class MonitorTest extends EngineTestCase
             'day_7' => 0,
         ];
         $computer = $this->createComputerUsageProfile($profile);
-        $model = $this->getItem(static::$model_class, ['power_consumption' => 20]);
-        $item = $this->getItem(static::$itemtype_class, [
+        $model = $this->createItem(static::$model_class, ['power_consumption' => 20]);
+        $item = $this->createItem(static::$itemtype_class, [
             static::$model_class::getForeignKeyField() => $model->getID(),
         ]);
-        $computer_item = $this->getItem(Computer_Item::class, [
+        $computer_item = $this->createItem(Computer_Item::class, [
             'computers_id' => $computer->getID(),
             'itemtype' => $item->getType(),
             'items_id' => $item->getID(),
@@ -165,16 +165,16 @@ class MonitorTest extends EngineTestCase
             'day_7' => 0,
         ];
         $computer = $this->createComputerUsageProfilePowerLocation($usage_profile, 40, $country);
-        $glpi_monitor_type = $this->getItem(GlpiMonitorType::class);
-        $monitory_type = $this->getItem(MonitorType::class, [
+        $glpi_monitor_type = $this->createItem(GlpiMonitorType::class);
+        $monitory_type = $this->createItem(MonitorType::class, [
             'monitortypes_id'   => $glpi_monitor_type->getID(),
             'power_consumption' => 31,
         ]);
-        $monitor = $this->getItem(GlpiMonitor::class, [
+        $monitor = $this->createItem(GlpiMonitor::class, [
             'locations_id' => $computer->fields['locations_id'],
             'monitortypes_id' => $glpi_monitor_type->getID(),
         ]);
-        $computer_item = $this->getItem(Computer_Item::class, [
+        $computer_item = $this->createItem(Computer_Item::class, [
             'computers_id' => $computer->getID(),
             'itemtype'     => $monitor->getType(),
             'items_id'     => $monitor->getID(),

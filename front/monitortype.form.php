@@ -33,8 +33,10 @@
 include(__DIR__ . "/../../../inc/includes.php");
 
 use GlpiPlugin\Carbon\MonitorType;
+use Glpi\Exception\Http\NotFoundHttpException;
+
 if (!Plugin::isPluginActive('carbon')) {
-    Html::displayNotFoundError();
+    throw new NotFoundHttpException();
 }
 
 Session::checkRight('config', UPDATE);

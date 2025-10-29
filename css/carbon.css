@@ -1,6 +1,4 @@
-<?php
-
-/**
+/*!
  * -------------------------------------------------------------------------
  * Carbon plugin for GLPI
  *
@@ -30,14 +28,68 @@
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Carbon\CarbonIntensity;
-
-include(__DIR__ . '/../../../inc/includes.php');
-
-// Check if plugin is activated...
-if (!Plugin::isPluginActive('carbon')) {
-    Html::displayNotFoundError();
+.footer-height, .header-height{
+    height: auto;
+    margin-top: 0 !important;
+    position: relative;
 }
 
-$dropdown = new CarbonIntensity();
-include(GLPI_ROOT . "/front/dropdown.common.php");
+.illustration-footer, .illustration-header {
+    width: 100%;
+    height: auto;
+}
+
+.title-color {
+    color: #005B52 !important;
+}
+
+.title-position {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+}
+
+.icon-size, .icon-size svg {
+    /* width: 63px; */
+    height: 63px;
+}
+
+.unhandled-computers-card {
+    background-color: #FCF8A1;
+}
+
+.card-max-height {
+    max-height: 380px !important;
+}
+
+.plugin_carbon_quick_report .card {
+    min-height: 185px !important;
+}
+
+.info-tooltip {
+    position: absolute;
+    bottom: 5px;
+    right: 10px;
+    text-align: right;
+}
+
+.legend-grid-left {
+  display: grid;
+  grid-auto-rows: auto;
+  gap: 8px;
+  justify-content: start;
+  max-width: 400px;
+}
+
+.legend-item {
+  display: grid;
+  grid-template-columns: 30px auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.legend-label {
+  text-align: left;
+}

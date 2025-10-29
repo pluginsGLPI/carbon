@@ -43,37 +43,33 @@ use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
 use GlpiPlugin\Carbon\DataSource\AbstractCarbonIntensity;
 use Infocom;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\Output;
 
+#[CoversClass('GlpiPlugin\Carbon\CarbonIntensity')]
 class CarbonIntensityTest extends DbTestCase
 {
-    /**
-     * @covers GlpiPlugin\Carbon\CarbonIntensity::getKnownDatesQuery
-     * @covers GlpiPlugin\Carbon\CarbonIntensity::getLastKnownDate
-     *
-     * @return void
-     */
     public function testGetLastKnownDate()
     {
         $instance = new CarbonIntensity();
         $result = $instance->getLastKnownDate('foo', 'bar');
         $this->assertNull($result);
 
-        $zone = $this->getItem(Zone::class, [
+        $zone = $this->createItem(Zone::class, [
             'name' => 'foo',
         ]);
-        $source = $this->getItem(CarbonIntensitySource::class, [
+        $source = $this->createItem(CarbonIntensitySource::class, [
             'name' => 'bar'
         ]);
-        $source_zone = $this->getItem(CarbonIntensitySource_Zone::class, [
+        $source_zone = $this->createItem(CarbonIntensitySource_Zone::class, [
             $source::getForeignKeyField() => $source->getID(),
             $zone::getForeignKeyField() => $zone->getID()
         ]);
         $result = $instance->getLastKnownDate('foo', 'bar');
         $this->assertNull($result);
 
-        $intensity = $this->getItem(CarbonIntensity::class, [
+        $intensity = $this->createItem(CarbonIntensity::class, [
             'date' => '2023-02-01 00:00:00',
             $source::getForeignKeyField() => $source->getID(),
             $zone::getForeignKeyField() => $zone->getID(),
@@ -81,7 +77,7 @@ class CarbonIntensityTest extends DbTestCase
             'data_quality' => 2,
         ]);
         $expected = '2024-02-01 00:00:00';
-        $intensity = $this->getItem(CarbonIntensity::class, [
+        $intensity = $this->createItem(CarbonIntensity::class, [
             'date' => $expected,
             $source::getForeignKeyField() => $source->getID(),
             $zone::getForeignKeyField() => $zone->getID(),
@@ -92,32 +88,26 @@ class CarbonIntensityTest extends DbTestCase
         $this->assertEquals($expected, $result->format('Y-m-d H:i:s'));
     }
 
-    /**
-     * @covers GlpiPlugin\Carbon\CarbonIntensity::getKnownDatesQuery
-     * @covers GlpiPlugin\Carbon\CarbonIntensity::getFirstKnownDate
-     *
-     * @return void
-     */
     public function testGetFirstKnownDate()
     {
         $instance = new CarbonIntensity();
         $result = $instance->getFirstKnownDate('foo', 'bar');
         $this->assertNull($result);
 
-        $zone = $this->getItem(Zone::class, [
+        $zone = $this->createItem(Zone::class, [
             'name' => 'foo',
         ]);
-        $source = $this->getItem(CarbonIntensitySource::class, [
+        $source = $this->createItem(CarbonIntensitySource::class, [
             'name' => 'bar'
         ]);
-        $source_zone = $this->getItem(CarbonIntensitySource_Zone::class, [
+        $source_zone = $this->createItem(CarbonIntensitySource_Zone::class, [
             $source::getForeignKeyField() => $source->getID(),
             $zone::getForeignKeyField() => $zone->getID()
         ]);
         $result = $instance->getFirstKnownDate('foo', 'bar');
         $this->assertNull($result);
 
-        $intensity = $this->getItem(CarbonIntensity::class, [
+        $intensity = $this->createItem(CarbonIntensity::class, [
             'date' => '2025-02-01 00:00:00',
             $source::getForeignKeyField() => $source->getID(),
             $zone::getForeignKeyField() => $zone->getID(),
@@ -125,7 +115,7 @@ class CarbonIntensityTest extends DbTestCase
             'data_quality' => 2,
         ]);
         $expected = '2024-02-01 00:00:00';
-        $intensity = $this->getItem(CarbonIntensity::class, [
+        $intensity = $this->createItem(CarbonIntensity::class, [
             'date' => $expected,
             $source::getForeignKeyField() => $source->getID(),
             $zone::getForeignKeyField() => $zone->getID(),
@@ -136,11 +126,6 @@ class CarbonIntensityTest extends DbTestCase
         $this->assertEquals($expected, $result->format('Y-m-d H:i:s'));
     }
 
-    /**
-     * @covers GlpiPlugin\Carbon\CarbonIntensity::findGaps
-     *
-     * @return void
-     */
     public function testFindGaps()
     {
         /** @var DBmysql $DB */
@@ -161,14 +146,14 @@ class CarbonIntensityTest extends DbTestCase
 
         $this->login('glpi', 'glpi');
 
-        $source = $this->getItem(CarbonIntensitySource::class, [
+        $source = $this->createItem(CarbonIntensitySource::class, [
             'name' => 'test_source',
         ]);
-        $zone = $this->getItem(Zone::class, [
+        $zone = $this->createItem(Zone::class, [
             'name' => 'test_zone',
             'plugin_carbon_carbonintensitysources_id_historical' => $source->getID(),
         ]);
-        $source_zone = $this->getItem(CarbonIntensitySource_Zone::class, [
+        $source_zone = $this->createItem(CarbonIntensitySource_Zone::class, [
             'plugin_carbon_carbonintensitysources_id' => $source->getID(),
             'plugin_carbon_zones_id' => $zone->getID(),
         ]);
@@ -309,8 +294,8 @@ class CarbonIntensityTest extends DbTestCase
         $expected = (new DateTime('13 months ago'))->setTime(0, 0, 0); // CarbonIntensity::MIN_HISTORY_LENGTH
         $this->assertEquals($expected, $result);
 
-        $computer = $this->getItem(Computer::class);
-        $infocom = $this->getItem(Infocom::class, [
+        $computer = $this->createItem(Computer::class);
+        $infocom = $this->createItem(Infocom::class, [
             'itemtype' => $computer->getType(),
             'items_id' => $computer->getID(),
             'buy_date' => '2022-02-01',
@@ -321,11 +306,6 @@ class CarbonIntensityTest extends DbTestCase
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @covers GlpiPlugin\Carbon\CarbonIntensity::getDownloadStopDate
-     *
-     * @return void
-     */
     public function testGetDownloadStopDate()
     {
         $instance = new CarbonIntensity();
@@ -340,18 +320,18 @@ class CarbonIntensityTest extends DbTestCase
         $result = $instance->getDownloadStopDate('foo', $data_source);
         $this->assertEquals($expected, $result);
 
-        $zone = $this->getItem(Zone::class, [
+        $zone = $this->createItem(Zone::class, [
             'name' => 'foo',
         ]);
-        $source = $this->getItem(CarbonIntensitySource::class, [
+        $source = $this->createItem(CarbonIntensitySource::class, [
             'name' => 'bar'
         ]);
         $expected = new DateTimeImmutable('2019-01-31 23:00:00');
-        $source_zone = $this->getItem(CarbonIntensitySource_Zone::class, [
+        $source_zone = $this->createItem(CarbonIntensitySource_Zone::class, [
             $source::getForeignKeyField() => $source->getID(),
             $zone::getForeignKeyField() => $zone->getID(),
         ]);
-        $intensity = $this->getItem(CarbonIntensity::class, [
+        $intensity = $this->createItem(CarbonIntensity::class, [
             'date' => '2019-02-01',
             $source::getForeignKeyField() => $source->getID(),
             $zone::getForeignKeyField() => $zone->getID(),
@@ -362,24 +342,19 @@ class CarbonIntensityTest extends DbTestCase
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @covers GlpiPlugin\Carbon\CarbonIntensity::downloadOneZone
-     *
-     * @return void
-     */
     public function testDownloadOneZone()
     {
         $instance = new CarbonIntensity();
         $result = $instance->getLastKnownDate('foo', 'bar');
         $this->assertNull($result);
 
-        $zone = $this->getItem(Zone::class, [
+        $zone = $this->createItem(Zone::class, [
             'name' => 'foo',
         ]);
-        $source = $this->getItem(CarbonIntensitySource::class, [
+        $source = $this->createItem(CarbonIntensitySource::class, [
             'name' => 'bar'
         ]);
-        $source_zone = $this->getItem(CarbonIntensitySource_Zone::class, [
+        $source_zone = $this->createItem(CarbonIntensitySource_Zone::class, [
             $source::getForeignKeyField() => $source->getID(),
             $zone::getForeignKeyField() => $zone->getID()
         ]);

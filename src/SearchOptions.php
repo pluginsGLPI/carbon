@@ -265,130 +265,70 @@ class SearchOptions
                 `glpi_plugin_carbon_monitortypes_54b036337d1b9bbf4f13db0e1ae93bc9`.`power_consumption` > 0
                 OR `glpi_monitormodels`.`power_consumption` > 0
             ), 1, 0)";
-            /** @phpstan-ignore if.alwaysFalse */
-            if (version_compare(GLPI_VERSION, '11.0', '>=')) {
-                $sopt[] = [
-                    'id'            => SearchOptions::IS_HISTORIZABLE,
-                    'table'         => getTableForItemType($itemtype),
-                    'field'         => 'id',
-                    'linkfield'     => 'id',
-                    'name'          => __('Is historizable', 'carbon'),
-                    'datatype'      => 'bool',
-                    'massiveaction' => false,
-                    'joinparams' => [
-                        'jointype' => 'empty',
-                        'beforejoin' => [
-                            [
-                                'table' => GlpiLocation::getTable(),
-                                'joinparams' => [
-                                    'jointype' => 'empty',
-                                    'nolink'   => true,
-                                    'beforejoin' => [
-                                        'table' => Computer::getTable(),
-                                        'linkfield' => 'items_id_peripheral',
-                                        'joinparams' => [
-                                            'jointype' => 'empty',
-                                            'beforejoin' => [
-                                                // ignore next line error until GLPI 11 is mandatory
-                                                /** @phpstan-ignore-next-line */
-                                                'table' => Asset_PeripheralAsset::getTable(),
-                                                'joinparams' => [
-                                                    'jointype' => 'custom_condition_only',
-                                                    'condition' => [
-                                                        'ON' => [
-                                                            'NEWTABLE' => 'items_id_peripheral',
-                                                            'REFTABLE' => 'id',
-                                                        ],
-                                                        'AND' => [
-                                                            'itemtype_peripheral' => Monitor::getType(),
-                                                        ]
+            $sopt[] = [
+                'id'            => SearchOptions::IS_HISTORIZABLE,
+                'table'         => getTableForItemType($itemtype),
+                'field'         => 'id',
+                'linkfield'     => 'id',
+                'name'          => __('Is historizable', 'carbon'),
+                'datatype'      => 'bool',
+                'massiveaction' => false,
+                'joinparams' => [
+                    'jointype' => 'empty',
+                    'beforejoin' => [
+                        [
+                            'table' => GlpiLocation::getTable(),
+                            'joinparams' => [
+                                'jointype' => 'empty',
+                                'nolink'   => true,
+                                'beforejoin' => [
+                                    'table' => Computer::getTable(),
+                                    'linkfield' => 'items_id_peripheral',
+                                    'joinparams' => [
+                                        'jointype' => 'empty',
+                                        'beforejoin' => [
+                                            'table' => Asset_PeripheralAsset::getTable(),
+                                            'joinparams' => [
+                                                'jointype' => 'custom_condition_only',
+                                                'condition' => [
+                                                    'ON' => [
+                                                        'NEWTABLE' => 'items_id_peripheral',
+                                                        'REFTABLE' => 'id',
                                                     ],
-                                                ]
+                                                    'AND' => [
+                                                        'itemtype_peripheral' => Monitor::getType(),
+                                                    ]
+                                                ],
                                             ]
                                         ]
                                     ]
                                 ]
-                            ],
-                            [
-                                'table' => MonitorType::getTable(),
-                                'joinparams' => [
-                                    'jointype' => 'child',
-                                    'nolink'   => true,
-                                    'beforejoin' => [
-                                        'table' => GlpiMonitorType::getTable(),
-                                        'joinparams' => [
-                                            'jointype' => 'empty',
-                                        ]
+                            ]
+                        ],
+                        [
+                            'table' => MonitorType::getTable(),
+                            'joinparams' => [
+                                'jointype' => 'child',
+                                'nolink'   => true,
+                                'beforejoin' => [
+                                    'table' => GlpiMonitorType::getTable(),
+                                    'joinparams' => [
+                                        'jointype' => 'empty',
                                     ]
                                 ]
-                            ],
-                            [
-                                'table' => MonitorModel::getTable(),
-                                'joinparams' => [
-                                    'jointype' => 'empty',
-                                    'nolink'   => true,
-                                ]
-                            ],
+                            ]
+                        ],
+                        [
+                            'table' => MonitorModel::getTable(),
+                            'joinparams' => [
+                                'jointype' => 'empty',
+                                'nolink'   => true,
+                            ]
                         ],
                     ],
-                    'computation' => $computation,
-                ];
-            } else {
-                $sopt[] = [
-                    'id'            => SearchOptions::IS_HISTORIZABLE,
-                    'table'         => getTableForItemType($itemtype),
-                    'field'         => 'id',
-                    'linkfield'     => 'id',
-                    'name'          => __('Is historizable', 'carbon'),
-                    'datatype'      => 'bool',
-                    'massiveaction' => false,
-                    'joinparams' => [
-                        'jointype' => 'empty',
-                        'beforejoin' => [
-                            [
-                                'table' => GlpiLocation::getTable(),
-                                'joinparams' => [
-                                    'jointype' => 'empty',
-                                    'nolink'   => true,
-                                    'beforejoin' => [
-                                        'table' => Computer::getTable(),
-                                        'joinparams' => [
-                                            'jointype' => 'empty',
-                                            'beforejoin' => [
-                                                'table' => Computer_Item::getTable(),
-                                                'joinparams' => [
-                                                    'jointype' => 'itemtype_item',
-                                                ]
-                                            ]
-                                        ]
-                                    ]
-                                ]
-                            ],
-                            [
-                                'table' => MonitorType::getTable(),
-                                'joinparams' => [
-                                    'jointype' => 'child',
-                                    'nolink'   => true,
-                                    'beforejoin' => [
-                                        'table' => GlpiMonitorType::getTable(),
-                                        'joinparams' => [
-                                            'jointype' => 'empty',
-                                        ]
-                                    ]
-                                ]
-                            ],
-                            [
-                                'table' => MonitorModel::getTable(),
-                                'joinparams' => [
-                                    'jointype' => 'empty',
-                                    'nolink'   => true,
-                                ]
-                            ],
-                        ],
-                    ],
-                    'computation' => $computation,
-                ];
-            }
+                ],
+                'computation' => $computation,
+            ];
         } else if ($itemtype === NetworkEquipment::class && in_array($itemtype, PLUGIN_CARBON_TYPES)) {
             $computation = "IF(`glpi_networkequipments_id_aef00423a27f97ae31ca50f63fb1a6fb`.`is_deleted` = 0
             AND `glpi_networkequipments_id_aef00423a27f97ae31ca50f63fb1a6fb`.`is_template` = 0

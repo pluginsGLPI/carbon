@@ -53,7 +53,7 @@ use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\UsageInfo;
 
 /**
- * @covers \GlpiPlugin\Carbon\Impact\History\Monitor
+ * #CoversMethod \GlpiPlugin\Carbon\Impact\History\Monitor
  */
 class MonitorTest extends CommonAsset
 {
@@ -90,22 +90,22 @@ class MonitorTest extends CommonAsset
         $entities_id = $this->isolateInEntity('glpi', 'glpi');
 
         $model_power = 55;
-        $location = $this->getItem(Location::class, [
+        $location = $this->createItem(Location::class, [
             'state' => 'Quebec',
         ]);
 
         $computer_model_power = 80;
-        $computer_model = $this->getItem(ComputerModel::class, ['power_consumption' => $computer_model_power]);
-        $glpi_computer_type = $this->getItem(GlpiComputerType::class);
-        $computer_type = $this->getItem(ComputerType::class, [
+        $computer_model = $this->createItem(ComputerModel::class, ['power_consumption' => $computer_model_power]);
+        $glpi_computer_type = $this->createItem(GlpiComputerType::class);
+        $computer_type = $this->createItem(ComputerType::class, [
             GlpiComputerType::getForeignKeyField() => $glpi_computer_type->getID(),
         ]);
-        $computer = $this->getItem(GlpiComputer::class, [
+        $computer = $this->createItem(GlpiComputer::class, [
             'computertypes_id'  => $glpi_computer_type->getID(),
             'computermodels_id' => $computer_model->getID(),
             'locations_id'      => $location->getID(),
         ]);
-        $usage_profile = $this->getItem(ComputerUsageProfile::class, [
+        $usage_profile = $this->createItem(ComputerUsageProfile::class, [
             'time_start'   => '09:00:00',
             'time_stop'    => '18:00:00',
             'day_1'        => '1',
@@ -116,25 +116,25 @@ class MonitorTest extends CommonAsset
             'day_6'        => '0',
             'day_7'        => '0',
         ]);
-        $impact = $this->getItem(UsageInfo::class, [
+        $impact = $this->createItem(UsageInfo::class, [
             $usage_profile->getForeignKeyField() => $usage_profile->getID(),
             'itemtype' => $computer->getType(),
             'items_id' => $computer->getID(),
         ]);
 
-        $model = $this->getItem(GlpiMonitorModel::class, ['power_consumption' => $model_power]);
-        $glpi_type = $this->getItem(GlpiMonitorType::class);
-        $type = $this->getItem(MonitorType::class, [
+        $model = $this->createItem(GlpiMonitorModel::class, ['power_consumption' => $model_power]);
+        $glpi_type = $this->createItem(GlpiMonitorType::class);
+        $type = $this->createItem(MonitorType::class, [
             GlpiMonitorType::getForeignKeyField() => $glpi_type->getID(),
         ]);
-        $asset = $this->getItem(GlpiMonitor::class, [
+        $asset = $this->createItem(GlpiMonitor::class, [
             'monitortypes_id'   => $glpi_type->getID(),
             'monitormodels_id'  => $model->getID(),
             'locations_id'      => $location->getID(),
             'date_creation'     => '2024-01-01',
             'date_mod'          => null,
         ]);
-        $computer_asset = $this->getItem(Computer_Item::class, [
+        $computer_asset = $this->createItem(Computer_Item::class, [
             'computers_id' => $computer->getID(),
             'itemtype' => $asset->getType(),
             'items_id' => $asset->getID(),
@@ -168,11 +168,11 @@ class MonitorTest extends CommonAsset
             [
                 'date'             => '2024-02-01 00:00:00',
                 'energy_per_day'   => 0.495,
-                'emission_per_day' => 234.138,
+                'emission_per_day' => 17.0775,
             ],[
                 'date' => '2024-02-02 00:00:00',
                 'energy_per_day'   => 0.495,
-                'emission_per_day' => 234.138,
+                'emission_per_day' => 17.0775,
             ], [
                 'date' => '2024-02-03 00:00:00',
                 'energy_per_day'   => 0,
@@ -184,15 +184,15 @@ class MonitorTest extends CommonAsset
             ], [
                 'date' => '2024-02-05 00:00:00',
                 'energy_per_day'   => 0.495,
-                'emission_per_day' => 234.138,
+                'emission_per_day' => 17.0775,
             ], [
                 'date' => '2024-02-06 00:00:00',
                 'energy_per_day'   => 0.495,
-                'emission_per_day' => 234.138,
+                'emission_per_day' => 17.0775,
             ], [
                 'date' => '2024-02-07 00:00:00',
                 'energy_per_day'   => 0.495,
-                'emission_per_day' => 234.138,
+                'emission_per_day' => 17.0775,
             ],
         ];
         foreach ($emissions as $emission) {
@@ -251,7 +251,7 @@ class MonitorTest extends CommonAsset
     {
         $history = new Monitor();
 
-        $monitor = $this->getItem(GlpiMonitor::class);
+        $monitor = $this->createItem(GlpiMonitor::class);
         $result = $history->getHistorizableDiagnosis($monitor);
         $expected = [
             'is_deleted'                  => true,
@@ -265,6 +265,8 @@ class MonitorTest extends CommonAsset
             'has_type'                    => false,
             'has_type_power_consumption'  => false,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);
@@ -276,9 +278,9 @@ class MonitorTest extends CommonAsset
     {
         $history = new Monitor();
 
-        $monitor = $this->getItem(GlpiMonitor::class);
-        $computer = $this->getItem(GlpiComputer::class);
-        $computer_item = $this->getItem(Computer_Item::class, [
+        $monitor = $this->createItem(GlpiMonitor::class);
+        $computer = $this->createItem(GlpiComputer::class);
+        $computer_item = $this->createItem(Computer_Item::class, [
             'computers_id' => $computer->getID(),
             'itemtype'     => $monitor->getType(),
             'items_id'     => $monitor->getID(),
@@ -296,6 +298,8 @@ class MonitorTest extends CommonAsset
             'has_type'                    => false,
             'has_type_power_consumption'  => false,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);
@@ -307,8 +311,8 @@ class MonitorTest extends CommonAsset
     {
         $history = new Monitor();
 
-        $monitor = $this->getItem(GlpiMonitor::class);
-        $infocom = $this->getItem(Infocom::class, [
+        $monitor = $this->createItem(GlpiMonitor::class);
+        $infocom = $this->createItem(Infocom::class, [
             'itemtype'     => $monitor->getType(),
             'items_id'     => $monitor->getID(),
         ]);
@@ -325,6 +329,8 @@ class MonitorTest extends CommonAsset
             'has_type'                    => false,
             'has_type_power_consumption'  => false,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);
@@ -336,8 +342,8 @@ class MonitorTest extends CommonAsset
     {
         $history = new Monitor();
 
-        $monitor = $this->getItem(GlpiMonitor::class);
-        $infocom = $this->getItem(Infocom::class, [
+        $monitor = $this->createItem(GlpiMonitor::class);
+        $infocom = $this->createItem(Infocom::class, [
             'itemtype'     => $monitor->getType(),
             'items_id'     => $monitor->getID(),
             'buy_date'     => '2024-01-01',
@@ -355,6 +361,8 @@ class MonitorTest extends CommonAsset
             'has_type'                    => false,
             'has_type_power_consumption'  => false,
             'has_inventory_entry_date'    => true,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);
@@ -366,12 +374,12 @@ class MonitorTest extends CommonAsset
     {
         $history = new Monitor();
 
-        $monitor = $this->getItem(GlpiMonitor::class);
-        $location = $this->getItem(Location::class);
-        $computer = $this->getItem(GlpiComputer::class, [
+        $monitor = $this->createItem(GlpiMonitor::class);
+        $location = $this->createItem(Location::class);
+        $computer = $this->createItem(GlpiComputer::class, [
             'locations_id' => $location->getID(),
         ]);
-        $computer_item = $this->getItem(Computer_Item::class, [
+        $computer_item = $this->createItem(Computer_Item::class, [
             'computers_id' => $computer->getID(),
             'itemtype'     => $monitor->getType(),
             'items_id'     => $monitor->getID(),
@@ -389,6 +397,8 @@ class MonitorTest extends CommonAsset
             'has_type'                    => false,
             'has_type_power_consumption'  => false,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);
@@ -400,14 +410,14 @@ class MonitorTest extends CommonAsset
     {
         $history = new Monitor();
 
-        $monitor = $this->getItem(GlpiMonitor::class);
-        $location = $this->getItem(Location::class, [
+        $monitor = $this->createItem(GlpiMonitor::class);
+        $location = $this->createItem(Location::class, [
             'country' => 'France',
         ]);
-        $computer = $this->getItem(GlpiComputer::class, [
+        $computer = $this->createItem(GlpiComputer::class, [
             'locations_id' => $location->getID(),
         ]);
-        $computer_item = $this->getItem(Computer_Item::class, [
+        $computer_item = $this->createItem(Computer_Item::class, [
             'computers_id' => $computer->getID(),
             'itemtype'     => $monitor->getType(),
             'items_id'     => $monitor->getID(),
@@ -426,6 +436,8 @@ class MonitorTest extends CommonAsset
             'has_type'                    => false,
             'has_type_power_consumption'  => false,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);
@@ -437,14 +449,14 @@ class MonitorTest extends CommonAsset
     {
         $history = new Monitor();
 
-        $location = $this->getItem(Location::class, [
+        $location = $this->createItem(Location::class, [
             'state' => 'Quebec',
         ]);
-        $monitor = $this->getItem(GlpiMonitor::class);
-        $computer = $this->getItem(GlpiComputer::class, [
+        $monitor = $this->createItem(GlpiMonitor::class);
+        $computer = $this->createItem(GlpiComputer::class, [
             'locations_id' => $location->getID(),
         ]);
-        $computer_item = $this->getItem(Computer_Item::class, [
+        $computer_item = $this->createItem(Computer_Item::class, [
             'computers_id' => $computer->getID(),
             'itemtype'     => $monitor->getType(),
             'items_id'     => $monitor->getID(),
@@ -462,6 +474,8 @@ class MonitorTest extends CommonAsset
             'has_type'                    => false,
             'has_type_power_consumption'  => false,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);
@@ -473,15 +487,15 @@ class MonitorTest extends CommonAsset
     {
         $history = new Monitor();
 
-        $monitor = $this->getItem(GlpiMonitor::class);
-        $computer = $this->getItem(GlpiComputer::class);
-        $computer_item = $this->getItem(Computer_Item::class, [
+        $monitor = $this->createItem(GlpiMonitor::class);
+        $computer = $this->createItem(GlpiComputer::class);
+        $computer_item = $this->createItem(Computer_Item::class, [
             'computers_id' => $computer->getID(),
             'itemtype'     => $monitor->getType(),
             'items_id'     => $monitor->getID(),
         ]);
-        $usage_profile = $this->getItem(ComputerUsageProfile::class);
-        $impact = $this->getItem(UsageInfo::class, [
+        $usage_profile = $this->createItem(ComputerUsageProfile::class);
+        $impact = $this->createItem(UsageInfo::class, [
             $usage_profile->getForeignKeyField() => $usage_profile->getID(),
             'itemtype' => $computer->getType(),
             'items_id' => $computer->getID(),
@@ -499,6 +513,8 @@ class MonitorTest extends CommonAsset
             'has_type'                    => false,
             'has_type_power_consumption'  => false,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);
@@ -510,8 +526,8 @@ class MonitorTest extends CommonAsset
     {
         $history = new Monitor();
 
-        $glpi_monitor_model = $this->getItem(GlpiMonitorModel::class);
-        $monitor = $this->getItem(GlpiMonitor::class, [
+        $glpi_monitor_model = $this->createItem(GlpiMonitorModel::class);
+        $monitor = $this->createItem(GlpiMonitor::class, [
             'monitormodels_id' => $glpi_monitor_model->getID(),
         ]);
         $result = $history->getHistorizableDiagnosis($monitor);
@@ -527,6 +543,8 @@ class MonitorTest extends CommonAsset
             'has_type'                    => false,
             'has_type_power_consumption'  => false,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);
@@ -538,10 +556,10 @@ class MonitorTest extends CommonAsset
     {
         $history = new Monitor();
 
-        $glpi_monitor_model = $this->getItem(GlpiMonitorModel::class, [
+        $glpi_monitor_model = $this->createItem(GlpiMonitorModel::class, [
             'power_consumption' => 35,
         ]);
-        $monitor = $this->getItem(GlpiMonitor::class, [
+        $monitor = $this->createItem(GlpiMonitor::class, [
             'monitormodels_id' => $glpi_monitor_model->getID(),
         ]);
         $result = $history->getHistorizableDiagnosis($monitor);
@@ -557,6 +575,8 @@ class MonitorTest extends CommonAsset
             'has_type'                    => false,
             'has_type_power_consumption'  => false,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);
@@ -568,12 +588,12 @@ class MonitorTest extends CommonAsset
     {
         $history = new Monitor();
 
-        $glpi_monitor_type = $this->getItem(GlpiMonitorType::class);
-        $monitor_type = $this->getItem(MonitorType::class, [
+        $glpi_monitor_type = $this->createItem(GlpiMonitorType::class);
+        $monitor_type = $this->createItem(MonitorType::class, [
             'power_consumption' => 55,
             'monitortypes_id' => $glpi_monitor_type->getID(),
         ]);
-        $monitor = $this->getItem(GlpiMonitor::class, [
+        $monitor = $this->createItem(GlpiMonitor::class, [
             'monitortypes_id' => $glpi_monitor_type->getID(),
         ]);
         $result = $history->getHistorizableDiagnosis($monitor);
@@ -589,6 +609,8 @@ class MonitorTest extends CommonAsset
             'has_type'                    => true,
             'has_type_power_consumption'  => true,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);
@@ -600,12 +622,12 @@ class MonitorTest extends CommonAsset
     {
         $history = new Monitor();
 
-        $glpi_monitor_type = $this->getItem(GlpiMonitorType::class);
-        $monitor_type = $this->getItem(MonitorType::class, [
+        $glpi_monitor_type = $this->createItem(GlpiMonitorType::class);
+        $monitor_type = $this->createItem(MonitorType::class, [
             'monitortypes_id'   => $glpi_monitor_type->getID(),
             'power_consumption' => 55,
         ]);
-        $monitor = $this->getItem(GlpiMonitor::class, [
+        $monitor = $this->createItem(GlpiMonitor::class, [
             'monitortypes_id' => $glpi_monitor_type->getID(),
         ]);
         $result = $history->getHistorizableDiagnosis($monitor);
@@ -621,6 +643,8 @@ class MonitorTest extends CommonAsset
             'has_type'                    => true,
             'has_type_power_consumption'  => true,
             'has_inventory_entry_date'    => false,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);
@@ -633,29 +657,29 @@ class MonitorTest extends CommonAsset
     {
         $history = new Monitor();
 
-        $location = $this->getItem(Location::class, [
+        $location = $this->createItem(Location::class, [
             'country' => 'France',
         ]);
-        $glpi_monitor_model = $this->getItem(GlpiMonitorModel::class, [
+        $glpi_monitor_model = $this->createItem(GlpiMonitorModel::class, [
             'power_consumption' => 35,
         ]);
-        $monitor = $this->getItem(GlpiMonitor::class, [
+        $monitor = $this->createItem(GlpiMonitor::class, [
             'monitormodels_id' => $glpi_monitor_model->getID(),
         ]);
-        $computer = $this->getItem(GlpiComputer::class, [
+        $computer = $this->createItem(GlpiComputer::class, [
             'locations_id' => $location->getID(),
         ]);
-        $computer_item = $this->getItem(Computer_Item::class, [
+        $computer_item = $this->createItem(Computer_Item::class, [
             'computers_id' => $computer->getID(),
             'itemtype'     => $monitor->getType(),
             'items_id'     => $monitor->getID(),
         ]);
-        $infocom = $this->getItem(Infocom::class, [
+        $infocom = $this->createItem(Infocom::class, [
             'itemtype'     => $monitor->getType(),
             'items_id'     => $monitor->getID(),
             'buy_date'     => '2024-01-01',
         ]);
-        $usage_profile = $this->getItem(ComputerUsageProfile::class, [
+        $usage_profile = $this->createItem(ComputerUsageProfile::class, [
             'time_start'   => '09:00:00',
             'time_stop'    => '18:00:00',
             'day_1'        => '1',
@@ -666,7 +690,7 @@ class MonitorTest extends CommonAsset
             'day_6'        => '0',
             'day_7'        => '0',
         ]);
-        $impact = $this->getItem(UsageInfo::class, [
+        $impact = $this->createItem(UsageInfo::class, [
             $usage_profile->getForeignKeyField() => $usage_profile->getID(),
             'itemtype' => $computer->getType(),
             'items_id' => $computer->getID(),
@@ -685,6 +709,8 @@ class MonitorTest extends CommonAsset
             'has_type'                    => false,
             'has_type_power_consumption'  => false,
             'has_inventory_entry_date'    => true,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
         ];
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);

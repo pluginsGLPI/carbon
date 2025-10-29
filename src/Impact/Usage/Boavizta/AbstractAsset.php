@@ -43,7 +43,7 @@ use GlpiPlugin\Carbon\Impact\Type;
 use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\Zone;
 use Location as GlpiLocation;
-use QueryExpression;
+use Glpi\DBAL\QueryExpression;
 
 abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterface
 {

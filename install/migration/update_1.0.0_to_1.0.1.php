@@ -30,14 +30,40 @@
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Carbon\CarbonIntensitySource;
+function update100to101(Migration $migration)
+{
+    /** @var DBmysql $DB */
+    global $DB;
 
-include(__DIR__ . '/../../../inc/includes.php');
+    $updateresult       = true;
+    $from_version       = '1.0.0';
+    $to_version         = '1.0.1';
+    $update_dir = __DIR__ . "/update_{$from_version}_to_{$to_version}/";
 
-// Check if plugin is activated
-if (!Plugin::isPluginActive('carbon')) {
-    Html::displayNotFoundError();
+    //TRANS: %s is the number of new version
+    $migration->addInfoMessage(sprintf(__('Update to %s'), $to_version));
+    $migration->setVersion($to_version);
+
+    // New tables from enpty.sql file after the migration
+    // If a script requires a new table, it may create it by itself
+
+    $update_scripts = scandir($update_dir);
+    natcasesort($update_scripts);
+    foreach ($update_scripts as $update_script) {
+        if (preg_match('/\.php$/', $update_script) !== 1) {
+            continue;
+        }
+        require $update_dir . $update_script;
+    }
+
+    $dbFile = plugin_carbon_getSchemaPath($to_version);
+    if ($dbFile === null || !$DB->runFile($dbFile)) {
+        $migration->addWarningMessage("Error creating tables : " . $DB->error());
+        $updateresult = false;
+    }
+
+    // ************ Keep it at the end **************
+    $migration->executeMigration();
+
+    return $updateresult;
 }
-
-$dropdown = new CarbonIntensitySource();
-include(GLPI_ROOT . "/front/dropdown.common.php");

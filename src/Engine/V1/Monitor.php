@@ -33,8 +33,7 @@
 namespace GlpiPlugin\Carbon\Engine\V1;
 
 use Computer as GlpiComputer;
-use Computer_Item;
-use DateTime;
+use Glpi\Asset\Asset_PeripheralAsset;
 use DBmysql;
 use Monitor as GlpiMonitor;
 use MonitorType as GlpiMonitorType;
@@ -59,7 +58,7 @@ class Monitor extends AbstractSwitchable
         global $DB;
 
         $computers_table = GlpiComputer::getTable();
-        $computer_item_table = Computer_Item::getTable();
+        $computer_item_table = Asset_PeripheralAsset::getTable();
         $usageinfo_table = UsageInfo::getTable();
         $computerUsageProfile_table = ComputerUsageProfile::getTable();
 
@@ -69,9 +68,13 @@ class Monitor extends AbstractSwitchable
             'INNER JOIN' => [
                 $computer_item_table => [
                     'FKEY' => [
-                        $computer_item_table => 'computers_id',
+                        $computer_item_table => 'items_id_asset',
                         $computers_table     => 'id',
-                        ['AND' => [Computer_Item::getTableField('itemtype') => self::$itemtype]],
+                        ['AND' => [
+                            Asset_PeripheralAsset::getTableField('itemtype_peripheral') => self::$itemtype
+                        ],
+                            Asset_PeripheralAsset::getTableField('itemtype_asset') => GlpiComputer::class,
+                        ],
                     ]
                 ],
                 $usageinfo_table => [
@@ -93,7 +96,7 @@ class Monitor extends AbstractSwitchable
                 ]
             ],
             'WHERE' => [
-                Computer_Item::getTableField('items_id') => $this->item->getID(),
+                Asset_PeripheralAsset::getTableField('items_id_peripheral') => $this->item->getID(),
             ],
         ];
 

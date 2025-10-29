@@ -34,15 +34,38 @@
  * -------------------------------------------------------------------------
  */
 
+use Glpi\Application\Environment;
+use Glpi\Application\ResourcesChecker;
+use Glpi\Kernel\Kernel;
+
 if (PHP_SAPI != 'cli') {
     echo "This script must be run from command line";
     exit();
 }
 
+// Check the resources state before trying to be sure that the tests are executed with up-to-date dependencies.
+require_once dirname(__DIR__, 3) . '/src/Glpi/Application/ResourcesChecker.php';
+(new ResourcesChecker(dirname(__DIR__, 3)))->checkResources();
+
+global $GLPI_CACHE;
+
+require_once dirname(__DIR__, 3) . '/vendor/autoload.php';
+
+$kernel = new Kernel(Environment::TESTING->value);
+$kernel->boot();
+
+if (!file_exists(GLPI_CONFIG_DIR . '/config_db.php')) {
+    echo("\nConfiguration file for tests not found\n\nrun: php bin/console database:install --env=testing ...\n\n");
+    exit(1);
+}
+if (Update::isUpdateMandatory()) {
+    echo 'The GLPI codebase has been updated. The update of the GLPI database is necessary.' . PHP_EOL;
+    exit(1);
+}
+
 require_once(__DIR__ . '/GraphViz.php');
 require_once(__DIR__ . '/PlantUml.php');
 require_once(__DIR__ . '/Mermaid.php');
-require realpath(__DIR__ . '/../../../inc/includes.php');
 
 $CFG_GLPI['root_doc']            = '/glpi';
 

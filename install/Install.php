@@ -35,6 +35,7 @@ namespace GlpiPlugin\Carbon;
 use Config;
 use DBmysql;
 use DirectoryIterator;
+use Glpi\Message\MessageType;
 use Glpi\Toolbox\Sanitizer;
 use Migration;
 use Plugin;
@@ -107,7 +108,7 @@ class Install
 
         $dbFile = plugin_carbon_getSchemaPath();
         if ($dbFile === null || !$DB->runFile($dbFile)) {
-            $this->migration->displayWarning("Error creating tables : " . $DB->error(), true);
+            $this->migration->addWarningMessage("Error creating tables : " . $DB->error());
             return false;
         }
 
@@ -179,6 +180,20 @@ class Install
             }
         }
 
+        // Cherry pick install sub tasts to run
+        // Useful to rewrite missing data in DB
+        $install_dir = __DIR__ . '/install/';
+        $update_scripts = scandir($install_dir);
+        $whitelist = [
+            'init_datasources.php'
+        ];
+        foreach ($update_scripts as $update_script) {
+            if (!in_array($update_script, $whitelist)) {
+                continue;
+            }
+            require $install_dir . $update_script;
+        }
+
         // If no migration was ran, we still set the version to the current one
         Config::setConfigurationValues('plugin:carbon', ['dbversion' => PLUGIN_CARBON_SCHEMA_VERSION]);
 
@@ -237,10 +252,10 @@ class Install
     public static function getOrCreateSource(string $name, int $is_fallback = 1): int
     {
         $source = new CarbonIntensitySource();
-        $source->getFromDBByCrit(['name' => Sanitizer::sanitize($name)]);
+        $source->getFromDBByCrit(['name' => $name]);
         if ($source->isNewItem()) {
             $source->add([
-                'name' => Sanitizer::sanitize($name),
+                'name' => $name,
                 'is_fallback' => $is_fallback,
             ]);
             /** @phpstan-ignore if.alwaysTrue */
@@ -261,10 +276,10 @@ class Install
     public static function getOrCreateZone(string $name, int $source_id): int
     {
         $zone = new Zone();
-        $zone->getFromDBByCrit(['name' => Sanitizer::sanitize($name)]);
+        $zone->getFromDBByCrit(['name' => $name]);
         if ($zone->isNewItem()) {
             $zone->add([
-                'name' => Sanitizer::sanitize($name),
+                'name' => $name,
                 'plugin_carbon_carbonintensitysources_id_historical' => $source_id,
             ]);
             /** @phpstan-ignore if.alwaysTrue */

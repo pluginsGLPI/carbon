@@ -30,12 +30,13 @@
  * -------------------------------------------------------------------------
  */
 
+use Glpi\Exception\Http\NotFoundHttpException;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
 
 include(__DIR__ . '/../../../inc/includes.php');
 
 if (!Plugin::isPluginActive('carbon')) {
-    Html::displayNotFoundError();
+    throw new NotFoundHttpException();
 }
 
 Session::checkRight('config', UPDATE);

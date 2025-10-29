@@ -53,13 +53,9 @@ class PluginUninstallTest extends CommonTestCase
         $plugin->getFromDBbyDir($pluginName);
 
         // Uninstall the plugin
-        $log = '';
-        ob_start(function ($in) use (&$log) {
-            $log .= $in;
-            return '';
-        });
+        ob_start();
         $plugin->uninstall($plugin->getID());
-        ob_end_clean();
+        $log = ob_get_clean();
 
         // Check the plugin is not installed
         $plugin->getFromDBbyDir(strtolower($pluginName));

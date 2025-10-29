@@ -49,7 +49,7 @@ use Item_DeviceProcessor;
 use Item_Devices;
 use Item_Disk;
 use Infocom;
-use QueryExpression;
+use Glpi\DBAL\QueryExpression;
 
 class Computer extends AbstractAsset
 {
@@ -85,7 +85,10 @@ class Computer extends AbstractAsset
                 $usage_info_table => [
                     'FKEY'   => [
                         $item_table  => 'id',
-                        $usage_info_table => 'computers_id',
+                        $usage_info_table => 'items_id',
+                        [
+                            'AND' => [UsageInfo::getTableField('itemtype') => self::$itemtype]
+                        ]
                     ]
                 ],
                 $computerUsageProfile_table => [

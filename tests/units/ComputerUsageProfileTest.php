@@ -43,12 +43,13 @@ use Ticket;
 class ComputerUsageProfileTest extends DbTestCase
 {
     /**
-     * @covers GlpiPlugin\Carbon\ComputerUsageProfile::canView
+     * #CoversMethod GlpiPlugin\Carbon\ComputerUsageProfile::canView
      *
      * @return void
      */
     public function testCanView()
     {
+        $this->logout();
         $result = ComputerUsageProfile::canView();
         $this->assertFalse($result);
 
@@ -58,8 +59,8 @@ class ComputerUsageProfileTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\ComputerUsageProfile::prepareInputForAdd
-     * @covers GlpiPlugin\Carbon\ComputerUsageProfile::inputIntegrityCheck
+     * #CoversMethod GlpiPlugin\Carbon\ComputerUsageProfile::prepareInputForAdd
+     * #CoversMethod GlpiPlugin\Carbon\ComputerUsageProfile::inputIntegrityCheck
      *
      * @return void
      */
@@ -100,8 +101,8 @@ class ComputerUsageProfileTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\ComputerUsageProfile::prepareInputForUpdate
-     * @covers GlpiPlugin\Carbon\ComputerUsageProfile::inputIntegrityCheck
+     * #CoversMethod GlpiPlugin\Carbon\ComputerUsageProfile::prepareInputForUpdate
+     * #CoversMethod GlpiPlugin\Carbon\ComputerUsageProfile::inputIntegrityCheck
      *
      * @return void
      */
@@ -142,7 +143,7 @@ class ComputerUsageProfileTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\ComputerUsageProfile::assignToItem
+     * #CoversMethod GlpiPlugin\Carbon\ComputerUsageProfile::assignToItem
      *
      * @return void
      */
@@ -150,17 +151,20 @@ class ComputerUsageProfileTest extends DbTestCase
     {
         $invalid_item = new class extends CommonDBTM {
         };
-        $usage_profile = $this->getItem(ComputerUsageProfile::class, ['name' => 'Test Usage Profile']);
+        /** @var ComputerUsageProfile $usage_profile */
+        $usage_profile = $this->createItem(ComputerUsageProfile::class, ['name' => 'Test Usage Profile']);
         $result = $usage_profile->assignToItem($invalid_item);
         $this->assertFalse($result);
 
-        $computer = $this->getItem(GlpiComputer::class, ['name' => 'Test Computer']);
-        $usage_profile = $this->getItem(ComputerUsageProfile::class, ['name' => 'Test Usage Profile']);
+        $computer = $this->createItem(GlpiComputer::class, ['name' => 'Test Computer']);
+        /** @var ComputerUsageProfile $usage_profile */
+        $usage_profile = $this->createItem(ComputerUsageProfile::class, ['name' => 'Test Usage Profile']);
 
         $result = $usage_profile->assignToItem($computer);
         $this->assertTrue($result);
 
-        $usage_profile = $this->getItem(ComputerUsageProfile::class, ['name' => 'Test Usage Profile 2']);
+        /** @var ComputerUsageProfile $usage_profile */
+        $usage_profile = $this->createItem(ComputerUsageProfile::class, ['name' => 'Test Usage Profile 2']);
         $result = $usage_profile->assignToItem($computer);
         $this->assertTrue($result);
     }
@@ -173,7 +177,7 @@ class ComputerUsageProfileTest extends DbTestCase
             ->getMock();
         $massive_action->method('getAction')->willReturn('MassAssociateItems');
         $massive_action->method('getItems')->willReturn([
-            GlpiComputer::class => $this->getItem(GlpiComputer::class)
+            GlpiComputer::class => $this->createItem(GlpiComputer::class)
         ]);
         ob_start(function ($buffer) {
             return $buffer;
@@ -190,7 +194,7 @@ class ComputerUsageProfileTest extends DbTestCase
     public function testProcessMassiveActionsForOneItemtype()
     {
         // Test with invalid usage profile
-        $computer = $this->getItem(GlpiComputer::class);
+        $computer = $this->createItem(GlpiComputer::class);
         $massive_action = $this->getMockBuilder(MassiveAction::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -201,7 +205,7 @@ class ComputerUsageProfileTest extends DbTestCase
             MassiveAction::ACTION_KO
         );
         $usage_profile_fk = ComputerUsageProfile::getForeignKeyField();
-        $usage_profile = $this->getItem(ComputerUsageProfile::class);
+        $usage_profile = $this->createItem(ComputerUsageProfile::class);
         $massive_action->POST[$usage_profile_fk] = -1;
         ComputerUsageProfile::processMassiveActionsForOneItemtype(
             $massive_action,
@@ -213,7 +217,7 @@ class ComputerUsageProfileTest extends DbTestCase
 
         // Test with invalid and valid computer
         $computer_1 = new GlpiComputer();
-        $computer_2 = $this->getItem(GlpiComputer::class);
+        $computer_2 = $this->createItem(GlpiComputer::class);
         $massive_action = $this->getMockBuilder(MassiveAction::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -226,7 +230,7 @@ class ComputerUsageProfileTest extends DbTestCase
         $massive_action->expects($matcher)->method('itemDone')->willReturnCallback(
             function (...$parameters) use ($matcher, $expected_args) {
                 // TODO: With PHPUnit 10 getInvocationCount becomes numberOfInvocations
-                switch ($matcher->getInvocationCount()) {
+                switch ($matcher->numberOfInvocations()) {
                     case 1:
                         $this->assertEquals($expected_args[1], $parameters);
                         break;
@@ -237,7 +241,7 @@ class ComputerUsageProfileTest extends DbTestCase
             }
         );
         $usage_profile_fk = ComputerUsageProfile::getForeignKeyField();
-        $usage_profile = $this->getItem(ComputerUsageProfile::class);
+        $usage_profile = $this->createItem(ComputerUsageProfile::class);
         $massive_action->POST[$usage_profile_fk] = $usage_profile->getID();
         ComputerUsageProfile::processMassiveActionsForOneItemtype(
             $massive_action,
@@ -252,7 +256,7 @@ class ComputerUsageProfileTest extends DbTestCase
     public function testShowForm()
     {
         $this->login('glpi', 'glpi');
-        $instance = $this->getItem(ComputerUsageProfile::class);
+        $instance = $this->createItem(ComputerUsageProfile::class);
         ob_start(function ($in) {
             return $in;
         });
@@ -262,9 +266,9 @@ class ComputerUsageProfileTest extends DbTestCase
         $crawler = new Crawler($output);
         $name_field = $crawler->filter('input[name="name"]');
         $this->assertEquals(1, $name_field->count());
-        $start_time_field = $crawler->filter('input[name="time_start"]');
+        $start_time_field = $crawler->filter('select[name="time_start"]');
         $this->assertEquals(1, $start_time_field->count());
-        $end_time_field = $crawler->filter('input[name="time_stop"]');
+        $end_time_field = $crawler->filter('select[name="time_stop"]');
         $this->assertEquals(1, $end_time_field->count());
         for ($i = 1; $i <= 7; $i++) {
             $field = $crawler->filter('input[name="day_' . $i . '"]');

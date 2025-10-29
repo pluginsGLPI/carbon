@@ -42,6 +42,12 @@ abstract class AbstractType extends CommonDBChild
 {
     public static $rightname = 'dropdown';
 
+
+    public static function getIcon(): string
+    {
+        return 'fa-solid fa-solar-panel';
+    }
+
     /**
      * @todo fix type name
      */
@@ -55,7 +61,7 @@ abstract class AbstractType extends CommonDBChild
         $tabName = '';
         if (!$withtemplate) {
             if ($item->getType() == static::$itemtype) {
-                $tabName = __('Carbon', 'carbon');
+                return self::createTabEntry(__('Carbon', 'carbon'), 0);
             }
         }
         return $tabName;

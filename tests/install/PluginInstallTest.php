@@ -35,6 +35,7 @@ namespace GlpiPlugin\Carbon\Tests;
 use Session;
 use Config;
 use CronTask as GLPICronTask;
+use DBmysql;
 use DbUtils;
 use Glpi\Dashboard\Dashboard;
 use DisplayPreference;
@@ -44,6 +45,7 @@ use Profile;
 use ProfileRight;
 use Glpi\Dashboard\Item;
 use Glpi\Dashboard\Right;
+use Glpi\DBAL\QueryExpression as QueryExpression;
 use Glpi\System\Diagnostic\DatabaseSchemaIntegrityChecker;
 use Glpi\Toolbox\Sanitizer;
 use GlpiPlugin\Carbon\CarbonIntensity;
@@ -65,16 +67,14 @@ class PluginInstallTest extends CommonTestCase
 
     /**
      * Execute plugin installation in the context if tests
-     *
-     * @return void
      */
     protected function executeInstallation()
     {
+        /** @var DBmysql */
         global $DB;
 
         $plugin_name = TEST_PLUGIN_NAME;
 
-        $this->setupGLPIFramework();
         $this->assertTrue($DB->connected);
 
         //Drop plugin configuration if exists
@@ -97,16 +97,15 @@ class PluginInstallTest extends CommonTestCase
         $this->assertFalse($plugin->isNewItem());
 
         // Install the plugin
-        ob_start(function ($in) {
-            return $in;
-        });
+        ob_start();
         $plugin->install($plugin->fields['id']);
-        $install_output = ob_get_contents();
-        ob_end_clean();
+        $install_output = ob_get_clean();
         $this->assertTrue($plugin->isInstalled($plugin_name), $install_output);
 
         // Enable the plugin
-        $plugin->activate($plugin->fields['id']);
+        $success = $plugin->activate($plugin->fields['id']);
+        $this->assertTrue($success);
+        $plugin->bootPlugins();
         $plugin->init();
         $messages = $_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR] ?? [];
         $messages = implode(PHP_EOL, $messages);
@@ -119,8 +118,10 @@ class PluginInstallTest extends CommonTestCase
             // For unit test script which expects that installation runs in the tests context
             $this->executeInstallation();
             GlobalFixture::loadDataset();
-            $this->setupGLPIFramework();
         }
+        $plugin = new Plugin();
+        $plugin->bootPlugins();
+        $plugin->init();
         $this->assertTrue(Plugin::isPluginActive(TEST_PLUGIN_NAME), 'Plugin not activated');
         $this->checkSchema(PLUGIN_CARBON_VERSION);
 
@@ -133,6 +134,7 @@ class PluginInstallTest extends CommonTestCase
         $this->checkInitialCarbonIntensities();
         $this->checkDisplayPrefs();
         $this->checkPredefinedUsageProfiles();
+        $this->checkSourceZoneRelation();
     }
 
     public function testConfigurationExists()
@@ -293,6 +295,7 @@ class PluginInstallTest extends CommonTestCase
 
     private function checkRight(string $rightname, array $profiles)
     {
+        /** @var DBmysql */
         global $DB;
 
         $profile_table = Profile::getTable();
@@ -343,7 +346,7 @@ class PluginInstallTest extends CommonTestCase
         foreach ($sources as $source_name) {
             $source = new CarbonIntensitySource();
             $source->getFromDBByCrit([
-                'name' => Sanitizer::sanitize($source_name),
+                'name' => $source_name,
                 'is_fallback' => 0
             ]);
             $this->assertFalse($source->isNewItem(), "Source '$source_name' not found");
@@ -353,7 +356,7 @@ class PluginInstallTest extends CommonTestCase
         foreach ($sources as $source_name) {
             $source = new CarbonIntensitySource();
             $source->getFromDBByCrit([
-                'name' => Sanitizer::sanitize($source_name),
+                'name' => $source_name,
                 'is_fallback' => 1
             ]);
             $this->assertFalse($source->isNewItem(), "Source '$source_name' not found");
@@ -370,7 +373,7 @@ class PluginInstallTest extends CommonTestCase
         foreach ($zones as $zone_name) {
             $zone = new Zone();
             $zone->getFromDBByCrit([
-                'name' => Sanitizer::sanitize($zone_name)
+                'name' => $zone_name,
             ]);
             $this->assertFalse($zone->isNewItem(), "Zone '$zone_name' not found");
         }
@@ -380,7 +383,7 @@ class PluginInstallTest extends CommonTestCase
         foreach ($this->zones as $zone_name) {
             $zone = new Zone();
             $zone->getFromDBByCrit([
-                'name' => Sanitizer::sanitize($zone_name)
+                'name' => $zone_name,
             ]);
             $this->assertFalse($zone->isNewItem());
         }
@@ -388,13 +391,14 @@ class PluginInstallTest extends CommonTestCase
 
     private function checkInitialCarbonIntensities()
     {
+        /** @var DBmysql */
         global $DB;
 
         // Find the source for Ember - Energy Institute
         $source_name = 'Ember - Energy Institute';
         $source = new CarbonIntensitySource();
         $source->getFromDBByCrit([
-            'name' => Sanitizer::sanitize($source_name)
+            'name' => $source_name,
         ]);
         if ($source->isNewItem()) {
             $this->fail("$source_name not found");
@@ -479,6 +483,9 @@ class PluginInstallTest extends CommonTestCase
 
     public function checkDashboard()
     {
+        /** @var DBmysql $DB */
+        global $DB;
+
         // Check the dashboard exists
         $dashboard_key = 'plugin_carbon_board';
         $dashboard = new Dashboard();
@@ -486,30 +493,40 @@ class PluginInstallTest extends CommonTestCase
         $this->assertFalse($dashboard->isNewItem());
 
         // Check rights on the dashboard
-        $right = new Right();
-        $profile = new Profile();
-        $profiles = $profile->find();
-        $profile_itemtype = Profile::getType();
-        foreach ($profiles as $profile) {
-            $profile_right = new ProfileRight();
-            $profile_right->getFromDBByCrit([
-                'profiles_id' => $profile['id'],
-                'name'        => 'config',
-            ]);
-            if ($profile_right->isNewItem()) {
-                continue;
-            }
+        $rights = DBmysql::quoteName(ProfileRight::getTableField('rights'));
+        $right_mask = READ + UPDATE;
+        $rights = "{$rights} AND ({$right_mask})";
+        $profile_table = Profile::getTable();
+        $profile_right_table = ProfileRight::getTable();
+        $iterator = $DB->request([
+            'SELECT' => [
+                Profile::getTableField('id'),
+            ],
+            'FROM' => $profile_table,
+            'INNER JOIN' => [
+                $profile_right_table => [
+                    'FKEY' => [
+                        $profile_table => 'id',
+                        $profile_right_table => 'profiles_id',
+                        [
+                            'AND' => [ProfileRight::getTableField('name') => [Config::$rightname, Report::$rightname]],
+                        ]
+                    ]
+                ]
+            ],
+            'WHERE' => [
+                new QueryExpression($rights),
+            ]
+        ]);
 
-            $rows = $right->find([
+        foreach ($iterator as $profile) {
+            $dashboard_right = new Right();
+            $dashboard_right->getFromDBByCrit([
                 'dashboards_dashboards_id' => $dashboard->fields['id'],
-                'itemtype'                 => $profile_itemtype,
-                'items_id'                 => $profile['id']
+                'itemtype'                 => Profile::class,
+                'items_id'                 => $profile['id'],
             ]);
-            if (($profile_right->fields['rights'] && READ + UPDATE) != READ + UPDATE) {
-                $this->assertCount(0, $rows);
-            } else {
-                $this->assertCount(1, $rows);
-            }
+            $this->assertFalse($dashboard_right->isNewItem());
         }
 
         // Check there is widgets in the dashboard
@@ -741,4 +758,38 @@ class PluginInstallTest extends CommonTestCase
         'Montenegro',
         'South Sudan'
     ];
+
+    public function checkSourceZoneRelation()
+    {
+        /** @var DBmysql */
+        global $DB;
+
+        $source_table = CarbonIntensitySource::getTable();
+        $zone_table = Zone::getTable();
+        $source_zone_table = CarbonIntensitySource_Zone::getTable();
+
+        $iterator = $DB->request([
+            'SELECT' => $source_zone_table . '.id',
+            'FROM' => $source_zone_table,
+            'INNER JOIN' => [
+                $source_table => [
+                    'FKEY' => [
+                        $source_zone_table => 'plugin_carbon_carbonintensitysources_id',
+                        $source_table => 'id'
+                    ]
+                ],
+                $zone_table => [
+                    'FKEY' => [
+                        $source_zone_table => 'plugin_carbon_zones_id',
+                        $zone_table => 'id'
+                    ]
+                ]
+            ],
+            'WHERE' => [
+                $source_table . '.name' => 'Hydro Quebec',
+                $zone_table . '.name'   => 'Quebec',
+            ],
+        ]);
+        $this->assertEquals(1, $iterator->count());
+    }
 }

@@ -49,23 +49,23 @@ use GlpiPlugin\Carbon\Location;
 class LocationTest extends DbTestCase
 {
     /**
-     * @covers GlpiPlugin\Carbon\Location::onGlpiLocationAdd
-     * @covers GlpiPlugin\Carbon\Location::setBoaviztaZone
-     * @covers plugin_carbon_locationAdd
+     * #CoversMethod GlpiPlugin\Carbon\Location::onGlpiLocationAdd
+     * #CoversMethod GlpiPlugin\Carbon\Location::setBoaviztaZone
+     * #CoversMethod plugin_carbon_locationAdd
      *
      * @return void
      */
     public function testOnGlpiLocationAdd()
     {
         // Test a location with a predefined zone
-        $glpi_location = $this->getItem(GlpiLocation::class);
+        $glpi_location = $this->createItem(GlpiLocation::class);
         $location = new Location();
         $location->getFromDBByCrit([
             'locations_id' => $glpi_location->getID(),
         ]);
         $this->assertTrue($location->isNewItem());
 
-        $glpi_location = $this->getItem(GlpiLocation::class, [
+        $glpi_location = $this->createItem(GlpiLocation::class, [
             '_boavizta_zone' => 'FRA',
         ]);
         $location = new Location();
@@ -96,7 +96,7 @@ class LocationTest extends DbTestCase
             ])
         );
         $instance = new Location();
-        $glpi_location = $this->getItem(GlpiLocation::class, [
+        $glpi_location = $this->createItem(GlpiLocation::class, [
             'country' => 'Vietnam',
             'town'    => 'Hanoi',
         ]);
@@ -106,16 +106,16 @@ class LocationTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Location::onGlpiLocationPreUpdate
-     * @covers GlpiPlugin\Carbon\Location::setBoaviztaZone
-     * @covers plugin_carbon_locationPreUpdate
+     * #CoversMethod GlpiPlugin\Carbon\Location::onGlpiLocationPreUpdate
+     * #CoversMethod GlpiPlugin\Carbon\Location::setBoaviztaZone
+     * #CoversMethod plugin_carbon_locationPreUpdate
      *
      * @return void
      */
     public function testOnGlpiLocationPreUpdate()
     {
         // Test the callback is actually called, and the zone is saved
-        $glpi_location = $this->getItem(GlpiLocation::class);
+        $glpi_location = $this->createItem(GlpiLocation::class);
         $location = new Location();
         $location->getFromDBByCrit([
             'locations_id' => $glpi_location->getID(),
@@ -152,7 +152,7 @@ class LocationTest extends DbTestCase
                 )
             ])
         );
-        $glpi_location = $this->getItem(GlpiLocation::class);
+        $glpi_location = $this->createItem(GlpiLocation::class);
         $glpi_location->input = [
             'country' => 'Vietnam',
             'town'    => 'Hanoi',
@@ -164,15 +164,15 @@ class LocationTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Location::onGlpiLocationPrePurge
-     * @covers plugin_carbon_locationPrePurge
+     * #CoversMethod GlpiPlugin\Carbon\Location::onGlpiLocationPrePurge
+     * #CoversMethod plugin_carbon_locationPrePurge
      *
      * @return void
      */
     public function testOnGlpiLocationPrePurge()
     {
         // Test the location object is deleted when core Location is deleted
-        $glpi_location = $this->getItem(GlpiLocation::class, [
+        $glpi_location = $this->createItem(GlpiLocation::class, [
             'country' => 'France',
             '_boavizta_zone' => 'FRA',
         ]);
@@ -190,7 +190,7 @@ class LocationTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Location::getIncompleteLocations
+     * #CoversMethod GlpiPlugin\Carbon\Location::getIncompleteLocations
      *
      * @return void
      */
@@ -200,12 +200,12 @@ class LocationTest extends DbTestCase
         $output = $iterator->count();
         $this->assertEquals(0, $output);
 
-        $glpi_location = $this->getItem(GlpiLocation::class);
+        $glpi_location = $this->createItem(GlpiLocation::class);
         $iterator = Location::getIncompleteLocations();
         $output = $iterator->count();
         $this->assertEquals(1, $output);
 
-        $glpi_location = $this->getItem(GlpiLocation::class, [
+        $glpi_location = $this->createItem(GlpiLocation::class, [
             '_boavizta_zone' => 'FRA',
         ]);
         $iterator = Location::getIncompleteLocations();
@@ -214,7 +214,7 @@ class LocationTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Location::getCountryCode
+     * #CoversMethod GlpiPlugin\Carbon\Location::getCountryCode
      *
      * @return void
      */
@@ -243,7 +243,7 @@ class LocationTest extends DbTestCase
         $geocoder = $this->createStub(Geocoder::class);
         $geocoder->method('geocodeQuery')->willReturn($geocoder_collection);
 
-        $glpi_location = $this->getItem(GlpiLocation::class, [
+        $glpi_location = $this->createItem(GlpiLocation::class, [
             'name' => 'Paris',
             'town'    => 'Paris',
             'country' => 'France'
@@ -257,7 +257,7 @@ class LocationTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Location::enableCarbonIntensityDownload
+     * #CoversMethod GlpiPlugin\Carbon\Location::enableCarbonIntensityDownload
      *
      * @return void
      */
@@ -270,48 +270,146 @@ class LocationTest extends DbTestCase
         $this->assertFalse($result);
 
         // Test when the location does not matches a zone
-        $glpi_location = $this->getItem(GlpiLocation::class, [
+        $glpi_location = $this->createItem(GlpiLocation::class, [
             'country' => 'Non existent country'
         ]);
         $result = $this->callPrivateMethod($instance, 'enableCarbonIntensityDownload', $glpi_location);
         $this->assertFalse($result);
 
         // Test when the zone does not matchs a source
-        $source = $this->getItem(CarbonIntensitySource::class, [
+        $source = $this->createItem(CarbonIntensitySource::class, [
             'name' => 'bar',
         ]);
-        $zone = $this->getItem(Zone::class, [
+        $zone = $this->createItem(Zone::class, [
             'name' => 'foo',
             'plugin_carbon_carbonintensitysources_id_historical' => 0,
         ]);
-        $source_zone = $this->getItem(CarbonIntensitySource_Zone::class, [
+        $source_zone = $this->createItem(CarbonIntensitySource_Zone::class, [
             $zone::getForeignKeyField() => $zone->getID(),
             $source::getForeignKeyField() => $source->getID(),
             'is_download_enabled' => 0,
         ]);
-        $glpi_location = $this->getItem(GlpiLocation::class, [
+        $glpi_location = $this->createItem(GlpiLocation::class, [
             'country' => 'bar'
         ]);
         $result = $this->callPrivateMethod($instance, 'enableCarbonIntensityDownload', $glpi_location);
         $this->assertFalse($result);
 
         // Test when the zone matches a source and download switches to enabled
-        $source = $this->getItem(CarbonIntensitySource::class, [
+        $source = $this->createItem(CarbonIntensitySource::class, [
             'name' => 'baz',
         ]);
-        $zone = $this->getItem(Zone::class, [
+        $zone = $this->createItem(Zone::class, [
             'name' => 'baz',
             'plugin_carbon_carbonintensitysources_id_historical' => $source->getID(),
         ]);
-        $source_zone = $this->getItem(CarbonIntensitySource_Zone::class, [
+        $source_zone = $this->createItem(CarbonIntensitySource_Zone::class, [
             $zone::getForeignKeyField() => $zone->getID(),
             $source::getForeignKeyField() => $source->getID(),
             'is_download_enabled' => 0,
         ]);
-        $glpi_location = $this->getItem(GlpiLocation::class, [
+        $glpi_location = $this->createItem(GlpiLocation::class, [
             'country' => 'baz'
         ]);
         $result = $this->callPrivateMethod($instance, 'enableCarbonIntensityDownload', $glpi_location);
+        $this->assertTrue($result);
+    }
+
+    public function testIsCarbonIntensityDownloadEnabled()
+    {
+        // Test with an enmpty core location
+        $glpi_location = new GlpiLocation();
+        $location = new Location();
+        $result = $location->isCarbonIntensityDownloadEnabled($glpi_location);
+        $this->assertFalse($result);
+
+        // Test with a core location without a country
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $location = new Location();
+        $result = $location->isCarbonIntensityDownloadEnabled($glpi_location);
+        $this->assertFalse($result);
+
+        // Test with a core location with a country
+        $glpi_location = $this->createItem(GlpiLocation::class, [
+            'country' => 'France'
+        ]);
+        $location = new Location();
+        $result = $location->isCarbonIntensityDownloadEnabled($glpi_location);
+        $this->assertFalse($result);
+
+        // Test with a core location with a country and the relation zource / zone exists, download disabled
+        $source_zone = new CarbonIntensitySource_Zone();
+        $source = new CarbonIntensitySource();
+        $source->getFromDBByCrit(['name' => 'RTE']);
+        $zone = new Zone();
+        $zone->getFromDBByCrit(['name' => 'France']);
+        $source_zone = $this->createItem(CarbonIntensitySource_Zone::class, [
+            'plugin_carbon_carbonintensitysources_id' => $source->getID(),
+            'plugin_carbon_zones_id' => $zone->getID(),
+            'is_download_enabled' => 0,
+        ]);
+        $source_zone->update([
+            'id' => $source_zone->getID(),
+            'is_download_enabled' => 0,
+        ]);
+        $location = new Location();
+        $result = $location->isCarbonIntensityDownloadEnabled($glpi_location);
+        $this->assertFalse($result);
+
+        // Test with a core location with a country and the relation zource / zone exists, download enabled
+        $source_zone->update([
+            'id' => $source_zone->getID(),
+            'is_download_enabled' => 1,
+        ]);
+        $location = new Location();
+        $result = $location->isCarbonIntensityDownloadEnabled($glpi_location);
+        $this->assertTrue($result);
+    }
+
+    public function testHasFallbackCarbonIntensityData()
+    {
+        // Test with an enmpty core location
+        $glpi_location = new GlpiLocation();
+        $location = new Location();
+        $result = $location->hasFallbackCarbonIntensityData($glpi_location);
+        $this->assertFalse($result);
+
+        // Test with a core location without a country
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $location = new Location();
+        $result = $location->hasFallbackCarbonIntensityData($glpi_location);
+        $this->assertFalse($result);
+
+        // Test with a core location with a non-existing country
+        $glpi_location = $this->createItem(GlpiLocation::class, [
+            'country' => 'Azeroth'
+        ]);
+        $location = new Location();
+        $result = $location->hasFallbackCarbonIntensityData($glpi_location);
+        $this->assertFalse($result);
+
+        // Test with a core location with a non-existing state
+        $glpi_location = $this->createItem(GlpiLocation::class, [
+            'state' => 'Durotar'
+        ]);
+        $location = new Location();
+        $result = $location->hasFallbackCarbonIntensityData($glpi_location);
+        $this->assertFalse($result);
+
+        // Test with a core location with a country
+        $glpi_location = $this->createItem(GlpiLocation::class, [
+            'country' => 'France'
+        ]);
+        $location = new Location();
+        $result = $location->hasFallbackCarbonIntensityData($glpi_location);
+        $this->assertTrue($result);
+
+        // Test with a core location with a state
+        $glpi_location = $this->createItem(GlpiLocation::class, [
+            'state' => 'Quebec'
+        ]);
+        $location = new Location();
+        $result = $location->hasFallbackCarbonIntensityData($glpi_location);
         $this->assertTrue($result);
     }
 }

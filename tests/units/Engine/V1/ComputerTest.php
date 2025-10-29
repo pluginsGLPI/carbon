@@ -256,7 +256,7 @@ class ComputerTest extends EngineTestCase
 
     private function computerSetModelWithPower(GlpiComputer $computer, int $power)
     {
-        $glpi_computer_model = $this->getItem(GlpiComputerModel::class, [
+        $glpi_computer_model = $this->createItem(GlpiComputerModel::class, [
             'power_consumption' => $power,
         ]);
         $success = $computer->update([
@@ -268,8 +268,8 @@ class ComputerTest extends EngineTestCase
 
     private function computerSetTypeWithPower(GlpiComputer $computer, int $power)
     {
-        $glpi_computer_type = $this->getItem(GlpiComputerType::class);
-        $carbonComputerType = $this->getItem(ComputerType::class, [
+        $glpi_computer_type = $this->createItem(GlpiComputerType::class);
+        $carbonComputerType = $this->createItem(ComputerType::class, [
             GlpiComputerType::getForeignKeyField() => $glpi_computer_type->getID(),
             'power_consumption'                    => $power,
         ]);
@@ -283,24 +283,24 @@ class ComputerTest extends EngineTestCase
     public function getPowerProvider(): \Generator
     {
         // computer with no model and no type
-        $computer_no_model_no_type = $this->getItem(GlpiComputer::class);
+        $computer_no_model_no_type = $this->createItem(GlpiComputer::class);
         $engine = new Computer($computer_no_model_no_type);
         yield 'Computer with no model and no type' => [$engine, 0];
 
         // computer with a model and no type
-        $computer_model_no_type = $this->getItem(GlpiComputer::class);
+        $computer_model_no_type = $this->createItem(GlpiComputer::class);
         $this->computerSetModelWithPower($computer_model_no_type, self::MODEL_NO_TYPE_POWER);
         $engine = new Computer($computer_model_no_type);
         yield 'Computer with a model and no type' => [$engine, self::MODEL_NO_TYPE_POWER];
 
         // computer with no model and a type
-        $computer_no_model_type = $this->getItem(GlpiComputer::class);
+        $computer_no_model_type = $this->createItem(GlpiComputer::class);
         $this->computerSetTypeWithPower($computer_no_model_type, self::NO_MODEL_TYPE_POWER);
         $engine = new Computer($computer_no_model_type);
         yield 'Computer with no model and a type' => [$engine, self::NO_MODEL_TYPE_POWER];
 
         // computer with a model and a type: model have priority
-        $computer_model_type = $this->getItem(GlpiComputer::class);
+        $computer_model_type = $this->createItem(GlpiComputer::class);
         $this->computerSetModelWithPower($computer_model_type, self::MODEL_TYPE_POWER);
         $this->computerSetTypeWithPower($computer_model_type, 0);
         $engine = new Computer($computer_model_type);
