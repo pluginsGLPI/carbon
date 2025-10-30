@@ -98,7 +98,6 @@ class Provider
      *
      * @param array $params
      * @param array $where
-     *
      * @return array of:
      *   - mixed  'number': sum for the model
      *   - string 'url': url to redirect when clicking on the slice
@@ -233,10 +232,11 @@ class Provider
     /**
      * Undocumented function
      *
+     * @param array $params
      * @param array $where
      * @return array
      */
-    public static function getSumUsageEmissionsPerType(array $where = []): array
+    public static function getSumUsageEmissionsPerType(array $params = [], array $where = []): array
     {
         /** @var DBmysql $DB */
         global $DB;

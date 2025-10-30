@@ -85,5 +85,4 @@ class MonitorTest extends DbTestCase
         $iterator = $DB->request($request);
         $this->assertEquals(0, $iterator->count());
     }
-
 }

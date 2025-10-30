@@ -251,7 +251,7 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
                     ],
                 ],
                 $item_type_table => [
-                     [
+                    [
                         'FKEY' => [
                             $item_type_table => $glpi_item_type_fk,
                             $item_table => $glpi_item_type_fk,
