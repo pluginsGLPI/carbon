@@ -1,5 +1,3 @@
-<?php
-
 /**
  * -------------------------------------------------------------------------
  * Carbon plugin for GLPI
@@ -29,15 +27,3 @@
  *
  * -------------------------------------------------------------------------
  */
-
-use GlpiPlugin\Carbon\CarbonIntensitySource;
-
-include(__DIR__ . '/../../../inc/includes.php');
-
-// Check if plugin is activated...
-if (!Plugin::isPluginActive('carbon')) {
-    Html::displayNotFoundError();
-}
-
-$dropdown = new CarbonIntensitySource();
-include(GLPI_ROOT . "/front/dropdown.common.form.php");

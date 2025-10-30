@@ -30,11 +30,13 @@
 
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const { globSync } = require('glob');
 const libOutputPath = 'public/lib';
+const picsOutputPath = 'public/images';
 
-module.exports = {
+const config = {
     plugins: [new MiniCssExtractPlugin()],
     entry: function () {
             // Create an entry per *.js file in lib/bundle directory.
@@ -74,3 +76,26 @@ module.exports = {
         ],
     },
 };
+
+const copyPatterns = [];
+copyPatterns.push({
+    from:   path.resolve(__dirname, 'pics'),
+    to:     path.resolve(__dirname, picsOutputPath),
+    filter: (resourcePath) => {
+        return /\.(svg|png|gif|jpe?g)$/i.test(path.basename(resourcePath));
+    },
+});
+
+copyPatterns.push({
+    from: path.resolve(__dirname, 'js/carbon.js'),
+    to: path.resolve(__dirname, 'public/lib/carbon.js')
+});
+
+copyPatterns.push({
+    from: path.resolve(__dirname, 'css/carbon.css'),
+    to: path.resolve(__dirname, 'public/lib/carbon.css')
+});
+
+config.plugins.push(new CopyWebpackPlugin({patterns:copyPatterns}));
+
+module.exports = [config];

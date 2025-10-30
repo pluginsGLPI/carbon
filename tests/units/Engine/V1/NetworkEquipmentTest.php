@@ -57,8 +57,8 @@ class NetworkEquipmentTest extends EngineTestCase
 
     public function getEnergyPerDayProvider(): \Generator
     {
-        $model = $this->getItem(static::$model_class, ['power_consumption' => 20]);
-        $item = $this->getItem(static::$itemtype_class, [
+        $model = $this->createItem(static::$model_class, ['power_consumption' => 20]);
+        $item = $this->createItem(static::$itemtype_class, [
             static::$model_class::getForeignKeyField() => $model->getID(),
         ]);
         $engine = new static::$engine_class($item);
@@ -86,8 +86,8 @@ class NetworkEquipmentTest extends EngineTestCase
         $zone = new Zone();
         $zone->getFromDBByCrit(['name' => $country]);
 
-        $model = $this->getItem(static::$model_class, ['power_consumption' => 80]);
-        $item = $this->getItem(static::$itemtype_class, [
+        $model = $this->createItem(static::$model_class, ['power_consumption' => 80]);
+        $item = $this->createItem(static::$itemtype_class, [
             $model::getForeignKeyField() => $model->getID(),
         ]);
         $engine = new static::$engine_class($item);
@@ -104,8 +104,8 @@ class NetworkEquipmentTest extends EngineTestCase
         $zone = new Zone();
         $zone->getEmpty();
 
-        $model = $this->getItem(static::$model_class, ['power_consumption' => 400]);
-        $item = $this->getItem(static::$itemtype_class, [
+        $model = $this->createItem(static::$model_class, ['power_consumption' => 400]);
+        $item = $this->createItem(static::$itemtype_class, [
             static::$model_class::getForeignKeyField() => $model->getID(),
         ]);
 

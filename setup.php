@@ -41,13 +41,13 @@ use Location as GlpiLocation;
 use Profile as GlpiProfile;
 use GlpiPlugin\Carbon\Dashboard\Grid;
 
-define('PLUGIN_CARBON_VERSION', '1.0.0');
-define('PLUGIN_CARBON_SCHEMA_VERSION', '1.0.0');
+define('PLUGIN_CARBON_VERSION', '1.1.1');
+define('PLUGIN_CARBON_SCHEMA_VERSION', '1.1.0');
 
 // Minimal GLPI version, inclusive
-define("PLUGIN_CARBON_MIN_GLPI_VERSION", "10.0.0");
+define("PLUGIN_CARBON_MIN_GLPI_VERSION", "11.0.0-beta");
 // Maximum GLPI version, exclusive
-define("PLUGIN_CARBON_MAX_GLPI_VERSION", "10.1.0");
+define("PLUGIN_CARBON_MAX_GLPI_VERSION", "12.0.0");
 
 define('PLUGIN_CARBON_DECIMALS', 3);
 
@@ -69,10 +69,7 @@ define('PLUGIN_CARBON_TYPES', [
 function plugin_init_carbon()
 {
     /** @var array $CFG_GLPI */
-     /** @var array $PLUGIN_HOOKS */
-    global $CFG_GLPI, $PLUGIN_HOOKS;
-
-    $PLUGIN_HOOKS[Hooks::CSRF_COMPLIANT]['carbon'] = true;
+    global $CFG_GLPI;
 
     if (!Plugin::isPluginActive('carbon')) {
         return;
@@ -127,17 +124,10 @@ function plugin_carbon_setupHooks()
     $PLUGIN_HOOKS[Hooks::PRE_ITEM_UPDATE]['carbon'][GlpiProfile::class] = 'plugin_carbon_profileUpdate';
     $PLUGIN_HOOKS[Hooks::PRE_ITEM_ADD]['carbon'][GlpiProfile::class] = 'plugin_carbon_profileAdd';
 
-    // Add ApexCharts.js library
-    $js_file = 'lib/apexcharts.js';
-    /** @phpstan-ignore-next-line */
-    if (version_compare(GLPI_VERSION, '11.0', '<')) {
-        // For GLPI < 11.0, we need to add resource the old way
-        $js_file = 'public/lib/apexcharts.js';
-    }
-    $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][] = $js_file;
+    $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][] = 'lib/apexcharts.js';
 
     // Import CSS
-    $PLUGIN_HOOKS[Hooks::ADD_CSS]['carbon'][] = 'public/main.css';
+    $PLUGIN_HOOKS[Hooks::ADD_CSS]['carbon'][] = 'lib/carbon.css';
 
     $PLUGIN_HOOKS['add_default_where']['carbon'] = 'plugin_carbon_add_default_where';
 
@@ -178,7 +168,7 @@ function plugin_version_carbon()
         ]
     ];
 
-    $dev_version = strpos(PLUGIN_CARBON_VERSION, 'dev') !== false;
+    $dev_version = strpos(PLUGIN_CARBON_VERSION, '-dev') !== false;
     if (!$dev_version) {
         // This is not a development version
         $requirements['requirements']['glpi']['max'] = PLUGIN_CARBON_MAX_GLPI_VERSION;

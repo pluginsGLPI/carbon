@@ -2,20 +2,21 @@
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
   bootstrap="tests/bootstrap.php"
+  displayDetailsOnTestsThatTriggerDeprecations="true"
+  displayDetailsOnTestsThatTriggerErrors="true"
+  displayDetailsOnTestsThatTriggerNotices="true"
+  displayDetailsOnTestsThatTriggerWarnings="true"
+  displayDetailsOnPhpunitDeprecations="true"
   backupGlobals="false"
   colors="true"
   stderr="true">
-  <coverage>
+  <source>
     <include>
       <directory suffix=".php">src</directory>
       <file>setup.php</file>
       <file>hook.php</file>
     </include>
-    <report>
-      <html outputDirectory="docs/coverage/html" lowUpperBound="50" highLowerBound="90"/>
-      <text outputFile="docs/coverage/coverage.txt" showUncoveredFiles="false" showOnlySummary="true"/>
-    </report>
-  </coverage>
+  </source>
   <logging>
     <junit outputFile="./tests/logs/junit_install.xml" />
   </logging>
@@ -38,8 +39,8 @@
     <testsuite name="Uninstall">
       <directory>./tests/uninstall/</directory>
     </testsuite>
-    <!-- <testsuite name="Upgrade">
+    <testsuite name="Upgrade">
       <directory>./tests/upgrade/</directory>
-    </testsuite> -->
+    </testsuite>
   </testsuites>
 </phpunit>

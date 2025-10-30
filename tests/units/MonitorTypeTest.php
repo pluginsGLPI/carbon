@@ -35,43 +35,44 @@ namespace GlpiPlugin\Carbon\Tests;
 use GlpiPlugin\Carbon\MonitorType;
 use MassiveAction;
 use MonitorType as GlpiMonitorType;
+use PHPUnit\Framework\Attributes\CoversClass;
+use Session;
 use Symfony\Component\DomCrawler\Crawler;
 
+#[CoversClass('GlpiPlugin\Carbon\AbstractType')]
+#[CoversClass('GlpiPlugin\Carbon\MonitorType')]
 class MonitorTypeTest extends DbTestCase
 {
+    public function testGetTypeName()
+    {
+        $this->assertEquals('Power', MonitorType::getTypeName(1));
+        $this->assertEquals('Powers', MonitorType::getTypeName(Session::getPluralNumber()));
+    }
+
     public function testGetTabNameForItem()
     {
-        $glpi_monitor_type = $this->getItem(GlpiMonitorType::class);
+        $glpi_monitor_type = $this->createItem(GlpiMonitorType::class);
         $instance = new MonitorType();
         $result = $instance->getTabNameForItem($glpi_monitor_type);
-        $this->assertEquals('Carbon', $result);
+        $crawler = new Crawler($result);
+        $this->assertEquals('Carbon', $crawler->text());
 
         $result = $instance->getTabNameForItem($glpi_monitor_type, 1);
         $this->assertEquals('', $result);
     }
 
-    /**
-     * @covers GlpiPlugin\Carbon\AbstractType::getOrCreate
-     *
-     * @return void
-     */
     public function testGetOrCreate()
     {
-        $computer_type = $this->getItem(GlpiMonitorType::class, ['name' => 'Test Computer Type']);
+        $computer_type = $this->createItem(GlpiMonitorType::class, ['name' => 'Test Computer Type']);
         $instance = new MonitorType();
         $this->callPrivateMethod($instance, 'getOrCreate', $computer_type);
         $this->assertFalse($instance->isNewItem());
     }
 
-    /**
-     * @covers GlpiPlugin\Carbon\AbstractType::showForItemType
-     *
-     * @return void
-     */
     public function testShowForItemType()
     {
-        $glpi_monitor_type = $this->getItem(GlpiMonitorType::class);
-        $monitor_type = $this->getItem(MonitorType::class, [
+        $glpi_monitor_type = $this->createItem(GlpiMonitorType::class);
+        $monitor_type = $this->createItem(MonitorType::class, [
             'monitortypes_id' => $glpi_monitor_type->getID(),
         ]);
         $this->login('glpi', 'glpi');
@@ -89,14 +90,9 @@ class MonitorTypeTest extends DbTestCase
         });
     }
 
-    /**
-     * @covers GlpiPlugin\Carbon\MonitorType::updatePowerConsumption
-     *
-     * @return void
-     */
     public function testUpdatePowerConsumption()
     {
-        $glpi_monitor_type = $this->getItem(GlpiMonitorType::class);
+        $glpi_monitor_type = $this->createItem(GlpiMonitorType::class);
 
         MonitorType::updatePowerConsumption($glpi_monitor_type, 10);
         $instance = new MonitorType();
@@ -114,11 +110,6 @@ class MonitorTypeTest extends DbTestCase
         $this->assertEquals(42, $instance->fields['power_consumption']);
     }
 
-    /**
-     * @covers GlpiPlugin\Carbon\MonitorType::showMassiveActionsSubForm
-     *
-     * @return void
-     */
     public function testShowMassiveActionsSubForm()
     {
         $massive_action = $this->getMockBuilder(MassiveAction::class)
@@ -126,7 +117,7 @@ class MonitorTypeTest extends DbTestCase
             ->getMock();
         $massive_action->method('getAction')->willReturn('MassUpdatePower');
         $massive_action->method('getItems')->willReturn([
-            MonitorType::class => $this->getItem(GlpiMonitorType::class)
+            MonitorType::class => $this->createItem(GlpiMonitorType::class)
         ]);
         ob_start(function ($buffer) {
             return $buffer;
@@ -154,7 +145,7 @@ class MonitorTypeTest extends DbTestCase
             ->getMock();
         $massive_action->method('getAction')->willReturn('');
         $massive_action->method('getItems')->willReturn([
-            MonitorType::class => $this->getItem(GlpiMonitorType::class)
+            MonitorType::class => $this->createItem(GlpiMonitorType::class)
         ]);
         ob_start(function ($buffer) {
             return $buffer;
@@ -165,11 +156,6 @@ class MonitorTypeTest extends DbTestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @covers GlpiPlugin\Carbon\MonitorType::processMassiveActionsForOneItemtype
-     *
-     * @return void
-     */
     public function testProcessMassiveActionForOneItemtype()
     {
         // Test update power consumption
@@ -177,7 +163,7 @@ class MonitorTypeTest extends DbTestCase
             ->disableOriginalConstructor()
             ->getMock();
         $massive_action->method('getAction')->willReturn('MassUpdatePower');
-        $glpi_monitor_type = $this->getItem(GlpiMonitorType::class);
+        $glpi_monitor_type = $this->createItem(GlpiMonitorType::class);
         $massive_action->POST = [
             'power_consumption' => 55,
         ];

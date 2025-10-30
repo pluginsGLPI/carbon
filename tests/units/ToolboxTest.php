@@ -45,7 +45,7 @@ use Location;
 class ToolboxTest extends DbTestCase
 {
     /**
-     * @covers GlpiPlugin\Carbon\Toolbox::getOldestAssetDate
+     * #CoversMethod GlpiPlugin\Carbon\Toolbox::getOldestAssetDate
      *
      * @return void
      */
@@ -56,20 +56,20 @@ class ToolboxTest extends DbTestCase
         $expected = null;
         $this->assertEquals($expected, $output);
 
-        $computer = $this->getItem(Computer::class);
+        $computer = $this->createItem(Computer::class);
         $output = $toolbox->getLatestAssetDate();
         $expected = null;
         $this->assertEquals($expected, $output);
 
         $expected = new DateTime('1980-01-01 00:00:00');
-        $computer = $this->getItem(Computer::class, [
+        $computer = $this->createItem(Computer::class, [
             'date_creation' => $expected->format('Y-m-d H:i:s'),
         ]);
         $output = $toolbox->getOldestAssetDate();
         $this->assertEquals($expected, $output);
 
         $expected = new DateTime('2000-01-01 00:00:00');
-        $infocom = $this->getItem(Infocom::class, [
+        $infocom = $this->createItem(Infocom::class, [
             'itemtype'    => $computer->getType(),
             'items_id'    => $computer->getID(),
             'entities_id' => $computer->fields['entities_id'],
@@ -88,7 +88,7 @@ class ToolboxTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Toolbox::getLatestAssetDate
+     * #CoversMethod GlpiPlugin\Carbon\Toolbox::getLatestAssetDate
      *
      * @return void
      */
@@ -99,14 +99,14 @@ class ToolboxTest extends DbTestCase
         $expected = null;
         $this->assertEquals($expected, $output);
 
-        $computer = $this->getItem(Computer::class);
+        $computer = $this->createItem(Computer::class);
         $output = $toolbox->getLatestAssetDate();
         $expected = null;
         $this->assertEquals($expected, $output);
 
 
         $expected = new DateTime('2024-06-15 00:00:00');
-        $infocom = $this->getItem(Infocom::class, [
+        $infocom = $this->createItem(Infocom::class, [
             'itemtype' => $computer->getType(),
             'items_id' => $computer->getID(),
             'decommission_date' => $expected->format('Y-m-d H:i:s'),
@@ -116,7 +116,7 @@ class ToolboxTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Toolbox::getDefaultCarbonIntensityDownloadDate
+     * #CoversMethod GlpiPlugin\Carbon\Toolbox::getDefaultCarbonIntensityDownloadDate
      *
      * @return void
      */
@@ -132,7 +132,7 @@ class ToolboxTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Toolbox::yearToLastMonth
+     * #CoversMethod GlpiPlugin\Carbon\Toolbox::yearToLastMonth
      *
      * @return void
      */
@@ -158,7 +158,7 @@ class ToolboxTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Toolbox::isLocationExistForZone
+     * #CoversMethod GlpiPlugin\Carbon\Toolbox::isLocationExistForZone
      *
      * @return void
      */
@@ -167,10 +167,10 @@ class ToolboxTest extends DbTestCase
         $output = Toolbox::isLocationExistForZone('foo');
         $this->assertFalse($output);
 
-        $this->getItem(Zone::class, [
+        $this->createItem(Zone::class, [
             'name' => 'foo',
         ]);
-        $this->getItem(Location::class, [
+        $this->createItem(Location::class, [
             'country' => 'foo'
         ]);
         $output = Toolbox::isLocationExistForZone('foo');
@@ -178,7 +178,7 @@ class ToolboxTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Toolbox::getGwpUsageImpactClasses
+     * #CoversMethod GlpiPlugin\Carbon\Toolbox::getGwpUsageImpactClasses
      *
      * @return void
      */
@@ -194,7 +194,7 @@ class ToolboxTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Toolbox::getUsageImpactClasses
+     * #CoversMethod GlpiPlugin\Carbon\Toolbox::getUsageImpactClasses
      *
      * @return void
      */
@@ -210,7 +210,7 @@ class ToolboxTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Toolbox::getEmbodiedImpactClasses
+     * #CoversMethod GlpiPlugin\Carbon\Toolbox::getEmbodiedImpactClasses
      *
      * @return void
      */

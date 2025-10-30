@@ -56,12 +56,14 @@ class Widget extends GlpiDashboardWidget
             'information_video' => [
                 'label'    => __('Environmental impact information video', 'carbon'),
                 'function' => self::class . '::DisplayInformationVideo',
+                'image'      => '',
                 'width'    => 6,
                 'height'   => 3,
             ],
             'methodology_information' => [
                 'label'    => __('Methodology information', 'carbon'),
                 'function' => self::class . '::DisplayInformationMethodology',
+                'image'      => '',
                 'width'    => 6,
                 'height'   => 3,
             ],
@@ -70,18 +72,21 @@ class Widget extends GlpiDashboardWidget
             'usage_carbon_emission_ytd' => [
                 'label'    => __('Total Carbon Emission', 'carbon'),
                 'function' => self::class . '::displayUsageCarbonEmissionYearToDate',
+                'image'      => '',
                 'width'    => 6,
                 'height'   => 3,
             ],
             'total_usage_carbon_emission_two_last_months' => [
                 'label'    => __('Monthly Carbon Emission', 'carbon'),
                 'function' => self::class . '::DisplayMonthlyCarbonEmission',
+                'image'      => '',
                 'width'    => 6,
                 'height'   => 3,
             ],
             'most_gwp_impacting_computer_models' => [
                 'label'    => __('Biggest monthly averaged carbon emission per model', 'carbon'),
                 'function' => self::class . '::DisplayGraphUsageCarbonEmissionPerModel',
+                'image'      => '',
                 'width'    => 6,
                 'height'   => 3,
                 'limit'    => true,
@@ -89,12 +94,14 @@ class Widget extends GlpiDashboardWidget
             'usage_gwp_monthly' => [
                 'label'    => __('Carbon Emission Per month', 'carbon'),
                 'function' => self::class . '::DisplayGraphUsageCarbonEmissionPerMonth',
+                'image'      => '',
                 'width'    => 16,
                 'height'   => 12,
             ],
             'usage_abiotic_depletion' => [
                 'label'    => __('Usage abiotic depletion potential', 'carbon'),
                 'function' => self::class . '::displayUsageAbioticDepletion',
+                'image'      => '',
                 'width'    => 6,
                 'height'   => 3,
             ],
@@ -103,18 +110,21 @@ class Widget extends GlpiDashboardWidget
             'embodied_global_warming' => [
                 'label'    => __('Embodied carbon emission', 'carbon'),
                 'function' => self::class . '::displayEmbodiedCarbonEmission',
+                'image'      => '',
                 'width'    => 6,
                 'height'   => 3,
             ],
             'embodied_abiotic_depletion' => [
                 'label'    => __('Embodied abiotic depletion potential', 'carbon'),
                 'function' => self::class . '::displayEmbodiedAbioticDepletion',
+                'image'      => '',
                 'width'    => 6,
                 'height'   => 3,
             ],
             'embodied_primary_energy' => [
                 'label'    => __('Embodied consumed primary energy', 'carbon'),
                 'function' => self::class . '::displayEmbodiedPrimaryEnergy',
+                'image'      => '',
                 'width'    => 6,
                 'height'   => 3,
             ],
@@ -126,6 +136,7 @@ class Widget extends GlpiDashboardWidget
                 'unhandled_computers_ratio' => [
                     'label'    => __('Unhandled Computers', 'carbon'),
                     'function' => self::class . '::DisplayUnhandledComputersRatio',
+                    'image'      => '',
                     'width'    => 5,
                     'height'   => 3,
                 ],
@@ -136,6 +147,7 @@ class Widget extends GlpiDashboardWidget
                 'unhandled_monitors_ratio' => [
                     'label'    => __('Unhandled Monitors', 'carbon'),
                     'function' => self::class . '::DisplayUnhandledMonitorsRatio',
+                    'image'      => '',
                     'width'    => 5,
                     'height'   => 3,
                 ],
@@ -146,6 +158,7 @@ class Widget extends GlpiDashboardWidget
                 'unhandled_network_equipments_ratio' => [
                     'label'    => __('Unhandled Network equipments', 'carbon'),
                     'function' => self::class . '::DisplayUnhandledNetworkEquipmentsRatio',
+                    'image'      => '',
                     'width'    => 5,
                     'height'   => 3,
                 ],
@@ -156,7 +169,7 @@ class Widget extends GlpiDashboardWidget
             'apex_radar' => [
                 'label'    => __('Radar chart', 'carbon'),
                 'function' => self::class . '::apexRadar',
-                // 'image'    => '',
+                'image'    => '',
                 'width'    => 4,
                 'height'   => 4,
             ]
@@ -164,6 +177,7 @@ class Widget extends GlpiDashboardWidget
         // 'graphpertype' => [
         //     'label'    => __('Carbon Emission Per Type', 'carbon'),
         //     'function' => self::class . '::DisplayGraphCarbonEmissionPerType',
+        //     'image'      => '',
         //     'limit'    => true,
         //     'width'    => 12,
         //     'height'   => 10,
@@ -171,6 +185,7 @@ class Widget extends GlpiDashboardWidget
         // 'totalcarbonemission' => [
         //     'label'    => __('Total Carbon Emission', 'carbon'),
         //     'function' => self::class . '::DisplayTotalCarbonEmission',
+        //     'image'      => '',
         //     'width'    => 5,
         //     'height'   => 4,
         // ],
@@ -304,7 +319,7 @@ class Widget extends GlpiDashboardWidget
 
     //     $palette_style = "";
     //     if (!$p['multiple'] || $p['use_gradient']) {
-    //         $palette_style = self::getCssGradientPalette($p['color'], $nb_series, "#{$chart_id}");
+    //         $palette_style = self::getGradientPalette($p['color'], $nb_series);
     //     }
 
     //     $chart_id = 'chart_' . $p['cache_key'];
@@ -414,10 +429,9 @@ class Widget extends GlpiDashboardWidget
 
     //     $palette_style = "";
     //     if ($p['use_gradient']) {
-    //         $palette_style = self::getCssGradientPalette(
+    //         $palette_style = self::getGradientPalette(
     //             $p['color'],
-    //             $nb_series,
-    //             "#{$chart_id}"
+    //             $nb_series
     //         );
     //     }
 
@@ -559,6 +573,12 @@ class Widget extends GlpiDashboardWidget
         }
         $apex_data['labels'] = $data['labels'];
         $apex_data['xaxis']['categories'] = $data['labels'];
+
+        $apex_data['yaxis'][1]['min'] = 0;
+        $energy = array_column($apex_data['series'][1]['data'], 'y');
+        if (count($energy) > 0) {
+            $apex_data['yaxis'][1]['min'] = 0.8 * min($energy);
+        }
 
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/graph-carbon-emission-per-month.html.twig', [
             'id' => $p['id'],
@@ -1055,10 +1075,6 @@ class Widget extends GlpiDashboardWidget
         $p = array_merge($default, $params);
 
         $icon_url = $CFG_GLPI['root_doc'] . '/plugins/carbon/images/ecology-icon-light.png';
-        /** @phpstan-ignore-next-line */
-        if (version_compare(GLPI_VERSION, '11.0', '<')) {
-            $icon_url = Plugin::getWebDir('carbon') . '/pics/ecology-icon-light.png';
-        }
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/information-block.html.twig', [
             'id'              => $p['id'],
             'color'           => $p['color'],
@@ -1156,10 +1172,9 @@ class Widget extends GlpiDashboardWidget
         $nb_series = count($series);
         $palette_style = "";
         if ($p['use_gradient']) {
-            $palette_style = self::getCssGradientPalette(
+            $palette_style = self::getGradientPalette(
                 $p['color'],
                 $nb_series,
-                ".dashboard #{$chart_id}",
                 false
             );
         }

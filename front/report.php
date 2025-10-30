@@ -30,6 +30,8 @@
  * -------------------------------------------------------------------------
  */
 
+use Glpi\Exception\Http\AccessDeniedHttpException;
+use Glpi\Exception\Http\NotFoundHttpException;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\Report;
 
@@ -37,12 +39,11 @@ include __DIR__ . '/../../../inc/includes.php';
 
 // Check if plugin is activated
 if (!Plugin::isPluginActive('carbon')) {
-    Html::displayNotFoundError();
+    throw new NotFoundHttpException();
 }
 
 if (!Report::canView()) {
-    // Will die
-    Html::displayRightError();
+    throw new AccessDeniedHttpException();
 }
 
 if (isset($_GET['disable_demo'])) {

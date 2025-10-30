@@ -99,6 +99,32 @@
                             {{ fields.field('', field, __('The location has a state or a country', 'carbon')) }}
                         {% endif %}
 
+                        {% if status.ci_download_enabled is defined %}
+                            {% set field = nok_field %}
+                            {% if status.ci_fallback_available is defined %}
+                                {% if status.ci_fallback_available %}
+                                    {% set field = warning_field %}
+                                {% endif %}
+                            {% endif %}
+                            {% if status.ci_download_enabled %}
+                                {% set field = ok_field %}
+                            {% endif %}
+                            {{ fields.field('', field, __('Real time carbon intensity enabled', 'carbon')) }}
+                        {% endif %}
+
+                        {% if status.ci_fallback_available is defined %}
+                            {% set field = nok_field %}
+                            {% if status.ci_download_enabled is defined %}
+                                {% if status.ci_download_enabled %}
+                                    {% set field = warning_field %}
+                                {% endif %}
+                            {% endif %}
+                            {% if status.ci_fallback_available %}
+                                {% set field = ok_field %}
+                            {% endif %}
+                            {{ fields.field('', field, __('The location has yearly carbon intensity data', 'carbon')) }}
+                        {% endif %}
+
                         {% if status.has_model is defined %}
                             {% set field = nok_field %}
                             {% if status.has_model %}
@@ -122,6 +148,11 @@
 
                         {% if status.has_type is defined %}
                             {% set field = nok_field %}
+                            {% if status.has_model is defined %}
+                                {% if status.has_model %}
+                                    {% set field = warning_field %}
+                                {% endif %}
+                            {% endif %}
                             {% if status.has_type %}
                                 {% set field = ok_field %}
                             {% endif %}
@@ -167,9 +198,20 @@
 
                         {{ fields.smallTitle(__('Legend', 'carbon')) }}
 
-                        {{ fields.field('', ok_field, __('Satisfied requirement', 'carbon')) }}
-                        {{ fields.field('', nok_field, __('Missing requirement', 'carbon')) }}
-                        {{ fields.field('', warning_field, __('Optional missing data', 'carbon')) }}
+                        <div class="legend-grid">
+                            <div class="legend-item">
+                                <i class="fa fa-check-circle ok"></i>
+                                <span class="legend-label">Satisfied requirement</span>
+                            </div>
+                            <div class="legend-item">
+                                <i class="fa fa-xmark-circle disabled"></i>
+                                <span class="legend-label">Missing requirement</span>
+                            </div>
+                            <div class="legend-item">
+                                <i class="fa fa-xmark-circle missing"></i>
+                                <span class="legend-label">Optional missing data</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

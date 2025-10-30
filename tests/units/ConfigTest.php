@@ -35,15 +35,14 @@ namespace GlpiPlugin\Carbon\Tests;
 use GlpiPlugin\Carbon\Config;
 use Config as GlpiConfig;
 use Geocoder\Geocoder;
-use GlpiPlugin\Carbon\DataSource\LCA\Boavizta;
-use RuleCriteria;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass('GlpiPlugin\Carbon\Config')]
 class ConfigTest extends DbTestCase
 {
     /**
-     * @covers GlpiPlugin\Carbon\Config::getEmbodiedImpactEngine
-     *
-     * @return void
+     * #CoversMethod GlpiPlugin\Carbon\Config::getEmbodiedImpactEngine
      */
     public function testGetEmbodiedImpactEngine()
     {
@@ -65,9 +64,7 @@ class ConfigTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Config::getUsageImpactEngine
-     *
-     * @return void
+     * #CoversMethod GlpiPlugin\Carbon\Config::getUsageImpactEngine
      */
     public function testGetUsageImpactEngine()
     {
@@ -118,13 +115,14 @@ class ConfigTest extends DbTestCase
     }
 
     /**
-     * @dataProvider configUpdateProvider
-     * @covers GlpiPlugin\Carbon\Config::configUpdate
+     * #dataProvider configUpdateProvider
+     * #CoversMethod GlpiPlugin\Carbon\Config::configUpdate
      *
      * @param array $input
      * @param array $expected
      * @return void
      */
+    #[dataProvider('configUpdateProvider')]
     public function testConfigUpdate(array $input, array $expected)
     {
         $result = Config::configUpdate($input);
@@ -132,7 +130,7 @@ class ConfigTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Config::isDemoMode
+     * #CoversMethod GlpiPlugin\Carbon\Config::isDemoMode
      *
      * @return void
      */
@@ -166,7 +164,7 @@ class ConfigTest extends DbTestCase
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\Config::getGeocoder
+     * #CoversMethod GlpiPlugin\Carbon\Config::getGeocoder
      *
      * @return void
      */

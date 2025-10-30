@@ -209,8 +209,7 @@ class Location extends CommonDBChild
      */
     protected function enableCarbonIntensityDownload(CommonDBTM $item): bool
     {
-        $input = $item->fields;
-        if (!in_array('country', array_keys($input))) {
+        if (!in_array('country', array_keys($item->fields))) {
             return false;
         }
         $zone = Zone::getByLocation($item);
@@ -226,6 +225,75 @@ class Location extends CommonDBChild
             return false;
         }
         return $source_zone->toggleZone(true);
+    }
+
+    /**
+     * Tells if the carbon intensity download is enabled
+     *
+     * @param CommonDBTM $item
+     * @return boolean
+     */
+    public function isCarbonIntensityDownloadEnabled(CommonDBTM $item): bool
+    {
+        $zone = Zone::getByLocation($item);
+        if ($zone === null) {
+            return false;
+        }
+        $source_zone = new CarbonIntensitySource_Zone();
+        $source_zone->getFromDBByCrit([
+            Zone::getForeignKeyField() => $zone->fields['id'],
+            CarbonIntensitySource::getForeignKeyField() => $zone->fields['plugin_carbon_carbonintensitysources_id_historical'],
+        ]);
+        if ($source_zone->isNewItem()) {
+            return false;
+        }
+        return $source_zone->fields['is_download_enabled'] === 1;
+    }
+
+    /**
+     * Tells id a location has fallback carbon intensity data
+     *
+     * @param CommonDBTM $item
+     * @return boolean
+     */
+    public function hasFallbackCarbonIntensityData(CommonDBTM $item): bool
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        $zone = Zone::getByLocation($item);
+        if ($zone === null) {
+            return false;
+        }
+        $carbon_intensity_table = CarbonIntensity::getTable();
+        $carbon_intensity_source_zone_table = CarbonIntensitySource_Zone::getTable();
+        $carbon_intensity_source_table = CarbonIntensitySource::getTable();
+        $request = [
+            'COUNT' => 'count',
+            'FROM' => $carbon_intensity_table,
+            'INNER JOIN' => [
+                $carbon_intensity_source_zone_table => [
+                    'FKEY'   => [
+                        $carbon_intensity_table => 'plugin_carbon_zones_id',
+                        $carbon_intensity_source_zone_table => 'plugin_carbon_zones_id',
+                    ]
+                ],
+                $carbon_intensity_source_table => [
+                    'FKEY'   => [
+                        $carbon_intensity_source_zone_table => 'plugin_carbon_carbonintensitysources_id',
+                        $carbon_intensity_source_table => 'id',
+                    ]
+                ]
+            ],
+            'WHERE' => [
+                CarbonIntensitySource::getTableField('is_fallback') => 1,
+                CarbonIntensitySource_Zone::getTableField('plugin_carbon_zones_id') => $zone->getID(),
+            ],
+            'ORDER' => CarbonIntensity::getTableField('date') . ' DESC',
+            'LIMIT' => 1,
+        ];
+        $result = $DB->request($request);
+        return ($result->count() > 0);
     }
 
     /**

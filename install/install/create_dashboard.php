@@ -33,6 +33,7 @@
 use Glpi\Dashboard\Dashboard;
 use Glpi\Dashboard\Item as DashboardItem;
 use Glpi\Dashboard\Right as DashboardRight;
+use Glpi\DBAL\QueryExpression;
 use GlpiPlugin\Carbon\Report;
 use Ramsey\Uuid\Uuid;
 
@@ -41,7 +42,6 @@ global $DB;
 
 $dashboard = new Dashboard();
 $dashboard_key = 'plugin_carbon_board';
-/** @phpstan-ignore argument.type */
 if ($dashboard->getFromDB($dashboard_key) === false) {
     // The dashboard already exists, nothing to create
     $dashboard->add([
@@ -97,7 +97,7 @@ $iterator = $DB->request([
     'SELECT' => [
         Profile::getTableField('id'),
     ],
-    'FROM' => Profile::getTable(),
+    'FROM' => $profile_table,
     'INNER JOIN' => [
         $profile_right_table => [
             'FKEY' => [

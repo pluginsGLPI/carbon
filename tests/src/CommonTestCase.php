@@ -33,6 +33,8 @@
 namespace GlpiPlugin\Carbon\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Glpi\Application\Environment;
+use Glpi\Kernel\Kernel;
 use Auth;
 use CommonDBTM;
 use Computer;
@@ -40,7 +42,6 @@ use ComputerType as GlpiComputerType;
 use DateTime;
 use DateInterval;
 use DateTimeInterface;
-use DB;
 use Glpi\Inventory\Conf;
 use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
@@ -51,9 +52,7 @@ use GlpiPlugin\Carbon\CarbonIntensity;
 use Entity;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
-use Html;
 use Location;
-use QueryExpression;
 use ReflectionMethod;
 use Session;
 use Ticket;
@@ -83,14 +82,11 @@ class CommonTestCase extends TestCase
 
     protected function setUp(): void
     {
-        $this->setupGLPIFramework();
         $this->resetGLPILogs();
     }
 
     protected function tearDown(): void
     {
-        $method = $this->getName();
-
         $logs = ['php-errors.log', 'sql-errors.log'];
         foreach ($logs as $log) {
             if (!file_exists(GLPI_LOG_DIR . '/' . $log)) {
@@ -109,29 +105,14 @@ class CommonTestCase extends TestCase
         file_put_contents(GLPI_LOG_DIR . "/php-errors.log", '');
     }
 
-    protected function setupGLPIFramework()
+    /**
+     * @deprecated not replaced
+     *
+     * @return void
+     */
+    protected function setupGLPIFramework(): void
     {
-        global $LOADED_PLUGINS, $AJAX_INCLUDE, $PLUGINS_INCLUDED;
-
-        if (session_status() == PHP_SESSION_ACTIVE) {
-            Session::destroy();
-            session_write_close();
-        }
-        unset($LOADED_PLUGINS);
-        unset($PLUGINS_INCLUDED);
-        unset($AJAX_INCLUDE);
-        $_SESSION = [];
-        require GLPI_ROOT . "/inc/includes.php";
-        //\Toolbox::setDebugMode(Session::DEBUG_MODE);
-
-        // Security of PHP_SELF
-        $_SERVER['PHP_SELF'] = Html::cleanParametersURL($_SERVER['PHP_SELF']);
-
-        if (session_status() == PHP_SESSION_ACTIVE) {
-            session_write_close();
-        }
-        Session::start();
-        $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
+        return;
     }
 
     protected function login($name, $password, $noauto = false)
@@ -142,7 +123,6 @@ class CommonTestCase extends TestCase
         $result = $auth->login($name, $password, $noauto);
         $this->restoreDebug();
         $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
-        // $this->setupGLPIFramework();
 
         return $result;
     }
@@ -165,11 +145,7 @@ class CommonTestCase extends TestCase
     }
 
     /**
-     * Create an item of the given itemtype
-     *
-     * @param string $itemtype itemtype to create
-     * @param array $input
-     * @return CommonDBTM
+     * @deprecated use createItem instead
      */
     protected function getItem(string $itemtype, array $input = []): CommonDBTM
     {
@@ -229,6 +205,12 @@ class CommonTestCase extends TestCase
         return $item;
     }
 
+    /**
+     * @deprecated use createItems insteaad
+     *
+     * @param array $batch
+     * @return array
+     */
     public function getItems(array $batch): array
     {
         return $this->createItems($batch);
@@ -240,7 +222,7 @@ class CommonTestCase extends TestCase
 
         foreach ($batch as $itemtype => $items) {
             foreach ($items as $data) {
-                $item = $this->getItem($itemtype, $data);
+                $item = $this->createItem($itemtype, $data);
                 $output[$itemtype][$item->getID()] = $item;
             }
         }
@@ -257,9 +239,9 @@ class CommonTestCase extends TestCase
 
     protected function createComputerUsageProfile(array $usage_profile_params): Computer
     {
-        $usage_profile = $this->getItem(ComputerUsageProfile::class, $usage_profile_params);
-        $glpi_computer = $this->getItem(Computer::class);
-        $impact = $this->getItem(UsageInfo::class, [
+        $usage_profile = $this->createItem(ComputerUsageProfile::class, $usage_profile_params);
+        $glpi_computer = $this->createItem(Computer::class);
+        $impact = $this->createItem(UsageInfo::class, [
             'itemtype' => Computer::class,
             'items_id' => $glpi_computer->getId(),
             ComputerUsageProfile::getForeignKeyField() => $usage_profile->getID(),
@@ -271,8 +253,8 @@ class CommonTestCase extends TestCase
     protected function createComputerUsageProfilePower(array $usage_profile_params, int $type_power): Computer
     {
         $glpi_computer = $this->createComputerUsageProfile($usage_profile_params);
-        $glpiComputerType = $this->getItem(GlpiComputerType::class);
-        $carbonComputerType = $this->getItem(ComputerType::class, [
+        $glpiComputerType = $this->createItem(GlpiComputerType::class);
+        $carbonComputerType = $this->createItem(ComputerType::class, [
             GlpiComputerType::getForeignKeyField() => $glpiComputerType->getID(),
             'power_consumption'                    => $type_power,
         ]);
@@ -288,7 +270,7 @@ class CommonTestCase extends TestCase
     {
         $glpi_computer = $this->createComputerUsageProfilePower($usage_profile_params, $type_power);
 
-        $location = $this->getItem(
+        $location = $this->createItem(
             Location::class,
             [
                 'country' => $country,
@@ -307,7 +289,7 @@ class CommonTestCase extends TestCase
         $source = new CarbonIntensitySource();
         $source->getFromDBByCrit(['name' => $source_name]);
         if ($source->isNewItem()) {
-            $source = $this->getItem(CarbonIntensitySource::class, [
+            $source = $this->createItem(CarbonIntensitySource::class, [
                 'name' => $source_name
             ]);
         }
@@ -315,7 +297,7 @@ class CommonTestCase extends TestCase
         $zone = new Zone();
         $zone->getFromDBByCrit(['name' => $country]);
         if ($zone->isNewItem()) {
-            $zone = $this->getItem(Zone::class, [
+            $zone = $this->createItem(Zone::class, [
                 'name' => $country,
                 'plugin_carbon_carbonintensitysources_id_historical' => $source->getID()
             ]);
@@ -333,7 +315,7 @@ class CommonTestCase extends TestCase
                 'date' => $current_date->format('Y-m-d H:00:00'),
                 'intensity' => $intensity,
             ];
-            $item = $this->getItem(
+            $item = $this->createItem(
                 CarbonIntensity::class,
                 $crit + [
                     'data_quality' => AbstractTracked::DATA_QUALITY_MANUAL
@@ -360,7 +342,7 @@ class CommonTestCase extends TestCase
         while ($date_current < $date_stop) {
             $itemtype = $item->getType();
             $items_id = $item->getID();
-            $this->getItem(CarbonEmission::class, [
+            $this->createItem(CarbonEmission::class, [
                 'itemtype'         => $itemtype,
                 'items_id'         => $items_id,
                 'entities_id'      => Session::getActiveEntity(),
@@ -401,33 +383,20 @@ class CommonTestCase extends TestCase
     /**
      * Handle deprecations in GLPI
      * Helps to make unit tests without deprecations warnings, accross 2 version of GLPI
-     *
-     * @param string $itemtype
-     * @param array $input
-     * @return void
      */
-    private function handleDeprecations($itemtype, &$input): void
+    private function handleDeprecations(&$itemtype, &$input): void
     {
-        switch ($itemtype) {
-            case Ticket::class:
-                if (version_compare(GLPI_VERSION, '10.1') < 0) {
-                    break;
-                }
-                // in GLPI 10.1
-                if (isset($input['users_id_validate'])) {
-                    if (!is_array($input['users_id_validate'])) {
-                        $input['users_id_validate'] = [$input['users_id_validate']];
-                    }
-                    $input['_validation_targets'] = [];
-                    foreach ($input['users_id_validate'] as $validator_user) {
-                        $input['_validation_targets'][] = [
-                            'itemtype_target' => User::class,
-                            'items_id_target' => $validator_user,
-                        ];
-                    }
-                    unset($input['users_id_validate']);
-                }
-                break;
+        if (version_compare(GLPI_VERSION, '11.0.0-beta') >= 0) {
+            if ($itemtype === \Computer_Item::class) {
+                $itemtype = \Glpi\Asset\Asset_PeripheralAsset::class;
+                $input['itemtype_asset'] = Computer::class;
+                $input['items_id_asset'] = $input['computers_id'];
+                $input['itemtype_peripheral'] = $input['itemtype'];
+                $input['items_id_peripheral'] = $input['items_id'];
+                unset($input['computers_id']);
+                unset($input['itemtype']);
+                unset($input['items_id']);
+            }
         }
     }
 

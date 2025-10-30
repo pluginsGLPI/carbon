@@ -42,9 +42,7 @@ use Session;
 class CarbonIntensitySourceTest extends DbTestCase
 {
     /**
-     * @covers \GlpiPlugin\Carbon\CarbonIntensitySource::getTypeName
-     *
-     * @return void
+     * #CoversMethod \GlpiPlugin\Carbon\CarbonIntensitySource::getTypeName
      */
     public function testGetTypeName()
     {
@@ -56,9 +54,7 @@ class CarbonIntensitySourceTest extends DbTestCase
     }
 
     /**
-     * @covers \GlpiPlugin\Carbon\CarbonIntensitySource::canCreate
-     *
-     * @return void
+     * #CoversMethod \GlpiPlugin\Carbon\CarbonIntensitySource::canCreate
      */
     public function testCanCreate()
     {
@@ -68,9 +64,7 @@ class CarbonIntensitySourceTest extends DbTestCase
     }
 
     /**
-     * @covers \GlpiPlugin\Carbon\CarbonIntensitySource::canUpdate
-     *
-     * @return void
+     * #CoversMethod \GlpiPlugin\Carbon\CarbonIntensitySource::canUpdate
      */
     public function testCanUpdate()
     {
@@ -80,9 +74,7 @@ class CarbonIntensitySourceTest extends DbTestCase
     }
 
     /**
-     * @covers \GlpiPlugin\Carbon\CarbonIntensitySource::canDelete
-     *
-     * @return void
+     * #CoversMethod \GlpiPlugin\Carbon\CarbonIntensitySource::canDelete
      */
     public function testCanDelete()
     {
@@ -92,9 +84,7 @@ class CarbonIntensitySourceTest extends DbTestCase
     }
 
     /**
-     * @covers \GlpiPlugin\Carbon\CarbonIntensitySource::canPurge
-     *
-     * @return void
+     * #CoversMethod \GlpiPlugin\Carbon\CarbonIntensitySource::canPurge
      */
     public function testCanPurge()
     {
@@ -104,9 +94,7 @@ class CarbonIntensitySourceTest extends DbTestCase
     }
 
     /**
-     * @covers \GlpiPlugin\Carbon\CarbonIntensitySource::defineTabs
-     *
-     * @return void
+     * #CoversMethod \GlpiPlugin\Carbon\CarbonIntensitySource::defineTabs
      */
     public function testDefineTabs()
     {
@@ -121,7 +109,7 @@ class CarbonIntensitySourceTest extends DbTestCase
     public function testGetTabNameForItem()
     {
         $this->login('glpi', 'glpi');
-        $item = $this->getItem(Zone::class);
+        $item = $this->createItem(Zone::class);
         $instance = new CarbonIntensitySource();
         $result = $instance->getTabNameForItem($item);
         $expected = 'Carbon intensity sources';
@@ -131,21 +119,19 @@ class CarbonIntensitySourceTest extends DbTestCase
         $expected = '';
         $this->assertEquals($expected, $result);
 
-        $item = $this->getItem(Computer::class);
+        $item = $this->createItem(Computer::class);
         $result = $instance->getTabNameForItem($item);
         $expected = '';
         $this->assertEquals($expected, $result);
     }
 
     /**
-     * @covers \GlpiPlugin\Carbon\CarbonIntensitySource::displayTabContentForItem
-     *
-     * @return void
+     * #CoversMethod \GlpiPlugin\Carbon\CarbonIntensitySource::displayTabContentForItem
      */
     public function testDisplayTabContentForItem()
     {
         $this->login('glpi', 'glpi');
-        $item = $this->getItem(Computer::class);
+        $item = $this->createItem(Computer::class);
         ob_start(function ($buffer) {
             return $buffer;
         });
@@ -154,9 +140,9 @@ class CarbonIntensitySourceTest extends DbTestCase
         $this->assertEquals('', $output);
         $this->assertTrue($result);
 
-        $item = $this->getItem(Zone::class);
-        $source = $this->getItem(CarbonIntensitySource::class);
-        $source_zone = $this->getItem(CarbonIntensitySource_Zone::class, [
+        $item = $this->createItem(Zone::class);
+        $source = $this->createItem(CarbonIntensitySource::class);
+        $source_zone = $this->createItem(CarbonIntensitySource_Zone::class, [
             $item::getForeignKeyField() => $item->getID(),
             $source::getForeignKeyField() => $source->getID()
         ]);

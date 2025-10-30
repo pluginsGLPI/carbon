@@ -159,10 +159,6 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
         }
 
         $renderer = TemplateRenderer::getInstance();
-        $extensions = $renderer->getEnvironment()->getExtensions();
-        if (!isset($extensions[DataHelpersExtension::class])) {
-            $renderer->getEnvironment()->addExtension(new DataHelpersExtension());
-        }
         $renderer->display('@carbon/pages/CarbonIntensitySource/tab_zone.html.twig', [
             'is_tab' => true,
             'nopager' => true,
@@ -195,7 +191,7 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
             // At least 1 entry then add JS to toggle the state of zones
             echo Html::scriptBlock('
                 var plugin_carbon_toggleZone = function (id) {
-                    fetch(CFG_GLPI["root_doc"] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/toggleZoneDownload.php?id=" + id).then(response => {
+                    fetch(CFG_GLPI["root_doc"] + "/plugins/carbon/ajax/toggleZoneDownload.php?id=" + id).then(response => {
                         if (response.status === 200) {
                             reloadTab();
                         }
@@ -258,11 +254,7 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
         }
 
         $renderer = TemplateRenderer::getInstance();
-        $extensions = $renderer->getEnvironment()->getExtensions();
-        if (!isset($extensions[DataHelpersExtension::class])) {
-            $renderer->getEnvironment()->addExtension(new DataHelpersExtension());
-        }
-        $renderer->display('@carbon/components/datatable.html.twig', [
+        $renderer->display('components/datatable.html.twig', [
             'is_tab' => true,
             'nopager' => true,
             'nofilter' => true,
@@ -292,7 +284,7 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
             // At least 1 entry then add JS to toggle the state of zones
             echo Html::scriptBlock('
                 var plugin_carbon_toggleZone = function (id) {
-                    fetch(CFG_GLPI["root_doc"] + "/" + GLPI_PLUGINS_PATH.carbon + "/ajax/toggleZoneDownload.php?id=" + id).then(response => {
+                    fetch(CFG_GLPI["root_doc"] + "/plugins/carbon/ajax/toggleZoneDownload.php?id=" + id).then(response => {
                         if (response.status === 200) {
                             reloadTab();
                         }
@@ -346,13 +338,26 @@ class CarbonIntensitySource_Zone extends CommonDBRelation
         return $zone_code;
     }
 
-    protected static function getToggleLink(int $zone_id, ?string $state)
+    /**
+     * Get HTML link to enable / disable the download of carbon intensity data for a source and a zone
+     *
+     * @param integer $zone_id
+     * @param string|null $state
+     * @return string
+     */
+    protected static function getToggleLink(int $zone_id, ?string $state): string
     {
         $state = $state == 0 ? __('No') : __('Yes');
         $link = '<a href="javascript:void(0)" onclick="plugin_carbon_toggleZone(' . $zone_id . ')" title="' . __('Enable / Disable', 'carbon') . '">' . $state . '</a>';
         return $link;
     }
 
+    /**
+     * Sets or toggles the download for a zone
+     *
+     * @param boolean|null $state if not null, don't toggle and force the state of the download
+     * @return boolean true if the update succeeded
+     */
     public function toggleZone(?bool $state = null): bool
     {
         // Check if the source is a fallback source

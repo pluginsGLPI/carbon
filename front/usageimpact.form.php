@@ -31,6 +31,7 @@
  */
 
 use Glpi\Event;
+use Glpi\Exception\Http\NotFoundHttpException;
 use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\Impact\History\AbstractAsset;
 use GlpiPlugin\Carbon\Impact\Usage\Engine;
@@ -40,7 +41,7 @@ include(__DIR__ . '/../../../inc/includes.php');
 
 // Check if plugin is activated...
 if (!Plugin::isPluginActive('carbon')) {
-    Html::displayNotFoundError();
+    throw new NotFoundHttpException();
 }
 
 Session::checkRight(UsageInfo::$rightname, READ);

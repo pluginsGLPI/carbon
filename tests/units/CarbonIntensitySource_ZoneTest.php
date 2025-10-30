@@ -36,80 +36,67 @@ use GlpiPlugin\Carbon\CarbonIntensitySource;
 use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\Zone;
+use PHPUnit\Framework\Attributes\CoversMethod;
 
 class CarbonIntensitySource_ZoneTest extends DbTestCase
 {
     /**
-     * @covers GlpiPlugin\Carbon\CarbonIntensitySource_Zone::showForSource
-     *
-     * @return void
+     * #CoversMethod GlpiPlugin\Carbon\CarbonIntensitySource_Zone::showForSource
      */
     public function testShowForSource()
     {
-        $source = $this->getItem(CarbonIntensitySource::class, [
+        $source = $this->createItem(CarbonIntensitySource::class, [
             'name' => 'foo'
         ]);
 
-        $zone = $this->getItem(Zone::class, [
+        $zone = $this->createItem(Zone::class, [
             'name' => 'bar'
         ]);
 
-        $instance = $this->getItem(CarbonIntensitySource_Zone::class, [
+        $instance = $this->createItem(CarbonIntensitySource_Zone::class, [
             $source::getForeignKeyField() => $source->getID(),
             $zone::getForeignKeyField() => $zone->getID(),
         ]);
 
-        $output = '';
-        ob_start(function ($buffer) use ($output) {
-            $output .= $buffer;
-        });
+        $this->logout();
+        ob_start();
         $result = $instance->showForSource($source);
         $output = ob_get_clean();
         $this->assertEquals('', $output);
 
         $this->login('glpi', 'glpi');
-        $output = '';
-        ob_start(function ($buffer) use ($output) {
-            $output .= $buffer;
-        });
+        ob_start();
         $result = $instance->showForSource($source);
         $output = ob_get_clean();
         $this->assertNotEmpty($output);
     }
 
     /**
-     * @covers GlpiPlugin\Carbon\CarbonIntensitySource_Zone::showForZone
-     *
-     * @return void
+     * #CoversMethod GlpiPlugin\Carbon\CarbonIntensitySource_Zone::showForZone
      */
     public function testShowForZone()
     {
-        $source = $this->getItem(CarbonIntensitySource::class, [
+        $source = $this->createItem(CarbonIntensitySource::class, [
             'name' => 'foo'
         ]);
 
-        $zone = $this->getItem(Zone::class, [
+        $zone = $this->createItem(Zone::class, [
             'name' => 'bar'
         ]);
 
-        $instance = $this->getItem(CarbonIntensitySource_Zone::class, [
+        $instance = $this->createItem(CarbonIntensitySource_Zone::class, [
             $source::getForeignKeyField() => $source->getID(),
             $zone::getForeignKeyField() => $zone->getID(),
         ]);
 
-        $output = '';
-        ob_start(function ($buffer) use ($output) {
-            $output .= $buffer;
-        });
+        $this->logout();
+        ob_start();
         $result = $instance->showForZone($zone);
         $output = ob_get_clean();
         $this->assertEquals('', $output);
 
         $this->login('glpi', 'glpi');
-        $output = '';
-        ob_start(function ($buffer) use ($output) {
-            $output .= $buffer;
-        });
+        ob_start();
         $result = $instance->showForZone($zone);
         $output = ob_get_clean();
         $this->assertNotEmpty($output);
