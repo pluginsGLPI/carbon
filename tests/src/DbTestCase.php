@@ -32,6 +32,8 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
+use DBmysql;
+
 class DbTestCase extends CommonTestCase
 {
     public function setUp(): void

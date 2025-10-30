@@ -38,16 +38,16 @@ use GlpiPlugin\Carbon\Toolbox;
 class Dashboard
 {
     /**
-     * Returns total carbon emission per computer type.
+     * Returns total usage carbon emission per computer type.
      *
      * @return array of:
      *  - float  'number': total carbon emission of the type
      *  - string 'url': url to redirect when clicking on the slice
      *  - string 'label': name of the computer type
      */
-    public static function getTotalCarbonEmissionPerType()
+    public static function getTotalUsageCarbonEmissionPerType()
     {
-        return Provider::getSumEmissionsPerType();
+        return Provider::getSumUsageEmissionsPerType();
     }
 
     /**

@@ -32,8 +32,8 @@
 
 namespace GlpiPlugin\Carbon\Dashboard;
 
-use Computer;
-use ComputerModel;
+use Computer as GlpiComputer;
+use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
 use DateInterval;
 use DateTime;
@@ -52,9 +52,6 @@ use GlpiPlugin\Carbon\SearchOptions;
 use GlpiPlugin\Carbon\UsageImpact;
 use Glpi\DBAL\QueryExpression;
 use Glpi\DBAL\QuerySubQuery;
-use Monitor;
-use Network;
-use NetworkEquipment;
 use Search;
 use Session;
 use Toolbox as GlpiToolbox;
@@ -112,37 +109,59 @@ class Provider
         /** @var DBmysql $DB */
         global $DB;
 
-        $computermodels_table = ComputerModel::getTable();
+        $glpi_computermodels_table = GlpiComputerModel::getTable();
         $carbonemissions_table = CarbonEmission::getTable();
+        $glpi_computer_table = getTableForItemType(GlpiComputer::class);
+        $computer_type_table = getTableForItemType(ComputerType::class);
 
         $sql_year_month = "DATE_FORMAT(`date`, '%Y-%m')";
         $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($carbonemissions_table, '', '', 'auto');
         $subrequest = [
             'SELECT'    => [
-                ComputerModel::getTableField('id'),
-                ComputerModel::getTableField('name'),
-                /**  */
+                GlpiComputerModel::getTableField('id'),
+                GlpiComputerModel::getTableField('name'),
                 new QueryExpression("$sql_year_month as `date`"),
                 'SUM' => 'emission_per_day AS monthly_emission_per_model',
                 new QueryExpression('COUNT(DISTINCT ' . CarbonEmission::getTableField('items_id') . ') AS nb_computers_per_model'),
             ],
-            'FROM'      => $computermodels_table,
+            'FROM'      => $glpi_computermodels_table,
             'INNER JOIN' => [
                 $carbonemissions_table => [
                     'FKEY'   => [
                         $carbonemissions_table => 'models_id',
-                        $computermodels_table  => 'id'
+                        $glpi_computermodels_table  => 'id'
                     ]
                 ],
+                $glpi_computer_table => [
+                    'FKEY' => [
+                        $carbonemissions_table => 'items_id',
+                        $glpi_computer_table => 'id',
+                        [
+                            'AND' => [CarbonEmission::getTableField('itemtype') => GlpiComputer::class]
+                        ]
+                    ]
+                ]
+            ],
+            'LEFT JOIN' => [
+                $computer_type_table => [
+                    'FKEY' => [
+                        $glpi_computer_table => 'computertypes_id',
+                        $computer_type_table => 'computertypes_id',
+                    ]
+                ]
             ],
             'WHERE' => [
-                CarbonEmission::getTableField('itemtype') => Computer::class
+                CarbonEmission::getTableField('itemtype') => GlpiComputer::class,
+                'OR' => [
+                    [ComputerType::getTableField('is_ignore') => 0],
+                    [ComputerType::getTableField('is_ignore') => null],
+                ]
             ] + $entity_restrict + $where,
             'GROUPBY' => [
-                ComputerModel::getTableField('id'),
+                GlpiComputerModel::getTableField('id'),
                 new QueryExpression($sql_year_month)
             ],
-            'ORDER'   => ComputerModel::getTableField('name'),
+            'ORDER'   => GlpiComputerModel::getTableField('name'),
         ];
 
         $request = [
@@ -160,7 +179,7 @@ class Provider
         ];
 
         if ($where !== []) {
-            $filter_criteria = self::getFiltersCriteria(Computer::getTable(), []);
+            $filter_criteria = self::getFiltersCriteria(GlpiComputer::getTable(), []);
             $request['WHERE'] += $filter_criteria;
         }
         $result = $DB->request($request);
@@ -199,9 +218,9 @@ class Provider
         foreach ($result as $row) {
             $count = $row['nb_computers_per_model'];
             $data['series'][] = (float) $emissions['serie'][$row['id']];
-            $data['labels'][] = $row['name'] . " (" . $row['nb_computers_per_model'] . " " . Computer::getTypeName($count) . ")";
+            $data['labels'][] = $row['name'] . " (" . $row['nb_computers_per_model'] . " " . GlpiComputer::getTypeName($count) . ")";
             $models_id = $row['id'];
-            $data['url'][] = Computer::getSearchURL() . '?' . GlpiToolbox::append_params($search_criteria);
+            $data['url'][] = GlpiComputer::getSearchURL() . '?' . GlpiToolbox::append_params($search_criteria);
         }
 
         $data['unit'] = $emissions['unit'];
@@ -211,54 +230,126 @@ class Provider
         ];
     }
 
-    public static function getSumEmissionsPerType(array $where = [])
+    /**
+     * Undocumented function
+     *
+     * @param array $where
+     * @return array
+     */
+    public static function getSumUsageEmissionsPerType(array $where = []): array
     {
         /** @var DBmysql $DB */
         global $DB;
 
-        $glpicomputertypes_table = GlpiComputerType::getTable();
+        $glpi_computertypes_table = GlpiComputerType::getTable();
         $carbonemissions_table = CarbonEmission::getTable();
+        $computer_type_table = getTableForItemType(ComputerType::class);
 
+        $sql_year_month = "DATE_FORMAT(`date`, '%Y-%m')";
         $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($carbonemissions_table, '', '', 'auto');
-        $request = [
+        $subrequest = [
             'SELECT'    => [
                 GlpiComputerType::getTableField('id'),
                 GlpiComputerType::getTableField('name'),
-                'SUM' => 'emission_per_day AS total_per_type',
+                new QueryExpression("$sql_year_month as `date`"),
+                'SUM' => 'emission_per_day AS monthly_emission_per_type',
                 new QueryExpression('COUNT(DISTINCT ' . CarbonEmission::getTableField('items_id') . ') AS nb_computers_per_type'),
             ],
-            'FROM'      => $glpicomputertypes_table,
+            'FROM'      => $glpi_computertypes_table,
             'INNER JOIN' => [
                 $carbonemissions_table => [
                     'FKEY'   => [
                         $carbonemissions_table => 'types_id',
-                        $glpicomputertypes_table  => 'id'
+                        $glpi_computertypes_table  => 'id'
                     ]
                 ],
             ],
+            'LEFT JOIN' => [
+                $computer_type_table => [
+                    'FKEY' => [
+                        $glpi_computertypes_table => 'id',
+                        $computer_type_table => 'computertypes_id',
+                    ]
+                ]
+            ],
             'WHERE' => [
-                CarbonEmission::getTableField('itemtype') => Computer::class
-            ] + $entity_restrict,
-            'GROUPBY' => GlpiComputerType::getTableField('id'),
+                CarbonEmission::getTableField('itemtype') => GlpiComputer::class,
+                'OR' => [
+                    [ComputerType::getTableField('is_ignore') => 0],
+                    [ComputerType::getTableField('is_ignore') => null],
+                ]
+            ] + $entity_restrict + $where,
+            'GROUPBY' => [
+                GlpiComputerType::getTableField('id'),
+                new QueryExpression($sql_year_month)
+            ],
             'ORDER'   => GlpiComputerType::getTableField('name'),
         ];
 
+        $request = [
+            'SELECT'    => [
+                'id',
+                'name',
+                'AVG' => 'monthly_emission_per_type AS total_per_type',
+                'MAX' => 'nb_computers_per_type AS nb_computers_per_type'
+            ],
+            'FROM' => new QuerySubQuery($subrequest, 'montly_per_type'),
+            'WHERE' => [],
+            'GROUPBY' => ['id'],
+            'ORDERBY' => 'total_per_type DESC',
+            'LIMIT'   => $params['limit'] ?? 9999
+        ];
+
         if ($where !== []) {
-            $request['WHERE'] += $where;
+            $filter_criteria = self::getFiltersCriteria(GlpiComputer::getTable(), []);
+            $request['WHERE'] += $filter_criteria;
         }
         $result = $DB->request($request);
 
-        $data = [];
+        $emissions = [];
+        foreach ($result as $row) {
+            $emissions[$row['id']] = $row['total_per_type'];
+        }
+        $co2eq = __('CO₂eq', 'carbon');
+        $units = [
+            __('g', 'carbon')  .  ' ' . $co2eq,
+            __('Kg', 'carbon') .  ' ' . $co2eq,
+            __('t', 'carbon')  .  ' ' . $co2eq,
+            __('Kt', 'carbon') .  ' ' . $co2eq,
+            __('Mt', 'carbon') .  ' ' . $co2eq,
+            __('Gt', 'carbon') .  ' ' . $co2eq,
+            __('Tt', 'carbon') .  ' ' . $co2eq,
+            __('Pt', 'carbon') .  ' ' . $co2eq,
+            __('Et', 'carbon') .  ' ' . $co2eq,
+            __('Zt', 'carbon') .  ' ' . $co2eq,
+            __('Yt', 'carbon') .  ' ' . $co2eq,
+        ];
+        $emissions = Toolbox::scaleSerie($emissions, $units);
+        $types_id = null;
+        $search_criteria = [
+            'criteria' => [
+                [
+                    'field'      => 40,
+                    'searchtype' => 'equals',
+                    'value'      => &$types_id // Reference to $types_id !
+                ],
+            ],
+            'reset'    => 'reset'
+        ];
+
         foreach ($result as $row) {
             $count = $row['nb_computers_per_type'];
-            $data[] = [
-                'number' => number_format($row['total_per_type'], PLUGIN_CARBON_DECIMALS, ',', ''),
-                'url' => GlpiComputerType::getFormURLWithID($row['id']),
-                'label' => $row['name'] . " (" . $row['nb_computers_per_type'] . " " . Computer::getTypeName($count) . ")",
-            ];
+            $data['series'][] = (float) $emissions['serie'][$row['id']];
+            $data['labels'][] = $row['name'] . " (" . $row['nb_computers_per_type'] . " " . GlpiComputer::getTypeName($count) . ")";
+            $types_id = $row['id'];
+            $data['url'][] = GlpiComputer::getSearchURL() . '?' . GlpiToolbox::append_params($search_criteria);
         }
 
-        return $data;
+        $data['unit'] = $emissions['unit'];
+
+        return [
+            'data' => $data
+        ];
     }
 
     /**
@@ -272,18 +363,18 @@ class Provider
         /** @var DBmysql $DB  */
         global $DB;
 
-        $computers_table = Computer::getTable();
-        $computermodels_table = ComputerModel::getTable();
+        $computers_table = GlpiComputer::getTable();
+        $computermodels_table = GlpiComputerModel::getTable();
         $glpiComputertypes_table = GlpiComputerType::getTable();
         $computertype_table = ComputerType::getTable();
 
         $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($computers_table, '', '', 'auto');
         $request = [
             'SELECT'    => [
-                ComputerModel::getTableField('id'),
-                ComputerModel::getTableField('name'),
-                'SUM' => ComputerModel::getTableField('power_consumption') . ' AS total_per_model',
-                'COUNT' => Computer::getTableField('id') . ' AS nb_computers_per_model',
+                GlpiComputerModel::getTableField('id'),
+                GlpiComputerModel::getTableField('name'),
+                'SUM' => GlpiComputerModel::getTableField('power_consumption') . ' AS total_per_model',
+                'COUNT' => GlpiComputer::getTableField('id') . ' AS nb_computers_per_model',
             ],
             'FROM'      => $computermodels_table,
             'INNER JOIN' => [
@@ -307,8 +398,8 @@ class Provider
                 ]
             ],
             'WHERE' => $entity_restrict,
-            'GROUPBY' => ComputerModel::getTableField('id'),
-            'ORDER'   => ComputerModel::getTableField('name'),
+            'GROUPBY' => GlpiComputerModel::getTableField('id'),
+            'ORDER'   => GlpiComputerModel::getTableField('name'),
         ];
         if ($where !== []) {
             $request['WHERE'] += $where;
@@ -319,7 +410,7 @@ class Provider
         foreach ($result as $row) {
             $data[] = [
                 'number' => number_format($row['total_per_model'], PLUGIN_CARBON_DECIMALS),
-                'url' => ComputerModel::getFormURLWithID($row['id']),
+                'url' => GlpiComputerModel::getFormURLWithID($row['id']),
                 'label' => $row['name'] . " (" . $row['nb_computers_per_model'] . " computers)",
             ];
         }
