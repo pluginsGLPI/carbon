@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-28 15:18+0000\n"
-"PO-Revision-Date: 2025-07-03 13:58+0000\n"
+"POT-Creation-Date: 2025-10-30 01:50+0000\n"
+"PO-Revision-Date: 2025-10-29 08:13+0000\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2025\n"
 "Language-Team: Turkish (Turkey) (https://app.transifex.com/teclib/teams/28042/tr_TR/)\n"
 "MIME-Version: 1.0\n"
@@ -463,16 +463,16 @@ msgid "Download carbon emissions from ElectricityMap"
 msgstr "ElectricityMap üzerinden karbon emisyonlarını indir"
 
 #: src/CronTask.php:82
-msgid "Compute usage environnemental impact for all assets"
-msgstr "Tüm varlıkların kullanım çevresel etkisini hesapla"
+msgid "Compute usage environmental impact for all assets"
+msgstr ""
 
 #: src/CronTask.php:83 src/CronTask.php:88
 msgid "Maximum number of entries to calculate"
 msgstr "Hesaplanacak en fazla kayıt sayısı"
 
 #: src/CronTask.php:87
-msgid "Compute embodied environnemental impact for all assets"
-msgstr "Tüm varlıkların gerçekleşen çevresel etkisini hesapla"
+msgid "Compute embodied environmental impact for all assets"
+msgstr ""
 
 #: src/CronTask.php:211
 msgid "No zone to download"
@@ -868,8 +868,8 @@ msgid "Usage global warming potential chart"
 msgstr "Kullanım küresel ısınma potansiyeli çizelgesi"
 
 #: src/Dashboard/Grid.php:322
-msgid "Environmental impact methodology_information"
-msgstr "Çevresel etki yöntemi bilgileri"
+msgid "Environmental impact methodology information"
+msgstr ""
 
 #: src/Dashboard/Provider.php:175 src/Dashboard/Provider.php:1014
 #: src/Toolbox.php:201
