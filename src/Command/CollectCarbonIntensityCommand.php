@@ -139,13 +139,17 @@ class CollectCarbonIntensityCommand extends AbstractCommand
         if (!$zone->getID()) {
             $zone->add([
                 'name' => $this->zones[$zone_code],
-                'plugin_carbon_sources_id_historical' => $data_source->getID(),
             ]);
             if ($zone->isNewItem()) {
                 $message = __("Zone not found", 'carbon');
                 $output->writeln("<error>$message</error>");
                 return Command::FAILURE;
             }
+            $source_zone = new Source_Zone();
+            $source_zone->add([
+                getForeignKeyFieldForItemType(Source::class) => $data_source->getID(),
+                getForeignKeyFieldForItemType(Zone::class) => $zone->getID(),
+            ]);
         }
         $carbon_intensity = new CarbonIntensity();
 

@@ -119,9 +119,6 @@ class ElectricityMapClient extends AbstractClient
             ];
             $zone = new Zone();
             if ($zone->getFromDbByCrit($zone_input) === false) {
-                if ($this->enableHistorical($zone_spec['zoneName'])) {
-                    $zone_input['plugin_carbon_sources_id_historical'] = $source_id;
-                }
                 if ($zone->add($zone_input) === false) {
                     $failed = true;
                     continue;
@@ -144,21 +141,6 @@ class ElectricityMapClient extends AbstractClient
         }
 
         return $count;
-    }
-
-    /**
-     * Enable historical for this source depending in the zone to configure
-     *
-     * @return boolean
-     */
-    protected function enableHistorical($zone_name): bool
-    {
-        if (in_array($zone_name, ['France'])) {
-            // Prefer an other source for France
-            return false;
-        }
-
-        return true;
     }
 
     private function getToken(): string

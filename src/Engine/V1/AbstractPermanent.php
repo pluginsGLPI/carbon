@@ -72,7 +72,7 @@ abstract class AbstractPermanent extends AbstractAsset implements EngineInterfac
         $start_time->setTime(0, 0, 0, 0);
         $length = new DateInterval('PT' . 86400 . 'S'); // 24h = 86400 seconds
         $iterator = $this->requestCarbonIntensitiesPerDay(DateTimeImmutable::createFromMutable($start_time), $length, $zone);
-        if ($iterator->count() === 0 && !$zone->hasHistoricalData()) {
+        if ($iterator->count() === 0 && !$zone->hasHistoricalDataSource()) {
             // Fallback to the closest value available
             $row = array_fill(0, 24, $this->getFallbackCarbonIntensity($day, $zone));
             $iterator = new ArrayObject($row);

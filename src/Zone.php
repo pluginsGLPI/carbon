@@ -277,25 +277,41 @@ class Zone extends CommonDropdown
     }
 
     /**
-     * Check if the zone has a historical data source
+     * Check if the zone has a historical data source.
+     * It does not checks if carbon intensity samples are available.
      *
      * @return bool
      */
-    public function hasHistoricalData(): bool
+    public function hasHistoricalDataSource(): bool
     {
         if ($this->isNewItem()) {
             return false;
         }
-        if (!isset($this->fields['plugin_carbon_sources_id_historical'])) {
-            return false;
-        }
+        $source_zone_table = getTableForItemType(Source_Zone::class);
+        $source_table = getTableForItemType(Source::class);
+        $zone_table = getTableForItemType(Zone::class);
         $source = new Source();
-        if (!$source->getFromDB($this->fields['plugin_carbon_sources_id_historical'])) {
-            // source does not exists
-            return false;
-        }
-
-        return $source->fields['is_fallback'] === 0;
+        return $source->getFromDBByRequest([
+            'INNER JOIN' => [
+                $source_zone_table => [
+                    'ON' => [
+                        $source_table => 'id',
+                        $source_zone_table => getForeignKeyFieldForItemType(Source::class),
+                    ]
+                ],
+                $zone_table => [
+                    'ON' => [
+                        $zone_table => 'id',
+                        $source_zone_table => self::getForeignKeyField()
+                    ]
+                ]
+            ],
+            'WHERE' => [
+                self::getTableField('id') => $this->fields['id'],
+                Source::getTableField('is_carbon_intensity_source') => 1,
+                Source::getTableField('is_fallback') => 0,
+            ]
+        ]);
     }
 
     /**

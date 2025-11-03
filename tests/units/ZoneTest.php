@@ -95,29 +95,30 @@ class ZoneTest extends DbTestCase
         $this->assertTrue($output);
     }
 
-    public function testHasHistoricalData()
+    public function testHasHistoricalDataSource()
     {
         // Test with an empty Zone object
         $zone = new Zone();
-        $this->assertFalse($zone->hasHistoricalData());
+        $this->assertFalse($zone->hasHistoricalDataSource());
 
-        // Test with a Zone object without the field
+        // Test with a Zone object without any relation with a source
         $zone = $this->createItem(Zone::class);
-        unset($zone->fields['plugin_carbon_sources_id_historical']);
-        $this->assertFalse($zone->hasHistoricalData());
+        $this->assertFalse($zone->hasHistoricalDataSource());
 
-        // Test with a Zone object that has no historical data
-        /** @var Zone $zone */
-        $zone = $this->createItem(Zone::class);
-        $this->assertFalse($zone->hasHistoricalData());
-
+        // Test with a zone linked to a source
         $source = $this->createItem(Source::class, [
-            'name' => 'foo'
+            'name' => 'foo',
+            'is_carbon_intensity_source' => 1,
+            'is_fallback' => 0,
         ]);
-        $zone->update(array_merge($zone->fields, [
-            'plugin_carbon_sources_id_historical' => $source->getID(),
-        ]));
-        $this->assertTrue($zone->hasHistoricalData());
+        $zone = $this->createItem(Zone::class, [
+            'name' => 'a zone'
+        ]);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            $source::getForeignKeyField() => $source->getID(),
+            $zone::getForeignKeyField() => $zone->getID(),
+        ]);
+        $this->assertTrue($zone->hasHistoricalDataSource());
     }
 
     public function testGetByItem()

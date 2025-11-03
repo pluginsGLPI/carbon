@@ -132,7 +132,7 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
         $total_seconds = (int) $length->format('%S');
         $expected_count = (int) ceil($total_seconds / 3600);
         $iterator = $this->requestCarbonIntensitiesPerDay($start_time, $length, $zone);
-        if ($iterator->count() === 0 && !$zone->hasHistoricalData()) {
+        if ($iterator->count() === 0 && !$zone->hasHistoricalDataSource()) {
             $row = array_fill(0, $expected_count, $this->getFallbackCarbonIntensity($start_time, $zone));
             $iterator = new ArrayObject($row);
             $iterator = $iterator->getIterator();

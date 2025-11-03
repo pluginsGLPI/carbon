@@ -118,16 +118,9 @@ class RteClient extends AbstractClient
             'name' => 'France',
         ];
         if ($zone->getFromDBByCrit($input) === false) {
-            $input['plugin_carbon_sources_id_historical'] = $source_id;
             if (!$zone->add($input)) {
                 return -1;
             }
-        } else {
-            if ($zone->fields['plugin_carbon_sources_id_historical'] == 0) {
-                $input['plugin_carbon_sources_id_historical'] = $source_id;
-                $input['id'] = $zone->getID();
-            }
-            $zone->update($input);
         }
 
         $source_zone = new Source_Zone();
