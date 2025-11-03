@@ -33,6 +33,7 @@
 namespace GlpiPlugin\Carbon\Tests;
 
 use Config;
+use DateTime;
 use Geocoder\Collection;
 use Geocoder\Geocoder;
 use Geocoder\Model\AddressCollection;
@@ -40,6 +41,7 @@ use Geocoder\Model\AdminLevel;
 use Geocoder\Model\AdminLevelCollection;
 use Geocoder\Model\Country;
 use Geocoder\Provider\Nominatim\Model\NominatimAddress;
+use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
@@ -379,44 +381,53 @@ class LocationTest extends DbTestCase
         $this->assertFalse($result);
 
         // Test with a core location with a relation to a non-fallback source
-        $source = new Source(); // This source exists after a fresh install
-        $source->getFromDBByCrit([
-            'name' => 'RTE'
+        $source =  $this->createItem(Source::class, ['name' => 'a source']);
+        $zone =  $this->createItem(Zone::class, ['name' => 'a zone']);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            Source::getForeignKeyField() => $source->getID(),
+            Zone::getForeignKeyField() => $zone->getID()
         ]);
-        $zone = new Zone(); // This zone  exists after a fresh install
-        $zone->getFromDBByCrit([
-            'name' => 'France'
-        ]);
-        $source_zone = new Source_Zone(); // the relation source / zone also exists after a fresh install
-        $source_zone->getFromDBByCrit([
-            $source::getForeignKeyField() => $source->getID(),
-            $zone::getForeignKeyField() => $zone->getID()
+        $carbon_intensity = $this->createItem(CarbonIntensity::class, [
+            'date' => (new DateTime())->setTime(0, 0)->format('Y-m-d H:i:s'),
+            Source::getForeignKeyField() => $source->getID(),
+            Zone::getForeignKeyField() => $zone->getID()
         ]);
         $glpi_location = $this->createItem(GlpiLocation::class);
         $location = $this->createItem(Location::class, [
-            'locations_id' => $glpi_location->getID(),
-            $source_zone::getForeignKeyField() => $source_zone->getID(),
+            GlpiLocation::getForeignKeyField() => $glpi_location->getID(),
+            Source_Zone::getForeignKeyField() => $source_zone->getID(),
         ]);
         $result = $location->hasFallbackCarbonIntensityData($glpi_location);
         $this->assertFalse($result);
 
         // Test with a core location with a relation to a fallback source
-        $source = new Source(); // This source exists after a fresh install
-        $source->getFromDBByCrit([
-            'name' => 'Ember - Energy Institute'
+        $source =  $this->createItem(Source::class, ['name' => 'a source 2']);
+        $zone =  $this->createItem(Zone::class, ['name' => 'a zone 2']);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            Source::getForeignKeyField() => $source->getID(),
+            Zone::getForeignKeyField() => $zone->getID()
         ]);
-        $zone = new Zone(); // This zone  exists after a fresh install
-        $zone->getFromDBByCrit([
-            'name' => 'France'
+        $carbon_intensity = $this->createItem(CarbonIntensity::class, [
+            'date' => (new DateTime())->setTime(0, 0)->format('Y-m-d H:i:s'),
+            Source::getForeignKeyField() => $source->getID(),
+            Zone::getForeignKeyField() => $zone->getID()
         ]);
-        $source_zone = new Source_Zone(); // the relation source / zone also exists after a fresh install
-        $source_zone->getFromDBByCrit([
-            $source::getForeignKeyField() => $source->getID(),
-            $zone::getForeignKeyField() => $zone->getID()
+        $fallback_source = $this->createItem(Source::class, [
+            'name' => 'fallback source 2',
+            'is_fallback' => 1,
+        ]);
+        $fallback_source_zone = $this->createItem(Source_Zone::class, [
+            Source::getForeignKeyField() => $fallback_source->getID(),
+            Zone::getForeignKeyField() => $zone->getID(),
+        ]);
+        $fallback_carbon_intensity = $this->createItem(CarbonIntensity::class, [
+            'date' => (new DateTime())->setTime(0, 0)->format('Y-m-d H:i:s'),
+            Source::getForeignKeyField() => $fallback_source->getID(),
+            Zone::getForeignKeyField() =>   $zone->getID()
         ]);
         $glpi_location = $this->createItem(GlpiLocation::class);
         $location = $this->createItem(Location::class, [
-            'locations_id' => $glpi_location->getID(),
+            GlpiLocation::getForeignKeyField() => $glpi_location->getID(),
             $source_zone::getForeignKeyField() => $source_zone->getID(),
         ]);
         $result = $location->hasFallbackCarbonIntensityData($glpi_location);
