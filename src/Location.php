@@ -363,7 +363,7 @@ class Location extends CommonDBChild
                     'ON' => [
                         $source_zone_table => 'plugin_carbon_zones_id',
                         'fallback_sources_zones' => 'plugin_carbon_zones_id',
-                        ['AND' => [$source_zone_table.'.id' => ['<>', new QueryExpression('`fallback_sources_zones`.`id`')]]]
+                        ['AND' => [$source_zone_table . '.id' => ['<>', new QueryExpression('`fallback_sources_zones`.`id`')]]]
                     ]
                 ],
                 $source_table => [
@@ -377,7 +377,7 @@ class Location extends CommonDBChild
                     'ON' => [
                         $carbon_intensity_table => $source_fk,
                         'fallback_sources_zones' => $source_fk,
-                        ['AND' => [CarbonIntensity::getTableField($zone_fk) => new QueryExpression('`fallback_sources_zones`.`'.$zone_fk.'`')]]
+                        ['AND' => [CarbonIntensity::getTableField($zone_fk) => new QueryExpression('`fallback_sources_zones`.`' . $zone_fk . '`')]]
                     ]
                 ]
             ],

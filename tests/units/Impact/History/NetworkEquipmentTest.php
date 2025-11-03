@@ -340,7 +340,7 @@ class NetworkEquipmentTest extends CommonAsset
             'has_type_power_consumption'  => false,
             'has_inventory_entry_date'    => false,
             'ci_download_enabled'         => true,
-            'ci_fallback_available'       => false,
+            'ci_fallback_available'       => true,
         ];
         $this->assertEquals($expected, $result);
         $expected = !in_array(false, $result, true);
