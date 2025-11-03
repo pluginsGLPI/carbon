@@ -45,6 +45,7 @@ use Html;
 use Location as GlpiLocation;
 use MassiveAction;
 use Glpi\Application\View\TemplateRenderer;
+use Glpi\DBAL\QueryExpression;
 use GlpiPlugin\Carbon\DataSource\Boaviztapi;
 use League\ISO3166\ISO3166;
 
@@ -345,35 +346,44 @@ class Location extends CommonDBChild
         $source_zone_table = Source_Zone::getTable();
         $source_table = Source::getTable();
         $location_table = Location::getTable();
+        $source_zone_fk = Source_Zone::getForeignKeyField();
+        $source_fk = Source::getForeignKeyField();
+        $zone_fk = Zone::getForeignKeyField();
         $request = [
             'COUNT' => 'count',
-            'FROM' => $carbon_intensity_table,
+            'FROM' => $location_table,
             'INNER JOIN' => [
                 $source_zone_table => [
-                    'FKEY'   => [
-                        $carbon_intensity_table => 'plugin_carbon_zones_id',
-                        $source_zone_table => 'plugin_carbon_zones_id',
+                    'ON' => [
+                        $source_zone_table => 'id',
+                        $location_table => $source_zone_fk
                     ]
                 ],
-                $location_table => [
-                    'FKEY' => [
-                        $location_table => 'plugin_carbon_sources_zones_id',
-                        $source_zone_table => 'id'
+                $source_zone_table . ' AS fallback_sources_zones' => [
+                    'ON' => [
+                        $source_zone_table => 'plugin_carbon_zones_id',
+                        'fallback_sources_zones' => 'plugin_carbon_zones_id',
+                        ['AND' => [$source_zone_table . '.id' => ['<>', new QueryExpression('`fallback_sources_zones`.`id`')]]]
                     ]
                 ],
                 $source_table => [
-                    'FKEY'   => [
-                        $source_zone_table => 'plugin_carbon_sources_id',
+                    'ON' => [
                         $source_table => 'id',
+                        'fallback_sources_zones' => $source_fk,
+                        ['AND' => [Source::getTableField('is_fallback') => 1]]
                     ]
                 ],
+                $carbon_intensity_table => [
+                    'ON' => [
+                        $carbon_intensity_table => $source_fk,
+                        'fallback_sources_zones' => $source_fk,
+                        ['AND' => [CarbonIntensity::getTableField($zone_fk) => new QueryExpression('`fallback_sources_zones`.`' . $zone_fk . '`')]]
+                    ]
+                ]
             ],
             'WHERE' => [
-                Source::getTableField('is_fallback') => 1,
-                Location::getTableField('locations_id') => $item->getID(),
-            ],
-            'ORDER' => CarbonIntensity::getTableField('date') . ' DESC',
-            'LIMIT' => 1,
+                Location::getTableField('locations_id') => $item->getID()
+            ]
         ];
         $result = $DB->request($request);
         return ($result->current()['count'] > 0);
