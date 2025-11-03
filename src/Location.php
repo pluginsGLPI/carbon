@@ -251,7 +251,7 @@ class Location extends CommonDBChild
      */
     public function onGlpiLocationAdd(CommonDBTM $item, Geocoder $geocoder)
     {
-        $this->enableCarbonIntensityDownload($item);
+        // $this->enableCarbonIntensityDownload($item);
         $enabled = GlpiConfig::getConfigurationValue('plugin:carbon', 'geocoding_enabled');
         if (!empty($enabled)) {
             if (!isset($item->input['_boavizta_zone']) || $item->input['_boavizta_zone'] == '' || $item->input['_boavizta_zone'] == '0') {

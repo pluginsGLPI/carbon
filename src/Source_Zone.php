@@ -397,7 +397,7 @@ class Source_Zone extends CommonDBRelation
             return false;
         }
 
-        // Prepare WHERE clause dependingof the type of the item
+        // Prepare WHERE clause depending of the type of the item
         $where = [];
         if ($item->getType() === GlpiLocation::class) {
             $where = [

@@ -38,7 +38,12 @@ use DbUtils;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\EmbodiedImpact;
+use GlpiPlugin\Carbon\Location;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\UsageInfo;
+use GlpiPlugin\Carbon\Zone;
+use Location as GlpiLocation;
 
 class HookTest extends DbTestCase
 {
@@ -101,5 +106,40 @@ class HookTest extends DbTestCase
             'computertypes_id' => $computer_type->getID()
         ]);
         $this->assertEquals(0, $count);
+    }
+
+    public function testAssetUpdateEnablesZoneDownload()
+    {
+        $zone = $this->createItem(Zone::class, ['name' => 'a zone']);
+        $source = $this->createItem(Source::class, [
+            'name' => 'a source',
+            'is_carbon_intensity_source' => 1,
+        ]);
+        $fallback_source = $this->createItem(Source::class, [
+            'name' => 'a fallback source',
+            'is_carbon_intensity_source' => 1,
+            'is_fallback' => 1
+        ]);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            $source::getForeignKeyField() => $source->getID(),
+            $zone::getForeignKeyField() => $zone->getID(),
+        ]);
+        $fallback_source_zone = $this->createItem(Source_Zone::class, [
+            $fallback_source::getForeignKeyField() => $fallback_source->getID(),
+            $zone::getForeignKeyField() => $zone->getID(),
+        ]);
+        $glpi_location = $this->createItem(GlpiLocation::class, ['name' => 'a location']);
+        $location = $this->createItem(Location::class, [
+            'locations_id' => $glpi_location->getID(),
+            $source_zone::getForeignKeyField() => $source_zone->getID(),
+        ]);
+        $computer = $this->createItem(Computer::class);
+        $this->assertEquals(0, $source_zone->fields['is_download_enabled']);
+        $computer->update([
+            'id' => $computer->getID(),
+            'locations_id' =>$glpi_location->getID(),
+        ]);
+        $source_zone->getFromDB($source_zone->getID());
+        $this->assertEquals(1, $source_zone->fields['is_download_enabled']);
     }
 }

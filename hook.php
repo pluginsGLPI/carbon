@@ -189,23 +189,32 @@ function plugin_carbon_hook_update_asset(CommonDBTM $item)
     if (!in_array($item::getType(), PLUGIN_CARBON_TYPES)) {
         return;
     }
-    $location_fk = GlpiLocation::getForeignKeyField();
-    if (!in_array($location_fk, $item->updates)) {
-        return;
-    }
-    if (GlpiLocation::isNewID($item->fields[$location_fk])) {
-        return;
-    }
-    $zone = new Zone();
-    if ($zone->getByAsset($item) === false) {
-        return;
-    }
+
+    $item_table = $item::getTable();
+    $location_table = getTableForItemType(Location::class);
+    $source_zone_table = getTableForItemType(Source_Zone::class);
+    $request = [
+        'INNER JOIN' => [
+            $location_table => [
+                'ON' => [
+                    $source_zone_table => 'id',
+                    $location_table => 'plugin_carbon_sources_zones_id',
+                ]
+            ],
+            $item_table => [
+                'ON' => [
+                    $item_table => 'locations_id',
+                    $location_table => 'locations_id',
+                ]
+            ],
+        ],
+        'WHERE' => [
+            $item::getTableField('id') => $item->getID(),
+        ]
+    ];
+
     $source_zone = new Source_Zone();
-    $source_zone->getFromDBByCrit([
-        $zone->getForeignKeyField() => $zone->fields['id'],
-        Source::getForeignKeyField() => $zone->fields['plugin_carbon_sources_id_historical'],
-    ]);
-    if ($source_zone->isNewItem()) {
+    if (!$source_zone->getFromDBByRequest($request)) {
         return;
     }
     $source_zone->toggleZone(true);
