@@ -243,11 +243,11 @@ class Install
     }
 
     /**
-     * Get or create a carbon intensity zone by name
+     * Get or create a carbon intensity source by name
      *
-     * @param string $name Name of the zone
-     * @param int $is_fallback Is the zone a fallback zone (1) or not (0)
-     * @return int ID of the zone
+     * @param string $name Name of the source
+     * @param int $is_fallback Is the source a fallback source (1) or not (0)
+     * @return int ID of the source
      */
     public static function getOrCreateSource(string $name, int $is_fallback = 1): int
     {
