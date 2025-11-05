@@ -241,7 +241,7 @@ class Install
     }
 
     /**
-     * Get or create a carbon intensity zone by name
+     * Get or create a carbon intensity source by name
      *
      * @param string $name Name of the zone
      * @param int $is_fallback Is the zone a fallback zone (1) or not (0)
