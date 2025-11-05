@@ -139,6 +139,14 @@ class Install
     {
         $oldest_upgradable_version = self::OLDEST_UPGRADABLE_VERSION;
 
+        $db_version = config::getConfigurationValue('plugin:carbon', 'dbversion');
+        if (version_compare($db_version, PLUGIN_CARBON_VERSION) > 0) {
+            // database more recent than current version
+            $e = new \RuntimeException('Database of the plugin is more recent than the installed version.');
+            trigger_error($e->getMessage(), E_USER_WARNING);
+            throw $e;
+        }
+
         $this->force_upgrade = array_key_exists('force-upgrade', $args);
         if ($this->force_upgrade) {
             $this->force_upgrade_from_version = PLUGIN_CARBON_VERSION;
