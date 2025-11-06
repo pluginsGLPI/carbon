@@ -36,6 +36,7 @@ use DateTime;
 use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\DataTracking\TrackedInt;
+use GlpiPlugin\Carbon\Source_Zone;
 
 /**
  * Compute environmental impact of a computer
@@ -62,7 +63,7 @@ interface EngineInterface
      *
      * Unit of returned value, if float, is grams of CO2
      */
-    public function getCarbonEmissionPerDay(DateTime $day, Zone $zone): ?TrackedFloat;
+    public function getCarbonEmissionPerDay(DateTime $day, Source_Zone $source_zone): ?TrackedFloat;
 
     /**
      * Returns the consumed energy for the specified day.

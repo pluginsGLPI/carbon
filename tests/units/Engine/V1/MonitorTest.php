@@ -43,7 +43,8 @@ use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Engine\V1\Monitor;
 use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\MonitorType;
-use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
 use MonitorModel;
 
 class MonitorTest extends EngineTestCase
@@ -145,13 +146,18 @@ class MonitorTest extends EngineTestCase
 
     public function getCarbonEmissionPerDateProvider(): \Generator
     {
-        $country = $this->getUniqueString();
         $thursday = DateTime::createFromFormat('Y-m-d H:i:s', '1999-12-02 12:00:00');
         $intensity = 1;
-        $this->createCarbonIntensityData($country, $this->getUniqueString(), $thursday, $intensity);
-        $zone = new Zone();
-        $zone->getFromDBByCrit(['name' => $country]);
-
+        $source = $this->createItem(source::class, [
+            'is_carbon_intensity_source' => 1,
+            'is_fallback' => 0
+        ]);
+        $zone = $this->createItem(Zone::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            $source::getForeignKeyField() => $source->getID(),
+            $zone::getForeignKeyField() => $zone->getID(),
+        ]);
+        $this->createCarbonIntensityData($source_zone, $thursday, $intensity);
         $usage_profile = [
             'name' => 'Test laptop usage profile',
             'time_start' => "09:00:00",
@@ -164,7 +170,7 @@ class MonitorTest extends EngineTestCase
             'day_6' => 0,
             'day_7' => 0,
         ];
-        $computer = $this->createComputerUsageProfilePowerLocation($usage_profile, 40, $country);
+        $computer = $this->createComputerUsageProfilePowerLocation($usage_profile, 40, $source_zone);
         $glpi_monitor_type = $this->createItem(GlpiMonitorType::class);
         $monitory_type = $this->createItem(MonitorType::class, [
             'monitortypes_id'   => $glpi_monitor_type->getID(),
@@ -180,13 +186,13 @@ class MonitorTest extends EngineTestCase
             'items_id'     => $monitor->getID(),
         ]);
 
-        /* 23 hours * 31 Watts */
+        /* 8 hours * 31 Watts */
         $engine = new Monitor($monitor);
         $expected_emission = 8.0 * 31 / 1000 * $intensity; // in CO2eq/KWh
         yield 'Monitor' => [
             $engine,
             $thursday,
-            $zone,
+            $source_zone,
             $expected_emission,
         ];
     }

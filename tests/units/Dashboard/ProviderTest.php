@@ -291,10 +291,19 @@ class ProviderTest extends DbTestCase
             'day_6' => 0,
             'day_7' => 0,
         ];
-        $computer_1 = $this->createComputerUsageProfilePowerLocation($usage_profile, 60, $country);
-        $computer_2 = $this->createComputerUsageProfilePowerLocation($usage_profile, 60, $country);
-        $computer_3 = $this->createComputerUsageProfilePowerLocation($usage_profile, 60, $country);
-        $computer_4 = $this->createComputerUsageProfilePowerLocation($usage_profile, 60, $country);
+        $source = $this->createItem(Source::class, [
+            'is_carbon_intensity_source' => 1,
+            'is_fallback' => 0
+        ]);
+        $zone = $this->createItem(Zone::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            $source::getForeignKeyField() => $source->getID(),
+            $zone::getForeignKeyField() => $zone->getID(),
+        ]);
+        $computer_1 = $this->createComputerUsageProfilePowerLocation($usage_profile, 60, $source_zone);
+        $computer_2 = $this->createComputerUsageProfilePowerLocation($usage_profile, 60, $source_zone);
+        $computer_3 = $this->createComputerUsageProfilePowerLocation($usage_profile, 60, $source_zone);
+        $computer_4 = $this->createComputerUsageProfilePowerLocation($usage_profile, 60, $source_zone);
 
         $computer_model_1 = $this->createItem(ComputerModel::class, [
             'power_consumption' => 10
@@ -349,7 +358,16 @@ class ProviderTest extends DbTestCase
             'day_6' => 1,
             'day_7' => 1,
         ];
-        $computer_1 = $this->createComputerUsageProfilePowerLocation($usage_profile, 60, PLUGIN_CARBON_TEST_FAKE_ZONE_NAME);
+        $source = $this->createItem(Source::class, [
+            'is_carbon_intensity_source' => 1,
+            'is_fallback' => 0
+        ]);
+        $zone = $this->createItem(Zone::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            $source::getForeignKeyField() => $source->getID(),
+            $zone::getForeignKeyField() => $zone->getID(),
+        ]);
+        $computer_1 = $this->createComputerUsageProfilePowerLocation($usage_profile, 60, $source_zone);
         $infocom = $this->createItem(Infocom::class, [
             'itemtype' => $computer_1->getType(),
             'items_id' => $computer_1->getID(),

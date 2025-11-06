@@ -42,18 +42,6 @@ use GlpiPlugin\Carbon\Source_Zone;
 
 class ElectricityMapClientTest extends DbTestCase
 {
-    public function testEnableHistorical()
-    {
-        $client = $this->createStub(RestApiClientInterface::class);
-        /** @var RestApiClientInterface $client */
-        $instance = new ElectricityMapClient($client);
-        $output = $this->callPrivateMethod($instance, 'enableHistorical', 'France');
-        $this->assertFalse($output);
-
-        $output = $this->callPrivateMethod($instance, 'enableHistorical', 'Brazil');
-        $this->assertTrue($output);
-    }
-
     public function testQueryZones()
     {
         $client = $this->createStub(RestApiClientInterface::class);

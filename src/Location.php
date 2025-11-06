@@ -334,13 +334,19 @@ class Location extends CommonDBChild
     /**
      * Tells if a location has fallback carbon intensity data
      *
-     * @param GlpiLocation $item
+     * @param CommonDBTM $item
      * @return boolean
      */
-    public function hasFallbackCarbonIntensityData(GlpiLocation $item): bool
+    public function hasFallbackCarbonIntensityData(CommonDBTM $item): bool
     {
         /** @var DBmysql $DB */
         global $DB;
+
+        if ($item->getType() === GlpiLocation::class) {
+            $location_id = $item->getID();
+        } else {
+            $location_id = $item->fields['locations_id'];
+        }
 
         $carbon_intensity_table = CarbonIntensity::getTable();
         $source_zone_table = Source_Zone::getTable();
@@ -382,7 +388,7 @@ class Location extends CommonDBChild
                 ]
             ],
             'WHERE' => [
-                Location::getTableField('locations_id') => $item->getID()
+                Location::getTableField('locations_id') => $location_id
             ]
         ];
         $result = $DB->request($request);

@@ -93,7 +93,7 @@ class ComputerTest extends CommonAsset
         $source->getFromDBByCrit([
             'name' => 'Hydro Quebec'
         ]);
-        $zone = new Zone(); // This zone  exists after a fresh install
+        $zone = new Zone(); // This zone exists after a fresh install
         $zone->getFromDBByCrit([
             'name' => 'Quebec'
         ]);
@@ -106,14 +106,14 @@ class ComputerTest extends CommonAsset
             'locations_id' => $glpi_location->getID(),
             'plugin_carbon_sources_zones_id' => $source_zone->getID()
         ]);
-        $model = $this->createItem(GlpiComputerModel::class, ['power_consumption' => $model_power]);
+        $glpi_model = $this->createItem(GlpiComputerModel::class, ['power_consumption' => $model_power]);
         $glpi_type = $this->createItem(GlpiComputerType::class);
         $type = $this->createItem(ComputerType::class, [
             GlpiComputerType::getForeignKeyField() => $glpi_type->getID(),
         ]);
         $asset = $this->createItem(GlpiComputer::class, [
             'computertypes_id'  => $glpi_type->getID(),
-            'computermodels_id' => $model->getID(),
+            'computermodels_id' => $glpi_model->getID(),
             'locations_id'      => $glpi_location->getID(),
             'date_creation'     => '2024-01-01',
             'date_mod'          => null,

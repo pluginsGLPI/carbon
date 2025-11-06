@@ -39,9 +39,9 @@ use CronTask;
 use DBmysql;
 use Location as GlpiLocation;
 use Glpi\Application\View\TemplateRenderer;
+use Glpi\DBAL\QueryExpression;
 use Html;
 use InvalidArgumentException;
-use RuntimeException;
 
 class Source_Zone extends CommonDBRelation
 {
@@ -340,6 +340,46 @@ class Source_Zone extends CommonDBRelation
         $zone_code = $iterator->current()['code'] ?? null;
 
         return $zone_code;
+    }
+
+    /**
+     * get the source_zone with fallback source for the given source_zone
+     * excluding Ember - Energy Institute source
+     *
+     * @param Source_Zone $source_zone realtime source-zone
+     * @return array request to get the fallback
+     */
+    public function getFallbackFromDB(Source_Zone $source_zone): bool
+    {
+        $source_zone_table = Source_Zone::getTable();
+        $source_table = Source::getTable();
+        $source_fk = Source::getForeignKeyField();
+        $request = [
+            'SELECT' => 'id',
+            'FROM' => $source_zone_table,
+            'INNER JOIN' => [
+                $source_zone_table . ' AS realtime_sources_zones' => [
+                    'ON' => [
+                        $source_zone_table => 'plugin_carbon_zones_id',
+                        'realtime_sources_zones' => 'plugin_carbon_zones_id',
+                        ['AND' => [$source_zone_table . '.id' => ['<>', new QueryExpression('`realtime_sources_zones`.`id`')]]]
+                    ]
+                ],
+                $source_table => [
+                    'ON' => [
+                        $source_table => 'id',
+                        $source_zone_table => $source_fk,
+                        ['AND' => [Source::getTableField('is_fallback') => 1]]
+                    ]
+                ],
+            ],
+            'WHERE' => [
+                'realtime_sources_zones.id' => $source_zone->getID(),
+                'NOT' => [Source::getTableField('name') => 'Ember - Energy Institute'],
+            ]
+        ];
+
+        return $this->getFromDBByRequest($request);
     }
 
     /**

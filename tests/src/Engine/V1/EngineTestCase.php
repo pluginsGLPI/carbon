@@ -136,8 +136,8 @@ abstract class EngineTestCase extends DbTestCase
     public function testGetCarbonEmissionPerDay()
     {
         foreach ($this->getCarbonEmissionPerDateProvider() as $data) {
-            list($engine, $day, $zone, $expected_emission) = $data;
-            $emission = $engine->getCarbonEmissionPerDay($day, $zone);
+            list($engine, $day, $source_zone, $expected_emission) = $data;
+            $emission = $engine->getCarbonEmissionPerDay($day, $source_zone);
             $this->assertEqualsWithDelta($expected_emission, $emission->getValue(), self::EPSILON);
         }
     }

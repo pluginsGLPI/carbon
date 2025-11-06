@@ -81,10 +81,10 @@ abstract class AbstractAsset implements EngineInterface
      *
      * @param DateTimeImmutable $start_time
      * @param DateInterval $length
-     * @param Zone $zone
+     * @param Source_Zone $source_zone
      * @return DBmysqlIterator
      */
-    protected function requestCarbonIntensitiesPerDay(DateTimeImmutable $start_time, DateInterval $length, Zone $zone): DBmysqlIterator
+    protected function requestCarbonIntensitiesPerDay(DateTimeImmutable $start_time, DateInterval $length, Source_Zone $source_zone): DBmysqlIterator
     {
         /** @var DBmysql $DB */
         global $DB;
@@ -97,28 +97,25 @@ abstract class AbstractAsset implements EngineInterface
         $stop_date = $stop_date->add($length);
         $stop_date_s = $stop_date->format('Y-m-d H:i:s'); // idem, may be can use directly concatenation
 
-        $intensities_table = CarbonIntensity::getTable();
-
         /**
          * Keep the lowest data quality of the set of intensities
          */
+        $carbon_intensity_date_field = CarbonIntensity::getTableField('date');
         $request = [
             'SELECT' => [
                 CarbonIntensity::getTableField('intensity') . ' AS intensity',
-                CarbonIntensity::getTableField('date') . ' AS date',
+                $carbon_intensity_date_field . ' AS date',
                 'MIN' => CarbonIntensity::getTableField('data_quality') . ' AS data_quality'
             ],
-            'FROM' => $intensities_table,
+            'FROM' => CarbonIntensity::getTable(),
             'WHERE' => [
-                'AND' => [
-                    CarbonIntensity::getTableField('plugin_carbon_zones_id') => $zone->getID(),
-                    CarbonIntensity::getTableField('plugin_carbon_sources_id') => $zone->fields['plugin_carbon_sources_id_historical'],
-                    [CarbonIntensity::getTableField('date') => ['>=', $start_date_s]],
-                    [CarbonIntensity::getTableField('date') => ['<', $stop_date_s]],
-                ],
+                CarbonIntensity::getTableField('plugin_carbon_zones_id') => $source_zone->fields['plugin_carbon_zones_id'],
+                CarbonIntensity::getTableField('plugin_carbon_sources_id') => $source_zone->fields['plugin_carbon_sources_id'],
+                [$carbon_intensity_date_field => ['>=', $start_date_s]],
+                [$carbon_intensity_date_field => ['<', $stop_date_s]],
             ],
-            'GROUP' => [CarbonIntensity::getTableField('date')],
-            'ORDER' => CarbonIntensity::getTableField('date') . ' ASC',
+            'GROUP' => [$carbon_intensity_date_field],
+            'ORDER' => $carbon_intensity_date_field . ' ASC',
         ];
 
         return $DB->request($request);
@@ -183,38 +180,25 @@ abstract class AbstractAsset implements EngineInterface
      * for the world. Use the latest value before the given date
      *
      * @param DateTimeInterface $day
-     * @param Zone $zone
+     * @param Source_Zone $source_zone
      * @return array|null
      */
-    protected function getFallbackCarbonIntensity(DateTimeInterface $day, Zone $zone): ?array
+    protected function getFallbackCarbonIntensity(DateTimeInterface $day, Source_Zone $source_zone): ?array
     {
         /** @var DBmysql $DB */
         global $DB;
 
         $carbon_intensity_table = CarbonIntensity::getTable();
-        $carbon_intensity_source_zone_table = Source_Zone::getTable();
-        $carbon_intensity_source_table = Source::getTable();
+        // $carbon_intensity_source_zone_table = Source_Zone::getTable();
+        // $carbon_intensity_source_table = Source::getTable();
+        $source_fk = getForeignKeyFieldForItemType(Source::class);
+        $zone_fk = getForeignKeyFieldForItemType(Zone::class);
         $request = [
             'SELECT' => "$carbon_intensity_table.*",
             'FROM' => $carbon_intensity_table,
-            'INNER JOIN' => [
-                $carbon_intensity_source_zone_table => [
-                    'FKEY'   => [
-                        $carbon_intensity_table => 'plugin_carbon_zones_id',
-                        $carbon_intensity_source_zone_table => 'plugin_carbon_zones_id',
-                    ]
-                ],
-                $carbon_intensity_source_table => [
-                    'FKEY'   => [
-                        $carbon_intensity_source_zone_table => 'plugin_carbon_sources_id',
-                        $carbon_intensity_source_table => 'id',
-                    ]
-                ]
-            ],
             'WHERE' => [
-                Source::getTableField('is_fallback') => 1,
-                'NOT' => [Source::getTableField('name') => 'Ember - Energy Institute'],
-                Source_Zone::getTableField('plugin_carbon_zones_id') => $zone->getID(),
+                CarbonIntensity::getTableField($source_fk) => $source_zone->fields[$source_fk],
+                CarbonIntensity::getTableField($zone_fk) => $source_zone->fields[$zone_fk],
                 CarbonIntensity::getTableField('date') => ['<=', $day->format('Y-m-d H:i:s')],
             ],
             'ORDER' => CarbonIntensity::getTableField('date') . ' DESC',
@@ -228,10 +212,10 @@ abstract class AbstractAsset implements EngineInterface
         // No data for the zone, fallback again to carbon intensity for the whole world
         // We assume that electricity is (nearly) immediately consumed then worlwide and yearly
         // carbon intensity generation and consumption is the same
-        return $this->getFallbackCarbonIntensityFromEmber($day, $zone);
+        return $this->getFallbackCarbonIntensityFromEmber($day, $source_zone);
     }
 
-    protected function getFallbackCarbonIntensityFromEmber(DateTimeInterface $day, Zone $zone)
+    protected function getFallbackCarbonIntensityFromEmber(DateTimeInterface $day, Source_Zone $source_zone)
     {
         /** @var DBmysql $DB */
         global $DB;

@@ -43,6 +43,7 @@ use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Toolbox;
 use LogicException;
 use Session;
@@ -226,15 +227,19 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     protected function evaluateItemPerDay(CommonDBTM $item, EngineInterface $engine, DateTimeInterface $day): bool
     {
         $energy = $engine->getEnergyPerDay($day);
-        $zone = new Zone();
-
-        if ($zone->getByAsset($item) === false) {
+        $source_zone = new Source_Zone();
+        if (!$source_zone->getFromDbByItem($item)) {
             return false;
         }
+        // $zone = new Zone();
+
+        // if ($zone->getByAsset($item) === false) {
+            // return false;
+        // }
 
         $emission = new TrackedFloat(0, $energy);
         if ($energy->getValue() !== 0) {
-            $emission = $engine->getCarbonEmissionPerDay($day, $zone);
+            $emission = $engine->getCarbonEmissionPerDay($day, $source_zone);
             if ($emission === null) {
                 return false;
             }

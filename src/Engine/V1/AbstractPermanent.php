@@ -39,6 +39,8 @@ use DateTimeInterface;
 use DateInterval;
 use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
 
 abstract class AbstractPermanent extends AbstractAsset implements EngineInterface
 {
@@ -64,22 +66,40 @@ abstract class AbstractPermanent extends AbstractAsset implements EngineInterfac
         );
     }
 
-    public function getCarbonEmissionPerDay(DateTimeInterface $day, Zone $zone): ?TrackedFloat
+    public function getCarbonEmissionPerDay(DateTimeInterface $day, Source_Zone $source_zone): ?TrackedFloat
     {
         $power = $this->getPower();
 
         $start_time = clone $day;
         $start_time->setTime(0, 0, 0, 0);
         $length = new DateInterval('PT' . 86400 . 'S'); // 24h = 86400 seconds
-        $iterator = $this->requestCarbonIntensitiesPerDay(DateTimeImmutable::createFromMutable($start_time), $length, $zone);
-        if ($iterator->count() === 0 && !$zone->hasHistoricalDataSource()) {
-            // Fallback to the closest value available
-            $row = array_fill(0, 24, $this->getFallbackCarbonIntensity($day, $zone));
+        $source = Source::getById($source_zone->fields['plugin_carbon_sources_id']);
+        $fallback_source_zone = null;
+
+        // Try to read real time carbon intensities
+        if ($source->fields['is_fallback'] === 0) {
+            $iterator = $this->requestCarbonIntensitiesPerDay(DateTimeImmutable::createFromMutable($start_time), $length, $source_zone);
+            if ($iterator->count() === 0) {
+                // Need to fallback to an alternate source
+                $fallback_source_zone = new Source_Zone();
+                $fallback_source_zone->getFallbackFromDB($source_zone);
+            }
+        } else {
+            // The source is already a fallback (exapmple: Quebec does has any realtime source)
+            $fallback_source_zone = $source_zone;
+        }
+
+        $expected_count = 24;
+
+        // Try a fallback source
+        if ($fallback_source_zone !== null) {
+            $row = array_fill(0, $expected_count, $this->getFallbackCarbonIntensity($start_time, $fallback_source_zone));
             $iterator = new ArrayObject($row);
             $iterator = $iterator->getIterator();
         }
+
         $count = $iterator->count();
-        if ($count != 24) {
+        if ($count != $expected_count) {
             trigger_error(sprintf(
                 'required count of carbon intensity %d samples not met. Got %d samples for date %s',
                 24,

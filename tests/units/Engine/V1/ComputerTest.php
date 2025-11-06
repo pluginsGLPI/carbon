@@ -39,6 +39,8 @@ use ComputerType as GlpiComputerType;
 use GlpiPlugin\Carbon\Engine\V1\Computer;
 use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\ComputerType;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Tests\Engine\V1\EngineTestCase;
 
 class ComputerTest extends EngineTestCase
@@ -109,8 +111,16 @@ class ComputerTest extends EngineTestCase
             self::TEST_LAPTOP_USAGE_PROFILE,
         ];
 
-        $country = $this->getUniqueString();
-        $server_glpi_computer = $this->createComputerUsageProfilePowerLocation(self::TEST_SERVER_USAGE_PROFILE, 150, $country);
+        $source = $this->createItem(source::class, [
+            'is_carbon_intensity_source' => 1,
+            'is_fallback' => 0
+        ]);
+        $zone = $this->createItem(Zone::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            $source::getForeignKeyField() => $source->getID(),
+            $zone::getForeignKeyField() => $zone->getID(),
+        ]);
+        $server_glpi_computer = $this->createComputerUsageProfilePowerLocation(self::TEST_SERVER_USAGE_PROFILE, 150, $source_zone);
         yield 'Computer with server usage profile' => [
             new Computer($server_glpi_computer),
             self::TEST_SERVER_USAGE_PROFILE,
@@ -150,21 +160,27 @@ class ComputerTest extends EngineTestCase
 
     public function getCarbonEmissionPerDateProvider(): \Generator
     {
-        $country = $this->getUniqueString();
         $thursday = DateTime::createFromFormat('Y-m-d H:i:s', self::TEST_DATE_THURSDAY);
-        $this->createCarbonIntensityData($country, self::TEST_CARBON_INTENSITY_SOURCE, $thursday, self::TEST_CARBON_INTENSITY_THURSDAY);
         $saturday = DateTime::createFromFormat('Y-m-d H:i:s', self::TEST_DATE_SATURDAY);
-        $this->createCarbonIntensityData($country, self::TEST_CARBON_INTENSITY_SOURCE, $saturday, self::TEST_CARBON_INTENSITY_SATURDAY);
-        $zone = new Zone();
-        $zone->getFromDBByCrit(['name' => $country]);
+        $source = $this->createItem(source::class, [
+            'is_carbon_intensity_source' => 1,
+            'is_fallback' => 0
+        ]);
+        $zone = $this->createItem(Zone::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            $source::getForeignKeyField() => $source->getID(),
+            $zone::getForeignKeyField() => $zone->getID(),
+        ]);
+        $this->createCarbonIntensityData($source_zone, $thursday, self::TEST_CARBON_INTENSITY_THURSDAY);
+        $this->createCarbonIntensityData($source_zone, $saturday, self::TEST_CARBON_INTENSITY_SATURDAY);
 
-        $laptop_glpi_computer = $this->createComputerUsageProfilePowerLocation(self::TEST_LAPTOP_USAGE_PROFILE, self::TEST_LAPTOP_POWER, $country);
+        $laptop_glpi_computer = $this->createComputerUsageProfilePowerLocation(self::TEST_LAPTOP_USAGE_PROFILE, self::TEST_LAPTOP_POWER, $source_zone);
         $laptop_computer = new Computer($laptop_glpi_computer);
 
         yield 'Computer with laptop usage profile and type on a Thursday' => [
             $laptop_computer,
             $thursday,
-            $zone,
+            $source_zone,
             self::TEST_LAPTOP_ENERGY_PER_DAY * self::TEST_CARBON_INTENSITY_THURSDAY,
         ];
 
@@ -180,11 +196,11 @@ class ComputerTest extends EngineTestCase
             'day_6' => 0,
             'day_7' => 0,
         ];
-        $laptop_glpi_computer_2 = $this->createComputerUsageProfilePowerLocation($profile, self::TEST_LAPTOP_POWER, $country);
+        $laptop_glpi_computer_2 = $this->createComputerUsageProfilePowerLocation($profile, self::TEST_LAPTOP_POWER, $source_zone);
         yield 'Computer with laptop usage profile starting at half hour' => [
             new Computer($laptop_glpi_computer_2),
             $thursday,
-            $zone,
+            $source_zone,
             self::TEST_LAPTOP_POWER * 7.5 / 1000,
         ];
 
@@ -200,11 +216,11 @@ class ComputerTest extends EngineTestCase
             'day_6' => 0,
             'day_7' => 0,
         ];
-        $laptop_glpi_computer_2 = $this->createComputerUsageProfilePowerLocation($profile, self::TEST_LAPTOP_POWER, $country);
+        $laptop_glpi_computer_2 = $this->createComputerUsageProfilePowerLocation($profile, self::TEST_LAPTOP_POWER, $source_zone);
         yield 'Computer with laptop usage profile ending at quarter hour' => [
             new Computer($laptop_glpi_computer_2),
             $thursday,
-            $zone,
+            $source_zone,
             self::TEST_LAPTOP_POWER * 8.25 / 1000,
         ];
 
@@ -220,39 +236,37 @@ class ComputerTest extends EngineTestCase
             'day_6' => 0,
             'day_7' => 0,
         ];
-        $laptop_glpi_computer_3 = $this->createComputerUsageProfilePowerLocation($profile, self::TEST_LAPTOP_POWER, $country);
+        $laptop_glpi_computer_3 = $this->createComputerUsageProfilePowerLocation($profile, self::TEST_LAPTOP_POWER, $source_zone);
         yield 'Computer with laptop usage profile a few minutes in a single hour' => [
             new Computer($laptop_glpi_computer_3),
             $thursday,
-            $zone,
+            $source_zone,
             self::TEST_LAPTOP_POWER * 0.5 / 1000,
         ];
 
-        $server_glpi_computer = $this->createComputerUsageProfilePowerLocation(self::TEST_SERVER_USAGE_PROFILE, self::TEST_SERVER_POWER, $country);
+        $server_glpi_computer = $this->createComputerUsageProfilePowerLocation(self::TEST_SERVER_USAGE_PROFILE, self::TEST_SERVER_POWER, $source_zone);
         $server_computer = new Computer($server_glpi_computer);
         yield 'Computer with server usage profile and type on a Thursday' => [
             $server_computer,
             $thursday,
-            $zone,
+            $source_zone,
             self::TEST_SERVER_ENERGY_PER_DAY * self::TEST_CARBON_INTENSITY_THURSDAY,
         ];
 
         yield 'Computer with laptop usage profile and type on a Saturday' => [
             $laptop_computer,
             $saturday,
-            $zone,
+            $source_zone,
             0.0,
         ];
 
         yield 'Computer with server usage profile and type on a Saturday' => [
             $server_computer,
             $saturday,
-            $zone,
+            $source_zone,
             self::TEST_SERVER_ENERGY_PER_DAY * self::TEST_CARBON_INTENSITY_SATURDAY,
         ];
     }
-
-
 
     private function computerSetModelWithPower(GlpiComputer $computer, int $power)
     {

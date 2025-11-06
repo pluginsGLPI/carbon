@@ -41,6 +41,8 @@ use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\Zone;
 use Location as GlpiLocation;
 
+use function PHPUnit\Framework\assertEquals;
+
 class Source_ZoneTest extends DbTestCase
 {
     /**
@@ -189,5 +191,39 @@ class Source_ZoneTest extends DbTestCase
         $source_zone = new Source_Zone();
         $output = $source_zone->getFromDbByItem($glpi_location);
         $this->assertTrue($output);
+    }
+
+    public function testGetFallbackFromDB()
+    {
+        // Test finding a fallback source zone from an 'non fallback) source_zone
+        $source = $this->createItem(Source::class);
+        $fallback_source = $this->createItem(Source::class, [
+            'is_fallback' => 1,
+        ]);
+        $zone = $this->createItem(Zone::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            $source::getForeignKeyField() => $source->getID(),
+            $zone::getForeignKeyField() => $zone->getID(),
+        ]);
+        $fallback_source_zone = $this->createItem(Source_Zone::class, [
+            $fallback_source::getForeignKeyField() => $fallback_source->getID(),
+            $zone::getForeignKeyField() => $zone->getID(),
+        ]);
+        $instance = new Source_Zone();
+        $success = $instance->getFallbackFromDB($source_zone);
+        $this->assertTrue($success);
+        $this->assertEquals($fallback_source_zone->getID(), $instance->getID());
+        $this->assertEquals($source_zone->fields['plugin_carbon_zones_id'], $instance->fields['plugin_carbon_zones_id']);
+
+        // Test failing a fallback source zone when it does not exists
+        $source = $this->createItem(Source::class);
+        $zone = $this->createItem(Zone::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            $source::getForeignKeyField() => $source->getID(),
+            $zone::getForeignKeyField() => $zone->getID(),
+        ]);
+        $instance = new Source_Zone();
+        $success = $instance->getFallbackFromDB($source_zone);
+        $this->assertFalse($success);
     }
 }

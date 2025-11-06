@@ -33,8 +33,6 @@
 namespace GlpiPlugin\Carbon\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Glpi\Application\Environment;
-use Glpi\Kernel\Kernel;
 use Auth;
 use CommonDBTM;
 use Computer;
@@ -52,12 +50,12 @@ use GlpiPlugin\Carbon\CarbonIntensity;
 use Entity;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
-use Location;
+use GlpiPlugin\Carbon\Location;
+use GlpiPlugin\Carbon\Source_Zone;
+use Location as GlpiLocation;
 use ReflectionMethod;
 use Session;
-use Ticket;
 use Toolbox;
-use User;
 
 class CommonTestCase extends TestCase
 {
@@ -271,42 +269,25 @@ class CommonTestCase extends TestCase
         return $glpi_computer;
     }
 
-    protected function createComputerUsageProfilePowerLocation(array $usage_profile_params, int $type_power, string $country): Computer
+    protected function createComputerUsageProfilePowerLocation(array $usage_profile_params, int $type_power, Source_Zone $source_zone): Computer
     {
         $glpi_computer = $this->createComputerUsageProfilePower($usage_profile_params, $type_power);
 
-        $location = $this->createItem(
-            Location::class,
-            [
-                'country' => $country,
-            ]
-        );
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $location = $this->createItem(Location::class, [
+            'locations_id' => $glpi_location->getID(),
+            $source_zone::getForeignKeyField() => $source_zone->getID(),
+        ]);
         $glpi_computer->update([
-            'id'                                => $glpi_computer->getID(),
-            Location::getForeignKeyField()      => $location->getID(),
+            'id'                               => $glpi_computer->getID(),
+            GlpiLocation::getForeignKeyField() => $glpi_location->getID(),
         ]);
 
         return $glpi_computer;
     }
 
-    protected function createCarbonIntensityData(string $country, string $source_name, DateTimeInterface $begin_date, float $intensity, string $length = 'P2D')
+    protected function createCarbonIntensityData(Source_Zone $source_zone, DateTimeInterface $begin_date, float $intensity, string $length = 'P2D')
     {
-        $source = new Source();
-        $source->getFromDBByCrit(['name' => $source_name]);
-        if ($source->isNewItem()) {
-            $source = $this->createItem(Source::class, [
-                'name' => $source_name
-            ]);
-        }
-
-        $zone = new Zone();
-        $zone->getFromDBByCrit(['name' => $country]);
-        if ($zone->isNewItem()) {
-            $zone = $this->createItem(Zone::class, [
-                'name' => $country,
-                'plugin_carbon_sources_id_historical' => $source->getID()
-            ]);
-        }
 
         $current_date = clone $begin_date;
         $current_date->sub(new DateInterval('P1D'));
@@ -315,8 +296,8 @@ class CommonTestCase extends TestCase
         $one_hour = new DateInterval('PT1H');
         while ($current_date < $end_date) {
             $crit = [
-                Source::getForeignKeyField()  => $source->getID(),
-                Zone::getForeignKeyField() => $zone->getID(),
+                Source::getForeignKeyField()  => $source_zone->fields[Source::getForeignKeyField()],
+                Zone::getForeignKeyField() => $source_zone->fields[Zone::getForeignKeyField()],
                 'date' => $current_date->format('Y-m-d H:00:00'),
                 'intensity' => $intensity,
             ];
