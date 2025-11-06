@@ -32,11 +32,11 @@
 
 namespace GlpiPlugin\Carbon\DataSource;
 
-use Config;
 use DBmysql;
 use Dropdown;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
+use GlpiPlugin\Carbon\Config as CarbonConfig;
 use GlpiPlugin\Carbon\Zone;
 
 class Boaviztapi
@@ -52,7 +52,7 @@ class Boaviztapi
         if (!empty($url)) {
             $this->base_url = $url;
         } else {
-            $url = Config::getConfigurationValue('plugin:carbon', 'boaviztapi_base_url');
+            $url = CarbonConfig::getPluginConfigurationValue('boaviztapi_base_url');
             if (!is_string($url) || $url === '') {
                 throw new \RuntimeException('Invalid Boaviztapi base URL');
             }
