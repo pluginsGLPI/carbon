@@ -49,6 +49,13 @@ use Session;
 
 class Config extends GlpiConfig
 {
+    /**
+     * Environment variable name to set the boaviztapi base URL
+     * If set, overrides the setting in the database
+     */
+    public const ENV_BOAVIZTAPI_BASE_URL = 'GLPI_PLUGIN_CARBON_BOAVIZTAPI_BASE_URL';
+    private const CONFIG_CONTEXT = 'plugin:carbon';
+
     public static function getTypeName($nb = 0)
     {
         return plugin_carbon_getFriendlyName();
@@ -84,15 +91,17 @@ class Config extends GlpiConfig
 
     public function showForm($ID, $options = [])
     {
-        $current_config = GlpiConfig::getConfigurationValues('plugin:carbon');
+        $current_config = GlpiConfig::getConfigurationValues(self::CONFIG_CONTEXT);
         $current_config['geocoding_enabled'] = $current_config['geocoding_enabled'] ?? '0';
         $canedit        = Session::haveRight(Config::$rightname, UPDATE);
 
+        $hide_boaviztapi_base_url = (getenv(self::ENV_BOAVIZTAPI_BASE_URL) !== false);
         TemplateRenderer::getInstance()->display('@carbon/config.html.twig', [
-            'can_edit'       => $canedit,
-            'current_config' => $current_config,
-            'impact_engines' => Engine::getAvailableBackends(),
-            'action'         => (isset($options['plugin_config']) ? Config::getFormURL() : GlpiConfig::getFormURL()),
+            'can_edit'                 => $canedit,
+            'current_config'           => $current_config,
+            'impact_engines'           => Engine::getAvailableBackends(),
+            'hide_boaviztapi_base_url' => $hide_boaviztapi_base_url,
+            'action'                   => (isset($options['plugin_config']) ? Config::getFormURL() : GlpiConfig::getFormURL()),
         ]);
 
         return true;
@@ -119,7 +128,7 @@ class Config extends GlpiConfig
 
         //Test Boavizta URL by acquiring zones
         if (isset($input['boaviztapi_base_url']) && strlen($input['boaviztapi_base_url']) > 0) {
-            $old_url = GlpiConfig::getConfigurationValue('plugin:carbon', 'boaviztapi_base_url');
+            $old_url = GlpiConfig::getConfigurationValue(self::CONFIG_CONTEXT, 'boaviztapi_base_url');
             if ($old_url != $input['boaviztapi_base_url']) {
                 $boavizta = new DataSource\Boaviztapi(new DataSource\RestApiClient(), $input['boaviztapi_base_url']);
                 $zones = [];
@@ -167,9 +176,9 @@ class Config extends GlpiConfig
     public static function getEmbodiedImpactEngine(): string
     {
         $default_engine = 'Boavizta';
-        $engine = GlpiConfig::getConfigurationValue('plugin:carbon', 'impact_engines');
+        $engine = GlpiConfig::getConfigurationValue(self::CONFIG_CONTEXT, 'impact_engines');
         if ($engine === null || $engine === '') {
-            GlpiConfig::setConfigurationValues('plugin:carbon', ['impact_engines' => $default_engine]);
+            GlpiConfig::setConfigurationValues(self::CONFIG_CONTEXT, ['impact_engines' => $default_engine]);
             $engine = $default_engine;
         }
 
@@ -184,9 +193,9 @@ class Config extends GlpiConfig
     public static function getUsageImpactEngine(): string
     {
         $default_engine = 'Boavizta';
-        $engine = GlpiConfig::getConfigurationValue('plugin:carbon', 'impact_engines');
+        $engine = GlpiConfig::getConfigurationValue(self::CONFIG_CONTEXT, 'impact_engines');
         if ($engine === null || $engine === '') {
-            GlpiConfig::setConfigurationValues('plugin:carbon', ['impact_engines' => $default_engine]);
+            GlpiConfig::setConfigurationValues(self::CONFIG_CONTEXT, ['impact_engines' => $default_engine]);
             $engine = $default_engine;
         }
 
@@ -200,7 +209,7 @@ class Config extends GlpiConfig
      */
     public static function isDemoMode(): bool
     {
-        $demo_mode = GlpiConfig::getConfigurationValue('plugin:carbon', 'demo');
+        $demo_mode = GlpiConfig::getConfigurationValue(self::CONFIG_CONTEXT, 'demo');
 
         return $demo_mode != 0;
     }
@@ -212,7 +221,7 @@ class Config extends GlpiConfig
      */
     public static function exitDemoMode()
     {
-        GlpiConfig::deleteConfigurationValues('plugin:carbon', ['demo']);
+        GlpiConfig::deleteConfigurationValues(self::CONFIG_CONTEXT, ['demo']);
     }
 
     /**
@@ -232,5 +241,33 @@ class Config extends GlpiConfig
         $provider = Nominatim::withOpenStreetMapServer(new Client(), $user_agent);
         $geocoder = new StatefulGeocoder($provider, $locale);
         return $geocoder;
+    }
+
+    /**
+     * Get a plugin configuration value
+     *
+     * @param string $name The name of the configuration value to read
+     * @return null|string The configuration value
+     */
+    public static function getPluginConfigurationValue(string $name): ?string
+    {
+        if ($name === 'boaviztapi_base_url') {
+            $value = getenv(self::ENV_BOAVIZTAPI_BASE_URL);
+            if ($value !== false) {
+                return $value;
+            }
+        }
+        return GlpiConfig::getConfigurationValue(self::CONFIG_CONTEXT, $name);
+    }
+
+    /**
+     * Set a plugin configuration value
+     *
+     * @param array $values key => value pairs to set
+     * @return void
+     */
+    public static function setPluginConfigurationValues(array $values = []): void
+    {
+        GlpiConfig::setConfigurationValues(self::CONFIG_CONTEXT, $values);
     }
 }

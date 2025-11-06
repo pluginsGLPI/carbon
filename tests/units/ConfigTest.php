@@ -173,4 +173,45 @@ class ConfigTest extends DbTestCase
         $result = Config::getGeocoder();
         $this->assertInstanceOf(Geocoder::class, $result);
     }
+
+    public function testGetPluginConfigurationValue()
+    {
+        // Test reading a regular configuration value
+        $this->createItem(GlpiConfig::class, [
+            'context' => 'plugin:carbon',
+            'name'    => 'foo',
+            'value'   => 'bar'
+        ]);
+        $result = Config::getPluginConfigurationValue('foo');
+        $this->assertEquals('bar', $result);
+
+        // Test an overridable configuration value, not overriden
+        GlpiConfig::setConfigurationValues('plugin:carbon', [
+            'boaviztapi_base_url' => 'bar'
+        ]);
+        $result = Config::getPluginConfigurationValue('boaviztapi_base_url');
+        $this->assertEquals('bar', $result);
+
+        // Test an overridable configuration value, overriden by an env var
+        GlpiConfig::setConfigurationValues('plugin:carbon', [
+            'boaviztapi_base_url' => 'baz'
+        ]);
+        putenv(Config::ENV_BOAVIZTAPI_BASE_URL . '=bar');
+        $result = Config::getPluginConfigurationValue('boaviztapi_base_url');
+        $this->assertEquals('bar', $result);
+    }
+
+    public function testSetPluginConfigurationValues()
+    {
+        Config::setPluginConfigurationValues([
+            'foo' => 'bar',
+        ]);
+        $config = new GlpiConfig();
+        $config->getFromDBByCrit([
+            'context' => 'plugin:carbon',
+            'name'    => 'foo',
+        ]);
+        $this->assertFalse($config->isNewItem());
+        $this->assertEquals('bar', $config->fields['value']);
+    }
 }
