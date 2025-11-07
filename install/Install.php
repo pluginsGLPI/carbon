@@ -252,18 +252,18 @@ class Install
      * Get or create a carbon intensity source by name
      *
      * @param string $name Name of the zone
-     * @param int $is_fallback Is the zone a fallback zone (1) or not (0)
+     * @param int $fallback_level Is the zone a fallback zone (1) or not (0)
      * @param int $is_carbon_intensity_source Does the source provide carbon intensity (1) or not (0)
      * @return int ID of the zone
      */
-    public static function getOrCreateSource(string $name, int $is_fallback = 1, int $is_carbon_intensity_source = 1): int
+    public static function getOrCreateSource(string $name, int $fallback_level = 1, int $is_carbon_intensity_source = 1): int
     {
         $source = new Source();
         $source->getFromDBByCrit(['name' => $name]);
         if ($source->isNewItem()) {
             $source->add([
                 'name' => $name,
-                'is_fallback' => $is_fallback,
+                'fallback_level' => $fallback_level,
                 'is_carbon_intensity_source' => $is_carbon_intensity_source,
             ]);
             /** @phpstan-ignore if.alwaysTrue */

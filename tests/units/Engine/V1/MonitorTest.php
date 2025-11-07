@@ -150,7 +150,7 @@ class MonitorTest extends EngineTestCase
         $intensity = 1;
         $source = $this->createItem(source::class, [
             'is_carbon_intensity_source' => 1,
-            'is_fallback' => 0
+            'fallback_level' => 0
         ]);
         $zone = $this->createItem(Zone::class);
         $source_zone = $this->createItem(Source_Zone::class, [

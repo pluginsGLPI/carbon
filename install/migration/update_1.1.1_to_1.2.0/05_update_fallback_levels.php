@@ -31,32 +31,16 @@
  */
 
 /** @var DBmysql $DB */
-/** @var Migration $migration */
+global $DB;
 
 $table = 'glpi_plugin_carbon_sources';
-$migration->addField(
-    $table,
-    'is_carbon_intensity_source',
-    'bool',
-    [
-        'after'     => 'is_fallback',
-        'update'    => 1,
-        'condition' => "WHERE `name` IN ('RTE', 'ElectricityMap', 'Ember - Energy Institute', 'Hydro Quebec')"
-    ]
-);
-$migration->changeField(
-    $table,
-    'is_fallback',
-    'fallback_level',
-    'int'
-);
-
-$table = 'glpi_plugin_carbon_locations';
-$migration->addField(
-    $table,
-    'plugin_carbon_sources_zones_id',
-    'fkey',
-    [
-        'after'     => 'boavizta_zone'
-    ]
-);
+$where = [
+    'name' => 'Ember - Energy Institute',
+];
+$params = [
+    'fallback_level' => 2,
+    'is_carbon_intensity_source' => 1,
+];
+$raw_sql = $DB->buildUpdateOrInsert($table, $params, $where);
+/** @var Migration $migration */
+$migration->addPostQuery($raw_sql, 'Failed to update fallback level of ' . $where['name'] . ' data source.');

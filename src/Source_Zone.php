@@ -120,7 +120,7 @@ class Source_Zone extends CommonDBRelation
                 $zone_table => 'name',
                 $source_zone_table => ['id', 'is_download_enabled'],
                 Source::getTableField('name') . ' AS historical_source_name',
-                $source_table => 'is_fallback'
+                $source_table => 'fallback_level'
             ],
             'FROM' => $source_zone_table,
             'INNER JOIN' => [
@@ -148,7 +148,7 @@ class Source_Zone extends CommonDBRelation
         $entries = [];
         foreach ($iterator as $data) {
             $is_download_enabled = __('Not downloadable', 'carbon') . Html::showToolTip(__('This is a fallback source, there is no real-time data available', 'carbon'), ['display' => false]);
-            if ($data['is_fallback'] == 0) {
+            if ($data['fallback_level'] == 0) {
                 $is_download_enabled = self::getToggleLink($data['id'], $data['is_download_enabled']);
             }
             $entries[] = [
@@ -347,7 +347,7 @@ class Source_Zone extends CommonDBRelation
      * excluding Ember - Energy Institute source
      *
      * @param Source_Zone $source_zone realtime source-zone
-     * @return array request to get the fallback
+     * @return bool
      */
     public function getFallbackFromDB(Source_Zone $source_zone): bool
     {
@@ -369,7 +369,7 @@ class Source_Zone extends CommonDBRelation
                     'ON' => [
                         $source_table => 'id',
                         $source_zone_table => $source_fk,
-                        ['AND' => [Source::getTableField('is_fallback') => 1]]
+                        ['AND' => [Source::getTableField('fallback_level') => ['>', 0]]]
                     ]
                 ],
             ],
@@ -407,7 +407,7 @@ class Source_Zone extends CommonDBRelation
         // Check if the source is a fallback source
         $source = new Source();
         $source->getFromDB($this->fields['plugin_carbon_sources_id']);
-        if ($source->fields['is_fallback'] === 1) {
+        if ($source->fields['fallback_level'] > 0) {
             // Fallback sources cannot be toggled
             return false;
         }

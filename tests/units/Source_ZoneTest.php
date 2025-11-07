@@ -198,7 +198,7 @@ class Source_ZoneTest extends DbTestCase
         // Test finding a fallback source zone from an 'non fallback) source_zone
         $source = $this->createItem(Source::class);
         $fallback_source = $this->createItem(Source::class, [
-            'is_fallback' => 1,
+            'fallback_level' => 1,
         ]);
         $zone = $this->createItem(Zone::class);
         $source_zone = $this->createItem(Source_Zone::class, [

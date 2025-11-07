@@ -88,9 +88,6 @@ class SearchOptionTest extends CommonTestCase
         CarbonIntensity::class => [
             'plugin_carbon_sources_id' => 'name',
             'plugin_carbon_zones_id'   => 'name',
-        ],
-        Zone::class => [
-            'plugin_carbon_sources_id_historical' => 'name',
         ]
     ];
 

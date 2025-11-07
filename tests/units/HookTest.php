@@ -118,7 +118,7 @@ class HookTest extends DbTestCase
         $fallback_source = $this->createItem(Source::class, [
             'name' => 'a fallback source',
             'is_carbon_intensity_source' => 1,
-            'is_fallback' => 1
+            'fallback_level' => 1
         ]);
         $source_zone = $this->createItem(Source_Zone::class, [
             $source::getForeignKeyField() => $source->getID(),
@@ -137,7 +137,7 @@ class HookTest extends DbTestCase
         $this->assertEquals(0, $source_zone->fields['is_download_enabled']);
         $computer->update([
             'id' => $computer->getID(),
-            'locations_id' =>$glpi_location->getID(),
+            'locations_id' => $glpi_location->getID(),
         ]);
         $source_zone->getFromDB($source_zone->getID());
         $this->assertEquals(1, $source_zone->fields['is_download_enabled']);

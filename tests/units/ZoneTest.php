@@ -109,7 +109,7 @@ class ZoneTest extends DbTestCase
         $source = $this->createItem(Source::class, [
             'name' => 'foo',
             'is_carbon_intensity_source' => 1,
-            'is_fallback' => 0,
+            'fallback_level' => 0,
         ]);
         $zone = $this->createItem(Zone::class, [
             'name' => 'a zone'

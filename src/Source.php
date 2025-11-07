@@ -113,7 +113,7 @@ class Source extends CommonDropdown
         $tab[] = [
             'id'                 => '3',
             'table'              => $table,
-            'field'              => 'is_fallback',
+            'field'              => 'fallback_level',
             'name'               => __('Is a fallback source'),
             'massiveaction'      => false,
             'datatype'           => 'boolean',
@@ -145,7 +145,7 @@ class Source extends CommonDropdown
             'SELECT' => ['id', 'name'],
             'FROM'   => self::getTable(),
             'WHERE'  => [
-                'is_fallback' => 0,
+                'fallback_level' => 0,
             ]
         ]);
         return iterator_to_array($iterator);

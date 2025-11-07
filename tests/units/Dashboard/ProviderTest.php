@@ -293,7 +293,7 @@ class ProviderTest extends DbTestCase
         ];
         $source = $this->createItem(Source::class, [
             'is_carbon_intensity_source' => 1,
-            'is_fallback' => 0
+            'fallback_level' => 0
         ]);
         $zone = $this->createItem(Zone::class);
         $source_zone = $this->createItem(Source_Zone::class, [
@@ -360,7 +360,7 @@ class ProviderTest extends DbTestCase
         ];
         $source = $this->createItem(Source::class, [
             'is_carbon_intensity_source' => 1,
-            'is_fallback' => 0
+            'fallback_level' => 0
         ]);
         $zone = $this->createItem(Zone::class);
         $source_zone = $this->createItem(Source_Zone::class, [

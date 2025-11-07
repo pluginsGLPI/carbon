@@ -60,7 +60,7 @@ $table = $dbUtil->getTableForItemType(GlpiPlugin\Carbon\CarbonIntensity::class);
 $data_source = dirname(__DIR__) . '/data/carbon_intensity/carbon-intensity-electricity.csv';
 
 // Create data source in DB
-$source_id = Install::getOrCreateSource('Ember - Energy Institute', 1);
+$source_id = Install::getOrCreateSource('Ember - Energy Institute', 2);
 
 try {
     $file = new SplFileObject($data_source, 'r');

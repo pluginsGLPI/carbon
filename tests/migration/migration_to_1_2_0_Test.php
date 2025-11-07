@@ -32,7 +32,6 @@
 
 use DBmysql;
 use Location as GlpiLocation;
-use GlpiPlugin\Carbon\Tests\CommonTestCase;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\Uninstall;
 
@@ -75,12 +74,11 @@ class migration_to_1_2_0_Test extends DbTestCase
         ]);
         $DB->insert('glpi_plugin_carbon_zones', [
             'name' => 'France',
-            'plugin_carbon_sources_id_historical' => 1,
         ]);
         $zone_id = $DB->insertId();
         $DB->insert('glpi_plugin_carbon_sources', [
             'name' => 'RTE',
-            'is_fallback' => 0,
+            'fallback_level' => 0,
             'is_carbon_intensity_source' => 1,
         ]);
         $source_id = $DB->insertId();
@@ -120,12 +118,11 @@ class migration_to_1_2_0_Test extends DbTestCase
         ]);
         $DB->insert('glpi_plugin_carbon_zones', [
             'name' => 'foo state',
-            'plugin_carbon_sources_id_historical' => 1,
         ]);
         $zone_id = $DB->insertId();
         $DB->insert('glpi_plugin_carbon_sources', [
             'name' => 'foo electricity distributor',
-            'is_fallback' => 1,
+            'fallback_level' => 1,
             'is_carbon_intensity_source' => 1,
         ]);
         $source_id = $DB->insertId();

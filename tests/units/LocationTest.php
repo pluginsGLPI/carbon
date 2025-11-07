@@ -285,7 +285,6 @@ class LocationTest extends DbTestCase
         ]);
         $zone = $this->createItem(Zone::class, [
             'name' => 'foo',
-            'plugin_carbon_sources_id_historical' => 0,
         ]);
         $source_zone = $this->createItem(Source_Zone::class, [
             $zone::getForeignKeyField() => $zone->getID(),
@@ -300,9 +299,7 @@ class LocationTest extends DbTestCase
 
         // Test when the zone matches a source and download switches to enabled
         $source = $this->createItem(Source::class);
-        $zone = $this->createItem(Zone::class, [
-            'plugin_carbon_sources_id_historical' => $source->getID(),
-        ]);
+        $zone = $this->createItem(Zone::class);
         $source_zone = $this->createItem(Source_Zone::class, [
             $zone::getForeignKeyField() => $zone->getID(),
             $source::getForeignKeyField() => $source->getID(),
@@ -414,7 +411,7 @@ class LocationTest extends DbTestCase
         ]);
         $fallback_source = $this->createItem(Source::class, [
             'name' => 'fallback source 2',
-            'is_fallback' => 1,
+            'fallback_level' => 1,
         ]);
         $fallback_source_zone = $this->createItem(Source_Zone::class, [
             Source::getForeignKeyField() => $fallback_source->getID(),

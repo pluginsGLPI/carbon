@@ -117,37 +117,9 @@ class Zone extends CommonDropdown
         return true;
     }
 
-    public function getAdditionalFields()
-    {
-        return [
-            [
-                'name'   => 'plugin_carbon_sources_id_historical',
-                'label'  => __('Data source for historical calculation', 'carbon'),
-                'type'   => 'dropdownValue',
-                'list'   => true
-            ]
-        ];
-    }
-
     public function rawSearchOptions()
     {
         $tab = parent::rawSearchOptions();
-
-        $tab[] = [
-            'id'            => SearchOptions::HISTORICAL_DATA_SOURCE,
-            'table'         => Source::getTable(),
-            'field'         => 'name',
-            'name'          => __('Data source for historical calculation', 'carbon'),
-            'datatype'      => 'dropdown',
-            'joinparams'         => [
-                'beforejoin'    => [
-                    'table'         => Source_Zone::getTable(),
-                    'joinparams'    => [
-                        'jointype'      => 'child',
-                    ],
-                ],
-            ],
-        ];
 
         $tab[] = [
             'id'            => SearchOptions::HISTORICAL_DATA_DL_ENABLED,
@@ -309,7 +281,7 @@ class Zone extends CommonDropdown
             'WHERE' => [
                 self::getTableField('id') => $this->fields['id'],
                 Source::getTableField('is_carbon_intensity_source') => 1,
-                Source::getTableField('is_fallback') => 0,
+                Source::getTableField('fallback_level') => 0,
             ]
         ]);
     }

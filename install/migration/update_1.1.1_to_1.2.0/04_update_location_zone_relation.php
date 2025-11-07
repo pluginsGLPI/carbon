@@ -122,3 +122,7 @@ foreach ($iterator as $row) {
     ];
     $DB->updateOrInsert($location_table, $params, $where);
 }
+
+$table = 'glpi_plugin_carbon_zones';
+/** @var Migration $migration */
+$migration->dropField($table, 'plugin_carbon_sources_id_historical');

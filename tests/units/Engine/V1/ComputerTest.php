@@ -113,7 +113,7 @@ class ComputerTest extends EngineTestCase
 
         $source = $this->createItem(source::class, [
             'is_carbon_intensity_source' => 1,
-            'is_fallback' => 0
+            'fallback_level' => 0
         ]);
         $zone = $this->createItem(Zone::class);
         $source_zone = $this->createItem(Source_Zone::class, [
@@ -164,7 +164,7 @@ class ComputerTest extends EngineTestCase
         $saturday = DateTime::createFromFormat('Y-m-d H:i:s', self::TEST_DATE_SATURDAY);
         $source = $this->createItem(source::class, [
             'is_carbon_intensity_source' => 1,
-            'is_fallback' => 0
+            'fallback_level' => 0
         ]);
         $zone = $this->createItem(Zone::class);
         $source_zone = $this->createItem(Source_Zone::class, [

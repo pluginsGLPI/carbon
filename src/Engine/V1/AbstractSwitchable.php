@@ -133,9 +133,10 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
 
         $source = Source::getById($source_zone->fields['plugin_carbon_sources_id']);
         $fallback_source_zone = null;
+        $iterator = null;
 
         // Try to read real time carbon intensities
-        if ($source->fields['is_fallback'] === 0) {
+        if ($source->fields['fallback_level'] === 0) {
             $iterator = $this->requestCarbonIntensitiesPerDay($start_time, $length, $source_zone);
             if ($iterator->count() === 0) {
                 // Need to fallback to an alternate source
@@ -157,7 +158,7 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
             $iterator = $iterator->getIterator();
         }
 
-        $count = $iterator->count();
+        $count = $iterator ? $iterator->count() : 0;
         if ($count != $expected_count) {
             trigger_error(sprintf(
                 "required count of carbon intensity %d samples not met. Got %d samples for date %s",

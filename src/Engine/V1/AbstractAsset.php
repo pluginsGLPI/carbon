@@ -241,9 +241,9 @@ abstract class AbstractAsset implements EngineInterface
                 ]
             ],
             'WHERE' => [
-                Source::getTableField('is_fallback') => 1,
+                Source::getTableField('fallback_level') => 2,
                 Source::getTableField('name') => 'Ember - Energy Institute',
-                Source_Zone::getTableField('plugin_carbon_zones_id') => $zone->getID(),
+                Source_Zone::getTableField('plugin_carbon_zones_id') => $source_zone->fields[getForeignKeyFieldForItemType(Zone::class)],
                 CarbonIntensity::getTableField('date') => ['<=', $day->format('Y-m-d H:i:s')],
             ],
             'ORDER' => CarbonIntensity::getTableField('date') . ' DESC',
@@ -305,7 +305,7 @@ abstract class AbstractAsset implements EngineInterface
                 ],
             ],
             'WHERE' => [
-                Source::getTableField('is_fallback') => 1,
+                Source::getTableField('fallback_level') => 2,
                 Source::getTableField('name') => 'Ember - Energy Institute',
                 Zone::getTableField('name') => 'World',
                 CarbonIntensity::getTableField('date') => ['<=', $day->format('Y-m-d H:i:s')],

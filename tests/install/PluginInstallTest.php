@@ -349,17 +349,27 @@ class PluginInstallTest extends CommonTestCase
             $source = new Source();
             $source->getFromDBByCrit([
                 'name' => $source_name,
-                'is_fallback' => 0
+                'fallback_level' => 0
             ]);
             $this->assertFalse($source->isNewItem(), "Source '$source_name' not found");
         }
 
-        $sources = ['Ember - Energy Institute', 'Hydro Quebec'];
+        $sources = ['Hydro Quebec'];
         foreach ($sources as $source_name) {
             $source = new Source();
             $source->getFromDBByCrit([
                 'name' => $source_name,
-                'is_fallback' => 1
+                'fallback_level' => 1
+            ]);
+            $this->assertFalse($source->isNewItem(), "Source '$source_name' not found");
+        }
+
+        $sources = ['Ember - Energy Institute'];
+        foreach ($sources as $source_name) {
+            $source = new Source();
+            $source->getFromDBByCrit([
+                'name' => $source_name,
+                'fallback_level' => 2
             ]);
             $this->assertFalse($source->isNewItem(), "Source '$source_name' not found");
         }

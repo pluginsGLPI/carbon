@@ -142,7 +142,7 @@ class Location extends CommonDBChild
                 ]
             ],
             'WHERE' => [
-                'is_fallback' => 0,
+                'fallback_level' => 0,
                 'is_carbon_intensity_source' => 1,
                 Source_Zone::getTableField('id') => $this->fields['plugin_carbon_sources_zones_id'],
             ]
@@ -251,7 +251,6 @@ class Location extends CommonDBChild
      */
     public function onGlpiLocationAdd(CommonDBTM $item, Geocoder $geocoder)
     {
-        // $this->enableCarbonIntensityDownload($item);
         $enabled = GlpiConfig::getConfigurationValue('plugin:carbon', 'geocoding_enabled');
         if (!empty($enabled)) {
             if (!isset($item->input['_boavizta_zone']) || $item->input['_boavizta_zone'] == '' || $item->input['_boavizta_zone'] == '0') {
@@ -376,7 +375,7 @@ class Location extends CommonDBChild
                     'ON' => [
                         $source_table => 'id',
                         'fallback_sources_zones' => $source_fk,
-                        ['AND' => [Source::getTableField('is_fallback') => 1]]
+                        ['AND' => [Source::getTableField('fallback_level') => ['>', 0]]]
                     ]
                 ],
                 $carbon_intensity_table => [

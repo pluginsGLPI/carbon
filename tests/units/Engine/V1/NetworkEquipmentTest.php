@@ -86,7 +86,7 @@ class NetworkEquipmentTest extends EngineTestCase
         $thursday = DateTime::createFromFormat('Y-m-d H:i:s', '1999-12-02 12:00:00');
         $source = $this->createItem(source::class, [
             'is_carbon_intensity_source' => 1,
-            'is_fallback' => 0
+            'fallback_level' => 0
         ]);
         $zone = $this->createItem(Zone::class);
         $source_zone = $this->createItem(Source_Zone::class, [
@@ -111,7 +111,7 @@ class NetworkEquipmentTest extends EngineTestCase
     // {
     //     $source = $this->createItem(Source::class, [
     //         'is_carbon_intensity_source' => 1,
-    //         'is_fallback' => 0
+    //         'fallback_level' => 0
     //     ]);
     //     $zone = $this->createItem(Zone::class);
     //     $source_zone = $this->createItem(Source_Zone::class, [
