@@ -152,7 +152,6 @@ class CarbonIntensityTest extends DbTestCase
         ]);
         $zone = $this->createItem(Zone::class, [
             'name' => 'test_zone',
-            'plugin_carbon_sources_id_historical' => $source->getID(),
         ]);
         $source_zone = $this->createItem(Source_Zone::class, [
             'plugin_carbon_sources_id' => $source->getID(),

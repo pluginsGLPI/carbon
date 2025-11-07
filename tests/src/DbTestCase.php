@@ -36,21 +36,27 @@ class DbTestCase extends CommonTestCase
 {
     public function setUp(): void
     {
+        /** @var DBmysql $DB */
         global $DB;
+
         $DB->beginTransaction();
         parent::setUp();
     }
 
     public function tearDown(): void
     {
+        /** @var DBmysql $DB */
         global $DB;
+
         $DB->rollback();
         parent::tearDown();
     }
 
     protected function DBVersionCheck()
     {
+        /** @var DBmysql $DB */
         global $DB;
+
         $version_string = $DB->getVersion();
 
         $server  = preg_match('/-MariaDB/', $version_string) ? 'MariaDB' : 'MySQL';

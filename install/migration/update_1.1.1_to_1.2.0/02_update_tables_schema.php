@@ -60,3 +60,4 @@ $migration->addField(
         'after'     => 'boavizta_zone'
     ]
 );
+$migration->migrationOneTable($table);

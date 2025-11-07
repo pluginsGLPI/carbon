@@ -174,14 +174,7 @@ class Install
         ini_set("max_execution_time", "0");
         $migrations = $this->getMigrationsToDo($from_version);
         foreach ($migrations as $file => $data) {
-            $function = $data['function'];
-            $target_version = $data['target_version'];
-            include_once($file);
-            if ($function($this->migration, $args)) {
-                // Set the version to the target one s it is complete
-                // May be useful if subsequent steps fail and need to run upgrade again, by not running already done steps
-                Config::setConfigurationValues('plugin:carbon', ['dbversion' => $target_version]);
-            } else {
+            if (!$this->upgradeOneVersion($file, $data, $args)) {
                 return false;
             }
         }
@@ -206,6 +199,21 @@ class Install
         return true;
     }
 
+    public function upgradeOneVersion(string $file, array $data, array $args = []): bool
+    {
+        $function = $data['function'];
+        $target_version = $data['target_version'];
+        include_once($file);
+        if ($function($this->migration, $args) === false) {
+            return false;
+        }
+        // Set the version to the target one s it is complete
+        // May be useful if subsequent steps fail and need to run upgrade again, by not running already done steps
+        Config::setConfigurationValues('plugin:carbon', ['dbversion' => $target_version]);
+
+        return true;
+    }
+
     /**
      * Get migrations that have to be ran.
      *
@@ -213,7 +221,7 @@ class Install
      *
      * @return array
      */
-    private function getMigrationsToDo(string $current_version): array
+    public function getMigrationsToDo(string $current_version): array
     {
         $pattern = '/^update_(?<source_version>\d+\.\d+\.(?:\d+|x))_to_(?<target_version>\d+\.\d+\.(?:\d+|x))\.php$/';
         $plugin_directory = Plugin::getPhpDir('carbon') . '/install/migration';

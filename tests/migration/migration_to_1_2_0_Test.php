@@ -31,65 +31,61 @@
  */
 
 use DBmysql;
+use GlpiPlugin\Carbon\Install;
 use Location as GlpiLocation;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\Uninstall;
 
 class migration_to_1_2_0_Test extends DbTestCase
 {
-    public static function setUpBeforeClass(): void
+    public function setUp(): void
     {
+        /** @var DBmysql $DB */
         global $DB;
 
-        parent::setUpBeforeClass();
-        $plugin = new Plugin();
-        $plugin->getFromDBbyDir('carbon');
-        if ($plugin->fields['state'] !== Plugin::ANEW && $plugin->fields['state'] !== Plugin::NOTINSTALLED) {
-            require_once(__DIR__ . '/../../install/Uninstall.php');
-            $uninstall = new Uninstall();
-            $uninstall->uninstall();
-        }
-
-        require_once(__DIR__ . '/../../setup.php');
-        $sql_file = plugin_carbon_getSchemaPath('1.2.0');
-        $success = $DB->runFile(realpath($sql_file));
-    }
-
-    public static function tearDownAfterClass(): void
-    {
-        parent::tearDownAfterClass();
+        parent::setUp();
         require_once(__DIR__ . '/../../install/Uninstall.php');
+        require_once(__DIR__ . '/../../install/Install.php');
         $uninstall = new Uninstall();
         $uninstall->uninstall();
+        $DB->clearSchemaCache();
+
+        Plugin::load(TEST_PLUGIN_NAME);
+        $sql_file = plugin_carbon_getSchemaPath('1.1.1');
+        $success = $DB->runFile(realpath($sql_file));
     }
 
     public function testUpdateCountryLocationZoneRelation()
     {
         /** @var DBMysql $DB */
         global $DB;
-        return;
 
         $glpi_location = $this->createItem(GlpiLocation::class, [
             'country' => 'France',
         ]);
-        $DB->insert('glpi_plugin_carbon_zones', [
-            'name' => 'France',
-        ]);
-        $zone_id = $DB->insertId();
-        $DB->insert('glpi_plugin_carbon_sources', [
+        $DB->insert('glpi_plugin_carbon_carbonintensitysources', [
             'name' => 'RTE',
-            'fallback_level' => 0,
-            'is_carbon_intensity_source' => 1,
+            'is_fallback' => 0,
         ]);
         $source_id = $DB->insertId();
-        $DB->insert('glpi_plugin_carbon_sources_zones', [
-            'plugin_carbon_sources_id' => $source_id,
+        $DB->insert('glpi_plugin_carbon_zones', [
+            'name' => 'France',
+            'plugin_carbon_carbonintensitysources_id_historical' => $source_id,
+        ]);
+        $zone_id = $DB->insertId();
+        $DB->insert('glpi_plugin_carbon_carbonintensitysources_zones', [
+            'plugin_carbon_carbonintensitysources_id' => $source_id,
             'plugin_carbon_zones_id'   => $zone_id,
         ]);
         $source_zone_id = $DB->insertId();
-        $migration_file = __DIR__ . '/../../install/migration/update_1.1.0_to_1.2.0/04_update_location_zone_relation.php';
-        $migration_file = realpath($migration_file);
-        require($migration_file);
+
+        $install = new Install(new Migration('1.2.0'));
+        // $install->upgrade('1.1.1');
+        $migrations = $install->getMigrationsToDo('1.1.1');
+        reset($migrations);
+        $file = key($migrations);
+        $data = current($migrations);
+        $install->upgradeOneVersion($file, $data);
 
         $result = $DB->request([
             'SELECT' => '*',
@@ -116,24 +112,28 @@ class migration_to_1_2_0_Test extends DbTestCase
         $glpi_location = $this->createItem(GlpiLocation::class, [
             'state' => 'foo state',
         ]);
-        $DB->insert('glpi_plugin_carbon_zones', [
-            'name' => 'foo state',
-        ]);
-        $zone_id = $DB->insertId();
-        $DB->insert('glpi_plugin_carbon_sources', [
+        $DB->insert('glpi_plugin_carbon_carbonintensitysources', [
             'name' => 'foo electricity distributor',
-            'fallback_level' => 1,
-            'is_carbon_intensity_source' => 1,
+            'is_fallback' => 1
         ]);
         $source_id = $DB->insertId();
-        $DB->insert('glpi_plugin_carbon_sources_zones', [
-            'plugin_carbon_sources_id' => $source_id,
+        $DB->insert('glpi_plugin_carbon_zones', [
+            'name' => 'foo state',
+            'plugin_carbon_carbonintensitysources_id_historical' => $source_id,
+        ]);
+        $zone_id = $DB->insertId();
+        $DB->insert('glpi_plugin_carbon_carbonintensitysources_zones', [
+            'plugin_carbon_carbonintensitysources_id' => $source_id,
             'plugin_carbon_zones_id'   => $zone_id,
         ]);
         $source_zone_id = $DB->insertId();
-        $migration_file = __DIR__ . '/../../install/migration/update_1.1.1_to_1.2.0/04_update_location_zone_relation.php';
-        $migration_file = realpath($migration_file);
-        require($migration_file);
+
+        $install = new Install(new Migration('1.2.0'));
+        $migrations = $install->getMigrationsToDo('1.1.1');
+        reset($migrations);
+        $file = key($migrations);
+        $data = current($migrations);
+        $install->upgradeOneVersion($file, $data);
 
         $result = $DB->request([
             'SELECT' => '*',
