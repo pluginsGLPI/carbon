@@ -61,3 +61,34 @@ $migration->addField(
     ]
 );
 $migration->migrationOneTable($table);
+
+// Blacklist assets by type - to avoid computation of impacts
+$table = 'glpi_plugin_carbon_computertypes';
+$migration->addField(
+    $table,
+    'is_ignore',
+    'bool',
+    [
+        'after'     => 'category'
+    ]
+);
+
+$table = 'glpi_plugin_carbon_monitortypes';
+$migration->addField(
+    $table,
+    'is_ignore',
+    'bool',
+    [
+        'after'     => 'power_consumption'
+    ]
+);
+
+$table = 'glpi_plugin_carbon_networkequipmenttypes';
+$migration->addField(
+    $table,
+    'is_ignore',
+    'bool',
+    [
+        'after'     => 'power_consumption'
+    ]
+);

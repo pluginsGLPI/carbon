@@ -33,13 +33,8 @@
 namespace GlpiPlugin\Carbon\Dashboard;
 
 use Computer;
-use DateTimeImmutable;
 use Glpi\Dashboard\Filter;
-use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\Config;
-use GlpiPlugin\Carbon\Toolbox;
-use Monitor;
-use NetworkEquipment;
 use Session;
 
 class Grid

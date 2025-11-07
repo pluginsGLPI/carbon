@@ -104,13 +104,16 @@ class CollectCarbonIntensityCommand extends AbstractCommand
                 $question = new ChoiceQuestion(__('Zone:', 'carbon'), $this->zones);
                 $value = $question_helper->ask($input, $output, $question);
                 $input->setArgument('zone', $value);
+            } else {
+                $input->setArgument('zone', null);
             }
         }
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if ($input->getArgument('zone') === null) {
+        if (count($this->zones) > 1 && $input->getArgument('zone') === null) {
+            // Null is not a valid key if there are several zones available for the source
             return Command::FAILURE;
         }
 
@@ -132,25 +135,9 @@ class CollectCarbonIntensityCommand extends AbstractCommand
         }
         $this->source_id = $data_source->getID();
 
-        // Create the zone if it does not exist
         $zone_code = $input->getArgument('zone');
         $zone = new Zone();
         $zone->getFromDBByCrit(['name' => $this->zones[$zone_code]]);
-        if (!$zone->getID()) {
-            $zone->add([
-                'name' => $this->zones[$zone_code],
-            ]);
-            if ($zone->isNewItem()) {
-                $message = __("Zone not found", 'carbon');
-                $output->writeln("<error>$message</error>");
-                return Command::FAILURE;
-            }
-            $source_zone = new Source_Zone();
-            $source_zone->add([
-                getForeignKeyFieldForItemType(Source::class) => $data_source->getID(),
-                getForeignKeyFieldForItemType(Zone::class) => $zone->getID(),
-            ]);
-        }
         $carbon_intensity = new CarbonIntensity();
 
         // Create relation between source and zone if t does not exist

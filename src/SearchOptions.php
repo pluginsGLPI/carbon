@@ -79,8 +79,9 @@ class SearchOptions
     public const CARBON_INTENSITY_INTENSITY = self::SEARCH_OPTION_BASE + 403;
 
     public const POWER_CONSUMPTION = self::SEARCH_OPTION_BASE + 500;
-    public const IS_HISTORIZABLE   = self::SEARCH_OPTION_BASE + 502;
     public const USAGE_PROFILE     = self::SEARCH_OPTION_BASE + 501;
+    public const IS_HISTORIZABLE   = self::SEARCH_OPTION_BASE + 502;
+    public const IS_IGNORED        = self::SEARCH_OPTION_BASE + 503;
 
     public const CARBON_EMISSION_DATE             = self::SEARCH_OPTION_BASE + 600;
     public const CARBON_EMISSION_ENERGY_PER_DAY   = self::SEARCH_OPTION_BASE + 601;
@@ -99,9 +100,14 @@ class SearchOptions
     public const USAGE_IMPACT_PE = self::SEARCH_OPTION_BASE + 705;
     public const USAGE_IMPACT_PE_QUALITY = self::SEARCH_OPTION_BASE + 706;
 
-    public const COMPUTER_TYPE_CATEGORY = self::SEARCH_OPTION_BASE + 800;
+    public const COMPUTER_TYPE_CATEGORY   = self::SEARCH_OPTION_BASE + 800;
+    public const COMPUTER_TYPE_IS_IGNORED = self::SEARCH_OPTION_BASE + 801;
 
     public const LOCATION_BOAVIZTA_ZONE = self::SEARCH_OPTION_BASE + 900;
+
+    public const MONITOR_TYPE_IS_IGNORED = self::SEARCH_OPTION_BASE + 1000;
+
+    public const NETEQUIP_TYPE_IS_IGNORED = self::SEARCH_OPTION_BASE + 1100;
 
     /*
      * Get search options added to a core itemtype by the plugin
@@ -135,9 +141,11 @@ class SearchOptions
             /** @phpstan-ignore-next-line */
             if (class_exists($item_type_class) && is_subclass_of($item_type_class, CommonDBTM::class)) {
                 $itemtype_fk = $itemtype::getForeignKeyField();
+                $item_type_table = getTableForItemType($item_type_class);
+                $glpi_item_type_table = getTableForItemType($glpi_item_type_class);
                 $sopt[] = [
                     'id'           => SearchOptions::POWER_CONSUMPTION,
-                    'table'        => getTableForItemType($item_type_class),
+                    'table'        => $item_type_table,
                     'field'        => 'power_consumption',
                     'name'         => __('Power consumption', 'carbon'),
                     'datatype'     => 'number',
@@ -149,13 +157,33 @@ class SearchOptions
                     'joinparams' => [
                         'jointype' => 'child',
                         'beforejoin' => [
-                            'table' => getTableForItemType($glpi_item_type_class),
+                            'table' => $glpi_item_type_table,
                             'joinparams' => [
                                 'jointype' => 'child',
                             ]
                         ]
                     ],
                     'computation' => "IF(TABLE.`power_consumption` IS NULL, 0, TABLE.`power_consumption`)",
+                ];
+
+                $sopt[] = [
+                    'id'           => SearchOptions::IS_IGNORED,
+                    'table'        => $item_type_table,
+                    'field'        => 'is_ignore',
+                    'name'         => __('Ignore environmental impact', 'carbon'),
+                    'datatype'     => 'bool',
+                    'massiveaction' => false,
+                    'linkfield'    => $itemtype_fk,
+                    'joinparams' => [
+                        'jointype' => 'child',
+                        'beforejoin' => [
+                            'table' => $glpi_item_type_table,
+                            'joinparams' => [
+                                'jointype' => 'child',
+                            ]
+                        ]
+                    ],
+                    'computation' => "IF(TABLE.`is_ignore` IS NULL, 0, TABLE.`is_ignore`)",
                 ];
             }
         }
@@ -183,6 +211,7 @@ class SearchOptions
             AND `glpi_computers_id_963cd5e903dddc7ab00a3b70933369df`.`is_template` = 0
             AND `glpi_plugin_carbon_locations_3d6da7fccf9233a3f1a4e41183391a41`.`plugin_carbon_sources_zones_id` > 0
             AND `glpi_plugin_carbon_computerusageprofiles_09f8403aa14af64cd70f350288a0331b`.`id` > 0
+            AND `glpi_plugin_carbon_computertypes_a643ab3ffd70abf99533ed214da87d60`.`is_ignore` = 0
             AND (
                 `glpi_plugin_carbon_computertypes_a643ab3ffd70abf99533ed214da87d60`.`power_consumption` > 0
                 OR `glpi_computermodels`.`power_consumption` > 0
@@ -249,6 +278,7 @@ class SearchOptions
                 'computation' => $computation,
             ];
         } else if ($itemtype === GlpiComputerType::class && in_array(Computer::class, PLUGIN_CARBON_TYPES)) {
+            $computer_type_table = getTableForItemType(ComputerType::class);
             $sopt[] = [
                 'id'             => SearchOptions::COMPUTER_TYPE_CATEGORY,
                 'table'          => getTableForItemType(ComputerType::class),
@@ -261,10 +291,50 @@ class SearchOptions
                     'jointype'   => 'child'
                 ]
             ];
+
+            $sopt[] = [
+                'id'           => SearchOptions::COMPUTER_TYPE_IS_IGNORED,
+                'table'        => $computer_type_table,
+                'field'        => 'is_ignore',
+                'name'         => __('Ignore environmental impact', 'carbon'),
+                'datatype'     => 'bool',
+                'massiveaction' => false,
+                'joinparams'     => [
+                    'jointype'   => 'child'
+                ],
+                'computation' => "IF(TABLE.`is_ignore` IS NULL, 0, TABLE.`is_ignore`)",
+            ];
+        } else if ($itemtype === GlpiMonitorType::class && in_array(Monitor::class, PLUGIN_CARBON_TYPES)) {
+            $sopt[] = [
+                'id'           => SearchOptions::MONITOR_TYPE_IS_IGNORED,
+                'table'        => getTableForItemType(MonitorType::class),
+                'field'        => 'is_ignore',
+                'name'         => __('Ignore environmental impact', 'carbon'),
+                'datatype'     => 'bool',
+                'massiveaction' => false,
+                'joinparams'     => [
+                    'jointype'   => 'child'
+                ],
+                'computation' => "IF(TABLE.`is_ignore` IS NULL, 0, TABLE.`is_ignore`)",
+            ];
+        } else if ($itemtype === GlpiNetworkEquipmentType::class && in_array(NetworkEquipment::class, PLUGIN_CARBON_TYPES)) {
+            $sopt[] = [
+                'id'           => SearchOptions::NETEQUIP_TYPE_IS_IGNORED,
+                'table'        => getTableForItemType(NetworkEquipmentType::class),
+                'field'        => 'is_ignore',
+                'name'         => __('Ignore environmental impact', 'carbon'),
+                'datatype'     => 'bool',
+                'massiveaction' => false,
+                'joinparams'     => [
+                    'jointype'   => 'child'
+                ],
+                'computation' => "IF(TABLE.`is_ignore` IS NULL, 0, TABLE.`is_ignore`)",
+            ];
         } else if ($itemtype === Monitor::class && in_array($itemtype, PLUGIN_CARBON_TYPES)) {
             $computation = "IF(`glpi_monitors_id_b24d2115745b49f0b5cdaf2ebb5e9ffe`.`is_deleted` = 0
             AND `glpi_monitors_id_b24d2115745b49f0b5cdaf2ebb5e9ffe`.`is_template` = 0
             AND `glpi_plugin_carbon_locations_3d6da7fccf9233a3f1a4e41183391a41`.`plugin_carbon_sources_zones_id` > 0
+            AND `glpi_plugin_carbon_monitortypes_54b036337d1b9bbf4f13db0e1ae93bc9`.`is_ignore` = 0
             AND (
                 `glpi_plugin_carbon_monitortypes_54b036337d1b9bbf4f13db0e1ae93bc9`.`power_consumption` > 0
                 OR `glpi_monitormodels`.`power_consumption` > 0
@@ -340,6 +410,7 @@ class SearchOptions
             $computation = "IF(`glpi_networkequipments_id_401e18dd2eaa15834dcd21d0f6fc677c`.`is_deleted` = 0
             AND `glpi_networkequipments_id_401e18dd2eaa15834dcd21d0f6fc677c`.`is_template` = 0
             AND `glpi_plugin_carbon_locations_3d6da7fccf9233a3f1a4e41183391a41`.`plugin_carbon_sources_zones_id` > 0
+            AND `glpi_plugin_carbon_networkequipmenttypes_640a9703b62363e5d254356fb4df69ef`.`is_ignore` = 0
             AND (
                 `glpi_plugin_carbon_networkequipmenttypes_640a9703b62363e5d254356fb4df69ef`.`power_consumption` > 0
                 OR `glpi_networkequipmentmodels`.`power_consumption` > 0

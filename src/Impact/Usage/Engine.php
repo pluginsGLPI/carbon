@@ -65,6 +65,7 @@ class Engine extends CommonGLPI
             return null;
         }
 
+        /** @var AbstractUsageImpact $usage_impact */
         $usage_impact = new $usage_impact_class();
         try {
             return self::configureEngine($usage_impact);
@@ -78,10 +79,12 @@ class Engine extends CommonGLPI
         if (!is_subclass_of($engine_class, AbstractUsageImpact::class)) {
             return null;
         }
-        $embodied_impact = new $engine_class();
+
+        /** @var AbstractUsageImpact $usage_impact */
+        $usage_impact = new $engine_class();
 
         try {
-            return self::configureEngine($embodied_impact);
+            return self::configureEngine($usage_impact);
         } catch (\RuntimeException $e) {
             return null;
         }

@@ -69,6 +69,8 @@ $iterator = $DB->request([
 ]);
 
 $location_table = 'glpi_plugin_carbon_locations';
+/** @var Migration $migration */
+$migration->migrationOneTable($location_table);
 foreach ($iterator as $row) {
     $where = [
         'locations_id' => $row['locations_id'],

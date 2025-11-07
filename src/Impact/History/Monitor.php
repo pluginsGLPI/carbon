@@ -154,6 +154,10 @@ class Monitor extends AbstractAsset
                 // Check the monitor is located the same place as the attached computer
                 // self::$itemtype::getTableField('locations_id') => new QueryExpression(DBmysql::quoteName(GlpiComputer::getTableField('locations_id'))),
                 Location::getTableField('plugin_carbon_sources_zones_id') => ['>', 0],
+                'OR' => [
+                    [MonitorType::getTableField('is_ignore') => 0],
+                    [MonitorType::getTableField('is_ignore') => null],
+                ],
                 [
                     'OR' => [
                         MonitorType::getTableField('power_consumption') => ['>', 0],
@@ -191,6 +195,7 @@ class Monitor extends AbstractAsset
             GlpiMonitorType::getTableField('id as type_id'),
             MonitorType::getTableField('id as plugin_carbon_type_id'),
             MonitorType::getTableField('power_consumption  as type_power_consumption'),
+            MonitorType::getTableField('is_ignore'),
             Infocom::getTableField('use_date'),
             Infocom::getTableField('delivery_date'),
             Infocom::getTableField('buy_date'),
@@ -231,6 +236,7 @@ class Monitor extends AbstractAsset
         $status['has_type_power_consumption'] = (($data['type_power_consumption'] ?? 0) !== 0);
         $status['ci_download_enabled'] = $is_carbon_intensity_download_enabled;
         $status['ci_fallback_available'] = $is_carbon_intensity_fallback_available;
+        $status['not_is_ignore'] = (($data['is_ignore'] ?? 0) === 0);
 
         $item_oldest_date = $data['use_date']
             ?? $data['delivery_date']
