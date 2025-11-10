@@ -32,18 +32,110 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
+use Computer as GlpiComputer;
 use GlpiPlugin\Carbon\Config;
 use Config as GlpiConfig;
 use Geocoder\Geocoder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Session;
+use Symfony\Component\DomCrawler\Crawler;
 
 #[CoversClass(Config::class)]
 class ConfigTest extends DbTestCase
 {
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\Config::getEmbodiedImpactEngine
-     */
+    public function testGetTypeName()
+    {
+        $result = Config::getTypeName(0);
+        $this->assertEquals('Environmental Impact', $result);
+
+        $result = Config::getTypeName(1);
+        $this->assertEquals('Environmental Impact', $result);
+
+        $result = Config::getTypeName(Session::getPluralNumber());
+        $this->assertEquals('Environmental Impact', $result);
+    }
+
+    public function testGetTabNameForItem()
+    {
+        $instance = new Config();
+        $result = $instance->getTabNameForItem(new GlpiComputer());
+        $this->assertEquals('', $result);
+
+        $result = $instance->getTabNameForItem(new GlpiConfig());
+        $this->assertEquals('Environmental Impact', $result);
+    }
+
+    public function testDisplayTabContentForItem()
+    {
+        $this->login('glpi', 'glpi');
+
+        ob_start();
+        Config::displayTabContentForItem(new GlpiComputer());
+        $output = ob_get_clean();
+        $this->assertEquals('', $output);
+
+        ob_start();
+        Config::displayTabContentForItem(new GlpiConfig());
+        $output = ob_get_clean();
+        $this->assertNotEquals('', $output);
+    }
+
+    public function testShowForm()
+    {
+        // No right to edit this page
+        $this->logout();
+        ob_start();
+        $instance = new Config();
+        $instance->showForm(-1);
+        $output = ob_get_clean();
+        $this->assertEquals('', trim($output));
+
+        $this->login('glpi', 'glpi');
+        ob_start();
+        $instance = new Config();
+        $instance->showForm(-1);
+        $output = ob_get_clean();
+        $crawler = new Crawler($output);
+        $config_class = $crawler->filter('input[type="hidden"][name="config_class"]');
+        $config_context = $crawler->filter('input[type="hidden"][name="config_context"]');
+        $csrf = $crawler->filter('input[type="hidden"][name="_glpi_csrf_token"]');
+        $this->assertEquals(1, $config_class->count());
+        $this->assertEquals(1, $config_context->count());
+        $this->assertEquals(1, $csrf->count());
+        $electricitymaps_api = $crawler->filter('input[name="electricitymap_api_key"]');
+        $impact_engine = $crawler->filter('select[name="impact_engine"]');
+        $boaviztapi_url = $crawler->filter('input[name="boaviztapi_base_url"]');
+        $geocoding = $crawler->filter('input[type="checkbox"][name="geocoding_enabled"]');
+        $this->assertEquals(1, $electricitymaps_api->count());
+        $this->assertEquals(1, $impact_engine->count());
+        $this->assertEquals(1, $boaviztapi_url->count());
+        $this->assertEquals(1, $geocoding->count());
+
+        // Test that the boaviztapi URL is hidden when set from an env var
+        putenv(Config::ENV_BOAVIZTAPI_BASE_URL . '=bar');
+        $this->login('glpi', 'glpi');
+        ob_start();
+        $instance = new Config();
+        $instance->showForm(-1);
+        $output = ob_get_clean();
+        $crawler = new Crawler($output);
+        $config_class = $crawler->filter('input[type="hidden"][name="config_class"]');
+        $config_context = $crawler->filter('input[type="hidden"][name="config_context"]');
+        $csrf = $crawler->filter('input[type="hidden"][name="_glpi_csrf_token"]');
+        $this->assertEquals(1, $config_class->count());
+        $this->assertEquals(1, $config_context->count());
+        $this->assertEquals(1, $csrf->count());
+        $electricitymaps_api = $crawler->filter('input[name="electricitymap_api_key"]');
+        $impact_engine = $crawler->filter('select[name="impact_engine"]');
+        $boaviztapi_url = $crawler->filter('input[name="boaviztapi_base_url"]');
+        $geocoding = $crawler->filter('input[type="checkbox"][name="geocoding_enabled"]');
+        $this->assertEquals(1, $electricitymaps_api->count());
+        $this->assertEquals(1, $impact_engine->count());
+        $this->assertEquals(0, $boaviztapi_url->count());
+        $this->assertEquals(1, $geocoding->count());
+    }
+
     public function testGetEmbodiedImpactEngine()
     {
         $configuration_key = 'impact_engines';
@@ -63,9 +155,6 @@ class ConfigTest extends DbTestCase
         $this->assertEquals('GlpiPlugin\\Carbon\\Impact\\Embodied\\Boavizta', $output);
     }
 
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\Config::getUsageImpactEngine
-     */
     public function testGetUsageImpactEngine()
     {
         $configuration_key = 'impact_engines';
