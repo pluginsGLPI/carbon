@@ -34,7 +34,6 @@ namespace GlpiPlugin\Carbon\Tests;
 
 use Config;
 use DateTime;
-use Geocoder\Collection;
 use Geocoder\Geocoder;
 use Geocoder\Model\AddressCollection;
 use Geocoder\Model\AdminLevel;
@@ -47,8 +46,9 @@ use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 use Location as GlpiLocation;
 use GlpiPlugin\Carbon\Location;
-use Locale;
+use PHPUnit\Framework\Attributes\CoversClass;
 
+#[CoversClass(Location::class)]
 class LocationTest extends DbTestCase
 {
     /**

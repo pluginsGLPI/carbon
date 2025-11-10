@@ -35,7 +35,9 @@ namespace GlpiPlugin\Carbon\Tests;
 use NetworkEquipmentModel as GlpiNetworkEquipmentModel;
 use GlpiPlugin\Carbon\NetworkEquipmentModel;
 use Symfony\Component\DomCrawler\Crawler;
+use PHPUnit\Framework\Attributes\CoversClass;
 
+#[CoversClass(NetworkEquipmentModel::class)]
 class NetworkEquipmentModelTest extends DbTestCase
 {
     /**

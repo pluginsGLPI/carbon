@@ -35,7 +35,9 @@ namespace GlpiPlugin\Carbon\Tests;
 use ComputerModel as GlpiComputerModel;
 use GlpiPlugin\Carbon\ComputerModel;
 use Symfony\Component\DomCrawler\Crawler;
+use PHPUnit\Framework\Attributes\CoversClass;
 
+#[CoversClass(ComputerModel::class)]
 class ComputerModelTest extends DbTestCase
 {
     /**

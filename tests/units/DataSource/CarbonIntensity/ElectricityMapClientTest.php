@@ -39,7 +39,9 @@ use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use DateTimeImmutable;
 use GlpiPlugin\Carbon\Source_Zone;
+use PHPUnit\Framework\Attributes\CoversClass;
 
+#[CoversClass(ElectricityMapClient::class)]
 class ElectricityMapClientTest extends DbTestCase
 {
     public function testQueryZones()

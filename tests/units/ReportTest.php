@@ -35,7 +35,9 @@ namespace GlpiPlugin\Carbon\Tests;
 use GlpiPlugin\Carbon\Report;
 use Session;
 use Symfony\Component\DomCrawler\Crawler;
+use PHPUnit\Framework\Attributes\CoversClass;
 
+#[CoversClass(Report::class)]
 class ReportTest extends DbTestCase
 {
     /**

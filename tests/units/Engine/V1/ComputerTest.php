@@ -42,7 +42,9 @@ use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Tests\Engine\V1\EngineTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 
+#[CoversClass(Computer::class)]
 class ComputerTest extends EngineTestCase
 {
     protected static string $engine_class = Computer::class;

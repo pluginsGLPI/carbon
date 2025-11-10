@@ -39,7 +39,9 @@ use GlpiPlugin\Carbon\Tests\DbTestCase;
 use DateTimeImmutable;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\Zone;
+use PHPUnit\Framework\Attributes\CoversClass;
 
+#[CoversClass(RteClient::class)]
 class RteClientTest extends DbTestCase
 {
     public function testFetchDay()

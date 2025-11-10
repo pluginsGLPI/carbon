@@ -58,7 +58,7 @@ use NetworkEquipment;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
 use PHPUnit\Framework\Attributes\CoversClass;
 
-#[CoversClass('GlpiPlugin\Carbon\Dashboard\Provider')]
+#[CoversClass(Provider::class)]
 class ProviderTest extends DbTestCase
 {
     public function setUp(): void

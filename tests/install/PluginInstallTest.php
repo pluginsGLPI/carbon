@@ -58,6 +58,7 @@ use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\CronTask;
+use GlpiPlugin\Carbon\Install;
 use GlpiPlugin\Carbon\Report;
 use Location;
 use Monitor;
@@ -66,7 +67,9 @@ use MonitorType;
 use NetworkEquipment;
 use NetworkEquipmentModel;
 use NetworkEquipmentType;
+use PHPUnit\Framework\Attributes\CoversClass;
 
+#[CoversClass(Install::class)]
 class PluginInstallTest extends CommonTestCase
 {
     public function setUp(): void

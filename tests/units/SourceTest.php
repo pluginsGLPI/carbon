@@ -38,7 +38,9 @@ use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 use Log;
 use Session;
+use PHPUnit\Metadata\CoversClass;
 
+#[CoversClass(Source::class)]
 class SourceTest extends DbTestCase
 {
     /**

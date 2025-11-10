@@ -44,7 +44,9 @@ use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\Zone;
 use Location as GlpiLocation;
+use PHPUnit\Framework\Attributes\CoversNothing;
 
+#[CoversNothing]
 class HookTest extends DbTestCase
 {
     public function testRelationsArePuegedOnAssetPurge()

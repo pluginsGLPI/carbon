@@ -35,7 +35,9 @@ namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\Tests;
 use DateTimeImmutable;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\AbstractClient;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 
+#[CoversClass(AbstractClient::class)]
 class AbstractClientTest extends DbTestCase
 {
     public function sliceDateRangeByMonthProvider()

@@ -38,7 +38,9 @@ use GlpiPlugin\Carbon\UsageInfo;
 use Computer as GlpiComputer;
 use Contact;
 use Symfony\Component\DomCrawler\Crawler;
+use PHPUnit\Metadata\CoversClass;
 
+#[CoversClass(UsageInfo::class)]
 class UsageInfoTest extends DbTestCase
 {
     /**

@@ -32,13 +32,14 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
-use Computer;
 use ComputerType as GlpiComputerType;
 use GlpiPlugin\Carbon\ComputerType;
 use MassiveAction;
 use Session;
 use Symfony\Component\DomCrawler\Crawler;
+use PHPUnit\Framework\Attributes\CoversClass;
 
+#[CoversClass(ComputerType::class)]
 class ComputerTypeTest extends DbTestCase
 {
     public function testGetTypeName()
