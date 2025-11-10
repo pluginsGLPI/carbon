@@ -38,7 +38,7 @@ use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 use Log;
 use Session;
-use PHPUnit\Metadata\CoversClass;
+use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(Source::class)]
 class SourceTest extends DbTestCase
@@ -155,5 +155,26 @@ class SourceTest extends DbTestCase
         $output = ob_get_clean();
         $this->assertNotEquals('', $output);
         $this->assertTrue($result);
+    }
+
+    public function testGetDownloadableSources()
+    {
+        $instance = new Source();
+        $original_count = $instance->getDownloadableSources();
+        $source = $this->createItem(source::class, [
+            'name'           => 'foo',
+            'fallback_level' => 0,
+        ]);
+        $new_count = $instance->getDownloadableSources();
+        $this->assertEquals(1, count($new_count) - count($original_count));
+
+        $instance = new Source();
+        $original_count = $instance->getDownloadableSources();
+        $source = $this->createItem(source::class, [
+            'name'           => 'foo 2',
+            'fallback_level' => 1,
+        ]);
+        $new_count = $instance->getDownloadableSources();
+        $this->assertEquals(0, count($new_count) - count($original_count));
     }
 }
