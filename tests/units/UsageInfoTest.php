@@ -32,13 +32,14 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
-use GlpiPlugin\Carbon\ComputerUsageProfile;
-use GlpiPlugin\Carbon\Profile;
 use GlpiPlugin\Carbon\UsageInfo;
 use Computer as GlpiComputer;
 use Contact;
+use DBmysql;
+use Monitor as GlpiMonitor;
+use NetworkEquipment as GlpiNetworkEquipment;
 use Symfony\Component\DomCrawler\Crawler;
-use PHPUnit\Metadata\CoversClass;
+use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(UsageInfo::class)]
 class UsageInfoTest extends DbTestCase
@@ -67,6 +68,53 @@ class UsageInfoTest extends DbTestCase
         $this->assertEquals('fa-solid fa-solar-panel', $icon);
     }
 
+    public function testCanPurgeItem()
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        // Test an empty insrance
+        $instance = new UsageInfo();
+        $result = $instance->canPurgeItem();
+        $this->assertFalse($result);
+
+        // Test an instance for a invalid asset type
+        $success = $DB->insert(getTableForItemType(UsageInfo::class), [
+            'itemtype' => 'InvalidType',
+        ]);
+        $this->assertTrue($success);
+        $instance = UsageInfo::getById($DB->insertId());
+        $this->assertFalse($result);
+
+        // Test an instance for a non existing asset
+        $glpi_computer = $this->createItem(GlpiComputer::class);
+        $instance = $this->createItem(UsageInfo::class, [
+            'itemtype' => $glpi_computer::getType(),
+            'items_id' => $glpi_computer->getID(),
+        ]);
+        $DB->delete($glpi_computer::getTable(), [
+            'id' => $glpi_computer->getID(),
+        ]);
+        $this->assertFalse($result);
+
+        // Test an instance for an existing asset without any right
+        $glpi_computer = $this->createItem(GlpiComputer::class);
+        $instance = $this->createItem(UsageInfo::class, [
+            'itemtype' => $glpi_computer::getType(),
+            'items_id' => $glpi_computer->getID(),
+        ]);
+        $this->assertFalse($result);
+
+        // Test an instance for an existing asset
+        $this->login('glpi', 'glpi');
+        $glpi_computer = $this->createItem(GlpiComputer::class);
+        $instance = $this->createItem(UsageInfo::class, [
+            'itemtype' => $glpi_computer::getType(),
+            'items_id' => $glpi_computer->getID(),
+        ]);
+        $this->assertFalse($result);
+    }
+
     /**
      * #CoversMethod GlpiPlugin\Carbon\UsageInfo::getTabNameForItem
      *
@@ -76,11 +124,71 @@ class UsageInfoTest extends DbTestCase
     {
         $usageInfo = new UsageInfo();
         $item = new GlpiComputer();
-        $tabName = $usageInfo->getTabNameForItem($item);
-        $this->assertEquals('Environmental impact', $tabName);
+        $result = $usageInfo->getTabNameForItem($item);
+        $crawler = new Crawler($result);
+        $this->assertEquals('Environmental impact', $crawler->text());
 
         $item = new Contact();
         $tabName = $usageInfo->getTabNameForItem($item);
         $this->assertEquals('', $tabName);
+    }
+
+    public function testShowForItem()
+    {
+        // Test that the usage profile shows for a computer
+        $glpi_computer = $this->createItem(GlpiComputer::class);
+        $instance = $this->createItem(UsageInfo::class, [
+            'itemtype' => $glpi_computer::getType(),
+            'items_id' => $glpi_computer->getID(),
+        ]);
+        ob_start();
+        $instance->showForItem($instance->getID());
+        $output = ob_get_clean();
+        $crawler = new Crawler($output);
+        $usage_profile_dropdown = $crawler->filter('select[name="plugin_carbon_computerusageprofiles_id"]');
+        $this->assertEquals(1, $usage_profile_dropdown->count());
+
+        // Test that the usage profile does not shows for a monitor
+        $glpi_monitor = $this->createItem(GlpiMonitor::class);
+        $instance = $this->createItem(UsageInfo::class, [
+            'itemtype' => $glpi_monitor::getType(),
+            'items_id' => $glpi_monitor->getID(),
+        ]);
+        ob_start();
+        $instance->showForItem($instance->getID());
+        $output = ob_get_clean();
+        $crawler = new Crawler($output);
+        $usage_profile_dropdown = $crawler->filter('select[name="plugin_carbon_computerusageprofiles_id"]');
+        $this->assertEquals(0, $usage_profile_dropdown->count());
+
+        // Test that the usage profile does not shows for a network equipment
+        $glpi_networkequipment = $this->createItem(GlpiNetworkEquipment::class);
+        $instance = $this->createItem(UsageInfo::class, [
+            'itemtype' => $glpi_networkequipment::getType(),
+            'items_id' => $glpi_networkequipment->getID(),
+        ]);
+        ob_start();
+        $instance->showForItem($instance->getID());
+        $output = ob_get_clean();
+        $crawler = new Crawler($output);
+        $usage_profile_dropdown = $crawler->filter('select[name="plugin_carbon_computerusageprofiles_id"]');
+        $this->assertEquals(0, $usage_profile_dropdown->count());
+    }
+
+    public function testShowcharts()
+    {
+        // Test that the charts shows for a computer
+        $glpi_computer = $this->createItem(GlpiComputer::class);
+        $instance = $this->createItem(UsageInfo::class, [
+            'itemtype' => $glpi_computer::getType(),
+            'items_id' => $glpi_computer->getID(),
+        ]);
+        ob_start();
+        UsageInfo::showCharts($glpi_computer);
+        $output = ob_get_clean();
+        $crawler = new Crawler($output);
+        $usage_profile_dropdown = $crawler->filter('select[name="plugin_carbon_computerusageprofiles_id"]');
+        $this->assertEquals(1, $usage_profile_dropdown->count());
+
     }
 }
