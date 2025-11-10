@@ -9,7 +9,8 @@
   displayDetailsOnPhpunitDeprecations="true"
   backupGlobals="false"
   colors="true"
-  stderr="true">
+  stderr="true"
+  requireCoverageMetadata="true">
   <source>
     <include>
       <directory suffix=".php">src</directory>

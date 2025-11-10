@@ -38,7 +38,9 @@ use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 use Location as GlpiLocation;
+use PHPUnit\Framework\Attributes\CoversClass;
 
+#[CoversClass(Zone::class)]
 class ZoneTest extends DbTestCase
 {
     public function testGetByAsset()

@@ -33,16 +33,15 @@
 namespace GlpiPlugin\Carbon\Tests;
 
 use Computer;
-use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\Zone;
 use Location as GlpiLocation;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-use function PHPUnit\Framework\assertEquals;
-
+#[CoversClass(Source_Zone::class)]
 class Source_ZoneTest extends DbTestCase
 {
     /**

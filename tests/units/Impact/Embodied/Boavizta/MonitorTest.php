@@ -38,7 +38,9 @@ use DBmysql;
 use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\Impact\Embodied\Boavizta\Monitor as BoaviztaMonitor;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 
+#[CoversClass(Monitor::class)]
 class MonitorTest extends DbTestCase
 {
     public function testGetEvaluableQuery()

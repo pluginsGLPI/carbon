@@ -32,6 +32,7 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
+use GlpiPlugin\Carbon\AbstractType;
 use GlpiPlugin\Carbon\MonitorType;
 use MassiveAction;
 use MonitorType as GlpiMonitorType;
@@ -39,8 +40,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use Session;
 use Symfony\Component\DomCrawler\Crawler;
 
-#[CoversClass('GlpiPlugin\Carbon\AbstractType')]
-#[CoversClass('GlpiPlugin\Carbon\MonitorType')]
+#[CoversClass(AbstractType::class)]
+#[CoversClass(MonitorType::class)]
 class MonitorTypeTest extends DbTestCase
 {
     public function testGetTypeName()

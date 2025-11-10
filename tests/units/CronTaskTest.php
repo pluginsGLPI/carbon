@@ -36,7 +36,6 @@ use Config;
 use GlpiPlugin\Carbon\CronTask;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\CarbonIntensity;
-use GlpiPlugin\Carbon\Location;
 use CronTask as GlpiCronTask;
 use Geocoder\Geocoder;
 use Geocoder\Model\AddressCollection;
@@ -46,7 +45,9 @@ use Geocoder\Model\Country;
 use Geocoder\Provider\Nominatim\Model\NominatimAddress;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientInterface;
 use Location as GlpiLocation;
+use PHPUnit\Framework\Attributes\CoversClass;
 
+#[CoversClass(CronTask::class)]
 class CronTaskTest extends DbTestCase
 {
     public function downloadSourceProvider()

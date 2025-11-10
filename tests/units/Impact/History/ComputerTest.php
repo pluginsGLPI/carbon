@@ -48,10 +48,9 @@ use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\Zone;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * #CoversMethod \GlpiPlugin\Carbon\Impact\History\Computer
- */
+#[CoversClass(Computer::class)]
 class ComputerTest extends CommonAsset
 {
     protected string $history_type = \GlpiPlugin\Carbon\Impact\History\Computer::class;

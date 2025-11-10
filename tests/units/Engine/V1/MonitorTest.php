@@ -46,7 +46,9 @@ use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use MonitorModel;
+use PHPUnit\Framework\Attributes\CoversClass;
 
+#[CoversClass(Monitor::class)]
 class MonitorTest extends EngineTestCase
 {
     protected static string $engine_class = Monitor::class;

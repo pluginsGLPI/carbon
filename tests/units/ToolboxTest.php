@@ -41,7 +41,9 @@ use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\Toolbox;
 use Infocom;
 use Location;
+use PHPUnit\Framework\Attributes\CoversClass;
 
+#[CoversClass(Toolbox::class)]
 class ToolboxTest extends DbTestCase
 {
     /**

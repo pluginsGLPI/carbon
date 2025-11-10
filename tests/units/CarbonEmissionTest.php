@@ -40,7 +40,9 @@ use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\CarbonEmission;
 use PHPUnit\Framework\Attributes\DataProvider;
 use User;
+use PHPUnit\Framework\Attributes\CoversClass;
 
+#[CoversClass(CarbonEmission::class)]
 class CarbonEmissionTest extends DbTestCase
 {
     public static function findGapsProvider(): array

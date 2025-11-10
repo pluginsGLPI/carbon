@@ -46,10 +46,9 @@ use NetworkEquipmentType as GlpiNetworkEquipmentType;
 use NetworkEquipment as GlpiNetworkEquipment;
 use Location as GlpiLocation;
 use NetworkEquipmentModel as GlpiNetworkEquipmentModel;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * #CoversMethod \GlpiPlugin\Carbon\Impact\History\NetworkEquipment
- */
+#[CoversClass(NetworkEquipment::class)]
 class NetworkEquipmentTest extends CommonAsset
 {
     protected string $history_type =  \GlpiPlugin\Carbon\Impact\History\NetworkEquipment::class;

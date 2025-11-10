@@ -56,10 +56,9 @@ use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\Zone;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * #CoversMethod \GlpiPlugin\Carbon\Impact\History\Monitor
- */
+#[CoversClass(Monitor::class)]
 class MonitorTest extends CommonAsset
 {
     protected string $history_type = \GlpiPlugin\Carbon\Impact\History\Monitor::class;

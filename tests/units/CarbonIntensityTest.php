@@ -41,14 +41,13 @@ use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
-use GlpiPlugin\Carbon\DataSource\AbstractCarbonIntensity;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\AbstractClient;
 use Infocom;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\Output;
 
-#[CoversClass('GlpiPlugin\Carbon\CarbonIntensity')]
+#[CoversClass(CarbonIntensity::class)]
 class CarbonIntensityTest extends DbTestCase
 {
     public function testGetLastKnownDate()

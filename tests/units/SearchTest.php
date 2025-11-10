@@ -36,8 +36,10 @@ use Computer;
 use GlpiPlugin\Carbon\SearchOptions;
 use Monitor;
 use NetworkEquipment;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Search;
 
+#[CoversClass(Search::class)]
 class SearchTest extends DbTestCase
 {
     public function testSearchOptions()

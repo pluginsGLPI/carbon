@@ -42,7 +42,9 @@ use GlpiPlugin\Carbon\Impact\Embodied\Boavizta\Computer;
 use GlpiPlugin\Carbon\Impact\Embodied\Boavizta\Monitor;
 use GlpiPlugin\Carbon\Impact\Embodied\Internal\NetworkEquipment;
 use GlpiPlugin\Carbon\Impact\Embodied\Engine;
+use PHPUnit\Framework\Attributes\CoversClass;
 
+#[CoversClass(Engine::class)]
 class EngineTest extends DbTestCase
 {
     public function testGetEngineFromItemtypeForBoavizta()

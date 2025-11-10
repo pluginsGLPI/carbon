@@ -41,7 +41,9 @@ use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\Impact\Usage\Boavizta\Computer;
 use GlpiPlugin\Carbon\Impact\Usage\Boavizta\Monitor;
 use GlpiPlugin\Carbon\Impact\Usage\Engine;
+use PHPUnit\Framework\Attributes\CoversClass;
 
+#[CoversClass(Engine::class)]
 class EngineTest extends DbTestCase
 {
     public function testGetEngineFromItemtypeForBoavizta()

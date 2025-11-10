@@ -42,7 +42,9 @@ use GlpiPlugin\Carbon\Zone;
 use NetworkEquipment as GlpiNetworkEquipment;
 use NetworkEquipmentModel;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
+use PHPUnit\Framework\Attributes\CoversClass;
 
+#[CoversClass(NetworkEquipment::class)]
 class NetworkEquipmentTest extends EngineTestCase
 {
     protected static string $engine_class = NetworkEquipment::class;

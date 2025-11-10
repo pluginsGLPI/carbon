@@ -38,7 +38,7 @@ use Geocoder\Geocoder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-#[CoversClass('GlpiPlugin\Carbon\Config')]
+#[CoversClass(Config::class)]
 class ConfigTest extends DbTestCase
 {
     /**

@@ -38,8 +38,9 @@ use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use MassiveAction;
 use Symfony\Component\DomCrawler\Crawler;
-use Ticket;
+use PHPUnit\Framework\Attributes\CoversClass;
 
+#[CoversClass(ComputerUsageProfile::class)]
 class ComputerUsageProfileTest extends DbTestCase
 {
     /**

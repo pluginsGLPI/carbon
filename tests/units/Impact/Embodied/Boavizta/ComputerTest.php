@@ -38,7 +38,9 @@ use DBmysql;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\Impact\Embodied\Boavizta\Computer as BoaviztaComputer;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 
+#[CoversClass(Computer::class)]
 class ComputerTest extends DbTestCase
 {
     public function testGetEvaluableQuery()

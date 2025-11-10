@@ -35,12 +35,13 @@ namespace GlpiPlugin\Carbon\Tests;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
 use MassiveAction;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
+use GlpiPlugin\Carbon\AbstractType;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Session;
 use Symfony\Component\DomCrawler\Crawler;
 
-#[CoversClass('GlpiPlugin\Carbon\NetworkEquipmentType')]
-#[CoversClass('GlpiPlugin\Carbon\AbstractType')]
+#[CoversClass(NetworkEquipmentType::class)]
+#[CoversClass(AbstractType::class)]
 class NetworkEquipmentTypeTest extends DbTestCase
 {
     public function testGetTypeName()

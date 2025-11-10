@@ -36,7 +36,9 @@ use GlpiPlugin\Carbon\Engine\V1\Inventory;
 use Computer;
 use Plugin;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 
+#[CoversClass(Inventory::class)]
 class InventoryTest extends DbTestCase
 {
     public function testAddItem()
