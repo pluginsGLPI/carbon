@@ -42,7 +42,6 @@ use GlpiPlugin\Carbon\Dashboard\Widget;
 use Html;
 use Monitor;
 use NetworkEquipment;
-use Plugin;
 
 /**
  * Relation between a computer and a usage profile
@@ -88,7 +87,7 @@ class UsageInfo extends CommonDBChild
         $tabName = '';
         if (!$withtemplate) {
             if (in_array($item->getType(), PLUGIN_CARBON_TYPES)) {
-                $tabName = __('Environmental impact', 'carbon');
+                $tabName = self::createTabEntry(__('Environmental impact', 'carbon'));
             }
         }
         return $tabName;
