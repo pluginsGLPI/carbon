@@ -32,7 +32,7 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
-use Computer;
+use Computer as GlpiComputer;
 use ComputerType as GlpiComputerType;
 use DbUtils;
 use GlpiPlugin\Carbon\CarbonEmission;
@@ -51,7 +51,7 @@ class HookTest extends DbTestCase
 {
     public function testRelationsArePuegedOnAssetPurge()
     {
-        $computer = $this->createItem(Computer::class);
+        $computer = $this->createItem(GlpiComputer::class);
         $carbon_emission = $this->createItem(CarbonEmission::class, [
             'itemtype' => $computer->getType(),
             'items_id' => $computer->getID()
@@ -135,7 +135,7 @@ class HookTest extends DbTestCase
             'locations_id' => $glpi_location->getID(),
             $source_zone::getForeignKeyField() => $source_zone->getID(),
         ]);
-        $computer = $this->createItem(Computer::class);
+        $computer = $this->createItem(GlpiComputer::class);
         $this->assertEquals(0, $source_zone->fields['is_download_enabled']);
         $computer->update([
             'id' => $computer->getID(),
