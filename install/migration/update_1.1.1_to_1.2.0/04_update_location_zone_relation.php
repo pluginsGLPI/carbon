@@ -42,7 +42,7 @@ $source_zone_table = 'glpi_plugin_carbon_sources_zones';
 $iterator = $DB->request([
     'SELECT' => [
         $glpi_location_table . '.id as locations_id',
-        $zone_table . '.plugin_carbon_sources_id_historical',
+        $zone_table . '.plugin_carbon_carbonintensitysources_id_historical',
         $zone_table . '.id as plugin_carbon_zones_id',
         $source_zone_table . '.id as plugin_carbon_sources_zones_id',
     ],
@@ -60,7 +60,7 @@ $iterator = $DB->request([
                 $zone_table => 'id',
                 [
                     'AND' => [
-                        new QueryExpression('`' . $source_zone_table . '`.`plugin_carbon_sources_id` = `' . $zone_table . '`.`plugin_carbon_sources_id_historical`'),
+                        new QueryExpression('`' . $source_zone_table . '`.`plugin_carbon_sources_id` = `' . $zone_table . '`.`plugin_carbon_carbonintensitysources_id_historical`'),
                     ]
                 ]
             ]
@@ -88,7 +88,7 @@ $source_zone_table = 'glpi_plugin_carbon_sources_zones';
 $iterator = $DB->request([
     'SELECT' => [
         $glpi_location_table . '.id as locations_id',
-        $zone_table . '.plugin_carbon_sources_id_historical',
+        $zone_table . '.plugin_carbon_carbonintensitysources_id_historical',
         $zone_table . '.id as plugin_carbon_zones_id',
         $source_zone_table . '.id as plugin_carbon_sources_zones_id',
     ],
@@ -106,7 +106,7 @@ $iterator = $DB->request([
                 $zone_table => 'id',
                 [
                     'AND' => [
-                        new QueryExpression('`' . $source_zone_table . '`.`plugin_carbon_sources_id` = `' . $zone_table . '`.`plugin_carbon_sources_id_historical`'),
+                        new QueryExpression('`' . $source_zone_table . '`.`plugin_carbon_sources_id` = `' . $zone_table . '`.`plugin_carbon_carbonintensitysources_id_historical`'),
                     ]
                 ]
             ]
@@ -127,4 +127,4 @@ foreach ($iterator as $row) {
 
 $table = 'glpi_plugin_carbon_zones';
 /** @var Migration $migration */
-$migration->dropField($table, 'plugin_carbon_sources_id_historical');
+$migration->dropField($table, 'plugin_carbon_carbonintensitysources_id_historical');

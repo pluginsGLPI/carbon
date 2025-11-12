@@ -138,9 +138,16 @@ class Install
         $oldest_upgradable_version = self::OLDEST_UPGRADABLE_VERSION;
 
         $db_version = config::getConfigurationValue('plugin:carbon', 'dbversion');
-        if (version_compare($db_version, PLUGIN_CARBON_VERSION) > 0) {
+        $matches = [];
+        preg_match('/^(\d+\.\d+\.\d+)/', PLUGIN_CARBON_VERSION, $matches);
+        $current_version = $matches[1];
+        if (version_compare($db_version, $current_version) > 0) {
             // database more recent than current version
-            $e = new \RuntimeException('Database of the plugin is more recent than the installed version.');
+            $e = new \RuntimeException(sprintf(
+                'Database of the plugin %s is more recent than the installed version %s.',
+                $db_version,
+                $current_version
+            ));
             trigger_error($e->getMessage(), E_USER_WARNING);
             throw $e;
         }
