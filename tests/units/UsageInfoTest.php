@@ -33,6 +33,7 @@
 namespace GlpiPlugin\Carbon\Tests;
 
 use GlpiPlugin\Carbon\UsageInfo;
+use GlpiPlugin\Carbon\EmbodiedImpact;
 use Computer as GlpiComputer;
 use Contact;
 use DBmysql;
@@ -177,18 +178,87 @@ class UsageInfoTest extends DbTestCase
 
     public function testShowcharts()
     {
-        // Test that the charts shows for a computer
-        $glpi_computer = $this->createItem(GlpiComputer::class);
-        $instance = $this->createItem(UsageInfo::class, [
-            'itemtype' => $glpi_computer::getType(),
-            'items_id' => $glpi_computer->getID(),
-        ]);
-        ob_start();
-        UsageInfo::showCharts($glpi_computer);
-        $output = ob_get_clean();
-        $crawler = new Crawler($output);
-        $usage_profile_dropdown = $crawler->filter('select[name="plugin_carbon_computerusageprofiles_id"]');
-        $this->assertEquals(1, $usage_profile_dropdown->count());
+        $itemtypes = PLUGIN_CARBON_TYPES;
+        foreach ($itemtypes as $itemtype) {
+            // Test charts and data are visible for an asset
+            $item = $this->createItem($itemtype);
+            $instance = $this->createItem(UsageInfo::class, [
+                'itemtype' => $item::getType(),
+                'items_id' => $item->getID(),
+            ]);
+            $embodied_impact = $this->createItem(EmbodiedImpact::class, [
+                'itemtype' => $item::getType(),
+                'items_id' => $item->getID(),
+                'gwp' => 10,
+                'adp' => 11,
+                'pe'  => 12,
+            ]);
+            ob_start();
+            UsageInfo::showCharts($item);
+            $output = ob_get_clean();
+            $crawler = new Crawler($output);
+            $monthlyCarbonEmissionChart = $crawler->filter('#carbonEmissionPerMonthChart');
+            $this->assertEquals(1, $monthlyCarbonEmissionChart->count());
+            $this->assertTrue($this->testEmbodiedGwp($crawler));
+            $this->assertTrue($this->testEmbodiedAdp($crawler));
+            $this->assertTrue($this->testEmbodiedPe($crawler));
 
+            // Test charts are visible for an asset - no embodied data
+            $item = $this->createItem($itemtype);
+            $instance = $this->createItem(UsageInfo::class, [
+                'itemtype' => $item::getType(),
+                'items_id' => $item->getID(),
+            ]);
+            ob_start();
+            UsageInfo::showCharts($item);
+            $output = ob_get_clean();
+            $crawler = new Crawler($output);
+            $monthlyCarbonEmissionChart = $crawler->filter('#carbonEmissionPerMonthChart');
+            $this->assertEquals(1, $monthlyCarbonEmissionChart->count());
+            $this->assertFalse($this->testEmbodiedGwp($crawler));
+            $this->assertFalse($this->testEmbodiedAdp($crawler));
+            $this->assertFalse($this->testEmbodiedPe($crawler));
+
+            // Test charts are visible for an asset - empty embodied data
+            $item = $this->createItem($itemtype);
+            $instance = $this->createItem(UsageInfo::class, [
+                'itemtype' => $item::getType(),
+                'items_id' => $item->getID(),
+            ]);
+            $embodied_impact = $this->createItem(EmbodiedImpact::class, [
+                'itemtype' => $item::getType(),
+                'items_id' => $item->getID(),
+                'gwp' => null,
+                'adp' => null,
+                'pe'  => null,
+            ]);
+            ob_start();
+            UsageInfo::showCharts($item);
+            $output = ob_get_clean();
+            $crawler = new Crawler($output);
+            $monthlyCarbonEmissionChart = $crawler->filter('#carbonEmissionPerMonthChart');
+            $this->assertEquals(1, $monthlyCarbonEmissionChart->count());
+            $this->assertFalse($this->testEmbodiedGwp($crawler));
+            $this->assertFalse($this->testEmbodiedAdp($crawler));
+            $this->assertFalse($this->testEmbodiedPe($crawler));
+        }
+    }
+
+    private function testEmbodiedGwp(Crawler $crawler): bool
+    {
+        $items = $crawler->filter('#plugin_carbon_embodied_impacts #embodied_carbon_emission_tip');
+        return $items->count() === 1;
+    }
+
+    private function testEmbodiedAdp(Crawler $crawler): bool
+    {
+        $items = $crawler->filter('#plugin_carbon_embodied_impacts #embodied_abiotic_depletion_tip');
+        return $items->count() === 1;
+    }
+
+    private function testEmbodiedPe(Crawler $crawler): bool
+    {
+        $items = $crawler->filter('#plugin_carbon_embodied_impacts #embodied_primary_energy_tip');
+        return $items->count() === 1;
     }
 }
