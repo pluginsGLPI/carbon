@@ -32,7 +32,7 @@
 
 namespace GlpiPlugin\Carbon;
 
-use Computer;
+use Computer as GlpiComputer;
 use CommonDBChild;
 use CommonDBTM;
 use CommonGLPI;
@@ -139,11 +139,16 @@ class UsageInfo extends CommonDBChild
         /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
+        // TODO: drop this early exit when enabling planned lifespan of assets
+        if ($this->fields['itemtype'] !== GlpiComputer::class) {
+            // Nothing to edit (for now)
+            return;
+        }
+
         // TODO: Design a rights system for the whole plugin
         $canedit = self::canUpdate();
 
         $target = $CFG_GLPI['root_doc'] . '/plugins/carbon/front/usageimpact.form.php';
-
         $options = [
             'candel'   => false,
             'can_edit' => $canedit,
@@ -195,7 +200,7 @@ class UsageInfo extends CommonDBChild
             'itemtype' => $asset->getType(),
             'items_id' => $asset->getID(),
         ]);
-        if (in_array($asset->getType(), [Computer::class, NetworkEquipment::class, Monitor::class])) {
+        if (in_array($asset->getType(), [GlpiComputer::class, NetworkEquipment::class, Monitor::class])) {
             // TODO: decide if we show or not this impact.
             unset($usage_impact->fields['pe']);
         }
