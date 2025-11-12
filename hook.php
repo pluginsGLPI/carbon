@@ -87,6 +87,9 @@ function plugin_carbon_install(array $args = []): bool
             $success = $install->upgrade($version, $args);
         }
     } catch (\RuntimeException $e) {
+        if (isCommandLine()) {
+            throw $e;
+        }
         $error_footer = '<br />' . __('Please check the logs for more details. Fill an issue in the repository of the plugin.', 'carbon');
         Session::addMessageAfterRedirect($e->getMessage() . $error_footer, false, ERROR);
         $success = false;

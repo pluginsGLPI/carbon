@@ -47,11 +47,6 @@ $migration->renameTable($old_table, $new_table);
 $table = 'glpi_plugin_carbon_carbonintensities';
 $migration->changeField($table, 'plugin_carbon_carbonintensitysources_id', 'plugin_carbon_sources_id', 'fkey');
 
-$table = 'glpi_plugin_carbon_zones';
-$migration->changeField($table, 'plugin_carbon_carbonintensitysources_id_historical', 'plugin_carbon_sources_id_historical', 'fkey');
-$migration->dropKey($table, 'plugin_carbon_carbonintensitysources_id_historical');
-$migration->addKey($table, 'plugin_carbon_sources_id_historical', 'plugin_carbon_sources_id_historical');
-
 $table = 'glpi_plugin_carbon_sources_zones';
 $migration->changeField($table, 'plugin_carbon_carbonintensitysources_id', 'plugin_carbon_sources_id', 'fkey');
 
