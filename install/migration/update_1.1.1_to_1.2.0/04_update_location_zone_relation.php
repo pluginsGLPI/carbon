@@ -35,96 +35,93 @@ use Glpi\DBAL\QueryExpression;
 /** @var DBmysql $DB */
 global $DB;
 
-// Migrate relations based on a country
-$glpi_location_table = 'glpi_locations';
 $zone_table = 'glpi_plugin_carbon_zones';
-$source_zone_table = 'glpi_plugin_carbon_sources_zones';
-$iterator = $DB->request([
-    'SELECT' => [
-        $glpi_location_table . '.id as locations_id',
-        $zone_table . '.plugin_carbon_carbonintensitysources_id_historical',
-        $zone_table . '.id as plugin_carbon_zones_id',
-        $source_zone_table . '.id as plugin_carbon_sources_zones_id',
-    ],
-    'FROM' => $glpi_location_table,
-    'INNER JOIN' => [
-        $zone_table => [
-            'FKEY' => [
-                $zone_table => 'name',
-                $glpi_location_table => 'country',
-            ]
+if ($DB->fieldExists($zone_table, 'plugin_carbon_carbonintensitysources_id_historical', false)) {
+    // Migrate relations based on a country
+    $glpi_location_table = 'glpi_locations';
+    $source_zone_table = 'glpi_plugin_carbon_sources_zones';
+    $iterator = $DB->request([
+        'SELECT' => [
+            $glpi_location_table . '.id as locations_id',
+            $zone_table . '.plugin_carbon_carbonintensitysources_id_historical',
+            $zone_table . '.id as plugin_carbon_zones_id',
+            $source_zone_table . '.id as plugin_carbon_sources_zones_id',
         ],
-        $source_zone_table => [
-            'FKEY' => [
-                $source_zone_table => 'plugin_carbon_zones_id',
-                $zone_table => 'id',
-                [
-                    'AND' => [
-                        new QueryExpression('`' . $source_zone_table . '`.`plugin_carbon_sources_id` = `' . $zone_table . '`.`plugin_carbon_carbonintensitysources_id_historical`'),
+        'FROM' => $glpi_location_table,
+        'INNER JOIN' => [
+            $zone_table => [
+                'FKEY' => [
+                    $zone_table => 'name',
+                    $glpi_location_table => 'country',
+                ]
+            ],
+            $source_zone_table => [
+                'FKEY' => [
+                    $source_zone_table => 'plugin_carbon_zones_id',
+                    $zone_table => 'id',
+                    [
+                        'AND' => [
+                            new QueryExpression('`' . $source_zone_table . '`.`plugin_carbon_sources_id` = `' . $zone_table . '`.`plugin_carbon_carbonintensitysources_id_historical`'),
+                        ]
                     ]
                 ]
             ]
         ]
-    ]
-]);
+    ]);
 
-$location_table = 'glpi_plugin_carbon_locations';
-/** @var Migration $migration */
-$migration->migrationOneTable($location_table);
-foreach ($iterator as $row) {
-    $where = [
-        'locations_id' => $row['locations_id'],
-    ];
-    $params = [
-        'plugin_carbon_sources_zones_id' => $row['plugin_carbon_sources_zones_id'],
-    ];
-    $DB->updateOrInsert($location_table, $params, $where);
-}
+    $location_table = 'glpi_plugin_carbon_locations';
+    /** @var Migration $migration */
+    $migration->migrationOneTable($location_table);
+    foreach ($iterator as $row) {
+        $where = [
+            'locations_id' => $row['locations_id'],
+        ];
+        $params = [
+            'plugin_carbon_sources_zones_id' => $row['plugin_carbon_sources_zones_id'],
+        ];
+        $DB->updateOrInsert($location_table, $params, $where);
+    }
 
-// Migrate relations based on a state
-$glpi_location_table = 'glpi_locations';
-$zone_table = 'glpi_plugin_carbon_zones';
-$source_zone_table = 'glpi_plugin_carbon_sources_zones';
-$iterator = $DB->request([
-    'SELECT' => [
-        $glpi_location_table . '.id as locations_id',
-        $zone_table . '.plugin_carbon_carbonintensitysources_id_historical',
-        $zone_table . '.id as plugin_carbon_zones_id',
-        $source_zone_table . '.id as plugin_carbon_sources_zones_id',
-    ],
-    'FROM' => $glpi_location_table,
-    'INNER JOIN' => [
-        $zone_table => [
-            'FKEY' => [
-                $zone_table => 'name',
-                $glpi_location_table => 'state',
-            ]
+    // Migrate relations based on a state
+    $iterator = $DB->request([
+        'SELECT' => [
+            $glpi_location_table . '.id as locations_id',
+            $zone_table . '.plugin_carbon_carbonintensitysources_id_historical',
+            $zone_table . '.id as plugin_carbon_zones_id',
+            $source_zone_table . '.id as plugin_carbon_sources_zones_id',
         ],
-        $source_zone_table => [
-            'FKEY' => [
-                $source_zone_table => 'plugin_carbon_zones_id',
-                $zone_table => 'id',
-                [
-                    'AND' => [
-                        new QueryExpression('`' . $source_zone_table . '`.`plugin_carbon_sources_id` = `' . $zone_table . '`.`plugin_carbon_carbonintensitysources_id_historical`'),
+        'FROM' => $glpi_location_table,
+        'INNER JOIN' => [
+            $zone_table => [
+                'FKEY' => [
+                    $zone_table => 'name',
+                    $glpi_location_table => 'state',
+                ]
+            ],
+            $source_zone_table => [
+                'FKEY' => [
+                    $source_zone_table => 'plugin_carbon_zones_id',
+                    $zone_table => 'id',
+                    [
+                        'AND' => [
+                            new QueryExpression('`' . $source_zone_table . '`.`plugin_carbon_sources_id` = `' . $zone_table . '`.`plugin_carbon_carbonintensitysources_id_historical`'),
+                        ]
                     ]
                 ]
             ]
         ]
-    ]
-]);
+    ]);
 
-$location_table = 'glpi_plugin_carbon_locations';
-foreach ($iterator as $row) {
-    $where = [
-        'locations_id' => $row['locations_id'],
-    ];
-    $params = [
-        'plugin_carbon_sources_zones_id' => $row['plugin_carbon_sources_zones_id'],
-    ];
-    $DB->updateOrInsert($location_table, $params, $where);
+    foreach ($iterator as $row) {
+        $where = [
+            'locations_id' => $row['locations_id'],
+        ];
+        $params = [
+            'plugin_carbon_sources_zones_id' => $row['plugin_carbon_sources_zones_id'],
+        ];
+        $DB->updateOrInsert($location_table, $params, $where);
+    }
 }
 
-$table = 'glpi_plugin_carbon_zones';
 /** @var Migration $migration */
-$migration->dropField($table, 'plugin_carbon_carbonintensitysources_id_historical');
+$migration->dropField($zone_table, 'plugin_carbon_carbonintensitysources_id_historical');
