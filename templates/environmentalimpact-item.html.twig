@@ -37,7 +37,7 @@
 ) }}
 
 {{ usage_carbon_emission_graph|raw }}
-<div class="card-body" id="cardBodyBorder1">
+<div class="card-body" id="plugin_carbon_usage_impacts">
   {% if usage_impact.fields.gwp ?? null is not null %}
     <div class="h1 mb-3">{{ usage_impact.getHumanReadableImpact('gwp')|raw }}</div>
   {% endif %}
@@ -71,10 +71,10 @@
     'fas fa-chart-pie'
 ) }}
 
-<div class="card-body" id="cardBodyBorder1">
+<div class="card-body" id="plugin_carbon_embodied_impacts">
   {% if embodied_impact.fields.gwp ?? null is not null %}
     <div class="h1 mb-3">
-      <span id="carbon_emission_tip">
+      <span id="embodied_carbon_emission_tip">
         {{ embodied_impact.getHumanReadableImpact('gwp')|raw }}
         {# <i class="fa-solid fa-circle-info"></i> #}
       </span>
