@@ -63,7 +63,8 @@ class Engine extends CommonGLPI
     {
         $embodied_impact_namespace = Config::getEmbodiedImpactEngine();
         $embodied_impact_class = $embodied_impact_namespace . '\\' . $itemtype;
-        if (!class_exists($embodied_impact_class) || !is_subclass_of($embodied_impact_class, AbstractEmbodiedImpact::class)) {
+        $must_implement = AbstractEmbodiedImpact::class;
+        if (!class_exists($embodied_impact_class) || !is_subclass_of($embodied_impact_class, $must_implement)) {
             return self::getInternalEngineFromItemtype($itemtype);
         }
 

@@ -34,6 +34,7 @@
 namespace GlpiPlugin\Carbon\Impact\Embodied;
 
 use CommonDBTM;
+use DBmysqlIterator;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 
 interface EmbodiedImpactInterface
@@ -73,9 +74,10 @@ interface EmbodiedImpactInterface
     /**
      * Start the evaluation of all items
      *
+     * @param DBmysqlIterator $iterator assets to evaluate providing their IDs
      * @return int count of successfully evaluated assets
      */
-    public function evaluateItems(): int;
+    public function evaluateItems(DBmysqlIterator $iterator): int;
 
     /**
      * Evaluate all impacts of the asset
