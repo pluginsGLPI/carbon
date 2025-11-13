@@ -128,7 +128,10 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         $attempts_count = 0;
         /** @var int $count count of successfully evaluated assets */
         $count = 0;
-        $iterator = $DB->request($this->getEvaluableQuery([], false));
+        $crit = [
+            EmbodiedImpact::getTableField('id') => null,
+        ];
+        $iterator = $DB->request($this->getEvaluableQuery($crit, false));
         foreach ($iterator as $row) {
             if ($this->evaluateItem($row['id'])) {
                 $count++;
