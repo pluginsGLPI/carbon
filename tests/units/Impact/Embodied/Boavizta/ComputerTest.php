@@ -32,30 +32,35 @@
 
 namespace GlpiPlugin\Carbon\Impact\Engine\Boavizta\Tests;
 
-use Computer;
+use Computer as GlpiComputer;
 use ComputerType as GlpiComputerType;
+use ComputerModel as GlpiComputerModel;
 use DBmysql;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\Impact\Embodied\Boavizta\Computer as BoaviztaComputer;
-use GlpiPlugin\Carbon\Tests\DbTestCase;
+use GlpiPlugin\Carbon\Tests\Impact\Engine\AbstractEmbodiedImpactTest;
 use PHPUnit\Framework\Attributes\CoversClass;
 
-#[CoversClass(Computer::class)]
-class ComputerTest extends DbTestCase
+#[CoversClass(BoaviztaComputer::class)]
+class ComputerTest extends AbstractEmbodiedImpactTest
 {
+    protected static string $itemtype = GlpiComputer::class;
+    protected static string $itemtype_type = GlpiComputerType::class;
+    protected static string $itemtype_model = GlpiComputerModel::class;
+
     public function testGetEvaluableQuery()
     {
         /** @var DBmysql $DB */
         global $DB;
 
+        // Test a computer is evaluable
         $glpi_computer_type = $this->createItem(GlpiComputerType::class);
         $computer_type = $this->createItem(ComputerType::class, [
             'computertypes_id' => $glpi_computer_type->getID()
         ]);
-        $computer = $this->createItem(Computer::class, [
+        $computer = $this->createItem(GlpiComputer::class, [
             'computertypes_id' => $glpi_computer_type->getID()
         ]);
-
         $instance = new BoaviztaComputer();
         $request = $instance->getEvaluableQuery([
             'glpi_computers.id' => $computer->getID(),
@@ -67,15 +72,15 @@ class ComputerTest extends DbTestCase
         $iterator = $DB->request($request);
         $this->assertEquals(1, $iterator->count());
 
+        // Test a computer is not evaluable
         $glpi_computer_type = $this->createItem(GlpiComputerType::class);
         $computer_type = $this->createItem(ComputerType::class, [
             'computertypes_id' => $glpi_computer_type->getID(),
             'is_ignore' => 1,
         ]);
-        $computer = $this->createItem(Computer::class, [
+        $computer = $this->createItem(GlpiComputer::class, [
             'computertypes_id' => $glpi_computer_type->getID()
         ]);
-
         $instance = new BoaviztaComputer();
         $request = $instance->getEvaluableQuery([
             'glpi_computers.id' => $computer->getID(),

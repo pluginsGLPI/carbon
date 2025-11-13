@@ -36,6 +36,7 @@ namespace GlpiPlugin\Carbon\Impact\Embodied;
 use DBmysql;
 use DbUtils;
 use CommonDBTM;
+use DBmysqlIterator;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\EmbodiedImpact;
 use GlpiPlugin\Carbon\Impact\Type;
@@ -99,7 +100,13 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         $this->limit = $limit;
     }
 
-    public function evaluateItems(): int
+    /**
+     * Get an iterator of items to evaluate
+     *
+     * @param array $crit criterias
+     * @return DBmysqlIterator
+     */
+    public function getEvaluateItems(array $crit = []): DBmysqlIterator
     {
         /** @var DBmysql $DB */
         global $DB;
@@ -112,6 +119,14 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
             throw new \LogicException('Itemtype does not inherits from ' . CommonDBTM::class);
         }
 
+        $crit[EmbodiedImpact::getTableField('id')] = null;
+        $iterator = $DB->request($this->getEvaluableQuery($crit, false));
+
+        return $iterator;
+    }
+
+    public function evaluateItems(DBmysqlIterator $iterator): int
+    {
         /**
          * Huge quantity of SQL queries will be executed
          * We NEED to check memory usage to avoid running out of memory
@@ -128,10 +143,7 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         $attempts_count = 0;
         /** @var int $count count of successfully evaluated assets */
         $count = 0;
-        $crit = [
-            EmbodiedImpact::getTableField('id') => null,
-        ];
-        $iterator = $DB->request($this->getEvaluableQuery($crit, false));
+
         foreach ($iterator as $row) {
             if ($this->evaluateItem($row['id'])) {
                 $count++;

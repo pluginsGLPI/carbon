@@ -32,17 +32,22 @@
 
 namespace GlpiPlugin\Carbon\Impact\Engine\Boavizta\Tests;
 
-use Monitor;
+use Monitor as GlpiMonitor;
 use MonitorType as GlpiMonitorType;
+use MonitorModel as glpiMonitorModel;
 use DBmysql;
 use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\Impact\Embodied\Boavizta\Monitor as BoaviztaMonitor;
-use GlpiPlugin\Carbon\Tests\DbTestCase;
+use GlpiPlugin\Carbon\Tests\Impact\Engine\AbstractEmbodiedImpactTest;
 use PHPUnit\Framework\Attributes\CoversClass;
 
-#[CoversClass(Monitor::class)]
-class MonitorTest extends DbTestCase
+#[CoversClass(BoaviztaMonitor::class)]
+class MonitorTest extends AbstractEmbodiedImpactTest
 {
+    protected static string $itemtype = GlpiMonitor::class;
+    protected static string $itemtype_type = GlpiMonitorType::class;
+    protected static string $itemtype_model = GlpiMonitorModel::class;
+
     public function testGetEvaluableQuery()
     {
         /** @var DBmysql $DB */
@@ -52,7 +57,7 @@ class MonitorTest extends DbTestCase
         $monitor_type = $this->createItem(MonitorType::class, [
             'monitortypes_id' => $glpi_monitor_type->getID()
         ]);
-        $monitor = $this->createItem(Monitor::class, [
+        $monitor = $this->createItem(GlpiMonitor::class, [
             'monitortypes_id' => $glpi_monitor_type->getID()
         ]);
 
@@ -72,7 +77,7 @@ class MonitorTest extends DbTestCase
             'monitortypes_id' => $glpi_monitor_type->getID(),
             'is_ignore' => 1,
         ]);
-        $monitor = $this->createItem(Monitor::class, [
+        $monitor = $this->createItem(GlpiMonitor::class, [
             'monitortypes_id' => $glpi_monitor_type->getID()
         ]);
 

@@ -33,7 +33,6 @@
 namespace GlpiPlugin\Carbon\Tests\Impact\History;
 
 use GlpiPlugin\Carbon\Tests\DbTestCase;
-use Computer as GlpiComputer;
 use Infocom;
 
 class CommonAsset extends DbTestCase
