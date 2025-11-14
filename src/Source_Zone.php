@@ -358,6 +358,7 @@ class Source_Zone extends CommonDBRelation
             'SELECT' => 'id',
             'FROM' => $source_zone_table,
             'INNER JOIN' => [
+                // the source_zone row matching the $source_zone argument
                 $source_zone_table . ' AS realtime_sources_zones' => [
                     'ON' => [
                         $source_zone_table => 'plugin_carbon_zones_id',
@@ -365,18 +366,29 @@ class Source_Zone extends CommonDBRelation
                         ['AND' => [$source_zone_table . '.id' => ['<>', new QueryExpression('`realtime_sources_zones`.`id`')]]]
                     ]
                 ],
+                // The source associated to the source_zone argument (to find the fallback_level)
+                $source_table . ' AS realtime_source' => [
+                    'ON' => [
+                        'realtime_sources_zones' => 'plugin_carbon_sources_id',
+                        'realtime_source' => 'id',
+                    ]
+                ],
+                // The fallback source (to compare its fallback_level against the other source)
                 $source_table => [
                     'ON' => [
                         $source_table => 'id',
                         $source_zone_table => $source_fk,
-                        ['AND' => [Source::getTableField('fallback_level') => ['>', 0]]]
+                        ['AND' => [
+                            Source::getTableField('fallback_level') => ['>', new QueryExpression('`realtime_source`.`fallback_level`')],
+                        ]]
                     ]
                 ],
             ],
             'WHERE' => [
                 'realtime_sources_zones.id' => $source_zone->getID(),
-                'NOT' => [Source::getTableField('name') => 'Ember - Energy Institute'],
-            ]
+            ],
+            'ORDER' => Source::getTableField('fallback_level'),
+            'LIMIT' => 1
         ];
 
         return $this->getFromDBByRequest($request);
