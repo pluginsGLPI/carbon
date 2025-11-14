@@ -301,8 +301,8 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
      */
     public function resetForItem(int $items_id): bool
     {
-        $usage_impact = new EmbodiedImpact();
-        return $usage_impact->deleteByCriteria([
+        $embodied_impact = new EmbodiedImpact();
+        return $embodied_impact->deleteByCriteria([
             'itemtype' => static::getItemtype(),
             'items_id' => $items_id
         ]);
