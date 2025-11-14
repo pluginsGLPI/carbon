@@ -34,6 +34,7 @@
 namespace GlpiPlugin\Carbon\Impact\Usage;
 
 use CommonDBTM;
+use DBmysqlIterator;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 
 interface UsageImpactInterface
@@ -70,11 +71,20 @@ interface UsageImpactInterface
     public function getEvaluableQuery(array $crit = []): array;
 
     /**
+     * Get an iterator of items to evaluate
+     *
+     * @param array $crit
+     * @return DBmysqlIterator
+     */
+    public function getItemsToEvaluate(array $crit = []): DBmysqlIterator;
+
+    /**
      * Start the evaluation of all items
      *
+     * @param DBmysqlIterator $iterator assets to evaluate providing their IDs
      * @return int count of successfully evaluated assets
      */
-    public function evaluateItems(): int;
+    public function evaluateItems(DBmysqlIterator $iterator): int;
 
     /**
      * Evaluate all impacts of the asset

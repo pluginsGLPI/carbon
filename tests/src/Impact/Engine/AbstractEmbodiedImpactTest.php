@@ -47,9 +47,6 @@ class AbstractEmbodiedImpactTest extends DbTestCase
 
     public function testGetEvaluableItems()
     {
-        /** @var DBmysql $DB */
-        global $DB;
-
         if (static::$itemtype === '' || static::$itemtype_type === '' || static::$itemtype_model === '') {
             // Ensure that the inherited test class is properly implemented for this test
             $this->fail('Itemtype properties not set in ' . static::class);
@@ -64,7 +61,7 @@ class AbstractEmbodiedImpactTest extends DbTestCase
             getForeignKeyFieldForItemType(static::$itemtype_type) => $glpi_asset_type->getID(),
         ]);
         $instance = new ('GlpiPlugin\\Carbon\\Impact\\Embodied\\Boavizta\\' . static::$itemtype)();
-        $iterator = $instance->getEvaluateItems([
+        $iterator = $instance->getItemsToEvaluate([
             $asset->getTableField('id') => $asset->getID(),
         ]);
         $this->assertEquals(1, $iterator->count());
@@ -82,10 +79,9 @@ class AbstractEmbodiedImpactTest extends DbTestCase
             'itemtype' => $asset->getType(),
             'items_id' => $asset->getID(),
         ]);
-        $iterator = $instance->getEvaluateItems([
+        $iterator = $instance->getItemsToEvaluate([
             $asset::getTableField('id') => $asset->getID(),
         ]);
         $this->assertEquals(0, $iterator->count());
-
     }
 }

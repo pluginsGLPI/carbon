@@ -106,7 +106,7 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
      * @param array $crit criterias
      * @return DBmysqlIterator
      */
-    public function getEvaluateItems(array $crit = []): DBmysqlIterator
+    public function getItemsToEvaluate(array $crit = []): DBmysqlIterator
     {
         /** @var DBmysql $DB */
         global $DB;

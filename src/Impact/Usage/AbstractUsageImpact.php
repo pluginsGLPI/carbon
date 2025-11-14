@@ -36,6 +36,7 @@ namespace GlpiPlugin\Carbon\Impact\Usage;
 use DBmysql;
 use DbUtils;
 use CommonDBTM;
+use DBmysqlIterator;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\UsageImpact;
 use GlpiPlugin\Carbon\Impact\Type;
@@ -100,7 +101,7 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
         $this->limit = $limit;
     }
 
-    public function evaluateItems(): int
+    public function getItemsToEvaluate(array $crit = []): DBmysqlIterator
     {
         /** @var DBmysql $DB */
         global $DB;
@@ -113,6 +114,14 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
             throw new \LogicException('Itemtype does not inherits from ' . CommonDBTM::class);
         }
 
+        $crit[UsageImpact::getTableField('id')] = null;
+        $iterator = $DB->request($this->getEvaluableQuery($crit, false));
+
+        return $iterator;
+    }
+
+    public function evaluateItems(DBmysqlIterator $iterator): int
+    {
         /**
          * Huge quantity of SQL queries will be executed
          * We NEED to check memory usage to avoid running out of memory
@@ -129,7 +138,6 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
         $attempts_count = 0;
         /** @var int $count count of successfully evaluated assets */
         $count = 0;
-        $iterator = $DB->request($this->getEvaluableQuery());
         foreach ($iterator as $row) {
             if ($this->evaluateItem($row['id'])) {
                 $count++;

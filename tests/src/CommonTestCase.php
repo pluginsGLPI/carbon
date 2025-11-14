@@ -143,16 +143,18 @@ class CommonTestCase extends TestCase
     }
 
     /**
-     * @deprecated use createItem instead
-     *
+     * @template T of CommonDBTM
      * @param class-string<T> $itemtype itemtype to create
-     * @param array $input
+     * @param array $crit
      * @return T
      */
-    protected function getItem(string $itemtype, array $input = []): CommonDBTM
+    protected function getItem(string $itemtype, array $crit = []): CommonDBTM
     {
-        return $this->createItem($itemtype, $input);
+        $item = new $itemtype();
+        $this->assertTrue($item->getFromDBByRequest($crit));
+        return $item;
     }
+
 
     /**
      * Create an item of the given itemtype

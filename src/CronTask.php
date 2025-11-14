@@ -118,7 +118,7 @@ class CronTask
             /** @var UsageImpactInterface $usage_impact */
             $usage_impact = new $usage_impact_type();
             $usage_impact->setLimit($limit_per_type);
-            $count = $usage_impact->evaluateItems();
+            $count = $usage_impact->evaluateItems($usage_impact->getItemsToEvaluate());
             $task->addVolume($count);
         }
 
@@ -130,7 +130,7 @@ class CronTask
                 continue;
             }
             $usage_impact->setLimit($limit_per_type);
-            $count = $usage_impact->evaluateItems();
+            $count = $usage_impact->evaluateItems($usage_impact->getItemsToEvaluate());
             $task->addVolume($count);
         }
 
@@ -157,7 +157,7 @@ class CronTask
                 continue;
             }
             $embodied_impact->setLimit($limit_per_type);
-            $count = $embodied_impact->evaluateItems();
+            $count = $embodied_impact->evaluateItems($embodied_impact->getItemsToEvaluate());
             $task->addVolume($count);
         }
         return ($count > 0 ? 1 : 0);
