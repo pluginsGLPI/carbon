@@ -40,6 +40,7 @@ use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\Zone;
 use Location as GlpiLocation;
 use PHPUnit\Framework\Attributes\CoversClass;
+use wapmorgan\UnifiedArchive\Drivers\Zip;
 
 #[CoversClass(Source_Zone::class)]
 class Source_ZoneTest extends DbTestCase
@@ -194,27 +195,69 @@ class Source_ZoneTest extends DbTestCase
 
     public function testGetFallbackFromDB()
     {
-        // Test finding a fallback source zone from an 'non fallback) source_zone
-        $source = $this->createItem(Source::class);
-        $fallback_source = $this->createItem(Source::class, [
-            'fallback_level' => 1,
+        // Test finding a fallback source zone from an 'non fallback' source_zone
+        $source_boaviztapi = $this->createItem(Source::class, [
+            'name' => 'Boaviztapi',
+            'fallback_level' => 0,
+            'is_carbon_intensity_source' => 0,
         ]);
-        $zone = $this->createItem(Zone::class);
-        $source_zone = $this->createItem(Source_Zone::class, [
-            $source::getForeignKeyField() => $source->getID(),
-            $zone::getForeignKeyField() => $zone->getID(),
+        $zone_france = $this->getItem(Zone::class, [
+            'WHERE' => ['name' => 'France']
         ]);
-        $fallback_source_zone = $this->createItem(Source_Zone::class, [
-            $fallback_source::getForeignKeyField() => $fallback_source->getID(),
-            $zone::getForeignKeyField() => $zone->getID(),
+        $source_zone_boaviztapi_france = $this->createItem(Source_Zone::class, [
+            getForeignKeyFieldForItemType(Source::class) => $source_boaviztapi->getID(),
+            getForeignKeyFieldForItemType(Zone::class)   => $zone_france->getID(),
         ]);
         $instance = new Source_Zone();
-        $success = $instance->getFallbackFromDB($source_zone);
+        $expected_source = $this->getItem(Source::class, [
+            'WHERE' => [
+                'name' => 'Ember - Energy Institute'
+            ]
+        ]);
+        $expected_zone = $this->getItem(Zone::class, [
+            'WHERE' => [
+                'name' => 'France'
+            ]
+        ]);
+        $success = $instance->getFallbackFromDB($source_zone_boaviztapi_france);
         $this->assertTrue($success);
-        $this->assertEquals($fallback_source_zone->getID(), $instance->getID());
-        $this->assertEquals($source_zone->fields['plugin_carbon_zones_id'], $instance->fields['plugin_carbon_zones_id']);
+        $this->assertEquals($expected_source->getID(), $instance->fields[Source::getForeignKeyField()]);
+        $this->assertEquals($expected_zone->getID(), $instance->fields[Zone::getForeignKeyField()]);
 
-        // Test failing a fallback source zone when it does not exists
+        // Test finding a fallback source zone when several levels of fallbacks are available
+        // RTE is level 0
+        // Ember is level 2
+        // Alternate source is level 3
+        // * Reuses the previous objects *
+        $alternate_fallback_source = $this->createItem(Source::class, [
+            'name' => 'alternate source',
+            'fallback_level' => 3,
+        ]);
+        $alternate_source_zone = $this->createItem(Source_Zone::class, [
+            getForeignKeyFieldForItemType(Source::class) => $alternate_fallback_source->getID(),
+            getForeignKeyFieldForItemType(Zone::class)   => $zone_france->getID(),
+        ]);
+        $input = $this->getItem(Source_Zone::class, [
+            'INNER JOIN' => [
+                Source::getTable() => [
+                    'ON' => [
+                        Source::getTable() => 'id',
+                        Source_Zone::getTable() => Source::getForeignKeyField()
+                    ]
+                ]
+            ],
+            'WHERE' => [
+                getForeignKeyFieldForItemType(Zone::class)   => $zone_france->getID(),
+                Source::getTableField('name') => 'Ember - Energy Institute',
+            ]
+        ]);
+        $instance = new Source_Zone();
+        $success = $instance->getFallbackFromDB($input);
+        $this->assertTrue($success);
+        $this->assertEquals($alternate_source_zone->getID(), $instance->getID());
+        $this->assertEquals($input->fields['plugin_carbon_zones_id'], $instance->fields['plugin_carbon_zones_id']);
+
+        // Test failing to a fallback source zone when it does not exists
         $source = $this->createItem(Source::class);
         $zone = $this->createItem(Zone::class);
         $source_zone = $this->createItem(Source_Zone::class, [
