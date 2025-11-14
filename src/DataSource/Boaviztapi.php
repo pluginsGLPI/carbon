@@ -115,6 +115,24 @@ class Boaviztapi
     }
 
     /**
+     * Get version of Boaviztapi
+     *
+     * @return string
+     */
+    public function queryVersion(): string
+    {
+        $response = $this->get('utils/version');
+        if (!isset($response[0]) || !is_string($response[0])) {
+            trigger_error(sprintf(
+                'Invalid response from Boavizta API: %s',
+                json_encode($response[0] ?? '')
+            ), E_USER_WARNING);
+            return '';
+        }
+        return $response[0];
+    }
+
+    /**
      * Get zones from Boaviztapi
      * countries or world regions woth a 3 letters code
      *

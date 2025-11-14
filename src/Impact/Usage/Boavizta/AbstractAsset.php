@@ -93,7 +93,7 @@ abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterfa
     public function setClient(Boaviztapi $client)
     {
         $this->client = $client;
-        $this->engine_version = $this->getVersion();
+        // $this->engine_version = $this->getVersion();
     }
 
     protected function getVersion(): string
