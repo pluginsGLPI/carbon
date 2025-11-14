@@ -81,7 +81,9 @@ abstract class AbstractPermanent extends AbstractAsset implements EngineInterfac
             if ($iterator->count() === 0) {
                 // Need to fallback to an alternate source
                 $fallback_source_zone = new Source_Zone();
-                $fallback_source_zone->getFallbackFromDB($source_zone);
+                if (!$fallback_source_zone->getFallbackFromDB($source_zone)) {
+                    $fallback_source_zone = null;
+                }
             }
         } else {
             // The source is already a fallback (exapmple: Quebec does has any realtime source)

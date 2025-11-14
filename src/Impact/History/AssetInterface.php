@@ -34,6 +34,7 @@
 namespace GlpiPlugin\Carbon\Impact\History;
 
 use CommonDBTM;
+use DBmysqlIterator;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 
 interface AssetInterface
@@ -42,7 +43,9 @@ interface AssetInterface
 
     public function setLimit(int $limit);
 
-    public function evaluateItems(): int;
+    public function getItemsToEvaluate(array $crit = []): DBmysqlIterator;
+
+    public function evaluateItems(DBmysqlIterator $iterator): int;
 
     public static function showHistorizableDiagnosis(CommonDBTM $item);
 

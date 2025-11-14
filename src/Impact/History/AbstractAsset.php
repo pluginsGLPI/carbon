@@ -39,7 +39,7 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DBmysql;
-use GlpiPlugin\Carbon\Zone;
+use DBmysqlIterator;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
@@ -114,11 +114,12 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     }
 
     /**
-     * Start the historization of all items
+     * Get an iterator of items to evaluate
      *
-     * @return int count of entries generated
+     * @param array $crit criterias
+     * @return DBmysqlIterator
      */
-    public function evaluateItems(): int
+    public function getItemsToEvaluate(array $crit = []): DBmysqlIterator
     {
         /** @var DBmysql $DB */
         global $DB;
@@ -130,10 +131,20 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         if (!is_subclass_of($itemtype, CommonDBTM::class)) {
             throw new \LogicException('Itemtype does not inherits from ' . CommonDBTM::class);
         }
-
-        $count = 0;
-
         $iterator = $DB->request($this->getEvaluableQuery([], false));
+
+        return $iterator;
+    }
+
+    /**
+     * Start the historization of all items
+     *
+     * @return int count of entries generated
+     */
+    public function evaluateItems(DBmysqlIterator $iterator): int
+    {
+        /** @var int $count count of successfully evaluated assets */
+        $count = 0;
         foreach ($iterator as $row) {
             $count += $this->evaluateItem($row['id']);
             if ($this->limit_reached) {

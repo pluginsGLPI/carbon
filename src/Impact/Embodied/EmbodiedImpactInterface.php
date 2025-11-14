@@ -72,7 +72,15 @@ interface EmbodiedImpactInterface
     public function getEvaluableQuery(array $crit = [], bool $entity_restrict = true): array;
 
     /**
-     * Start the evaluation of all items
+     * Get an iterator of items to evaluate
+     *
+     * @param array $crit
+     * @return DBmysqlIterator
+     */
+    public function getItemsToEvaluate(array $crit = []): DBmysqlIterator;
+
+    /**
+     * Start the evaluation of items of the given iterator
      *
      * @param DBmysqlIterator $iterator assets to evaluate providing their IDs
      * @return int count of successfully evaluated assets
