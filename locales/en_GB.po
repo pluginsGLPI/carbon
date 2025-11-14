@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-29 01:52+0000\n"
-"PO-Revision-Date: 2025-10-29 01:52+0000\n"
+"POT-Creation-Date: 2025-11-14 01:49+0000\n"
+"PO-Revision-Date: 2025-11-14 01:49+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: en_GB\n"
@@ -459,16 +459,16 @@ msgid "Download carbon emissions from ElectricityMap"
 msgstr "Download carbon emissions from ElectricityMap"
 
 #: src/CronTask.php:82
-msgid "Compute usage environnemental impact for all assets"
-msgstr "Compute usage environnemental impact for all assets"
+msgid "Compute usage environmental impact for all assets"
+msgstr "Compute usage environmental impact for all assets"
 
 #: src/CronTask.php:83 src/CronTask.php:88
 msgid "Maximum number of entries to calculate"
 msgstr "Maximum number of entries to calculate"
 
 #: src/CronTask.php:87
-msgid "Compute embodied environnemental impact for all assets"
-msgstr "Compute embodied environnemental impact for all assets"
+msgid "Compute embodied environmental impact for all assets"
+msgstr "Compute embodied environmental impact for all assets"
 
 #: src/CronTask.php:211
 msgid "No zone to download"
@@ -862,8 +862,8 @@ msgid "Usage global warming potential chart"
 msgstr "Usage global warming potential chart"
 
 #: src/Dashboard/Grid.php:322
-msgid "Environmental impact methodology_information"
-msgstr "Environmental impact methodology_information"
+msgid "Environmental impact methodology information"
+msgstr "Environmental impact methodology information"
 
 #: src/Dashboard/Provider.php:175 src/Dashboard/Provider.php:1014
 #: src/Toolbox.php:201
