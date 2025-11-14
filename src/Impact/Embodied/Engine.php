@@ -57,10 +57,9 @@ class Engine extends CommonGLPI
      * Returns null if no engine found
      *
      * @param string $itemtype itemtype of assets to analyze
-     * @param ?RestApiClientInterface $client
      * @return EmbodiedImpactInterface|null an instance if an embodied impact calculation object or null on error
      */
-    public static function getEngineFromItemtype(string $itemtype, ?RestApiClientInterface $client = null): ?EmbodiedImpactInterface
+    public static function getEngineFromItemtype(string $itemtype): ?EmbodiedImpactInterface
     {
         $embodied_impact_namespace = Config::getEmbodiedImpactEngine();
         $embodied_impact_class = $embodied_impact_namespace . '\\' . $itemtype;
@@ -72,7 +71,7 @@ class Engine extends CommonGLPI
         /** @var AbstractEmbodiedImpact $embodied_impact */
         $embodied_impact = new $embodied_impact_class();
         try {
-            return self::configureEngine($embodied_impact, $client);
+            return self::configureEngine($embodied_impact);
         } catch (\RuntimeException $e) {
             // If the engine cannot be configured, it is not usable
             return null;
@@ -100,20 +99,15 @@ class Engine extends CommonGLPI
      * Configure the engine depending on its specificities
      *
      * @param EmbodiedImpactInterface $engine the engine to configure
-     * @param ?RestApiClientInterface $client
      * @return EmbodiedImpactInterface the configured engine
      */
-    protected static function configureEngine(EmbodiedImpactInterface $engine, ?RestApiClientInterface $client = null): EmbodiedImpactInterface
+    protected static function configureEngine(EmbodiedImpactInterface $engine): EmbodiedImpactInterface
     {
         $embodied_impact_namespace = explode('\\', get_class($engine));
         switch (array_slice($embodied_impact_namespace, -2, 1)[0]) {
             case 'Boavizta':
-                if ($client === null) {
-                    throw new \RuntimeException('A RestApiClientInterface instance is required to configure Boavizta embodied impact engine');
-                }
                 /** @var AbstractAsset $engine  */
-                $client = $client ?? new RestApiClient();
-                $engine->setClient(new Boaviztapi($client));
+                $engine->setClient(new Boaviztapi(new RestApiClient()));
         }
 
         return $engine;
