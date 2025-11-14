@@ -35,6 +35,7 @@ namespace GlpiPlugin\Carbon\Impact\Embodied;
 use CommonGLPI;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\DataSource\Boaviztapi;
+use GlpiPlugin\Carbon\DataSource\RestApiClient;
 use GlpiPlugin\Carbon\Impact\Embodied\Boavizta\AbstractAsset;
 use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
 
@@ -111,6 +112,7 @@ class Engine extends CommonGLPI
                     throw new \RuntimeException('A RestApiClientInterface instance is required to configure Boavizta embodied impact engine');
                 }
                 /** @var AbstractAsset $engine  */
+                $client = $client ?? new RestApiClient();
                 $engine->setClient(new Boaviztapi($client));
         }
 

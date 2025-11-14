@@ -89,6 +89,7 @@ class Engine extends CommonGLPI
         switch (array_slice($embodied_impact_namespace, -2, 1)[0]) {
             case 'Boavizta':
                 /** @var Boavizta\AbstractAsset $engine  */
+                $client = $client ?? new RestApiClient();
                 $engine->setClient(new Boaviztapi($client));
         }
 
