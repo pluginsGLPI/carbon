@@ -34,7 +34,6 @@ namespace GlpiPlugin\Carbon\Engine\V1;
 
 use CommonDBTM;
 use DateInterval;
-use DateTime;
 use DateTimeInterface;
 use DateTimeImmutable;
 use DBmysqlIterator;
