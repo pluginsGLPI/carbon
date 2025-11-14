@@ -125,7 +125,7 @@ class CronTask
         // Calculate other impacts
         foreach (PLUGIN_CARBON_TYPES as $itemtype) {
             /** @ar UsageImpactInterface $usage_impact */
-            $usage_impact = UsageEngine::getEngineFromItemtype($itemtype, new RestApiClient());
+            $usage_impact = UsageEngine::getEngineFromItemtype($itemtype);
             if ($usage_impact === null) {
                 continue;
             }
@@ -151,7 +151,7 @@ class CronTask
         $remaining = $task->fields['param'];
         $limit_per_type = max(1, floor(($remaining) / count($embodied_impacts)));
         foreach (PLUGIN_CARBON_TYPES as $itemtype) {
-            $embodied_impact = EmbodiedEngine::getEngineFromItemtype($itemtype, new RestApiClient());
+            $embodied_impact = EmbodiedEngine::getEngineFromItemtype($itemtype);
             if ($embodied_impact === null) {
                 // An error occured while configuring the engine
                 continue;
