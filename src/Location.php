@@ -142,7 +142,6 @@ class Location extends CommonDBChild
                 ]
             ],
             'WHERE' => [
-                'fallback_level' => 0,
                 'is_carbon_intensity_source' => 1,
                 Source_Zone::getTableField('id') => $this->fields['plugin_carbon_sources_zones_id'],
             ]
