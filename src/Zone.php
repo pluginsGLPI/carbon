@@ -127,6 +127,9 @@ class Zone extends CommonDropdown
             'field'         => 'is_download_enabled',
             'name'          => __('Download enabled', 'carbon'),
             'datatype'      => 'bool',
+            'joinparams'    => [
+                'jointype' => 'child',
+            ]
         ];
 
         return $tab;
