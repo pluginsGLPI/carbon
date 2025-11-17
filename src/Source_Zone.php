@@ -378,9 +378,11 @@ class Source_Zone extends CommonDBRelation
                     'ON' => [
                         $source_table => 'id',
                         $source_zone_table => $source_fk,
-                        ['AND' => [
-                            Source::getTableField('fallback_level') => ['>', new QueryExpression('`realtime_source`.`fallback_level`')],
-                        ]]
+                        [
+                            'AND' => [
+                                Source::getTableField('fallback_level') => ['>', new QueryExpression('`realtime_source`.`fallback_level`')],
+                            ]
+                        ]
                     ]
                 ],
             ],
