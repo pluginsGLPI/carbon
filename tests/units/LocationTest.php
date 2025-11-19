@@ -46,6 +46,7 @@ use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 use Location as GlpiLocation;
 use GlpiPlugin\Carbon\Location;
+use GlpiPlugin\Carbon\Toolbox;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(Location::class)]
@@ -378,7 +379,11 @@ class LocationTest extends DbTestCase
         $this->assertFalse($result);
 
         // Test with a core location with a relation to a non-fallback source
-        $source =  $this->createItem(Source::class, ['name' => 'a source']);
+        $source =  $this->createItem(Source::class, [
+            'name' => 'a source',
+            'is_carbon_intensity_source' => 1,
+            'fallback_level' => 0,
+        ]);
         $zone =  $this->createItem(Zone::class, ['name' => 'a zone']);
         $source_zone = $this->createItem(Source_Zone::class, [
             Source::getForeignKeyField() => $source->getID(),
@@ -397,8 +402,12 @@ class LocationTest extends DbTestCase
         $result = $location->hasFallbackCarbonIntensityData($glpi_location);
         $this->assertFalse($result);
 
-        // Test with a core location with a relation to a fallback source
-        $source =  $this->createItem(Source::class, ['name' => 'a source 2']);
+        // Test with a core location with a relation to a non fallback source, that source having an other fallback source
+        $source =  $this->createItem(Source::class, [
+            'name' => 'a source 2',
+            'is_carbon_intensity_source' => 1,
+            'fallback_level' => 0,
+        ]);
         $zone =  $this->createItem(Zone::class, ['name' => 'a zone 2']);
         $source_zone = $this->createItem(Source_Zone::class, [
             Source::getForeignKeyField() => $source->getID(),
@@ -411,7 +420,69 @@ class LocationTest extends DbTestCase
         ]);
         $fallback_source = $this->createItem(Source::class, [
             'name' => 'fallback source 2',
+            'is_carbon_intensity_source' => 1,
             'fallback_level' => 1,
+        ]);
+        $fallback_source_zone = $this->createItem(Source_Zone::class, [
+            Source::getForeignKeyField() => $fallback_source->getID(),
+            Zone::getForeignKeyField() => $zone->getID(),
+        ]);
+        $fallback_carbon_intensity = $this->createItem(CarbonIntensity::class, [
+            'date' => (new DateTime())->setTime(0, 0)->format('Y-m-d H:i:s'),
+            Source::getForeignKeyField() => $fallback_source->getID(),
+            Zone::getForeignKeyField() =>   $zone->getID()
+        ]);
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $location = $this->createItem(Location::class, [
+            GlpiLocation::getForeignKeyField() => $glpi_location->getID(),
+            $source_zone::getForeignKeyField() => $source_zone->getID(),
+        ]);
+        $result = $location->hasFallbackCarbonIntensityData($glpi_location);
+        $this->assertTrue($result);
+
+        // Test a core location with a relation to a fallback source
+        $source =  $this->createItem(Source::class, [
+            'name' => 'a source 3',
+            'is_carbon_intensity_source' => 1,
+            'fallback_level' => 1,
+        ]);
+        $zone =  $this->createItem(Zone::class, ['name' => 'a zone 3']);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            Source::getForeignKeyField() => $source->getID(),
+            Zone::getForeignKeyField() => $zone->getID()
+        ]);
+        $carbon_intensity = $this->createItem(CarbonIntensity::class, [
+            'date' => (new DateTime())->setTime(0, 0)->format('Y-m-d H:i:s'),
+            Source::getForeignKeyField() => $source->getID(),
+            Zone::getForeignKeyField() => $zone->getID()
+        ]);
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $location = $this->createItem(Location::class, [
+            GlpiLocation::getForeignKeyField() => $glpi_location->getID(),
+            Source_Zone::getForeignKeyField() => $source_zone->getID(),
+        ]);
+        $result = $location->hasFallbackCarbonIntensityData($glpi_location);
+        $this->assertTrue($result);
+
+        // Test with a core location with a relation to a fallback source, that source having an other fallback source
+        $source =  $this->createItem(Source::class, [
+            'name' => 'a source 4',
+            'is_carbon_intensity_source' => 1,
+        ]);
+        $zone =  $this->createItem(Zone::class, ['name' => 'a zone 4']);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            Source::getForeignKeyField() => $source->getID(),
+            Zone::getForeignKeyField() => $zone->getID()
+        ]);
+        $carbon_intensity = $this->createItem(CarbonIntensity::class, [
+            'date' => (new DateTime())->setTime(0, 0)->format('Y-m-d H:i:s'),
+            Source::getForeignKeyField() => $source->getID(),
+            Zone::getForeignKeyField() => $zone->getID()
+        ]);
+        $fallback_source = $this->createItem(Source::class, [
+            'name' => 'fallback source 4',
+            'is_carbon_intensity_source' => 1,
+            'fallback_level' => 2,
         ]);
         $fallback_source_zone = $this->createItem(Source_Zone::class, [
             Source::getForeignKeyField() => $fallback_source->getID(),

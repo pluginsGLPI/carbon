@@ -330,22 +330,13 @@ class Location extends CommonDBChild
     }
 
     /**
-     * Tells if a location has fallback carbon intensity data
+     * Get request to find carbon intensity sources
      *
-     * @param CommonDBTM $item
-     * @return boolean
+     * @param array $crit Criterias
+     * @return array
      */
-    public function hasFallbackCarbonIntensityData(CommonDBTM $item): bool
+    public static function getCarbonIntensityDataSourceRequest(array $crit = []): array
     {
-        /** @var DBmysql $DB */
-        global $DB;
-
-        if ($item->getType() === GlpiLocation::class) {
-            $location_id = $item->getID();
-        } else {
-            $location_id = $item->fields['locations_id'];
-        }
-
         $carbon_intensity_table = CarbonIntensity::getTable();
         $source_zone_table = Source_Zone::getTable();
         $source_table = Source::getTable();
@@ -363,32 +354,84 @@ class Location extends CommonDBChild
                         $location_table => $source_zone_fk
                     ]
                 ],
-                $source_zone_table . ' AS fallback_sources_zones' => [
-                    'ON' => [
-                        $source_zone_table => 'plugin_carbon_zones_id',
-                        'fallback_sources_zones' => 'plugin_carbon_zones_id',
-                        ['AND' => [$source_zone_table . '.id' => ['<>', new QueryExpression('`fallback_sources_zones`.`id`')]]]
-                    ]
-                ],
                 $source_table => [
                     'ON' => [
                         $source_table => 'id',
-                        'fallback_sources_zones' => $source_fk,
-                        ['AND' => [Source::getTableField('fallback_level') => ['>', 0]]]
+                        $source_zone_table => $source_fk,
+                        [
+                            'AND' => [
+                                Source::getTableField('is_carbon_intensity_source') => 1,
+                            ]
+                        ]
+                    ]
+                ],
+            ],
+            'LEFT JOIN' => [
+                $source_zone_table . ' AS alternate_sources_zones' => [
+                    'ON' => [
+                        $source_zone_table => 'plugin_carbon_zones_id',
+                        'alternate_sources_zones' => 'plugin_carbon_zones_id',
+                    ]
+                ],
+                $source_table . ' AS alternate_sources' => [
+                    'ON' => [
+                        'alternate_sources' => 'id',
+                        'alternate_sources_zones' => $source_fk,
+                        [
+                            'AND' => [
+                                'alternate_sources.is_carbon_intensity_source' => 1,
+                                'alternate_sources.fallback_level' => ['>', new QueryExpression(Source::getTableField('fallback_level'))],
+                            ]
+                        ]
                     ]
                 ],
                 $carbon_intensity_table => [
                     'ON' => [
-                        $carbon_intensity_table => $source_fk,
-                        'fallback_sources_zones' => $source_fk,
-                        ['AND' => [CarbonIntensity::getTableField($zone_fk) => new QueryExpression('`fallback_sources_zones`.`' . $zone_fk . '`')]]
+                        $carbon_intensity_table => $zone_fk,
+                        $source_zone_table => $zone_fk,
+                        [
+                            'AND' => [
+                                'OR' => [
+                                    [CarbonIntensity::getTableField($source_fk) => new QueryExpression(Source_Zone::getTableField($source_fk))],
+                                    [CarbonIntensity::getTableField($source_fk) => new QueryExpression('alternate_sources_zones.' . $source_fk)],
+                                ]
+                            ]
+                        ]
                     ]
                 ]
             ],
-            'WHERE' => [
-                Location::getTableField('locations_id') => $location_id
-            ]
+            'WHERE' => $crit
         ];
+
+        return $request;
+    }
+
+    /**
+     * Tells if a location has fallback carbon intensity data
+     *
+     * @param CommonDBTM $item
+     * @return boolean
+     */
+    public function hasFallbackCarbonIntensityData(CommonDBTM $item): bool
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        if ($item->getType() === GlpiLocation::class) {
+            $location_id = $item->getID();
+        } else {
+            $location_id = $item->fields['locations_id'];
+        }
+
+        $request = self::getCarbonIntensityDataSourceRequest([
+            Location::getTableField('locations_id') => $location_id,
+            'OR' => [
+                // Primary source is a fallback or alternate source is a fallback
+                'NOT' => ['alternate_sources.id' => null],
+                Source::getTableField('fallback_level') => ['>', 0]
+            ],
+        ]);
+
         $result = $DB->request($request);
         return ($result->current()['count'] > 0);
     }
