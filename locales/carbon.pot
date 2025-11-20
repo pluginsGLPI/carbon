@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-29 01:52+0000\n"
+"POT-Creation-Date: 2025-11-20 01:46+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -436,7 +436,7 @@ msgid "Download carbon emissions from ElectricityMap"
 msgstr ""
 
 #: src/CronTask.php:82
-msgid "Compute usage environnemental impact for all assets"
+msgid "Compute usage environmental impact for all assets"
 msgstr ""
 
 #: src/CronTask.php:83 src/CronTask.php:88
@@ -444,7 +444,7 @@ msgid "Maximum number of entries to calculate"
 msgstr ""
 
 #: src/CronTask.php:87
-msgid "Compute embodied environnemental impact for all assets"
+msgid "Compute embodied environmental impact for all assets"
 msgstr ""
 
 #: src/CronTask.php:211
@@ -830,7 +830,7 @@ msgid "Usage global warming potential chart"
 msgstr ""
 
 #: src/Dashboard/Grid.php:322
-msgid "Environmental impact methodology_information"
+msgid "Environmental impact methodology information"
 msgstr ""
 
 #: src/Dashboard/Provider.php:175 src/Dashboard/Provider.php:1014
