@@ -140,7 +140,8 @@ class EmbodiedImpact extends CommonDBTM
     /**
      * Get iterator of items without known embodied impact for a specified itemtype
      *
-     * @param string $itemtype
+     * @template T of CommonDBTM
+     * @param class-string<T> $itemtype
      * @param array $crit Criteria array of WHERE, ORDER, GROUP BY, LEFT JOIN, INNER JOIN, RIGHT JOIN, HAVING, LIMIT
      * @return DBmysqlIterator
      */
@@ -150,9 +151,9 @@ class EmbodiedImpact extends CommonDBTM
         global $DB;
 
         // Check $itemtype inherits from CommonDBTM
-        if (!is_subclass_of($itemtype, CommonDBTM::class)) {
-            throw new \LogicException('itemtype is not a CommonDBTM object');
-        }
+        // if (!is_subclass_of($itemtype, CommonDBTM::class)) {
+        //     throw new \LogicException('itemtype is not a CommonDBTM object');
+        // }
 
         // clean $crit array: remove mostly SELECT, FROM
         $crit = array_intersect_key($crit, array_flip([

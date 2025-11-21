@@ -153,7 +153,8 @@ function plugin_carbon_postShowTab(array $param)
 /**
  * Add search options to core itemtypes
  *
- * @param string $itemtype
+* @template T of CommonDBTM
+* @param class-string<T> $itemtype
  * @return array
  */
 function plugin_carbon_getAddSearchOptionsNew($itemtype): array

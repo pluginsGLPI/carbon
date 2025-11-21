@@ -33,13 +33,12 @@
 namespace GlpiPlugin\Carbon\Engine\V1;
 
 use DateTime;
+use CommonDBTM;
 use Computer as GlpiComputer;
 use DbUtils;
-use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\DataTracking\TrackedInt;
 use GlpiPlugin\Carbon\Source_Zone;
-use GlpiPlugin\Carbon\Tests\Engine\V1\EngineTestCase;
 
 /**
  * Compute environmental impact of a whole inventory
@@ -56,7 +55,8 @@ class Inventory implements EngineInterface
     /**
      * Check an item is already in the inventory
      *
-     * @param string $itemtype
+     * @template T of CommonDBTM
+     * @param class-string<T> $itemtype
      * @param integer $items_id
      * @return boolean
      */
@@ -69,7 +69,8 @@ class Inventory implements EngineInterface
     /**
      * Is the itemtype an asset ?
      *
-     * @param string $itemtype
+     * @template T of CommonDBTM
+     * @param class-string<T> $itemtype
      * @return boolean
      */
     private static function isAsset(string $itemtype): bool
@@ -83,7 +84,8 @@ class Inventory implements EngineInterface
     /**
      * Add an item to the inventory to be processed
      *
-     * @param string $itemtype
+     * @template T of CommonDBTM
+     * @param class-string<T> $itemtype
      * @param integer $items_id
      * @return boolean
      */
@@ -125,7 +127,8 @@ class Inventory implements EngineInterface
     /**
      * Add several items to the inventory by itemtype and a search criteria
      *
-     * @param string $itemtype itemtype of the items to add
+     * @template T of CommonDBTM
+     * @param class-string<T> $itemtype itemtype of the items to add
      * @param array $crit search criteria of items to add
      * @return boolean true if success
      */

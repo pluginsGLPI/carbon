@@ -31,6 +31,7 @@
  */
 
 use Config as GlpiConfig;
+use CommonDBTM;
 use GlpiPlugin\Carbon\Dashboard\Widget;
 use Glpi\Plugin\Hooks;
 use GlpiPlugin\Carbon\Config;
@@ -53,6 +54,9 @@ define("PLUGIN_CARBON_MAX_GLPI_VERSION", "12.0.0");
 define('PLUGIN_CARBON_DECIMALS', 3);
 
 // Plugin compatible itemtypes
+/**
+ * @var array<class-string<CommonDBTM>> $PLUGIN_CARBON_TYPES
+ */
 define('PLUGIN_CARBON_TYPES', [
     Computer::class,
     Monitor::class,

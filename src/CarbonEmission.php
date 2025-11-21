@@ -37,6 +37,7 @@ use DateInterval;
 use DateTimeInterface;
 use Entity;
 use Location;
+use CommonDBTM;
 
 class CarbonEmission extends CommonDBChild
 {
@@ -172,6 +173,8 @@ class CarbonEmission extends CommonDBChild
      * Gaps are returned as an array of start and end
      * where start is the 1st msising date and end is the last missing date
      *
+     * @template T of CommonDBTM
+     * @param class-string<T> $itemtype
      * @param integer $id
      * @param DateTimeInterface|null $start
      * @param DateTimeInterface|null $stop

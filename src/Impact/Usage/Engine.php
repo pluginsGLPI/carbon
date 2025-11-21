@@ -32,11 +32,11 @@
 
 namespace GlpiPlugin\Carbon\Impact\Usage;
 
+use CommonDBTM;
 use CommonGLPI;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\DataSource\Boaviztapi;
 use GlpiPlugin\Carbon\DataSource\RestApiClient;
-use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
 
 class Engine extends CommonGLPI
 {
@@ -55,7 +55,8 @@ class Engine extends CommonGLPI
      *
      * Returns null if no engine found
      *
-     * @param string $itemtype itemtype of assets to analyze
+     * @template T of CommonDBTM
+     * @param class-string<T> $itemtype itemtype of assets to analyze
      * @return AbstractUsageImpact|null an instance if an embodied impact calculation object or null on error
      */
     public static function getEngineFromItemtype(string $itemtype): ?AbstractUsageImpact
