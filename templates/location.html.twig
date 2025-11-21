@@ -62,9 +62,10 @@
             multiple: false,
             disabled: false,
             condition: {
-                fallback_level: ['<=', '1'],
+                fallback_level: ['<=', '2'],
                 is_carbon_intensity_source: 1
             },
+            order: 'fallback_level'
         }) }}
 
     <script type="text/javascript">
