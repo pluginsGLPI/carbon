@@ -545,17 +545,11 @@ class Provider
             ],
             'reset'    => 'reset'
         ];
-        if ($handled === false) {
-            // If we count unhandled assets, we must exclude ighored assets from the count
-            $search_criteria['criteria'][] = [
-                'field'      => SearchOptions::IS_IGNORED,
-                'searchtype' => 'equals',
-                'value'      => 0
-            ];
-        }
-        // $itemtype_table = (new DbUtils())->getTableForItemType($itemtype);
-        // Exploit defaultWhere to inject WHERE criterias from dashboard filters
-        // $filter_criteria = self::getFiltersCriteria($itemtype_table, $params['apply_filters'] ?? []);
+        $search_criteria['criteria'][] = [
+            'field'      => SearchOptions::IS_IGNORED,
+            'searchtype' => 'equals',
+            'value'      => 0
+        ];
         $search_data = Search::prepareDatasForSearch($itemtype, $search_criteria);
         Search::constructSQL($search_data);
         Search::constructData($search_data, true);

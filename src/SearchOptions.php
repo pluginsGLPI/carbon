@@ -33,13 +33,14 @@
 namespace GlpiPlugin\Carbon;
 
 use CommonDBTM;
-use Computer;
+use Computer as GlpiComputer;
 use Location as GlpiLocation;
 use ComputerType as GlpiComputerType;
 use ComputerModel;
-use Computer_Item;
 use Glpi\Asset\Asset_PeripheralAsset;
-use Monitor;
+use Glpi\DBAL\QueryExpression;
+use Glpi\DBAL\QuerySubQuery;
+use Monitor as GlpiMonitor;
 use MonitorType as GlpiMonitorType;
 use MonitorModel;
 use NetworkEquipment;
@@ -164,7 +165,7 @@ class SearchOptions
                             ]
                         ]
                     ],
-                    'computation' => "IF(TABLE.`power_consumption` IS NULL, 0, TABLE.`power_consumption`)",
+                    'computation' => "COALESCE(TABLE.`power_consumption`, 0)",
                 ];
 
                 $sopt[] = [
@@ -184,12 +185,12 @@ class SearchOptions
                             ]
                         ]
                     ],
-                    'computation' => "IF(TABLE.`is_ignore` IS NULL, 0, TABLE.`is_ignore`)",
+                    'computation' => "COALESCE(TABLE.`is_ignore`, 0)",
                 ];
             }
         }
 
-        if ($itemtype === Computer::class && in_array($itemtype, PLUGIN_CARBON_TYPES)) {
+        if ($itemtype === GlpiComputer::class && in_array($itemtype, PLUGIN_CARBON_TYPES)) {
             $sopt[] = [
                 'id'            => SearchOptions::USAGE_PROFILE,
                 'table'         => ComputerUsageProfile::getTable(),
@@ -208,15 +209,21 @@ class SearchOptions
                 ]
             ];
 
+            $fallback_carbon_intensity_subquery = Location::getCarbonIntensityDataSourceRequest([
+                Location::getTableField('id') => new QueryExpression('glpi_plugin_carbon_locations_3d6da7fccf9233a3f1a4e41183391a41.id')
+            ]);
+            $fallback_carbon_intensity_subquery = (new QuerySubQuery($fallback_carbon_intensity_subquery))->getQuery();
             $computation = "IF(`glpi_computers_id_963cd5e903dddc7ab00a3b70933369df`.`is_deleted` = 0
             AND `glpi_computers_id_963cd5e903dddc7ab00a3b70933369df`.`is_template` = 0
             AND `glpi_plugin_carbon_locations_3d6da7fccf9233a3f1a4e41183391a41`.`plugin_carbon_sources_zones_id` > 0
-            AND `glpi_plugin_carbon_computerusageprofiles_09f8403aa14af64cd70f350288a0331b`.`id` > 0
-            AND `glpi_plugin_carbon_computertypes_a643ab3ffd70abf99533ed214da87d60`.`is_ignore` = 0
-            AND (
+            AND `glpi_plugin_carbon_computerusageprofiles_09f8403aa14af64cd70f350288a0331b`.`id` > 0"
+            // Do not check if an asset is ignored
+            // . "AND COALESCE(`glpi_plugin_carbon_computertypes_a643ab3ffd70abf99533ed214da87d60`.`is_ignore`, 0) = 0"
+            . " AND (
                 `glpi_plugin_carbon_computertypes_a643ab3ffd70abf99533ed214da87d60`.`power_consumption` > 0
                 OR `glpi_computermodels`.`power_consumption` > 0
-            ), 1, 0)";
+            )
+            AND ($fallback_carbon_intensity_subquery) > 0, 1, 0)";
             $sopt[] = [
                 'id'            => SearchOptions::IS_HISTORIZABLE,
                 'table'         => getTableForItemType($itemtype),
@@ -278,7 +285,7 @@ class SearchOptions
                 ],
                 'computation' => $computation,
             ];
-        } else if ($itemtype === GlpiComputerType::class && in_array(Computer::class, PLUGIN_CARBON_TYPES)) {
+        } else if ($itemtype === GlpiComputerType::class && in_array(GlpiComputer::class, PLUGIN_CARBON_TYPES)) {
             $computer_type_table = getTableForItemType(ComputerType::class);
             $sopt[] = [
                 'id'             => SearchOptions::COMPUTER_TYPE_CATEGORY,
@@ -303,9 +310,9 @@ class SearchOptions
                 'joinparams'     => [
                     'jointype'   => 'child'
                 ],
-                'computation' => "IF(TABLE.`is_ignore` IS NULL, 0, TABLE.`is_ignore`)",
+                'computation' => "COALESCE(TABLE.`is_ignore`, 0)",
             ];
-        } else if ($itemtype === GlpiMonitorType::class && in_array(Monitor::class, PLUGIN_CARBON_TYPES)) {
+        } else if ($itemtype === GlpiMonitorType::class && in_array(GlpiMonitor::class, PLUGIN_CARBON_TYPES)) {
             $sopt[] = [
                 'id'           => SearchOptions::MONITOR_TYPE_IS_IGNORED,
                 'table'        => getTableForItemType(MonitorType::class),
@@ -316,7 +323,7 @@ class SearchOptions
                 'joinparams'     => [
                     'jointype'   => 'child'
                 ],
-                'computation' => "IF(TABLE.`is_ignore` IS NULL, 0, TABLE.`is_ignore`)",
+                'computation' => "COALESCE(TABLE.`is_ignore`, 0)",
             ];
         } else if ($itemtype === GlpiNetworkEquipmentType::class && in_array(NetworkEquipment::class, PLUGIN_CARBON_TYPES)) {
             $sopt[] = [
@@ -329,14 +336,15 @@ class SearchOptions
                 'joinparams'     => [
                     'jointype'   => 'child'
                 ],
-                'computation' => "IF(TABLE.`is_ignore` IS NULL, 0, TABLE.`is_ignore`)",
+                'computation' => "COALESCE(TABLE.`is_ignore`, 0)",
             ];
-        } else if ($itemtype === Monitor::class && in_array($itemtype, PLUGIN_CARBON_TYPES)) {
+        } else if ($itemtype === GlpiMonitor::class && in_array($itemtype, PLUGIN_CARBON_TYPES)) {
             $computation = "IF(`glpi_monitors_id_b24d2115745b49f0b5cdaf2ebb5e9ffe`.`is_deleted` = 0
             AND `glpi_monitors_id_b24d2115745b49f0b5cdaf2ebb5e9ffe`.`is_template` = 0
-            AND `glpi_plugin_carbon_locations_3d6da7fccf9233a3f1a4e41183391a41`.`plugin_carbon_sources_zones_id` > 0
-            AND `glpi_plugin_carbon_monitortypes_54b036337d1b9bbf4f13db0e1ae93bc9`.`is_ignore` = 0
-            AND (
+            AND `glpi_plugin_carbon_locations_3d6da7fccf9233a3f1a4e41183391a41`.`plugin_carbon_sources_zones_id` > 0"
+            // Do not check if an asset is ignored
+            // . "AND `glpi_plugin_carbon_monitortypes_54b036337d1b9bbf4f13db0e1ae93bc9`.`is_ignore` = 0"
+            . " AND (
                 `glpi_plugin_carbon_monitortypes_54b036337d1b9bbf4f13db0e1ae93bc9`.`power_consumption` > 0
                 OR `glpi_monitormodels`.`power_consumption` > 0
             ), 1, 0)";
@@ -360,7 +368,7 @@ class SearchOptions
                                     'joinparams' => [
                                         'jointype' => 'empty',
                                         'beforejoin' => [
-                                            'table' => Computer::getTable(),
+                                            'table' => GlpiComputer::getTable(),
                                             'linkfield' => 'items_id_peripheral',
                                             'joinparams' => [
                                                 'jointype' => 'empty',
@@ -374,7 +382,7 @@ class SearchOptions
                                                                 'REFTABLE' => 'id',
                                                             ],
                                                             'AND' => [
-                                                                'itemtype_peripheral' => Monitor::getType(),
+                                                                'itemtype_peripheral' => GlpiMonitor::getType(),
                                                             ]
                                                         ],
                                                     ]
@@ -410,9 +418,10 @@ class SearchOptions
         } else if ($itemtype === NetworkEquipment::class && in_array($itemtype, PLUGIN_CARBON_TYPES)) {
             $computation = "IF(`glpi_networkequipments_id_401e18dd2eaa15834dcd21d0f6fc677c`.`is_deleted` = 0
             AND `glpi_networkequipments_id_401e18dd2eaa15834dcd21d0f6fc677c`.`is_template` = 0
-            AND `glpi_plugin_carbon_locations_3d6da7fccf9233a3f1a4e41183391a41`.`plugin_carbon_sources_zones_id` > 0
-            AND `glpi_plugin_carbon_networkequipmenttypes_640a9703b62363e5d254356fb4df69ef`.`is_ignore` = 0
-            AND (
+            AND `glpi_plugin_carbon_locations_3d6da7fccf9233a3f1a4e41183391a41`.`plugin_carbon_sources_zones_id` > 0"
+            // Do not check if an asset is ignored
+            //  . "AND `glpi_plugin_carbon_networkequipmenttypes_640a9703b62363e5d254356fb4df69ef`.`is_ignore` = 0
+             . " AND (
                 `glpi_plugin_carbon_networkequipmenttypes_640a9703b62363e5d254356fb4df69ef`.`power_consumption` > 0
                 OR `glpi_networkequipmentmodels`.`power_consumption` > 0
             ), 1, 0)";
