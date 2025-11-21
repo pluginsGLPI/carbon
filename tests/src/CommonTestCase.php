@@ -35,11 +35,12 @@ namespace GlpiPlugin\Carbon\Tests;
 use PHPUnit\Framework\TestCase;
 use Auth;
 use CommonDBTM;
-use Computer;
+use Computer as GlpiComputer;
 use ComputerType as GlpiComputerType;
 use DateTime;
 use DateInterval;
 use DateTimeInterface;
+use ComputerModel as GlpiComputerModel;
 use Glpi\Inventory\Conf;
 use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
@@ -242,12 +243,12 @@ class CommonTestCase extends TestCase
         return $item;
     }
 
-    protected function createComputerUsageProfile(array $usage_profile_params): Computer
+    protected function createComputerUsageProfile(array $usage_profile_params): GlpiComputer
     {
         $usage_profile = $this->createItem(ComputerUsageProfile::class, $usage_profile_params);
-        $glpi_computer = $this->createItem(Computer::class);
+        $glpi_computer = $this->createItem(GlpiComputer::class);
         $impact = $this->createItem(UsageInfo::class, [
-            'itemtype' => Computer::class,
+            'itemtype' => GlpiComputer::class,
             'items_id' => $glpi_computer->getId(),
             ComputerUsageProfile::getForeignKeyField() => $usage_profile->getID(),
         ]);
@@ -255,7 +256,7 @@ class CommonTestCase extends TestCase
         return $glpi_computer;
     }
 
-    protected function createComputerUsageProfilePower(array $usage_profile_params, int $type_power): Computer
+    protected function createComputerUsageProfilePower(array $usage_profile_params, int $type_power): GlpiComputer
     {
         $glpi_computer = $this->createComputerUsageProfile($usage_profile_params);
         $glpiComputerType = $this->createItem(GlpiComputerType::class);
@@ -271,7 +272,7 @@ class CommonTestCase extends TestCase
         return $glpi_computer;
     }
 
-    protected function createComputerUsageProfilePowerLocation(array $usage_profile_params, int $type_power, Source_Zone $source_zone): Computer
+    protected function createComputerUsageProfilePowerLocation(array $usage_profile_params, int $type_power, Source_Zone $source_zone): GlpiComputer
     {
         $glpi_computer = $this->createComputerUsageProfilePower($usage_profile_params, $type_power);
 
@@ -345,6 +346,113 @@ class CommonTestCase extends TestCase
         }
     }
 
+    /**
+     * Build a computer and all its data to make it historiable
+     * except the data provided in argument
+     *
+     * @param array $skip
+     * @return GlpiComputer
+     */
+    protected function createHistorizableComputer(array $skip = []): GlpiComputer
+    {
+        if (!in_array(GlpiComputerType::class, $skip)) {
+            $glpi_computer_type = $this->createItem(GlpiComputerType::class);
+        }
+        if (!in_array(ComputerType::class, $skip)) {
+            $computer_type = $this->createItem(ComputerType::class, [
+                'computertypes_id' => isset($glpi_computer_type) ? $glpi_computer_type->getID() : 0,
+                'power_consumption' => !in_array(ComputerType::class . '_power', $skip) ? 90 : 0,
+            ]);
+        }
+        if (!in_array(GlpiComputerModel::class, $skip)) {
+            $glpi_computer_model = $this->createItem(GlpiComputerModel::class, [
+                'power_consumption' => !in_array(GlpiComputerModel::class . '_power', $skip) ? 150 : 0,
+            ]);
+        }
+        if (!in_array(Zone::class, $skip)) {
+            $zone = $this->createItem(Zone::class);
+        }
+        if (!in_array(Source::class, $skip)) {
+            $source = $this->createItem(Source::class, [
+                'is_carbon_intensity_source' => 1,
+                'fallback_level' => 0,
+            ]);
+        }
+        if (!in_array(Source_Zone::class, $skip)) {
+            $source_zone = $this->createItem(Source_Zone::class, [
+                'plugin_carbon_sources_id' => isset($source) ? $source->getID() : 0,
+                'plugin_carbon_zones_id'   => isset($zone) ? $zone->getID() : 0,
+            ]);
+        }
+        if (!in_array(CarbonIntensity::class, $skip)) {
+            $carbon_intensity = $this->createItem(CarbonIntensity::class, [
+                'plugin_carbon_sources_id' => isset($source) ? $source->getID() : 0,
+                'plugin_carbon_zones_id'   => isset($zone) ? $zone->getID() : 0,
+            ]);
+        }
+        if (!in_array('fallback_' . Source::class, $skip)) {
+            $fallback_source = $this->createItem(Source::class, [
+                'is_carbon_intensity_source' => 1,
+                'fallback_level' => 1,
+            ]);
+        }
+        if (!in_array('fallback_' . Source_Zone::class, $skip)) {
+            $fallback_source_zone = $this->createItem(Source_Zone::class, [
+                'plugin_carbon_sources_id' => isset($fallback_source) ? $fallback_source->getID() : 0,
+                'plugin_carbon_zones_id'   => isset($zone) ? $zone->getID() : 0,
+            ]);
+        }
+        if (!in_array('fallback_' . CarbonIntensity::class, $skip)) {
+            $fallback_carbon_intensity = $this->createItem(CarbonIntensity::class, [
+                'plugin_carbon_sources_id' => isset($fallback_source) ? $fallback_source->getID() : 0,
+                'plugin_carbon_zones_id'   => isset($zone) ? $zone->getID() : 0,
+            ]);
+        }
+        if (!in_array('2nd_fallback_' . Source::class, $skip)) {
+            $fallback_source = $this->createItem(Source::class, [
+                'is_carbon_intensity_source' => 1,
+                'fallback_level' => 2,
+            ]);
+        }
+        if (!in_array('2nd_fallback_' . Source_Zone::class, $skip)) {
+            $fallback_source_zone = $this->createItem(Source_Zone::class, [
+                'plugin_carbon_sources_id' => isset($fallback_source) ? $fallback_source->getID() : 0,
+                'plugin_carbon_zones_id'   => isset($zone) ? $zone->getID() : 0,
+            ]);
+        }
+        if (!in_array('2nd_fallback_' . CarbonIntensity::class, $skip)) {
+            $fallback_carbon_intensity = $this->createItem(CarbonIntensity::class, [
+                'plugin_carbon_sources_id' => isset($fallback_source) ? $fallback_source->getID() : 0,
+                'plugin_carbon_zones_id'   => isset($zone) ? $zone->getID() : 0,
+            ]);
+        }
+        if (!in_array(GlpiLocation::class, $skip)) {
+            $glpi_location = $this->createItem(GlpiLocation::class);
+        }
+        if (!in_array(Location::class, $skip)) {
+            $location = $this->createItem(Location::class, [
+                'locations_id' => isset($glpi_location) ? $glpi_location->getID() : 0,
+                Source_Zone::getForeignKeyField() => isset($source_zone) ? $source_zone->getID() : 0,
+            ]);
+        }
+        $glpi_computer = $this->createItem(GlpiComputer::class, [
+            GlpiLocation::getForeignKeyField()      => isset($glpi_location) ? $glpi_location->getID() : 0,
+            GlpiComputerType::getForeignKeyField()  => isset($glpi_computer_type) ? $glpi_computer_type->getID() : 0,
+            GlpiComputerModel::getForeignKeyField() => isset($glpi_computer_model) ? $glpi_computer_model->getID() : 0,
+        ]);
+        if (!in_array(ComputerUsageProfile::class, $skip)) {
+            $usage_profile = $this->createItem(ComputerUsageProfile::class);
+        }
+        if (!in_array(UsageInfo::class, $skip)) {
+            $impact = $this->createItem(UsageInfo::class, [
+                'itemtype' => $glpi_computer::getType(),
+                'items_id' => $glpi_computer->getID(),
+                'plugin_carbon_computerusageprofiles_id' => isset($usage_profile) ? $usage_profile->getID() : 0,
+            ]);
+        }
+        return $glpi_computer;
+    }
+
     protected function getSessionMessage(): string
     {
         if (
@@ -377,7 +485,7 @@ class CommonTestCase extends TestCase
         if (version_compare(GLPI_VERSION, '11.0.0-beta') >= 0) {
             if ($itemtype === \Computer_Item::class) {
                 $itemtype = \Glpi\Asset\Asset_PeripheralAsset::class;
-                $input['itemtype_asset'] = Computer::class;
+                $input['itemtype_asset'] = GlpiComputer::class;
                 $input['items_id_asset'] = $input['computers_id'];
                 $input['itemtype_peripheral'] = $input['itemtype'];
                 $input['items_id_peripheral'] = $input['items_id'];
