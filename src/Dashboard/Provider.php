@@ -32,6 +32,7 @@
 
 namespace GlpiPlugin\Carbon\Dashboard;
 
+use CommonDBTM;
 use Computer as GlpiComputer;
 use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
@@ -459,7 +460,8 @@ class Provider
      *
      * Handled assets are assets with enough data to calculate usage carbon emission
      *
-     * @param array|string $itemtypes types of asets to count
+     * @template T of CommonDBTM
+     * @param array[class-string<T>]|class-string<T> $itemtypes types of asets to count
      * @param array $params
      * @return array
      */

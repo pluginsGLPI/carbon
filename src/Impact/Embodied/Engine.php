@@ -33,11 +33,11 @@
 namespace GlpiPlugin\Carbon\Impact\Embodied;
 
 use CommonGLPI;
+use CommonDBTM;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\DataSource\Boaviztapi;
 use GlpiPlugin\Carbon\DataSource\RestApiClient;
 use GlpiPlugin\Carbon\Impact\Embodied\Boavizta\AbstractAsset;
-use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
 
 class Engine extends CommonGLPI
 {
@@ -56,7 +56,8 @@ class Engine extends CommonGLPI
      *
      * Returns null if no engine found
      *
-     * @param string $itemtype itemtype of assets to analyze
+     * @template T of CommonDBTM
+     * @param class-string<T> $itemtype itemtype of assets to analyze
      * @return EmbodiedImpactInterface|null an instance if an embodied impact calculation object or null on error
      */
     public static function getEngineFromItemtype(string $itemtype): ?EmbodiedImpactInterface
@@ -82,7 +83,8 @@ class Engine extends CommonGLPI
      * Get an instance of the internal engine to calcilate impacts for the given itemtype
      * This is a fallback engine
      *
-     * @param string $itemtype
+     * @template T of CommonDBTM
+     * @param class-string<T> $itemtype
      * @return ?EmbodiedImpactInterface
      */
     public static function getInternalEngineFromItemtype(string $itemtype): ?EmbodiedImpactInterface

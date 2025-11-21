@@ -190,8 +190,8 @@ class Zone extends CommonDropdown
 
     /**
      * Get the request fragment to find a zone by asset
-     *
-     * @param class-string $itemtype asset type
+     * @template T of CommonDBTM
+     * @param class-string<T> $itemtype asset type
      * @return array Request fragment
      */
     private static function getByAssetRequest(string $itemtype): array

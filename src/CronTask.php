@@ -37,7 +37,6 @@ use Config as GlpiConfig;
 use Geocoder\Geocoder;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientFactory;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientInterface;
-use GlpiPlugin\Carbon\DataSource\RestApiClient;
 use GlpiPlugin\Carbon\Impact\Embodied\Engine as EmbodiedEngine;
 use GlpiPlugin\Carbon\Impact\Usage\UsageImpactInterface as UsageImpactInterface;
 use GlpiPlugin\Carbon\Impact\Usage\Engine as UsageEngine;
@@ -124,7 +123,6 @@ class CronTask
 
         // Calculate other impacts
         foreach (PLUGIN_CARBON_TYPES as $itemtype) {
-            /** @ar UsageImpactInterface $usage_impact */
             $usage_impact = UsageEngine::getEngineFromItemtype($itemtype);
             if ($usage_impact === null) {
                 continue;
