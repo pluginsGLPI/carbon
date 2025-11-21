@@ -109,10 +109,11 @@ class SearchOptions
 
     public const NETEQUIP_TYPE_IS_IGNORED = self::SEARCH_OPTION_BASE + 1100;
 
-    /*
+    /**
      * Get search options added to a core itemtype by the plugin
      *
-     * @param string $itemtype
+     * @template T of CommonDBTM
+     * @param class-string<T> $itemtype
      * @return array
      */
     public static function getCoreSearchOptions(string $itemtype): array
