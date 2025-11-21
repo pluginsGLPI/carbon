@@ -39,6 +39,7 @@ use DateInterval;
 use DateTime;
 use Glpi\Asset\Asset_PeripheralAsset;
 use GlpiPlugin\Carbon\CarbonEmission;
+use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Dashboard\Provider;
@@ -68,7 +69,7 @@ class ProviderTest extends DbTestCase
         $this->login('glpi', 'glpi');
     }
 
-    protected function handledComputersCountFixture(): int
+    protected function handledComputersCountFixture_old(): int
     {
         // Switch to an empty entity
         $entities_id = $this->isolateInEntity('glpi', 'glpi');
@@ -97,11 +98,17 @@ class ProviderTest extends DbTestCase
 
         $glpi_location_empty = $this->createItem(GlpiLocation::class);
         $glpi_location = $this->createItem(GlpiLocation::class);
-        $source = $this->createItem(Source::class);
+        $source = $this->createItem(Source::class, [
+            'is_carbon_intensity_source' => 1
+        ]);
         $zone = $this->createItem(Zone::class);
         $source_zone = $this->createItem(Source_Zone::class, [
             'plugin_carbon_sources_id' => $source->getID(),
             'plugin_carbo_zones_id'    => $zone->getID(),
+        ]);
+        $carbon_intensity = $this->createItem(CarbonIntensity::class, [
+            'plugin_carbon_sources_id' => $source->getID(),
+            'plugin_carbon_zones_id' => $zone->getID(),
         ]);
         $location = $this->createItem(Location::class, [
             'locations_id' => $glpi_location->getID(),
@@ -173,16 +180,132 @@ class ProviderTest extends DbTestCase
         return $total_count;
     }
 
+    protected function handledComputersCountFixture(): int
+    {
+        $glpi_computers = [];
+
+        // Handled computer with all requirments
+        $glpi_computer = $this->createHistorizableComputer();
+        $glpi_computers[] = $glpi_computer;
+
+        // Computer without
+        // - fallback carbon intensity
+        $glpi_computer = $this->createHistorizableComputer([
+            'fallback_' . CarbonIntensity::class,
+            '2nd_fallback_' . CarbonIntensity::class,
+        ]);
+        $glpi_computers[] = $glpi_computer;
+
+        // Computer without
+        // - fallback source_zone
+        $glpi_computer = $this->createHistorizableComputer([
+            'fallback_' . Source_Zone::class,
+            'fallback_' . CarbonIntensity::class,
+            '2nd_fallback_' . Source_Zone::class,
+            '2nd_fallback_' . CarbonIntensity::class,
+        ]);
+        $glpi_computers[] = $glpi_computer;
+
+        // Computer without
+        // - realtime carbon intensity
+        $glpi_computer = $this->createHistorizableComputer([CarbonIntensity::class]);
+        $glpi_computers[] = $glpi_computer;
+
+        // Computer without
+        // - Type power consumption
+        $glpi_computer = $this->createHistorizableComputer([ComputerType::class . '_power']);
+        $glpi_computers[] = $glpi_computer;
+
+        // Computer without
+        // - plugin data for type
+        $glpi_computer = $this->createHistorizableComputer([ComputerType::class]);
+        $glpi_computers[] = $glpi_computer;
+
+        // Computer without
+        // - type
+        $glpi_computer = $this->createHistorizableComputer([
+            GlpiComputerType::class,
+            ComputerType::class
+        ]);
+        $glpi_computers[] = $glpi_computer;
+
+        // Computer without
+        // - model power conssumption
+        $glpi_computer = $this->createHistorizableComputer([GlpiComputerModel::class . '_power']);
+        $glpi_computers[] = $glpi_computer;
+
+        // Computer without
+        // - model power conssumption
+        // - type power consumption
+        $glpi_computer = $this->createHistorizableComputer([
+            ComputerType::class . '_power',
+            GlpiComputerModel::class . '_power',
+        ]);
+        $glpi_computers[] = $glpi_computer;
+
+        // Computer without
+        // - model
+        // - type
+        $glpi_computer = $this->createHistorizableComputer([
+            ComputerType::class,
+            GlpiComputerModel::class,
+        ]);
+        $glpi_computers[] = $glpi_computer;
+
+        // Computer without
+        // - model
+        $glpi_computer = $this->createHistorizableComputer([GlpiComputerModel::class]);
+        $glpi_computers[] = $glpi_computer;
+
+        // Computer without
+        // - plugin location data
+        $glpi_computer = $this->createHistorizableComputer([Location::class]);
+        $glpi_computers[] = $glpi_computer;
+
+        // Computer without
+        // - any source_zone
+        $glpi_computer = $this->createHistorizableComputer([
+            Source_Zone::class,
+            CarbonIntensity::class,
+            'fallback_' . Source_Zone::class,
+            'fallback_' . CarbonIntensity::class,
+            '2nd_fallback_' . Source_Zone::class,
+            '2nd_fallback_' . CarbonIntensity::class,
+        ]);
+        $glpi_computers[] = $glpi_computer;
+
+        // Computer without
+        // - location
+        $glpi_computer = $this->createHistorizableComputer([GlpiLocation::class]);
+        $glpi_computers[] = $glpi_computer;
+
+        // Computer without
+        // - Usage profile
+        $glpi_computer = $this->createHistorizableComputer([ComputerUsageProfile::class]);
+        $glpi_computers[] = $glpi_computer;
+
+        // Computer
+        // - as template
+        $glpi_computer = $this->createHistorizableComputer();
+        $glpi_computers[] = $glpi_computer;
+        $this->assertTrue($glpi_computer->update(['is_template' => 1] + $glpi_computer->fields));
+
+        // Computer
+        // - deleted
+        $glpi_computer = $this->createHistorizableComputer();
+        $glpi_computers[] = $glpi_computer;
+        $this->assertTrue($glpi_computer->update(['is_deleted' => 1] + $glpi_computer->fields));
+
+        return count($glpi_computers);
+    }
+
     public function testGetHandledComputersCount()
     {
         $total_count = $this->handledComputersCountFixture();
 
-        // 3 computers are complete
-        // 1 having both power_consumption from computer type and computer model
-        // 1 having both power_consumption from computer type only
-        // 1 having both power_consumption from computer model only
+        // 9 computers fill historization requirements
         $handled_count = Provider::getHandledAssetCount(GlpiComputer::class, true);
-        $this->assertEquals(3, $handled_count['number']);
+        $this->assertEquals(9, $handled_count['number']);
     }
 
     public function testGetUnhandledComputersCount()
@@ -190,14 +313,15 @@ class ProviderTest extends DbTestCase
         $total_count = $this->handledComputersCountFixture();
 
         $unhandled_count = Provider::getHandledAssetCount(GlpiComputer::class, false);
-        $this->assertEquals($total_count - 3, $unhandled_count['number']);
+        $deleted_or_template_count = 2;
+        $this->assertEquals($total_count - 9 - $deleted_or_template_count, $unhandled_count['number']);
     }
 
     public function testGetHandledAssetsRatio()
     {
         $total_count = $this->handledComputersCountFixture();
         $result = Provider::getHandledAssetsRatio([GlpiComputer::class]);
-        $expected = 19; // This is a percentage
+        $expected = 60; // This is a percentage
         $this->assertEquals($expected, $result['data'][0]['number']);
     }
 
