@@ -80,6 +80,10 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
 
     protected function getVersion(): string
     {
+        if ($this->engine_version !== 'unknown') {
+            return $this->engine_version;
+        }
+
         try {
             $response = $this->client->get('utils/version');
         } catch (\RuntimeException $e) {
@@ -93,8 +97,8 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
             ), E_USER_WARNING);
             throw new \RuntimeException('Invalid response from Boavizta API');
         }
-
-        return $response[0];
+        $this->engine_version = $response[0];
+        return $this->engine_version;
     }
 
     protected function query($description): array

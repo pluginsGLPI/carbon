@@ -31,7 +31,6 @@
  */
 
 use Config as GlpiConfig;
-use CommonDBTM;
 use GlpiPlugin\Carbon\Dashboard\Widget;
 use Glpi\Plugin\Hooks;
 use GlpiPlugin\Carbon\Config;
