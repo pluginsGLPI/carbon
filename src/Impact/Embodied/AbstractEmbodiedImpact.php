@@ -69,6 +69,8 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         }
     }
 
+    abstract protected function getVersion(): string;
+
     /**
      * Get the unit of an impact
      *
@@ -200,7 +202,7 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         $impact_types = Type::getImpactTypes();
 
         $input['engine'] = $this->engine;
-        $input['engine_version'] = $this->engine_version;
+        $input['engine_version'] = $this->getVersion();
 
         // Prepare inputs for add or update
         foreach ($impacts as $type => $value) {
@@ -245,7 +247,10 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         // }
 
         $crit[] = [
-            $item_type_table . '.is_ignore' => false,
+            'OR' => [
+                $item_type_table . '.is_ignore' => 0,
+                $item_type_table . '.id' => null,
+            ]
         ];
 
         $request = [

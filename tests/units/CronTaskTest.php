@@ -100,13 +100,15 @@ class CronTaskTest extends DbTestCase
     {
         $cron_task = new CronTask();
         $glpi_cron_task = new GlpiCronTask();
-        $glpi_cron_task->getFromDBByCrit([
-            'itemtype' => get_class($cron_task),
-            'name'     => 'LocationCountryCode',
+        $glpi_cron_task = $this->getItem(GlpiCronTask::class, [
+            'WHERE' => [
+                'itemtype' => CronTask::class,
+                'name'     => 'LocationCountryCode',
+            ]
         ]);
 
         // Mock the getGeocoder method to return a callable that simulates geocoding
-        $geocoder_collection = new AddressCollection([
+        $address_collection = new AddressCollection([
             new NominatimAddress(
                 '',
                 new AdminLevelCollection([
@@ -127,7 +129,7 @@ class CronTaskTest extends DbTestCase
             ),
         ]);
         $geocoder = $this->createStub(Geocoder::class);
-        $geocoder->method('geocodeQuery')->willReturn($geocoder_collection);
+        $geocoder->method('geocodeQuery')->willReturn($address_collection);
         $cron_task->setGeocoder(function () use ($geocoder) {
             return $geocoder;
         });
