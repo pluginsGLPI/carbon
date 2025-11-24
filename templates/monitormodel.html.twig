@@ -34,6 +34,10 @@
 {% import "@carbon/components/form/fields_macros.html.twig" as carbonFields %}
 
 {% block form_fields %}
+    <div class="row">
+        {{ __('The impacts below shall include the manufacturing, disposal and recycling processes only.', 'carbon') }}
+    </div>
+
     {% for key, field_description in criterias %}
         {% set criteria = key %}
         {% set criteria_source = key ~ '_source' %}
