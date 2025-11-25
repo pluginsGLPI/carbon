@@ -37,7 +37,9 @@ use DBmysql;
 use DbUtils;
 use CommonDBTM;
 use DBmysqlIterator;
+use GlpiPlugin\Carbon\AbstractModel;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
+use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\EmbodiedImpact;
 use GlpiPlugin\Carbon\Impact\Type;
 use Toolbox as GlpiToolbox;
@@ -181,15 +183,30 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         if ($item === false) {
             return false;
         }
-        try {
-            $impacts = $this->doEvaluation($item);
-        } catch (\RuntimeException $e) {
-            return false;
-        }
 
-        if ($impacts === null) {
-            // Nothing calculated
-            return false;
+        // Check the asset does not has embodied impact data in its model
+        $glpi_model_class = $itemtype . 'Model';
+        $glpi_model_class_fk = getForeignKeyFieldForItemType($glpi_model_class);
+        /**
+         * @var class-string<AbstractModel> $model_class
+         */
+        $model_class = 'GlpiPlugin\\Carbon\\' . $glpi_model_class;
+        $glpi_model_id = $item->fields[$glpi_model_class_fk];
+        $model = new $model_class;
+
+        if ($model->getFromDBByCrit([$glpi_model_class_fk => $glpi_model_id]) !== false) {
+            $impacts = $this->getModelImpacts($model);
+        } else {
+            try {
+                $impacts = $this->doEvaluation($item);
+            } catch (\RuntimeException $e) {
+                return false;
+            }
+
+            if ($impacts === null) {
+                // Nothing calculated
+                return false;
+            }
         }
 
         // Find an existing row, if any
@@ -311,5 +328,15 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
             'itemtype' => static::getItemtype(),
             'items_id' => $items_id
         ]);
+    }
+
+    protected function getModelImpacts(CommonDBTM $model): array
+    {
+        $impacts = [];
+        $types = Type::getImpactTypes();
+        foreach ($types as $key => $type) {
+            $impacts[$key] = new TrackedFloat($model->fields[$type], null, $model->fields[$type . '_quality']);
+        };
+        return $impacts;
     }
 }
