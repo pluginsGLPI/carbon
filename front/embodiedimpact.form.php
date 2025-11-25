@@ -87,13 +87,18 @@ if (isset($_POST['update'])) {
         Html::back();
     }
 
-    $embodied_impact = Engine::getEngineFromItemtype($_POST['itemtype']);
+    $itemtype = $_POST['itemtype'];
+    if (!Toolbox::isCommonDBTM($itemtype)) {
+        Session::addMessageAfterRedirect(__('Bad arguments.', 'carbon'), false, ERROR);
+        Html::back();
+    }
+
+    $embodied_impact = Engine::getEngineFromItemtype($itemtype);
     if ($embodied_impact === null) {
         Session::addMessageAfterRedirect(__('Unable to find calculation engine for this asset.', 'carbon'), false, ERROR);
         Html::back();
     }
 
-    $itemtype = $embodied_impact::getItemtype();
     $item = new $itemtype();
     $item->check($_POST['items_id'], UPDATE);
 

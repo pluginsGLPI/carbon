@@ -128,7 +128,7 @@ if (isset($_POST['update'])) {
         }
     }
 
-    $usage_impact = Engine::getEngineFromItemtype($_POST['itemtype']);
+    $usage_impact = Engine::getEngineFromItemtype($itemtype);
     if ($usage_impact === null) {
         Session::addMessageAfterRedirect(__('Unable to find calculation engine for this asset.', 'carbon'), false, ERROR);
         Html::back();
