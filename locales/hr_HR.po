@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-28 15:18+0000\n"
-"PO-Revision-Date: 2025-07-03 13:58+0000\n"
+"POT-Creation-Date: 2025-11-10 01:54+0000\n"
+"PO-Revision-Date: 2025-10-29 08:13+0000\n"
 "Last-Translator: Milo Ivir <mail@milotype.de>, 2025\n"
 "Language-Team: Croatian (Croatia) (https://app.transifex.com/teclib/teams/28042/hr_HR/)\n"
 "MIME-Version: 1.0\n"
@@ -140,9 +140,9 @@ msgstr ""
 #: templates/networkequipmenttype.html.twig src/AbstractType.php:56
 msgid "Power"
 msgid_plural "Powers"
-msgstr[0] "Struja"
-msgstr[1] "Struje"
-msgstr[2] "Struja"
+msgstr[0] "Energija"
+msgstr[1] "Energije"
+msgstr[2] "Energijae"
 
 #: templates/computertype.html.twig
 msgid ""
@@ -267,11 +267,11 @@ msgstr "Lokacija ima državu ili zemllju"
 
 #: templates/history/status-item.html.twig
 msgid "Real time carbon intensity enabled"
-msgstr ""
+msgstr "Stvarno vrijeme intenziteta ugljika je aktivirano"
 
 #: templates/history/status-item.html.twig
 msgid "The location has yearly carbon intensity data"
-msgstr ""
+msgstr "Lokacija ima godišnje podatke o intenzitetu ugljika"
 
 #: templates/history/status-item.html.twig
 msgid "The asset has a model"
@@ -463,7 +463,7 @@ msgid "Download carbon emissions from ElectricityMap"
 msgstr "Preuzmi emisije ugljika od ElectricityMap"
 
 #: src/CronTask.php:82
-msgid "Compute usage environnemental impact for all assets"
+msgid "Compute usage environmental impact for all assets"
 msgstr "Izračunaj utjecaj na okoliš za sva sredstva zbog korištenja"
 
 #: src/CronTask.php:83 src/CronTask.php:88
@@ -471,7 +471,7 @@ msgid "Maximum number of entries to calculate"
 msgstr "Maksimalan broj unosa za računanje"
 
 #: src/CronTask.php:87
-msgid "Compute embodied environnemental impact for all assets"
+msgid "Compute embodied environmental impact for all assets"
 msgstr "Izračunaj ugrađeni utjecaj na okoliš za sva sredstva"
 
 #: src/CronTask.php:211
@@ -871,7 +871,7 @@ msgid "Usage global warming potential chart"
 msgstr "Dijagram potencijala globalnog zagrijavanje zbog korištenja"
 
 #: src/Dashboard/Grid.php:322
-msgid "Environmental impact methodology_information"
+msgid "Environmental impact methodology information"
 msgstr "Informacije o metodologiji za utjecaj na okoliš"
 
 #: src/Dashboard/Provider.php:175 src/Dashboard/Provider.php:1014
