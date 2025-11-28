@@ -85,6 +85,17 @@ class AbstractModel extends CommonDBChild
         $type->showForItemType($type->getID());
     }
 
+    public function prepareInputForUpdate($input)
+    {
+        $keys = Type::getImpactTypes();
+        foreach ($keys as $key) {
+            $source_key = $key . '_source';
+            $input[$source_key] = trim($input[$source_key] ?? '');
+        }
+
+        return parent::prepareInputForUpdate($input);
+    }
+
     /**
      * Get the type for the item, creating it if it doesn't exist.
      *
