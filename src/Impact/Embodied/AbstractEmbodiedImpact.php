@@ -42,6 +42,8 @@ use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\EmbodiedImpact;
 use GlpiPlugin\Carbon\Impact\Type;
+use GuzzleHttp\Exception\ConnectException;
+use Session;
 use Toolbox as GlpiToolbox;
 
 abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
@@ -192,18 +194,29 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
          */
         $model_class = 'GlpiPlugin\\Carbon\\' . $glpi_model_class;
         $glpi_model_id = $item->fields[$glpi_model_class_fk];
-        $model = new $model_class;
+        $model = new $model_class();
 
+        $impacts = [];
         if ($model->getFromDBByCrit([$glpi_model_class_fk => $glpi_model_id]) !== false) {
             $impacts = $this->getModelImpacts($model);
+        }
+        if (count($impacts) !== 0) {
+            $input['engine'] = __('user input', 'carbon');
+            $input['engine_version'] = '';
         } else {
+            $input['engine'] = $this->engine;
             try {
+                $input['engine_version'] = $this->getVersion();
                 $impacts = $this->doEvaluation($item);
+            } catch (ConnectException $e) {
+                Session::addMessageAfterRedirect(__('Connection to Boavizta failed.', 'carbon'), false, ERROR);
+                return false;
             } catch (\RuntimeException $e) {
+                Session::addMessageAfterRedirect(__('Embodied impact evaluation valuation falied.', 'carbon'), false, ERROR);
                 return false;
             }
 
-            if ($impacts === null) {
+            if ($impacts === null || count($impacts) === 0) {
                 // Nothing calculated
                 return false;
             }
@@ -217,9 +230,6 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         $embodied_impact = new EmbodiedImpact();
         $embodied_impact->getFromDBByCrit($input);
         $impact_types = Type::getImpactTypes();
-
-        $input['engine'] = $this->engine;
-        $input['engine_version'] = $this->getVersion();
 
         // Prepare inputs for add or update
         foreach ($impacts as $type => $value) {

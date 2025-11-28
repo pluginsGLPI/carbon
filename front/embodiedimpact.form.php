@@ -102,9 +102,7 @@ if (isset($_POST['update'])) {
     $item = new $itemtype();
     $item->check($_POST['items_id'], UPDATE);
 
-    if (!$embodied_impact->evaluateItem($_POST['items_id'])) {
-        Session::addMessageAfterRedirect(__('Update failed.', 'carbon'), false, ERROR);
-    }
+    $embodied_impact->evaluateItem($_POST['items_id']);
 }
 
 Html::back();
