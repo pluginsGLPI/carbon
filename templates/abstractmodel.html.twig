@@ -29,8 +29,36 @@
  # -------------------------------------------------------------------------
  #}
 
-{% extends "generic_show_form.html.twig" %}
+{% import "components/form/fields_macros.html.twig" as fields %}
+{% import "@carbon/components/form/fields_macros.html.twig" as carbonFields %}
+{% import 'components/form/basic_inputs_macros.html.twig' as _inputs %}
 
-{% block form_fields %}
-{% include('@carbon/abstractmodel.html.twig') %}
-{% endblock %}
+<div class="row">
+    {{ __('The impacts below shall include the manufacturing, disposal and recycling processes only.', 'carbon') }}
+</div>
+
+{% for key, field_description in criterias %}
+    {% set criteria = key %}
+    {% set criteria_source = key ~ '_source' %}
+    {% set criteria_quality = key ~ '_quality' %}
+
+    {{ fields.smallTitle(field_description.title) }}
+
+    {% set checkbox = _inputs.checkbox(key, false) %}
+
+    {{ fields.numberField(criteria,
+        item.fields[criteria],
+        field_description.label, {
+            min: 0
+    }) }}
+
+    {{ fields.textfield(criteria_source,
+        item.fields[criteria_source],
+        __('Data source', 'carbon'), {}) }}
+
+    {{ carbonFields.dropdownDataQuaity(criteria_quality,
+        item.fields[criteria_quality],
+        __('Data quality', 'carbon'), {
+            min: 0
+    }) }}
+{% endfor %}
