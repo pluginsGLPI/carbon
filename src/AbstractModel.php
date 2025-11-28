@@ -156,4 +156,93 @@ class AbstractModel extends CommonDBChild
             'criterias' => $criterias,
         ]);
     }
+
+    public function rawSearchOptions()
+    {
+        $tab = parent::rawSearchOptions();
+        $table   = $this->getTable();
+
+        $tab[] = [
+            'id'                 => '2',
+            'table'              => $table,
+            'field'              => 'id',
+            'name'               => __('ID'),
+            'massiveaction'      => false, // implicit field is id
+            'datatype'           => 'number'
+        ];
+
+        $tab[] = [
+            'id'       => SearchOptions::EMBODIED_IMPACT_GWP,
+            'table'    => $table,
+            'field'    => 'gwp',
+            'name'     => __('Global warming potential', 'carbon'),
+            'datatype' => 'float',
+        ];
+
+        $tab[] = [
+            'id'       => SearchOptions::EMBODIED_IMPACT_GWP_SOURCE,
+            'table'    => $table,
+            'field'    => 'gwp_source',
+            'name'     => __('Global warming potential source', 'carbon'),
+            'datatype' => 'string',
+        ];
+
+        $tab[] = [
+            'id'       => SearchOptions::EMBODIED_IMPACT_GWP_QUALITY,
+            'table'    => $table,
+            'field'    => 'gwp_quality',
+            'name'     => __('Global warming potential quality', 'carbon'),
+            'datatype' => 'int',
+        ];
+
+        $tab[] = [
+            'id'       => SearchOptions::EMBODIED_IMPACT_ADP,
+            'table'    => $table,
+            'field'    => 'adp',
+            'name'     => __('Abiotic depletion potential', 'carbon'),
+            'datatype' => 'float',
+        ];
+
+        $tab[] = [
+            'id'       => SearchOptions::EMBODIED_IMPACT_ADP_SOURCE,
+            'table'    => $table,
+            'field'    => 'adp_source',
+            'name'     => __('Abiotic depletion potential source', 'carbon'),
+            'datatype' => 'string',
+        ];
+
+        $tab[] = [
+            'id'       => SearchOptions::EMBODIED_IMPACT_ADP_QUALITY,
+            'table'    => $table,
+            'field'    => 'adp_quality',
+            'name'     => __('Abiotic depletion potential quality', 'carbon'),
+            'datatype' => 'int',
+        ];
+
+        $tab[] = [
+            'id'       => SearchOptions::EMBODIED_IMPACT_PE,
+            'table'    => $table,
+            'field'    => 'pe',
+            'name'     => __('Primary energy (J)', 'carbon'),
+            'datatype' => 'float',
+        ];
+
+        $tab[] = [
+            'id'       => SearchOptions::EMBODIED_IMPACT_PE_SOURCE,
+            'table'    => $table,
+            'field'    => 'pe_source',
+            'name'     => __('Primary energy source', 'carbon'),
+            'datatype' => 'string',
+        ];
+
+        $tab[] = [
+            'id'       => SearchOptions::EMBODIED_IMPACT_PE_QUALITY,
+            'table'    => $table,
+            'field'    => 'pe_quality',
+            'name'     => __('Primary energy quality', 'carbon'),
+            'datatype' => 'int',
+        ];
+
+        return $tab;
+    }
 }
