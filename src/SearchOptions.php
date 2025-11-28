@@ -110,6 +110,16 @@ class SearchOptions
 
     public const NETEQUIP_TYPE_IS_IGNORED = self::SEARCH_OPTION_BASE + 1100;
 
+    public const EMBODIED_IMPACT_GWP         = self::SEARCH_OPTION_BASE + 1200;
+    public const EMBODIED_IMPACT_GWP_SOURCE  = self::SEARCH_OPTION_BASE + 1201;
+    public const EMBODIED_IMPACT_GWP_QUALITY = self::SEARCH_OPTION_BASE + 1202;
+    public const EMBODIED_IMPACT_ADP         = self::SEARCH_OPTION_BASE + 1203;
+    public const EMBODIED_IMPACT_ADP_SOURCE  = self::SEARCH_OPTION_BASE + 1204;
+    public const EMBODIED_IMPACT_ADP_QUALITY = self::SEARCH_OPTION_BASE + 1205;
+    public const EMBODIED_IMPACT_PE          = self::SEARCH_OPTION_BASE + 1206;
+    public const EMBODIED_IMPACT_PE_SOURCE   = self::SEARCH_OPTION_BASE + 1207;
+    public const EMBODIED_IMPACT_PE_QUALITY  = self::SEARCH_OPTION_BASE + 1208;
+
     /**
      * Get search options added to a core itemtype by the plugin
      *

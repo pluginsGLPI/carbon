@@ -62,6 +62,7 @@ use PHPUnit\Framework\Attributes\CoversMethod;
 #[CoversMethod('GlpiPlugin\Carbon\UsageImpact', 'rawSearchOptions')]
 #[CoversMethod('GlpiPlugin\Carbon\UsageInfo', 'rawSearchOptions')]
 #[CoversMethod('GlpiPlugin\Carbon\Zone', 'rawSearchOptions')]
+#[CoversMethod('GlpiPlugin\Carbon\AbstractModel', 'rawSearchOptions')]
 class SearchOptionTest extends CommonTestCase
 {
     private array $exceptions = [
@@ -85,9 +86,15 @@ class SearchOptionTest extends CommonTestCase
         Zone::class => [
             'entities_id',
         ],
-        ComputerModel::class => [],
-        MonitorModel::class => [],
-        NetworkEquipmentModel::class => [],
+        ComputerModel::class => [
+            'computermodels_id'
+        ],
+        MonitorModel::class => [
+            'monitormodels_id'
+        ],
+        NetworkEquipmentModel::class => [
+            'networkequipmentmodels_id'
+        ],
     ];
 
     private array $mapping = [
