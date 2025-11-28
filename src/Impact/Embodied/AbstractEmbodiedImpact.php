@@ -335,6 +335,9 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         $impacts = [];
         $types = Type::getImpactTypes();
         foreach ($types as $key => $type) {
+            if ($model->fields[$type] === null || $model->fields[$type . '_quality'] === AbstractTracked::DATA_QUALITY_UNSET_VALUE) {
+                continue;
+            }
             $impacts[$key] = new TrackedFloat($model->fields[$type], null, $model->fields[$type . '_quality']);
         };
         return $impacts;

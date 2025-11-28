@@ -36,6 +36,8 @@ use CommonDBChild;
 use CommonDBTM;
 use CommonGLPI;
 use Glpi\Application\View\TemplateRenderer;
+use GlpiPlugin\Carbon\DataTracking\TrackedInt;
+use GlpiPlugin\Carbon\Impact\Type;
 use Session;
 
 class AbstractModel extends CommonDBChild
@@ -95,9 +97,14 @@ class AbstractModel extends CommonDBChild
         $item_fk = $item->getForeignKeyField();
         $this->getFromDBByCrit([$item_fk => $item->getID()]);
         if ($this->isNewItem()) {
-            $this->add([
+            $input = [
                 $item_fk => $item->getID()
-            ]);
+            ];
+            $types = Type::getImpactTypes();
+            foreach ($types as $type) {
+                $input[$type . '_quality'] = TrackedInt::DATA_QUALITY_UNSET_VALUE;
+            }
+            $this->add($input);
         }
         return $this->isNewItem();
     }
