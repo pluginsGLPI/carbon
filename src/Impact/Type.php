@@ -39,12 +39,25 @@ class Type
     const IMPACT_ADP = 1; // Abiotic Depletion Potential
     const IMPACT_PE  = 2; // Primary Energy
 
+    private static array $impact_types = [
+        self::IMPACT_GWP => 'gwp',
+        self::IMPACT_ADP => 'adp',
+        self::IMPACT_PE  => 'pe',
+    ];
+
     public static function getImpactTypes(): array
     {
-        return [
-            self::IMPACT_GWP => 'gwp',
-            self::IMPACT_ADP => 'adp',
-            self::IMPACT_PE  => 'pe',
-        ];
+        return self::$impact_types;
+    }
+
+    /**
+     * get the ID of an impact type acronym
+     *
+     * @param string $type
+     * @return int|string|false
+     */
+    public static function getImpactId(string $type)
+    {
+        return array_search($type, self::$impact_types);
     }
 }

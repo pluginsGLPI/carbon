@@ -47,6 +47,7 @@ abstract class AbstractTracked
     /**
      * Quality of data, must be ordered from 0 (lowest quality) to highest quality
      */
+    public const DATA_QUALITY_UNSET_VALUE = -1;
     public const DATA_QUALITY_UNSPECIFIED = 0;
     public const DATA_QUALITY_MANUAL = 1;
     public const DATA_QUALITY_ESTIMATED = 2;
@@ -73,6 +74,7 @@ abstract class AbstractTracked
     public static function getDataQualities(): array
     {
         return [
+            self::DATA_QUALITY_UNSET_VALUE                           => __('Impact not evaluated', 'carbon'),
             self::DATA_QUALITY_UNSPECIFIED                           => __('Unspecified quality', 'carbon'),
             self::DATA_QUALITY_MANUAL                                => __('Manual data', 'carbon'),
             self::DATA_QUALITY_ESTIMATED                             => __('Estimated data', 'carbon'),
