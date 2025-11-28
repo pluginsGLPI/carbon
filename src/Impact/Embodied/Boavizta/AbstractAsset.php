@@ -123,21 +123,25 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
     protected function parseResponse(array $response): array
     {
         $impacts = [];
+        $types = Type::getImpactTypes();
         foreach ($response['impacts'] as $type => $impact) {
-            if (!in_array($type, Type::getImpactTypes())) {
+            if (!in_array($type, $types)) {
                 trigger_error(sprintf('Unsupported impact type %s in class %s', $type, __CLASS__));
                 continue;
             }
-
+            $impact_id = Type::getImpactId($type);
+            if ($impact_id === false) {
+                continue;
+            }
             switch ($type) {
                 case 'gwp':
-                    $impacts[Type::IMPACT_GWP] = $this->parseGwp($response['impacts']['gwp']);
+                    $impacts[$impact_id] = $this->parseGwp($response['impacts'][$type]);
                     break;
                 case 'adp':
-                    $impacts[Type::IMPACT_ADP] = $this->parseAdp($response['impacts']['adp']);
+                    $impacts[$impact_id] = $this->parseAdp($response['impacts'][$type]);
                     break;
                 case 'pe':
-                    $impacts[Type::IMPACT_PE] = $this->parsePe($response['impacts']['pe']);
+                    $impacts[$impact_id] = $this->parsePe($response['impacts'][$type]);
                     break;
             }
         }
