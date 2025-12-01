@@ -53,10 +53,10 @@ class Computer extends AbstractAsset
 
     protected string $endpoint        = 'server';
 
-    protected function doEvaluation(CommonDBTM $item): ?array
+    protected function doEvaluation(): ?array
     {
         // adapt $this->endpoint depending on the type of computer (server, laptop, ...)
-        $type = $this->getType($item);
+        $type = $this->getType($this->item);
         $this->endpoint = $this->getEndpoint($type);
 
         // Ask for embodied impact only
@@ -65,7 +65,7 @@ class Computer extends AbstractAsset
             ComputerType::CATEGORY_DESKTOP,
             ComputerType::CATEGORY_UNDEFINED,
         ]);
-        $configuration = $this->analyzeHardware($item);
+        $configuration = $this->analyzeHardware($this->item);
         if ($handle_hardware && count($configuration) === 0) {
             return null;
         }
@@ -139,11 +139,11 @@ class Computer extends AbstractAsset
         return 'terminal/desktop';
     }
 
-    protected function analyzeHardware(CommonDBTM $item): array
+    protected function analyzeHardware(): array
     {
         $configuration = [];
         // Yes, string expected here.
-        $iterator = Item_Devices::getItemsAssociatedTo($item->getType(), (string) $item->getID());
+        $iterator = Item_Devices::getItemsAssociatedTo(self::$itemtype, (string) $this->item->getID());
         foreach ($iterator as $item_device) {
             switch ($item_device->getType()) {
                 case Item_DeviceProcessor::class:

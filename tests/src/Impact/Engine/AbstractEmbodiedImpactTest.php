@@ -60,7 +60,7 @@ class AbstractEmbodiedImpactTest extends DbTestCase
         $asset = $this->createItem(static::$itemtype, [
             getForeignKeyFieldForItemType(static::$itemtype_type) => $glpi_asset_type->getID(),
         ]);
-        $instance = new ('GlpiPlugin\\Carbon\\Impact\\Embodied\\Boavizta\\' . static::$itemtype)();
+        $instance = new ('GlpiPlugin\\Carbon\\Impact\\Embodied\\Boavizta\\' . static::$itemtype)($asset);
         $iterator = $instance->getItemsToEvaluate([
             $asset->getTableField('id') => $asset->getID(),
         ]);
@@ -74,7 +74,7 @@ class AbstractEmbodiedImpactTest extends DbTestCase
         $asset = $this->createItem(static::$itemtype, [
             getForeignKeyFieldForItemType(static::$itemtype_type) => $glpi_asset_type->getID(),
         ]);
-        $instance = new ('GlpiPlugin\\Carbon\\Impact\\Embodied\\Boavizta\\' . static::$itemtype)();
+        $instance = new ('GlpiPlugin\\Carbon\\Impact\\Embodied\\Boavizta\\' . static::$itemtype)($asset);
         $embodied_impact = $this->createItem(EmbodiedImpact::class, [
             'itemtype' => $asset->getType(),
             'items_id' => $asset->getID(),

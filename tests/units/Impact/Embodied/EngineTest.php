@@ -59,17 +59,17 @@ class EngineTest extends DbTestCase
             ->getMock();
         $client_stub->method('request')->willReturn($version_response);
 
-        $itemtype = GlpiComputer::class;
-        $result = Engine::getEngineFromItemtype($itemtype, $client_stub);
+        $item = $this->createItem(GlpiComputer::class);
+        $result = Engine::getEngineFromItemtype($item, $client_stub);
         $this->assertTrue($result instanceof Computer);
 
-        $itemtype = GlpiMonitor::class;
-        $result = Engine::getEngineFromItemtype($itemtype, $client_stub);
+        $item = $this->createItem(GlpiMonitor::class);
+        $result = Engine::getEngineFromItemtype($item, $client_stub);
         $this->assertTrue($result instanceof Monitor);
 
         // This case returns internal embodied impact engine, as Boavizta does not provide data
-        $itemtype = GlpiNetworkEquipment::class;
-        $result = Engine::getEngineFromItemtype($itemtype, $client_stub);
+        $item = $this->createItem(GlpiNetworkEquipment::class);
+        $result = Engine::getEngineFromItemtype($item, $client_stub);
         $this->assertTrue($result instanceof NetworkEquipment);
     }
 }

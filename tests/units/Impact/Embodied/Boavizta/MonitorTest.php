@@ -57,13 +57,13 @@ class MonitorTest extends AbstractEmbodiedImpactTest
         $monitor_type = $this->createItem(MonitorType::class, [
             'monitortypes_id' => $glpi_monitor_type->getID()
         ]);
-        $monitor = $this->createItem(GlpiMonitor::class, [
+        $glpi_monitor = $this->createItem(GlpiMonitor::class, [
             'monitortypes_id' => $glpi_monitor_type->getID()
         ]);
 
-        $instance = new BoaviztaMonitor();
+        $instance = new BoaviztaMonitor($glpi_monitor);
         $request = $instance->getEvaluableQuery([
-            'glpi_monitors.id' => $monitor->getID(),
+            'glpi_monitors.id' => $glpi_monitor->getID(),
         ]);
         $this->assertArrayHasKey('SELECT', $request);
         $this->assertArrayHasKey('FROM', $request);
@@ -77,13 +77,13 @@ class MonitorTest extends AbstractEmbodiedImpactTest
             'monitortypes_id' => $glpi_monitor_type->getID(),
             'is_ignore' => 1,
         ]);
-        $monitor = $this->createItem(GlpiMonitor::class, [
+        $glpi_monitor = $this->createItem(GlpiMonitor::class, [
             'monitortypes_id' => $glpi_monitor_type->getID()
         ]);
 
-        $instance = new BoaviztaMonitor();
+        $instance = new BoaviztaMonitor($glpi_monitor);
         $request = $instance->getEvaluableQuery([
-            'glpi_monitors.id' => $monitor->getID(),
+            'glpi_monitors.id' => $glpi_monitor->getID(),
         ]);
         $this->assertArrayHasKey('SELECT', $request);
         $this->assertArrayHasKey('FROM', $request);

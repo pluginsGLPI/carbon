@@ -61,7 +61,7 @@ class ComputerTest extends AbstractEmbodiedImpactTest
         $computer = $this->createItem(GlpiComputer::class, [
             'computertypes_id' => $glpi_computer_type->getID()
         ]);
-        $instance = new BoaviztaComputer();
+        $instance = new BoaviztaComputer($computer);
         $request = $instance->getEvaluableQuery([
             'glpi_computers.id' => $computer->getID(),
         ]);
@@ -81,7 +81,7 @@ class ComputerTest extends AbstractEmbodiedImpactTest
         $computer = $this->createItem(GlpiComputer::class, [
             'computertypes_id' => $glpi_computer_type->getID()
         ]);
-        $instance = new BoaviztaComputer();
+        $instance = new BoaviztaComputer($computer);
         $request = $instance->getEvaluableQuery([
             'glpi_computers.id' => $computer->getID(),
         ]);

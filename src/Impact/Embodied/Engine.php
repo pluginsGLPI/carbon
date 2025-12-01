@@ -56,21 +56,21 @@ class Engine extends CommonGLPI
      *
      * Returns null if no engine found
      *
-     * @template T of CommonDBTM
-     * @param class-string<T> $itemtype itemtype of assets to analyze
+     * @param CommonDBTM $item item to analyze
      * @return EmbodiedImpactInterface|null an instance if an embodied impact calculation object or null on error
      */
-    public static function getEngineFromItemtype(string $itemtype): ?EmbodiedImpactInterface
+    public static function getEngineFromItemtype(CommonDBTM $item): ?EmbodiedImpactInterface
     {
+        $itemtype = get_class($item);
         $embodied_impact_namespace = Config::getEmbodiedImpactEngine();
         $embodied_impact_class = $embodied_impact_namespace . '\\' . $itemtype;
         $must_implement = AbstractEmbodiedImpact::class;
         if (!class_exists($embodied_impact_class) || !is_subclass_of($embodied_impact_class, $must_implement)) {
-            return self::getInternalEngineFromItemtype($itemtype);
+            return self::getInternalEngineFromItemtype($item);
         }
 
         /** @var AbstractEmbodiedImpact $embodied_impact */
-        $embodied_impact = new $embodied_impact_class();
+        $embodied_impact = new $embodied_impact_class($item);
         try {
             return self::configureEngine($embodied_impact);
         } catch (\RuntimeException $e) {
@@ -83,17 +83,17 @@ class Engine extends CommonGLPI
      * Get an instance of the internal engine to calcilate impacts for the given itemtype
      * This is a fallback engine
      *
-     * @template T of CommonDBTM
-     * @param class-string<T> $itemtype
+     * @param CommonDBTM $item item to analyze
      * @return ?EmbodiedImpactInterface
      */
-    public static function getInternalEngineFromItemtype(string $itemtype): ?EmbodiedImpactInterface
+    public static function getInternalEngineFromItemtype(CommonDBTM $item): ?EmbodiedImpactInterface
     {
+        $itemtype = get_class($item);
         $embodied_impact_class = 'GlpiPlugin\\Carbon\\Impact\\Embodied\Internal' . '\\' . $itemtype;
         if (!class_exists($embodied_impact_class) || !is_subclass_of($embodied_impact_class, AbstractEmbodiedImpact::class)) {
             return null;
         }
-        $embodied_impact = new $embodied_impact_class();
+        $embodied_impact = new $embodied_impact_class($item);
         return $embodied_impact;
     }
 

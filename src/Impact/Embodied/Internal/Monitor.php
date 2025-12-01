@@ -45,15 +45,15 @@ class Monitor extends AbstractAsset
 {
     protected static string $itemtype = GlpiMonitor::class;
 
-    protected function doEvaluation(CommonDBTM $item): ?array
+    protected function doEvaluation(): ?array
     {
-        if (GlpiMonitorModel::isNewID($item->fields['networkequipmentmodels_id'])) {
+        if (GlpiMonitorModel::isNewID($this->item->fields['networkequipmentmodels_id'])) {
             return [];
         }
 
         $model = new GlpiMonitorModel();
         $model->getFromDBByCrit([
-            'networkequipmentmodels_id' => $item->fields['networkequipmentmodels_id']
+            'networkequipmentmodels_id' => $this->item->fields['networkequipmentmodels_id']
         ]);
         if ($model->isNewItem()) {
             return [];

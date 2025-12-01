@@ -42,13 +42,13 @@ class Monitor extends AbstractAsset
 
     protected string $endpoint        = 'peripheral/monitor';
 
-    protected function doEvaluation(CommonDBTM $item): ?array
+    protected function doEvaluation(): ?array
     {
         // TODO: determine if the computer is a server, a computer, a laptop, a tablet...
         // then adapt $this->endpoint depending on the result
 
         // Ask for embodied impact only
-        $configuration = $this->analyzeHardware($item);
+        $configuration = $this->analyzeHardware();
 
         $description = [
             'configuration' => $configuration,
@@ -62,7 +62,7 @@ class Monitor extends AbstractAsset
         return $impacts;
     }
 
-    protected function analyzeHardware(CommonDBTM $item): array
+    protected function analyzeHardware(): array
     {
         $configuration = [];
 
