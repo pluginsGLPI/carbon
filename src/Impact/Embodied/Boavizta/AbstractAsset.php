@@ -33,7 +33,6 @@
 
 namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta;
 
-use CommonDBTM;
 use GlpiPlugin\Carbon\DataSource\Boaviztapi;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\Impact\Type;
@@ -60,11 +59,10 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
 
     /**
      * Analyze the hardware of the asset to prepare the request to the backend
-     * @param CommonDBTM $item asset to analyze
      *
      * @return void
      */
-    abstract protected function analyzeHardware(CommonDBTM $item);
+    abstract protected function analyzeHardware();
 
     /**
      * Set the REST API client to use for requests

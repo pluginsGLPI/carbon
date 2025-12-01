@@ -32,7 +32,6 @@
 
 namespace GlpiPlugin\Carbon\Impact\Embodied\Internal;
 
-use CommonDBTM;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use NetworkEquipment as GlpiNetworkEquipment;
 use NetworkEquipmentModel as GlpiNetworkEquipmentModel;
@@ -46,15 +45,15 @@ class NetworkEquipment extends AbstractAsset
 {
     protected static string $itemtype = GlpiNetworkEquipment::class;
 
-    protected function doEvaluation(CommonDBTM $item): ?array
+    protected function doEvaluation(): ?array
     {
-        if (GlpiNetworkEquipmentModel::isNewID($item->fields['networkequipmentmodels_id'])) {
+        if (GlpiNetworkEquipmentModel::isNewID($this->item->fields['networkequipmentmodels_id'])) {
             return [];
         }
 
         $model = new NetworkEquipmentModel();
         $success = $model->getFromDBByCrit([
-            'networkequipmentmodels_id' => $item->fields['networkequipmentmodels_id']
+            'networkequipmentmodels_id' => $this->item->fields['networkequipmentmodels_id']
         ]);
         if ($success === false) {
             return [];

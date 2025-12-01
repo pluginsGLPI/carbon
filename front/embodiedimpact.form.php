@@ -93,7 +93,7 @@ if (isset($_POST['update'])) {
         Html::back();
     }
 
-    $embodied_impact = Engine::getEngineFromItemtype($itemtype);
+    $embodied_impact = Engine::getEngineFromItemtype($item);
     if ($embodied_impact === null) {
         Session::addMessageAfterRedirect(__('Unable to find calculation engine for this asset.', 'carbon'), false, ERROR);
         Html::back();

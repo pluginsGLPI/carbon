@@ -51,6 +51,9 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
     /** @var string Handled itemtype */
     protected static string $itemtype = '';
 
+    /** @var CommonDBTM Item to analyze */
+    protected CommonDBTM $item;
+
     /** @var int maximum number of entries to build */
     protected int $limit = 0;
 
@@ -66,8 +69,15 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
     /** @var array of TrackedFloat */
     protected array $impacts = [];
 
-    public function __construct()
+    public function __construct(CommonDBTM $item)
     {
+        if (get_class($item) !== static::$itemtype) {
+            throw new \LogicException(sprintf("item if type %s expected, %s given", static::$itemtype, get_class($item)));
+        }
+        if ($item->isNewItem()) {
+            throw new \LogicException("Given item is empty");
+        }
+        $this->item = $item;
         foreach (array_flip(Type::getImpactTypes()) as $type) {
             $this->impacts[$type] = null;
         }
@@ -181,10 +191,6 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
     public function evaluateItem(int $id): bool
     {
         $itemtype = static::$itemtype;
-        $item = $itemtype::getById($id);
-        if ($item === false) {
-            return false;
-        }
 
         // Check the asset does not has embodied impact data in its model
         $glpi_model_class = $itemtype . 'Model';
@@ -193,7 +199,7 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
          * @var class-string<AbstractModel> $model_class
          */
         $model_class = 'GlpiPlugin\\Carbon\\' . $glpi_model_class;
-        $glpi_model_id = $item->fields[$glpi_model_class_fk];
+        $glpi_model_id = $this->item->fields[$glpi_model_class_fk];
         $model = new $model_class();
 
         $impacts = [];
@@ -207,7 +213,7 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
             $input['engine'] = $this->engine;
             try {
                 $input['engine_version'] = $this->getVersion();
-                $impacts = $this->doEvaluation($item);
+                $impacts = $this->doEvaluation();
             } catch (ConnectException $e) {
                 Session::addMessageAfterRedirect(__('Connection to Boavizta failed.', 'carbon'), false, ERROR);
                 return false;
@@ -320,10 +326,9 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
     /**
      * Do the environmental impact evaluation of an asset
      *
-     * @param CommonDBTM $item
      * @return ?array
      */
-    abstract protected function doEvaluation(CommonDBTM $item): ?array;
+    abstract protected function doEvaluation(): ?array;
 
     /**
      * Delete all calculated usage impact for an asset
