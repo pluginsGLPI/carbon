@@ -73,7 +73,6 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
     public function setClient(Boaviztapi $client)
     {
         $this->client = $client;
-        // $this->engine_version = $this->getVersion();
     }
 
     protected function getVersion(): string
