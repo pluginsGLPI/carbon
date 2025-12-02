@@ -40,10 +40,10 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact
     protected string $engine = 'Internal';
 
     /** @var string $engine_version Version of the calculation engine */
-    protected string $engine_version = '1';
+    protected static string $engine_version = '1';
 
     protected function getVersion(): string
     {
-        return $this->engine_version;
+        return self::$engine_version;
     }
 }

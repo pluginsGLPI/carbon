@@ -44,7 +44,7 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
     protected string $engine = 'Boavizta';
 
     /** @var string $engine_version Version of the calculation engine */
-    protected string $engine_version = 'unknown';
+    protected static string $engine_version = 'unknown';
 
     /** @var string Endpoint to query for the itemtype, to be filled in child class */
     protected string $endpoint       = '';
@@ -77,8 +77,8 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
 
     protected function getVersion(): string
     {
-        if ($this->engine_version !== 'unknown') {
-            return $this->engine_version;
+        if (self::$engine_version !== 'unknown') {
+            return self::$engine_version;
         }
 
         try {
@@ -94,8 +94,8 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
             ), E_USER_WARNING);
             throw new \RuntimeException('Invalid response from Boavizta API');
         }
-        $this->engine_version = $response[0];
-        return $this->engine_version;
+        self::$engine_version = $response[0];
+        return self::$engine_version;
     }
 
     protected function query($description): array

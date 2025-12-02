@@ -64,7 +64,7 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
     protected string $engine = 'undefined';
 
     /** @var string $engine_version Version of the calculation engine */
-    protected string $engine_version = 'unknown';
+    protected static string $engine_version = 'unknown';
 
     /** @var array of TrackedFloat */
     protected array $impacts = [];
