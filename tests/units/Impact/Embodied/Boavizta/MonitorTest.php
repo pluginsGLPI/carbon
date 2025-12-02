@@ -36,7 +36,7 @@ use Monitor as GlpiMonitor;
 use MonitorType as GlpiMonitorType;
 use MonitorModel as glpiMonitorModel;
 use DBmysql;
-use GlpiPlugin\Carbon\MonitorType;
+use GlpiPlugin\Carbon\Impact\Embodied\AbstractEmbodiedImpact;
 use GlpiPlugin\Carbon\Impact\Embodied\Boavizta\Monitor as BoaviztaMonitor;
 use GlpiPlugin\Carbon\Tests\Impact\Engine\AbstractEmbodiedImpactTest;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -47,49 +47,4 @@ class MonitorTest extends AbstractEmbodiedImpactTest
     protected static string $itemtype = GlpiMonitor::class;
     protected static string $itemtype_type = GlpiMonitorType::class;
     protected static string $itemtype_model = GlpiMonitorModel::class;
-
-    public function testGetEvaluableQuery()
-    {
-        /** @var DBmysql $DB */
-        global $DB;
-
-        $glpi_monitor_type = $this->createItem(GlpiMonitorType::class);
-        $monitor_type = $this->createItem(MonitorType::class, [
-            'monitortypes_id' => $glpi_monitor_type->getID()
-        ]);
-        $glpi_monitor = $this->createItem(GlpiMonitor::class, [
-            'monitortypes_id' => $glpi_monitor_type->getID()
-        ]);
-
-        $instance = new BoaviztaMonitor($glpi_monitor);
-        $request = $instance->getEvaluableQuery([
-            'glpi_monitors.id' => $glpi_monitor->getID(),
-        ]);
-        $this->assertArrayHasKey('SELECT', $request);
-        $this->assertArrayHasKey('FROM', $request);
-        $this->assertArrayHasKey('LEFT JOIN', $request);
-        $this->assertArrayHasKey('WHERE', $request);
-        $iterator = $DB->request($request);
-        $this->assertEquals(1, $iterator->count());
-
-        $glpi_monitor_type = $this->createItem(GlpiMonitorType::class);
-        $monitor_type = $this->createItem(MonitorType::class, [
-            'monitortypes_id' => $glpi_monitor_type->getID(),
-            'is_ignore' => 1,
-        ]);
-        $glpi_monitor = $this->createItem(GlpiMonitor::class, [
-            'monitortypes_id' => $glpi_monitor_type->getID()
-        ]);
-
-        $instance = new BoaviztaMonitor($glpi_monitor);
-        $request = $instance->getEvaluableQuery([
-            'glpi_monitors.id' => $glpi_monitor->getID(),
-        ]);
-        $this->assertArrayHasKey('SELECT', $request);
-        $this->assertArrayHasKey('FROM', $request);
-        $this->assertArrayHasKey('LEFT JOIN', $request);
-        $this->assertArrayHasKey('WHERE', $request);
-        $iterator = $DB->request($request);
-        $this->assertEquals(0, $iterator->count());
-    }
 }

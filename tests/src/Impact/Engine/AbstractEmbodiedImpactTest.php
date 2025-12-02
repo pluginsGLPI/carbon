@@ -60,8 +60,8 @@ class AbstractEmbodiedImpactTest extends DbTestCase
         $asset = $this->createItem(static::$itemtype, [
             getForeignKeyFieldForItemType(static::$itemtype_type) => $glpi_asset_type->getID(),
         ]);
-        $instance = new ('GlpiPlugin\\Carbon\\Impact\\Embodied\\Boavizta\\' . static::$itemtype)($asset);
-        $iterator = $instance->getItemsToEvaluate([
+        $iterator = AbstractEmbodiedImpact::getItemsToEvaluate(
+            static::$itemtype, [
             $asset->getTableField('id') => $asset->getID(),
         ]);
         $this->assertEquals(1, $iterator->count());
@@ -74,14 +74,64 @@ class AbstractEmbodiedImpactTest extends DbTestCase
         $asset = $this->createItem(static::$itemtype, [
             getForeignKeyFieldForItemType(static::$itemtype_type) => $glpi_asset_type->getID(),
         ]);
-        $instance = new ('GlpiPlugin\\Carbon\\Impact\\Embodied\\Boavizta\\' . static::$itemtype)($asset);
         $embodied_impact = $this->createItem(EmbodiedImpact::class, [
             'itemtype' => $asset->getType(),
             'items_id' => $asset->getID(),
         ]);
-        $iterator = $instance->getItemsToEvaluate([
+        $iterator = AbstractEmbodiedImpact::getItemsToEvaluate(
+            static::$itemtype, [
             $asset::getTableField('id') => $asset->getID(),
         ]);
         $this->assertEquals(0, $iterator->count());
     }
+
+    public function testGetEvaluableQuery()
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        // Test an asset is evaluable
+        $itemtype_table = getTableForItemType(static::$itemtype);
+        $itemtype_type_fk = getForeignKeyFieldForItemType(static::$itemtype_type);
+        $glpi_asset_type = $this->createItem(static::$itemtype_type);
+        $asset_type = $this->createItem('GlpiPlugin\\Carbon\\' . static::$itemtype_type, [
+            $itemtype_type_fk => $glpi_asset_type->getID()
+        ]);
+        $asset = $this->createItem(static::$itemtype, [
+            $itemtype_type_fk => $glpi_asset_type->getID()
+        ]);
+
+        $request = AbstractEmbodiedImpact::getEvaluableQuery(
+            static::$itemtype, [
+            $itemtype_table . '.id' => $asset->getID(),
+        ]);
+        $this->assertArrayHasKey('SELECT', $request);
+        $this->assertArrayHasKey('FROM', $request);
+        $this->assertArrayHasKey('LEFT JOIN', $request);
+        $this->assertArrayHasKey('WHERE', $request);
+        $iterator = $DB->request($request);
+        $this->assertEquals(1, $iterator->count());
+
+        // Test an asset is not evaluable
+        $glpi_asset_type = $this->createItem(static::$itemtype_type);
+        $asset_type = $this->createItem('GlpiPlugin\\Carbon\\' . static::$itemtype_type, [
+            $itemtype_type_fk => $glpi_asset_type->getID(),
+            'is_ignore' => 1,
+        ]);
+        $asset = $this->createItem(static::$itemtype, [
+            $itemtype_type_fk => $glpi_asset_type->getID()
+        ]);
+
+        $request = AbstractEmbodiedImpact::getEvaluableQuery(
+            static::$itemtype,  [
+            $itemtype_table . '.id' => $asset->getID(),
+        ]);
+        $this->assertArrayHasKey('SELECT', $request);
+        $this->assertArrayHasKey('FROM', $request);
+        $this->assertArrayHasKey('LEFT JOIN', $request);
+        $this->assertArrayHasKey('WHERE', $request);
+        $iterator = $DB->request($request);
+        $this->assertEquals(0, $iterator->count());
+    }
+
 }
