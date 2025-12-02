@@ -33,14 +33,22 @@
 namespace GlpiPlugin\Carbon\Impact\Embodied\Tests;
 
 use Computer as GlpiComputer;
+use ComputerModel as GlpiComputerModel;
 use Monitor as GlpiMonitor;
+use MonitorModel as GlpiMonitorModel;
+use NetworkEquipmentModel as GlpiNetworkEquipmentModel;
 use NetworkEquipment as GlpiNetworkEquipment;
 use Config as GlpiConfig;
-use GlpiPlugin\Carbon\DataSource\RestApiClient;
+use GlpiPlugin\Carbon\ComputerModel;
+use GlpiPlugin\Carbon\MonitorModel;
+use GlpiPlugin\Carbon\NetworkEquipmentModel;
+use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
-use GlpiPlugin\Carbon\Impact\Embodied\Boavizta\Computer;
-use GlpiPlugin\Carbon\Impact\Embodied\Boavizta\Monitor;
-use GlpiPlugin\Carbon\Impact\Embodied\Internal\NetworkEquipment;
+use GlpiPlugin\Carbon\Impact\Embodied\Boavizta\Computer as BoaviztaComputer;
+use GlpiPlugin\Carbon\Impact\Embodied\Boavizta\Monitor as BoaviztaMonitor;
+use GlpiPlugin\Carbon\Impact\Embodied\Internal\Computer as InternalComputer;
+use GlpiPlugin\Carbon\Impact\Embodied\Internal\Monitor as InternalMonitor;
+use GlpiPlugin\Carbon\Impact\Embodied\Internal\NetworkEquipment as InternalNetworkEquipment;
 use GlpiPlugin\Carbon\Impact\Embodied\Engine;
 use PHPUnit\Framework\Attributes\CoversClass;
 
@@ -52,24 +60,57 @@ class EngineTest extends DbTestCase
         GlpiConfig::setConfigurationValues('plugin:carbon', [
             'boaviztapi_base_url' => 'http://localhost:5000'
         ]);
-        $version_response = [
-            '1.3.11',
-        ];
-        $client_stub = $this->getMockBuilder(RestApiClient::class)
-            ->getMock();
-        $client_stub->method('request')->willReturn($version_response);
 
         $item = $this->createItem(GlpiComputer::class);
-        $result = Engine::getEngineFromItemtype($item, $client_stub);
-        $this->assertTrue($result instanceof Computer);
+        $result = Engine::getEngineFromItemtype($item);
+        $this->assertTrue($result instanceof BoaviztaComputer);
 
         $item = $this->createItem(GlpiMonitor::class);
-        $result = Engine::getEngineFromItemtype($item, $client_stub);
-        $this->assertTrue($result instanceof Monitor);
+        $result = Engine::getEngineFromItemtype($item);
+        $this->assertTrue($result instanceof BoaviztaMonitor);
 
         // This case returns internal embodied impact engine, as Boavizta does not provide data
         $item = $this->createItem(GlpiNetworkEquipment::class);
-        $result = Engine::getEngineFromItemtype($item, $client_stub);
-        $this->assertTrue($result instanceof NetworkEquipment);
+        $result = Engine::getEngineFromItemtype($item);
+        $this->assertTrue($result instanceof InternalNetworkEquipment);
+    }
+
+    public function testGetEngineFromItemtypeForInternal()
+    {
+        $glpi_asset_model = $this->createItem(GlpiComputerModel::class);
+        $asset_model = $this->createItem(ComputerModel::class, [
+            'computermodels_id' => $glpi_asset_model->getID(),
+        ]);
+        $asset = $this->createItem(GlpiComputer::class, [
+            'computermodels_id' => $glpi_asset_model->getID(),
+            'gwp'               => 0,
+            'gwp_quality'       => AbstractTracked::DATA_QUALITY_ESTIMATED
+        ]);
+        $result = Engine::getEngineFromItemtype($asset);
+        $this->assertTrue($result instanceof InternalComputer);
+
+        $glpi_asset_model = $this->createItem(GlpiMonitorModel::class);
+        $asset_model = $this->createItem(MonitorModel::class, [
+            'monitormodels_id' => $glpi_asset_model->getID(),
+        ]);
+        $asset = $this->createItem(GlpiMonitor::class, [
+            'monitormodels_id' => $glpi_asset_model->getID(),
+            'gwp'               => 0,
+            'gwp_quality'       => AbstractTracked::DATA_QUALITY_ESTIMATED
+        ]);
+        $result = Engine::getEngineFromItemtype($asset);
+        $this->assertTrue($result instanceof InternalMonitor);
+
+        $glpi_asset_model = $this->createItem(GlpiNetworkEquipmentModel::class);
+        $asset_model = $this->createItem(NetworkEquipmentModel::class, [
+            'networkequipmentmodels_id' => $glpi_asset_model->getID(),
+        ]);
+        $asset = $this->createItem(GlpiNetworkEquipment::class, [
+            'networkequipmentmodels_id' => $glpi_asset_model->getID(),
+            'gwp'               => 0,
+            'gwp_quality'       => AbstractTracked::DATA_QUALITY_ESTIMATED
+        ]);
+        $result = Engine::getEngineFromItemtype($asset);
+        $this->assertTrue($result instanceof InternalNetworkEquipment);
     }
 }
