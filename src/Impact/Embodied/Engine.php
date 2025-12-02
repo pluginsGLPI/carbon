@@ -34,10 +34,13 @@ namespace GlpiPlugin\Carbon\Impact\Embodied;
 
 use CommonGLPI;
 use CommonDBTM;
+use GlpiPlugin\Carbon\AbstractModel;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\DataSource\Boaviztapi;
 use GlpiPlugin\Carbon\DataSource\RestApiClient;
+use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\Impact\Embodied\Boavizta\AbstractAsset;
+use GlpiPlugin\Carbon\Impact\Type;
 
 class Engine extends CommonGLPI
 {
@@ -62,6 +65,11 @@ class Engine extends CommonGLPI
     public static function getEngineFromItemtype(CommonDBTM $item): ?EmbodiedImpactInterface
     {
         $itemtype = get_class($item);
+
+        if (self::hasModelData($item)) {
+            return self::getInternalEngineFromItemtype($item);
+        }
+
         $embodied_impact_namespace = Config::getEmbodiedImpactEngine();
         $embodied_impact_class = $embodied_impact_namespace . '\\' . $itemtype;
         $must_implement = AbstractEmbodiedImpact::class;
@@ -113,5 +121,37 @@ class Engine extends CommonGLPI
         }
 
         return $engine;
+    }
+
+    /**
+     * Check if the asset has a model specific dmeodied impact data
+     *
+     * @param CommonDBTM $item
+     * @return boolean
+     */
+    private static function hasModelData(CommonDBTM $item): bool
+    {
+        $itemtype = get_class($item);
+        $glpi_model_class = $itemtype . 'Model';
+        $glpi_model_class_fk = getForeignKeyFieldForItemType($glpi_model_class);
+        /**
+         * @var class-string<AbstractModel> $model_class
+         */
+        $model_class = 'GlpiPlugin\\Carbon\\' . $glpi_model_class;
+        $glpi_model_id = $item->fields[$glpi_model_class_fk];
+        $crit = [
+            $glpi_model_class_fk => $glpi_model_id
+        ];
+        $types = Type::getImpactTypes();
+        foreach ($types as $key => $type) {
+            $crit[] = [
+                'OR' => [
+                    ['NOT' => [$type => null]],
+                    $type . '_quality' => ['<>', AbstractTracked::DATA_QUALITY_UNSET_VALUE]
+                ]
+            ];
+        }
+        $model = new $model_class();
+        return $model->getFromDBByCrit($crit);
     }
 }

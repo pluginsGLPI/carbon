@@ -135,40 +135,21 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
     {
         $itemtype = get_class($this->item);
 
-        // Check the asset does not has embodied impact data in its model
-        $glpi_model_class = $itemtype . 'Model';
-        $glpi_model_class_fk = getForeignKeyFieldForItemType($glpi_model_class);
-        /**
-         * @var class-string<AbstractModel> $model_class
-         */
-        $model_class = 'GlpiPlugin\\Carbon\\' . $glpi_model_class;
-        $glpi_model_id = $this->item->fields[$glpi_model_class_fk];
-        $model = new $model_class();
-
-        $impacts = [];
-        if ($model->getFromDBByCrit([$glpi_model_class_fk => $glpi_model_id]) !== false) {
-            $impacts = $this->getModelImpacts($model);
+        $input['engine'] = $this->engine;
+        try {
+            $input['engine_version'] = $this->getVersion();
+            $impacts = $this->doEvaluation();
+        } catch (ConnectException $e) {
+            Session::addMessageAfterRedirect(__('Connection to Boavizta failed.', 'carbon'), false, ERROR);
+            return false;
+        } catch (\RuntimeException $e) {
+            Session::addMessageAfterRedirect(__('Embodied impact evaluation valuation falied.', 'carbon'), false, ERROR);
+            return false;
         }
-        if (count($impacts) !== 0) {
-            $input['engine'] = __('user input', 'carbon');
-            $input['engine_version'] = '';
-        } else {
-            $input['engine'] = $this->engine;
-            try {
-                $input['engine_version'] = $this->getVersion();
-                $impacts = $this->doEvaluation();
-            } catch (ConnectException $e) {
-                Session::addMessageAfterRedirect(__('Connection to Boavizta failed.', 'carbon'), false, ERROR);
-                return false;
-            } catch (\RuntimeException $e) {
-                Session::addMessageAfterRedirect(__('Embodied impact evaluation valuation falied.', 'carbon'), false, ERROR);
-                return false;
-            }
 
-            if ($impacts === null || count($impacts) === 0) {
-                // Nothing calculated
-                return false;
-            }
+        if ($impacts === null || count($impacts) === 0) {
+            // Nothing calculated
+            return false;
         }
 
         // Find an existing row, if any
