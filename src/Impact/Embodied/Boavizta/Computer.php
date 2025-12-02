@@ -65,7 +65,7 @@ class Computer extends AbstractAsset
             ComputerType::CATEGORY_DESKTOP,
             ComputerType::CATEGORY_UNDEFINED,
         ]);
-        $configuration = $this->analyzeHardware($this->item);
+        $configuration = $this->analyzeHardware();
         if ($handle_hardware && count($configuration) === 0) {
             return null;
         }
@@ -143,7 +143,7 @@ class Computer extends AbstractAsset
     {
         $configuration = [];
         // Yes, string expected here.
-        $iterator = Item_Devices::getItemsAssociatedTo(self::$itemtype, (string) $this->item->getID());
+        $iterator = Item_Devices::getItemsAssociatedTo(get_class($this->item), (string) $this->item->getID());
         foreach ($iterator as $item_device) {
             switch ($item_device->getType()) {
                 case Item_DeviceProcessor::class:

@@ -65,19 +65,23 @@ interface EmbodiedImpactInterface
     /**
      * Get query to find items we can evaluate
      *
+     * @template T of CommonDBTM
+     * @param class-string<T> $itemtype
      * @param array $crit
      * @param boolean $entity_restrict
      * @return array
      */
-    public function getEvaluableQuery(array $crit = [], bool $entity_restrict = true): array;
+    public static function getEvaluableQuery(string $itemtype, array $crit = [], bool $entity_restrict = true): array;
 
     /**
      * Get an iterator of items to evaluate
      *
-     * @param array $crit
+     * @template T of CommonDBTM
+     * @param class-string<T> $itemtype
+     * @param array $crit criterias
      * @return DBmysqlIterator
      */
-    public function getItemsToEvaluate(array $crit = []): DBmysqlIterator;
+    public static function getItemsToEvaluate(string $itemtype, array $crit = []): DBmysqlIterator;
 
     /**
      * Start the evaluation of items of the given iterator
@@ -85,13 +89,12 @@ interface EmbodiedImpactInterface
      * @param DBmysqlIterator $iterator assets to evaluate providing their IDs
      * @return int count of successfully evaluated assets
      */
-    public function evaluateItems(DBmysqlIterator $iterator): int;
+    // public function evaluateItems(DBmysqlIterator $iterator): int;
 
     /**
-     * Evaluate all impacts of the asset
+     * Evaluate and save tne environmental impact of an asset
      *
-     * @param integer $id
      * @return bool true if success, false otherwise
      */
-    public function evaluateItem(int $id): bool;
+    public function evaluateItem(): bool;
 }

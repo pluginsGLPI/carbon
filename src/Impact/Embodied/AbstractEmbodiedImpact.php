@@ -72,7 +72,7 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
     public function __construct(CommonDBTM $item)
     {
         if (get_class($item) !== static::$itemtype) {
-            throw new \LogicException(sprintf("item if type %s expected, %s given", static::$itemtype, get_class($item)));
+            throw new \LogicException(sprintf("item of type %s expected, %s given", static::$itemtype, get_class($item)));
         }
         if ($item->isNewItem()) {
             throw new \LogicException("Given item is empty");
@@ -116,81 +116,24 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         $this->limit = $limit;
     }
 
-    /**
-     * Get an iterator of items to evaluate
-     *
-     * @param array $crit criterias
-     * @return DBmysqlIterator
-     */
-    public function getItemsToEvaluate(array $crit = []): DBmysqlIterator
+    public static function getItemsToEvaluate(string $itemtype, array $crit = []): DBmysqlIterator
     {
         /** @var DBmysql $DB */
         global $DB;
 
-        $itemtype = static::$itemtype;
-        if ($itemtype === '') {
-            throw new \LogicException('Itemtype not set');
-        }
         if (!is_subclass_of($itemtype, CommonDBTM::class)) {
             throw new \LogicException('Itemtype does not inherits from ' . CommonDBTM::class);
         }
 
         $crit[EmbodiedImpact::getTableField('id')] = null;
-        $iterator = $DB->request($this->getEvaluableQuery($crit, false));
+        $iterator = $DB->request(self::getEvaluableQuery($itemtype, $crit, false));
 
         return $iterator;
     }
 
-    public function evaluateItems(DBmysqlIterator $iterator): int
+    public function evaluateItem(): bool
     {
-        /**
-         * Huge quantity of SQL queries will be executed
-         * We NEED to check memory usage to avoid running out of memory
-         * @see DbMysql::doQuery()
-         */
-        $memory_limit = GlpiToolbox::getMemoryLimit() - 8 * 1024 * 1024;
-        if ($memory_limit < 0) {
-            // May happen in test seems that ini_get("memory_limits") returns
-            // enpty string in PHPUnit environment
-            $memory_limit = null;
-        }
-
-        /** @var int $attempts_count count of evaluation attempts */
-        $attempts_count = 0;
-        /** @var int $count count of successfully evaluated assets */
-        $count = 0;
-
-        foreach ($iterator as $row) {
-            if ($this->evaluateItem($row['id'])) {
-                $count++;
-            }
-            $attempts_count++;
-            if ($this->limit !== 0 && $attempts_count >= $this->limit) {
-                $this->limit_reached = true;
-                break;
-            }
-            if ($memory_limit && $memory_limit < memory_get_usage()) {
-                // 8 MB memory left, emergency exit
-                $this->limit_reached = true;
-                break;
-            }
-            if ($this->limit_reached) {
-                break;
-            }
-        }
-
-        return $count;
-    }
-
-    /**
-     * Evaluate and save tne environmental impact of an asset.
-     *
-     * @param integer $id
-     * @return bool true if sucess, false otherwise
-     */
-    public function evaluateItem(int $id): bool
-    {
-        $itemtype = static::$itemtype;
+        $itemtype = get_class($this->item);
 
         // Check the asset does not has embodied impact data in its model
         $glpi_model_class = $itemtype . 'Model';
@@ -231,7 +174,7 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         // Find an existing row, if any
         $input = [
             'itemtype' => $itemtype,
-            'items_id' => $id,
+            'items_id' => $this->item->getID(),
         ];
         $embodied_impact = new EmbodiedImpact();
         $embodied_impact->getFromDBByCrit($input);
@@ -265,10 +208,9 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         return false;
     }
 
-    public function getEvaluableQuery(array $crit = [], bool $entity_restrict = true): array
+    public static function getEvaluableQuery(string $itemtype, array $crit = [], bool $entity_restrict = true): array
     {
-        $itemtype = static::$itemtype;
-        $item_table = $itemtype::getTable();
+        $item_table = getTableForItemType($itemtype);
         $glpi_item_type_table = getTableForItemType($itemtype . 'Type');
         $glpi_item_type_fk = getForeignKeyFieldForTable($glpi_item_type_table);
         $item_type_table = getTableForItemType('GlpiPlugin\\Carbon\\' . $itemtype . 'Type');

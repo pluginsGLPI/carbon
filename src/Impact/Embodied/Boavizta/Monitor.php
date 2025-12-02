@@ -33,7 +33,6 @@
 
 namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta;
 
-use CommonDBTM;
 use Monitor as GlpiMonitor;
 
 class Monitor extends AbstractAsset

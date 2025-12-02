@@ -37,11 +37,13 @@ use Config as GlpiConfig;
 use Geocoder\Geocoder;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientFactory;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientInterface;
+use GlpiPlugin\Carbon\Impact\Embodied\AbstractEmbodiedImpact;
 use GlpiPlugin\Carbon\Impact\Embodied\Engine as EmbodiedEngine;
 use GlpiPlugin\Carbon\Impact\Usage\UsageImpactInterface as UsageImpactInterface;
 use GlpiPlugin\Carbon\Impact\Usage\Engine as UsageEngine;
 use GlpiPlugin\Carbon\Toolbox;
 use Location as GlpiLocation;
+use Toolbox as GlpiToolbox;
 
 class CronTask
 {
@@ -148,16 +150,51 @@ class CronTask
         $task->setVolume(0); // start with zero
         $remaining = $task->fields['param'];
         $limit_per_type = max(1, floor(($remaining) / count($embodied_impacts)));
-        foreach (PLUGIN_CARBON_TYPES as $itemtype) {
-            $embodied_impact = EmbodiedEngine::getEngineFromItemtype($itemtype);
-            if ($embodied_impact === null) {
-                // An error occured while configuring the engine
-                continue;
-            }
-            $embodied_impact->setLimit($limit_per_type);
-            $count = $embodied_impact->evaluateItems($embodied_impact->getItemsToEvaluate());
-            $task->addVolume($count);
+
+        /**
+         * Huge quantity of SQL queries will be executed
+         * We NEED to check memory usage to avoid running out of memory
+         * @see DbMysql::doQuery()
+         */
+        $memory_limit = GlpiToolbox::getMemoryLimit() - 8 * 1024 * 1024;
+        if ($memory_limit < 0) {
+            // May happen in test seems that ini_get("memory_limits") returns
+            // enpty string in PHPUnit environment
+            $memory_limit = null;
         }
+
+        $count = 0;
+        foreach (PLUGIN_CARBON_TYPES as $itemtype) {
+            /** @var int $count count of successfully evaluated assets */
+            foreach (AbstractEmbodiedImpact::getItemsToEvaluate($itemtype) as $row) {
+                $item = new $itemtype();
+                if (!$item->getFromDB($row['id'])) {
+                    continue;
+                }
+                $embodied_impact = EmbodiedEngine::getEngineFromItemtype($item);
+                if ($embodied_impact === null) {
+                    // An error occured while configuring the engine
+                    continue;
+                }
+                if ($embodied_impact->evaluateItem()) {
+                    $count++;
+                }
+
+                // Check free memory
+                if ($memory_limit && $memory_limit < memory_get_usage()) {
+                    // 8 MB memory left, emergency exit
+                    // Terminate the task
+                    break 2;
+                }
+
+                if ($count >= $limit_per_type) {
+                    // Process next itemtype
+                    break;
+                }
+            }
+        }
+
+        $task->addVolume($count);
         return ($count > 0 ? 1 : 0);
     }
 
