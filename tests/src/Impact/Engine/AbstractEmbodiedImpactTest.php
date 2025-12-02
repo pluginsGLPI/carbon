@@ -60,8 +60,7 @@ class AbstractEmbodiedImpactTest extends DbTestCase
         $asset = $this->createItem(static::$itemtype, [
             getForeignKeyFieldForItemType(static::$itemtype_type) => $glpi_asset_type->getID(),
         ]);
-        $iterator = AbstractEmbodiedImpact::getItemsToEvaluate(
-            static::$itemtype, [
+        $iterator = AbstractEmbodiedImpact::getItemsToEvaluate(static::$itemtype, [
             $asset->getTableField('id') => $asset->getID(),
         ]);
         $this->assertEquals(1, $iterator->count());
@@ -78,8 +77,7 @@ class AbstractEmbodiedImpactTest extends DbTestCase
             'itemtype' => $asset->getType(),
             'items_id' => $asset->getID(),
         ]);
-        $iterator = AbstractEmbodiedImpact::getItemsToEvaluate(
-            static::$itemtype, [
+        $iterator = AbstractEmbodiedImpact::getItemsToEvaluate(static::$itemtype, [
             $asset::getTableField('id') => $asset->getID(),
         ]);
         $this->assertEquals(0, $iterator->count());
@@ -102,9 +100,11 @@ class AbstractEmbodiedImpactTest extends DbTestCase
         ]);
 
         $request = AbstractEmbodiedImpact::getEvaluableQuery(
-            static::$itemtype, [
-            $itemtype_table . '.id' => $asset->getID(),
-        ]);
+            static::$itemtype,
+            [
+                $itemtype_table . '.id' => $asset->getID(),
+            ]
+        );
         $this->assertArrayHasKey('SELECT', $request);
         $this->assertArrayHasKey('FROM', $request);
         $this->assertArrayHasKey('LEFT JOIN', $request);
@@ -123,9 +123,11 @@ class AbstractEmbodiedImpactTest extends DbTestCase
         ]);
 
         $request = AbstractEmbodiedImpact::getEvaluableQuery(
-            static::$itemtype,  [
-            $itemtype_table . '.id' => $asset->getID(),
-        ]);
+            static::$itemtype,
+            [
+                $itemtype_table . '.id' => $asset->getID(),
+            ]
+        );
         $this->assertArrayHasKey('SELECT', $request);
         $this->assertArrayHasKey('FROM', $request);
         $this->assertArrayHasKey('LEFT JOIN', $request);
@@ -133,5 +135,4 @@ class AbstractEmbodiedImpactTest extends DbTestCase
         $iterator = $DB->request($request);
         $this->assertEquals(0, $iterator->count());
     }
-
 }
