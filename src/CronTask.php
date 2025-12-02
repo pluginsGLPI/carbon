@@ -163,9 +163,9 @@ class CronTask
             $memory_limit = null;
         }
 
+        /** @var int $count count of successfully evaluated assets */
         $count = 0;
         foreach (PLUGIN_CARBON_TYPES as $itemtype) {
-            /** @var int $count count of successfully evaluated assets */
             foreach (AbstractEmbodiedImpact::getItemsToEvaluate($itemtype) as $row) {
                 $item = new $itemtype();
                 if (!$item->getFromDB($row['id'])) {
