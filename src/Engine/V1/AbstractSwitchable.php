@@ -77,8 +77,8 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
         $power = $this->getPower();
 
         $day_s = $day->format('Y-m-d');
-        $start_date = DateTime::createFromFormat('Y-m-d H:i:s', $day_s . ' ' . $usage_profile->fields['time_start']);
-        $stop_date = DateTime::createFromFormat('Y-m-d H:i:s', $day_s . ' ' . $usage_profile->fields['time_stop']);
+        $start_date = DateTime::createFromFormat('Y-m-d H:i:s', $day_s . ' ' . $usage_profile->fields['time_start'] . ':00');
+        $stop_date = DateTime::createFromFormat('Y-m-d H:i:s', $day_s . ' ' . $usage_profile->fields['time_stop'] . ':00');
         $delta_time = $stop_date->getTimestamp() - $start_date->getTimestamp();
 
         // units:
@@ -109,10 +109,10 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
         // Convert to integers
         $seconds_start[0] = (int) $seconds_start[0];
         $seconds_start[1] = (int) $seconds_start[1];
-        $seconds_start[2] = (int) $seconds_start[2];
+        $seconds_start[2] = 0;
         $seconds_stop[0] = (int) $seconds_stop[0];
         $seconds_stop[1] = (int) $seconds_stop[1];
-        $seconds_stop[2] = (int) $seconds_stop[2];
+        $seconds_stop[2] = 0;
 
         $start_time = clone $day;
         $start_time->setTime($seconds_start[0], $seconds_start[1], $seconds_start[2]);

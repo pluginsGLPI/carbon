@@ -111,7 +111,7 @@ class ComputerUsageProfile extends CommonDropdown
      */
     protected function isValidTime(string $time): bool
     {
-        $time_pattern = '/^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/';
+        $time_pattern = '/^([01]\d|2[0-3]):[0-5]\d$/';
         $found = preg_match($time_pattern, $time, $matches);
         return ($found === 1);
     }
