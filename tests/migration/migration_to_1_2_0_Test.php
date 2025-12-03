@@ -30,11 +30,15 @@
  * -------------------------------------------------------------------------
  */
 
+namespace GlpiPlugin\Carbon\Tests;
+
 use DBmysql;
 use GlpiPlugin\Carbon\Install;
 use Location as GlpiLocation;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\Uninstall;
+use Migration;
+use Plugin;
 
 class migration_to_1_2_0_Test extends DbTestCase
 {
