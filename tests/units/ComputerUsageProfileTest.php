@@ -83,20 +83,20 @@ class ComputerUsageProfileTest extends DbTestCase
         $this->assertEquals($expected, $result);
 
         $input = [
-            'time_start' => '09:00:00',
+            'time_start' => '09:00',
         ];
         $result = $instance->prepareInputForAdd($input);
         $expected = [
-            'time_start' => '09:00:00',
+            'time_start' => '09:00',
         ];
         $this->assertEquals($expected, $result);
 
         $input = [
-            'time_stop' => '17:00:00',
+            'time_stop' => '17:00',
         ];
         $result = $instance->prepareInputForAdd($input);
         $expected = [
-            'time_stop' => '17:00:00',
+            'time_stop' => '17:00',
         ];
         $this->assertEquals($expected, $result);
     }
@@ -125,20 +125,20 @@ class ComputerUsageProfileTest extends DbTestCase
         $this->assertEquals($expected, $result);
 
         $input = [
-            'time_start' => '09:00:00',
+            'time_start' => '09:00',
         ];
         $result = $instance->prepareInputForUpdate($input);
         $expected = [
-            'time_start' => '09:00:00',
+            'time_start' => '09:00',
         ];
         $this->assertEquals($expected, $result);
 
         $input = [
-            'time_stop' => '17:00:00',
+            'time_stop' => '17:00',
         ];
         $result = $instance->prepareInputForUpdate($input);
         $expected = [
-            'time_stop' => '17:00:00',
+            'time_stop' => '17:00',
         ];
         $this->assertEquals($expected, $result);
     }

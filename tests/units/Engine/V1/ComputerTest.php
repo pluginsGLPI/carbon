@@ -55,8 +55,8 @@ class ComputerTest extends EngineTestCase
 
     const TEST_LAPTOP_USAGE_PROFILE = [
         'name' => 'Test laptop usage profile',
-        'time_start' => "09:00:00",
-        'time_stop' => "17:00:00",
+        'time_start' => "09:00",
+        'time_stop' => "17:00",
         'day_1' => 1,
         'day_2' => 1,
         'day_3' => 1,
@@ -71,8 +71,8 @@ class ComputerTest extends EngineTestCase
 
     const TEST_SERVER_USAGE_PROFILE = [
         'name' => 'Test server usage profile',
-        'time_start' => "00:00:00",
-        'time_stop' => "23:00:00",
+        'time_start' => "00:00",
+        'time_stop' => "23:00",
         'day_1' => 1,
         'day_2' => 1,
         'day_3' => 1,
@@ -188,8 +188,8 @@ class ComputerTest extends EngineTestCase
 
         $profile = [
             'name' => 'Test laptop usage profile',
-            'time_start' => "09:30:00",
-            'time_stop' => "17:00:00",
+            'time_start' => "09:30",
+            'time_stop' => "17:00",
             'day_1' => 1,
             'day_2' => 1,
             'day_3' => 1,
@@ -208,8 +208,8 @@ class ComputerTest extends EngineTestCase
 
         $profile = [
             'name' => 'Test laptop usage profile',
-            'time_start' => "09:00:00",
-            'time_stop' => "17:15:00",
+            'time_start' => "09:00",
+            'time_stop' => "17:15",
             'day_1' => 1,
             'day_2' => 1,
             'day_3' => 1,
@@ -228,8 +228,8 @@ class ComputerTest extends EngineTestCase
 
         $profile = [
             'name' => 'Test laptop usage profile',
-            'time_start' => "09:15:00",
-            'time_stop' => "09:45:00",
+            'time_start' => "09:15",
+            'time_stop' => "09:45",
             'day_1' => 1,
             'day_2' => 1,
             'day_3' => 1,
