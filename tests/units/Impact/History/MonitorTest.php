@@ -127,8 +127,8 @@ class MonitorTest extends CommonAsset
             'locations_id'      => $glpi_location->getID(),
         ]);
         $usage_profile = $this->createItem(ComputerUsageProfile::class, [
-            'time_start'   => '09:00:00',
-            'time_stop'    => '18:00:00',
+            'time_start'   => '09:00',
+            'time_stop'    => '18:00',
             'day_1'        => '1',
             'day_2'        => '1',
             'day_3'        => '1',
@@ -704,8 +704,8 @@ class MonitorTest extends CommonAsset
             'buy_date'     => '2024-01-01',
         ]);
         $usage_profile = $this->createItem(ComputerUsageProfile::class, [
-            'time_start'   => '09:00:00',
-            'time_stop'    => '18:00:00',
+            'time_start'   => '09:00',
+            'time_stop'    => '18:00',
             'day_1'        => '1',
             'day_2'        => '1',
             'day_3'        => '1',

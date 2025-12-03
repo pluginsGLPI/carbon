@@ -526,8 +526,8 @@ class ProviderTest extends DbTestCase
         $country = $this->getUniqueString();
         $usage_profile = [
             'name' => 'Test laptop usage profile',
-            'time_start' => "09:00:00",
-            'time_stop' => "17:00:00",
+            'time_start' => "09:00",
+            'time_stop' => "17:00",
             'day_1' => 1,
             'day_2' => 1,
             'day_3' => 1,
@@ -593,8 +593,8 @@ class ProviderTest extends DbTestCase
     {
         $usage_profile = [
             'name' => 'Test laptop usage profile',
-            'time_start' => "09:00:00",
-            'time_stop' => "17:00:00",
+            'time_start' => "09:00",
+            'time_stop' => "17:00",
             'day_1' => 1,
             'day_2' => 1,
             'day_3' => 1,
