@@ -135,4 +135,18 @@ class AbstractEmbodiedImpactTest extends DbTestCase
         $iterator = $DB->request($request);
         $this->assertEquals(0, $iterator->count());
     }
+
+    public function testResetForItem()
+    {
+        $asset = $this->createItem(static::$itemtype);
+        $instance = $this->createItem(EmbodiedImpact::class, [
+            'itemtype' => get_class($asset),
+            'items_id' => $asset->getID(),
+        ]);
+
+        $result = AbstractEmbodiedImpact::resetForItem($asset);
+        $this->assertTrue($result);
+        $result = EmbodiedImpact::getById($instance->getID());
+        $this->assertFalse($result);
+    }
 }
