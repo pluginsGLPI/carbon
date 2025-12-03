@@ -46,9 +46,6 @@ use Session;
 
 abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
 {
-    /** @var string Handled itemtype */
-    protected static string $itemtype = '';
-
     /** @var CommonDBTM Item to analyze */
     protected CommonDBTM $item;
 
@@ -69,9 +66,6 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
 
     public function __construct(CommonDBTM $item)
     {
-        if (get_class($item) !== static::$itemtype) {
-            throw new \LogicException(sprintf("item of type %s expected, %s given", static::$itemtype, get_class($item)));
-        }
         if ($item->isNewItem()) {
             throw new \LogicException("Given item is empty");
         }
@@ -102,11 +96,6 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         }
 
         return null;
-    }
-
-    public static function getItemtype(): string
-    {
-        return static::$itemtype;
     }
 
     public function setLimit(int $limit)
@@ -254,15 +243,15 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
     /**
      * Delete all calculated usage impact for an asset
      *
-     * @param integer $items_id
+     * @param CommonDBTM $item
      * @return boolean
      */
-    public function resetForItem(int $items_id): bool
+    public static function resetForItem(CommonDBTM $item): bool
     {
         $embodied_impact = new EmbodiedImpact();
         return $embodied_impact->deleteByCriteria([
-            'itemtype' => static::getItemtype(),
-            'items_id' => $items_id
+            'itemtype' => get_class($item),
+            'items_id' => $item->getID(),
         ]);
     }
 

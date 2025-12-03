@@ -40,21 +40,6 @@ use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 interface EmbodiedImpactInterface
 {
     /**
-     * Get an instance of the impact calculation engine for the itemtype of the analyzed object
-     *
-     * @param CommonDBTM $item
-     * @return EngineInterface
-     */
-    // public static function getEngine(CommonDBTM $item): EngineInterface;
-
-    /**
-     * Get  the itemtype of the asset handled by this class
-     *
-     * @return string
-     */
-    public static function getItemtype(): string;
-
-    /**
      * Set the maximum count of items to calculate with evaluateItems()
      *
      * @param integer $limit
@@ -82,14 +67,6 @@ interface EmbodiedImpactInterface
      * @return DBmysqlIterator
      */
     public static function getItemsToEvaluate(string $itemtype, array $crit = []): DBmysqlIterator;
-
-    /**
-     * Start the evaluation of items of the given iterator
-     *
-     * @param DBmysqlIterator $iterator assets to evaluate providing their IDs
-     * @return int count of successfully evaluated assets
-     */
-    // public function evaluateItems(DBmysqlIterator $iterator): int;
 
     /**
      * Evaluate and save tne environmental impact of an asset
