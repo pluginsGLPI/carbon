@@ -37,14 +37,12 @@ use DBmysql;
 use DbUtils;
 use CommonDBTM;
 use DBmysqlIterator;
-use GlpiPlugin\Carbon\AbstractModel;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\EmbodiedImpact;
 use GlpiPlugin\Carbon\Impact\Type;
 use GuzzleHttp\Exception\ConnectException;
 use Session;
-use Toolbox as GlpiToolbox;
 
 abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
 {
