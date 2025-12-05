@@ -463,11 +463,12 @@ class Toolbox
      *
      * @see https://bertwagner.com/posts/gaps-and-islands/
      *
-     * @param string $table                table to search for gaps
-     * @param DateTimeInterface $start     start date to search
-     * @param DateInterval $interval       Interval between each data sample (do not use intervals in months or years)
-     * @param DateTimeInterface|null $stop stop date to search
-     * @return array                       list of gaps
+     * @param string                 $table    Table to search for gaps
+     * @param DateTimeInterface      $start    Start date to search
+     * @param DateInterval           $interval Interval between each data sample (do not use intervals in months or years)
+     * @param DateTimeInterface|null $stop     Stop date to search
+     * @param array                  $criteria Criterias for the SQL query
+     * @return array                           list of gaps
      */
     public static function findTemporalGapsInTable(string $table, DateTimeInterface $start, DateInterval $interval, ?DateTimeInterface $stop = null, array $criteria = [])
     {
