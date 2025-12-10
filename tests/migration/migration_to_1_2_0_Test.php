@@ -33,11 +33,13 @@
 namespace GlpiPlugin\Carbon\Tests;
 
 use DBmysql;
+use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Install;
 use Location as GlpiLocation;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\Uninstall;
 use Migration;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use Plugin;
 
 class migration_to_1_2_0_Test extends DbTestCase
@@ -59,6 +61,7 @@ class migration_to_1_2_0_Test extends DbTestCase
         $success = $DB->runFile(realpath($sql_file));
     }
 
+    #[CoversNothing]
     public function testUpdateCountryLocationZoneRelation()
     {
         /** @var DBMysql $DB */
@@ -108,6 +111,7 @@ class migration_to_1_2_0_Test extends DbTestCase
         $this->assertEquals($expected, $result->current());
     }
 
+    #[CoversNothing]
     public function testUpdateStateLocationZoneRelation()
     {
         /** @var DBMysql $DB */
@@ -154,5 +158,68 @@ class migration_to_1_2_0_Test extends DbTestCase
             'plugin_carbon_sources_zones_id' => $source_zone_id,
         ];
         $this->assertEquals($expected, $result->current());
+    }
+
+    #[CoversNothing]
+    public function testTimeformatInUsageProfile()
+    {
+        global $DB;
+        $table = getTableForItemType(ComputerUsageProfile::class);
+        $input = [
+            'name' => 'usage profile 1',
+            'time_start' => '09:00:00',
+            'time_stop'  => '17:00:00',
+        ];
+        $DB->insert($table, $input);
+        $usage_profile_1 = $this->getItem(ComputerUsageProfile::class, $input);
+        $input = [
+            'name' => 'usage profile 2',
+            'time_start' => '09:00',
+            'time_stop'  => '17:00:00',
+        ];
+        $DB->insert($table, $input);
+        $usage_profile_2 = $this->getItem(ComputerUsageProfile::class, $input);
+        $input = [
+            'name' => 'usage profile 3',
+            'time_start' => '09:00:00',
+            'time_stop'  => '17:00',
+        ];
+        $DB->insert($table, $input);
+        $usage_profile_3 = $this->getItem(ComputerUsageProfile::class, $input);
+        $input = [
+            'name' => 'usage profile 4',
+            'time_start' => '09:00',
+            'time_stop'  => '17:00',
+        ];
+        $DB->insert($table, $input);
+        $usage_profile_4 = $this->getItem(ComputerUsageProfile::class, $input);
+
+        $install = new Install(new Migration('1.2.0'));
+        $migrations = $install->getMigrationsToDo('1.1.1');
+        reset($migrations);
+        $file = key($migrations);
+        $data = current($migrations);
+        $install->upgradeOneVersion($file, $data);
+
+        $updated_usage_profile = $this->getItem(ComputerUsageProfile::class, [
+            'id' => $usage_profile_1->getID(),
+        ]);
+        $this->assertSame('09:00', $updated_usage_profile->fields['time_start']);
+        $this->assertSame('17:00', $updated_usage_profile->fields['time_stop']);
+        $updated_usage_profile = $this->getItem(ComputerUsageProfile::class, [
+            'id' => $usage_profile_2->getID(),
+        ]);
+        $this->assertSame('09:00', $updated_usage_profile->fields['time_start']);
+        $this->assertSame('17:00', $updated_usage_profile->fields['time_stop']);
+        $updated_usage_profile = $this->getItem(ComputerUsageProfile::class, [
+            'id' => $usage_profile_3->getID(),
+        ]);
+        $this->assertSame('09:00', $updated_usage_profile->fields['time_start']);
+        $this->assertSame('17:00', $updated_usage_profile->fields['time_stop']);
+        $updated_usage_profile = $this->getItem(ComputerUsageProfile::class, [
+            'id' => $usage_profile_4->getID(),
+        ]);
+        $this->assertSame('09:00', $updated_usage_profile->fields['time_start']);
+        $this->assertSame('17:00', $updated_usage_profile->fields['time_stop']);
     }
 }
