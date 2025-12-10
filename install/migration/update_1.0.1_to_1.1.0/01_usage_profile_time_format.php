@@ -30,40 +30,34 @@
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Carbon\ComputerUsageProfile;
-
 /** @var DBmysql $DB */
 global $DB;
 
-Plugin::loadLang('carbon');
-$usage_profiles = [
-    [
-        'name'       => __('Always on', 'carbon'),
-        'time_start' => '00:00',
-        'time_stop'  => '23:59',
-        'day_1'      => '1',
-        'day_2'      => '1',
-        'day_3'      => '1',
-        'day_4'      => '1',
-        'day_5'      => '1',
-        'day_6'      => '1',
-        'day_7'      => '1',
-    ], [
-        'name'       => __('Office hours', 'carbon'),
-        'time_start' => '09:00',
-        'time_stop'  => '18:00',
-        'day_1'      => '1',
-        'day_2'      => '1',
-        'day_3'      => '1',
-        'day_4'      => '1',
-        'day_5'      => '1',
-        'day_6'      => '0',
-        'day_7'      => '0',
-    ],
-];
-$dbUtil = new DbUtils();
-$usage_profile_table = $dbUtil->getTableForItemType(ComputerUsageProfile::class);
-foreach ($usage_profiles as $input) {
-    $query = $DB->buildInsert($usage_profile_table, $input);
-    $DB->doQuery($query);
+// Time selector in GLPI 11 sets H:m without s (seconds)
+// We need to drop seconds from times saved in DB in version 1.0.x for GLPI 10
+$table = 'glpi_plugin_carbon_computerusageprofiles';
+$iterator = $DB->request([
+    'SELECT' => ['id', 'time_start', 'time_stop'],
+    'FROM' => $table
+]);
+foreach ($iterator as $row) {
+    $split_start = explode(':', $row['time_start']);
+    $split_stop  = explode(':', $row['time_stop']);
+    $update = false;
+    if (count($split_start) > 2) {
+        array_splice($split_start, 2);
+        $update = true;
+    }
+    if (count($split_stop) > 2) {
+        array_splice($split_stop, 2);
+        $update = true;
+    }
+    if ($update) {
+        $DB->update($table, [
+            'time_start' => implode(':', $split_start),
+            'time_stop' => implode(':', $split_stop),
+        ], [
+            'id' => $row['id']
+        ]);
+    }
 }

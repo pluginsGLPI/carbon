@@ -30,40 +30,40 @@
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Carbon\ComputerUsageProfile;
+function update101to110(Migration $migration)
+{
+    /** @var DBmysql $DB */
+    global $DB;
 
-/** @var DBmysql $DB */
-global $DB;
+    $updateresult       = true;
+    $from_version       = '1.0.1';
+    $to_version         = '1.1.0';
+    $update_dir = __DIR__ . "/update_{$from_version}_to_{$to_version}/";
 
-Plugin::loadLang('carbon');
-$usage_profiles = [
-    [
-        'name'       => __('Always on', 'carbon'),
-        'time_start' => '00:00',
-        'time_stop'  => '23:59',
-        'day_1'      => '1',
-        'day_2'      => '1',
-        'day_3'      => '1',
-        'day_4'      => '1',
-        'day_5'      => '1',
-        'day_6'      => '1',
-        'day_7'      => '1',
-    ], [
-        'name'       => __('Office hours', 'carbon'),
-        'time_start' => '09:00',
-        'time_stop'  => '18:00',
-        'day_1'      => '1',
-        'day_2'      => '1',
-        'day_3'      => '1',
-        'day_4'      => '1',
-        'day_5'      => '1',
-        'day_6'      => '0',
-        'day_7'      => '0',
-    ],
-];
-$dbUtil = new DbUtils();
-$usage_profile_table = $dbUtil->getTableForItemType(ComputerUsageProfile::class);
-foreach ($usage_profiles as $input) {
-    $query = $DB->buildInsert($usage_profile_table, $input);
-    $DB->doQuery($query);
+    //TRANS: %s is the number of new version
+    $migration->addInfoMessage(sprintf(__('Update to %s'), $to_version));
+    $migration->setVersion($to_version);
+
+    // New tables from enpty.sql file after the migration
+    // If a script requires a new table, it may create it by itself
+
+    $update_scripts = scandir($update_dir);
+    natcasesort($update_scripts);
+    foreach ($update_scripts as $update_script) {
+        if (preg_match('/\.php$/', $update_script) !== 1) {
+            continue;
+        }
+        require $update_dir . $update_script;
+    }
+
+    $dbFile = plugin_carbon_getSchemaPath($to_version);
+    if ($dbFile === null || !$DB->runFile($dbFile)) {
+        $migration->addWarningMessage("Error creating tables : " . $DB->error());
+        $updateresult = false;
+    }
+
+    // ************ Keep it at the end **************
+    $migration->executeMigration();
+
+    return $updateresult;
 }
