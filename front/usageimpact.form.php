@@ -32,6 +32,7 @@
 
 use Glpi\Event;
 use Glpi\Exception\Http\NotFoundHttpException;
+use GlpiPlugin\Carbon\CommonAsset;
 use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\Impact\History\AbstractAsset;
 use GlpiPlugin\Carbon\Impact\Usage\Engine;
@@ -90,12 +91,9 @@ if (isset($_POST['update'])) {
         Html::back();
     }
 
-    if (!$gwp_impact->resetForItem($item->getID())) {
+    if (!CommonAsset::deleteUsageImpact($item)) {
         Session::addMessageAfterRedirect(__('Reset failed.', 'carbon'), false, ERROR);
-    }
-
-    if (!$usage_impact->isNewItem() && !$usage_impact->delete($usage_impact->fields)) {
-        Session::addMessageAfterRedirect(__('Delete of usage impact failed.', 'carbon'), false, ERROR);
+        Html::back();
     }
 } else if (isset($_POST['calculate'])) {
     if (!isset($_POST['itemtype']) || !isset($_POST['items_id'])) {

@@ -30,6 +30,9 @@
  * -------------------------------------------------------------------------
  */
 
+use Computer as GlpiComputer;
+use Monitor as GlpiMonitor;
+use NetworkEquipment as GlpiNetworkEquipment;
 use Glpi\Dashboard\Right as GlpiDashboardRight;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
@@ -41,6 +44,7 @@ use GlpiPlugin\Carbon\Zone;
 use ComputerType as GlpiComputerType;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\CarbonIntensity;
+use GlpiPlugin\Carbon\CommonAsset;
 use MonitorType as GlpiMonitorType;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
 use GlpiPlugin\Carbon\Source_Zone;
@@ -292,9 +296,15 @@ function plugin_carbon_hook_pre_purge_assettype(CommonDBTM $item)
 function plugin_carbon_MassiveActions($itemtype)
 {
     switch ($itemtype) {
-        case Computer::class:
+        case GlpiComputer::class:
             return [
                 ComputerUsageProfile::class . MassiveAction::CLASS_ACTION_SEPARATOR . 'MassAssociateItems' => __('Associate to an usage profile', 'carbon'),
+                CommonAsset::class . MassiveAction::CLASS_ACTION_SEPARATOR . 'MassDeleteAllImpacts' => __('Delete all calculated environmental impacts', 'carbon'),
+            ];
+        case GlpiMonitor::class:
+        case GlpiNetworkEquipment::class:
+            return [
+                CommonAsset::class . MassiveAction::CLASS_ACTION_SEPARATOR . 'MassDeleteAllImpacts' => __('Delete all calculated environmental impacts', 'carbon'),
             ];
         case GlpiComputerType::class:
             return [
