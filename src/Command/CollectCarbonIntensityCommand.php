@@ -143,13 +143,13 @@ class CollectCarbonIntensityCommand extends AbstractCommand
         // Create relation between source and zone if t does not exist
         $source_zone = new Source_Zone();
         $input = [
-            'code' => $zone_code,
             $data_source::getForeignKeyField() => $data_source->getID(),
             $zone::getForeignKeyField() => $zone->getID()
         ];
         $source_zone->getFromDbByCrit($input);
         if ($source_zone->isNewItem()) {
             $input['is_download_enabled'] = 1;
+            $input['code'] = $zone_code;
             if ($source_zone->add($input) === false) {
                 $message = __("Creation of relation between source and zone failed", 'carbon');
                 $output->writeln("<error>$message</error>");
