@@ -36,14 +36,12 @@ namespace GlpiPlugin\Carbon\Impact\Usage\Boavizta;
 use CommonDBTM;
 use DateTime;
 use DbUtils;
-use GlpiPlugin\Carbon\DataSource\Boaviztapi;
+use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\Client;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\Impact\Usage\AbstractUsageImpact;
 use GlpiPlugin\Carbon\Impact\Type;
 use GlpiPlugin\Carbon\Location;
-use GlpiPlugin\Carbon\Zone;
 use Location as GlpiLocation;
-use Glpi\DBAL\QueryExpression;
 
 abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterface
 {
@@ -63,8 +61,8 @@ abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterfa
     /** @var array $hardware hardware description for the request */
     protected array $hardware = [];
 
-    /** @var Boaviztapi instance of the HTTP client */
-    protected ?Boaviztapi $client = null;
+    /** @var Client instance of the HTTP client */
+    protected ?Client $client = null;
 
     // abstract public static function getEngine(CommonDBTM $item): EngineInterface;
 
@@ -87,10 +85,10 @@ abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterfa
     /**
      * Set the REST API client to use for requests
      *
-     * @param Boaviztapi $client
+     * @param Client $client
      * @return void
      */
-    public function setClient(Boaviztapi $client)
+    public function setClient(Client $client)
     {
         $this->client = $client;
         // $this->engine_version = $this->getVersion();

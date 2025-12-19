@@ -30,9 +30,9 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\DataSource\Tests;
+namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\ElectricityMaps;
 
-use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ElectricityMapClient;
+use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ElectricityMaps\Client;
 use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Zone;
@@ -41,16 +41,16 @@ use DateTimeImmutable;
 use GlpiPlugin\Carbon\Source_Zone;
 use PHPUnit\Framework\Attributes\CoversClass;
 
-#[CoversClass(ElectricityMapClient::class)]
-class ElectricityMapClientTest extends DbTestCase
+#[CoversClass(Client::class)]
+class ClientTest extends DbTestCase
 {
     public function testQueryZones()
     {
         $client = $this->createStub(RestApiClientInterface::class);
-        $fixture_file = realpath(dirname(__DIR__, 3) . '/fixtures/ElectricityMap/zones.json');
+        $fixture_file = TU_FIXTURE_PATH . '/ElectricityMap/zones.json';
         $response = file_get_contents($fixture_file);
         $client->method('request')->willReturn(json_decode($response, true));
-        $instance = new ElectricityMapClient($client);
+        $instance = new Client($client);
         $output = $this->callPrivateMethod($instance, 'queryZones');
         $this->assertIsArray($output);
         $this->assertCount(2, $output);
@@ -59,12 +59,12 @@ class ElectricityMapClientTest extends DbTestCase
     public function testFetchDay()
     {
         $client = $this->createStub(RestApiClientInterface::class);
-        $fixture_file = realpath(dirname(__DIR__, 3) . '/fixtures/ElectricityMap/api-sample.json');
+        $fixture_file = TU_FIXTURE_PATH . '/ElectricityMap/api-sample.json';
         $response = file_get_contents($fixture_file);
         $client->method('request')->willReturn(json_decode($response, true));
 
         /** @var RestApiClientInterface $client */
-        $data_source = new ElectricityMapClient($client);
+        $data_source = new Client($client);
         $source = new Source();
         $source->getFromDBByCrit(['name' => $data_source->getSourceName()]);
         $this->assertFalse($source->isNewItem());

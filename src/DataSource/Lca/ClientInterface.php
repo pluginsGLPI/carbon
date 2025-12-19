@@ -5,7 +5,6 @@
  * Carbon plugin for GLPI
  *
  * @copyright Copyright (C) 2024-2025 Teclib' and contributors.
- * @copyright Copyright (C) 2024 by the carbon plugin team.
  * @license   https://www.gnu.org/licenses/gpl-3.0.txt GPLv3+
  * @link      https://github.com/pluginsGLPI/carbon
  *
@@ -31,17 +30,22 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\Impact\Usage\Boavizta;
+namespace GlpiPlugin\Carbon\DataSource\Lca;
 
-use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\Client;
+/**
+ * The common interface for all classes implementing Life Cycle Assessment fetching from various sources.
+ * Sources are most of the time REST API, but this is not limitative.
+ *
+ * Depending on the source, the time range of the intensities may vary.
+ *
+ */
 
-interface AssetInterface
+interface ClientInterface
 {
     /**
-     * Set the API client to use for HTTP requests
+     * Get the source name of the data source
      *
-     * @param Client $client
-     * @return void
+     * @return string
      */
-    public function setClient(Client $client);
+    public function getSourceName(): string;
 }

@@ -37,7 +37,7 @@
         <input type="hidden" name="config_context" value="plugin:carbon">
         <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token() }}">
 
-        {{ fields.largeTitle(
+        {# {{ fields.largeTitle(
             __('Electricity maps', 'carbon'),
             'fas fa-gears'
         ) }}
@@ -46,7 +46,7 @@
             'electricitymap_api_key',
             current_config['electricitymap_api_key'],
             __('Key for electricitymap.org API', 'carbon')
-        ) }}
+        ) }} #}
 
         {{ fields.largeTitle(
             __('Impact engine', 'carbon'),
@@ -64,28 +64,9 @@
             __('Impact engine', 'carbon')
         ) }}
 
-        {{ fields.largeTitle(
-            __('Boavizta', 'carbon'),
-            'fas fa-gears'
-        ) }}
-
-        {% if (hide_boaviztapi_base_url == false) %}
-            {{ fields.textField(
-                'boaviztapi_base_url',
-                current_config['boaviztapi_base_url'],
-                __('Base URL to the Boaviztapi instance', 'carbon')
-            ) }}
-        {% endif %}
-
-        <div>
-            <p>{{ __('Geocoding converts a location into a ISO 3166 (3 letters) code. Boavizta needs this to determine usage impacts of assets. This feature sends the address stored in a location to nominatim.org service. If this is an issue, you can disable it below, and fill the coutry code manually.', 'carbon') }}</p>
-        </div>
-
-        {{ fields.checkboxField(
-            'geocoding_enabled',
-            current_config['geocoding_enabled'],
-            __('Enable geocoding', 'carbon')
-        ) }}
+        {% for include_config in include_configs %}
+            {{ include(template_from_string(include_config)) }}
+        {% endfor %}
 
         <button type="submit" class="btn btn-primary mx-1" name="update" value="1">
             <i class="ti ti-device-floppy"></i>

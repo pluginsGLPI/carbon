@@ -30,10 +30,10 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\Tests;
+namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\Rte;
 
 use DateTime;
-use GlpiPlugin\Carbon\DataSource\CarbonIntensity\RteClient;
+use GlpiPlugin\Carbon\DataSource\CarbonIntensity\Rte\Client;
 use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use DateTimeImmutable;
@@ -41,17 +41,17 @@ use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\Zone;
 use PHPUnit\Framework\Attributes\CoversClass;
 
-#[CoversClass(RteClient::class)]
-class RteClientTest extends DbTestCase
+#[CoversClass(Client::class)]
+class ClientTest extends DbTestCase
 {
     public function testFetchDay()
     {
         $client = $this->createStub(RestApiClientInterface::class);
-        $fixture_file = realpath(dirname(__DIR__, 3) . '/fixtures/RTE/api-sample.json');
+        $fixture_file = TU_FIXTURE_PATH . '/RTE/api-sample.json';
         $response = file_get_contents($fixture_file);
         $client->method('request')->willReturn(json_decode($response, true));
 
-        $source = new RteClient($client);
+        $source = new Client($client);
 
         $date = new DateTimeImmutable('5 days ago');
         $intensities = $source->fetchDay($date, '');
@@ -79,7 +79,7 @@ class RteClientTest extends DbTestCase
         }
         $client->method('request')->willReturn($response);
 
-        $source = new RteClient($client);
+        $source = new Client($client);
 
         $start = new DateTimeImmutable('2021-03-01');
         $stop  = new DateTimeImmutable('2021-03-27');
@@ -112,7 +112,7 @@ class RteClientTest extends DbTestCase
             ],
         ]);
         /** @var RestApiClientInterface $client */
-        $instance = new RteClient($client);
+        $instance = new Client($client);
         $start_date = new DateTimeImmutable('2024-10-08');
         $stop_date = new DateTimeImmutable('2024-10-08');
         $carbon_intensity = new CarbonIntensity();
@@ -145,7 +145,7 @@ class RteClientTest extends DbTestCase
                 ]
             ],
         ]);
-        $instance = new RteClient($client);
+        $instance = new Client($client);
         $start_date = new DateTime('3 days ago');
         $start_date->setTime(0, 0, 0);
         $start_date = DateTimeImmutable::createFromMutable($start_date);

@@ -105,35 +105,8 @@ class ConfigTest extends DbTestCase
         $this->assertEquals(1, $csrf->count());
         $electricitymaps_api = $crawler->filter('input[name="electricitymap_api_key"]');
         $impact_engine = $crawler->filter('select[name="impact_engine"]');
-        $boaviztapi_url = $crawler->filter('input[name="boaviztapi_base_url"]');
-        $geocoding = $crawler->filter('input[type="checkbox"][name="geocoding_enabled"]');
         $this->assertEquals(1, $electricitymaps_api->count());
         $this->assertEquals(1, $impact_engine->count());
-        $this->assertEquals(1, $boaviztapi_url->count());
-        $this->assertEquals(1, $geocoding->count());
-
-        // Test that the boaviztapi URL is hidden when set from an env var
-        putenv(Config::ENV_BOAVIZTAPI_BASE_URL . '=bar');
-        $this->login('glpi', 'glpi');
-        ob_start();
-        $instance = new Config();
-        $instance->showForm(-1);
-        $output = ob_get_clean();
-        $crawler = new Crawler($output);
-        $config_class = $crawler->filter('input[type="hidden"][name="config_class"]');
-        $config_context = $crawler->filter('input[type="hidden"][name="config_context"]');
-        $csrf = $crawler->filter('input[type="hidden"][name="_glpi_csrf_token"]');
-        $this->assertEquals(1, $config_class->count());
-        $this->assertEquals(1, $config_context->count());
-        $this->assertEquals(1, $csrf->count());
-        $electricitymaps_api = $crawler->filter('input[name="electricitymap_api_key"]');
-        $impact_engine = $crawler->filter('select[name="impact_engine"]');
-        $boaviztapi_url = $crawler->filter('input[name="boaviztapi_base_url"]');
-        $geocoding = $crawler->filter('input[type="checkbox"][name="geocoding_enabled"]');
-        $this->assertEquals(1, $electricitymaps_api->count());
-        $this->assertEquals(1, $impact_engine->count());
-        $this->assertEquals(0, $boaviztapi_url->count());
-        $this->assertEquals(1, $geocoding->count());
     }
 
     public function testGetEmbodiedImpactEngine()

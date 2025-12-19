@@ -36,7 +36,7 @@ use CommonGLPI;
 use CommonDBTM;
 use GlpiPlugin\Carbon\AbstractModel;
 use GlpiPlugin\Carbon\Config;
-use GlpiPlugin\Carbon\DataSource\Boaviztapi;
+use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\Client;
 use GlpiPlugin\Carbon\DataSource\RestApiClient;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\Impact\Embodied\Boavizta\AbstractAsset;
@@ -117,7 +117,7 @@ class Engine extends CommonGLPI
         switch (array_slice($embodied_impact_namespace, -2, 1)[0]) {
             case 'Boavizta':
                 /** @var AbstractAsset $engine  */
-                $engine->setClient(new Boaviztapi(new RestApiClient()));
+                $engine->setClient(new Client(new RestApiClient()));
         }
 
         return $engine;

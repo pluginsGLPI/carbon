@@ -30,16 +30,18 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\DataSource;
+namespace GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi;
 
 use DBmysql;
 use Dropdown;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Config as CarbonConfig;
+use GlpiPlugin\Carbon\DataSource\Lca\AbstractClient;
+use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
 use GlpiPlugin\Carbon\Zone;
 
-class Boaviztapi
+class Client extends AbstractClient
 {
     private RestApiClientInterface $client;
 

@@ -30,7 +30,7 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity;
+namespace GlpiPlugin\Carbon\DataSource\Lca;
 
 use GlpiPlugin\Carbon\DataSource\RestApiClient;
 use GlpiPlugin\Carbon\DataSource\ConfigInterface;
@@ -47,7 +47,7 @@ class ClientFactory
         $client_types = [];
         foreach (glob(__DIR__ . '/*', GLOB_ONLYDIR) as $dir) {
             $dir = basename($dir);
-            $class_name = 'GlpiPlugin\\Carbon\\DataSource\\CarbonIntensity\\' . $dir . '\\Client';
+            $class_name = 'GlpiPlugin\\Carbon\\DataSource\\Lca\\' . $dir . '\\Client';
             if (!class_exists($class_name)) {
                 continue;
             }
@@ -70,7 +70,7 @@ class ClientFactory
         $config_types = [];
         foreach (glob(__DIR__ . '/*', GLOB_ONLYDIR) as $dir) {
             $dir = basename($dir);
-            $class_name = 'GlpiPlugin\\Carbon\\DataSource\\CarbonIntensity\\' . $dir . '\\Config';
+            $class_name = 'GlpiPlugin\\Carbon\\DataSource\\Lca\\' . $dir . '\\Config';
             if (!class_exists($class_name)) {
                 continue;
             }
@@ -78,6 +78,17 @@ class ClientFactory
         }
 
         return $config_types;
+    }
+
+    public static function getSecuredConfigs()
+    {
+        $secured_configs = [];
+        foreach (self::getConfigTypes() as $config_class) {
+            $config = new $config_class();
+            $secured_configs = array_merge($secured_configs, $config->getSecuredConfigs());
+        }
+
+        return $secured_configs;
     }
 
     /**
@@ -98,25 +109,15 @@ class ClientFactory
         return $names;
     }
 
-    public static function getSecuredConfigs()
-    {
-        $secured_configs = [];
-        foreach (self::getConfigTypes() as $config_class) {
-            $config = new $config_class();
-            $secured_configs = array_merge($secured_configs, $config->getSecuredConfigs());
-        }
-
-        return $secured_configs;
-    }
-
     /**
      * Create an instance of a client
      *
-     * @param string $type type of the client
+     * @param class-string<AbstractClient> $type type of the client
      * @return AbstractClient instantiated client
      */
     public static function create(string $type): AbstractClient
     {
+        $type .= 'Client';
         $client_classes = self::getClientTypes();
         if (!isset($client_classes[$type])) {
             throw new \InvalidArgumentException("Unknown client type: $type");
