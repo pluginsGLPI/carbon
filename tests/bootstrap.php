@@ -43,6 +43,7 @@ define('GLPI_URI', getenv('GLPI_URI') ?: 'http://localhost');
 
 define('TU_USER', '_test_user');
 define('TU_PASS', 'PhpUnit_4');
+define('TU_FIXTURE_PATH', __DIR__ . '/fixtures');
 
 ini_set('session.use_cookies', 0); //disable session cookies
 

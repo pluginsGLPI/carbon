@@ -5,7 +5,6 @@
  * Carbon plugin for GLPI
  *
  * @copyright Copyright (C) 2024-2025 Teclib' and contributors.
- * @copyright Copyright (C) 2024 by the carbon plugin team.
  * @license   https://www.gnu.org/licenses/gpl-3.0.txt GPLv3+
  * @link      https://github.com/pluginsGLPI/carbon
  *
@@ -31,17 +30,37 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\Impact\Usage\Boavizta;
+namespace GlpiPlugin\Carbon\DataSource\Lca;
 
-use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\Client;
+use GlpiPlugin\Carbon\Tests\DbTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-interface AssetInterface
+#[CoversClass(ClientFactory::class)]
+class ClientFactoryTest extends DbTestCase
 {
-    /**
-     * Set the API client to use for HTTP requests
-     *
-     * @param Client $client
-     * @return void
-     */
-    public function setClient(Client $client);
+    public function testGetClientTypes()
+    {
+        $result = ClientFactory::getClientTypes();
+        $expected = [
+            'Boaviztapi' => 'GlpiPlugin\\Carbon\\DataSource\\Lca\\Boaviztapi\\Client',
+        ];
+        $this->assertSame($expected, $result);
+    }
+
+    public function testGetConfigTypes()
+    {
+        $result = ClientFactory::getConfigTypes();
+        $expected = [
+            'Boaviztapi' => 'GlpiPlugin\\Carbon\\DataSource\\Lca\\Boaviztapi\\Config',
+        ];
+        $this->assertSame($expected, $result);
+    }
+
+    public function testGetSecuredConfigs()
+    {
+        // This tests takes into account the available data sources
+        $result = ClientFactory::getSecuredConfigs();
+        $expected = [];
+        $this->assertSame($expected, $result);
+    }
 }

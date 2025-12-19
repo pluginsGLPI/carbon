@@ -52,7 +52,7 @@
    {% endif %}
 
    {% set field %}
-      {% do call('GlpiPlugin\\Carbon\\DataSource\\Boaviztapi::dropdownBoaviztaZone', [name, {
+      {% do call('GlpiPlugin\\Carbon\\DataSource\\Lca\\Boaviztapi\\Client::dropdownBoaviztaZone', [name, {
          'value': value,
          'rand': options.rand,
          'width': '100%',

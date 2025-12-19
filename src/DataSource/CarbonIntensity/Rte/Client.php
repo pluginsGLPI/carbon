@@ -30,7 +30,7 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity;
+namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\Rte;
 
 use DateInterval;
 use DateTime;
@@ -38,6 +38,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
 use DBmysql;
+use GlpiPlugin\Carbon\DataSource\CarbonIntensity\AbstractClient;
 use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
@@ -52,7 +53,7 @@ use GlpiPlugin\Carbon\Toolbox;
  * API documentation
  * @see https://help.opendatasoft.com/apis/ods-explore-v2/explore_v2.1.html
  */
-class RteClient extends AbstractClient
+class Client extends AbstractClient
 {
     const RECORDS_URL =         '/eco2mix-national-tr/records';
     const EXPORT_URL_REALTIME      = '/eco2mix-national-tr/exports/json';
@@ -68,7 +69,6 @@ class RteClient extends AbstractClient
     public function __construct(RestApiClientInterface $client, string $url = '')
     {
         $this->client = $client;
-
         $this->base_url = 'https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets';
         if (!empty($url)) {
             $this->base_url = $url;

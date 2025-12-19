@@ -5,7 +5,6 @@
  * Carbon plugin for GLPI
  *
  * @copyright Copyright (C) 2024-2025 Teclib' and contributors.
- * @copyright Copyright (C) 2024 by the carbon plugin team.
  * @license   https://www.gnu.org/licenses/gpl-3.0.txt GPLv3+
  * @link      https://github.com/pluginsGLPI/carbon
  *
@@ -31,17 +30,18 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\Impact\Usage\Boavizta;
+namespace GlpiPlugin\Carbon\DataSource;
 
-use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\Client;
-
-interface AssetInterface
+interface ConfigInterface
 {
     /**
-     * Set the API client to use for HTTP requests
+     * Get array of secured config items
      *
-     * @param Client $client
-     * @return void
+     * @return array
      */
-    public function setClient(Client $client);
+    public static function getSecuredConfigs(): array;
+
+    public function getConfigTemplate(): string;
+
+    public function configUpdate(array $input): array;
 }

@@ -216,7 +216,7 @@ class CronTask
      */
     public static function cronDownloadElectricityMap(GlpiCronTask $task): int
     {
-        $client = ClientFactory::create('ElectricityMap');
+        $client = ClientFactory::create('ElectricityMaps');
         return self::downloadCarbonIntensityFromSource($task, $client, new CarbonIntensity());
     }
 

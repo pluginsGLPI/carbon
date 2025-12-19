@@ -40,6 +40,8 @@ use GlpiPlugin\Carbon\Report;
 use Location as GlpiLocation;
 use Profile as GlpiProfile;
 use GlpiPlugin\Carbon\Dashboard\Grid;
+use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientFactory as CarbonIntensityClientFactory;
+use GlpiPlugin\Carbon\DataSource\Lca\ClientFactory as LcaClientFactory;
 use GlpiPlugin\Carbon\Location;
 
 define('PLUGIN_CARBON_VERSION', '1.2.0-dev');
@@ -92,9 +94,10 @@ function plugin_carbon_setupHooks()
     global $PLUGIN_HOOKS;
 
     // Secured config
-    $PLUGIN_HOOKS[Hooks::SECURED_CONFIGS]['carbon'] = [
-        'electricitymap_api_key',
-    ];
+    $PLUGIN_HOOKS[Hooks::SECURED_CONFIGS]['carbon'] = array_merge(
+        CarbonIntensityClientFactory::getSecuredConfigs(),
+        LcaClientFactory::getSecuredConfigs()
+    );
 
     // add new cards to the dashboard
     $PLUGIN_HOOKS[Hooks::DASHBOARD_CARDS]['carbon'] = [Grid::class, 'getDashboardCards'];

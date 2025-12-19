@@ -30,7 +30,7 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity;
+namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\ElectricityMaps;
 
 use DateInterval;
 use DateTime;
@@ -43,6 +43,8 @@ use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\Source_Zone;
 use Config as GlpiConfig;
 use GLPIKey;
+use GlpiPlugin\Carbon\DataSource\CarbonIntensity\AbortException;
+use GlpiPlugin\Carbon\DataSource\CarbonIntensity\AbstractClient;
 use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\Toolbox;
@@ -54,7 +56,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
  * API documentation:
  * @see https://static.electricitymaps.com/api/docs/index.html
  */
-class ElectricityMapClient extends AbstractClient
+class Client extends AbstractClient
 {
     const HISTORY_URL = '/carbon-intensity/history';
     const PAST_URL    = '/carbon-intensity/past-range';
@@ -146,7 +148,7 @@ class ElectricityMapClient extends AbstractClient
     private function getToken(): string
     {
         $glpi_key = new GLPIKey();
-        $value = GlpiConfig::getConfigurationValue('plugin:carbon', 'electricitymap_api_key');
+        $value = Config::getConfigurationValue('electricitymap_api_key');
         return $glpi_key->decrypt($value);
     }
 

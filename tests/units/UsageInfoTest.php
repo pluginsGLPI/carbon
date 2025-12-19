@@ -136,6 +136,7 @@ class UsageInfoTest extends DbTestCase
 
     public function testShowForItem()
     {
+        $this->login('glpi', 'glpi');
         // Test that the usage profile shows for a computer
         $glpi_computer = $this->createItem(GlpiComputer::class);
         $instance = $this->createItem(UsageInfo::class, [

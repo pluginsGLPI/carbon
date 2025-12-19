@@ -43,9 +43,12 @@ use Monitor as GlpiMonitor;
 use NetworkEquipment as GlpiNetworkEquipment;
 use Glpi\Application\View\TemplateRenderer;
 use GLPINetwork;
+use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientFactory as CarbonIntensityClientFactory;
+use GlpiPlugin\Carbon\DataSource\Lca\ClientFactory as LcaClientFactory;
 use GlpiPlugin\Carbon\Impact\Embodied\Engine;
 use GuzzleHttp\Client;
 use Session;
+use Twig\Extension\StringLoaderExtension;
 
 class Config extends GlpiConfig
 {
@@ -95,11 +98,28 @@ class Config extends GlpiConfig
         $current_config['geocoding_enabled'] = $current_config['geocoding_enabled'] ?? '0';
         $canedit        = Session::haveRight(Config::$rightname, UPDATE);
 
+        // Get config template foreach LCA data source
+        $include_configs = [];
+        foreach (CarbonIntensityClientFactory::getConfigTypes() as $config_type) {
+            $config = new $config_type();
+            $include_configs[] = $config->getConfigTemplate();
+        }
+        foreach (LcaClientFactory::getConfigTypes() as $config_type) {
+            $config = new $config_type();
+            $include_configs[] = $config->getConfigTemplate();
+        }
+
         $hide_boaviztapi_base_url = (getenv(self::ENV_BOAVIZTAPI_BASE_URL) !== false);
-        TemplateRenderer::getInstance()->display('@carbon/config.html.twig', [
+        $renderer = TemplateRenderer::getInstance();
+        $environment = $renderer->getEnvironment();
+        if (!$environment->hasExtension(StringLoaderExtension::class)) {
+            $environment->addExtension(new StringLoaderExtension());
+        }
+        $renderer->display('@carbon/config.html.twig', [
             'can_edit'                 => $canedit,
             'current_config'           => $current_config,
             'impact_engines'           => Engine::getAvailableBackends(),
+            'include_configs'          => $include_configs,
             'hide_boaviztapi_base_url' => $hide_boaviztapi_base_url,
             'action'                   => (isset($options['plugin_config']) ? Config::getFormURL() : GlpiConfig::getFormURL()),
         ]);
@@ -126,27 +146,13 @@ class Config extends GlpiConfig
             }
         }
 
-        //Test Boavizta URL by acquiring zones
-        if (isset($input['boaviztapi_base_url']) && strlen($input['boaviztapi_base_url']) > 0) {
-            $old_url = GlpiConfig::getConfigurationValue(self::CONFIG_CONTEXT, 'boaviztapi_base_url');
-            if ($old_url != $input['boaviztapi_base_url']) {
-                $boavizta = new DataSource\Boaviztapi(new DataSource\RestApiClient(), $input['boaviztapi_base_url']);
-                $zones = [];
-                try {
-                    $zones = $boavizta->queryZones();
-                } catch (\Exception $e) {
-                    unset($input['boaviztapi_base_url']);
-                    Session::addMessageAfterRedirect(__('Invalid Boavizta API URL', 'carbon'), false, ERROR);
-                }
-                if (count($zones) > 0) {
-                    // Create the source if it does not exists already
-                    if ($boavizta->createSource()) {
-                        // Save zones into database
-                        $boavizta->saveZones($zones);
-                    }
-                    Session::addMessageAfterRedirect(__('Connection to Boavizta API established', 'carbon'), false, INFO);
-                }
-            }
+        foreach (CarbonIntensityClientFactory::getConfigTypes() as $config_type) {
+            $config = new $config_type();
+            $input = $config->configUpdate($input);
+        }
+        foreach (LcaClientFactory::getConfigTypes() as $config_type) {
+            $config = new $config_type();
+            $input = $config->configUpdate($input);
         }
 
         return $input;

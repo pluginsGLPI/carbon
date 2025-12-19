@@ -46,7 +46,7 @@ use Location as GlpiLocation;
 use MassiveAction;
 use Glpi\Application\View\TemplateRenderer;
 use Glpi\DBAL\QueryExpression;
-use GlpiPlugin\Carbon\DataSource\Boaviztapi;
+use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\Client as BoaviztapiClient;
 use League\ISO3166\ISO3166;
 
 /**
@@ -172,7 +172,7 @@ class Location extends CommonDBChild
             case 'MassUpdateBoaviztaZone':
                 echo '<div>';
                 echo __('Boavizta zone', 'carbon') . '&nbsp;';
-                Boaviztapi::dropdownBoaviztaZone('_boavizta_zone');
+                BoaviztapiClient::dropdownBoaviztaZone('_boavizta_zone');
                 echo '</div>';
                 echo '<br /><br />' . Html::submit(_x('button', 'Post'), ['name' => 'massiveaction']);
                 return true;
@@ -228,7 +228,7 @@ class Location extends CommonDBChild
     {
         switch ($field) {
             case 'boavizta_zone':
-                $categories = Boaviztapi::getZones();
+                $categories = BoaviztapiClient::getZones();
                 return $categories[$values['boavizta_zone']] ?? '';
         }
 
@@ -238,7 +238,7 @@ class Location extends CommonDBChild
     public static function getSpecificValueToSelect($field, $name = '', $values = '', array $options = [])
     {
         $options['values'] = $values;
-        return Boaviztapi::dropdownBoaviztaZone($name, $options);
+        return BoaviztapiClient::dropdownBoaviztaZone($name, $options);
     }
 
     /**
