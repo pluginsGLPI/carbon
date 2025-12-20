@@ -36,6 +36,7 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
+use Symfony\Component\Console\Output\StreamOutput;
 
 /** @var DBmysql $DB */
 global $DB;
@@ -75,7 +76,7 @@ $file->rewind();
 $file->setFlags(SplFileObject::READ_CSV);
 $progress_bar = null;
 if (isCommandLine()) {
-    $output = new ConsoleOutput();
+    $output = new StreamOutput(fopen('php://stdout', 'w'));
     $output->writeln("Writing fallback carbon intensity data");
     $progress_bar = new ProgressBar($output, $rows_count);
 }
