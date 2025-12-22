@@ -36,10 +36,13 @@ use Config;
 use GLPIKey;
 use Glpi\Plugin\Hooks;
 use Plugin;
+use GlpiPlugin\Carbon\Install;
+use PHPUnit\Framework\Attributes\CoversClass;
 
 // Load base class
 // TODO: Create common code in tests/src/<someclass>.php
 require_once(__DIR__ . '/../install/PluginInstallTest.php');
+#[CoversClass(Install::class)]
 class PluginUpgradeTest extends PluginInstallTest
 {
     private string $old_version = '1.0.0';
