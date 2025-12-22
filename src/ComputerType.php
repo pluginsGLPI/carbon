@@ -184,6 +184,9 @@ class ComputerType extends AbstractType
     {
         switch ($field) {
             case 'category':
+                if ($values['category'] === null) {
+                    return '';
+                }
                 $categories = self::getCategories();
                 return $categories[$values['category']] ?? '';
         }
