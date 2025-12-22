@@ -534,7 +534,9 @@ class CommonTestCase extends TestCase
     protected function callPrivateMethod($instance, string $methodName, ...$args)
     {
         $method = new ReflectionMethod($instance, $methodName);
-        $method->setAccessible(true);
+        if (version_compare(PHP_VERSION, '8.1.0') < 0) {
+            $method->setAccessible(true);
+        }
 
         return $method->invoke($instance, ...$args);
     }
