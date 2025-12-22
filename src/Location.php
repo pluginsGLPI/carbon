@@ -237,8 +237,13 @@ class Location extends CommonDBChild
 
     public static function getSpecificValueToSelect($field, $name = '', $values = '', array $options = [])
     {
-        $options['values'] = $values;
-        return BoaviztapiClient::dropdownBoaviztaZone($name, $options);
+        switch ($field) {
+            case 'boavizta_zone':
+                $options['values'] = $values;
+                return BoaviztapiClient::dropdownBoaviztaZone($name, $options);
+        }
+
+        return '';
     }
 
     /**
