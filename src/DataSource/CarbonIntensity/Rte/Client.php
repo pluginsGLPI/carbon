@@ -107,28 +107,35 @@ class Client extends AbstractClient
 
     public function createZones(): int
     {
-        $source = $this->getOrCreateSource();
-        if ($source === null) {
+        $source = new source();
+        $source->getOrCreate([], [
+            'name' => $this->getSourceName(),
+        ]);
+        if ($source->isNewItem()) {
             return -1;
         }
         $source_id = $source->getID();
 
         $zone = new Zone();
-        $input = [
-            'name' => 'France',
-        ];
-        if ($zone->getFromDBByCrit($input) === false) {
-            if (!$zone->add($input)) {
-                return -1;
-            }
+        $zone->getOrCreate([], [
+            'name' => 'France'
+        ]);
+        if ($zone->isNewItem()) {
+            return -1;
         }
+        $zone_id = $zone->getID();
 
         $source_zone = new Source_Zone();
-        $source_zone->add([
+        $source_zone->getOrCreate([
+            'code' => '',
+            'is_download_enabled' => Toolbox::isLocationExistForZone($zone->fields['name'])
+        ], [
             Source::getForeignKeyField() => $source_id,
-            Zone::getForeignKeyField() => $zone->getID(),
-            'is_download_enabled' => Toolbox::isLocationExistForZone($zone->fields['name']),
+            Zone::getForeignKeyField() => $zone_id
         ]);
+        if ($source_zone->isNewItem()) {
+            return -1;
+        }
         $this->setZoneSetupComplete();
         return 1;
     }

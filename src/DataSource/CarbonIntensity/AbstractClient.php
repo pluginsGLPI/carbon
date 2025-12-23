@@ -55,27 +55,6 @@ abstract class AbstractClient implements ClientInterface
     abstract protected function formatOutput(array $response, int $step): array;
 
     /**
-     * Create the source in the database
-     * Should not be called as it shall be created at plugin installation
-     *
-     * @return Source
-     */
-    protected function getOrCreateSource(): ?Source
-    {
-        $source = new Source();
-        if (!$source->getFromDBByCrit(['name' => $this->getSourceName()])) {
-            $source->add([
-                'name' => $this->getSourceName(),
-            ]);
-            if ($source->isNewItem()) {
-                return null;
-            }
-        }
-
-        return $source;
-    }
-
-    /**
      * Download all data for a single day from the datasource
      *
      * @param DateTimeImmutable $day

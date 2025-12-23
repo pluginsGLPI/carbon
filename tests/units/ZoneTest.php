@@ -39,6 +39,7 @@ use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 use Location as GlpiLocation;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(Zone::class)]
 class ZoneTest extends DbTestCase
@@ -198,5 +199,20 @@ class ZoneTest extends DbTestCase
         $zone = new Zone();
         $this->assertTrue($zone->getByItem($item, null, true));
         $this->assertEquals($zone->getID(), $expected_zone->getID());
+    }
+
+    public function testGetOrCreate()
+    {
+        // Test we can create a non existing item
+        $instance = new Zone();
+        $where = ['name' => 'to becreated'];
+        $this->count(0, $instance->find($where));
+        $instance->getOrCreate([], $where);
+        $this->count(1, $instance->find($where));
+
+        // Test we find an existing instance
+        $instance_2 = new Zone();
+        $instance_2->getOrCreate([], $where);
+        $this->assertSame($instance->getID(), $instance_2->getID());
     }
 }

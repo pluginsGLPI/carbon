@@ -481,4 +481,22 @@ class Source_Zone extends CommonDBRelation
 
         return $this->getFromDBByRequest($request);
     }
+
+    /**
+     * get or create an item
+     *
+     * @param array $params
+     * @param array $where
+     * @return self|null
+     */
+    public function getOrCreate(array $params, array $where): ?self
+    {
+        if (!$this->getFromDBByCrit($where)) {
+            $this->add(array_merge($where, $params));
+            return $this;
+        }
+
+        $this->update(array_merge($where, $params, ['id' => $this->getID()]));
+        return $this;
+    }
 }
