@@ -101,8 +101,11 @@ class Client extends AbstractClient
 
     public function createZones(): int
     {
-        $source = $this->getOrCreateSource();
-        if ($source === null) {
+        $source = new Source();
+        $source->getOrCreate([], [
+            ['name' => $this->getSourceName()]
+        ]);
+        if ($source->isNewItem()) {
             return -1;
         }
         $source_id = $source->getID();

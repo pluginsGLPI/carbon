@@ -274,17 +274,14 @@ class Install
     public static function getOrCreateSource(string $name, int $fallback_level = 1, int $is_carbon_intensity_source = 1): int
     {
         $source = new Source();
-        $source->getFromDBByCrit(['name' => $name]);
+        $source->getOrCreate([
+            'fallback_level' => $fallback_level,
+            'is_carbon_intensity_source' => $is_carbon_intensity_source,
+        ], [
+            'name' => $name
+        ]);
         if ($source->isNewItem()) {
-            $source->add([
-                'name' => $name,
-                'fallback_level' => $fallback_level,
-                'is_carbon_intensity_source' => $is_carbon_intensity_source,
-            ]);
-            /** @phpstan-ignore if.alwaysTrue */
-            if ($source->isNewItem()) {
-                throw new \RuntimeException("Failed to create carbon intensity source '$name' in DB");
-            }
+            throw new \RuntimeException("Failed to create carbon intensity source '$name' in DB");
         }
         return $source->getID();
     }
@@ -299,18 +296,15 @@ class Install
     public static function getOrCreateZone(string $name, int $source_id): int
     {
         $zone = new Zone();
+        $zone->getOrCreate([
+            'plugin_carbon_sources_id_historical' => $source_id,
+        ], [
+            'name' => $name,
+        ]);
         $zone->getFromDBByCrit(['name' => $name]);
         if ($zone->isNewItem()) {
-            $zone->add([
-                'name' => $name,
-                'plugin_carbon_sources_id_historical' => $source_id,
-            ]);
-            /** @phpstan-ignore if.alwaysTrue */
-            if ($zone->isNewItem()) {
-                throw new \RuntimeException("Failed to create zone '$name' in DB");
-            }
+            throw new \RuntimeException("Failed to create zone '$name' in DB");
         }
-
         return $zone->getID();
     }
 

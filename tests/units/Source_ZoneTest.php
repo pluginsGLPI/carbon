@@ -268,4 +268,31 @@ class Source_ZoneTest extends DbTestCase
         $success = $instance->getFallbackFromDB($source_zone);
         $this->assertFalse($success);
     }
+
+    public function testGetOrCreate()
+    {
+        // Test we can create a non existing item
+        $instance = new Source_Zone();
+        $source_fk = getForeignKeyFieldForItemType(Source::class);
+        $zone_fk = getForeignKeyFieldForItemType(Zone::class);
+        $source = $this->createItem(Source::class);
+        $zone = $this->createItem(Zone::class);
+        $where = [
+            $source_fk => $source->getID(),
+            $zone_fk => $zone->getID(),
+        ];
+        $this->count(0, $instance->find($where));
+        $instance->getOrCreate([], $where);
+        $this->count(1, $instance->find($where));
+
+        // Test we find an existing instance
+        $instance_2 = new Source_Zone();
+        $instance_2->getOrCreate([], $where);
+        $this->assertSame($instance->getID(), $instance_2->getID());
+
+        // Test we can update an existing item
+        $instance_3 = new Source_Zone();
+        $instance_3->getOrCreate(['code' => 'FOO'], $where);
+        $this->assertEquals('FOO', $instance_3->fields['code']);
+    }
 }

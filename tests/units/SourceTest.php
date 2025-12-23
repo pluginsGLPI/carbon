@@ -177,4 +177,24 @@ class SourceTest extends DbTestCase
         $new_count = $instance->getDownloadableSources();
         $this->assertEquals(0, count($new_count) - count($original_count));
     }
+
+    public function testGetOrCreate()
+    {
+        // Test we can create a non existing item
+        $instance = new Source();
+        $where = ['name' => 'to becreated'];
+        $this->count(0, $instance->find($where));
+        $instance->getOrCreate([], $where);
+        $this->count(1, $instance->find($where));
+
+        // Test we find an existing instance
+        $instance_2 = new Source();
+        $instance_2->getOrCreate([], $where);
+        $this->assertSame($instance->getID(), $instance_2->getID());
+
+        // Test we can update an existing item
+        $instance_3 = new source();
+        $instance_3->getOrCreate(['fallback_level' => 2], $where);
+        $this->assertEquals(2, $instance_3->fields['fallback_level']);
+    }
 }
