@@ -40,6 +40,7 @@ use DeviceProcessor;
 use GlpiPlugin\Carbon\ComputerType;
 use ComputerType as GlpiComputerType;
 use DeviceHardDrive;
+use DeviceHardDriveType;
 use InterfaceType;
 use Item_DeviceHardDrive;
 use Item_DeviceMemory;
@@ -189,6 +190,13 @@ class Computer extends AbstractAsset
                     $device_hard_drive = new DeviceHardDrive();
                     $device_hard_drive->getFromDB($item_device->fields['deviceharddrives_id']);
                     if (!$device_hard_drive->isNewItem()) {
+                        $device_hard_drive_type = DeviceHardDriveType::getById(
+                            $device_hard_drive->fields[getForeignKeyFieldForItemType(DeviceHardDriveType::class)]
+                        );
+                        if ($device_hard_drive_type !== false && $device_hard_drive_type->fields['name'] === 'removable') {
+                            // Ignore removable storage (USB sticks, ...)
+                            continue;
+                        }
                         $interface_type = new InterfaceType();
                         $interface_type->getFromDB($device_hard_drive->fields['interfacetypes_id']);
                         if (!$interface_type->isNewItem()) {
