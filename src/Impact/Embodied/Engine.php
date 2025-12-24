@@ -144,11 +144,8 @@ class Engine extends CommonGLPI
         ];
         $types = Type::getImpactTypes();
         foreach ($types as $key => $type) {
-            $crit[] = [
-                'OR' => [
-                    ['NOT' => [$type => null]],
-                    $type . '_quality' => ['<>', AbstractTracked::DATA_QUALITY_UNSET_VALUE]
-                ]
+            $crit['OR'][] = [
+                $type . '_quality' => ['<>', AbstractTracked::DATA_QUALITY_UNSET_VALUE]
             ];
         }
         $model = new $model_class();
