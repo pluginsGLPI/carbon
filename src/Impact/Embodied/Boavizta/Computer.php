@@ -204,9 +204,8 @@ class Computer extends AbstractAsset
                                 $type = 'ssd';
                                 $manufacturer = $this->getDeviceManufacturer($item_device);
                                 if ($manufacturer !== null) {
-                                    $$hard_drive['manufacturer'] = $manufacturer;
+                                    $hard_drive['manufacturer'] = $manufacturer;
                                 }
-                                $hard_drive['manufacturer'] = $manufacturer;
                             }
                         }
                     }
