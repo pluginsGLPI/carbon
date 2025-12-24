@@ -100,20 +100,11 @@ class Client extends AbstractClient
      */
     public function createSource(): bool
     {
-        $source_name = $this->getSourceName();
         // create a source in Source
         $source = new Source();
-        $source->getFromDBByCrit([
-            'name' => $source_name,
-        ]);
-        if ($source->isNewItem()) {
-            $id = $source->add([
-                'name' => $source_name,
-            ]);
-            return !$source->isNewID($id);
-        }
+        $source->getOrCreate([], ['name' => $this->getSourceName()]);
 
-        return true;
+        return (!$source->isNewItem());
     }
 
     /**
@@ -157,49 +148,23 @@ class Client extends AbstractClient
     public function saveZones(array $zones): void
     {
         $source = new Source();
-        $source->getFromDBByCrit([
-            'name' => $this->getSourceName(),
-        ]);
+        $source->getOrCreate([], ['name' => $this->getSourceName()]);
         if ($source->isNewItem()) {
             return;
         }
 
-        $source_id = $source->getID();
-        $zone = new Zone();
         foreach ($zones as $code => $name) {
-            $zone_id = $zone->getFromDBByCrit([
-                'name' => $name,
-            ]);
-            if ($zone_id === false) {
-                $zone_id = $zone->add([
-                    'name' => $name,
-                ]);
-                if ($zone_id === false) {
-                    // Failed to add the zone
-                    continue;
-                }
-            } else {
-                $zone_id = $zone->getID();
+            $zone = new Zone();
+            $zone->getOrCreate([], ['name' => $name]);
+            if ($zone->isNewItem()) {
+                continue;
             }
             $source_zone = new Source_Zone();
-            $source_zone_id = $source_zone->getFromDBByCrit([
-                'plugin_carbon_sources_id' => $source_id,
-                'plugin_carbon_zones_id' => $zone_id,
-            ]);
-            if ($source_zone_id === false) {
-                $source_zone_id = $source_zone->add([
-                    'plugin_carbon_sources_id' => $source_id,
-                    'plugin_carbon_zones_id' => $zone_id,
-                ]);
-                if ($source_zone_id === false) {
-                    continue;
-                }
-            } else {
-                $source_zone_id = $source_zone->getID();
-            }
-            $source_zone->update([
-                'id'   => $source_zone_id,
+            $source_zone->getOrCreate([
                 'code' => $code,
+            ], [
+                'plugin_carbon_sources_id' => $source->getID(),
+                'plugin_carbon_zones_id' => $zone->getID(),
             ]);
         }
     }
