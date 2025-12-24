@@ -100,20 +100,11 @@ class Client extends AbstractClient
      */
     public function createSource(): bool
     {
-        $source_name = $this->getSourceName();
         // create a source in Source
         $source = new Source();
-        $source->getFromDBByCrit([
-            'name' => $source_name,
-        ]);
-        if ($source->isNewItem()) {
-            $id = $source->add([
-                'name' => $source_name,
-            ]);
-            return !$source->isNewID($id);
-        }
+        $source->getOrCreate([], ['name' => $this->getSourceName()]);
 
-        return true;
+        return (!$source->isNewItem());
     }
 
     /**
