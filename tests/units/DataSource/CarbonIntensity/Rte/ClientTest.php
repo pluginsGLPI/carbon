@@ -114,7 +114,7 @@ class ClientTest extends DbTestCase
         /** @var RestApiClientInterface $client */
         $instance = new Client($client);
         $start_date = new DateTimeImmutable('2024-10-08');
-        $stop_date = new DateTimeImmutable('2024-10-08');
+        $stop_date = new DateTimeImmutable('2024-10-09');
         $carbon_intensity = new CarbonIntensity();
         $output = $instance->fullDownload('France', $start_date, $stop_date, $carbon_intensity);
         $this->assertEquals(1, $output);

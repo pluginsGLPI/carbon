@@ -169,7 +169,7 @@ class CollectCarbonIntensityCommand extends AbstractCommand
         $carbon_intensity->downloadOneZone($this->client, $this->zones[$zone_code], 0, new ProgressBar($this->output));
 
         // Find start and stop dates to cover
-        $start_date = $carbon_intensity->getDownloadStartDate($this->zones[$zone_code], $this->client);
+        $start_date = $carbon_intensity->getDownloadStartDate();
         $gaps = $carbon_intensity->findGaps($this->source_id, $zone->getID(), $start_date);
 
         // Count the hours not covered by any sample

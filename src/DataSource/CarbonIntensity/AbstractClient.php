@@ -157,8 +157,17 @@ abstract class AbstractClient implements ClientInterface
 
     public function fullDownload(string $zone, DateTimeImmutable $start_date, DateTimeImmutable $stop_date, CarbonIntensity $intensity, int $limit = 0, ?ProgressBar $progress_bar = null): int
     {
+        if ($start_date >= $stop_date) {
+            return 0;
+        }
+        // Round start date to beginning of month
+        $start_date = $start_date->setTime(0, 0, 0, 0)->setDate((int) $start_date->format('Y'), (int) $start_date->format('m'), 1);
+        $stop_date = $stop_date->setTime(0, 0, 0, 0)->setDate((int) $stop_date->format('Y'), (int) $stop_date->format('m'), 1);
         $count = 0;
         $saved = 0;
+        if ($start_date == $stop_date) {
+            $stop_date = $stop_date->add(new DateInterval('P1M'));
+        }
 
         /**
          * Huge quantity of SQL queries will be executed
@@ -171,9 +180,18 @@ abstract class AbstractClient implements ClientInterface
             // enpty string in PHPUnit environment
             $memory_limit = null;
         }
-        foreach ($this->sliceDateRangeByMonth($start_date, $stop_date) as $slice) {
+
+        // Traverse each month from start_date to end_date
+        $current_date = DateTime::createFromImmutable($start_date);
+        while ($current_date < $stop_date) {
+            $next_month = clone $current_date;
+            $next_month->add(new DateInterval('P1M'));
             try {
-                $data = $this->fetchRange($slice['start'], $slice['stop'], $zone);
+                $data = $this->fetchRange(
+                    DateTimeImmutable::createFromMutable($current_date),
+                    DateTimeImmutable::createFromMutable($next_month),
+                    $zone
+                );
             } catch (AbortException $e) {
                 break;
             }
@@ -194,8 +212,8 @@ abstract class AbstractClient implements ClientInterface
                 // 8 MB memory left, emergency exit
                 return $saved > 0 ? $count : -$count;
             }
+            $current_date = $next_month;
         }
-
         return $saved > 0 ? $count : -$count;
     }
 
