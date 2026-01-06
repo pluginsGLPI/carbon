@@ -59,12 +59,12 @@ class Client extends AbstractClient
     const EXPORT_URL_REALTIME      = '/eco2mix-national-tr/exports/json';
     const EXPORT_URL_CONSOLIDATED  = '/eco2mix-national-cons-def/exports/json';
 
+    const DATASET_REALTIME = 0;
+    const DATASET_CONSOLIDATED = 1;
+
     private RestApiClientInterface $client;
 
     private string $base_url;
-
-    /** @var bool Use consolidated dataset (true) or realtime dataset (false) */
-    private bool $use_consolidated = false;
 
     public function __construct(RestApiClientInterface $client, string $url = '')
     {
@@ -208,89 +208,98 @@ class Client extends AbstractClient
     }
 
     /**
-     * Fetch carbon intensities from Opendata Réseaux-Énergies using export dataset.
+     * Fetch range from cached data or online database. Assume that $start is the beginning of a month (Y-m-1 00:00:00)
+     * and $stop is the beginning of the next month (Y-m+1-1 00:00:00).
      *
-     * See https://odre.opendatasoft.com/explore/dataset/eco2mix-national-tr/api/?disjunctive.nature
-     *
-     * The method fetches the intensities for the date range specified in argument.
      * @param DateTimeImmutable $start
      * @param DateTimeImmutable $stop
      * @param string $zone
+     * @param int $dataset
      * @return array
      */
-    public function fetchRange(DateTimeImmutable $start, DateTimeImmutable $stop, string $zone): array
+    public function fetchRange(DateTimeImmutable $start, DateTimeImmutable $stop, string $zone, int $dataset = self::DATASET_REALTIME): array
     {
         /** @var DBmysql $DB */
         global $DB;
 
-        $format = DateTime::ATOM;
-        $from = $start->format($format);
-        $to = $stop->format($format);
+        // Build realtime and consolidated paths
+        $base_path = GLPI_PLUGIN_DOC_DIR . '/carbon/carbon_intensity/' . $this->getSourceName() . '/' . $zone;
+        $consolidated_dir = $base_path . '/consolidated';
+        $realtime_dir = $base_path . '/realtime';
 
-        $timezone = $DB->guessTimezone();
-        $interval = $stop->diff($start);
-        $where = "date_heure IN [date'$from' TO date'$to'";
-        if ($interval->y === 0 && $interval->m === 0 && $interval->d === 0 && $interval->h === 1) {
-            $where .= ']';
-        } else {
-            $where .= '[';
-        }
-        $params = [
-            'select' => 'taux_co2,date_heure',
-            'where' => $where,
-            'order_by' => 'date_heure asc',
-            'timezone' => $timezone,
-        ];
-        // convert to 15 minutes interval
-        if ($this->use_consolidated) {
-            $this->step = 60;
-            $url = $this->base_url . self::EXPORT_URL_CONSOLIDATED;
-        } else {
-            $this->step = 15;
-            $url = $this->base_url . self::EXPORT_URL_REALTIME;
-        }
+        // Set timezone to +00:00 and extend range by 12 hours on each side
+        $request_start = $start->setTimezone(new DateTimeZone('+0000'))->sub(new DateInterval('PT12H'));
+        $request_stop = $stop->setTimezone(new DateTimeZone('+0000'))->add(new DateInterval('PT12H'));
+        $format = DateTime::ATOM;
+        $from = $request_start->format($format);
+        $to = $request_stop->format($format);
+        $interval = $request_stop->diff($request_start);
         $expected_samples_count = (int) ($interval->days * 24)
             + (int) ($interval->h)
             + (int) ($interval->i / 60);
+        $timezone = $DB->guessTimezone();
+        $where = "date_heure IN [date'$from' TO date'$to'[ AND taux_co2 is not null";
+        $params = [
+            'select' => 'date_heure,taux_co2',
+            'where' => $where,
+            'order_by' => 'date_heure asc',
+            'timezone' => $timezone
+        ];
 
-        $alt_response = [];
-        $response = $this->client->request('GET', $url, ['timeout' => 8, 'query' => $params]);
-        if ($response) {
-            // Adjust step as consolidated dataset may return data for each 15 minutes !
+        // Prepend base URL
+        switch ($dataset) {
+            case self::DATASET_CONSOLIDATED:
+                $url = self::EXPORT_URL_CONSOLIDATED;
+                $cache_file = $this->getCacheFilename(
+                    $consolidated_dir,
+                    $start,
+                    $stop
+                );
+                break;
+            case self::DATASET_REALTIME:
+            default:
+                $url = self::EXPORT_URL_REALTIME;
+                $cache_file = $this->getCacheFilename(
+                    $realtime_dir,
+                    $start,
+                    $stop
+                );
+                break;
+        }
+
+        // If cached file exists, use it
+        if (file_exists($cache_file)) {
+            $response = json_decode(file_get_contents($cache_file), true);
             $this->step = $this->detectStep($response);
-            $expected_samples_count *= (60 / $this->step);
+            return $response;
         }
+        @mkdir(dirname($cache_file), 0755, true);
 
-        // Tolerate DST switching issues with 15 minutes samples (4 missing samples or too many samples)
-        if (!$response || abs(count($response) - $expected_samples_count) > 4) {
-            // Retry with realtime dataset
-            if (!$this->use_consolidated) {
-                $this->use_consolidated = true;
-                $alt_response = $this->fetchRange($start, $stop, $zone);
-
-                if (!isset($alt_response['error_code']) && count($alt_response) > count($response)) {
-                    // Use the alternative response if more samples than the original response
-                    $response = $alt_response;
-                }
+        $url = $this->base_url . $url;
+        $response = $this->client->request('GET', $url, ['timeout' => 8, 'query' => $params]);
+        $this->step = $this->detectStep($response);
+        $expected_samples_count *= (60 / $this->step);
+        if (!$response || ($dataset === self::DATASET_REALTIME && abs(count($response) - $expected_samples_count) > 4)) {
+            $alt_response = $this->fetchRange($start, $stop, $zone, self::DATASET_CONSOLIDATED);
+            if (!isset($alt_response['error_code']) && count($alt_response) > count($response)) {
+                // Use the alternative response if more samples than the original response
+                $response = $alt_response;
             }
+        } else {
+            $json = json_encode($response);
+            file_put_contents($cache_file, $json);
         }
-
-        if (!$response) {
-            trigger_error('No response from RTE API for ' . $zone, E_USER_WARNING);
-            return [];
-        }
-        if (count($response) === 0) {
-            trigger_error('Empty response from RTE API for ' . $zone, E_USER_WARNING);
-            return [];
-        }
-        if (abs(count($response) - $expected_samples_count) > 4) {
-            trigger_error('Not enough samples from RTE API for ' . $zone . ' (expected: ' . $expected_samples_count . ', got: ' . count($response) . ')', E_USER_WARNING);
-        }
-        if (isset($response['error_code'])) {
-            trigger_error($this->formatError($response));
-        }
-
         return $response;
+    }
+
+    protected function getCacheFilename(string $base_dir, DateTimeImmutable $start, DateTimeImmutable $end): string
+    {
+        return sprintf(
+            '%s/%s_%s.json',
+            $base_dir,
+            $start->format('Y-m-d'),
+            $end->format('Y-m-d')
+        );
     }
 
     protected function formatOutput(array $response, int $step): array
@@ -309,11 +318,13 @@ class Client extends AbstractClient
         // Even if we use UTC timezone.
         $filtered_response = $this->deduplicate($response);
 
-        // Convert string dates into datetime objects, restoring timezone as type Continent/City instead of offset
+        // Convert string dates into datetime objects, shifting to local timezone
+        // and using timezone expressed as type Continent/City instead of offset
         // This is needed to detect later the switching to winter time
-        $timezone = new DateTimeZone($DB->guessTimezone());
+        $timezone = new DateTimeZone('+0000');
+        $local_timezone = new DateTimeZone($DB->guessTimezone());
         foreach ($filtered_response as &$record) {
-            $record['date_heure'] = DateTime::createFromFormat('Y-m-d\TH:i:s??????', $record['date_heure'], $timezone);
+            $record['date_heure'] = DateTime::createFromFormat('Y-m-d\TH:i:s??????', $record['date_heure'], $timezone)->setTimezone($local_timezone);
         }
 
         // Convert samples from 15 min to 1 hour
@@ -354,6 +365,12 @@ class Client extends AbstractClient
         return $filtered_response;
     }
 
+    /**
+     * Get the temporal distance between records
+     *
+     * @param array $records
+     * @return integer step in minutes
+     */
     protected function detectStep(array $records): ?int
     {
         if (count($records) < 2) {
@@ -366,9 +383,8 @@ class Client extends AbstractClient
 
         if ($diff->h === 1) {
             return 60; // 1 hour step
-        } else {
-            return $diff->i; // Return the minutes step
         }
+        return $diff->i; // Return the minutes step
     }
 
     /**
@@ -387,8 +403,11 @@ class Client extends AbstractClient
 
         foreach ($records as $record) {
             $date = $record['date_heure'];
-            $count++;
             $intensity += $record['taux_co2'];
+            if ($record['taux_co2'] === null) {
+                continue;
+            }
+            $count++;
             $minute = (int) $date->format('i');
 
             if ($previous_record_date !== null) {

@@ -51,7 +51,38 @@ class DbTestCase extends CommonTestCase
         global $DB;
 
         $DB->rollback();
+        if (!defined('TEST_PLUGIN_NAME')) {
+            throw new \RuntimeException('TEST_PLUGIN_NAME is not defined');
+        }
+        $this->recursiveRmDir(GLPI_PLUGIN_DOC_DIR . '/' . TEST_PLUGIN_NAME);
         parent::tearDown();
+    }
+
+    /**
+     * Recursively remove directory
+     * @see https://www.php.net/manual/en/function.rmdir.php#117354
+     *
+     * @param string $dir
+     * @return void
+     */
+    protected function recursiveRmDir(string $src)
+    {
+        if (!is_dir($src)) {
+            return;
+        }
+        $dir = opendir($src);
+        while (false !== ($file = readdir($dir))) {
+            if ($file != '.' && $file != '..') {
+                $full = $src . '/' . $file;
+                if (is_dir($full)) {
+                    $this->recursiveRmDir($full);
+                } else {
+                    unlink($full);
+                }
+            }
+        }
+        closedir($dir);
+        rmdir($src);
     }
 
     protected function DBVersionCheck()

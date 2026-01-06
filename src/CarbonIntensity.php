@@ -214,7 +214,7 @@ class CarbonIntensity extends CommonDropdown
      */
     public function downloadOneZone(ClientInterface $data_source, string $zone_name, int $limit = 0, ?ProgressBar $progress_bar = null): int
     {
-        $start_date = $this->getDownloadStartDate($zone_name, $data_source);
+        $start_date = $this->getDownloadStartDate();
 
         $total_count = 0;
 
@@ -280,11 +280,9 @@ class CarbonIntensity extends CommonDropdown
     /**
      * Get the oldest date where data are required
      *
-     * @param string                   $zone_name   ignored for now; zone to examine
-     * @param ClientInterface          $data_source ignored for now; data source
      * @return DateTimeImmutable|null
      */
-    public function getDownloadStartDate(string $zone_name, ClientInterface $data_source): ?DateTimeImmutable
+    public function getDownloadStartDate(): ?DateTimeImmutable
     {
         // Get the default oldest date od data to download
         $start_date = new DateTime(self::MIN_HISTORY_LENGTH);

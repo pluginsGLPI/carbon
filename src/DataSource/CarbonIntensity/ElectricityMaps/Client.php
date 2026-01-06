@@ -41,7 +41,6 @@ use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\Source_Zone;
-use Config as GlpiConfig;
 use GLPIKey;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\AbortException;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\AbstractClient;
@@ -264,16 +263,45 @@ class Client extends AbstractClient
 
     public function fetchRange(DateTimeImmutable $start, DateTimeImmutable $stop, string $zone): array
     {
-
         // TODO: get zones from GLPI locations
         $params = [
             'zone' => $zone,
         ];
 
+        $base_path = GLPI_PLUGIN_DOC_DIR . '/carbon/carbon_intensity/' . $this->getSourceName() . '/' . $zone;
+        $cache_file = $this->getCacheFilename(
+            $base_path,
+            $start,
+            $stop
+        );
+        // If cached file exists, use it
+        if (file_exists($cache_file)) {
+            $full_response = json_decode(file_get_contents($cache_file), true);
+            return $full_response;
+        }
+        @mkdir(dirname($cache_file), 0755, true);
+
+        // Set timezone to +00:00 and extend range by 12 hours on each side
+        $request_start = $start->setTimezone(new DateTimeZone('+0000'))->sub(new DateInterval('PT12H'));
+        $request_stop = $stop->setTimezone(new DateTimeZone('+0000'))->add(new DateInterval('PT12H'));
         $this->step = 60;
 
-        $response = $this->client->request('GET', $this->base_url . self::PAST_URL, ['query' => $params]);
-        if (!$response) {
+        $step = new DateInterval('P10D');
+        $full_response = [];
+        $current_date = DateTime::createFromImmutable($request_start);
+        while ($current_date < $request_stop) {
+            $response = $this->client->request('GET', $this->base_url . self::PAST_URL, ['query' => $params]);
+            if (!$full_response) {
+                $full_response = $response;
+            } else {
+                $full_response['data'] = array_merge($full_response['data'], $response['data']);
+            }
+            $current_date->add($step);
+            if ($current_date > $request_stop) {
+                $current_date = $request_stop;
+            }
+        }
+        if (!$full_response) {
             return [];
         }
 
@@ -286,7 +314,9 @@ class Client extends AbstractClient
             return [];
         }
 
-        return $$response['history'];
+        $json = json_encode($full_response);
+        file_put_contents($cache_file, $json);
+        return $full_response['data'];
     }
 
     protected function formatOutput(array $response, int $step): array
@@ -368,5 +398,15 @@ class Client extends AbstractClient
             $current_date->add(new DateInterval('P1D'));
             $current_date->setTime(0, 0, 0);
         }
+    }
+
+    protected function getCacheFilename(string $base_dir, DateTimeImmutable $start, DateTimeImmutable $end): string
+    {
+        return sprintf(
+            '%s/%s_%s.json',
+            $base_dir,
+            $start->format('Y-m-d'),
+            $end->format('Y-m-d')
+        );
     }
 }
