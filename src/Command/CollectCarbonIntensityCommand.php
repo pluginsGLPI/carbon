@@ -46,6 +46,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
@@ -68,6 +69,7 @@ class CollectCarbonIntensityCommand extends AbstractCommand
            ->setDescription(__('Read carbon dioxyde intensity from external sources', 'carbon'))
            ->addArgument('source', InputArgument::REQUIRED, '')
            ->addArgument('zone', InputArgument::REQUIRED, '')
+           ->addOption('cache', null, InputOption::VALUE_NEGATABLE, 'Use cache. Cache is not read is disabled, but still fed by requests.')
            ;
     }
 
@@ -136,6 +138,7 @@ class CollectCarbonIntensityCommand extends AbstractCommand
         $this->source_id = $data_source->getID();
 
         $zone_code = $input->getArgument('zone');
+        $use_cache = $input->getOption('cache');
         $zone = new Zone();
         $zone->getFromDBByCrit(['name' => $this->zones[$zone_code]]);
         $carbon_intensity = new CarbonIntensity();
@@ -164,6 +167,9 @@ class CollectCarbonIntensityCommand extends AbstractCommand
         // May be created when asking some questions
         if ($this->client === null) {
             $this->client = ClientFactory::createByName($source_name);
+        }
+        if ($use_cache === false) {
+            $this->client->disableCache();
         }
 
         $carbon_intensity->downloadOneZone($this->client, $this->zones[$zone_code], 0, new ProgressBar($this->output));

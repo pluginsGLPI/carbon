@@ -138,11 +138,9 @@ class ClientTest extends DbTestCase
         // $instance->method('fetchDay')->willReturn(['FR' => []]);
         $client = $this->createStub(RestApiClientInterface::class);
         $client->method('request')->willReturn([
-            'results' => [
-                [
-                    'taux_co2'   => 1,
-                    'date_heure' => '2024-10-08T18:00:00+00:00'
-                ]
+            [
+                'taux_co2'   => 1,
+                'date_heure' => '2024-10-08T18:00:00+00:00'
             ],
         ]);
         $instance = new Client($client);

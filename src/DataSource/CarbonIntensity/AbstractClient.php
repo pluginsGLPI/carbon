@@ -48,6 +48,8 @@ abstract class AbstractClient implements ClientInterface
 {
     protected int $step;
 
+    protected bool $use_cache = true;
+
     abstract public function getSourceName(): string;
 
     abstract public function getDataInterval(): string;
@@ -76,6 +78,11 @@ abstract class AbstractClient implements ClientInterface
      * @throws AbortException if an error requires to stop all subsequent fetches
      */
     abstract public function fetchRange(DateTimeImmutable $start, DateTimeImmutable $stop, string $zone): array;
+
+    public function disableCache()
+    {
+        $this->use_cache = false;
+    }
 
     /**
      * Key of the configuration value that indicates if the full download is complete
@@ -229,6 +236,9 @@ abstract class AbstractClient implements ClientInterface
             } catch (AbortException $e) {
                 throw $e;
             }
+            if (!isset($data[$zone])) {
+                continue;
+            }
             $saved = $intensity->save($zone, $this->getSourceName(), $data[$zone]);
             $count += abs($saved);
             if ($limit > 0 && $count >= $limit) {
@@ -296,10 +306,9 @@ abstract class AbstractClient implements ClientInterface
      */
     protected function sliceDateRangeByDay(DateTimeImmutable $start, DateTimeImmutable $stop)
     {
-        $real_start = $start;
         $real_stop = $stop->setTime((int) $stop->format('H'), 0, 0);
 
-        $current_date = DateTime::createFromImmutable($real_start);
+        $current_date = DateTime::createFromImmutable($start);
         while ($current_date <= $real_stop) {
             yield DateTimeImmutable::createFromMutable($current_date);
             $current_date->add(new DateInterval('P1D'));

@@ -213,6 +213,11 @@ function plugin_carbon_check_prerequisites()
         $prerequisitesSuccess = false;
     }
 
+    if ($DB->use_timezones !== true) {
+        echo "Enable timezones support<br>";
+        $prerequisitesSuccess = false;
+    }
+
     if (getenv('CI') === false) {
         // only when not under test
         $version_string = $DB->getVersion();
