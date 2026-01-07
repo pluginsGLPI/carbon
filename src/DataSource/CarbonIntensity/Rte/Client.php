@@ -52,6 +52,12 @@ use GlpiPlugin\Carbon\Toolbox;
  *
  * API documentation
  * @see https://help.opendatasoft.com/apis/ods-explore-v2/explore_v2.1.html
+ *
+ * About DST for this data source
+ * GLPI must be set up with timezones enabled, set to the same timezone as the host system
+ *
+ * If this requirement is not met, then dates here DST change occurs will cause problems
+ * Searching for gaps will find gaps that the algorithm will try to fill, but fail.
  */
 class Client extends AbstractClient
 {
@@ -157,25 +163,22 @@ class Client extends AbstractClient
         /** @var DBmysql $DB */
         global $DB;
 
-        $start = DateTime::createFromImmutable($day);
-        $stop = clone $start;
-        $stop->setTime(23, 59, 59);
+        $stop = $day->add(new DateInterval('P1D'));
 
         $format = DateTime::ATOM;
         $timezone = $DB->guessTimezone();
-        $from = $start->format($format);
+        $from = $day->format($format);
         $to = $stop->format($format);
 
         $params = [
-            'select' => 'taux_co2,date_heure',
-            'where' => "date_heure IN [date'$from' TO date'$to']",
+            'select' => 'date_heure,taux_co2',
+            'where' => "date_heure IN [date'$from' TO date'$to'[ AND taux_co2 is not null",
             'order_by' => 'date_heure asc',
-            'limit' => 4 * 24, // 4 samples per hour = 4 * 24 hours
-            'offset' => 0,
             'timezone' => $timezone,
         ];
 
-        $response = $this->client->request('GET', $this->base_url . self::RECORDS_URL, ['timeout' => 8, 'query' => $params]);
+        $url = $this->base_url . self::EXPORT_URL_REALTIME;
+        $response = $this->client->request('GET', $url, ['timeout' => 8, 'query' => $params]);
         if (!$response) {
             return [];
         }
@@ -185,26 +188,26 @@ class Client extends AbstractClient
         }
 
         // Drop data with no carbon intensity (may be returned by the provider)
-        $response['results'] = array_filter($response['results'], function ($item) {
+        $response = array_filter($response, function ($item) {
             return $item['taux_co2'] != 0;
         });
 
         // Drop last rows until we reach
         $safety_count = 0;
-        while (($last_item = end($response['results'])) !== false) {
+        while (($last_item = end($response)) !== false) {
             $time = DateTime::createFromFormat(DateTimeInterface::ATOM, $last_item['date_heure']);
             if ($time->format('i') === '45') {
                 // We expect 15 minutes steps
                 break;
             }
-            array_pop($response['results']);
+            array_pop($response);
             $safety_count++;
             if ($safety_count > 3) {
                 break;
             }
         }
 
-        return $this->formatOutput($response['results'], 15);
+        return $this->formatOutput($response, 15);
     }
 
     /**
@@ -227,9 +230,9 @@ class Client extends AbstractClient
         $consolidated_dir = $base_path . '/consolidated';
         $realtime_dir = $base_path . '/realtime';
 
-        // Set timezone to +00:00 and extend range by 12 hours on each side
+        // Set timezone to +00:00 and extend range by -12/+14 hours
         $request_start = $start->setTimezone(new DateTimeZone('+0000'))->sub(new DateInterval('PT12H'));
-        $request_stop = $stop->setTimezone(new DateTimeZone('+0000'))->add(new DateInterval('PT12H'));
+        $request_stop = $stop->setTimezone(new DateTimeZone('+0000'))->add(new DateInterval('PT14H'));
         $format = DateTime::ATOM;
         $from = $request_start->format($format);
         $to = $request_stop->format($format);
@@ -237,16 +240,8 @@ class Client extends AbstractClient
         $expected_samples_count = (int) ($interval->days * 24)
             + (int) ($interval->h)
             + (int) ($interval->i / 60);
-        $timezone = $DB->guessTimezone();
-        $where = "date_heure IN [date'$from' TO date'$to'[ AND taux_co2 is not null";
-        $params = [
-            'select' => 'date_heure,taux_co2',
-            'where' => $where,
-            'order_by' => 'date_heure asc',
-            'timezone' => $timezone
-        ];
 
-        // Prepend base URL
+        // Choose URL
         switch ($dataset) {
             case self::DATASET_CONSOLIDATED:
                 $url = self::EXPORT_URL_CONSOLIDATED;
@@ -266,28 +261,40 @@ class Client extends AbstractClient
                 );
                 break;
         }
+        $url = $this->base_url . $url;
 
-        // If cached file exists, use it
-        if (file_exists($cache_file)) {
+        // If a cached file exists, use it
+        if ($this->use_cache && file_exists($cache_file)) {
             $response = json_decode(file_get_contents($cache_file), true);
             $this->step = $this->detectStep($response);
             return $response;
         }
         @mkdir(dirname($cache_file), 0755, true);
 
-        $url = $this->base_url . $url;
+        // Prepare the HTTP request
+        $timezone = $DB->guessTimezone();
+        $where = "date_heure IN [date'$from' TO date'$to'[ AND taux_co2 is not null";
+        $params = [
+            'select' => 'date_heure,taux_co2',
+            'where' => $where,
+            'order_by' => 'date_heure asc',
+            'timezone' => $timezone
+        ];
         $response = $this->client->request('GET', $url, ['timeout' => 8, 'query' => $params]);
         $this->step = $this->detectStep($response);
         $expected_samples_count *= (60 / $this->step);
-        if (!$response || ($dataset === self::DATASET_REALTIME && abs(count($response) - $expected_samples_count) > 4)) {
+        if (($dataset === self::DATASET_REALTIME && abs(count($response) - $expected_samples_count) > 4)) {
             $alt_response = $this->fetchRange($start, $stop, $zone, self::DATASET_CONSOLIDATED);
             if (!isset($alt_response['error_code']) && count($alt_response) > count($response)) {
                 // Use the alternative response if more samples than the original response
                 $response = $alt_response;
             }
         } else {
-            $json = json_encode($response);
-            file_put_contents($cache_file, $json);
+            if (count($response) > 0 && $stop->format('Y-m') < date('Y-m')) {
+                // Cache only if the month being processed is older than the month of now
+                $json = json_encode($response);
+                file_put_contents($cache_file, $json);
+            }
         }
         return $response;
     }
@@ -318,16 +325,15 @@ class Client extends AbstractClient
         // Even if we use UTC timezone.
         $filtered_response = $this->deduplicate($response);
 
-        // Convert string dates into datetime objects, shifting to local timezone
-        // and using timezone expressed as type Continent/City instead of offset
+        // Convert string dates into datetime objects,
+        // using timezone expressed as type Continent/City instead of offset
         // This is needed to detect later the switching to winter time
-        $timezone = new DateTimeZone('+0000');
         $local_timezone = new DateTimeZone($DB->guessTimezone());
-        foreach ($filtered_response as &$record) {
-            $record['date_heure'] = DateTime::createFromFormat('Y-m-d\TH:i:s??????', $record['date_heure'], $timezone)->setTimezone($local_timezone);
-        }
+        array_walk($filtered_response, function (&$item, $key) use ($local_timezone) {
+            $item['date_heure'] = DateTime::createFromFormat('Y-m-d\TH:i:sP', $item['date_heure'])->setTimezone($local_timezone);
+        });
 
-        // Convert samples from 15 min to 1 hour
+        // Convert samples from to 1 hour
         if ($this->step < 60) {
             $intensities = $this->convertToHourly($filtered_response, $this->step);
         } else {
@@ -414,8 +420,7 @@ class Client extends AbstractClient
                 // Ensure that current date is $step minutes ahead than previous record date
                 $diff = $date->getTimestamp() - $previous_record_date->getTimestamp();
                 if ($diff !== $step * 60) {
-                    if ($diff == 4500 && $this->switchToWinterTime($previous_record_date, $date)) {
-                        // 4500 = 1h + 15m
+                    if ($this->switchToWinterTime(clone $previous_record_date, clone $date)) {
                         $filled_date = DateTime::createFromFormat('Y-m-d\TH:i:s', end($intensities)['datetime']);
                         $filled_date->add(new DateInterval('PT1H'));
                         $intensities[] = [
@@ -433,6 +438,7 @@ class Client extends AbstractClient
             }
 
             if ($minute === (60 - $step)) {
+                // Finalizing an average of accumulated samples
                 $intensities[] = [
                     'datetime' => $date->format('Y-m-d\TH:00:00'),
                     'intensity' => (float) $intensity / $count,
@@ -449,12 +455,15 @@ class Client extends AbstractClient
     }
 
     /**
-     * Detect if the given datetime matches a switching ot winter time (DST)
+     * Detect if the given datetime matches a switching ot winter time (DST) for France
      *
      * @return bool
      */
     private function switchToWinterTime(DateTime $previous, DateTime $date): bool
     {
+        $timezone_paris = new DateTimeZone('Europe/Paris');
+        $previous->setTimezone($timezone_paris);
+        $date->setTimezone($timezone_paris);
         $first_dst = $previous->format('I');
         $second_dst = $date->format('I');
         return $first_dst === '1' && $second_dst === '0';
