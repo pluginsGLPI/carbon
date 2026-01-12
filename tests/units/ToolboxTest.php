@@ -36,6 +36,9 @@ use Computer;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
+use GlpiPlugin\Carbon\CarbonIntensity;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\Toolbox;
@@ -257,5 +260,160 @@ class ToolboxTest extends DbTestCase
         $interval = new DateInterval('P3YT40M');
         $result = Toolbox::dateIntervalToMySQLInterval($interval);
         $this->assertEquals('INTERVAL 3 YEAR + INTERVAL 40 MINUTE', $result);
+    }
+
+
+    /**
+     * Undocumented function
+     *
+     * @return void
+     */
+    public function testFindTemporalGapsInTable()
+    {
+        $table = getTableForItemType(CarbonIntensity::class);
+        $source = $this->createItem(Source::class);
+        $zone   = $this->createItem(Zone::class);
+        $criterias = [
+            getForeignKeyFieldForItemType(Source::class) => $source->getID(),
+            getForeignKeyFieldForItemType(Zone::class)   => $zone->getID(),
+        ];
+        $source_zone = $this->createItem(Source_Zone::class, $criterias);
+
+        // Test when no record exists in the requested interval
+        $result = Toolbox::findTemporalGapsInTable(
+            $table,
+            new DateTime('2020-01-01 00:00:00'),
+            new DateInterval('PT1H'),
+            new DateTime('2020-06-01 00:00:00'),
+            $criterias
+        );
+        $result = iterator_to_array($result);
+        $expected = [
+            [
+                'start' => '2020-01-01 00:00:00',
+                'end'  =>  '2020-06-01 00:00:00'
+            ]
+        ];
+        $this->assertEquals($expected, $result);
+
+        // Test when there is a record matching the beginning of the interval,
+        // but none matching the end
+        $this->createItem(CarbonIntensity::class, [
+            'date' => '2020-01-01 00:00:00'
+        ] + $criterias);
+        $result = Toolbox::findTemporalGapsInTable(
+            $table,
+            new DateTime('2020-01-01 00:00:00'),
+            new DateInterval('PT1H'),
+            new DateTime('2020-06-01 00:00:00'),
+            $criterias
+        );
+        $result = iterator_to_array($result);
+        $expected = [
+            [
+                'start' => '2020-01-01 01:00:00',
+                'end'  =>  '2020-06-01 00:00:00'
+            ]
+        ];
+        $this->assertEquals($expected, $result);
+
+        // Test when there is a record matching the end of the interval,
+        // but none matching the beginning
+        $result = Toolbox::findTemporalGapsInTable(
+            $table,
+            new DateTime('2019-01-01 00:00:00'),
+            new DateInterval('PT1H'),
+            new DateTime('2020-01-01 00:00:00'),
+            $criterias
+        );
+        $result = iterator_to_array($result);
+        $expected = [
+            [
+                'start' => '2019-01-01 00:00:00',
+                'end'  =>  '2020-01-01 00:00:00'
+            ]
+        ];
+        $this->assertEquals($expected, $result);
+
+        // Test when there is a record in the requesterd interval
+        $result = Toolbox::findTemporalGapsInTable(
+            $table,
+            new DateTime('2019-01-01 00:00:00'),
+            new DateInterval('PT1H'),
+            new DateTime('2021-01-01 00:00:00'),
+            $criterias
+        );
+        $result = iterator_to_array($result);
+        $expected = [
+            [
+                'start' => '2019-01-01 00:00:00',
+                'end'  =>  '2020-01-01 00:00:00'
+            ],
+            [
+                'start' => '2020-01-01 01:00:00',
+                'end'  =>  '2021-01-01 00:00:00'
+            ],
+        ];
+        $this->assertEquals($expected, $result);
+
+        // Test when there is are 2 non consecutive records in the requesterd interval
+        $this->createItem(CarbonIntensity::class, [
+            'date' => '2020-06-01 00:00:00'
+        ] + $criterias);
+        $result = Toolbox::findTemporalGapsInTable(
+            $table,
+            new DateTime('2019-01-01 00:00:00'),
+            new DateInterval('PT1H'),
+            new DateTime('2021-01-01 00:00:00'),
+            $criterias
+        );
+        $result = iterator_to_array($result);
+        $expected = [
+            [
+                'start' => '2019-01-01 00:00:00',
+                'end'  =>  '2020-01-01 00:00:00'
+            ],
+            [
+                'start' => '2020-01-01 01:00:00',
+                'end'  =>  '2020-06-01 00:00:00'
+            ],
+            [
+                'start' => '2020-06-01 01:00:00',
+                'end'  =>  '2021-01-01 00:00:00'
+            ],
+        ];
+        $this->assertEquals($expected, $result);
+
+        // Test when there is are 2 consecutive records
+        // in 2 separated groups in the requesterd interval
+        $this->createItem(CarbonIntensity::class, [
+            'date' => '2020-01-01 01:00:00'
+        ] + $criterias);
+        $this->createItem(CarbonIntensity::class, [
+            'date' => '2020-06-01 01:00:00'
+        ] + $criterias);
+        $result = Toolbox::findTemporalGapsInTable(
+            $table,
+            new DateTime('2019-01-01 00:00:00'),
+            new DateInterval('PT1H'),
+            new DateTime('2021-01-01 00:00:00'),
+            $criterias
+        );
+        $result = iterator_to_array($result);
+        $expected = [
+            [
+                'start' => '2019-01-01 00:00:00',
+                'end'  =>  '2020-01-01 00:00:00'
+            ],
+            [
+                'start' => '2020-01-01 02:00:00',
+                'end'  =>  '2020-06-01 00:00:00'
+            ],
+            [
+                'start' => '2020-06-01 02:00:00',
+                'end'  =>  '2021-01-01 00:00:00'
+            ],
+        ];
+        $this->assertEquals($expected, $result);
     }
 }

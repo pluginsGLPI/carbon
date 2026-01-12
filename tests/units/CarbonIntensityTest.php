@@ -173,8 +173,9 @@ class CarbonIntensityTest extends DbTestCase
         }
 
         $carbon_intensity = new CarbonIntensity();
-        $output = $carbon_intensity->findGaps($source->getID(), $zone->getID(), $start_date, $end_date);
-        $this->assertEquals([], $output);
+        $result = $carbon_intensity->findGaps($source->getID(), $zone->getID(), $start_date, $end_date);
+        $result = iterator_to_array($result);
+        $this->assertEquals([], $result);
 
         // delete some samples at the beginning
         $delete_before_date = new DateTime('2024-01-03 12:00:00');
@@ -184,13 +185,14 @@ class CarbonIntensityTest extends DbTestCase
             'date' => ['<', $delete_before_date->format('Y-m-d H:i:s')],
         ]);
 
-        $output = $carbon_intensity->findGaps($source->getID(), $zone->getID(), $start_date, $end_date);
+        $result = $carbon_intensity->findGaps($source->getID(), $zone->getID(), $start_date, $end_date);
+        $result = iterator_to_array($result);
         $this->assertEquals([
             [
                 'start' => $start_date->format('Y-m-d H:i:s'),
                 'end' => $delete_before_date->format('Y-m-d H:i:s'),
             ],
-        ], $output);
+        ], $result);
 
         // delete some samples at the end
         $delete_after_date = new DateTime('2024-02-17 09:00:00');
@@ -199,7 +201,8 @@ class CarbonIntensityTest extends DbTestCase
             'plugin_carbon_zones_id' => $zone->getID(),
             'date' => ['>=', $delete_after_date->format('Y-m-d H:i:s')],
         ]);
-        $output = $carbon_intensity->findGaps($source->getID(), $zone->getID(), $start_date, $end_date);
+        $result = $carbon_intensity->findGaps($source->getID(), $zone->getID(), $start_date, $end_date);
+        $result = iterator_to_array($result);
         $this->assertEquals([
             [
                 'start' => $start_date->format('Y-m-d H:i:s'),
@@ -209,7 +212,7 @@ class CarbonIntensityTest extends DbTestCase
                 'start' => $delete_after_date->format('Y-m-d H:i:s'),
                 'end' => $end_date->format('Y-m-d H:i:s'),
             ],
-        ], $output);
+        ], $result);
 
         // delete some samples in the middle
         $delete_middle_start_date = new DateTime('2024-01-29 06:00:00');
@@ -222,7 +225,8 @@ class CarbonIntensityTest extends DbTestCase
                 ['date' => ['<', $delete_middle_end_date->format('Y-m-d H:i:s')]],
             ]
         ]);
-        $output = $carbon_intensity->findGaps($source->getID(), $zone->getID(), $start_date, $end_date);
+        $result = $carbon_intensity->findGaps($source->getID(), $zone->getID(), $start_date, $end_date);
+        $result = iterator_to_array($result);
         $this->assertEquals([
             [
                 'start' => $start_date->format('Y-m-d H:i:s'),
@@ -236,7 +240,7 @@ class CarbonIntensityTest extends DbTestCase
                 'start' => $delete_after_date->format('Y-m-d H:i:s'),
                 'end' => $end_date->format('Y-m-d H:i:s'),
             ],
-        ], $output);
+        ], $result);
 
         // restore the deleted samples at the beginning
         $cursor_date = clone $start_date;
@@ -250,7 +254,8 @@ class CarbonIntensityTest extends DbTestCase
             $cursor_date->modify('+1 hour');
         }
 
-        $output = $carbon_intensity->findGaps($source->getID(), $zone->getID(), $start_date, $end_date);
+        $result = $carbon_intensity->findGaps($source->getID(), $zone->getID(), $start_date, $end_date);
+        $result = iterator_to_array($result);
         $this->assertEquals([
             [
                 'start' => $delete_middle_start_date->format('Y-m-d H:i:s'),
@@ -260,7 +265,7 @@ class CarbonIntensityTest extends DbTestCase
                 'start' => $delete_after_date->format('Y-m-d H:i:s'),
                 'end' => $end_date->format('Y-m-d H:i:s'),
             ],
-        ], $output);
+        ], $result);
 
         // restore the deleted samples at the middle
         $cursor_date = clone $delete_middle_start_date;
@@ -274,13 +279,14 @@ class CarbonIntensityTest extends DbTestCase
             $cursor_date->modify('+1 hour');
         }
 
-        $output = $carbon_intensity->findGaps($source->getID(), $zone->getID(), $start_date, $end_date);
+        $result = $carbon_intensity->findGaps($source->getID(), $zone->getID(), $start_date, $end_date);
+        $result = iterator_to_array($result);
         $this->assertEquals([
             [
                 'start' => $delete_after_date->format('Y-m-d H:i:s'),
                 'end' => $end_date->format('Y-m-d H:i:s'),
             ],
-        ], $output);
+        ], $result);
     }
 
     public function testGetDownloadStartDate()

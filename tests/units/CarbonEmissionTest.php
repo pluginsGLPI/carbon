@@ -84,7 +84,8 @@ class CarbonEmissionTest extends DbTestCase
 
         $start_date = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $start_date);
         $stop_date =  DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $stop_date);
-        $gaps = $instance->findGaps($itemtype, $asset->getID(), $start_date, $stop_date);
+        $result = $instance->findGaps($itemtype, $asset->getID(), $start_date, $stop_date);
+        $result = iterator_to_array($result);
         $expected = [
             [
                 'start' => '2019-01-01 00:00:00',
@@ -95,7 +96,7 @@ class CarbonEmissionTest extends DbTestCase
                 'end'   => '2023-12-31 00:00:00',
             ],
         ];
-        $this->assertEquals($expected, $gaps);
+        $this->assertEquals($expected, $result);
 
         // Create a gap
         $gap_start = '2020-04-05 00:00:00';
@@ -106,7 +107,8 @@ class CarbonEmissionTest extends DbTestCase
             ['date' => ['<=', $gap_end]],
         ]);
 
-        $gaps = $instance->findGaps($itemtype, $asset->getID(), $start_date, $stop_date);
+        $result = $instance->findGaps($itemtype, $asset->getID(), $start_date, $stop_date);
+        $result = iterator_to_array($result);
         $expected = [
             [
                 'start' => '2019-01-01 00:00:00',
@@ -121,7 +123,7 @@ class CarbonEmissionTest extends DbTestCase
                 'end'   => '2023-12-31 00:00:00',
             ],
         ];
-        $this->assertEquals($expected, $gaps);
+        $this->assertEquals($expected, $result);
 
         // Create an other gap
         $gap_start_2 = '2020-06-20 00:00:00';
@@ -131,7 +133,8 @@ class CarbonEmissionTest extends DbTestCase
             ['date' => ['>=', $gap_start_2]],
             ['date' => ['<=', $gap_end_2]],
         ]);
-        $gaps = $instance->findGaps($itemtype, $asset->getID(), $start_date, $stop_date);
+        $result = $instance->findGaps($itemtype, $asset->getID(), $start_date, $stop_date);
+        $result = iterator_to_array($result);
         $expected = [
             [
                 'start' => '2019-01-01 00:00:00',
@@ -150,6 +153,6 @@ class CarbonEmissionTest extends DbTestCase
                 'end'   => '2023-12-31 00:00:00',
             ],
         ];
-        $this->assertEquals($expected, $gaps);
+        $this->assertEquals($expected, $result);
     }
 }
