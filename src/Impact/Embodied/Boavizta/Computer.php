@@ -195,7 +195,7 @@ class Computer extends AbstractAsset
                         );
                         if ($device_hard_drive_type !== false && $device_hard_drive_type->fields['name'] === 'removable') {
                             // Ignore removable storage (USB sticks, ...)
-                            continue;
+                            break;
                         }
                         $interface_type = new InterfaceType();
                         $interface_type->getFromDB($device_hard_drive->fields['interfacetypes_id']);
