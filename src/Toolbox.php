@@ -37,11 +37,13 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DBmysql;
+use DBmysqlIterator;
 use Glpi\Dashboard\Dashboard as GlpiDashboard;
 use Infocom;
 use Location;
 use Glpi\DBAL\QueryExpression;
 use Glpi\DBAL\QuerySubQuery;
+use Glpi\DBAL\QueryUnion;
 use Mexitek\PHPColors\Color;
 
 class Toolbox
@@ -460,17 +462,17 @@ class Toolbox
     /**
      * Gets date intervals where data are missing in a table
      * To use with Mysql 8.0+ or MariaDB 10.2+
+     * Gaps are expressed as intervals like [X; Y[
+     * X is the 1st missing row, and Y is the first existing row which ends the gap
      *
-     * @see https://bertwagner.com/posts/gaps-and-islands/
-     *
-     * @param string                 $table    Table to search for gaps
-     * @param DateTimeInterface      $start    Start date to search
-     * @param DateInterval           $interval Interval between each data sample (do not use intervals in months or years)
-     * @param DateTimeInterface|null $stop     Stop date to search
-     * @param array                  $criteria Criterias for the SQL query
-     * @return array                           list of gaps
+     * @param  string                 $table    Table to search for gaps
+     * @param  DateTimeInterface      $start    Start date to search
+     * @param  DateInterval           $interval Interval between each data sample (do not use intervals in months or years)
+     * @param  DateTimeInterface|null $stop     Stop date to search
+     * @param  array                  $criteria Criterias for the SQL query
+     * @return DBmysqlIterator                  list of gaps
      */
-    public static function findTemporalGapsInTable(string $table, DateTimeInterface $start, DateInterval $interval, ?DateTimeInterface $stop = null, array $criteria = [])
+    public static function findTemporalGapsInTable(string $table, DateTimeInterface $start, DateInterval $interval, ?DateTimeInterface $stop = null, array $criteria = []): DBmysqlIterator
     {
         /** @var DBmysql $DB */
         global $DB;
@@ -478,98 +480,88 @@ class Toolbox
         if ($interval->m !== 0 || $interval->y !== 0) {
             throw new \InvalidArgumentException('Interval must be in days, hours, minutes or seconds');
         }
-        // $interval_in_seconds = $interval->s + $interval->i * 60 + $interval->h * 3600 + $interval->d * 86400;
-        $sql_interval = self::dateIntervalToMySQLInterval($interval);
-
-        // Get start date as unix timestamp
-        $boundaries[] = new QueryExpression('`date` >= "' . $start->format('Y-m-d H:i:s') . '"');
-
-        // get stop date as unix timestamp
         if ($stop === null) {
             // Assume stop date is yesterday at midnight
-            $stop = new DateTime();
-            $stop->setTime(0, 0, 0);
-            $stop->sub(new DateInterval('P1D'));
+            $stop = new DateTime('yesterday midnight');
         }
-        $boundaries[] = new QueryExpression('`date` <= "' . $stop->format('Y-m-d H:i:s') . '"');
+        $sql_interval = self::dateIntervalToMySQLInterval($interval);
 
-        // prepare sub query to get start and end date of an atomic date range
-        // An atomic date range is set to 1 hour
-        // To reduce problems with DST, we use the unix timestamp of the date
-        $atomic_ranges_subquery = new QuerySubQuery([
+        $start_string = $start->format('Y-m-d H:i:s');
+        $stop_string  = $stop->format('Y-m-d H:i:s');
+        // Get start date as unix timestamp
+        $boundaries[] = new QueryExpression('`date` >= "' . $start_string . '"');
+        $boundaries[] = new QueryExpression('`date` < "' . $stop_string . '"');
+
+        $common_criterias = array_merge($boundaries, $criteria);
+
+        $records_query = new QuerySubQuery([
             'SELECT' => [
-                new QueryExpression('`date` as `start_date`'),
-                new QueryExpression("DATE_ADD(`date`, $sql_interval) as `end_date`"),
+                'date',
+                new QueryExpression('LAG(`date`) OVER (ORDER BY `date`) AS `prev_date`')
             ],
-            'FROM'   => $table,
-            'WHERE'  => $criteria + $boundaries,
-        ], 'atomic_ranges');
+            'FROM' => $table,
+            'WHERE' => $common_criterias,
+        ], 'records');
 
-        // For each atomic date range, find the end date of previous atomic date range
-        $groups_subquery = new QuerySubQuery([
-            'SELECT' => [
-                new QueryExpression('ROW_NUMBER() OVER (ORDER BY `start_date`, `end_date`) AS `row_number`'),
-                'start_date',
-                'end_date',
-                new QueryExpression('LAG(`end_date`, 1) OVER (ORDER BY `start_date`, `end_date`) AS `previous_end_date`')
+        $request = new QueryUnion([
+            // Internal gaps (between existing records in the requred interval)
+            [
+                'SELECT' => [
+                    new QueryExpression('`prev_date` + ' . $sql_interval . ' AS `start`'),
+                    'date AS `end`'
+                ],
+                'FROM' => $records_query,
+                'WHERE' => array_merge($boundaries, [
+                    'NOT'  => ['prev_date' => null],
+                    // new QueryExpression('TIMESTAMPDIFF(SECOND, `records`.`prev_date`, `records`.`date`) > ' . $interval_in_seconds)
+                    new QueryExpression('DATE_ADD(`records`.`prev_date`, ' . $sql_interval . ') < `date`')
+                ]),
             ],
-            'FROM' => $atomic_ranges_subquery
-        ], 'groups');
 
-        // For each atomic date range, find if it is the start of an island
-        $islands_subquery = new QuerySubQuery([
-            'SELECT' => [
-                '*',
-                new QueryExpression('SUM(CASE WHEN `groups`.`previous_end_date` >= `start_date` THEN 0 ELSE 1 END) OVER (ORDER BY `groups`.`row_number`) AS `ìsland_id`')
+            // Gap before the beginning of the serie
+            [
+                'SELECT' => [
+                    new queryExpression('\'' . $start_string . '\' AS start'),
+                    new queryExpression('MIN(`date`) AS `end`')
+                ],
+                'FROM'  => $table,
+                'WHERE' => $common_criterias,
+                'HAVING' => [
+                    new QueryExpression("'" . $start_string . "' < MIN(`date`)")
+                ],
             ],
-            'FROM' => $groups_subquery
-        ], 'islands');
 
-        $request = [
-            'SELECT' => [
-                'MIN' => 'start_date as island_start_date',
-                'MAX' => 'end_date as island_end_date',
+            // Gap after the end of the serie
+            [
+                'SELECT' => [
+                    new queryExpression('MAX(`date`) + ' . $sql_interval . ' AS `start`'),
+                    new queryExpression('\'' . $stop_string . '\' AS `end`'),
+                ],
+                'FROM' => $table,
+                'WHERE' => $common_criterias,
+                'HAVING' => [
+                    new QueryExpression("DATE_SUB('" . $stop_string . "', " . $sql_interval . ") > MAX(`date`)")
+                ],
             ],
-            'FROM' => $islands_subquery,
-            'GROUPBY' => ['ìsland_id'],
-            'ORDER' => ['island_start_date']
-        ];
 
-        $result = $DB->request($request);
-        if ($result->count() === 0) {
-            // No island at all, the whole range is a gap
-            return [
-                [
-                    'start' => $start->format('Y-m-d H:i:s'),
-                    'end'   => $stop->format('Y-m-d H:i:s'),
-                ]
-            ];
-        }
+            // No record between the boundaries
+            [
+                'SELECT' => [
+                    new QueryExpression('\'' . $start_string . '\' AS `start`'),
+                    new QueryExpression('\'' . $stop_string  . '\' AS `end`'),
+                ],
+                'FROM' => $table,
+                'WHERE' => $common_criterias,
+                'HAVING' => [
+                    new QueryExpression('COUNT(*) = 0'),
+                ],
+            ]
+        ], true);
 
-        // Find gaps from islands
-        $expected_start_date = $start;
-        $gaps = [];
-        foreach ($result as $row) {
-            if ($expected_start_date < new DateTimeImmutable($row['island_start_date'])) {
-                // The current island starts after the expected start date
-                // Then there is a gap
-                $gaps[] = [
-                    'start' => $expected_start_date->format('Y-m-d H:i:s'),
-                    'end'   => $row['island_start_date'],
-                ];
-            }
-            $expected_start_date = new DateTimeImmutable($row['island_end_date']);
-        }
-        if ($expected_start_date < $stop) {
-            // The last island ends before the stop date
-            // Then there is a gap
-            $gaps[] = [
-                'start' => $expected_start_date->format('Y-m-d H:i:s'),
-                'end'   => $stop->format('Y-m-d H:i:s'),
-            ];
-        }
-
-        return $gaps;
+        return $DB->request([
+            'FROM'  => $request,
+            'ORDER' => 'start'
+        ]);
     }
 
     /**

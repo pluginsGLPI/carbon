@@ -38,6 +38,7 @@ use DateTimeInterface;
 use Entity;
 use Location;
 use CommonDBTM;
+use DBmysqlIterator;
 
 class CarbonEmission extends CommonDBChild
 {
@@ -178,9 +179,9 @@ class CarbonEmission extends CommonDBChild
      * @param integer $id
      * @param DateTimeInterface|null $start
      * @param DateTimeInterface|null $stop
-     * @return array
+     * @return DBmysqlIterator
      */
-    public function findGaps(string $itemtype, int $id, ?DateTimeInterface $start, ?DateTimeInterface $stop = null): array
+    public function findGaps(string $itemtype, int $id, ?DateTimeInterface $start, ?DateTimeInterface $stop = null): DBmysqlIterator
     {
         $criteria = [
             'itemtype' => $itemtype,
