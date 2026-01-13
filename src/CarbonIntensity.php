@@ -257,24 +257,7 @@ class CarbonIntensity extends CommonDropdown
             }
         }
 
-        $first_known_intensity_date = $this->getFirstKnownDate($zone_name, $data_source->getSourceName());
-        $incremental = false;
-        if ($first_known_intensity_date !== null) {
-            $incremental = ($start_date >= $first_known_intensity_date);
-        }
-        if ($first_known_intensity_date !== null && $first_known_intensity_date <= $data_source->getHardStartDate()) {
-            // Cannot download older data than absolute start date of the source, then switch to incremetal mode
-            $incremental = true;
-        }
-        if ($incremental) {
-            $start_date = max($data_source->getMaxIncrementalAge(), $this->getLastKnownDate($zone_name, $data_source->getSourceName()));
-            $start_date = $start_date->add(new DateInterval('PT1H'));
-            $count = $data_source->incrementalDownload($zone_name, $start_date, $this, $limit);
-            $total_count += $count;
-            return $total_count;
-        }
-
-        return $total_count;
+        return 0;
     }
 
     /**

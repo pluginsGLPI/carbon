@@ -57,11 +57,7 @@ class ClientTest extends DbTestCase
         $intensities = $source->fetchDay($date, '');
 
         $this->assertIsArray($intensities);
-        $this->assertArrayHasKey('source', $intensities);
-        $this->assertEquals('RTE', $intensities['source']);
-        $this->assertArrayHasKey('France', $intensities);
-        $this->assertIsArray($intensities['France']);
-        $this->assertEquals(24, count($intensities['France']));
+        $this->assertEquals(96, count($intensities));
     }
 
     public function testFetchRange()

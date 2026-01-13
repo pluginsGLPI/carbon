@@ -236,6 +236,7 @@ abstract class AbstractClient implements ClientInterface
             } catch (AbortException $e) {
                 throw $e;
             }
+            $data = $this->formatOutput($data, $this->step);
             if (!isset($data[$zone])) {
                 continue;
             }

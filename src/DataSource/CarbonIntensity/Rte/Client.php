@@ -54,14 +54,16 @@ use GlpiPlugin\Carbon\Toolbox;
  * @see https://help.opendatasoft.com/apis/ods-explore-v2/explore_v2.1.html
  *
  * About DST for this data source
- * GLPI must be set up with timezones enabled, set to the same timezone as the host system
- *
+ * GLPI must be set up with timezones enabled
  * If this requirement is not met, then dates here DST change occurs will cause problems
- * Searching for gaps will find gaps that the algorithm will try to fill, but fail.
+ * Searching for gaps will find gaps that the algorithm will try to fill, but fail repeatidly.
+ *
+ * Queries to the provider uses dates intervals in the form [start, stop]. Those boundaries
+ * are expresses with timezone +00:00 (aka Z or UTC). An extra timezone parameter is given
+ * in the query and let the server respond with datetimes shifted to this timezone.
  */
 class Client extends AbstractClient
 {
-    const RECORDS_URL =         '/eco2mix-national-tr/records';
     const EXPORT_URL_REALTIME      = '/eco2mix-national-tr/exports/json';
     const EXPORT_URL_CONSOLIDATED  = '/eco2mix-national-cons-def/exports/json';
 
@@ -160,21 +162,18 @@ class Client extends AbstractClient
      */
     public function fetchDay(DateTimeImmutable $day, string $zone): array
     {
-        /** @var DBmysql $DB */
-        global $DB;
-
         $stop = $day->add(new DateInterval('P1D'));
 
         $format = DateTime::ATOM;
-        $timezone = $DB->guessTimezone();
         $from = $day->format($format);
         $to = $stop->format($format);
 
+        $timezone = new DateTimeZone('Europe/Paris');
         $params = [
             'select' => 'date_heure,taux_co2',
             'where' => "date_heure IN [date'$from' TO date'$to'[ AND taux_co2 is not null",
             'order_by' => 'date_heure asc',
-            'timezone' => $timezone,
+            'timezone' => $timezone->getName(),
         ];
 
         $url = $this->base_url . self::EXPORT_URL_REALTIME;
@@ -186,6 +185,8 @@ class Client extends AbstractClient
             trigger_error($this->formatError($response));
             return [];
         }
+
+        $this->step = $this->detectStep($response);
 
         // Drop data with no carbon intensity (may be returned by the provider)
         $response = array_filter($response, function ($item) {
@@ -207,7 +208,7 @@ class Client extends AbstractClient
             }
         }
 
-        return $this->formatOutput($response, 15);
+        return $response;
     }
 
     /**
@@ -222,17 +223,15 @@ class Client extends AbstractClient
      */
     public function fetchRange(DateTimeImmutable $start, DateTimeImmutable $stop, string $zone, int $dataset = self::DATASET_REALTIME): array
     {
-        /** @var DBmysql $DB */
-        global $DB;
-
         // Build realtime and consolidated paths
         $base_path = GLPI_PLUGIN_DOC_DIR . '/carbon/carbon_intensity/' . $this->getSourceName() . '/' . $zone;
         $consolidated_dir = $base_path . '/consolidated';
         $realtime_dir = $base_path . '/realtime';
 
         // Set timezone to +00:00 and extend range by -12/+14 hours
-        $request_start = $start->setTimezone(new DateTimeZone('+0000'))->sub(new DateInterval('PT12H'));
-        $request_stop = $stop->setTimezone(new DateTimeZone('+0000'))->add(new DateInterval('PT14H'));
+        $timezone_z = new DateTimeZone('+0000');
+        $request_start = $start->setTimezone($timezone_z)->sub(new DateInterval('PT12H'));
+        $request_stop = $stop->setTimezone($timezone_z)->add(new DateInterval('PT14H'));
         $format = DateTime::ATOM;
         $from = $request_start->format($format);
         $to = $request_stop->format($format);
@@ -272,13 +271,13 @@ class Client extends AbstractClient
         @mkdir(dirname($cache_file), 0755, true);
 
         // Prepare the HTTP request
-        $timezone = $DB->guessTimezone();
+        $timezone = new DateTimeZone('Europe/Paris'); // Optimal timezone to avoid DST mess in the response
         $where = "date_heure IN [date'$from' TO date'$to'[ AND taux_co2 is not null";
         $params = [
             'select' => 'date_heure,taux_co2',
             'where' => $where,
             'order_by' => 'date_heure asc',
-            'timezone' => $timezone
+            'timezone' => $timezone->getName()
         ];
         $response = $this->client->request('GET', $url, ['timeout' => 8, 'query' => $params]);
         $this->step = $this->detectStep($response);
@@ -301,46 +300,44 @@ class Client extends AbstractClient
 
     protected function getCacheFilename(string $base_dir, DateTimeImmutable $start, DateTimeImmutable $end): string
     {
+        $timezone_name = $start->getTimezone()->getName();
+        $timezone_name = str_replace('/', '-', $timezone_name);
         return sprintf(
-            '%s/%s_%s.json',
+            '%s/%s_%s_%s.json',
             $base_dir,
+            $timezone_name,
             $start->format('Y-m-d'),
             $end->format('Y-m-d')
         );
     }
 
+    /**
+     * Format the records before saving them in DB
+     * It is assumed  that the records are chronologically sorted
+     *
+     * @param array $response
+     * @param integer $step
+     * @return array
+     */
     protected function formatOutput(array $response, int $step): array
     {
         /** @var DBMysql $DB */
         global $DB;
 
-        // array sort records, just in case
-        usort($response, function ($a, $b) {
-            return $a['date_heure'] <=> $b['date_heure'];
-        });
-
         $this->step = $this->detectStep($response);
-        // Deduplicate entries (solves switching from winter time to summer time)
-        // because there are 2 samples at same date time, during 1 hour
-        // Even if we use UTC timezone.
-        $filtered_response = $this->deduplicate($response);
-
         // Convert string dates into datetime objects,
         // using timezone expressed as type Continent/City instead of offset
         // This is needed to detect later the switching to winter time
-        $local_timezone = new DateTimeZone($DB->guessTimezone());
-        array_walk($filtered_response, function (&$item, $key) use ($local_timezone) {
-            $item['date_heure'] = DateTime::createFromFormat('Y-m-d\TH:i:sP', $item['date_heure'])->setTimezone($local_timezone);
-        });
+        $response = $this->shiftToLocalTimezone($response);
 
         // Convert samples from to 1 hour
         if ($this->step < 60) {
-            $intensities = $this->convertToHourly($filtered_response, $this->step);
+            $intensities = $this->downsample($response, $this->step);
         } else {
             $intensities = [];
-            foreach ($filtered_response as $record) {
+            foreach ($response as $local_datetime => $record) {
                 $intensities[] = [
-                    'datetime' => $record['date_heure']->format('Y-m-d\TH:00:00'),
+                    'datetime' => $record['date_heure']->format('Y-m-d\TH:00:00??????'),
                     'intensity' => (float) $record['taux_co2'],
                     'data_quality' => AbstractTracked::DATA_QUALITY_RAW_REAL_TIME_MEASUREMENT,
                 ];
@@ -353,22 +350,56 @@ class Client extends AbstractClient
         ];
     }
 
+    /**
+     * convert dates to the timezone of GLPI
+     *
+     * @param array $response
+     * @return array array of records: ['date_heure' => string, 'taux_co2' => number, 'datetime' => DateTime]
+     */
+    protected function shiftToLocalTimezone(array $response): array
+    {
+        /** @var DBMysql $DB */
+        global $DB;
+
+        $shifted_response = [];
+        $local_timezone = new DateTimeZone($DB->guessTimezone());
+        array_walk($response, function ($item, $key) use (&$shifted_response, $local_timezone) {
+            $shifted_date_object = DateTime::createFromFormat('Y-m-d\TH:i:sP', $item['date_heure'])
+                ->setTimezone($local_timezone);
+            $shifted_date_string = $shifted_date_object->format('Y-m-d H:i:sP');
+            if (isset($shifted_response[$shifted_date_string]) && $shifted_response['taux_co2'] !== $item['taux_co2']) {
+                trigger_error("Duplicate record with different carbon intensity detected.");
+            }
+            $item['datetime'] = $shifted_date_object;
+            $shifted_response[$shifted_date_string] = $item;
+        });
+
+        return $shifted_response;
+    }
+
+    /**
+     * Deduplicates records
+     *
+     * @param  array $records Records in the format ['date_heure' => DateTime, 'taux_co2' => number]
+     * @return array          Array of records where key is the string formatted datetime and value is the carbon intensity
+     */
     protected function deduplicate(array $records): array
     {
-        $filtered_response = [];
+        $deduplicated = [];
         foreach ($records as $record) {
-            if (isset($filtered_response[$record['date_heure']])) {
-                if ($filtered_response[$record['date_heure']]['taux_co2'] != $record['taux_co2']) {
+            $date = $record['date_heure'];
+            if (key_exists($date, $deduplicated)) {
+                if ($deduplicated[$date]['taux_co2'] != $record['taux_co2']) {
                     // Inconsistency detected. What to do with this record?
                     continue;
                 }
                 continue;
             }
 
-            $filtered_response[$record['date_heure']] = $record;
+            $deduplicated[$date] = $record;
         }
 
-        return $filtered_response;
+        return $deduplicated;
     }
 
     /**
@@ -402,6 +433,10 @@ class Client extends AbstractClient
      */
     protected function convertToHourly(array $records, int $step): array
     {
+        if ($step === 60) {
+            return $records;
+        }
+
         $intensities = [];
         $intensity = 0.0;
         $count = 0;
@@ -452,6 +487,40 @@ class Client extends AbstractClient
         }
 
         return $intensities;
+    }
+
+    /**
+     * Downsample records to a new set of records at the given frequency in minutes.
+     * The records may have irregular interval between samples due to filtered out null elements
+     *
+     * @param  array $records The records to downsample
+     * @param  int   $step    The step of output records in minutes
+     * @return array          The downsampled records
+     */
+    protected function downsample(array $records, int $step): array
+    {
+        $downsampled = [];
+        $intensity = 0.0;
+        $count = 0;
+        foreach ($records as $record) {
+            $date = $record['datetime'];
+            $intensity += $record['taux_co2'];
+            $count++;
+            $minute = (int) $date->format('i');
+
+            if ($minute === (60 - $step)) {
+                // Finalizing an average of accumulated samples
+                $downsampled[] = [
+                    'datetime'     => $date->format('Y-m-d\TH:00:00'),
+                    'intensity'    => (float) $intensity / $count,
+                    'data_quality' => AbstractTracked::DATA_QUALITY_RAW_REAL_TIME_MEASUREMENT_DOWNSAMPLED,
+                ];
+                $intensity = 0.0;
+                $count = 0;
+            }
+        }
+
+        return $downsampled;
     }
 
     /**

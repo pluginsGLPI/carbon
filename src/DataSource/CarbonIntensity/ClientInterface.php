@@ -130,6 +130,13 @@ interface ClientInterface
     public function createZones(): int;
 
     /**
+     * Disable caching of data source
+     *
+     * @return void
+     */
+    public function disableCache();
+
+    /**
      * Get the absolute starrt date of data from the source
      *
      * @return DateTimeImmutable
