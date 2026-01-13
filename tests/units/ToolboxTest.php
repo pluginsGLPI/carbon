@@ -45,15 +45,11 @@ use GlpiPlugin\Carbon\Toolbox;
 use Infocom;
 use Location;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
 
 #[CoversClass(Toolbox::class)]
 class ToolboxTest extends DbTestCase
 {
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\Toolbox::getOldestAssetDate
-     *
-     * @return void
-     */
     public function testGetOldestAssetDate()
     {
         $toolbox = new Toolbox();
@@ -92,11 +88,6 @@ class ToolboxTest extends DbTestCase
         $this->assertEquals($expected, $output);
     }
 
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\Toolbox::getLatestAssetDate
-     *
-     * @return void
-     */
     public function testGetLatestAssetDate()
     {
         $toolbox = new Toolbox();
@@ -120,11 +111,6 @@ class ToolboxTest extends DbTestCase
         $this->assertEquals($expected, $output);
     }
 
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\Toolbox::getDefaultCarbonIntensityDownloadDate
-     *
-     * @return void
-     */
     public function testGetDefaultCarbonIntensityDownloadDate()
     {
         $instance = new Toolbox();
@@ -136,11 +122,6 @@ class ToolboxTest extends DbTestCase
         $this->assertEquals($expected, $output);
     }
 
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\Toolbox::yearToLastMonth
-     *
-     * @return void
-     */
     public function testYearToLastMonth()
     {
         $end = new DateTimeImmutable('2023-04-09 13:45:17');
@@ -162,11 +143,6 @@ class ToolboxTest extends DbTestCase
         $this->assertEquals($expected, $output);
     }
 
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\Toolbox::isLocationExistForZone
-     *
-     * @return void
-     */
     public function testIsLocationExistsForZone()
     {
         $output = Toolbox::isLocationExistForZone('foo');
@@ -182,11 +158,6 @@ class ToolboxTest extends DbTestCase
         $this->assertTrue($output);
     }
 
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\Toolbox::getGwpUsageImpactClasses
-     *
-     * @return void
-     */
     public function testGetGwpUsageImpactClasses()
     {
         $output = Toolbox::getGwpUsageImpactClasses();
@@ -198,11 +169,6 @@ class ToolboxTest extends DbTestCase
         ], $output);
     }
 
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\Toolbox::getUsageImpactClasses
-     *
-     * @return void
-     */
     public function testGetUsageImpactClasses()
     {
         $output = Toolbox::getUsageImpactClasses();
@@ -214,11 +180,6 @@ class ToolboxTest extends DbTestCase
         ], $output);
     }
 
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\Toolbox::getEmbodiedImpactClasses
-     *
-     * @return void
-     */
     public function testGetEmbodiedImpactClasses()
     {
         $output = Toolbox::getEmbodiedImpactClasses();
@@ -262,12 +223,6 @@ class ToolboxTest extends DbTestCase
         $this->assertEquals('INTERVAL 3 YEAR + INTERVAL 40 MINUTE', $result);
     }
 
-
-    /**
-     * Undocumented function
-     *
-     * @return void
-     */
     public function testFindTemporalGapsInTable()
     {
         $table = getTableForItemType(CarbonIntensity::class);
