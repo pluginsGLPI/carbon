@@ -5,15 +5,16 @@
 # 
 # Translators:
 # Thierry Bugier <tbugier@teclib.com>, 2025
+# EpicIT33, 2025
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-01 02:08+0000\n"
+"POT-Creation-Date: 2026-01-12 02:05+0000\n"
 "PO-Revision-Date: 2025-10-29 08:13+0000\n"
-"Last-Translator: Thierry Bugier <tbugier@teclib.com>, 2025\n"
+"Last-Translator: EpicIT33, 2025\n"
 "Language-Team: French (France) (https://app.transifex.com/teclib/teams/28042/fr_FR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -157,7 +158,7 @@ msgstr ""
 #: templates/computertype.html.twig src/SearchOptions.php:251
 #: src/ComputerType.php:78
 msgid "Category"
-msgstr ""
+msgstr "Catégorie"
 
 #: templates/pages/CarbonIntensitySource/tab_zone.html.twig
 msgid "No zone available"
@@ -220,7 +221,7 @@ msgstr[2] "Profils d'utilisation"
 
 #: templates/quick-report.html.twig front/report.php:54
 msgid "GLPI Carbon"
-msgstr ""
+msgstr "GLPI Carbon"
 
 #: templates/location.html.twig src/Profile.php:45 src/UsageInfo.php:91
 msgid "Environmental impact"
@@ -315,7 +316,7 @@ msgstr "Légende"
 
 #: templates/config.html.twig
 msgid "Electricity maps"
-msgstr ""
+msgstr "Cartes d'électricité"
 
 #: templates/config.html.twig
 msgid "Key for electricitymap.org API"
@@ -334,7 +335,7 @@ msgstr ""
 #: templates/config.html.twig src/Impact/Embodied/Engine.php:46
 #: src/Impact/Usage/Engine.php:46
 msgid "Boavizta"
-msgstr ""
+msgstr "Boavizta"
 
 #: templates/config.html.twig
 msgid "Base URL to the Boaviztapi instance"
@@ -475,7 +476,7 @@ msgstr "Téléchargement des émissions de carbone depuis ElectricityMap"
 
 #: src/CronTask.php:82
 msgid "Compute usage environmental impact for all assets"
-msgstr ""
+msgstr "Calculer l'impact environnemental de l'utilisation de tous les actifs"
 
 #: src/CronTask.php:83 src/CronTask.php:88
 msgid "Maximum number of entries to calculate"
@@ -483,7 +484,7 @@ msgstr "Nombre maximum d'éléments à calculer"
 
 #: src/CronTask.php:87
 msgid "Compute embodied environmental impact for all assets"
-msgstr ""
+msgstr "Calculer l'impact environnemental intrinsèque de tous les actifs"
 
 #: src/CronTask.php:211
 msgid "No zone to download"
@@ -785,7 +786,7 @@ msgstr "CO₂eq"
 #: src/Dashboard/DemoProvider.php:83 src/Dashboard/DemoProvider.php:101
 #: src/Dashboard/Provider.php:796 src/Dashboard/Provider.php:830
 msgid "Sbeq"
-msgstr ""
+msgstr "Sbeq"
 
 #: src/Dashboard/DemoProvider.php:113
 msgid "Usage carbon emission per month"
@@ -885,7 +886,7 @@ msgstr "Graphique du potentiel de réchauffement climatique"
 
 #: src/Dashboard/Grid.php:322
 msgid "Environmental impact methodology information"
-msgstr ""
+msgstr "Informations sur la méthodologie relative à l'impact environnemental"
 
 #: src/Dashboard/Provider.php:175 src/Dashboard/Provider.php:1014
 #: src/Toolbox.php:201
@@ -1040,7 +1041,7 @@ msgstr "YW"
 
 #: src/Toolbox.php:286
 msgid "Wh"
-msgstr ""
+msgstr "Wh"
 
 #: src/SearchOptions.php:196 src/SearchOptions.php:275
 #: src/SearchOptions.php:342 src/SearchOptions.php:406
