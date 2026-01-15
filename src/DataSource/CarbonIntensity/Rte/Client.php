@@ -321,9 +321,6 @@ class Client extends AbstractClient
      */
     protected function formatOutput(array $response, int $step): array
     {
-        /** @var DBMysql $DB */
-        global $DB;
-
         $this->step = $this->detectStep($response);
         // Convert string dates into datetime objects,
         // using timezone expressed as type Continent/City instead of offset
