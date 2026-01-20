@@ -52,6 +52,7 @@ use Glpi\Dashboard\Right;
 use Glpi\DBAL\QueryExpression as QueryExpression;
 use Glpi\Plugin\Hooks;
 use Glpi\System\Diagnostic\DatabaseSchemaIntegrityChecker;
+use GlpiPlugin\Carbon\DataSource\CarbonIntensity\Rte\CronTask as RteCronTask;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
@@ -232,7 +233,7 @@ class PluginInstallTest extends CommonTestCase
     {
         $cronTask = new GLPICronTask();
         $rows = $cronTask->find([
-            'itemtype' => ['LIKE', '%' . 'Carbon' . '%'],
+            'itemtype' => ['LIKE', 'GlpiPlugin\\\\Carbon\\\\%'],
         ]);
         $this->assertEquals(5, count($rows));
 
@@ -254,7 +255,7 @@ class PluginInstallTest extends CommonTestCase
 
         $cronTask = new GLPICronTask();
         $cronTask->getFromDBByCrit([
-            'itemtype' => CronTask::class,
+            'itemtype' => RteCronTask::class,
             'name'     => 'DownloadRte',
         ]);
         $this->assertFalse($cronTask->isNewItem());
