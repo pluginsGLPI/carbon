@@ -53,6 +53,7 @@ use Glpi\DBAL\QueryExpression as QueryExpression;
 use Glpi\Plugin\Hooks;
 use Glpi\System\Diagnostic\DatabaseSchemaIntegrityChecker;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\Rte\CronTask as RteCronTask;
+use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ElectricityMaps\CronTask as ElectricityMapsCronTask;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
@@ -262,7 +263,7 @@ class PluginInstallTest extends CommonTestCase
 
         $cronTask = new GLPICronTask();
         $cronTask->getFromDBByCrit([
-            'itemtype' => CronTask::class,
+            'itemtype' => ElectricityMapsCronTask::class,
             'name'     => 'DownloadElectricityMap',
         ]);
         $this->assertFalse($cronTask->isNewItem());

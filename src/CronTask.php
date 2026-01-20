@@ -71,11 +71,11 @@ class CronTask
             //         'parameter' => __('Maximum number of entries to download', 'carbon'),
             //     ];
 
-            case 'DownloadElectricityMap':
-                return [
-                    'description' => __('Download carbon emissions from ElectricityMap', 'carbon'),
-                    'parameter' => __('Maximum number of entries to download', 'carbon'),
-                ];
+            // case 'DownloadElectricityMap':
+            //     return [
+            //         'description' => __('Download carbon emissions from ElectricityMap', 'carbon'),
+            //         'parameter' => __('Maximum number of entries to download', 'carbon'),
+            //     ];
 
             case 'DownloadWatttime':
                 return [
@@ -209,16 +209,16 @@ class CronTask
     //     return self::downloadCarbonIntensityFromSource($task, $client, new CarbonIntensity());
     // }
 
-    /**
-     * Automatic action for ElectricityMap datasource
-     *
-     * @return int
-     */
-    public static function cronDownloadElectricityMap(GlpiCronTask $task): int
-    {
-        $client = ClientFactory::create('ElectricityMaps');
-        return self::downloadCarbonIntensityFromSource($task, $client, new CarbonIntensity());
-    }
+    // /**
+    //  * Automatic action for ElectricityMap datasource
+    //  *
+    //  * @return int
+    //  */
+    // public static function cronDownloadElectricityMap(GlpiCronTask $task): int
+    // {
+    //     $client = ClientFactory::create('ElectricityMaps');
+    //     return self::downloadCarbonIntensityFromSource($task, $client, new CarbonIntensity());
+    // }
 
     /**
      * Automatic action for Watttime datasource

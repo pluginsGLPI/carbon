@@ -77,18 +77,18 @@ $automatic_actions = array_merge($automatic_actions, [
     //         'param'   => 10000, // Maximum rows to generate per execution
     //     ]
     // ],
-    [
-        'itemtype'  => CronTask::class,
-        'name'      => 'DownloadElectricityMap',
-        'frequency' => DAY_TIMESTAMP / 2, // Twice a day
-        'options'   => [
-            'mode' => GlpiCronTask::MODE_EXTERNAL,
-            'allowmode' => GlpiCronTask::MODE_INTERNAL + GlpiCronTask::MODE_EXTERNAL,
-            'logs_lifetime' => 30,
-            'comment' => __('Collect carbon intensities from ElectricityMap', 'carbon'),
-            'param'   => 10000, // Maximum rows to generate per execution
-        ]
-    ],
+    // [
+    //     'itemtype'  => CronTask::class,
+    //     'name'      => 'DownloadElectricityMap',
+    //     'frequency' => DAY_TIMESTAMP / 2, // Twice a day
+    //     'options'   => [
+    //         'mode' => GlpiCronTask::MODE_EXTERNAL,
+    //         'allowmode' => GlpiCronTask::MODE_INTERNAL + GlpiCronTask::MODE_EXTERNAL,
+    //         'logs_lifetime' => 30,
+    //         'comment' => __('Collect carbon intensities from ElectricityMap', 'carbon'),
+    //         'param'   => 10000, // Maximum rows to generate per execution
+    //     ]
+    // ],
     [
         'itemtype'  => CronTask::class,
         'name'      => 'EmbodiedImpact',
