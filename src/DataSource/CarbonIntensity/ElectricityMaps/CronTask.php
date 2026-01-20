@@ -30,7 +30,7 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\Rte;
+namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\ElectricityMaps;
 
 use CronTask as GlpiCronTask;
 use GlpiPlugin\Carbon\CarbonIntensity;
@@ -46,13 +46,13 @@ class CronTask implements CronTaskInterface
         return [
             [
                 'itemtype'    => self::class,
-                'name'        => 'DownloadRte',
-                'frequency'   => DAY_TIMESTAMP,
+                'name'        => 'DownloadElectricityMap',
+                'frequency'   => DAY_TIMESTAMP / 2,
                 'options'     => [
                     'mode'          => GlpiCronTask::MODE_EXTERNAL,
                     'allowmode'     => GlpiCronTask::MODE_INTERNAL + GlpiCronTask::MODE_EXTERNAL,
                     'logs_lifetime' => 30,
-                    'comment'       => __('Collect carbon intensities from RTE', 'carbon'),
+                    'comment'       => __('Collect carbon intensities from Electricity Maps', 'carbon'),
                     'param'         => 10000, // Maximum rows to generate per execution
                 ]
             ]
@@ -70,7 +70,7 @@ class CronTask implements CronTaskInterface
         switch ($name) {
             case 'DownloadRte':
                 return [
-                    'description' => __('Download carbon emissions from RTE', 'carbon'),
+                    'description' => __('Download carbon emissions from Electricity Maps', 'carbon'),
                     'parameter' => __('Maximum number of entries to download', 'carbon'),
                 ];
         }
@@ -78,13 +78,13 @@ class CronTask implements CronTaskInterface
     }
 
     /**
-     * Automatic action for RTE datasource
+     * Automatic action for Electricity Maps datasource
      *
      * @return int
      */
-    public static function cronDownloadRte(GlpiCronTask $task): int
+    public static function cronDownloadElectricityMap(GlpiCronTask $task): int
     {
-        $client = ClientFactory::create('Rte');
+        $client = ClientFactory::create('ElectricityMaps');
         return CarbonCronTask::downloadCarbonIntensityFromSource($task, $client, new CarbonIntensity());
     }
 }

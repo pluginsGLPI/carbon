@@ -43,3 +43,15 @@ if (!$task->isNewItem()) {
         'itemtype' => 'GlpiPlugin\\Carbon\\DataSource\\CarbonIntensity\\Rte\\CronTask',
     ]);
 }
+
+$task = new GlpiCronTask();
+$task->getFromDBByCrit([
+    'itemtype' => 'GlpiPlugin\\Carbon\\CronTask',
+    'name'     => 'DownloadElectricityMap',
+]);
+if (!$task->isNewItem()) {
+    $task->update([
+        'id' => $task->getID(),
+        'itemtype' => 'GlpiPlugin\\Carbon\\DataSource\\CarbonIntensity\\ElectricityMaps\\CronTask',
+    ]);
+}
