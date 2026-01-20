@@ -32,8 +32,15 @@
 
 use GlpiPlugin\Carbon\CronTask;
 use CronTask as GlpiCronTask;
+use GlpiPlugin\Carbon\DataSource\CronTaskProvider;
 
-$automatic_actions = [
+$cron_task_classes = CronTaskProvider::getCronTaskTypes();
+$automatic_actions = [];
+foreach ($cron_task_classes as $cron_task_class) {
+    $automatic_actions = array_merge($automatic_actions, $cron_task_class::enumerateTasks());
+}
+
+$automatic_actions = array_merge($automatic_actions, [
     [
         'itemtype'  => CronTask::class,
         'name'      => 'LocationCountryCode',
@@ -58,18 +65,18 @@ $automatic_actions = [
             'param'   => 10000, // Maximum rows to generate per execution
         ]
     ],
-    [
-        'itemtype'  => CronTask::class,
-        'name'      => 'DownloadRte',
-        'frequency' => DAY_TIMESTAMP,
-        'options'   => [
-            'mode' => GlpiCronTask::MODE_EXTERNAL,
-            'allowmode' => GlpiCronTask::MODE_INTERNAL + GlpiCronTask::MODE_EXTERNAL,
-            'logs_lifetime' => 30,
-            'comment' => __('Collect carbon intensities from RTE', 'carbon'),
-            'param'   => 10000, // Maximum rows to generate per execution
-        ]
-    ],
+    // [
+    //     'itemtype'  => CronTask::class,
+    //     'name'      => 'DownloadRte',
+    //     'frequency' => DAY_TIMESTAMP,
+    //     'options'   => [
+    //         'mode' => GlpiCronTask::MODE_EXTERNAL,
+    //         'allowmode' => GlpiCronTask::MODE_INTERNAL + GlpiCronTask::MODE_EXTERNAL,
+    //         'logs_lifetime' => 30,
+    //         'comment' => __('Collect carbon intensities from RTE', 'carbon'),
+    //         'param'   => 10000, // Maximum rows to generate per execution
+    //     ]
+    // ],
     [
         'itemtype'  => CronTask::class,
         'name'      => 'DownloadElectricityMap',
@@ -94,7 +101,7 @@ $automatic_actions = [
             'param'   => 10000, // Maximum rows to generate per execution
         ]
     ],
-];
+]);
 
 foreach ($automatic_actions as $action) {
     $task = new GlpiCronTask();

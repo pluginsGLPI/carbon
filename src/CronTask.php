@@ -65,11 +65,11 @@ class CronTask
                     'parameter' => __('Maximum number of locations to solve', 'carbon'),
                 ];
 
-            case 'DownloadRte':
-                return [
-                    'description' => __('Download carbon emissions from RTE', 'carbon'),
-                    'parameter' => __('Maximum number of entries to download', 'carbon'),
-                ];
+            // case 'DownloadRte':
+            //     return [
+            //         'description' => __('Download carbon emissions from RTE', 'carbon'),
+            //         'parameter' => __('Maximum number of entries to download', 'carbon'),
+            //     ];
 
             case 'DownloadElectricityMap':
                 return [
@@ -198,16 +198,16 @@ class CronTask
         return ($count > 0 ? 1 : 0);
     }
 
-    /**
-     * Automatic action for RTE datasource
-     *
-     * @return int
-     */
-    public static function cronDownloadRte(GlpiCronTask $task): int
-    {
-        $client = ClientFactory::create('Rte');
-        return self::downloadCarbonIntensityFromSource($task, $client, new CarbonIntensity());
-    }
+    // /**
+    //  * Automatic action for RTE datasource
+    //  *
+    //  * @return int
+    //  */
+    // public static function cronDownloadRte(GlpiCronTask $task): int
+    // {
+    //     $client = ClientFactory::create('Rte');
+    //     return self::downloadCarbonIntensityFromSource($task, $client, new CarbonIntensity());
+    // }
 
     /**
      * Automatic action for ElectricityMap datasource
@@ -239,7 +239,7 @@ class CronTask
      * @param CarbonIntensity $intensity
      * @return integer
      */
-    protected static function downloadCarbonIntensityFromSource(GlpiCronTask $task, ClientInterface $data_source, CarbonIntensity $intensity): int
+    public static function downloadCarbonIntensityFromSource(GlpiCronTask $task, ClientInterface $data_source, CarbonIntensity $intensity): int
     {
         $task->setVolume(0); // start with zero
         $remaining = $task->fields['param'];
