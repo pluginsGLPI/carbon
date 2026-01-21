@@ -32,14 +32,26 @@
 
 namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\ElectricityMaps;
 
+use CommonGLPI;
 use CronTask as GlpiCronTask;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CronTask as CarbonCronTask;
+use GlpiPlugin\Carbon\DataSource\AbstractCronTask;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientFactory;
 use GlpiPlugin\Carbon\DataSource\CronTaskInterface;
 
-class CronTask implements CronTaskInterface
+class CronTask extends AbstractCronTask implements CronTaskInterface
 {
+    public static function getIcon()
+    {
+        return 'fa-solid fa-gears';
+    }
+
+    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    {
+        return self::createTabEntry(__('Resource diagnosis', 'carbon'), 0);
+    }
+
     public static function enumerateTasks(): array
     {
         // TODO: This data shoud replace the occurrence in CronTask::cronInfo()
