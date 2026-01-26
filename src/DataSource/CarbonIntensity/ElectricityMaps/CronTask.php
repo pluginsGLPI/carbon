@@ -32,6 +32,7 @@
 
 namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\ElectricityMaps;
 
+use CommonDBTM;
 use CommonGLPI;
 use CronTask as GlpiCronTask;
 use GlpiPlugin\Carbon\CarbonIntensity;
@@ -39,6 +40,8 @@ use GlpiPlugin\Carbon\CronTask as CarbonCronTask;
 use GlpiPlugin\Carbon\DataSource\AbstractCronTask;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientFactory;
 use GlpiPlugin\Carbon\DataSource\CronTaskInterface;
+use GlpiPlugin\Carbon\DataSource\RestApiClient;
+use GlpiPlugin\Carbon\Source_Zone;
 
 class CronTask extends AbstractCronTask implements CronTaskInterface
 {
@@ -80,7 +83,7 @@ class CronTask extends AbstractCronTask implements CronTaskInterface
     public static function cronInfo(string $name): array
     {
         switch ($name) {
-            case 'DownloadRte':
+            case 'DownloadElectricityMap':
                 return [
                     'description' => __('Download carbon emissions from Electricity Maps', 'carbon'),
                     'parameter' => __('Maximum number of entries to download', 'carbon'),
@@ -98,5 +101,21 @@ class CronTask extends AbstractCronTask implements CronTaskInterface
     {
         $client = ClientFactory::create('ElectricityMaps');
         return CarbonCronTask::downloadCarbonIntensityFromSource($task, $client, new CarbonIntensity());
+    }
+
+    public function showForCronTask(CommonDBTM $item)
+    {
+        switch ($item->fields['name']) {
+            case 'DownloadElectricityMap':
+                $client = new Client(new RestApiClient());
+                $source_name = ($client)->getSourceName();
+                foreach ($client->getSupportedZones() as $zone_name) {
+                    $source_zone = new Source_Zone();
+                    if (!$source_zone->getFromDbBySourceAndZone($source_name, $zone_name)) {
+                        continue;
+                    }
+                    $source_zone->showGaps();
+                }
+        }
     }
 }

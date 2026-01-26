@@ -34,16 +34,12 @@ namespace GlpiPlugin\Carbon\DataSource;
 
 use CommonDBTM;
 use CommonGLPI;
+use GlpiPlugin\Carbon\Source_Zone;
 
 abstract class AbstractCronTask extends CommonGLPI implements CronTaskInterface
 {
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         return '';
-    }
-
-    public function showForCronTask(CommonDBTM $item)
-    {
-        return;
     }
 }

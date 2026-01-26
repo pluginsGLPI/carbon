@@ -303,9 +303,9 @@ class Source_Zone extends CommonDBRelation
      *
      * @param string $source_name
      * @param string $zone_name
-     * @return string
+     * @return bool
      */
-    public function getFromDbBySourceAndZone(string $source_name, string $zone_name): ?string
+    public function getFromDbBySourceAndZone(string $source_name, string $zone_name): bool
     {
         /** @var DBmysql $DB */
         global $DB;
@@ -314,7 +314,7 @@ class Source_Zone extends CommonDBRelation
         $source_table = Source::getTable();
         $source_zone_table = self::getTable();
         $request = [
-            'SELECT' => Source_Zone::getTableField('code'),
+            'SELECT' => Source_Zone::getTable() . '.id',
             'FROM'   => $source_zone_table,
             'INNER JOIN' => [
                 $source_table => [
@@ -337,9 +337,11 @@ class Source_Zone extends CommonDBRelation
             'LIMIT' => '1'
         ];
         $iterator = $DB->request($request);
-        $zone_code = $iterator->current()['code'] ?? null;
-
-        return $zone_code;
+        if ($iterator->count() !== 1) {
+            return false;
+        }
+        $id = $iterator->current()['id'];
+        return $this->getFromDB($id);
     }
 
     /**
@@ -498,5 +500,54 @@ class Source_Zone extends CommonDBRelation
 
         $this->update(array_merge($where, $params, ['id' => $this->getID()]));
         return $this;
+    }
+
+    /**
+     * Show gaps in carbon intensities stored for the source and zone of the current instance
+     *
+     * @return void
+     */
+    public function showGaps()
+    {
+        $canedit = false;
+        $oldest_asset_date = (new Toolbox())->getOldestAssetDate();
+        $carbon_intensity = new CarbonIntensity();
+        $zone_id = $this->fields['plugin_carbon_zones_id'];
+        $entries = $carbon_intensity->findGaps(
+            $this->fields['plugin_carbon_sources_id'],
+            $this->fields['plugin_carbon_zones_id'],
+            $oldest_asset_date
+        );
+        $total = $entries->count();
+
+        $renderer = TemplateRenderer::getInstance();
+        $template = <<<TWIG
+        {% import "components/form/fields_macros.html.twig" as fields %}
+        {{ fields.smallTitle(zone_name) }}
+TWIG;
+        $zone = Zone::getById($zone_id);
+        echo $renderer->renderFromStringTemplate($template, ['zone_name' => $zone->fields['name']]);
+        $renderer->display('components/datatable.html.twig', [
+            'is_tab' => true,
+            'nopager' => true,
+            'nofilter' => true,
+            'nosort' => true,
+            'columns' => [
+                'start' => __('Start'),
+                'end' => __('End', 'carbon'),
+            ],
+            'footers' => [
+                ['', '', '', __('Total'), $total, '']
+            ],
+            'footer_class' => 'fw-bold',
+            'entries' => $entries,
+            'total_number' => count($entries),
+            'filtered_number' => count($entries),
+            'showmassiveactions' => $canedit,
+            'massiveactionparams' => [
+                'num_displayed' => count($entries),
+                'container'     => 'mass' . static::class . mt_rand(),
+            ]
+        ]);
     }
 }

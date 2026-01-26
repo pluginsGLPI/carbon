@@ -32,11 +32,14 @@
 
 namespace GlpiPlugin\Carbon;
 
+use CommonDBTM;
+use CommonGLPI;
 use CronTask as GlpiCronTask;
 use Config as GlpiConfig;
 use Geocoder\Geocoder;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientFactory;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientInterface;
+use GlpiPlugin\Carbon\DataSource\CronTaskProvider;
 use GlpiPlugin\Carbon\Impact\Embodied\AbstractEmbodiedImpact;
 use GlpiPlugin\Carbon\Impact\Embodied\Engine as EmbodiedEngine;
 use GlpiPlugin\Carbon\Impact\Usage\UsageImpactInterface as UsageImpactInterface;
@@ -45,9 +48,44 @@ use GlpiPlugin\Carbon\Toolbox;
 use Location as GlpiLocation;
 use Toolbox as GlpiToolbox;
 
-class CronTask
+class CronTask extends CommonGLPI
 {
     private $getGeocoder = [Location::class, 'getGeocoder'];
+
+    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    {
+        // Delegate to the client's crontask class the tab name to return
+        // But keep here the logic to decide if a tab name shall be returned
+        // to reduce class loading
+        if (!is_a($item, GlpiCronTask::class)) {
+            return '';
+        }
+        if (!in_array($item->fields['itemtype'], CronTaskProvider::getCronTaskTypes())) {
+            return '';
+        }
+        $client_cron_task = new $item->fields['itemtype']();
+        return $client_cron_task->getTabNameForItem($item);
+    }
+
+    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
+    {
+        if (is_a($item, GlpiCronTask::class)) {
+            /** @var GlpiCronTask $item */
+            $cron_task = new self();
+            $cron_task->showForCronTask($item);
+        }
+        return true;
+    }
+
+    public function showForCronTask(CommonDBTM $item)
+    {
+        $itemtype = $item->fields['itemtype'];
+        if (!in_array($itemtype, CronTaskProvider::getCronTaskTypes())) {
+            return;
+        }
+        $crontask = new $itemtype();
+        $crontask->showForCronTask($item);
+    }
 
     /**
      * Get description of an automatic action
