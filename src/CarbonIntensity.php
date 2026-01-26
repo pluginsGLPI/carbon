@@ -116,7 +116,7 @@ class CarbonIntensity extends CommonDropdown
             'name'               => __('Intensity', 'carbon'),
             'massiveaction'      => false, // implicit field is id
             'datatype'           => 'decimal',
-            'unit'               => 'gCO<sub>2</sub>eq/KWh',
+            'unit'               => 'gCO₂eq/KWh',
         ];
 
         return $tab;
