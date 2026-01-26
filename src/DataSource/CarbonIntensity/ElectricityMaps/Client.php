@@ -199,7 +199,8 @@ class Client extends AbstractClient
     public function fetchDay(DateTimeImmutable $day, string $zone): array
     {
         $source_zone = new Source_Zone();
-        $zone_code = $source_zone->getFromDbBySourceAndZone($this->getSourceName(), $zone);
+        $source_zone->getFromDbBySourceAndZone($this->getSourceName(), $zone);
+        $zone_code = $source_zone->fields['code'];
 
         if ($zone_code === null) {
             throw new AbortException('Invalid zone');

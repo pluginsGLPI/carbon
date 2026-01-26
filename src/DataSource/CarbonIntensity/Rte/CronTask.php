@@ -41,6 +41,8 @@ use GlpiPlugin\Carbon\DataSource\AbstractCronTask;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientFactory;
 use GlpiPlugin\Carbon\DataSource\CronTaskInterface;
 use GlpiPlugin\Carbon\DataSource\CronTaskProvider;
+use GlpiPlugin\Carbon\DataSource\RestApiClient;
+use GlpiPlugin\Carbon\Source_Zone;
 
 class CronTask extends AbstractCronTask implements CronTaskInterface
 {
@@ -56,12 +58,17 @@ class CronTask extends AbstractCronTask implements CronTaskInterface
 
     public function showForCronTask(CommonDBTM $item)
     {
-        if (!in_array($item->fields['itemtype'], CronTaskProvider::getCronTaskTypes())) {
-            return;
-        }
-
         switch ($item->fields['name']) {
             case 'DownloadRte':
+                $client = new Client(new RestApiClient());
+                $source_name = ($client)->getSourceName();
+                foreach ($client->getSupportedZones() as $zone_name) {
+                    $source_zone = new Source_Zone();
+                    if (!$source_zone->getFromDbBySourceAndZone($source_name, $zone_name)) {
+                        continue;
+                    }
+                    $source_zone->showGaps();
+                }
         }
     }
 
