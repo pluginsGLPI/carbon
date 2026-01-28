@@ -257,7 +257,7 @@ class CarbonIntensity extends CommonDropdown
             }
         }
 
-        return 0;
+        return $total_count;
     }
 
     /**
