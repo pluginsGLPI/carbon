@@ -511,11 +511,11 @@ class Toolbox
                     'date AS `end`'
                 ],
                 'FROM' => $records_query,
-                'WHERE' => array_merge($boundaries, [
+                'WHERE' => [
                     'NOT'  => ['prev_date' => null],
                     // new QueryExpression('TIMESTAMPDIFF(SECOND, `records`.`prev_date`, `records`.`date`) > ' . $interval_in_seconds)
                     new QueryExpression('DATE_ADD(`records`.`prev_date`, ' . $sql_interval . ') < `date`')
-                ]),
+                ],
             ],
 
             // Gap before the beginning of the serie
