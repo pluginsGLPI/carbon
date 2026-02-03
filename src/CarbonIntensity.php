@@ -38,7 +38,7 @@ use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DBmysql;
-use DBmysqlIterator;
+use Iterator;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Zone;
 use Glpi\DBAL\QueryParam;
@@ -224,7 +224,7 @@ class CarbonIntensity extends CommonDropdown
         $zone = new Zone();
         $zone->getFromDBByCrit(['name' => $zone_name]);
         $gaps = $this->findGaps($source->getID(), $zone->getID(), $start_date);
-        if (count($gaps) === 0) {
+        if (iterator_count($gaps) === 0) {
             // Log a notice specifying the source and the zone
             trigger_error(sprintf(
                 "No gap to fill for source %s and zone %s between %s and %s",
@@ -376,9 +376,9 @@ class CarbonIntensity extends CommonDropdown
      * @param integer $zone_id
      * @param DateTimeInterface $start
      * @param DateTimeInterface|null $stop
-     * @return DBmysqlIterator
+     * @return Iterator
      */
-    public function findGaps(int $source_id, int $zone_id, DateTimeInterface $start, ?DateTimeInterface $stop = null): DBmysqlIterator
+    public function findGaps(int $source_id, int $zone_id, DateTimeInterface $start, ?DateTimeInterface $stop = null): Iterator
     {
         $criteria = [
             Source::getForeignKeyField() => $source_id,
