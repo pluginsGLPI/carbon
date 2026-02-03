@@ -37,6 +37,7 @@ use Monitor as GlpiMonitor;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use MonitorModel as GlpiMonitorModel;
 use GlpiPlugin\Carbon\Impact\Type;
+use GlpiPlugin\Carbon\MonitorModel;
 
 /**
  * This embodied impact
@@ -47,13 +48,13 @@ class Monitor extends AbstractAsset
 
     protected function doEvaluation(): ?array
     {
-        if (GlpiMonitorModel::isNewID($this->item->fields['networkequipmentmodels_id'])) {
+        if (GlpiMonitorModel::isNewID($this->item->fields['monitormodels_id'])) {
             return [];
         }
 
-        $model = new GlpiMonitorModel();
+        $model = new MonitorModel();
         $model->getFromDBByCrit([
-            'networkequipmentmodels_id' => $this->item->fields['networkequipmentmodels_id']
+            'monitormodels_id' => $this->item->fields['monitormodels_id']
         ]);
         if ($model->isNewItem()) {
             return [];
