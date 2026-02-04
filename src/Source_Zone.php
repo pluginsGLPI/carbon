@@ -520,7 +520,7 @@ class Source_Zone extends CommonDBRelation
             $oldest_asset_date
         );
 
-        $total = iterator_count($entries);
+        $total = count($entries);
         $renderer = TemplateRenderer::getInstance();
         $template = <<<TWIG
         {% import "components/form/fields_macros.html.twig" as fields %}
