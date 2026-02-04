@@ -36,6 +36,7 @@ use CommonDBRelation;
 use CommonGLPI;
 use CommonDBTM;
 use CronTask;
+use DateTimeImmutable;
 use DBmysql;
 use Location as GlpiLocation;
 use Glpi\Application\View\TemplateRenderer;
@@ -518,8 +519,8 @@ class Source_Zone extends CommonDBRelation
             $this->fields['plugin_carbon_zones_id'],
             $oldest_asset_date
         );
-        $total = $entries->count();
 
+        $total = count($entries);
         $renderer = TemplateRenderer::getInstance();
         $template = <<<TWIG
         {% import "components/form/fields_macros.html.twig" as fields %}
@@ -541,11 +542,11 @@ TWIG;
             ],
             'footer_class' => 'fw-bold',
             'entries' => $entries,
-            'total_number' => count($entries),
-            'filtered_number' => count($entries),
+            'total_number' => $total,
+            'filtered_number' => $total,
             'showmassiveactions' => $canedit,
             'massiveactionparams' => [
-                'num_displayed' => count($entries),
+                'num_displayed' => $total,
                 'container'     => 'mass' . static::class . mt_rand(),
             ]
         ]);

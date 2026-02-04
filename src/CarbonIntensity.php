@@ -38,7 +38,7 @@ use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DBmysql;
-use DBmysqlIterator;
+use SeekableIterator;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Zone;
 use Glpi\DBAL\QueryParam;
@@ -376,9 +376,9 @@ class CarbonIntensity extends CommonDropdown
      * @param integer $zone_id
      * @param DateTimeInterface $start
      * @param DateTimeInterface|null $stop
-     * @return DBmysqlIterator
+     * @return array
      */
-    public function findGaps(int $source_id, int $zone_id, DateTimeInterface $start, ?DateTimeInterface $stop = null): DBmysqlIterator
+    public function findGaps(int $source_id, int $zone_id, DateTimeInterface $start, ?DateTimeInterface $stop = null): array
     {
         $criteria = [
             Source::getForeignKeyField() => $source_id,

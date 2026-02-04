@@ -32,15 +32,16 @@
 
 namespace GlpiPlugin\Carbon;
 
+use ArrayIterator;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DBmysql;
-use DBmysqlIterator;
 use Glpi\Dashboard\Dashboard as GlpiDashboard;
 use Infocom;
 use Location;
+use SeekableIterator;
 use Glpi\DBAL\QueryExpression;
 use Glpi\DBAL\QuerySubQuery;
 use Glpi\DBAL\QueryUnion;
@@ -470,9 +471,9 @@ class Toolbox
      * @param  DateInterval           $interval Interval between each data sample (do not use intervals in months or years)
      * @param  DateTimeInterface|null $stop     Stop date to search
      * @param  array                  $criteria Criterias for the SQL query
-     * @return DBmysqlIterator                  list of gaps
+     * @return array                            list of gaps
      */
-    public static function findTemporalGapsInTable(string $table, DateTimeInterface $start, DateInterval $interval, ?DateTimeInterface $stop = null, array $criteria = []): DBmysqlIterator
+    public static function findTemporalGapsInTable(string $table, DateTimeInterface $start, DateInterval $interval, ?DateTimeInterface $stop = null, array $criteria = []): array
     {
         /** @var DBmysql $DB */
         global $DB;
@@ -513,7 +514,6 @@ class Toolbox
                 'FROM' => $records_query,
                 'WHERE' => [
                     'NOT'  => ['prev_date' => null],
-                    // new QueryExpression('TIMESTAMPDIFF(SECOND, `records`.`prev_date`, `records`.`date`) > ' . $interval_in_seconds)
                     new QueryExpression('DATE_ADD(`records`.`prev_date`, ' . $sql_interval . ') < `date`')
                 ],
             ],
@@ -558,10 +558,32 @@ class Toolbox
             ]
         ], true);
 
-        return $DB->request([
+        $result = $DB->request([
             'FROM'  => $request,
             'ORDER' => 'start'
         ]);
+
+        // Filter out gaps caused by DST switch
+        // In the SQL function DATE_ADD() we may do the following process
+        // DATE_ADD('2022-03-27 01:00:00', INTERVAL 1 HOUR) and '2022-03-27 01:00:00' + INTERVAL 1 HOUR
+        // while we use Europe/Paris timezone
+        // Both expressions return '2022-03-27 02:00:00' and it matches the exact time where we switch to summer time
+        // '2022-03-27 02:00:00' should be actually '2022-03-27 03:00:00', but this is not what happens with MySQL 8.0
+        // Therefore when the date '2022-03-27 02:00:00' is converted into a DateTime object in PHP with Europe/Paris timezone
+        // it is converted into '2022-03-27 03:00:00'.
+        // When the start of a gap and the end of a gap, both converted into a DateTime object, are equal
+        // then this means that we are switching to summer time and the gap is irrelevant
+        // The code below tracks such intervals and filters them out
+        $filtered_gaps = [];
+        foreach ($result as $gap) {
+            $gap_start = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $gap['start']);
+            $gap_end = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $gap['end']);
+            if ($gap_start == $gap_end) {
+                continue;
+            }
+            $filtered_gaps[] = $gap;
+        }
+        return $filtered_gaps;
     }
 
     /**
