@@ -57,7 +57,7 @@ class CreateFakeCarbonIntensityCommand extends Command
     {
         $this
            ->setName('plugins:carbon:create_carbon_intensity')
-           ->setDescription("Create fake carbon intenssity data");
+           ->setDescription("Create fake carbon intensity data");
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
