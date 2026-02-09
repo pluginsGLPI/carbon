@@ -230,13 +230,15 @@ class Client extends AbstractClient
 
         // Set timezone to +00:00 and extend range by -12/+14 hours
         $timezone_z = new DateTimeZone('+0000');
-        $request_start = $start->setTimezone($timezone_z)->sub(new DateInterval('PT12H'));
-        $request_stop = $stop->setTimezone($timezone_z)->add(new DateInterval('PT14H'));
+        // $request_start = $start->setTimezone($timezone_z)->sub(new DateInterval('PT12H'));
+        // $request_stop = $stop->setTimezone($timezone_z)->add(new DateInterval('PT14H'));
+        $request_start = $start->sub(new DateInterval('PT12H'));
+        $request_stop = $stop->add(new DateInterval('PT14H'));
         $format = DateTime::ATOM;
         $from = $request_start->format($format);
         $to = $request_stop->format($format);
         $interval = $request_stop->diff($request_start);
-        $expected_samples_count = (int) ($interval->days * 24)
+        $expected_samples_hours = (int) ($interval->days * 24)
             + (int) ($interval->h)
             + (int) ($interval->i / 60);
 
@@ -271,7 +273,8 @@ class Client extends AbstractClient
         @mkdir(dirname($cache_file), 0755, true);
 
         // Prepare the HTTP request
-        $timezone = new DateTimeZone('Europe/Paris'); // Optimal timezone to avoid DST mess in the response
+        // Optimal timezone for returned dates to reduce DST mess in the response
+        $timezone = new DateTimeZone('Europe/Paris');
         $where = "date_heure IN [date'$from' TO date'$to'[ AND taux_co2 is not null";
         $params = [
             'select' => 'date_heure,taux_co2',
@@ -281,8 +284,9 @@ class Client extends AbstractClient
         ];
         $response = $this->client->request('GET', $url, ['timeout' => 8, 'query' => $params]);
         $this->step = $this->detectStep($response);
-        $expected_samples_count *= (60 / $this->step);
-        if (($dataset === self::DATASET_REALTIME && abs(count($response) - $expected_samples_count) > 4)) {
+        $expected_samples_count = $expected_samples_hours * (60 / $this->step);
+        $expected_samples_count--; // End boundary is excluded, decreasing the expeected count by 1
+        if (($dataset === self::DATASET_REALTIME && abs(count($response) - $expected_samples_count) > (60 / $this->step))) {
             $alt_response = $this->fetchRange($start, $stop, $zone, self::DATASET_CONSOLIDATED);
             if (!isset($alt_response['error_code']) && count($alt_response) > count($response)) {
                 // Use the alternative response if more samples than the original response
