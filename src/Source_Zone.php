@@ -521,12 +521,13 @@ class Source_Zone extends CommonDBRelation
         );
 
         $total = count($entries);
+        $zone = Zone::getById($zone_id);
         $renderer = TemplateRenderer::getInstance();
+
         $template = <<<TWIG
         {% import "components/form/fields_macros.html.twig" as fields %}
-        {{ fields.smallTitle(zone_name) }}
+        {{ fields.smallTitle(__('Gaps for the zone %s', 'carbon')|format(zone_name)) }}
 TWIG;
-        $zone = Zone::getById($zone_id);
         echo $renderer->renderFromStringTemplate($template, ['zone_name' => $zone->fields['name']]);
         $renderer->display('components/datatable.html.twig', [
             'is_tab' => true,
