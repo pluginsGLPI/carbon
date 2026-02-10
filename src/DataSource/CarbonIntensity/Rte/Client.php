@@ -45,6 +45,9 @@ use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\Toolbox;
+use Safe\Exceptions\FilesystemException;
+
+use function Safe\mkdir;
 
 /**
  * Query carbon intensity data from Réseau de Transport d'Électricité (RTE)
@@ -230,38 +233,34 @@ class Client extends AbstractClient
 
         // Set timezone to +00:00 and extend range by -12/+14 hours
         $timezone_z = new DateTimeZone('+0000');
-        // $request_start = $start->setTimezone($timezone_z)->sub(new DateInterval('PT12H'));
-        // $request_stop = $stop->setTimezone($timezone_z)->add(new DateInterval('PT14H'));
-        $request_start = $start->sub(new DateInterval('PT12H'));
-        $request_stop = $stop->add(new DateInterval('PT14H'));
+        $request_start = $start->setTimezone($timezone_z)->sub(new DateInterval('PT12H'));
+        $request_stop = $stop->setTimezone($timezone_z)->add(new DateInterval('PT14H'));
         $format = DateTime::ATOM;
         $from = $request_start->format($format);
         $to = $request_stop->format($format);
         $interval = $request_stop->diff($request_start);
         $expected_samples_hours = (int) ($interval->days * 24)
             + (int) ($interval->h)
-            + (int) ($interval->i / 60);
+            + (int) ($interval->i / 60)
+            - (($start->getOffset() - $stop->getOffset()) / 3600);
 
         // Choose URL
         switch ($dataset) {
             case self::DATASET_CONSOLIDATED:
                 $url = self::EXPORT_URL_CONSOLIDATED;
-                $cache_file = $this->getCacheFilename(
-                    $consolidated_dir,
-                    $start,
-                    $stop
-                );
+                $cache_dir = $consolidated_dir;
                 break;
             case self::DATASET_REALTIME:
             default:
                 $url = self::EXPORT_URL_REALTIME;
-                $cache_file = $this->getCacheFilename(
-                    $realtime_dir,
-                    $start,
-                    $stop
-                );
+                $cache_dir = $realtime_dir;
                 break;
         }
+        $cache_file = $this->getCacheFilename(
+            $cache_dir,
+            $start,
+            $stop
+        );
         $url = $this->base_url . $url;
 
         // If a cached file exists, use it
@@ -269,8 +268,16 @@ class Client extends AbstractClient
             $response = json_decode(file_get_contents($cache_file), true);
             $this->step = $this->detectStep($response);
             return $response;
+        } else {
+            $cache_dir = dirname($cache_file);
+            if (!is_dir($cache_dir)) {
+                try {
+                    mkdir($cache_dir, 0755, true);
+                } catch (FilesystemException $e) {
+                    trigger_error($e->getMessage(), E_USER_WARNING);
+                }
+            }
         }
-        @mkdir(dirname($cache_file), 0755, true);
 
         // Prepare the HTTP request
         // Optimal timezone for returned dates to reduce DST mess in the response
@@ -300,19 +307,6 @@ class Client extends AbstractClient
             }
         }
         return $response;
-    }
-
-    protected function getCacheFilename(string $base_dir, DateTimeImmutable $start, DateTimeImmutable $end): string
-    {
-        $timezone_name = $start->getTimezone()->getName();
-        $timezone_name = str_replace('/', '-', $timezone_name);
-        return sprintf(
-            '%s/%s_%s_%s.json',
-            $base_dir,
-            $timezone_name,
-            $start->format('Y-m-d'),
-            $end->format('Y-m-d')
-        );
     }
 
     /**
