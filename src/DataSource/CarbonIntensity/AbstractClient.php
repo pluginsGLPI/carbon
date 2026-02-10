@@ -326,4 +326,17 @@ abstract class AbstractClient implements ClientInterface
         ]);
         return $source_zone->toggleZone($state);
     }
+
+    protected function getCacheFilename(string $base_dir, DateTimeImmutable $start, DateTimeImmutable $end): string
+    {
+        $timezone_name = $start->getTimezone()->getName();
+        $timezone_name = str_replace('/', '-', $timezone_name);
+        return sprintf(
+            '%s/%s_%s_%s.json',
+            $base_dir,
+            $timezone_name,
+            $start->format('Y-m-d'),
+            $end->format('Y-m-d')
+        );
+    }
 }

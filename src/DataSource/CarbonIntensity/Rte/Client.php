@@ -45,6 +45,9 @@ use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\Toolbox;
+use Safe\Exceptions\FilesystemException;
+
+use function Safe\mkdir;
 
 /**
  * Query carbon intensity data from Réseau de Transport d'Électricité (RTE)
@@ -236,30 +239,28 @@ class Client extends AbstractClient
         $from = $request_start->format($format);
         $to = $request_stop->format($format);
         $interval = $request_stop->diff($request_start);
-        $expected_samples_count = (int) ($interval->days * 24)
+        $expected_samples_hours = (int) ($interval->days * 24)
             + (int) ($interval->h)
-            + (int) ($interval->i / 60);
+            + (int) ($interval->i / 60)
+            - (($start->getOffset() - $stop->getOffset()) / 3600);
 
         // Choose URL
         switch ($dataset) {
             case self::DATASET_CONSOLIDATED:
                 $url = self::EXPORT_URL_CONSOLIDATED;
-                $cache_file = $this->getCacheFilename(
-                    $consolidated_dir,
-                    $start,
-                    $stop
-                );
+                $cache_dir = $consolidated_dir;
                 break;
             case self::DATASET_REALTIME:
             default:
                 $url = self::EXPORT_URL_REALTIME;
-                $cache_file = $this->getCacheFilename(
-                    $realtime_dir,
-                    $start,
-                    $stop
-                );
+                $cache_dir = $realtime_dir;
                 break;
         }
+        $cache_file = $this->getCacheFilename(
+            $cache_dir,
+            $start,
+            $stop
+        );
         $url = $this->base_url . $url;
 
         // If a cached file exists, use it
@@ -267,11 +268,20 @@ class Client extends AbstractClient
             $response = json_decode(file_get_contents($cache_file), true);
             $this->step = $this->detectStep($response);
             return $response;
+        } else {
+            $cache_dir = dirname($cache_file);
+            if (!is_dir($cache_dir)) {
+                try {
+                    mkdir($cache_dir, 0755, true);
+                } catch (FilesystemException $e) {
+                    trigger_error($e->getMessage(), E_USER_WARNING);
+                }
+            }
         }
-        @mkdir(dirname($cache_file), 0755, true);
 
         // Prepare the HTTP request
-        $timezone = new DateTimeZone('Europe/Paris'); // Optimal timezone to avoid DST mess in the response
+        // Optimal timezone for returned dates to reduce DST mess in the response
+        $timezone = new DateTimeZone('Europe/Paris');
         $where = "date_heure IN [date'$from' TO date'$to'[ AND taux_co2 is not null";
         $params = [
             'select' => 'date_heure,taux_co2',
@@ -281,8 +291,9 @@ class Client extends AbstractClient
         ];
         $response = $this->client->request('GET', $url, ['timeout' => 8, 'query' => $params]);
         $this->step = $this->detectStep($response);
-        $expected_samples_count *= (60 / $this->step);
-        if (($dataset === self::DATASET_REALTIME && abs(count($response) - $expected_samples_count) > 4)) {
+        $expected_samples_count = $expected_samples_hours * (60 / $this->step);
+        $expected_samples_count--; // End boundary is excluded, decreasing the expeected count by 1
+        if (($dataset === self::DATASET_REALTIME && abs(count($response) - $expected_samples_count) > (60 / $this->step))) {
             $alt_response = $this->fetchRange($start, $stop, $zone, self::DATASET_CONSOLIDATED);
             if (!isset($alt_response['error_code']) && count($alt_response) > count($response)) {
                 // Use the alternative response if more samples than the original response
@@ -296,19 +307,6 @@ class Client extends AbstractClient
             }
         }
         return $response;
-    }
-
-    protected function getCacheFilename(string $base_dir, DateTimeImmutable $start, DateTimeImmutable $end): string
-    {
-        $timezone_name = $start->getTimezone()->getName();
-        $timezone_name = str_replace('/', '-', $timezone_name);
-        return sprintf(
-            '%s/%s_%s_%s.json',
-            $base_dir,
-            $timezone_name,
-            $start->format('Y-m-d'),
-            $end->format('Y-m-d')
-        );
     }
 
     /**

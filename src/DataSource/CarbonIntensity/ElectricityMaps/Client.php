@@ -47,6 +47,7 @@ use GlpiPlugin\Carbon\DataSource\CarbonIntensity\AbstractClient;
 use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\Toolbox;
+use Safe\Exceptions\FilesystemException;
 use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
@@ -279,8 +280,16 @@ class Client extends AbstractClient
         if (file_exists($cache_file)) {
             $full_response = json_decode(file_get_contents($cache_file), true);
             return $full_response;
+        } else {
+            $cache_dir = dirname($cache_file);
+            if (!is_dir($cache_dir)) {
+                try {
+                    mkdir($cache_dir, 0755, true);
+                } catch (FilesystemException $e) {
+                    trigger_error($e->getMessage(), E_USER_WARNING);
+                }
+            }
         }
-        @mkdir(dirname($cache_file), 0755, true);
 
         // Set timezone to +00:00 and extend range by 12 hours on each side
         $request_start = $start->setTimezone(new DateTimeZone('+0000'))->sub(new DateInterval('PT12H'));
@@ -399,15 +408,5 @@ class Client extends AbstractClient
             $current_date->add(new DateInterval('P1D'));
             $current_date->setTime(0, 0, 0);
         }
-    }
-
-    protected function getCacheFilename(string $base_dir, DateTimeImmutable $start, DateTimeImmutable $end): string
-    {
-        return sprintf(
-            '%s/%s_%s.json',
-            $base_dir,
-            $start->format('Y-m-d'),
-            $end->format('Y-m-d')
-        );
     }
 }
