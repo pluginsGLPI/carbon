@@ -131,6 +131,8 @@ class Engine extends CommonGLPI
      */
     private static function hasModelData(CommonDBTM $item): bool
     {
+        global $DB;
+
         $itemtype = get_class($item);
         $glpi_model_class = $itemtype . 'Model';
         $glpi_model_class_fk = getForeignKeyFieldForItemType($glpi_model_class);
@@ -138,12 +140,16 @@ class Engine extends CommonGLPI
          * @var class-string<AbstractModel> $model_class
          */
         $model_class = 'GlpiPlugin\\Carbon\\' . $glpi_model_class;
+        $model_table = getTableForItemType($model_class);
         $glpi_model_id = $item->fields[$glpi_model_class_fk];
         $crit = [
             $glpi_model_class_fk => $glpi_model_id
         ];
         $types = Type::getImpactTypes();
         foreach ($types as $key => $type) {
+            if (!$DB->fieldExists($model_table, $type)) {
+                continue;
+            }
             $crit['OR'][] = [
                 $type . '_quality' => ['<>', AbstractTracked::DATA_QUALITY_UNSET_VALUE]
             ];
