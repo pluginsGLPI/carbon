@@ -59,6 +59,7 @@ class Computer extends AbstractAsset
         // adapt $this->endpoint depending on the type of computer (server, laptop, ...)
         $type = $this->getType($this->item);
         $this->endpoint = $this->getEndpoint($type);
+        $this->endpoint .= '?' . $this->getCriteriasQueryString();
 
         // Ask for embodied impact only
         $handle_hardware = in_array($type, [

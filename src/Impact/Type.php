@@ -35,14 +35,50 @@ namespace GlpiPlugin\Carbon\Impact;
 
 class Type
 {
-    const IMPACT_GWP = 0; // Global warming potential
-    const IMPACT_ADP = 1; // Abiotic Depletion Potential
-    const IMPACT_PE  = 2; // Primary Energy
+    const IMPACT_GWP    = 0; // Global warming potential
+    const IMPACT_ADP    = 1; // Abiotic Depletion Potential
+    const IMPACT_PE     = 3; // Primary Energy
+    const IMPACT_GWPPB  = 4;
+    const IMPACT_GWPPF  = 5;
+    const IMPACT_GWPPLU = 6;
+    const IMPACT_IR     = 7;
+    const IMPACT_LU     = 8;
+    const IMPACT_ODP    = 9;
+    const IMPACT_PM     = 10;
+    const IMPACT_POCP   = 11;
+    const IMPACT_WU     = 12;
+    const IMPACT_MIPS   = 13;
+    const IMPACT_ADPE   = 14;
+    const IMPACT_ADPF   = 15;
+    const IMPACT_AP     = 16;
+    const IMPACT_CTUE   = 17;
+    // const IMPACT_CTUHC  = 18;
+    const IMPACT_EPF    = 19;
+    const IMPACT_EPM    = 20;
+    const IMPACT_EPT    = 21;
 
     private static array $impact_types = [
-        self::IMPACT_GWP => 'gwp',
-        self::IMPACT_ADP => 'adp',
-        self::IMPACT_PE  => 'pe',
+        self::IMPACT_GWP    => 'gwp',
+        self::IMPACT_ADP    => 'adp',
+        self::IMPACT_PE     => 'pe',
+        self::IMPACT_GWPPB  => 'gwppb',
+        self::IMPACT_GWPPF  => 'gwppf',
+        self::IMPACT_GWPPLU => 'gwpplu',
+        self::IMPACT_IR     => 'ir',
+        self::IMPACT_LU     => 'lu',
+        self::IMPACT_ODP    => 'odp',
+        self::IMPACT_PM     => 'pm',
+        self::IMPACT_POCP   => 'pocp',
+        self::IMPACT_WU     => 'wu',
+        self::IMPACT_MIPS   => 'mips',
+        self::IMPACT_ADPE   => 'adpe',
+        self::IMPACT_ADPF   => 'adpf',
+        self::IMPACT_AP     => 'ap',
+        self::IMPACT_CTUE   => 'ctue',
+        // self::IMPACT_CTUHC  => 'ctuh_c',
+        self::IMPACT_EPF    => 'epf',
+        self::IMPACT_EPM    => 'epm',
+        self::IMPACT_EPT    => 'ept',
     ];
 
     public static function getImpactTypes(): array

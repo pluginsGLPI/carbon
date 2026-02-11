@@ -55,6 +55,30 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
     /** @var Client instance of the HTTP client */
     protected ?Client $client = null;
 
+    protected array $criterias = [
+        'gwp'    => 1000,       // Kg
+        'adp'    => 1000,       // Kg
+        'pe'     => 1000000,    // MJ
+        'gwppb'  => 1000,       // Kg
+        'gwppf'  => 1000,       // Kg
+        'gwpplu' => 1000,       // Kg
+        'ir'     => 1000,       // Kg
+        'lu'     => 1,          // (no unit)
+        'odp'    => 1000,       // Kg
+        'pm'     => 1,          // (no unit)
+        'pocp'   => 1000,       // Kg
+        'wu'     => 1000,       // M^3
+        'mips'   => 1000,       // Kg
+        'adpe'   => 1000,       // Kg
+        'adpf'   => 1000000,    // MJ
+        'ap'     => 1,          // mol
+        'ctue'   => 1,          // CTUe
+        // 'ctuh_c' => '',      // CTUh   request fails when this criteria is added, not a URL encoding issue
+        'epf'    => 1000,       // Kg
+        'epm'    => 1000,       // Kg
+        'ept'    => 1,          // mol
+    ];
+
     // abstract public static function getEngine(CommonDBTM $item): EngineInterface;
 
     /**
@@ -98,7 +122,23 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
         return self::$engine_version;
     }
 
-    protected function query($description): array
+    /**
+     * Get the quety string specifying the impact criterias for the HTTP request
+     *
+     * @return string
+     */
+    protected function getCriteriasQueryString(): string
+    {
+        return 'criteria=' . implode('&criteria=', array_keys($this->criterias));
+    }
+
+    /**
+     * Send a HTTP query
+     *
+     * @param array $description
+     * @return array
+     */
+    protected function query(array $description): array
     {
         try {
             $response = $this->client->post($this->endpoint, [
@@ -115,6 +155,7 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
     /**
      * Read the response to find the impacts provided by Boaviztapi
      *
+     * @param array $response
      * @return array
      */
     protected function parseResponse(array $response): array
@@ -130,20 +171,71 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
             if ($impact_id === false) {
                 continue;
             }
-            switch ($type) {
-                case 'gwp':
-                    $impacts[$impact_id] = $this->parseGwp($response['impacts'][$type]);
-                    break;
-                case 'adp':
-                    $impacts[$impact_id] = $this->parseAdp($response['impacts'][$type]);
-                    break;
-                case 'pe':
-                    $impacts[$impact_id] = $this->parsePe($response['impacts'][$type]);
-                    break;
-            }
+            $impacts[$impact_id] = $this->parseCriteria($type, $response['impacts'][$type]);
+            // switch ($type) {
+            //     case 'gwp':
+            //         $impacts[$impact_id] = $this->parseGwp($response['impacts'][$type]);
+            //         break;
+            //     case 'adp':
+            //         $impacts[$impact_id] = $this->parseAdp($response['impacts'][$type]);
+            //         break;
+            //     case 'pe':
+            //         $impacts[$impact_id] = $this->parsePe($response['impacts'][$type]);
+            //         break;
+            //     case 'gwppb':
+            //         break;
+            //     case 'gwppf':
+            //         break;
+            //     case 'gwpplu':
+            //         break;
+            //     case 'ir':
+            //         break;
+            //     case 'lu':
+            //         break;
+            //     case 'odp':
+            //         break;
+            //     case 'pm':
+            //         break;
+            //     case 'pocp':
+            //         break;
+            //     case 'wu':
+            //         break;
+            //     case 'mips':
+            //         break;
+            //     case 'adpe':
+            //         break;
+            //     case 'adpf':
+            //         break;
+            //     case 'ap':
+            //         break;
+            //     case 'ctue':
+            //         break;
+            //     case 'epf':
+            //         break;
+            //     case 'epm':
+            //         break;
+            //     case 'ept':
+            //         break;
+            // }
         }
 
         return $impacts;
+    }
+
+    protected function parseCriteria(string $name, array $impact): ?TrackedFloat
+    {
+        if ($impact['embedded'] === 'not implemented') {
+            return null;
+        }
+
+        $unit_multiplier = $this->criterias[$name];
+        $value = new TrackedFloat(
+            $impact['embedded']['value'] * $unit_multiplier,
+            null,
+            TrackedFloat::DATA_QUALITY_ESTIMATED
+        );
+
+        return $value;
     }
 
     protected function parseGwp(array $impact): ?TrackedFloat
