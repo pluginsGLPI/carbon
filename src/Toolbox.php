@@ -201,9 +201,9 @@ class Toolbox
     {
        //TRANS: list of unit (o for octet)
         $units = [
-            __('g',  'carbon'),
+            __('g', 'carbon'),
             __('Kg', 'carbon'),
-            __('t',  'carbon'),
+            __('t', 'carbon'),
             __('Kt', 'carbon'),
             __('Mt', 'carbon'),
             __('Gt', 'carbon'),
@@ -320,7 +320,7 @@ class Toolbox
      * @return string
      */
     public static function getHumanReadableValue(float $value, array $unit): string
-     {
+    {
         switch ($unit[0]) {
             case 'g':
                 return self::getWeight($value) . $unit[1];
