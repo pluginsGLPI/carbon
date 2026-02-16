@@ -53,6 +53,7 @@ use GlpiPlugin\Carbon\SearchOptions;
 use GlpiPlugin\Carbon\UsageImpact;
 use Glpi\DBAL\QueryExpression;
 use Glpi\DBAL\QuerySubQuery;
+use GlpiPlugin\Carbon\Impact\Type;
 use Search;
 use Session;
 use Toolbox as GlpiToolbox;
@@ -947,6 +948,44 @@ class Provider
             'number'     => $value,
             'label'      => $params['label'],
             'icon'       => $params['icon'],
+        ];
+    }
+
+    /**
+     * Total embodied abiotic depletion potential in antimony equivalent
+     *
+     * @param array $params
+     * @param array $crit
+     * @return array
+     */
+    public static function getImpactOfEmbodiedCriteria(string $impact_type, array $params = [], array $crit = []): array
+    {
+        $default_params = [
+            'label' => Type::getEmbodiedImpactLabel($impact_type),
+            'icon'  => 'fa-solid fa-temperature-arrow-up',
+        ];
+        $params = array_merge($default_params, $params);
+        if (count($crit['itemtype'] ?? []) === 0) {
+            $crit['itemtype'] = PLUGIN_CARBON_TYPES;
+        } else {
+            $crit['itemtype'] = array_intersect($crit['itemtype'], PLUGIN_CARBON_TYPES);
+        }
+
+        $value = self::getSum(EmbodiedImpact::getTable(), $impact_type, $params, $crit);
+        if ($value === null) {
+            $value = 'N/A';
+        } else {
+            // $value = Toolbox::getWeight($value) . Type::getImpactUnit($impact_type);
+            $value = Toolbox::getHumanReadableValue(
+                $value,
+                Type::getImpactUnit($impact_type)
+            );
+        }
+
+        return [
+            'number' => $value,
+            'label'  => $params['label'],
+            'icon'   => $params['icon'],
         ];
     }
 

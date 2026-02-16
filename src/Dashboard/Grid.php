@@ -35,6 +35,7 @@ namespace GlpiPlugin\Carbon\Dashboard;
 use Computer;
 use Glpi\Dashboard\Filter;
 use GlpiPlugin\Carbon\Config;
+use GlpiPlugin\Carbon\Impact\Type;
 use Session;
 
 class Grid
@@ -153,6 +154,22 @@ class Grid
             ];
         }
 
+        foreach (Type::getImpactTypes() as $impact_type) {
+            $key = "plugin_carbon_embodied_{$impact_type}_impact";
+            if (isset($new_cards[$key])) {
+                trigger_error("The card $key already exists", E_USER_WARNING);
+            }
+            $new_cards[$key] = [
+                'widgettype'   => ['bigNumber'],
+                'group'        => $group,
+                'label'        => Type::getEmbodiedImpactLabel($impact_type),
+                'provider'     => Provider::class . '::getImpactOfEmbodiedCriteria',
+                'args'     => [
+                    'impact_type' => $impact_type
+                ]
+            ];
+        }
+
         $new_cards += [
             // Usage impact
             'plugin_carbon_total_usage_power' => [
@@ -175,24 +192,24 @@ class Grid
             ],
 
             // Embodied impact
-            'plugin_carbon_embodied_gwp_impact' => [
-                'widgettype'   => ['bigNumber'],
-                'group'        => $group,
-                'label'        => __('Embodied global warming potential', 'carbon'),
-                'provider'     => Provider::class . '::getEmbodiedGlobalWarming',
-            ],
-            'plugin_carbon_embodied_pe_impact' => [
-                'widgettype'   => ['bigNumber'],
-                'group'        => $group,
-                'label'        => __('Embodied primary energy consumed', 'carbon'),
-                'provider'     => Provider::class . '::getEmbodiedPrimaryEnergy',
-            ],
-            'plugin_carbon_embodied_adp_impact' => [
-                'widgettype'   => ['bigNumber'],
-                'group'        => $group,
-                'label'        => __('Embodied abiotic depletion potential', 'carbon'),
-                'provider'     => Provider::class . '::getEmbodiedAbioticDepletion',
-            ],
+            // 'plugin_carbon_embodied_gwp_impact' => [
+            //     'widgettype'   => ['bigNumber'],
+            //     'group'        => $group,
+            //     'label'        => __('Embodied global warming potential', 'carbon'),
+            //     'provider'     => Provider::class . '::getEmbodiedGlobalWarming',
+            // ],
+            // 'plugin_carbon_embodied_pe_impact' => [
+            //     'widgettype'   => ['bigNumber'],
+            //     'group'        => $group,
+            //     'label'        => __('Embodied primary energy consumed', 'carbon'),
+            //     'provider'     => Provider::class . '::getEmbodiedPrimaryEnergy',
+            // ],
+            // 'plugin_carbon_embodied_adp_impact' => [
+            //     'widgettype'   => ['bigNumber'],
+            //     'group'        => $group,
+            //     'label'        => __('Embodied abiotic depletion potential', 'carbon'),
+            //     'provider'     => Provider::class . '::getEmbodiedAbioticDepletion',
+            // ],
 
             // embodied + usage impact
             'plugin_carbon_total_gwp_impact' => [
@@ -238,8 +255,8 @@ class Grid
             ];
         }
 
-        // Usage impact
         $new_cards += [
+            // Usage impact
             'plugin_carbon_report_usage_carbon_emission_ytd' => [
                 'widgettype'   => ['usage_carbon_emission_ytd'],
                 'group'        => $group,
@@ -278,25 +295,40 @@ class Grid
             ],
 
             // Embodied impact
-            'plugin_carbon_report_embodied_global_warming' => [
-                'widgettype'   => ['embodied_global_warming'],
-                'group'        => $group,
-                'label'        => __('Embodied global warming potential', 'carbon'),
-                'provider'     => Provider::class . '::getEmbodiedGlobalWarming',
-            ],
-            'plugin_carbon_report_embodied_abiotic_depletion' => [
-                'widgettype'   => ['embodied_abiotic_depletion'],
-                'group'        => $group,
-                'label'        => __('Embodied abiotic depletion potential', 'carbon'),
-                'provider'     => Provider::class . '::getEmbodiedAbioticDepletion',
-            ],
-            'plugin_carbon_report_embodied_pe_impact' => [
-                'widgettype'   => ['embodied_primary_energy'],
-                'group'        => $group,
-                'label'        => __('Embodied primary energy consumed', 'carbon'),
-                'provider'     => Provider::class . '::getEmbodiedPrimaryEnergy',
-            ],
+            // 'plugin_carbon_report_embodied_global_warming' => [
+            //     'widgettype'   => ['embodied_global_warming'],
+            //     'group'        => $group,
+            //     'label'        => __('Embodied global warming potential', 'carbon'),
+            //     'provider'     => Provider::class . '::getEmbodiedGlobalWarming',
+            // ],
+            // 'plugin_carbon_report_embodied_abiotic_depletion' => [
+            //     'widgettype'   => ['embodied_abiotic_depletion'],
+            //     'group'        => $group,
+            //     'label'        => __('Embodied abiotic depletion potential', 'carbon'),
+            //     'provider'     => Provider::class . '::getEmbodiedAbioticDepletion',
+            // ],
+            // 'plugin_carbon_report_embodied_pe_impact' => [
+            //     'widgettype'   => ['embodied_primary_energy'],
+            //     'group'        => $group,
+            //     'label'        => __('Embodied primary energy consumed', 'carbon'),
+            //     'provider'     => Provider::class . '::getEmbodiedPrimaryEnergy',
+            // ],
         ];
+        foreach (Type::getImpactTypes() as $impact_type) {
+            $key = "plugin_carbon_report_embodied_{$impact_type}_impact";
+            if (isset($new_cards[$key])) {
+                trigger_error("The card $key already exists", E_USER_WARNING);
+            }
+            $new_cards[$key] = [
+                'widgettype'   => [self::getWidgetForImpact(true, $impact_type)],
+                'group'        => $group,
+                'label'        => Type::getEmbodiedImpactLabel($impact_type),
+                'provider'     => Provider::class . '::getImpactOfEmbodiedCriteria',
+                'args'     => [
+                    'impact_type' => $impact_type
+                ]
+            ];
+        }
 
         // Informational content
         $new_cards += [
@@ -313,5 +345,22 @@ class Grid
         ];
 
         return $new_cards;
+    }
+
+    private static function getWidgetForImpact(bool $embodied, string $type): string
+    {
+        switch (($embodied ? 'embodied' : 'usage') . ' ' . $type) {
+            case 'embodied gwp':
+                return 'embodied_global_warming';
+                break;
+            case 'embodied adp':
+                return 'embodied_abiotic_depletion';
+                break;
+            case 'embodied pe':
+                return 'embodied_primary_energy';
+                break;
+        }
+
+        return '';
     }
 }
