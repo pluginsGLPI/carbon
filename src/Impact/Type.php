@@ -148,7 +148,7 @@ class Type
      **/
     public static function getEmbodiedImpactLabel(string $type): string
     {
-        $embodied_impact_label = [
+        $label = match ($type) {
             'gwp'    => __('Embodied Global warming potential', 'carbon'),
             'adp'    => __('Embodied Abiotic depletion potential', 'carbon'),
             'pe'     => __('Embodied Primary energy consumed', 'carbon'),
@@ -171,8 +171,9 @@ class Type
             'epf'    => __('Embodied Eutrophication of freshwater', 'carbon'),
             'epm'    => __('Embodied Eutrophication of marine waters', 'carbon'),
             'ept'    => __('Embodied Terrestrial eutrophication', 'carbon'),
-        ];
-        return $embodied_impact_label[$type] ?? '';
+            default  => '',
+        };
+        return $label;
     }
 
     /**
@@ -183,7 +184,7 @@ class Type
      **/
     public static function getUsageImpactLabel(string $type): string
     {
-        static $usage_impact_label = [
+        $label = match ($type) {
             'gwp'    => __('Usage Global warming potential', 'carbon'),
             'adp'    => __('Usage Abiotic depletion potential', 'carbon'),
             'pe'     => __('Usage Primary energy consumed', 'carbon'),
@@ -206,7 +207,8 @@ class Type
             'epf'    => __('Usage Eutrophication of freshwater', 'carbon'),
             'epm'    => __('Usage Eutrophication of marine waters', 'carbon'),
             'ept'    => __('Usage Terrestrial eutrophication', 'carbon'),
-        ];
-        return $usage_impact_label[$type] ?? '';
+            default  => ''
+        };
+        return $label;
     }
 }
