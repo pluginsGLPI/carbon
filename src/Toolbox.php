@@ -227,19 +227,6 @@ class Toolbox
         return sprintf(__('%1$s&nbsp;%2$s'), $weight, $human_readable_unit);
     }
 
-    public static function dynamicRound(float $number): float
-    {
-        if ($number < 10) {
-            $number = round($number, 2);
-        } else if ($number < 100) {
-            $number = round($number, 1);
-        } else {
-            $number = round($number, 0);
-        }
-
-        return $number;
-    }
-
     /**
      * Format a power passing a power in grams
      *
@@ -307,7 +294,49 @@ class Toolbox
         $p = self::dynamicRound($p);
 
        //TRANS: %1$s is a number maybe float or string and %2$s the unit
-        return sprintf(__('%1$s&nbsp;%2$s'), $p, $human_readable_unit);
+        return sprintf(__('%1$s %2$s'), $p, $human_readable_unit);
+    }
+
+    public static function dynamicRound(float $number): float
+    {
+        if ($number < 10) {
+            $number = round($number, 2);
+        } else if ($number < 100) {
+            $number = round($number, 1);
+        } else {
+            $number = round($number, 0);
+        }
+
+        return $number;
+    }
+
+    /**
+     * Convert a value and its unit into a human readable value
+     *
+     * Unit is an array i.e. ['g', 'CO2 eq'] for grams of carbondioxyde equivalent
+     *
+     * @param float $value value of the quantity to convert
+     * @param array $unit unit splitted into a standard unit and a qualification.
+     * @return string
+     */
+    public static function getHumanReadableValue(float $value, array $unit): string
+    {
+        switch ($unit[0]) {
+            case 'g':
+                return self::getWeight($value) . $unit[1];
+            case 'J':
+                // To be converted into watt.hour
+                return self::getEnergy($value / 3600) . $unit[1];
+            case 'Wh':
+                return self::getEnergy($value) . $unit[1];
+            case 'm³':
+                // Value is in m^3
+                return sprintf(__('%1$s %2$s', 'carbon'), $value * 1000, 'L');
+            case 'mol':
+                break;
+        }
+
+        return sprintf(__('%1$s %2$s', 'carbon'), $value, implode(' ', $unit));
     }
 
     /**

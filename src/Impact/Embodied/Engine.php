@@ -34,6 +34,7 @@ namespace GlpiPlugin\Carbon\Impact\Embodied;
 
 use CommonGLPI;
 use CommonDBTM;
+use DBmysql;
 use GlpiPlugin\Carbon\AbstractModel;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\Client;
