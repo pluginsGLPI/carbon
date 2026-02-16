@@ -36,6 +36,7 @@ use CommonDBTM;
 use DBmysql;
 use DBmysqlIterator;
 use Glpi\DBAL\QuerySubQuery;
+use GlpiPlugin\Carbon\Impact\Type;
 
 /**
  * Embodied impact of assets
@@ -83,35 +84,19 @@ class EmbodiedImpact extends CommonDBTM
             'datatype'           => 'itemtypename',
         ];
 
-        $tab[] = [
-            'id'                 => '5',
-            'table'              => $this->getTable(),
-            'field'              => 'gwp',
-            'name'               => __('Global Warming Potential', 'carbon'),
-            'massiveaction'      => false,
-            'datatype'           => 'number',
-            'unit'               => 'g CO<sub>2</sub> eq',
-        ];
-
-        $tab[] = [
-            'id'                 => '6',
-            'table'              => $this->getTable(),
-            'field'              => 'adp',
-            'name'               => __('Abiotic Depletion Potential', 'carbon'),
-            'massiveaction'      => false,
-            'datatype'           => 'number',
-            'unit'               => 'g Sb eq',
-        ];
-
-        $tab[] = [
-            'id'                 => '7',
-            'table'              => $this->getTable(),
-            'field'              => 'pe',
-            'name'               => __('Primary energy', 'carbon'),
-            'massiveaction'      => false,
-            'datatype'           => 'number',
-            'unit'               => 'J',
-        ];
+        $id = 5;
+        foreach (Type::getImpactTypes() as $type => $unit) {
+            $tab[] = [
+                'id'                 => $id,
+                'table'              => $this->getTable(),
+                'field'              => $type,
+                'name'               => Type::getEmbodiedImpactLabel($type),
+                'massiveaction'      => false,
+                'datatype'           => 'number',
+                'unit'               => implode(' ', $unit),
+            ];
+            $id++;
+        }
 
         $tab[] = [
             'id'                 => SearchOptions::CARBON_EMISSION_CALC_DATE,
