@@ -105,8 +105,15 @@ class Install
         global $DB;
 
         $dbFile = plugin_carbon_getSchemaPath();
-        if ($dbFile === null || !$DB->runFile($dbFile)) {
+        if ($dbFile === null) {
             $this->migration->addWarningMessage("Error creating tables : " . $DB->error());
+            return false;
+        }
+
+        try {
+            $DB->runFile($dbFile);
+        } catch (\RuntimeException $e) {
+            $this->migration->addWarningMessage("Error creating tables : " . $e->getMessage());
             return false;
         }
 
