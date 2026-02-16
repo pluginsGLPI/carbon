@@ -85,7 +85,7 @@ class EmbodiedImpact extends CommonDBTM
         ];
 
         $id = 5;
-        foreach (Type::getImpactTypes() as $type => $unit) {
+        foreach (Type::getImpactTypes() as $type) {
             $tab[] = [
                 'id'                 => $id,
                 'table'              => $this->getTable(),
@@ -93,7 +93,7 @@ class EmbodiedImpact extends CommonDBTM
                 'name'               => Type::getEmbodiedImpactLabel($type),
                 'massiveaction'      => false,
                 'datatype'           => 'number',
-                'unit'               => implode(' ', $unit),
+                'unit'               => implode(' ', Type::getImpactUnit($type)),
             ];
             $id++;
         }

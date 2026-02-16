@@ -35,8 +35,8 @@ namespace GlpiPlugin\Carbon\Impact;
 
 class Type
 {
-    const IMPACT_GWP    = 0; // Global warming potential
-    const IMPACT_ADP    = 1; // Abiotic Depletion Potential
+    const IMPACT_GWP    = 1; // Global warming potential
+    const IMPACT_ADP    = 2; // Abiotic Depletion Potential
     const IMPACT_PE     = 3; // Primary Energy
     const IMPACT_GWPPB  = 4;
     const IMPACT_GWPPF  = 5;
@@ -114,9 +114,9 @@ class Type
     ];
 
     /**
-     * Undocumented function
+     * get an array of impact types
      *
-     * @return array<string, array>
+     * @return array<int, string>
      */
     public static function getImpactTypes(): array
     {
@@ -138,7 +138,7 @@ class Type
      * Get the unit of an impact type
      *
      * @param string $type impact type name
-     * @return array
+     * @return array<string>
      **/
     public static function getImpactUnit(string $type): array
     {
