@@ -113,6 +113,11 @@ class Type
         'ept'    => ['mol', 'N eq'],
     ];
 
+    /**
+     * Undocumented function
+     *
+     * @return array<string, array>
+     */
     public static function getImpactTypes(): array
     {
         return self::$impact_types;
