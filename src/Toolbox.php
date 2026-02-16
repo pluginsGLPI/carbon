@@ -324,18 +324,14 @@ class Toolbox
         switch ($unit[0]) {
             case 'g':
                 return self::getWeight($value) . $unit[1];
-                break;
             case 'J':
                 // To be converted into watt.hour
                 return self::getEnergy($value / 3600) . $unit[1];
-                break;
             case 'Wh':
                 return self::getEnergy($value) . $unit[1];
-                break;
             case 'm³':
                 // Value is in m^3
                 return sprintf(__('%1$s %2$s', 'carbon'), $value * 1000, 'L');
-                break;
             case 'mol':
                 break;
         }

@@ -34,6 +34,7 @@ namespace GlpiPlugin\Carbon\Impact\Embodied;
 
 use CommonGLPI;
 use CommonDBTM;
+use DBmysql;
 use GlpiPlugin\Carbon\AbstractModel;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\Client;
@@ -131,6 +132,7 @@ class Engine extends CommonGLPI
      */
     private static function hasModelData(CommonDBTM $item): bool
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $itemtype = get_class($item);
