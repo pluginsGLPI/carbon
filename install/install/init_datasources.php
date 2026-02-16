@@ -115,7 +115,7 @@ while (($line = $file->fgetcsv(',', '"', '\\')) !== false) {
         ]);
     } catch (\RuntimeException $e) {
         $file = null; // close the file
-        throw new \RuntimeException("Failed to insert data for year $year");
+        throw new \RuntimeException("Failed to insert data for year $year; reason: " . $e->getMessage(), $e->getCode(), $e);
     }
 }
 if ($progress_bar) {
@@ -140,6 +140,6 @@ foreach ($quebec_carbon_intensity as $year => $intensity) {
         ]);
     } catch (\RuntimeException $e) {
         $file = null; // close the file
-        throw new \RuntimeException("Failed to insert data for year $year");
+        throw new \RuntimeException("Failed to insert data for year $year; reason: " . $e->getMessage(), $e->getCode(), $e);
     }
 }
