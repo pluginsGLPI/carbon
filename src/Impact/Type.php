@@ -89,12 +89,12 @@ class Type
      * @var array
      */
     private static array $impact_units = [
-        'gwp'    => ['g', 'CO2 eq'],
+        'gwp'    => ['g', 'CO₂ eq'],
         'adp'    => ['g', 'SB eq'],
         'pe'     => ['J', ''],
-        'gwppb'  => ['g', 'CO2 eq'],
-        'gwppf'  => ['g', 'CO2 eq'],
-        'gwpplu' => ['g', 'CO2 eq'],
+        'gwppb'  => ['g', 'CO₂ eq'],
+        'gwppf'  => ['g', 'CO₂ eq'],
+        'gwpplu' => ['g', 'CO₂ eq'],
         'ir'     => ['g', 'U235 eq'],
         'lu'     => null,
         'odp'    => ['g', 'CFC-11 eq'],
