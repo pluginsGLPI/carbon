@@ -90,7 +90,7 @@ class EmbodiedImpact extends CommonDBTM
             'name'               => __('Global Warming Potential', 'carbon'),
             'massiveaction'      => false,
             'datatype'           => 'number',
-            'unit'               => 'gCO<sub>2</sub>eq',
+            'unit'               => 'g CO<sub>2</sub> eq',
         ];
 
         $tab[] = [
@@ -100,7 +100,7 @@ class EmbodiedImpact extends CommonDBTM
             'name'               => __('Abiotic Depletion Potential', 'carbon'),
             'massiveaction'      => false,
             'datatype'           => 'number',
-            'unit'               => 'KgSbeq',
+            'unit'               => 'g Sb eq',
         ];
 
         $tab[] = [

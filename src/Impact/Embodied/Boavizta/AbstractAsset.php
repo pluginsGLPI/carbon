@@ -55,7 +55,8 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
     /** @var Client instance of the HTTP client */
     protected ?Client $client = null;
 
-    protected array $criterias = [
+    /** @var array Supported impact criterias and the multiplier unit of the value returned by Boaviztapi */
+    protected array $criteria_units = [
         'gwp'    => 1000,       // Kg
         'adp'    => 1000,       // Kg
         'pe'     => 1000000,    // MJ
@@ -73,7 +74,8 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
         'adpf'   => 1000000,    // MJ
         'ap'     => 1,          // mol
         'ctue'   => 1,          // CTUe
-        // 'ctuh_c' => '',      // CTUh   request fails when this criteria is added, not a URL encoding issue
+        // 'ctuh_c' => 1,          // CTUh   request fails when this criteria is added, not a URL encoding issue
+        // 'ctuh_nc' => 1,         // CTUh   request fails when this criteria is added, not a URL encoding issue
         'epf'    => 1000,       // Kg
         'epm'    => 1000,       // Kg
         'ept'    => 1,          // mol
@@ -129,7 +131,7 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
      */
     protected function getCriteriasQueryString(): string
     {
-        return 'criteria=' . implode('&criteria=', array_keys($this->criterias));
+        return 'criteria=' . implode('&criteria=', array_keys($this->criteria_units));
     }
 
     /**
@@ -172,51 +174,6 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
                 continue;
             }
             $impacts[$impact_id] = $this->parseCriteria($type, $response['impacts'][$type]);
-            // switch ($type) {
-            //     case 'gwp':
-            //         $impacts[$impact_id] = $this->parseGwp($response['impacts'][$type]);
-            //         break;
-            //     case 'adp':
-            //         $impacts[$impact_id] = $this->parseAdp($response['impacts'][$type]);
-            //         break;
-            //     case 'pe':
-            //         $impacts[$impact_id] = $this->parsePe($response['impacts'][$type]);
-            //         break;
-            //     case 'gwppb':
-            //         break;
-            //     case 'gwppf':
-            //         break;
-            //     case 'gwpplu':
-            //         break;
-            //     case 'ir':
-            //         break;
-            //     case 'lu':
-            //         break;
-            //     case 'odp':
-            //         break;
-            //     case 'pm':
-            //         break;
-            //     case 'pocp':
-            //         break;
-            //     case 'wu':
-            //         break;
-            //     case 'mips':
-            //         break;
-            //     case 'adpe':
-            //         break;
-            //     case 'adpf':
-            //         break;
-            //     case 'ap':
-            //         break;
-            //     case 'ctue':
-            //         break;
-            //     case 'epf':
-            //         break;
-            //     case 'epm':
-            //         break;
-            //     case 'ept':
-            //         break;
-            // }
         }
 
         return $impacts;
@@ -228,7 +185,7 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
             return null;
         }
 
-        $unit_multiplier = $this->criterias[$name];
+        $unit_multiplier = $this->criteria_units[$name];
         $value = new TrackedFloat(
             $impact['embedded']['value'] * $unit_multiplier,
             null,
