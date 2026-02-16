@@ -57,8 +57,14 @@ function update100to101(Migration $migration)
     }
 
     $dbFile = plugin_carbon_getSchemaPath($to_version);
-    if ($dbFile === null || !$DB->runFile($dbFile)) {
+    if ($dbFile === null) {
         $migration->addWarningMessage("Error creating tables : " . $DB->error());
+        $updateresult = false;
+    }
+    try {
+        $DB->runFile($dbFile);
+    } catch (\RuntimeException $e) {
+        $migration->addWarningMessage("Error creating tables : " . $e->getMessage());
         $updateresult = false;
     }
 

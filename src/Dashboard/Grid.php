@@ -352,13 +352,10 @@ class Grid
         switch (($embodied ? 'embodied' : 'usage') . ' ' . $type) {
             case 'embodied gwp':
                 return 'embodied_global_warming';
-                break;
             case 'embodied adp':
                 return 'embodied_abiotic_depletion';
-                break;
             case 'embodied pe':
                 return 'embodied_primary_energy';
-                break;
         }
 
         return '';
