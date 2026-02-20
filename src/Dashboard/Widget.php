@@ -107,27 +107,34 @@ class Widget extends GlpiDashboardWidget
             ],
 
             // Embodied impact
-            'embodied_global_warming' => [
-                'label'    => __('Embodied carbon emission', 'carbon'),
-                'function' => self::class . '::displayEmbodiedCarbonEmission',
+            // 'embodied_global_warming' => [
+            //     'label'    => __('Embodied carbon emission', 'carbon'),
+            //     'function' => self::class . '::displayEmbodiedCarbonEmission',
+            //     'image'      => '',
+            //     'width'    => 6,
+            //     'height'   => 3,
+            // ],
+            // 'embodied_abiotic_depletion' => [
+            //     'label'    => __('Embodied abiotic depletion potential', 'carbon'),
+            //     'function' => self::class . '::displayEmbodiedAbioticDepletion',
+            //     'image'      => '',
+            //     'width'    => 6,
+            //     'height'   => 3,
+            // ],
+            // 'embodied_primary_energy' => [
+            //     'label'    => __('Embodied consumed primary energy', 'carbon'),
+            //     'function' => self::class . '::displayEmbodiedPrimaryEnergy',
+            //     'image'      => '',
+            //     'width'    => 6,
+            //     'height'   => 3,
+            // ],
+            'impact_criteria_number' => [
+                'label'    => __('Impact criteria', 'carbon'),
+                'function' => self::class . '::displayImpactCriteriaNumber',
                 'image'      => '',
                 'width'    => 6,
                 'height'   => 3,
-            ],
-            'embodied_abiotic_depletion' => [
-                'label'    => __('Embodied abiotic depletion potential', 'carbon'),
-                'function' => self::class . '::displayEmbodiedAbioticDepletion',
-                'image'      => '',
-                'width'    => 6,
-                'height'   => 3,
-            ],
-            'embodied_primary_energy' => [
-                'label'    => __('Embodied consumed primary energy', 'carbon'),
-                'function' => self::class . '::displayEmbodiedPrimaryEnergy',
-                'image'      => '',
-                'width'    => 6,
-                'height'   => 3,
-            ],
+            ]
         ];
 
         // Data diagnostic
@@ -830,23 +837,25 @@ class Widget extends GlpiDashboardWidget
         ]);
     }
 
-    public static function displayEmbodiedCarbonEmission(array $params = []): string
+    public static function displayImpactCriteriaNumber(array $params = []): string
     {
         $default = [
-            'number'  => 0,
             'url'     => '',
             'label'   => '',
             'alt'     => '',
             'color'   => '',
             'icon'    => '',
-            'id'      => 'plugin_carbon_embodied_carbon_emission_' . mt_rand(),
+            'id'      => 'plugin_carbon_embodied_primary_energy_' . mt_rand(),
             'filters' => [], // TODO: Not implemented yet (is this useful ?)
         ];
         $p = array_merge($default, $params);
 
-        $url = Documentation::getInfoLink('carbon_emission');
-        $tooltip = __('Evaluates the carbon emission in CO₂ equivalent. %s More information %s', 'carbon');
-        $tooltip = sprintf($tooltip, '<br /><a target="_blank" href="' . $url . '">', '</a>');
+        $url = Documentation::getInfoLink('primary_energy_impact');
+        $url = $p['doc_url'];
+        $tooltip = $p['tooltip'];
+        $tooltip .= '<br /><a target="_blank" href="' . $url . '">'
+            . __('More information', 'carbon')
+            . '</a>';
         $tooltip_html = Html::showToolTip($tooltip, [
             'display' => false,
             'applyto' => $p['id'] . '_tip',
@@ -854,43 +863,7 @@ class Widget extends GlpiDashboardWidget
 
         $label_color = '#626976';
         $fg_color = GlpiToolbox::getFgColor($p['color']);
-        return TemplateRenderer::getInstance()->render('@carbon/dashboard/embodied-carbon-emission.html.twig', [
-            'id' => $p['id'],
-            'color' => $p['color'],
-            'fg_color' => $fg_color,
-            'fg_hover_color'  => GlpiToolbox::getFgColor($p['color'], 15),
-            'fg_hover_border' => GlpiToolbox::getFgColor($p['color'], 30),
-            'label_color'     => Toolbox::getAdaptedFgColor($p['color'], $label_color, 4),
-            'dark_label_color' => Toolbox::getAdaptedFgColor($fg_color, $label_color, 4),
-            'number' => $p['number'],
-            'tooltip_html' => $tooltip_html,
-        ]);
-    }
-
-    public static function displayEmbodiedAbioticDepletion(array $params = []): string
-    {
-        $default = [
-            'number'  => 0,
-            'url'     => '',
-            'label'   => '',
-            'alt'     => '',
-            'color'   => '',
-            'icon'    => '',
-            'id'      => 'plugin_carbon_embodied_abiotic_depletion_' . mt_rand(),
-            'filters' => [], // TODO: Not implemented yet (is this useful ?)
-        ];
-        $p = array_merge($default, $params);
-        $url = Documentation::getInfoLink('abiotic_depletion_impact');
-        $tooltip = __('Evaluates the consumption of non renewable resources in Antimony equivalent. %s More information %s', 'carbon');
-        $tooltip = sprintf($tooltip, '<br /><a target="_blank" href="' . $url . '">', '</a>');
-        $tooltip_html = Html::showToolTip($tooltip, [
-            'display' => false,
-            'applyto' => $p['id'] . '_tip',
-        ]);
-
-        $label_color = '#626976';
-        $fg_color = GlpiToolbox::getFgColor($p['color']);
-        return TemplateRenderer::getInstance()->render('@carbon/dashboard/embodied-abiotic-depletion.html.twig', [
+        return TemplateRenderer::getInstance()->render('@carbon/dashboard/embodied-impact-criteria.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
             'fg_color' => $fg_color,
@@ -898,8 +871,10 @@ class Widget extends GlpiDashboardWidget
             'fg_hover_border'  => GlpiToolbox::getFgColor($p['color'], 30),
             'label_color'      => Toolbox::getAdaptedFgColor($p['color'], $label_color, 4),
             'dark_label_color' => Toolbox::getAdaptedFgColor($fg_color, $label_color, 4),
+            'label' => $p['label'],
             'number' => $p['number'],
             'tooltip_html' => $tooltip_html,
+            'pictogram_file' => $p['pictogram_file'],
         ]);
     }
 
@@ -1082,42 +1057,6 @@ class Widget extends GlpiDashboardWidget
             'fg_hover_color'  => GlpiToolbox::getFgColor($p['color'], 15),
             'fg_hover_border' => GlpiToolbox::getFgColor($p['color'], 30),
             'icon_url'        => $icon_url,
-        ]);
-    }
-
-    public static function displayEmbodiedPrimaryEnergy(array $params = []): string
-    {
-        $default = [
-            'url'     => '',
-            'label'   => __('Total embodied primary energy', 'carbon'),
-            'alt'     => '',
-            'color'   => '',
-            'icon'    => '',
-            'id'      => 'plugin_carbon_embodied_primary_energy_' . mt_rand(),
-            'filters' => [], // TODO: Not implemented yet (is this useful ?)
-        ];
-        $p = array_merge($default, $params);
-
-        $url = Documentation::getInfoLink('primary_energy_impact');
-        $tooltip = __('Evaluates the primary energy consumed. %s More information %s', 'carbon');
-        $tooltip = sprintf($tooltip, '<br /><a target="_blank" href="' . $url . '">', '</a>');
-        $tooltip_html = Html::showToolTip($tooltip, [
-            'display' => false,
-            'applyto' => $p['id'] . '_tip',
-        ]);
-
-        $label_color = '#626976';
-        $fg_color = GlpiToolbox::getFgColor($p['color']);
-        return TemplateRenderer::getInstance()->render('@carbon/dashboard/embodied-primary-energy.html.twig', [
-            'id' => $p['id'],
-            'color' => $p['color'],
-            'fg_color' => $fg_color,
-            'fg_hover_color'   => GlpiToolbox::getFgColor($p['color'], 15),
-            'fg_hover_border'  => GlpiToolbox::getFgColor($p['color'], 30),
-            'label_color'      => Toolbox::getAdaptedFgColor($p['color'], $label_color, 4),
-            'dark_label_color' => Toolbox::getAdaptedFgColor($fg_color, $label_color, 4),
-            'number' => $p['number'],
-            'tooltip_html' => $tooltip_html,
         ]);
     }
 

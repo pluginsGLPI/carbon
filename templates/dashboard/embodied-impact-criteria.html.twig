@@ -72,13 +72,15 @@
 <div class="card" id="{{ id }}">
     <div class="card-body" style="height: 100%">
         <div class="row align-items-center">
-            <div class="col-auto">
+            <div class="col-auto" id="carbonEmbodiedCarbonEmissionIconElement">
                 <span class="icon icon-size">
-                    {{ source('@carbon/dashboard/icon-pickaxe.svg') }}
+                {% if pictogram_file != '' %}
+                    {{ source('@carbon/dashboard/' ~ pictogram_file) }}
+                {% endif %}
                 </span>
             </div>
             <div class="col">
-                <div class="label">{{ __('Embodied abiotic depletion potential', 'carbon') }}</div>
+                <div class="label">{{ label }}</div>
             </div>
             <div class="my-3 number text-center">{{ number|raw }}</div>
             <div class="info-tooltip">
@@ -90,13 +92,13 @@
     </div>
 </div>
 <script>
-(function () {
-    observer = new ResizeObserver(entries => {
-        for (const entry of entries) {
-            $(entry.target).fitText(0.7);
-        }
-    })
-    observer.observe(document.querySelector('#{{ id }} .number'));
-})();
+    (function () {
+        observer = new ResizeObserver(entries => {
+            for (const entry of entries) {
+                $(entry.target).fitText(0.7);
+            }
+        })
+        observer.observe(document.querySelector('#{{ id }} .number'));
+    })();
 </script>
 {{ tooltip_html|raw }}
