@@ -154,6 +154,7 @@ class Grid
             ];
         }
 
+        // Embodied impact
         foreach (Type::getImpactTypes() as $impact_type) {
             $key = "plugin_carbon_embodied_{$impact_type}_impact";
             if (isset($new_cards[$key])) {
@@ -190,26 +191,6 @@ class Grid
                 'label'        => __('Usage abiotic depletion potential', 'carbon'),
                 'provider'     => Provider::class . '::getUsageAbioticDepletion',
             ],
-
-            // Embodied impact
-            // 'plugin_carbon_embodied_gwp_impact' => [
-            //     'widgettype'   => ['bigNumber'],
-            //     'group'        => $group,
-            //     'label'        => __('Embodied global warming potential', 'carbon'),
-            //     'provider'     => Provider::class . '::getEmbodiedGlobalWarming',
-            // ],
-            // 'plugin_carbon_embodied_pe_impact' => [
-            //     'widgettype'   => ['bigNumber'],
-            //     'group'        => $group,
-            //     'label'        => __('Embodied primary energy consumed', 'carbon'),
-            //     'provider'     => Provider::class . '::getEmbodiedPrimaryEnergy',
-            // ],
-            // 'plugin_carbon_embodied_adp_impact' => [
-            //     'widgettype'   => ['bigNumber'],
-            //     'group'        => $group,
-            //     'label'        => __('Embodied abiotic depletion potential', 'carbon'),
-            //     'provider'     => Provider::class . '::getEmbodiedAbioticDepletion',
-            // ],
 
             // embodied + usage impact
             'plugin_carbon_total_gwp_impact' => [
@@ -293,34 +274,16 @@ class Grid
                 'label'        => __('Usage abiotic depletion potential', 'carbon'),
                 'provider'     => Provider::class . '::getUsageAbioticDepletion',
             ],
-
-            // Embodied impact
-            // 'plugin_carbon_report_embodied_global_warming' => [
-            //     'widgettype'   => ['embodied_global_warming'],
-            //     'group'        => $group,
-            //     'label'        => __('Embodied global warming potential', 'carbon'),
-            //     'provider'     => Provider::class . '::getEmbodiedGlobalWarming',
-            // ],
-            // 'plugin_carbon_report_embodied_abiotic_depletion' => [
-            //     'widgettype'   => ['embodied_abiotic_depletion'],
-            //     'group'        => $group,
-            //     'label'        => __('Embodied abiotic depletion potential', 'carbon'),
-            //     'provider'     => Provider::class . '::getEmbodiedAbioticDepletion',
-            // ],
-            // 'plugin_carbon_report_embodied_pe_impact' => [
-            //     'widgettype'   => ['embodied_primary_energy'],
-            //     'group'        => $group,
-            //     'label'        => __('Embodied primary energy consumed', 'carbon'),
-            //     'provider'     => Provider::class . '::getEmbodiedPrimaryEnergy',
-            // ],
         ];
+
+        // Embodied impact
         foreach (Type::getImpactTypes() as $impact_type) {
             $key = "plugin_carbon_report_embodied_{$impact_type}_impact";
             if (isset($new_cards[$key])) {
                 trigger_error("The card $key already exists", E_USER_WARNING);
             }
             $new_cards[$key] = [
-                'widgettype'   => [self::getWidgetForImpact(true, $impact_type)],
+                'widgettype'   => ['impact_criteria_number'],
                 'group'        => $group,
                 'label'        => Type::getEmbodiedImpactLabel($impact_type),
                 'provider'     => Provider::class . '::getImpactOfEmbodiedCriteria',
@@ -351,13 +314,13 @@ class Grid
     {
         switch (($embodied ? 'embodied' : 'usage') . ' ' . $type) {
             case 'embodied gwp':
-                return 'embodied_global_warming';
+                return 'impact_criteria_number';
             case 'embodied adp':
-                return 'embodied_abiotic_depletion';
+                return 'impact_criteria_number';
             case 'embodied pe':
-                return 'embodied_primary_energy';
+                return 'impact_criteria_number';
         }
 
-        return '';
+        return 'bigNumber';
     }
 }

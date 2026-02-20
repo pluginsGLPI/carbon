@@ -53,6 +53,7 @@ use GlpiPlugin\Carbon\SearchOptions;
 use GlpiPlugin\Carbon\UsageImpact;
 use Glpi\DBAL\QueryExpression;
 use Glpi\DBAL\QuerySubQuery;
+use GlpiPlugin\Carbon\Documentation;
 use GlpiPlugin\Carbon\Impact\Type;
 use Search;
 use Session;
@@ -962,7 +963,7 @@ class Provider
     {
         $default_params = [
             'label' => Type::getEmbodiedImpactLabel($impact_type),
-            'icon'  => 'fa-solid fa-temperature-arrow-up',
+            'icon'  => Type::getCriteriaIcon($impact_type),
         ];
         $params = array_merge($default_params, $params);
         if (count($crit['itemtype'] ?? []) === 0) {
@@ -975,7 +976,6 @@ class Provider
         if ($value === null) {
             $value = 'N/A';
         } else {
-            // $value = Toolbox::getWeight($value) . Type::getImpactUnit($impact_type);
             $value = Toolbox::getHumanReadableValue(
                 $value,
                 Type::getImpactUnit($impact_type)
@@ -986,6 +986,9 @@ class Provider
             'number' => $value,
             'label'  => $params['label'],
             'icon'   => $params['icon'],
+            'tooltip' => Type::getCriteriaTooltip($impact_type),
+            'pictogram_file' => Type::getCriteriaPictogram($impact_type),
+            'doc_url' => Type::getCriteriaInfoLink($impact_type),
         ];
     }
 
