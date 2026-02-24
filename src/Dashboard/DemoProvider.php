@@ -36,6 +36,7 @@ use Computer;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
+use GlpiPlugin\Carbon\Impact\Type;
 use GlpiPlugin\Carbon\Toolbox;
 use Monitor;
 use NetworkEquipment;
@@ -43,51 +44,30 @@ use Session;
 
 class DemoProvider
 {
-    public static function getEmbodiedGlobalWarming(array $params = []): array
-    {
-        $value = 616000000;
-        $value = Toolbox::getWeight($value) . __('CO₂eq', 'carbon');
-
-        $params['icon'] = 'fa-solid fa-temperature-arrow-up';
-
-        return [
-            'number' => $value,
-            'label'  => $params['label'],
-            'icon'   => $params['icon'],
-        ];
-    }
-
-    public static function getEmbodiedPrimaryEnergy(array $params = []): array
-    {
-        $value = 491000000;
-        $value = Toolbox::getEnergy($value / 3600);
-
-        $params['icon'] = 'fa-solid fa-fire-flame-simple';
-
-        return [
-            'number' => $value,
-            'label'  => $params['label'],
-            'icon'   => $params['icon'],
-        ];
-    }
-
-    public static function getEmbodiedAbioticDepletion(array $params = [], array $crit = []): array
-    {
-        $default_params = [
-            'label' => __('Embodied abiotic depletion potential', 'carbon'),
-            'icon'  => 'fa-solid fa-temperature-arrow-up',
-        ];
-        $params = array_merge($default_params, $params);
-
-        $value = 12.748;
-        $value = Toolbox::getWeight($value) . __('Sbeq', 'carbon');
-
-        return [
-            'number'     => $value,
-            'label'      => $params['label'],
-            'icon'       => $params['icon'],
-        ];
-    }
+    private static array $impact_values = [
+        'gwp'    => 616000000,
+        'adp'    => 12.748,
+        'pe'     => 491000000,
+        'gwppb'  => null,
+        'gwppf'  => null,
+        'gwpplu' => null,
+        'ir'     => null,
+        'lu'     => -101,
+        'odp'    => null,
+        'pm'     => null,
+        'pocp'   => null,
+        'wu'     => null,
+        'mips'   => null,
+        'adpe'   => null,
+        'adpf'   => null,
+        'ap'     => null,
+        'ctue'   => null,
+        // 'ctuh_c' =>  null,
+        // 'ctuh_nc' => null,
+        'epf'    => null,
+        'epm'    => null,
+        'ept'    => null,
+    ];
 
     public static function getUsageAbioticDepletion(array $params = [], array $crit = []): array
     {
@@ -417,6 +397,46 @@ class DemoProvider
             'number' => $gwp,
             'label'  => $params['label'],
             'icon'   => $params['icon'],
+        ];
+    }
+
+     /**
+     * Total embodied abiotic depletion potential in antimony equivalent
+     *
+     * @param array $params
+     * @param array $crit
+     * @return array
+     */
+    public static function getImpactOfEmbodiedCriteria(string $impact_type, array $params = [], array $crit = []): array
+    {
+        $default_params = [
+            'label' => Type::getEmbodiedImpactLabel($impact_type),
+            'icon'  => Type::getCriteriaIcon($impact_type),
+        ];
+        $params = array_merge($default_params, $params);
+        if (count($crit['itemtype'] ?? []) === 0) {
+            $crit['itemtype'] = PLUGIN_CARBON_TYPES;
+        } else {
+            $crit['itemtype'] = array_intersect($crit['itemtype'], PLUGIN_CARBON_TYPES);
+        }
+
+        $value = self::$impact_values[$impact_type];
+        if ($value === null) {
+            $value = 'N/A';
+        } else {
+            $value = Toolbox::getHumanReadableValue(
+                $value,
+                Type::getImpactUnit($impact_type)
+            );
+        }
+
+        return [
+            'number' => $value,
+            'label'  => $params['label'],
+            'icon'   => $params['icon'],
+            'tooltip' => Type::getCriteriaTooltip($impact_type),
+            'pictogram_file' => Type::getCriteriaPictogram($impact_type),
+            'doc_url' => Type::getCriteriaInfoLink($impact_type),
         ];
     }
 }

@@ -36,6 +36,7 @@ use Config;
 use CronTask;
 use DisplayPreference;
 use Glpi\Dashboard\Dashboard;
+use Glpi\Dashboard\Dashboard_Item;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\Uninstall;
@@ -75,7 +76,6 @@ class PluginUninstallTest extends CommonTestCase
         $this->checkConfig();
         // $this->checkRequestType();
         $this->checkAutomaticAction();
-        // $this->checkDashboard();
         $this->checkRights();
         $this->checkDisplayPrefs();
         $this->checkDashboard();
