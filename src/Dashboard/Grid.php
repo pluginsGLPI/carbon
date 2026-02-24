@@ -309,18 +309,4 @@ class Grid
 
         return $new_cards;
     }
-
-    private static function getWidgetForImpact(bool $embodied, string $type): string
-    {
-        switch (($embodied ? 'embodied' : 'usage') . ' ' . $type) {
-            case 'embodied gwp':
-                return 'impact_criteria_number';
-            case 'embodied adp':
-                return 'impact_criteria_number';
-            case 'embodied pe':
-                return 'impact_criteria_number';
-        }
-
-        return 'bigNumber';
-    }
 }

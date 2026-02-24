@@ -40,6 +40,7 @@ use Html;
 use Glpi\Application\View\TemplateRenderer;
 use Glpi\Dashboard\Widget as GlpiDashboardWidget;
 use GlpiPlugin\Carbon\Documentation;
+use GlpiPlugin\Carbon\Impact\Type;
 use GlpiPlugin\Carbon\Report;
 use GlpiPlugin\Carbon\Toolbox;
 use Monitor;
@@ -744,7 +745,7 @@ class Widget extends GlpiDashboardWidget
             $last_month['series'][0]['unit']
         );
 
-        $url = Documentation::getInfoLink('carbon_emission');
+        $url = Type::getCriteriaInfoLink('gwp');
         $tooltip = __('Evaluates the usage carbon emission in CO₂ equivalent during the last 2 months. %s More information %s', 'carbon');
         $tooltip = sprintf($tooltip, '<br /><a target="_blank" href="' . $url . '">', '</a>');
         $tooltip_html = Html::showToolTip($tooltip, [
@@ -810,7 +811,7 @@ class Widget extends GlpiDashboardWidget
                 break;
         }
 
-        $url = Documentation::getInfoLink('carbon_emission');
+        $url = Type::getCriteriaInfoLink('gwp');
         $tooltip = __('Evaluates the usage carbon emission in CO₂ equivalent during the last 12 elapsed months. %s More information %s', 'carbon');
         $tooltip = sprintf($tooltip, '<br /><a target="_blank" href="' . $url . '">', '</a>');
         $tooltip_html = Html::showToolTip($tooltip, [
@@ -845,12 +846,11 @@ class Widget extends GlpiDashboardWidget
             'alt'     => '',
             'color'   => '',
             'icon'    => '',
-            'id'      => 'plugin_carbon_embodied_primary_energy_' . mt_rand(),
+            'id'      => 'plugin_carbon_impact_criteria_' . mt_rand(),
             'filters' => [], // TODO: Not implemented yet (is this useful ?)
         ];
         $p = array_merge($default, $params);
 
-        $url = Documentation::getInfoLink('primary_energy_impact');
         $url = $p['doc_url'];
         $tooltip = $p['tooltip'];
         $tooltip .= '<br /><a target="_blank" href="' . $url . '">'
@@ -892,7 +892,7 @@ class Widget extends GlpiDashboardWidget
         ];
         $p = array_merge($default, $params);
 
-        $url = Documentation::getInfoLink('abiotic_depletion_impact');
+        $url = Type::getCriteriaInfoLink('adp');
         $tooltip = __('Evaluates the consumption of non renewable resources in Antimony equivalent. %s More information %s', 'carbon');
         $tooltip = sprintf($tooltip, '<br /><a target="_blank" href="' . $url . '">', '</a>');
         $tooltip_html = Html::showToolTip($tooltip, [

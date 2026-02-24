@@ -53,7 +53,6 @@ use GlpiPlugin\Carbon\SearchOptions;
 use GlpiPlugin\Carbon\UsageImpact;
 use Glpi\DBAL\QueryExpression;
 use Glpi\DBAL\QuerySubQuery;
-use GlpiPlugin\Carbon\Documentation;
 use GlpiPlugin\Carbon\Impact\Type;
 use Search;
 use Session;

@@ -77,27 +77,27 @@
             "point_labels": "0"
         }
     },
-    "plugin_carbon_report_embodied_abiotic_depletion": {
+    "plugin_carbon_report_embodied_adp_impact": {
         "x": 5,
         "y": 3,
         "width": 5,
         "height": 3,
         "card_options": {
             "color": "#ffd966",
-            "widgettype": "embodied_abiotic_depletion",
+            "widgettype": "impact_criteria_number",
             "use_gradient": "0",
             "point_labels": "0",
             "limit": "7"
         }
     },
-    "plugin_carbon_report_embodied_global_warming": {
+    "plugin_carbon_report_embodied_gwp_impact": {
         "x": 10,
         "y": 0,
         "width": 5,
         "height": 3,
         "card_options": {
             "color": "#7a941e",
-            "widgettype": "embodied_global_warming",
+            "widgettype": "impact_criteria_number",
             "use_gradient": "0",
             "point_labels": "0",
             "limit": "7"
@@ -110,7 +110,7 @@
         "height": 3,
         "card_options": {
             "color": "#326319",
-            "widgettype": "embodied_primary_energy",
+            "widgettype": "impact_criteria_number",
             "use_gradient": "0",
             "point_labels": "0",
             "limit": "7"

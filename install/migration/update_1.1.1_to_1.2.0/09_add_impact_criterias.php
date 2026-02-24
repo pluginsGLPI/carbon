@@ -97,12 +97,17 @@ foreach ($old_criterias as $criteria => $comment) {
 // Rename cards for the report
 $dashboard_item = new DashboardItem();
 $rows = $dashboard_item->find([
-    'card_id' => 'plugin_carbon_report_embodied_gwp_impact'
+    'card_id' => 'plugin_carbon_report_embodied_global_warming'
 ]);
 foreach ($rows as $row) {
+    $card_options = json_decode($row['card_options'], true);
+    if ($card_options['widgettype'] === 'embodied_global_warming') {
+        $card_options['widgettype'] = 'impact_criteria_number';
+    }
     $dashboard_item->update([
         'id' => $row['id'],
         'card_id' => 'plugin_carbon_report_embodied_gwp_impact',
+        'card_options' => json_encode($card_options),
     ]);
 }
 
@@ -111,8 +116,29 @@ $rows = $dashboard_item->find([
     'card_id' => 'plugin_carbon_report_embodied_abiotic_depletion'
 ]);
 foreach ($rows as $row) {
+    $card_options = json_decode($row['card_options'], true);
+    if ($card_options['widgettype'] === 'embodied_abiotic_depletion') {
+        $card_options['widgettype'] = 'impact_criteria_number';
+    }
     $dashboard_item->update([
         'id' => $row['id'],
         'card_id' => 'plugin_carbon_report_embodied_adp_impact',
+        'card_options' => json_encode($card_options),
+    ]);
+}
+
+$dashboard_item = new DashboardItem();
+$rows = $dashboard_item->find([
+    'card_id' => 'plugin_carbon_report_embodied_pe_impact'
+]);
+foreach ($rows as $row) {
+    $card_options = json_decode($row['card_options'], true);
+    if ($card_options['widgettype'] === 'embodied_primary_energy') {
+        $card_options['widgettype'] = 'impact_criteria_number';
+    }
+    $dashboard_item->update([
+        'id' => $row['id'],
+        'card_id' => 'plugin_carbon_report_embodied_pe_impact',
+        'card_options' => json_encode($card_options),
     ]);
 }
