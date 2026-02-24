@@ -39,6 +39,7 @@ use CommonGLPI;
 use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\Dashboard\Provider;
 use GlpiPlugin\Carbon\Dashboard\Widget;
+use GlpiPlugin\Carbon\Impact\Type;
 use Html;
 use Monitor;
 use NetworkEquipment;
@@ -214,7 +215,7 @@ class UsageInfo extends CommonDBChild
             'items_id' => $asset->getID(),
         ]);
 
-        $url = Documentation::getInfoLink('carbon_emission');
+        $url = Type::getCriteriaInfoLink('gwp');
         $tooltip = __('Evaluates the carbon emission in CO₂ equivalent. %s More information %s', 'carbon');
         $tooltip = sprintf($tooltip, '<br /><a target="_blank" href="' . $url . '">', '</a>');
         $carbon_emission_tooltip_html = Html::showToolTip($tooltip, [
@@ -222,7 +223,7 @@ class UsageInfo extends CommonDBChild
             'applyto' => 'carbon_emission_tip',
         ]);
 
-        $url = Documentation::getInfoLink('abiotic_depletion_impact');
+        $url = Type::getCriteriaInfoLink('adp');
         $tooltip = __('Evaluates the consumption of non renewable resources in Antimony equivalent. %s More information %s', 'carbon');
         $tooltip = sprintf($tooltip, '<br /><a target="_blank" href="' . $url . '">', '</a>');
         $usage_abiotic_depletion_tooltip_html = Html::showToolTip($tooltip, [
@@ -234,7 +235,7 @@ class UsageInfo extends CommonDBChild
             'applyto' => 'embodied_abiotic_depletion_tip',
         ]);
 
-        $url = Documentation::getInfoLink('primary_energy');
+        $url = Type::getCriteriaInfoLink('pe');
         $tooltip = __('Evaluates the primary energy consumed. %s More information %s', 'carbon');
         $tooltip = sprintf($tooltip, '<br /><a target="_blank" href="' . $url . '">', '</a>');
         $embodied_primary_energy_tooltip_html = Html::showToolTip($tooltip, [

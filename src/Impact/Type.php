@@ -35,7 +35,6 @@ namespace GlpiPlugin\Carbon\Impact;
 
 class Type
 {
-
     private const BASE_URL = 'https://glpi-plugins.readthedocs.io/%s/latest/carbon';
 
     const IMPACT_GWP    = 1; // Global warming potential
@@ -344,7 +343,7 @@ class Type
     /**
      * Get external URL to a detailed description of the given path
      *
-     * @param string $object_descriptor
+     * @param string $impact_type
      * @return string
      */
     public static function getCriteriaInfoLink(string $impact_type): string
