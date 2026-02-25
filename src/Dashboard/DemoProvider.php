@@ -46,8 +46,8 @@ class DemoProvider
 {
     /** @var array<string, array> $impact_values Embodied and usage impact values*/
     private static array $impact_values = [
-        'gwp'    => [616000000, null],
-        'adp'    => [12.748, null],
+        'gwp'    => [616000000, 176483],
+        'adp'    => [12.748, 2.86],
         'pe'     => [491000000, null],
         'gwppb'  => [null, null],
         'gwppf'  => [null, null],
@@ -69,24 +69,6 @@ class DemoProvider
         'epm'    => [null, null],
         'ept'    => [null, null],
     ];
-
-    public static function getUsageAbioticDepletion(array $params = [], array $crit = []): array
-    {
-        $default_params = [
-            'label' => __('Usage abiotic depletion potential', 'carbon'),
-            'icon'  => 'fa-solid fa-temperature-arrow-up',
-        ];
-        $params = array_merge($default_params, $params);
-
-        $value = 2.86;
-        $value = Toolbox::getWeight($value) . __('Sbeq', 'carbon');
-
-        return [
-            'number'     => $value,
-            'label'      => $params['label'],
-            'icon'       => $params['icon'],
-        ];
-    }
 
     public static function getUsageCarbonEmissionPerMonth(array $params = [], array $crit = []): array
     {
@@ -381,27 +363,6 @@ class DemoProvider
     }
 
     /**
-     * Get usage CO2 emissions
-     *
-     * @param array $params
-     * @return array
-     */
-    public static function getUsageCarbonEmission(array $params = []): array
-    {
-        $default_params = [
-            'label' => __('plugin carbon - Usage carbon emission', 'carbon'),
-            'icon'  => 'fa-solid fa-temperature-arrow-up',
-        ];
-        $params = array_merge($default_params, $params);
-        $gwp = Toolbox::getWeight(176483) . __('CO₂eq', 'carbon');
-        return [
-            'number' => $gwp,
-            'label'  => $params['label'],
-            'icon'   => $params['icon'],
-        ];
-    }
-
-    /**
      * Get the value of an impact criteria for the embodied scope
      *
      * @param array $params
@@ -501,7 +462,7 @@ class DemoProvider
             $crit['itemtype'] = array_intersect($crit['itemtype'], PLUGIN_CARBON_TYPES);
         }
 
-        $value = self::$impact_values[$impact_type][1];
+        $value = self::$impact_values[$impact_type][0] ?? 0 + self::$impact_values[$impact_type][1] ?? 0;
         if ($value === null) {
             $value = 'N/A';
         } else {
