@@ -219,6 +219,42 @@ class Type
         return $label;
     }
 
+    /**
+     * Get the unit of an impact type
+     *
+     * @param string $type impact type name
+     * @return string
+     **/
+    public static function getEmbodiedAndUsageImpactLabel(string $type): string
+    {
+        $label = match ($type) {
+            'gwp'    => __('Total Global warming potential', 'carbon'),
+            'adp'    => __('Total Abiotic depletion potential', 'carbon'),
+            'pe'     => __('Total Primary energy consumed', 'carbon'),
+            'gwppb'  => __('Total Climate change - Contribution of biogenic emissions', 'carbon'),
+            'gwppf'  => __('Total Climate change - Contribution of fossil fuel emissions', 'carbon'),
+            'gwpplu' => __('Total Climate change - Contribution of emissions from land use change', 'carbon'),
+            'ir'     => __('Total Emissions of radionizing substances', 'carbon'),
+            'lu'     => __('Total Land use', 'carbon'),
+            'odp'    => __('Total Depletion of the ozone layer', 'carbon'),
+            'pm'     => __('Total Fine particle emissions', 'carbon'),
+            'pocp'   => __('Total Photochemical ozone formation', 'carbon'),
+            'wu'     => __('Total Use of water resources', 'carbon'),
+            'mips'   => __('Total Material input per unit of service', 'carbon'),
+            'adpe'   => __('Total Use of mineral and metal resources', 'carbon'),
+            'adpf'   => __('Total Use of fossil resources (including nuclear)', 'carbon'),
+            'ap'     => __('Total Acidification', 'carbon'),
+            'ctue'   => __('Total Freshwater ecotoxicity', 'carbon'),
+            // 'ctuh_c' => __('Total Human Toxicity - Carcinogenic Effects', 'carbon'),
+            // 'ctuh_nc' => __('Total Human toxicity - non-carcinogenic effects', 'carbon'),
+            'epf'    => __('Total Eutrophication of freshwater', 'carbon'),
+            'epm'    => __('Total Eutrophication of marine waters', 'carbon'),
+            'ept'    => __('Total Terrestrial eutrophication', 'carbon'),
+            default  => '',
+        };
+        return $label;
+    }
+
     public static function getCriteriaIcon(string $type): string
     {
         return match ($type) {

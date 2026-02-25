@@ -44,29 +44,30 @@ use Session;
 
 class DemoProvider
 {
+    /** @var array<string, array> $impact_values Embodied and usage impact values*/
     private static array $impact_values = [
-        'gwp'    => 616000000,
-        'adp'    => 12.748,
-        'pe'     => 491000000,
-        'gwppb'  => null,
-        'gwppf'  => null,
-        'gwpplu' => null,
-        'ir'     => null,
-        'lu'     => -101,
-        'odp'    => null,
-        'pm'     => null,
-        'pocp'   => null,
-        'wu'     => null,
-        'mips'   => null,
-        'adpe'   => null,
-        'adpf'   => null,
-        'ap'     => null,
-        'ctue'   => null,
-        // 'ctuh_c' =>  null,
-        // 'ctuh_nc' => null,
-        'epf'    => null,
-        'epm'    => null,
-        'ept'    => null,
+        'gwp'    => [616000000, null],
+        'adp'    => [12.748, null],
+        'pe'     => [491000000, null],
+        'gwppb'  => [null, null],
+        'gwppf'  => [null, null],
+        'gwpplu' => [null, null],
+        'ir'     => [null, null],
+        'lu'     => [-101, null],
+        'odp'    => [null, null],
+        'pm'     => [null, null],
+        'pocp'   => [null, null],
+        'wu'     => [null, null],
+        'mips'   => [null, null],
+        'adpe'   => [null, null],
+        'adpf'   => [null, null],
+        'ap'     => [null, null],
+        'ctue'   => [null, null],
+        // 'ctuh_c' =>  [null, null],
+        // 'ctuh_nc' => [null, null],
+        'epf'    => [null, null],
+        'epm'    => [null, null],
+        'ept'    => [null, null],
     ];
 
     public static function getUsageAbioticDepletion(array $params = [], array $crit = []): array
@@ -400,8 +401,8 @@ class DemoProvider
         ];
     }
 
-     /**
-     * Total embodied abiotic depletion potential in antimony equivalent
+    /**
+     * Get the value of an impact criteria for the embodied scope
      *
      * @param array $params
      * @param array $crit
@@ -420,7 +421,87 @@ class DemoProvider
             $crit['itemtype'] = array_intersect($crit['itemtype'], PLUGIN_CARBON_TYPES);
         }
 
-        $value = self::$impact_values[$impact_type];
+        $value = self::$impact_values[$impact_type][0];
+        if ($value === null) {
+            $value = 'N/A';
+        } else {
+            $value = Toolbox::getHumanReadableValue(
+                $value,
+                Type::getImpactUnit($impact_type)
+            );
+        }
+
+        return [
+            'number' => $value,
+            'label'  => $params['label'],
+            'icon'   => $params['icon'],
+            'tooltip' => Type::getCriteriaTooltip($impact_type),
+            'pictogram_file' => Type::getCriteriaPictogram($impact_type),
+            'doc_url' => Type::getCriteriaInfoLink($impact_type),
+        ];
+    }
+
+    /**
+     * Get the value of an impact criteria for the usage scope
+     *
+     * @param array $params
+     * @param array $crit
+     * @return array
+     */
+    public static function getImpactOfUsageCriteria(string $impact_type, array $params = [], array $crit = []): array
+    {
+        $default_params = [
+            'label' => Type::getEmbodiedImpactLabel($impact_type),
+            'icon'  => Type::getCriteriaIcon($impact_type),
+        ];
+        $params = array_merge($default_params, $params);
+        if (count($crit['itemtype'] ?? []) === 0) {
+            $crit['itemtype'] = PLUGIN_CARBON_TYPES;
+        } else {
+            $crit['itemtype'] = array_intersect($crit['itemtype'], PLUGIN_CARBON_TYPES);
+        }
+
+        $value = self::$impact_values[$impact_type][1];
+        if ($value === null) {
+            $value = 'N/A';
+        } else {
+            $value = Toolbox::getHumanReadableValue(
+                $value,
+                Type::getImpactUnit($impact_type)
+            );
+        }
+
+        return [
+            'number' => $value,
+            'label'  => $params['label'],
+            'icon'   => $params['icon'],
+            'tooltip' => Type::getCriteriaTooltip($impact_type),
+            'pictogram_file' => Type::getCriteriaPictogram($impact_type),
+            'doc_url' => Type::getCriteriaInfoLink($impact_type),
+        ];
+    }
+
+    /**
+     * Get the value of an impact criteria for the embodied + usage scopes
+     *
+     * @param array $params
+     * @param array $crit
+     * @return array
+     */
+    public static function getImpactOfEmbodiedAndUsageCriteria(string $impact_type, array $params = [], array $crit = []): array
+    {
+        $default_params = [
+            'label' => Type::getEmbodiedImpactLabel($impact_type),
+            'icon'  => Type::getCriteriaIcon($impact_type),
+        ];
+        $params = array_merge($default_params, $params);
+        if (count($crit['itemtype'] ?? []) === 0) {
+            $crit['itemtype'] = PLUGIN_CARBON_TYPES;
+        } else {
+            $crit['itemtype'] = array_intersect($crit['itemtype'], PLUGIN_CARBON_TYPES);
+        }
+
+        $value = self::$impact_values[$impact_type][1];
         if ($value === null) {
             $value = 'N/A';
         } else {
