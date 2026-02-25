@@ -171,47 +171,45 @@ class Grid
             ];
         }
 
-        $new_cards += [
-            // Usage impact
-            'plugin_carbon_total_usage_power' => [
+        // Usage impact
+        foreach (Type::getImpactTypes() as $impact_type) {
+            $key = "plugin_carbon_usage_{$impact_type}_impact";
+            if (isset($new_cards[$key])) {
+                trigger_error("The card $key already exists", E_USER_WARNING);
+            }
+            $new_cards[$key] = [
                 'widgettype'   => ['bigNumber'],
                 'group'        => $group,
-                'label'        => __('Usage power consumption', 'carbon'),
-                'provider'     => Provider::class . '::getUsagePower',
-            ],
-            'plugin_carbon_total_usage_carbon_emission' => [
-                'widgettype'   => ['bigNumber'],
-                'group'        => $group,
-                'label'        => __('Usage carbon emission', 'carbon'),
-                'provider'     => Provider::class . '::getUsageCarbonEmission',
-            ],
-            'plugin_carbon_total_usage_adp_impact' => [
-                'widgettype'   => ['bigNumber'],
-                'group'        => $group,
-                'label'        => __('Usage abiotic depletion potential', 'carbon'),
-                'provider'     => Provider::class . '::getUsageAbioticDepletion',
-            ],
+                'label'        => Type::getUsageImpactLabel($impact_type),
+                'provider'     => Provider::class . '::getImpactOfUsageCriteria',
+                'args'     => [
+                    'impact_type' => $impact_type
+                ]
+            ];
+        }
 
-            // embodied + usage impact
-            'plugin_carbon_total_gwp_impact' => [
+        // embodied + usage impact
+        foreach (Type::getImpactTypes() as $impact_type) {
+            $key = "plugin_carbon_all_scopes_{$impact_type}_impact";
+            if (isset($new_cards[$key])) {
+                trigger_error("The card $key already exists", E_USER_WARNING);
+            }
+            $new_cards[$key] = [
                 'widgettype'   => ['bigNumber'],
                 'group'        => $group,
-                'label'        => __('Global warming potential', 'carbon'),
-                'provider'     => Provider::class . '::getTotalGlobalWarming',
-            ],
-            'plugin_carbon_total_adp_impact' => [
-                'widgettype'   => ['bigNumber'],
-                'group'        => $group,
-                'label'        => __('Abiotic depletion potential', 'carbon'),
-                'provider'     => Provider::class . '::getTotalAbioticDepletion',
-            ],
-        ];
+                'label'        => Type::getEmbodiedAndUsageImpactLabel($impact_type),
+                'provider'     => Provider::class . '::getImpactOfEmbodiedAndUsageCriteria',
+                'args'     => [
+                    'impact_type' => $impact_type
+                ]
+            ];
+        }
 
         return $new_cards;
     }
 
     /**
-     * getdescription of cards for dashboard in the reporting page of the plugin
+     * Get description of cards for dashboard in the reporting page of the plugin
      *
      * @return array
      */

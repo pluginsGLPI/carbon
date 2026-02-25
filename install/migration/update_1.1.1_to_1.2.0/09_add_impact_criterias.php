@@ -142,3 +142,61 @@ foreach ($rows as $row) {
         'card_options' => json_encode($card_options),
     ]);
 }
+
+// Rename cards for the standard dashboard : usage indicators
+
+$dashboard_item = new DashboardItem();
+$rows = $dashboard_item->find([
+    'card_id' => 'plugin_carbon_total_usage_power'
+]);
+foreach ($rows as $row) {
+    $dashboard_item->update([
+        'id' => $row['id'],
+        'card_id' => 'plugin_carbon_usage_pe_impact',
+    ]);
+}
+
+$dashboard_item = new DashboardItem();
+$rows = $dashboard_item->find([
+    'card_id' => 'plugin_carbon_total_usage_carbon_emission'
+]);
+foreach ($rows as $row) {
+    $dashboard_item->update([
+        'id' => $row['id'],
+        'card_id' => 'plugin_carbon_usage_gwp_impact',
+    ]);
+}
+
+$dashboard_item = new DashboardItem();
+$rows = $dashboard_item->find([
+    'card_id' => 'plugin_carbon_total_usage_adp_impact'
+]);
+foreach ($rows as $row) {
+    $dashboard_item->update([
+        'id' => $row['id'],
+        'card_id' => 'plugin_carbon_usage_adp_impact',
+    ]);
+}
+
+// Rename cards for the standard dashboard : Embodied + usage indicators
+$dashboard_item = new DashboardItem();
+$rows = $dashboard_item->find([
+    'card_id' => 'plugin_carbon_total_gwp_impact'
+]);
+foreach ($rows as $row) {
+    $dashboard_item->update([
+        'id' => $row['id'],
+        'card_id' => 'plugin_carbon_all_scopes_gwp_impact',
+    ]);
+}
+
+$dashboard_item = new DashboardItem();
+$rows = $dashboard_item->find([
+    'card_id' => 'plugin_carbon_total_adp_impact'
+]);
+foreach ($rows as $row) {
+    $dashboard_item->update([
+        'id' => $row['id'],
+        'card_id' => 'plugin_carbon_all_scopes_adp_impact',
+    ]);
+}

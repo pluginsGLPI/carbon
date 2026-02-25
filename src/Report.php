@@ -129,7 +129,7 @@ class Report extends CommonDBTM
             $end_date   = DateTime::createFromFormat('Y-m-d\TH:i:s.v\Z', $params['args']['apply_filters'][1]);
         }
 
-        $value = Provider::getUsageCarbonEmission($params)['number'];
+        $value = Provider::getImpactOfUsageCriteria('gwp', $params)['number'];
 
         // Prepare date format
         $date_format = 'Y F';
@@ -166,7 +166,7 @@ class Report extends CommonDBTM
             $end_date   = DateTime::createFromFormat('Y-m-d\TH:i:s.v\Z', $params['args']['apply_filters'][1]);
         }
 
-        $value = Provider::getEmbodiedGlobalWarming($params);
+        $value = Provider::getImpactOfEmbodiedCriteria('gwp', $params);
 
         // Prepare date format
         $date_format = 'Y F';
