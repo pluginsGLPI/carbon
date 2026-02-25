@@ -266,11 +266,14 @@ class Grid
                 'label'        => __('Biggest monthly averaged carbon emission per model', 'carbon'),
                 'provider'     => Provider::class . '::getSumUsageEmissionsPerModel',
             ],
-            'plugin_carbon_report_usage_abiotic_depletion' => [
-                'widgettype'   => ['usage_abiotic_depletion'],
+            'plugin_carbon_report_usage_adp_impact' => [
+                'widgettype'   => ['impact_criteria_number'],
                 'group'        => $group,
                 'label'        => __('Usage abiotic depletion potential', 'carbon'),
-                'provider'     => Provider::class . '::getUsageAbioticDepletion',
+                'provider'     => Provider::class . '::getImpactOfUsageCriteria',
+                'args'         => [
+                    'impact_type' => 'adp',
+                ]
             ],
         ];
 

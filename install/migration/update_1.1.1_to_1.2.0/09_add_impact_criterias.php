@@ -113,6 +113,22 @@ foreach ($rows as $row) {
 
 $dashboard_item = new DashboardItem();
 $rows = $dashboard_item->find([
+    'card_id' => 'plugin_carbon_report_usage_abiotic_depletion'
+]);
+foreach ($rows as $row) {
+    $card_options = json_decode($row['card_options'], true);
+    if ($card_options['widgettype'] === 'usage_abiotic_depletion') {
+        $card_options['widgettype'] = 'impact_criteria_number';
+    }
+    $dashboard_item->update([
+        'id' => $row['id'],
+        'card_id' => 'plugin_carbon_report_usage_adp_impact',
+        'card_options' => json_encode($card_options),
+    ]);
+}
+
+$dashboard_item = new DashboardItem();
+$rows = $dashboard_item->find([
     'card_id' => 'plugin_carbon_report_embodied_abiotic_depletion'
 ]);
 foreach ($rows as $row) {

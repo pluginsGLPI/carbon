@@ -863,7 +863,7 @@ class Widget extends GlpiDashboardWidget
 
         $label_color = '#626976';
         $fg_color = GlpiToolbox::getFgColor($p['color']);
-        return TemplateRenderer::getInstance()->render('@carbon/dashboard/embodied-impact-criteria.html.twig', [
+        return TemplateRenderer::getInstance()->render('@carbon/dashboard/impact-criteria.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
             'fg_color' => $fg_color,
