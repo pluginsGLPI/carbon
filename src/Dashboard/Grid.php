@@ -154,8 +154,10 @@ class Grid
             ];
         }
 
+        $impact_types = Type::getImpactTypes();
+
         // Embodied impact
-        foreach (Type::getImpactTypes() as $impact_type) {
+        foreach ($impact_types as $impact_type) {
             $key = "plugin_carbon_embodied_{$impact_type}_impact";
             if (isset($new_cards[$key])) {
                 trigger_error("The card $key already exists", E_USER_WARNING);
@@ -172,7 +174,7 @@ class Grid
         }
 
         // Usage impact
-        foreach (Type::getImpactTypes() as $impact_type) {
+        foreach ($impact_types as $impact_type) {
             $key = "plugin_carbon_usage_{$impact_type}_impact";
             if (isset($new_cards[$key])) {
                 trigger_error("The card $key already exists", E_USER_WARNING);
@@ -189,7 +191,7 @@ class Grid
         }
 
         // embodied + usage impact
-        foreach (Type::getImpactTypes() as $impact_type) {
+        foreach ($impact_types as $impact_type) {
             $key = "plugin_carbon_all_scopes_{$impact_type}_impact";
             if (isset($new_cards[$key])) {
                 trigger_error("The card $key already exists", E_USER_WARNING);
