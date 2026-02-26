@@ -44,7 +44,7 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
     protected string $engine = 'Boavizta';
 
     /** @var string $engine_version Version of the calculation engine */
-    protected static string $engine_version = 'unknown';
+    // protected static string $engine_version = 'unknown';
 
     /** @var string Endpoint to query for the itemtype, to be filled in child class */
     protected string $endpoint       = '';

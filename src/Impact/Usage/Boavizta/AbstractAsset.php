@@ -53,7 +53,7 @@ abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterfa
     protected string $engine = 'Boavizta';
 
     /** @var string $engine_version Version of the calculation engine */
-    protected string $engine_version = 'unknown';
+    // protected static string $engine_version = 'unknown';
 
     /** @var string Endpoint to query for the itemtype, to be filled in child class */
     protected string $endpoint       = '';
@@ -91,11 +91,14 @@ abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterfa
     public function setClient(Client $client)
     {
         $this->client = $client;
-        // $this->engine_version = $this->getVersion();
     }
 
     protected function getVersion(): string
     {
+        if (self::$engine_version !== 'unknown') {
+            return self::$engine_version;
+        }
+
         try {
             $response = $this->client->get('utils/version');
         } catch (\RuntimeException $e) {
@@ -109,8 +112,8 @@ abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterfa
             ), E_USER_WARNING);
             throw new \RuntimeException('Invalid response from Boavizta API');
         }
-
-        return $response[0];
+        self::$engine_version = $response[0];
+        return self::$engine_version;
     }
 
     protected function query($description): array

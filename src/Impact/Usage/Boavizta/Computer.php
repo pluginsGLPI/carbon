@@ -183,7 +183,7 @@ class Computer extends AbstractAsset
 
         $average_power = $this->getAveragePower($item->getID());
 
-        // Ask for embodied impact only
+        // Ask for usage impact only
         $configuration = $this->analyzeHardware($item);
         if (count($configuration) === 0) {
             return null;

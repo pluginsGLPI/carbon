@@ -30,7 +30,7 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\Impact\Engine\Boavizta\Tests;
+namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta\Tests;
 
 use Monitor as GlpiMonitor;
 use MonitorType as GlpiMonitorType;

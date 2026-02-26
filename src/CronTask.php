@@ -146,6 +146,7 @@ class CronTask extends CommonGLPI
         $task->setVolume(0); // start with zero
 
         $usage_impacts = Toolbox::getGwpUsageImpactClasses();
+        $task->setVolume(0); // start with zero
         $remaining = $task->fields['param'];
         $limit_per_type = (int) floor(($remaining) / count($usage_impacts));
         // Half of job for GWP, the other half for other impacts
