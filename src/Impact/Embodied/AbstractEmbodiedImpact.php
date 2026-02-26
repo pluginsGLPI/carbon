@@ -121,9 +121,8 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
     {
         $itemtype = get_class($this->item);
 
-        $input['engine'] = $this->engine;
         try {
-            $input['engine_version'] = $this->getVersion();
+            $this->getVersion();
             $impacts = $this->doEvaluation();
         } catch (ConnectException $e) {
             Session::addMessageAfterRedirect(__('Connection to Boavizta failed.', 'carbon'), false, ERROR);
@@ -146,6 +145,10 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         $embodied_impact = new EmbodiedImpact();
         $embodied_impact->getFromDBByCrit($input);
         $impact_types = Type::getImpactTypes();
+
+        $input['recalculate'] = 0;
+        $input['engine'] = $this->engine;
+        $input['engine_version'] = self::$engine_version;
 
         // Prepare inputs for add or update
         foreach ($impacts as $type => $value) {

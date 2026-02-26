@@ -58,7 +58,7 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
     protected string $engine = 'undefined';
 
     /** @var string $engine_version Version of the calculation engine */
-    protected string $engine_version = 'unknown';
+    protected static string $engine_version = 'unknown';
 
     /** @var array of TrackedFloat */
     protected array $impacts = [];
@@ -69,6 +69,8 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
             $this->impacts[$type] = null;
         }
     }
+
+    abstract protected function getVersion(): string;
 
     /**
      * Get the unit of an impact
@@ -173,6 +175,7 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
         }
 
         try {
+            $this->getVersion();
             $impacts = $this->doEvaluation($item);
         } catch (\RuntimeException $e) {
             return false;
@@ -192,8 +195,9 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
         $usage_impact->getFromDBByCrit($input);
         $impact_types = Type::getImpactTypes();
 
+        $input['recalculate'] = 0;
         $input['engine'] = $this->engine;
-        $input['engine_version'] = $this->engine_version;
+        $input['engine_version'] = self::$engine_version;
 
         // Prepare inputs for add or update
         foreach ($impacts as $type => $value) {

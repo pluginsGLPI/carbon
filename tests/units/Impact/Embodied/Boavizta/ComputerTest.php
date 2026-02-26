@@ -30,7 +30,7 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\Impact\Engine\Boavizta\Tests;
+namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta\Tests;
 
 use Computer as GlpiComputer;
 use ComputerType as GlpiComputerType;
