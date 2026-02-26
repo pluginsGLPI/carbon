@@ -35,10 +35,8 @@ namespace GlpiPlugin\Carbon\Impact\Engine\Boavizta\Tests;
 use Computer as GlpiComputer;
 use ComputerType as GlpiComputerType;
 use ComputerModel as GlpiComputerModel;
-use DBmysql;
-use GlpiPlugin\Carbon\Impact\Embodied\AbstractEmbodiedImpact;
 use GlpiPlugin\Carbon\Impact\Embodied\Boavizta\Computer as BoaviztaComputer;
-use GlpiPlugin\Carbon\Tests\Impact\Engine\AbstractEmbodiedImpactTest;
+use GlpiPlugin\Carbon\Tests\Impact\Embodied\AbstractEmbodiedImpactTest;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(BoaviztaComputer::class)]

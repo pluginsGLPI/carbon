@@ -30,7 +30,7 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\Tests\Impact\Engine;
+namespace GlpiPlugin\Carbon\Tests\Impact\Embodied;
 
 use DBmysql;
 use GlpiPlugin\Carbon\EmbodiedImpact;
@@ -45,7 +45,7 @@ class AbstractEmbodiedImpactTest extends DbTestCase
     protected static string $itemtype_type = '';
     protected static string $itemtype_model = '';
 
-    public function testGetEvaluableItems()
+    public function testGetItemsToEvaluate()
     {
         if (static::$itemtype === '' || static::$itemtype_type === '' || static::$itemtype_model === '') {
             // Ensure that the inherited test class is properly implemented for this test
@@ -65,7 +65,7 @@ class AbstractEmbodiedImpactTest extends DbTestCase
         ]);
         $this->assertEquals(1, $iterator->count());
 
-        // Test the asset is no longer evaluable when no embodied impact is in the DB
+        // Test the asset is no longer evaluable when there is embodied impact in the DB
         $glpi_asset_type = $this->createItem(static::$itemtype_type);
         $asset_type = $this->createItem('GlpiPlugin\\Carbon\\' . static::$itemtype_type, [
             getForeignKeyFieldForItemType(static::$itemtype_type) => $glpi_asset_type->getID(),
@@ -76,11 +76,31 @@ class AbstractEmbodiedImpactTest extends DbTestCase
         $embodied_impact = $this->createItem(EmbodiedImpact::class, [
             'itemtype' => $asset->getType(),
             'items_id' => $asset->getID(),
+            'recalculate' => 0,
         ]);
         $iterator = AbstractEmbodiedImpact::getItemsToEvaluate(static::$itemtype, [
             $asset::getTableField('id') => $asset->getID(),
         ]);
         $this->assertEquals(0, $iterator->count());
+
+        // Test the asset is evaluable when there is embodied impact in the DB but recamculate is set
+        $glpi_asset_type = $this->createItem(static::$itemtype_type);
+        $asset_type = $this->createItem('GlpiPlugin\\Carbon\\' . static::$itemtype_type, [
+            getForeignKeyFieldForItemType(static::$itemtype_type) => $glpi_asset_type->getID(),
+        ]);
+        $asset = $this->createItem(static::$itemtype, [
+            getForeignKeyFieldForItemType(static::$itemtype_type) => $glpi_asset_type->getID(),
+        ]);
+        $embodied_impact = $this->createItem(EmbodiedImpact::class, [
+            'itemtype' => $asset->getType(),
+            'items_id' => $asset->getID(),
+            'recalculate' => 1,
+        ]);
+        $iterator = AbstractEmbodiedImpact::getItemsToEvaluate(static::$itemtype, [
+            $asset::getTableField('id') => $asset->getID(),
+        ]);
+        $this->assertEquals(1, $iterator->count());
+
     }
 
     public function testGetEvaluableQuery()

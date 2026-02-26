@@ -108,11 +108,10 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         /** @var DBmysql $DB */
         global $DB;
 
-        // if (!is_subclass_of($itemtype, CommonDBTM::class)) {
-        //     throw new \LogicException('Itemtype does not inherits from ' . CommonDBTM::class);
-        // }
-
-        $crit[EmbodiedImpact::getTableField('id')] = null;
+        $crit[] = ['OR' => [
+            EmbodiedImpact::getTableField('id') => null,
+            EmbodiedImpact::getTableField('recalculate') => 1,
+        ]];
         $iterator = $DB->request(self::getEvaluableQuery($itemtype, $crit, false));
 
         return $iterator;
