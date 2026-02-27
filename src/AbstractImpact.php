@@ -39,6 +39,76 @@ abstract class AbstractImpact extends CommonDBChild
 {
     public static $rightname = 'carbon:report';
 
+    public function rawSearchOptions()
+    {
+        $tab = parent::rawSearchOptions();
+
+        $tab[] = [
+            'id'                 => '2',
+            'table'              => $this->getTable(),
+            'field'              => 'id',
+            'name'               => __('ID'),
+            'massiveaction'      => false, // implicit field is id
+            'datatype'           => 'number'
+        ];
+
+        $tab[] = [
+            'id'                 => '3',
+            'table'              => $this->getTable(),
+            'field'              => 'items_id',
+            'name'               => __('Associated item ID'),
+            'massiveaction'      => false,
+            'datatype'           => 'specific',
+            'additionalfields'   => ['itemtype']
+        ];
+
+        $tab[] = [
+            'id'                 => '4',
+            'table'              => $this->getTable(),
+            'field'              => 'itemtype',
+            'name'               => _n('Type', 'Types', 1),
+            'massiveaction'      => false,
+            'datatype'           => 'itemtypename',
+        ];
+
+        $id = 5;
+        foreach (Type::getImpactTypes() as $type) {
+            $tab[] = [
+                'id'                 => $id,
+                'table'              => $this->getTable(),
+                'field'              => $type,
+                'name'               => Type::getEmbodiedImpactLabel($type),
+                'massiveaction'      => false,
+                'datatype'           => 'number',
+                'unit'               => implode(' ', Type::getImpactUnit($type)),
+            ];
+            $id++;
+        }
+
+        $tab[] = [
+            'id'                 => SearchOptions::CARBON_EMISSION_CALC_DATE,
+            'table'              => self::getTable(),
+            'field'              => 'date_mod',
+            'name'               => __('Date of evaluation', 'carbon')
+        ];
+
+        $tab[] = [
+            'id'                 => SearchOptions::CARBON_EMISSION_ENGINE,
+            'table'              => self::getTable(),
+            'field'              => 'engine',
+            'name'               => __('Engine', 'carbon')
+        ];
+
+        $tab[] = [
+            'id'                 => SearchOptions::CARBON_EMISSION_ENGINE_VER,
+            'table'              => self::getTable(),
+            'field'              => 'engine_version',
+            'name'               => __('Engine version', 'carbon')
+        ];
+
+        return $tab;
+    }
+
     /**
      * Get impact value in a human r eadable format, selecting the best unit
      *
