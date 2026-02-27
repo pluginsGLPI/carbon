@@ -392,7 +392,7 @@ class Type
         );
         switch ($impact_type) {
             case 'gwp':
-                return "$base_url/carbon/types_of_impact.html#carbon-dioxyde-equivalent";
+                return "$base_url/types_of_impact.html#carbon-dioxyde-equivalent";
             case 'adp':
                 return "$base_url/types_of_impact.html#antimony-equivalent";
             case 'pe':

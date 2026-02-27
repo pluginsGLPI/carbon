@@ -32,18 +32,12 @@
 
 namespace GlpiPlugin\Carbon;
 
-use CommonDBChild;
-use DateInterval;
-use DateTimeInterface;
-use Entity;
-use Location;
+use GlpiPlugin\Carbon\Impact\Type;
 
-class UsageImpact extends CommonDBChild
+class UsageImpact extends AbstractImpact
 {
     public static $itemtype = 'itemtype';
     public static $items_id = 'items_id';
-
-    public static $rightname = 'carbon:report';
 
     public static function getTypeName($nb = 0)
     {
@@ -164,22 +158,5 @@ class UsageImpact extends CommonDBChild
         ];
 
         return $tab;
-    }
-
-    /**
-     * Get impact value in a human r eadable format, selecting the best unit
-     */
-    public function getHumanReadableImpact(string $field): string
-    {
-        switch ($field) {
-            case 'gwp':
-                return Toolbox::getWeight($this->fields[$field]) . 'CO2eq';
-            case 'adp':
-                return Toolbox::getWeight($this->fields[$field]) . 'Sbeq';
-            case 'pe':
-                return Toolbox::getEnergy($this->fields[$field] / 3600); // Convert J into Wh
-        }
-
-        return '';
     }
 }

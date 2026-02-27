@@ -37,7 +37,27 @@
 ) }}
 
 {{ usage_carbon_emission_graph|raw }}
-<div class="card-body" id="plugin_carbon_usage_impacts">
+<div class="card-body d-flex flex-wrap" id="plugin_carbon_usage_impacts">
+  <div class="col-12 col-xxl-12 flex-column">
+    <div class="d-flex flex-row flex-wrap flex-xl-nowrap">
+      <div class="row flex-row align-items-start flex-grow-1 col-12 col-sm-6 mb-2">
+        {% for criteria, label in usage_labels %}
+          {% if usage_impact.fields[criteria] ?? null is not null %}
+            <div class="col-xxl-7">
+              {{ label }}
+            </div>
+            <div class="col-xxl-5">
+              <span id="embodied_{{criteria}}_tip">
+                {{ usage_impact.getHumanReadableImpact(criteria)|raw }}
+                {# <i class="fa-solid fa-circle-info"></i> #}
+              </span>
+              {{ tooltips[criteria]|raw }}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
   {% if usage_impact.fields.gwp ?? null is not null %}
     <div class="h1 mb-3">{{ usage_impact.getHumanReadableImpact('gwp')|raw }}</div>
   {% endif %}
@@ -71,37 +91,27 @@
     'fas fa-chart-pie'
 ) }}
 
-<div class="card-body" id="plugin_carbon_embodied_impacts">
-  {% if embodied_impact.fields.gwp ?? null is not null %}
-    <div class="h1 mb-3">
-      <span id="embodied_carbon_emission_tip">
-        {{ embodied_impact.getHumanReadableImpact('gwp')|raw }}
-        {# <i class="fa-solid fa-circle-info"></i> #}
-      </span>
-      {{ carbon_emission_tooltip_html|raw }}
+<div class="card-body d-flex flex-wrap" id="plugin_carbon_embodied_impacts">
+  <div class="col-12 col-xxl-12 flex-column">
+    <div class="d-flex flex-row flex-wrap flex-xl-nowrap">
+      <div class="row flex-row align-items-start flex-grow-1 col-12 col-sm-6 mb-2">
+        {% for criteria, label in embodied_labels %}
+          {% if embodied_impact.fields[criteria] ?? null is not null %}
+            <div class="col-xxl-7">
+              {{ label }}
+            </div>
+            <div class="col-xxl-5">
+              <span id="embodied_{{criteria}}_tip">
+                {{ embodied_impact.getHumanReadableImpact(criteria)|raw }}
+                {# <i class="fa-solid fa-circle-info"></i> #}
+              </span>
+              {{ tooltips[criteria]|raw }}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
     </div>
-  {% endif %}
-
-  {% if embodied_impact.fields.adp ?? null is not null %}
-    <div class="h1 mb-3">
-      <span id="embodied_abiotic_depletion_tip">
-        {{ embodied_impact.getHumanReadableImpact('adp')|raw }}
-        {# <i class="fa-solid fa-circle-info"></i> #}
-      </span>
-      {{ embodied_abiotic_depletion_tooltip_html|raw }}
-    </div>
-  {% endif %}
-
-  {% if embodied_impact.fields.pe ?? null is not null %}
-    <div class="h1 mb-3">
-      <span id="embodied_primary_energy_tip">
-        {{ embodied_impact.getHumanReadableImpact('pe')|raw }}
-        {# <i class="fa-solid fa-circle-info"></i> #}
-      </span>
-      {{ embodied_primary_energy_tooltip_html|raw }}
-    </div>
-  {% endif %}
-
+  </div>
   <div>
     {% if not embodied_impact.isNewItem() %}
       {% set reset_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', reset: '', id: '" ~ embodied_impact.getID() ~ "'}" %}
