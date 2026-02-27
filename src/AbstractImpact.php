@@ -37,6 +37,9 @@ use GlpiPlugin\Carbon\Impact\Type;
 
 abstract class AbstractImpact extends CommonDBChild
 {
+    public static $itemtype = 'itemtype';
+    public static $items_id = 'items_id';
+
     public static $rightname = 'carbon:report';
 
     public function rawSearchOptions()
@@ -117,8 +120,8 @@ abstract class AbstractImpact extends CommonDBChild
     public function getHumanReadableImpact(string $field): string
     {
         return Toolbox::getHumanReadableValue(
-                $this->fields[$field],
-                Type::getImpactUnit($field)
+            $this->fields[$field],
+            Type::getImpactUnit($field)
         );
     }
 }

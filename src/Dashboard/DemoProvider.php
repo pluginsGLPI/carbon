@@ -462,10 +462,10 @@ class DemoProvider
             $crit['itemtype'] = array_intersect($crit['itemtype'], PLUGIN_CARBON_TYPES);
         }
 
-        $value = self::$impact_values[$impact_type][0] ?? 0 + self::$impact_values[$impact_type][1] ?? 0;
-        if ($value === null) {
+        if (self::$impact_values[$impact_type][0] === null && self::$impact_values[$impact_type][1] === null) {
             $value = 'N/A';
         } else {
+            $value = (self::$impact_values[$impact_type][0] ?? 0) + (self::$impact_values[$impact_type][1] ?? 0);
             $value = Toolbox::getHumanReadableValue(
                 $value,
                 Type::getImpactUnit($impact_type)

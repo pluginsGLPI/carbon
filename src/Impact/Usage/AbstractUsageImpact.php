@@ -116,10 +116,12 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
             throw new \LogicException('Itemtype does not inherits from ' . CommonDBTM::class);
         }
 
-        $crit[] = ['OR' => [
-            UsageImpact::getTableField('id') => null,
-            UsageImpact::getTableField('recalculate') => 1,
-        ]];
+        $crit[] = [
+            'OR' => [
+                UsageImpact::getTableField('id') => null,
+                UsageImpact::getTableField('recalculate') => 1,
+            ]
+        ];
         $crit[UsageImpact::getTableField('id')] = null;
         $iterator = $DB->request($this->getEvaluableQuery($crit, false));
 

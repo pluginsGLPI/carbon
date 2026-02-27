@@ -36,7 +36,6 @@ use CommonDBTM;
 use DBmysql;
 use DBmysqlIterator;
 use Glpi\DBAL\QuerySubQuery;
-use GlpiPlugin\Carbon\Impact\Type;
 
 /**
  * Embodied impact of assets
