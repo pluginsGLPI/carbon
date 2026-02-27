@@ -36,9 +36,6 @@ use GlpiPlugin\Carbon\Impact\Type;
 
 class UsageImpact extends AbstractImpact
 {
-    public static $itemtype = 'itemtype';
-    public static $items_id = 'items_id';
-
     public static function getTypeName($nb = 0)
     {
         return _n("Usage impact", "Usage impacts", $nb, 'carbon');

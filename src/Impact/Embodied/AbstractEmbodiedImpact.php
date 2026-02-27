@@ -108,10 +108,12 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         /** @var DBmysql $DB */
         global $DB;
 
-        $crit[] = ['OR' => [
-            EmbodiedImpact::getTableField('id') => null,
-            EmbodiedImpact::getTableField('recalculate') => 1,
-        ]];
+        $crit[] = [
+            'OR' => [
+                EmbodiedImpact::getTableField('id') => null,
+                EmbodiedImpact::getTableField('recalculate') => 1,
+            ]
+        ];
         $iterator = $DB->request(self::getEvaluableQuery($itemtype, $crit, false));
 
         return $iterator;

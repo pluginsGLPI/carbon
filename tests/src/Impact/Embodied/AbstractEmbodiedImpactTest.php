@@ -100,7 +100,6 @@ class AbstractEmbodiedImpactTest extends DbTestCase
             $asset::getTableField('id') => $asset->getID(),
         ]);
         $this->assertEquals(1, $iterator->count());
-
     }
 
     public function testGetEvaluableQuery()
