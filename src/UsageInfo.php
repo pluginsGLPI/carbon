@@ -243,6 +243,30 @@ class UsageInfo extends CommonDBChild
             'applyto' => 'embodied_primary_energy_tip',
         ]);
 
+        $tooltips = [];
+        $embodied_labels = [];
+        $usage_labels = [];
+        foreach (Type::getImpactTypes() as $impact_type) {
+            $tooltip = Type::getCriteriaTooltip($impact_type);
+            $url = Type::getCriteriaInfoLink($impact_type);
+            if ($url !== '') {
+                $tooltip = sprintf(
+                    $tooltip . __('%s More information %s', 'carbon'),
+                    '<br /><a target="_blank" href="' . $url . '">',
+                    '</a>'
+                );
+            }
+            $tooltips[$impact_type] = '';
+            if ($tooltip !== '') {
+                $tooltips[$impact_type] = Html::showToolTip($tooltip, [
+                    'display' => false,
+                    'applyto' => 'embodied_' . $impact_type . '_tip',
+                ]);
+            }
+            $embodied_labels[$impact_type] = Type::getEmbodiedImpactLabel($impact_type);
+            $usage_labels[$impact_type] = Type::getUsageImpactLabel($impact_type);
+        }
+
         $usage_imapct_action_url    = $CFG_GLPI['root_doc'] . '/plugins/carbon/front/usageimpact.form.php';
         $embodied_impact_action_url = $CFG_GLPI['root_doc'] . '/plugins/carbon/front/embodiedimpact.form.php';
         TemplateRenderer::getInstance()->display('@carbon/environmentalimpact-item.html.twig', [
@@ -251,6 +275,9 @@ class UsageInfo extends CommonDBChild
             'usage_carbon_emission_count' => $usage_carbon_emission_count,
             'embodied_impact' => $embodied_impact,
             'usage_impact'    => $usage_impact,
+            'embodied_labels' => $embodied_labels,
+            'usage_labels' => $usage_labels,
+            'tooltips' => $tooltips,
             'usage_carbon_emission_graph' => Widget::DisplayGraphUsageCarbonEmissionPerMonth($data),
             'carbon_emission_tooltip_html' => $carbon_emission_tooltip_html,
             'usage_abiotic_depletion_tooltip_html' => $usage_abiotic_depletion_tooltip_html,

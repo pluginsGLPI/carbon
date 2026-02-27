@@ -43,10 +43,8 @@ use GlpiPlugin\Carbon\Impact\Type;
  *
  * Embodied impact is the impact of the asset while it is built and destroyed or recycled
  */
-class EmbodiedImpact extends CommonDBTM
+class EmbodiedImpact extends AbstractImpact
 {
-    public static $rightname = 'carbon:report';
-
     public function canEdit($ID): bool
     {
         return false;
@@ -192,22 +190,5 @@ class EmbodiedImpact extends CommonDBTM
         }
 
         return $iterator->count();
-    }
-
-    /**
-     * Get impact value in a human r eadable format, selecting the best unit
-     */
-    public function getHumanReadableImpact(string $field): string
-    {
-        switch ($field) {
-            case 'gwp':
-                return Toolbox::getWeight($this->fields[$field]) . 'CO2eq';
-            case 'adp':
-                return Toolbox::getWeight($this->fields[$field]) . 'Sbeq';
-            case 'pe':
-                return Toolbox::getEnergy($this->fields[$field] / 3600); // Convert J into Wh
-        }
-
-        return '';
     }
 }
