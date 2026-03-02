@@ -215,35 +215,8 @@ class UsageInfo extends CommonDBChild
             'items_id' => $asset->getID(),
         ]);
 
-        $url = Type::getCriteriaInfoLink('gwp');
-        $tooltip = __('Evaluates the carbon emission in CO₂ equivalent. %s More information %s', 'carbon');
-        $tooltip = sprintf($tooltip, '<br /><a target="_blank" href="' . $url . '">', '</a>');
-        $carbon_emission_tooltip_html = Html::showToolTip($tooltip, [
-            'display' => false,
-            'applyto' => 'carbon_emission_tip',
-        ]);
-
-        $url = Type::getCriteriaInfoLink('adp');
-        $tooltip = __('Evaluates the consumption of non renewable resources in Antimony equivalent. %s More information %s', 'carbon');
-        $tooltip = sprintf($tooltip, '<br /><a target="_blank" href="' . $url . '">', '</a>');
-        $usage_abiotic_depletion_tooltip_html = Html::showToolTip($tooltip, [
-            'display' => false,
-            'applyto' => 'usage_abiotic_depletion_tip',
-        ]);
-        $embodied_abiotic_depletion_tooltip_html = Html::showToolTip($tooltip, [
-            'display' => false,
-            'applyto' => 'embodied_abiotic_depletion_tip',
-        ]);
-
-        $url = Type::getCriteriaInfoLink('pe');
-        $tooltip = __('Evaluates the primary energy consumed. %s More information %s', 'carbon');
-        $tooltip = sprintf($tooltip, '<br /><a target="_blank" href="' . $url . '">', '</a>');
-        $embodied_primary_energy_tooltip_html = Html::showToolTip($tooltip, [
-            'display' => false,
-            'applyto' => 'embodied_primary_energy_tip',
-        ]);
-
-        $tooltips = [];
+        $embodied_tooltips = [];
+        $usage_tooltips = [];
         $embodied_labels = [];
         $usage_labels = [];
         foreach (Type::getImpactTypes() as $impact_type) {
@@ -256,11 +229,16 @@ class UsageInfo extends CommonDBChild
                     '</a>'
                 );
             }
-            $tooltips[$impact_type] = '';
+            $embodied_tooltips[$impact_type] = '';
+            $usage_tooltips[$impact_type] = '';
             if ($tooltip !== '') {
-                $tooltips[$impact_type] = Html::showToolTip($tooltip, [
+                $embodied_tooltips[$impact_type] = Html::showToolTip($tooltip, [
                     'display' => false,
                     'applyto' => 'embodied_' . $impact_type . '_tip',
+                ]);
+                $usage_tooltips[$impact_type] = Html::showToolTip($tooltip, [
+                    'display' => false,
+                    'applyto' => 'usage_' . $impact_type . '_tip',
                 ]);
             }
             $embodied_labels[$impact_type] = Type::getEmbodiedImpactLabel($impact_type);
@@ -277,12 +255,9 @@ class UsageInfo extends CommonDBChild
             'usage_impact'    => $usage_impact,
             'embodied_labels' => $embodied_labels,
             'usage_labels' => $usage_labels,
-            'tooltips' => $tooltips,
+            'embodied_tooltips' => $embodied_tooltips,
+            'usage_tooltips' => $usage_tooltips,
             'usage_carbon_emission_graph' => Widget::DisplayGraphUsageCarbonEmissionPerMonth($data),
-            'carbon_emission_tooltip_html' => $carbon_emission_tooltip_html,
-            'usage_abiotic_depletion_tooltip_html' => $usage_abiotic_depletion_tooltip_html,
-            'embodied_abiotic_depletion_tooltip_html' => $embodied_abiotic_depletion_tooltip_html,
-            'embodied_primary_energy_tooltip_html' => $embodied_primary_energy_tooltip_html,
             'usage_impact_action_url'    => $usage_imapct_action_url,
             'embodied_impact_action_url' => $embodied_impact_action_url,
         ]);

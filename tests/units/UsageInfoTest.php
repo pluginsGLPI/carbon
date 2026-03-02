@@ -247,19 +247,19 @@ class UsageInfoTest extends DbTestCase
 
     private function testEmbodiedGwp(Crawler $crawler): bool
     {
-        $items = $crawler->filter('#plugin_carbon_embodied_impacts #embodied_carbon_emission_tip');
+        $items = $crawler->filter('#plugin_carbon_embodied_impacts #embodied_gwp_tip');
         return $items->count() === 1;
     }
 
     private function testEmbodiedAdp(Crawler $crawler): bool
     {
-        $items = $crawler->filter('#plugin_carbon_embodied_impacts #embodied_abiotic_depletion_tip');
+        $items = $crawler->filter('#plugin_carbon_embodied_impacts #embodied_adp_tip');
         return $items->count() === 1;
     }
 
     private function testEmbodiedPe(Crawler $crawler): bool
     {
-        $items = $crawler->filter('#plugin_carbon_embodied_impacts #embodied_primary_energy_tip');
+        $items = $crawler->filter('#plugin_carbon_embodied_impacts #embodied_pe_tip');
         return $items->count() === 1;
     }
 }

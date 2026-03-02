@@ -47,11 +47,11 @@
               {{ label }}
             </div>
             <div class="col-xxl-5">
-              <span id="embodied_{{ criteria }}_tip">
+              <span id="usage_{{ criteria }}_tip">
                 {{ usage_impact.getHumanReadableImpact(criteria)|raw }}
                 {# <i class="fa-solid fa-circle-info"></i> #}
               </span>
-              {{ tooltips[criteria]|raw }}
+              {{ usage_tooltips[criteria]|raw }}
             </div>
           {% endif %}
         {% endfor %}
@@ -60,20 +60,6 @@
   </div>
   {% if usage_impact.fields.gwp ?? null is not null %}
     <div class="h1 mb-3">{{ usage_impact.getHumanReadableImpact('gwp')|raw }}</div>
-  {% endif %}
-
-  {% if usage_impact.fields.adp ?? null is not null %}
-    <div class="h1 mb-3">
-      <span id="usage_abiotic_depletion_tip">
-        {{ usage_impact.getHumanReadableImpact('adp')|raw }}
-        {# <i class="fa-solid fa-circle-info"></i> #}
-      </span>
-      {{ usage_abiotic_depletion_tooltip_html|raw }}
-    </div>
-  {% endif %}
-
-  {% if usage_impact.fields.pe ?? null is not null %}
-    <div class="h1 mb-3">{{ usage_impact.getHumanReadableImpact('pe')|raw }}</div>
   {% endif %}
 </div>
 
@@ -105,7 +91,7 @@
                 {{ embodied_impact.getHumanReadableImpact(criteria)|raw }}
                 {# <i class="fa-solid fa-circle-info"></i> #}
               </span>
-              {{ tooltips[criteria]|raw }}
+              {{ embodied_tooltips[criteria]|raw }}
             </div>
           {% endif %}
         {% endfor %}
