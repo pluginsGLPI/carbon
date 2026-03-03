@@ -145,21 +145,21 @@ class CarbonEmission extends CommonDBChild
         ];
 
         $tab[] = [
-            'id'                 => SearchOptions::CARBON_EMISSION_CALC_DATE,
+            'id'                 => SearchOptions::CALCULATION_DATE,
             'table'              => self::getTable(),
             'field'              => 'date_mod',
             'name'               => __('Date of evaluation', 'carbon')
         ];
 
         $tab[] = [
-            'id'                 => SearchOptions::CARBON_EMISSION_ENGINE,
+            'id'                 => SearchOptions::CALCULATION_ENGINE,
             'table'              => self::getTable(),
             'field'              => 'engine',
             'name'               => __('Engine', 'carbon')
         ];
 
         $tab[] = [
-            'id'                 => SearchOptions::CARBON_EMISSION_ENGINE_VER,
+            'id'                 => SearchOptions::CALCULATION_ENGINE_VERSION,
             'table'              => self::getTable(),
             'field'              => 'engine_version',
             'name'               => __('Engine version', 'carbon')

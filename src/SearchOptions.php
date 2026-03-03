@@ -89,17 +89,9 @@ class SearchOptions
     public const CARBON_EMISSION_PER_DAY          = self::SEARCH_OPTION_BASE + 602;
     public const CARBON_EMISSION_ENERGY_QUALITY   = self::SEARCH_OPTION_BASE + 603;
     public const CARBON_EMISSION_EMISSION_QUALITY = self::SEARCH_OPTION_BASE + 604;
-    public const CARBON_EMISSION_CALC_DATE        = self::SEARCH_OPTION_BASE + 605;
-    public const CARBON_EMISSION_ENGINE           = self::SEARCH_OPTION_BASE + 606;
-    public const CARBON_EMISSION_ENGINE_VER       = self::SEARCH_OPTION_BASE + 607;
-
-    public const USAGE_IMPACT_DATE = self::SEARCH_OPTION_BASE + 700;
-    public const USAGE_IMPACT_GWP = self::SEARCH_OPTION_BASE + 701;
-    public const USAGE_IMPACT_GWP_QUALITY = self::SEARCH_OPTION_BASE + 702;
-    public const USAGE_IMPACT_ADP = self::SEARCH_OPTION_BASE + 703;
-    public const USAGE_IMPACT_ADP_QUALITY = self::SEARCH_OPTION_BASE + 704;
-    public const USAGE_IMPACT_PE = self::SEARCH_OPTION_BASE + 705;
-    public const USAGE_IMPACT_PE_QUALITY = self::SEARCH_OPTION_BASE + 706;
+    public const CALCULATION_DATE                 = self::SEARCH_OPTION_BASE + 605;
+    public const CALCULATION_ENGINE               = self::SEARCH_OPTION_BASE + 606;
+    public const CALCULATION_ENGINE_VERSION       = self::SEARCH_OPTION_BASE + 607;
 
     public const COMPUTER_TYPE_CATEGORY   = self::SEARCH_OPTION_BASE + 800;
     public const COMPUTER_TYPE_IS_IGNORED = self::SEARCH_OPTION_BASE + 801;
@@ -109,6 +101,13 @@ class SearchOptions
     public const MONITOR_TYPE_IS_IGNORED = self::SEARCH_OPTION_BASE + 1000;
 
     public const NETEQUIP_TYPE_IS_IGNORED = self::SEARCH_OPTION_BASE + 1100;
+
+    // First search option ID for all imapcts
+    // Impacts are numbered accross several consecutive IDs
+    // - impact type
+    // - impact quality
+    // @see AbstractImpact::rawSearchOption
+    public const IMPACT_BASE                 = self::SEARCH_OPTION_BASE + 1200;
 
     public const EMBODIED_IMPACT_GWP         = self::SEARCH_OPTION_BASE + 1200;
     public const EMBODIED_IMPACT_GWP_SOURCE  = self::SEARCH_OPTION_BASE + 1201;

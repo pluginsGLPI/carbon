@@ -74,8 +74,18 @@ abstract class AbstractImpact extends CommonDBChild
             'datatype'           => 'itemtypename',
         ];
 
-        $id = 5;
-        foreach (Type::getImpactTypes() as $type) {
+        $tab[] = [
+            'id'                 => '5',
+            'table'              => $this->getTable(),
+            'field'              => 'recalculate',
+            'name'               => __('', 'carbon'),
+            'massiveaction'      => false,
+            'datatype'           => 'bool',
+        ];
+
+        $id = SearchOptions::IMPACT_BASE;
+        foreach (Type::getImpactTypes() as $type_id => $type) {
+            $id = SearchOptions::IMPACT_BASE + $type_id * 2;
             $tab[] = [
                 'id'                 => $id,
                 'table'              => $this->getTable(),
@@ -86,24 +96,34 @@ abstract class AbstractImpact extends CommonDBChild
                 'unit'               => implode(' ', Type::getImpactUnit($type)),
             ];
             $id++;
+
+            $tab[] = [
+                'id'                 => $id,
+                'table'              => $this->getTable(),
+                'field'              => "{$type}_quality",
+                'name'               => Type::getEmbodiedImpactLabel($type),
+                'massiveaction'      => false,
+                'datatype'           => 'number',
+                'unit'               => implode(' ', Type::getImpactUnit($type)),
+            ];
         }
 
         $tab[] = [
-            'id'                 => SearchOptions::CARBON_EMISSION_CALC_DATE,
+            'id'                 => SearchOptions::CALCULATION_DATE,
             'table'              => self::getTable(),
             'field'              => 'date_mod',
             'name'               => __('Date of evaluation', 'carbon')
         ];
 
         $tab[] = [
-            'id'                 => SearchOptions::CARBON_EMISSION_ENGINE,
+            'id'                 => SearchOptions::CALCULATION_ENGINE,
             'table'              => self::getTable(),
             'field'              => 'engine',
             'name'               => __('Engine', 'carbon')
         ];
 
         $tab[] = [
-            'id'                 => SearchOptions::CARBON_EMISSION_ENGINE_VER,
+            'id'                 => SearchOptions::CALCULATION_ENGINE_VERSION,
             'table'              => self::getTable(),
             'field'              => 'engine_version',
             'name'               => __('Engine version', 'carbon')
