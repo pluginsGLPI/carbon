@@ -8,6 +8,7 @@
         "php-http/message-factory": "^1.1"
     },
     "require-dev": {
+        "glpi-project/tools": "^0.8.3",
         "marcocesarato/php-conventional-changelog": "^1.17"
     },
     "config": {
