@@ -47,10 +47,10 @@ return RectorConfig::configure()
     ])
     ->withPhpVersion(PhpVersion::PHP_82)
     ->withCache(
-        sys_get_temp_dir() . '/rector',
-        FileCacheStorage::class
+        cacheClass: FileCacheStorage::class,
+        cacheDirectory: '../../files/_cache/rector',
     )
-    ->withParallel(300)
+    ->withParallel(timeoutSeconds: 300)
     // FIXME apply it in another PR, it generates a huge diff ->withImportNames()
     ->withRules([
         CodeQuality\Assign\CombinedAssignRector::class,
@@ -96,4 +96,5 @@ return RectorConfig::configure()
         CodeQuality\Ternary\UnnecessaryTernaryExpressionRector::class,
         DeadCode\Assign\RemoveUnusedVariableAssignRector::class,
     ])
+    ->withPhpSets(php74: true) // apply PHP sets up to PHP 7.4
 ;
