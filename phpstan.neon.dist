@@ -3,7 +3,6 @@ parameters:
         maximumNumberOfProcesses: 2
     level: 5
     bootstrapFiles:
-        - ../../stubs/db_config_classes.php
         - ../../stubs/glpi_constants.php
         - ../../vendor/autoload.php
     paths:
@@ -13,9 +12,10 @@ parameters:
         - install
         - hook.php
         - setup.php
-    tmpDir: ../../files/_cache/phpstan
     scanDirectories:
         - ../../inc
         - ../../src
     stubFiles:
         - ../../stubs/glpi_constants.php
+rules:
+    - GlpiProject\Tools\PHPStan\Rules\GlobalVarTypeRule
