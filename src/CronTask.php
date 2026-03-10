@@ -103,18 +103,6 @@ class CronTask extends CommonGLPI
                     'parameter' => __('Maximum number of locations to solve', 'carbon'),
                 ];
 
-                // case 'DownloadRte':
-                //     return [
-                //         'description' => __('Download carbon emissions from RTE', 'carbon'),
-                //         'parameter' => __('Maximum number of entries to download', 'carbon'),
-                //     ];
-
-                // case 'DownloadElectricityMap':
-                //     return [
-                //         'description' => __('Download carbon emissions from ElectricityMap', 'carbon'),
-                //         'parameter' => __('Maximum number of entries to download', 'carbon'),
-                //     ];
-
             case 'DownloadWatttime':
                 return [
                     'description' => __('Download carbon emissions from Watttime', 'carbon'),
@@ -236,28 +224,6 @@ class CronTask extends CommonGLPI
         $task->addVolume($count);
         return ($count > 0 ? 1 : 0);
     }
-
-    // /**
-    //  * Automatic action for RTE datasource
-    //  *
-    //  * @return int
-    //  */
-    // public static function cronDownloadRte(GlpiCronTask $task): int
-    // {
-    //     $client = ClientFactory::create('Rte');
-    //     return self::downloadCarbonIntensityFromSource($task, $client, new CarbonIntensity());
-    // }
-
-    // /**
-    //  * Automatic action for ElectricityMap datasource
-    //  *
-    //  * @return int
-    //  */
-    // public static function cronDownloadElectricityMap(GlpiCronTask $task): int
-    // {
-    //     $client = ClientFactory::create('ElectricityMaps');
-    //     return self::downloadCarbonIntensityFromSource($task, $client, new CarbonIntensity());
-    // }
 
     /**
      * Automatic action for Watttime datasource
