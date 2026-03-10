@@ -356,7 +356,7 @@ class CarbonIntensity extends CommonDropdown
                 );
                 $DB->executeStatement($stmt);
                 $count++;
-            } catch (\RuntimeException $e) {
+            } catch (\Exception $e) {
                 $count++;
                 continue;
             }
