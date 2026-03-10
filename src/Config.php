@@ -32,21 +32,21 @@
 
 namespace GlpiPlugin\Carbon;
 
-use Config as GlpiConfig;
 use CommonDBTM;
 use CommonGLPI;
 use Computer as GlpiComputer;
+use Config as GlpiConfig;
 use Geocoder\Geocoder;
 use Geocoder\Provider\Nominatim\Nominatim;
 use Geocoder\StatefulGeocoder;
-use Monitor as GlpiMonitor;
-use NetworkEquipment as GlpiNetworkEquipment;
 use Glpi\Application\View\TemplateRenderer;
 use GLPINetwork;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientFactory as CarbonIntensityClientFactory;
 use GlpiPlugin\Carbon\DataSource\Lca\ClientFactory as LcaClientFactory;
 use GlpiPlugin\Carbon\Impact\Embodied\Engine;
 use GuzzleHttp\Client;
+use Monitor as GlpiMonitor;
+use NetworkEquipment as GlpiNetworkEquipment;
 use Session;
 use Twig\Extension\StringLoaderExtension;
 
@@ -79,8 +79,8 @@ class Config extends GlpiConfig
      * Undocumented function
      *
      * @param CommonGLPI $item
-     * @param integer $tabnum
-     * @param integer $withtemplate
+     * @param int $tabnum
+     * @param int $withtemplate
      * @return void
      */
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
@@ -95,7 +95,7 @@ class Config extends GlpiConfig
     public function showForm($ID, $options = [])
     {
         $current_config = GlpiConfig::getConfigurationValues(self::CONFIG_CONTEXT);
-        $current_config['geocoding_enabled'] = $current_config['geocoding_enabled'] ?? '0';
+        $current_config['geocoding_enabled'] ??= '0';
         $canedit        = Session::haveRight(Config::$rightname, UPDATE);
 
         // Get config template foreach LCA data source
@@ -211,7 +211,7 @@ class Config extends GlpiConfig
     /**
      * Get demo mode status
      *
-     * @return boolean true if demo mode enabled
+     * @return bool true if demo mode enabled
      */
     public static function isDemoMode(): bool
     {

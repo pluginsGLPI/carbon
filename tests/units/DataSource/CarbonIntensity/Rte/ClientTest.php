@@ -33,11 +33,10 @@
 namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\Rte;
 
 use DateTime;
-use GlpiPlugin\Carbon\DataSource\CarbonIntensity\Rte\Client;
-use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
-use GlpiPlugin\Carbon\Tests\DbTestCase;
 use DateTimeImmutable;
 use GlpiPlugin\Carbon\CarbonIntensity;
+use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
+use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\Zone;
 use PHPUnit\Framework\Attributes\CoversClass;
 
@@ -92,19 +91,19 @@ class ClientTest extends DbTestCase
         $client->method('request')->willReturn([
             [
                 'taux_co2'   => 1,
-                'date_heure' => '2024-10-08T18:00:00+00:00'
+                'date_heure' => '2024-10-08T18:00:00+00:00',
             ],
             [
                 'taux_co2'   => 1,
-                'date_heure' => '2024-10-08T18:15:00+00:00'
+                'date_heure' => '2024-10-08T18:15:00+00:00',
             ],
             [
                 'taux_co2'   => 1,
-                'date_heure' => '2024-10-08T18:30:00+00:00'
+                'date_heure' => '2024-10-08T18:30:00+00:00',
             ],
             [
                 'taux_co2'   => 1,
-                'date_heure' => '2024-10-08T18:45:00+00:00'
+                'date_heure' => '2024-10-08T18:45:00+00:00',
             ],
         ]);
         /** @var RestApiClientInterface $client */
@@ -136,7 +135,7 @@ class ClientTest extends DbTestCase
         $client->method('request')->willReturn([
             [
                 'taux_co2'   => 1,
-                'date_heure' => '2024-10-08T18:00:00+00:00'
+                'date_heure' => '2024-10-08T18:00:00+00:00',
             ],
         ]);
         $instance = new Client($client);

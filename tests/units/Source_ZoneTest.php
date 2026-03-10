@@ -36,11 +36,9 @@ use Computer;
 use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
-use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\Zone;
 use Location as GlpiLocation;
 use PHPUnit\Framework\Attributes\CoversClass;
-use wapmorgan\UnifiedArchive\Drivers\Zip;
 
 #[CoversClass(Source_Zone::class)]
 class Source_ZoneTest extends DbTestCase
@@ -51,11 +49,11 @@ class Source_ZoneTest extends DbTestCase
     public function testShowForSource()
     {
         $source = $this->createItem(Source::class, [
-            'name' => 'foo'
+            'name' => 'foo',
         ]);
 
         $zone = $this->createItem(Zone::class, [
-            'name' => 'bar'
+            'name' => 'bar',
         ]);
 
         $instance = $this->createItem(Source_Zone::class, [
@@ -82,11 +80,11 @@ class Source_ZoneTest extends DbTestCase
     public function testShowForZone()
     {
         $source = $this->createItem(Source::class, [
-            'name' => 'foo'
+            'name' => 'foo',
         ]);
 
         $zone = $this->createItem(Zone::class, [
-            'name' => 'bar'
+            'name' => 'bar',
         ]);
 
         $instance = $this->createItem(Source_Zone::class, [
@@ -202,7 +200,7 @@ class Source_ZoneTest extends DbTestCase
             'is_carbon_intensity_source' => 0,
         ]);
         $zone_france = $this->getItem(Zone::class, [
-            'WHERE' => ['name' => 'France']
+            'WHERE' => ['name' => 'France'],
         ]);
         $source_zone_boaviztapi_france = $this->createItem(Source_Zone::class, [
             getForeignKeyFieldForItemType(Source::class) => $source_boaviztapi->getID(),
@@ -211,13 +209,13 @@ class Source_ZoneTest extends DbTestCase
         $instance = new Source_Zone();
         $expected_source = $this->getItem(Source::class, [
             'WHERE' => [
-                'name' => 'Ember - Energy Institute'
-            ]
+                'name' => 'Ember - Energy Institute',
+            ],
         ]);
         $expected_zone = $this->getItem(Zone::class, [
             'WHERE' => [
-                'name' => 'France'
-            ]
+                'name' => 'France',
+            ],
         ]);
         $success = $instance->getFallbackFromDB($source_zone_boaviztapi_france);
         $this->assertTrue($success);
@@ -242,14 +240,14 @@ class Source_ZoneTest extends DbTestCase
                 Source::getTable() => [
                     'ON' => [
                         Source::getTable() => 'id',
-                        Source_Zone::getTable() => Source::getForeignKeyField()
-                    ]
-                ]
+                        Source_Zone::getTable() => Source::getForeignKeyField(),
+                    ],
+                ],
             ],
             'WHERE' => [
                 getForeignKeyFieldForItemType(Zone::class)   => $zone_france->getID(),
                 Source::getTableField('name') => 'Ember - Energy Institute',
-            ]
+            ],
         ]);
         $instance = new Source_Zone();
         $success = $instance->getFallbackFromDB($input);

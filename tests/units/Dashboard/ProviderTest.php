@@ -48,8 +48,8 @@ use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
-use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
+use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\Zone;
 use Infocom;
 use Location as GlpiLocation;
@@ -99,7 +99,7 @@ class ProviderTest extends DbTestCase
         $glpi_location_empty = $this->createItem(GlpiLocation::class);
         $glpi_location = $this->createItem(GlpiLocation::class);
         $source = $this->createItem(Source::class, [
-            'is_carbon_intensity_source' => 1
+            'is_carbon_intensity_source' => 1,
         ]);
         $zone = $this->createItem(Zone::class);
         $source_zone = $this->createItem(Source_Zone::class, [
@@ -161,7 +161,7 @@ class ProviderTest extends DbTestCase
                     'computertypes_id'  => $glpi_computer_type->getID(),
                     'locations_id'      => $glpi_location->getID(),
                 ],
-            ]
+            ],
         ];
         $computers = $this->createItems($computers_definition);
         $total_count += count($computers[GlpiComputer::class]);
@@ -225,7 +225,7 @@ class ProviderTest extends DbTestCase
         // - type
         $glpi_computer = $this->createHistorizableComputer([
             GlpiComputerType::class,
-            ComputerType::class
+            ComputerType::class,
         ]);
         $glpi_computers[] = $glpi_computer;
 
@@ -357,7 +357,7 @@ class ProviderTest extends DbTestCase
         ]);
         $computer_3 = $this->createItem(GlpiComputer::class, [
             'computermodels_id' => $glpi_computer_model_3->getID(),
-            'computertypes_id'  => $glpi_computer_type_3->getID()
+            'computertypes_id'  => $glpi_computer_type_3->getID(),
         ]);
 
         // Create carbon emissions for the assets
@@ -398,8 +398,8 @@ class ProviderTest extends DbTestCase
                         'energy_per_day'   => 2,
                         'emission_per_day' => 4,
                         'date'             => $date->format('Y-m-d'),
-                    ]
-                ]
+                    ],
+                ],
             ];
 
             $items = $this->createItems($rows);
@@ -455,7 +455,7 @@ class ProviderTest extends DbTestCase
             'computertypes_id' => $glpi_computer_type_2->getID(),
         ]);
         $computer_3 = $this->createItem(GlpiComputer::class, [
-            'computertypes_id'  => $glpi_computer_type_3->getID()
+            'computertypes_id'  => $glpi_computer_type_3->getID(),
         ]);
 
         $date = new DateTime('2024-08-15');
@@ -491,8 +491,8 @@ class ProviderTest extends DbTestCase
                         'energy_per_day'   => 2,
                         'emission_per_day' => 4,
                         'date'             => $date->format('Y-m-d'),
-                    ]
-                ]
+                    ],
+                ],
             ];
 
             $items = $this->createItems($rows);
@@ -538,7 +538,7 @@ class ProviderTest extends DbTestCase
         ];
         $source = $this->createItem(Source::class, [
             'is_carbon_intensity_source' => 1,
-            'fallback_level' => 0
+            'fallback_level' => 0,
         ]);
         $zone = $this->createItem(Zone::class);
         $source_zone = $this->createItem(Source_Zone::class, [
@@ -551,10 +551,10 @@ class ProviderTest extends DbTestCase
         $computer_4 = $this->createComputerUsageProfilePowerLocation($usage_profile, 60, $source_zone);
 
         $computer_model_1 = $this->createItem(GlpiComputerModel::class, [
-            'power_consumption' => 10
+            'power_consumption' => 10,
         ]);
         $computer_model_2 = $this->createItem(GlpiComputerModel::class, [
-            'power_consumption' => 40
+            'power_consumption' => 40,
         ]);
 
         $computer_1->update([
@@ -584,7 +584,7 @@ class ProviderTest extends DbTestCase
                 'number' => 80.0,
                 'url' => GlpiComputerModel::getFormURLWithID($computer_model_2->getID()),
                 'label' => $computer_model_2->fields['name'] . " (2 computers)",
-            ]
+            ],
         ];
         $this->assertEquals($expected, $output);
     }
@@ -605,7 +605,7 @@ class ProviderTest extends DbTestCase
         ];
         $source = $this->createItem(Source::class, [
             'is_carbon_intensity_source' => 1,
-            'fallback_level' => 0
+            'fallback_level' => 0,
         ]);
         $zone = $this->createItem(Zone::class);
         $source_zone = $this->createItem(Source_Zone::class, [

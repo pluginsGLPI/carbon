@@ -34,11 +34,11 @@ namespace GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi;
 
 use DBmysql;
 use Dropdown;
-use GlpiPlugin\Carbon\Source;
-use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Config as CarbonConfig;
 use GlpiPlugin\Carbon\DataSource\Lca\AbstractClient;
 use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 
 class Client extends AbstractClient
@@ -96,7 +96,7 @@ class Client extends AbstractClient
     /**
      * Create Boavizeta source if it does not exists
      *
-     * @return boolean
+     * @return bool
      */
     public function createSource(): bool
     {

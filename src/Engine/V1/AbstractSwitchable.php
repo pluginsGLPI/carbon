@@ -33,11 +33,10 @@
 namespace GlpiPlugin\Carbon\Engine\V1;
 
 use ArrayObject;
-use DateTime;
 use DateInterval;
+use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
-use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\DataTracking\TrackedInt;
@@ -51,7 +50,7 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
      *
      * @param ComputerUsageProfile $usage_profile
      * @param DateTimeInterface $dateTime
-     * @return boolean true if the asset is powered on
+     * @return bool true if the asset is powered on
      */
     protected static function isUsageDay(ComputerUsageProfile $usage_profile, DateTimeInterface $dateTime): bool
     {

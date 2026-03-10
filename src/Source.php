@@ -32,11 +32,11 @@
 
 namespace GlpiPlugin\Carbon;
 
-use CommonDropdown;
 use CommonDBTM;
+use CommonDropdown;
 use CommonGLPI;
-use DbUtils;
 use DBmysql;
+use DbUtils;
 use Session;
 
 class Source extends CommonDropdown
@@ -146,7 +146,7 @@ class Source extends CommonDropdown
             'FROM'   => self::getTable(),
             'WHERE'  => [
                 'fallback_level' => 0,
-            ]
+            ],
         ]);
         return iterator_to_array($iterator);
     }

@@ -37,11 +37,10 @@ use DateTime;
 use DateTimeImmutable;
 use DBmysql;
 use GlpiPlugin\Carbon\CarbonIntensity;
-use GlpiPlugin\Carbon\Tests\DbTestCase;
-use GlpiPlugin\Carbon\Zone;
+use GlpiPlugin\Carbon\DataSource\CarbonIntensity\AbstractClient;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
-use GlpiPlugin\Carbon\DataSource\CarbonIntensity\AbstractClient;
+use GlpiPlugin\Carbon\Zone;
 use Infocom;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -60,11 +59,11 @@ class CarbonIntensityTest extends DbTestCase
             'name' => 'foo',
         ]);
         $source = $this->createItem(Source::class, [
-            'name' => 'bar'
+            'name' => 'bar',
         ]);
         $source_zone = $this->createItem(Source_Zone::class, [
             $source::getForeignKeyField() => $source->getID(),
-            $zone::getForeignKeyField() => $zone->getID()
+            $zone::getForeignKeyField() => $zone->getID(),
         ]);
         $result = $instance->getLastKnownDate('foo', 'bar');
         $this->assertNull($result);
@@ -98,11 +97,11 @@ class CarbonIntensityTest extends DbTestCase
             'name' => 'foo',
         ]);
         $source = $this->createItem(Source::class, [
-            'name' => 'bar'
+            'name' => 'bar',
         ]);
         $source_zone = $this->createItem(Source_Zone::class, [
             $source::getForeignKeyField() => $source->getID(),
-            $zone::getForeignKeyField() => $zone->getID()
+            $zone::getForeignKeyField() => $zone->getID(),
         ]);
         $result = $instance->getFirstKnownDate('foo', 'bar');
         $this->assertNull($result);
@@ -223,7 +222,7 @@ class CarbonIntensityTest extends DbTestCase
             'AND' => [
                 ['date' => ['>=', $delete_middle_start_date->format('Y-m-d H:i:s')]],
                 ['date' => ['<', $delete_middle_end_date->format('Y-m-d H:i:s')]],
-            ]
+            ],
         ]);
         $result = $carbon_intensity->findGaps($source->getID(), $zone->getID(), $start_date, $end_date);
         $result = iterator_to_array($result);
@@ -329,7 +328,7 @@ class CarbonIntensityTest extends DbTestCase
             'name' => 'foo',
         ]);
         $source = $this->createItem(Source::class, [
-            'name' => 'bar'
+            'name' => 'bar',
         ]);
         $expected = new DateTimeImmutable('2019-01-31 23:00:00');
         $source_zone = $this->createItem(Source_Zone::class, [
@@ -357,11 +356,11 @@ class CarbonIntensityTest extends DbTestCase
             'name' => 'foo',
         ]);
         $source = $this->createItem(Source::class, [
-            'name' => 'bar'
+            'name' => 'bar',
         ]);
         $source_zone = $this->createItem(Source_Zone::class, [
             $source::getForeignKeyField() => $source->getID(),
-            $zone::getForeignKeyField() => $zone->getID()
+            $zone::getForeignKeyField() => $zone->getID(),
         ]);
 
         $data_source = $this->getMockBuilder(AbstractClient::class)

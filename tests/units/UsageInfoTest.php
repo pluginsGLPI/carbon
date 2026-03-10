@@ -32,15 +32,15 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
-use GlpiPlugin\Carbon\UsageInfo;
-use GlpiPlugin\Carbon\EmbodiedImpact;
 use Computer as GlpiComputer;
 use Contact;
 use DBmysql;
+use GlpiPlugin\Carbon\EmbodiedImpact;
+use GlpiPlugin\Carbon\UsageInfo;
 use Monitor as GlpiMonitor;
 use NetworkEquipment as GlpiNetworkEquipment;
-use Symfony\Component\DomCrawler\Crawler;
 use PHPUnit\Framework\Attributes\CoversClass;
+use Symfony\Component\DomCrawler\Crawler;
 
 #[CoversClass(UsageInfo::class)]
 class UsageInfoTest extends DbTestCase

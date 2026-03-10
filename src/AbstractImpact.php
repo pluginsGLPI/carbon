@@ -52,7 +52,7 @@ abstract class AbstractImpact extends CommonDBChild
             'field'              => 'id',
             'name'               => __('ID'),
             'massiveaction'      => false, // implicit field is id
-            'datatype'           => 'number'
+            'datatype'           => 'number',
         ];
 
         $tab[] = [
@@ -62,7 +62,7 @@ abstract class AbstractImpact extends CommonDBChild
             'name'               => __('Associated item ID'),
             'massiveaction'      => false,
             'datatype'           => 'specific',
-            'additionalfields'   => ['itemtype']
+            'additionalfields'   => ['itemtype'],
         ];
 
         $tab[] = [
@@ -112,21 +112,21 @@ abstract class AbstractImpact extends CommonDBChild
             'id'                 => SearchOptions::CALCULATION_DATE,
             'table'              => self::getTable(),
             'field'              => 'date_mod',
-            'name'               => __('Date of evaluation', 'carbon')
+            'name'               => __('Date of evaluation', 'carbon'),
         ];
 
         $tab[] = [
             'id'                 => SearchOptions::CALCULATION_ENGINE,
             'table'              => self::getTable(),
             'field'              => 'engine',
-            'name'               => __('Engine', 'carbon')
+            'name'               => __('Engine', 'carbon'),
         ];
 
         $tab[] = [
             'id'                 => SearchOptions::CALCULATION_ENGINE_VERSION,
             'table'              => self::getTable(),
             'field'              => 'engine_version',
-            'name'               => __('Engine version', 'carbon')
+            'name'               => __('Engine version', 'carbon'),
         ];
 
         return $tab;

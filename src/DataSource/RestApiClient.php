@@ -39,11 +39,11 @@ use Toolbox;
 
 class RestApiClient implements RestApiClientInterface
 {
-    const DEFAULT_TIMEOUT = 5;
-    const DEFAULT_HEADERS = [
+    public const DEFAULT_TIMEOUT = 5;
+    public const DEFAULT_HEADERS = [
         'Accept' => 'application/json; charset=utf-8',
     ];
-    const DEFAULT_HTTP_VERSION = '2.0';
+    public const DEFAULT_HTTP_VERSION = '2.0';
 
     protected $api_client = null;
     protected $last_error = '';

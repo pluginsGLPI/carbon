@@ -52,7 +52,7 @@ class Monitor extends AbstractAsset
         $description = [
             'configuration' => $configuration,
             'usage' => [
-                'avg_power' => 0
+                'avg_power' => 0,
             ],
         ];
         $response = $this->query($description);
@@ -68,7 +68,7 @@ class Monitor extends AbstractAsset
         // Disable usage
         $this->hardware['configuration'] = $configuration;
         $this->hardware['usage'] = [
-            'avg_power' => 0
+            'avg_power' => 0,
         ];
 
         return $configuration;

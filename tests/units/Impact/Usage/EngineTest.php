@@ -33,14 +33,14 @@
 namespace GlpiPlugin\Carbon\Impact\Usage\Tests;
 
 use Computer as GlpiComputer;
-use Monitor as GlpiMonitor;
-use NetworkEquipment as GlpiNetworkEquipment;
 use Config as GlpiConfig;
 use GlpiPlugin\Carbon\DataSource\RestApiClient;
-use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\Impact\Usage\Boavizta\Computer;
 use GlpiPlugin\Carbon\Impact\Usage\Boavizta\Monitor;
 use GlpiPlugin\Carbon\Impact\Usage\Engine;
+use GlpiPlugin\Carbon\Tests\DbTestCase;
+use Monitor as GlpiMonitor;
+use NetworkEquipment as GlpiNetworkEquipment;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(Engine::class)]
@@ -49,7 +49,7 @@ class EngineTest extends DbTestCase
     public function testGetEngineFromItemtypeForBoavizta()
     {
         GlpiConfig::setConfigurationValues('plugin:carbon', [
-            'boaviztapi_base_url' => 'http://localhost:5000'
+            'boaviztapi_base_url' => 'http://localhost:5000',
         ]);
         $version_response = [
             '1.3.11',

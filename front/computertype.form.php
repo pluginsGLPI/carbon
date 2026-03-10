@@ -30,9 +30,9 @@
  * -------------------------------------------------------------------------
  */
 
+use ComputerType as GlpiComputerType;
 use Glpi\Exception\Http\NotFoundHttpException;
 use GlpiPlugin\Carbon\ComputerType;
-use ComputerType as GlpiComputerType;
 
 include(__DIR__ . '/../../../inc/includes.php');
 

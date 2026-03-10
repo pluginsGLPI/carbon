@@ -1,5 +1,7 @@
 <?php
 
+use GlpiPlugin\Carbon\CarbonDataProviderElectricityMap;
+
 /**
  * -------------------------------------------------------------------------
  * Carbon plugin for GLPI
@@ -32,7 +34,7 @@
 
 include("../../../inc/includes.php");
 
-$provider = new GlpiPlugin\Carbon\CarbonDataProviderElectricityMap();
+$provider = new CarbonDataProviderElectricityMap();
 
 $zones = [
     'BE',

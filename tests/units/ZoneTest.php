@@ -39,7 +39,6 @@ use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 use Location as GlpiLocation;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(Zone::class)]
 class ZoneTest extends DbTestCase
@@ -115,7 +114,7 @@ class ZoneTest extends DbTestCase
             'fallback_level' => 0,
         ]);
         $zone = $this->createItem(Zone::class, [
-            'name' => 'a zone'
+            'name' => 'a zone',
         ]);
         $source_zone = $this->createItem(Source_Zone::class, [
             $source::getForeignKeyField() => $source->getID(),
@@ -138,7 +137,7 @@ class ZoneTest extends DbTestCase
 
         // Test with a Computer object that has a location with country and no matching zone
         $glpi_location = $this->createItem(GlpiLocation::class, [
-            'country' => 'foo'
+            'country' => 'foo',
         ]);
         $item->update(['id' => $item->getID(), 'locations_id' => $glpi_location->getID()]);
         $zone = new Zone();
@@ -146,7 +145,7 @@ class ZoneTest extends DbTestCase
 
         // Test with a Computer object that has a location with country and a matching zone
         $expected_zone = $this->createItem(Zone::class, [
-            'name' => 'foo'
+            'name' => 'foo',
         ]);
         $zone = new Zone();
         $this->assertTrue($zone->getByItem($item));
@@ -154,7 +153,7 @@ class ZoneTest extends DbTestCase
 
         // Test with a Computer object that has a location with state and no matching zone
         $glpi_location = $this->createItem(GlpiLocation::class, [
-            'state' => 'bar'
+            'state' => 'bar',
         ]);
         $item->update(['id' => $item->getID(), 'locations_id' => $glpi_location->getID()]);
         $zone = new Zone();
@@ -162,7 +161,7 @@ class ZoneTest extends DbTestCase
 
         // Test with a Computer object that has a location with state and a matching zone
         $expected_zone = $this->createItem(Zone::class, [
-            'name' => 'bar'
+            'name' => 'bar',
         ]);
         $zone = new Zone();
         $this->assertTrue($zone->getByItem($item));
@@ -171,7 +170,7 @@ class ZoneTest extends DbTestCase
         // Test with a Computer object that has a location with both country and state and no matching zone
         $glpi_location = $this->createItem(GlpiLocation::class, [
             'country' => 'fooo',
-            'state' => 'baz'
+            'state' => 'baz',
         ]);
         $item->update(['id' => $item->getID(), 'locations_id' => $glpi_location->getID()]);
         $zone = new Zone();
@@ -179,7 +178,7 @@ class ZoneTest extends DbTestCase
 
         // Test with a Computer object that has a location with both country and state and a matching zone for state
         $expected_zone = $this->createItem(Zone::class, [
-            'name' => 'baz'
+            'name' => 'baz',
         ]);
         $zone = new Zone();
         $this->assertTrue($zone->getByItem($item));
@@ -188,7 +187,7 @@ class ZoneTest extends DbTestCase
         // Test with a Computer object that has a location with both country and state and a matching zone for state and country
         $glpi_location = $this->createItem(GlpiLocation::class, [
             'country' => 'foo',
-            'state' => 'baz'
+            'state' => 'baz',
         ]);
         $item->update(['id' => $item->getID(), 'locations_id' => $glpi_location->getID()]);
         $zone = new Zone();

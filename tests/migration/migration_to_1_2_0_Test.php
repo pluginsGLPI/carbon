@@ -35,9 +35,8 @@ namespace GlpiPlugin\Carbon\Tests;
 use DBmysql;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Install;
-use Location as GlpiLocation;
-use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\Uninstall;
+use Location as GlpiLocation;
 use Migration;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use Plugin;
@@ -64,7 +63,7 @@ class migration_to_1_2_0_Test extends DbTestCase
     #[CoversNothing]
     public function testUpdateCountryLocationZoneRelation()
     {
-        /** @var DBMysql $DB */
+        /** @var DBmysql $DB */
         global $DB;
 
         $glpi_location = $this->createItem(GlpiLocation::class, [
@@ -114,7 +113,7 @@ class migration_to_1_2_0_Test extends DbTestCase
     #[CoversNothing]
     public function testUpdateStateLocationZoneRelation()
     {
-        /** @var DBMysql $DB */
+        /** @var DBmysql $DB */
         global $DB;
 
         $glpi_location = $this->createItem(GlpiLocation::class, [
@@ -122,7 +121,7 @@ class migration_to_1_2_0_Test extends DbTestCase
         ]);
         $DB->insert('glpi_plugin_carbon_carbonintensitysources', [
             'name' => 'foo electricity distributor',
-            'is_fallback' => 1
+            'is_fallback' => 1,
         ]);
         $source_id = $DB->insertId();
         $DB->insert('glpi_plugin_carbon_zones', [

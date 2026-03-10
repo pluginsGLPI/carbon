@@ -32,10 +32,10 @@
 
 namespace GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi;
 
-use GlpiPlugin\Carbon\DataSource\RestApiClient;
-use Session;
 use GlpiPlugin\Carbon\Config as PluginConfig;
 use GlpiPlugin\Carbon\DataSource\ConfigInterface;
+use GlpiPlugin\Carbon\DataSource\RestApiClient;
+use Session;
 
 class Config implements ConfigInterface
 {

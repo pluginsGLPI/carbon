@@ -30,8 +30,8 @@
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Carbon\CronTask;
 use CronTask as GlpiCronTask;
+use GlpiPlugin\Carbon\CronTask;
 use GlpiPlugin\Carbon\DataSource\CronTaskProvider;
 
 $cron_task_classes = CronTaskProvider::getCronTaskTypes();
@@ -51,7 +51,7 @@ $automatic_actions = array_merge($automatic_actions, [
             'logs_lifetime' => 30,
             'comment' => __('Find the Alpha3 country code (ISO3166) of locations', 'carbon'),
             'param'   => 10, // Maximum rows to generate per execution
-        ]
+        ],
     ],
     [
         'itemtype'  => CronTask::class,
@@ -63,7 +63,7 @@ $automatic_actions = array_merge($automatic_actions, [
             'logs_lifetime' => 30,
             'comment' => __('Compute carbon emissions of computers', 'carbon'),
             'param'   => 10000, // Maximum rows to generate per execution
-        ]
+        ],
     ],
     // [
     //     'itemtype'  => CronTask::class,
@@ -99,7 +99,7 @@ $automatic_actions = array_merge($automatic_actions, [
             'logs_lifetime' => 30,
             'comment' => __('Compute embodied impact of assets', 'carbon'),
             'param'   => 10000, // Maximum rows to generate per execution
-        ]
+        ],
     ],
 ]);
 
@@ -115,6 +115,6 @@ foreach ($automatic_actions as $action) {
         $action['options']
     );
     if (!$success) {
-        throw new \RuntimeException('Error while creating automatic action: ' . $action['name']);
+        throw new RuntimeException('Error while creating automatic action: ' . $action['name']);
     }
 }

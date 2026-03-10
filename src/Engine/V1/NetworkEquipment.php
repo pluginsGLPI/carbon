@@ -32,10 +32,10 @@
 
 namespace GlpiPlugin\Carbon\Engine\V1;
 
-use NetworkEquipment as GlpiNetworkEquipment;
-use NetworkEquipmentType as GlpiNetworkEquipmentType;
-use NetworkEquipmentModel;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
+use NetworkEquipment as GlpiNetworkEquipment;
+use NetworkEquipmentModel;
+use NetworkEquipmentType as GlpiNetworkEquipmentType;
 
 class NetworkEquipment extends AbstractPermanent
 {

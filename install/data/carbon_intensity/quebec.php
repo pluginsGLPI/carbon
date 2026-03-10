@@ -38,5 +38,5 @@
 // https://www.hydroquebec.com/data/developpement-durable/pdf/amelioration-precision-empreinte-carbone-electricite.pdf
 // year => intensity in gCo2eq/KWh
 return [
-    2017 => 34.5
+    2017 => 34.5,
 ];

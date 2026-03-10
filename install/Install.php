@@ -50,7 +50,7 @@ class Install
     /**
      * Force upgrade from the previous version to the currrent one
      *
-     * @var boolean
+     * @var bool
      */
     private bool $force_upgrade = false;
 
@@ -97,7 +97,7 @@ class Install
      * Fresh install of the plugin
      *
      * @param array $args
-     * @return boolean
+     * @return bool
      */
     public function install(array $args = []): bool
     {
@@ -144,7 +144,7 @@ class Install
     {
         $oldest_upgradable_version = self::OLDEST_UPGRADABLE_VERSION;
 
-        $db_version = config::getConfigurationValue('plugin:carbon', 'dbversion');
+        $db_version = Config::getConfigurationValue('plugin:carbon', 'dbversion');
         $matches = [];
         preg_match('/^(\d+\.\d+\.\d+)/', PLUGIN_CARBON_VERSION, $matches);
         $current_version = $matches[1];
@@ -198,7 +198,7 @@ class Install
         $install_dir = __DIR__ . '/install/';
         $update_scripts = scandir($install_dir);
         $whitelist = [
-            'init_datasources.php'
+            'init_datasources.php',
         ];
         foreach ($update_scripts as $update_script) {
             if (!in_array($update_script, $whitelist)) {
@@ -285,7 +285,7 @@ class Install
             'fallback_level' => $fallback_level,
             'is_carbon_intensity_source' => $is_carbon_intensity_source,
         ], [
-            'name' => $name
+            'name' => $name,
         ]);
         if ($source->isNewItem()) {
             throw new \RuntimeException("Failed to create carbon intensity source '$name' in DB");
@@ -334,7 +334,7 @@ class Install
             $source_zone->add([
                 'plugin_carbon_sources_id' => $source_id,
                 'plugin_carbon_zones_id'   => $zone_id,
-                'code'                     => $code
+                'code'                     => $code,
             ]);
         } else {
             if ($source_zone->fields['code'] !== $code) {

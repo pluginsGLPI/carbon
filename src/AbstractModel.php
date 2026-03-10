@@ -69,8 +69,8 @@ class AbstractModel extends CommonDBChild
      * Undocumented function
      *
      * @param CommonGLPI $item
-     * @param integer $tabnum
-     * @param integer $withtemplate
+     * @param int $tabnum
+     * @param int $withtemplate
      * @return void
      */
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
@@ -109,7 +109,7 @@ class AbstractModel extends CommonDBChild
         $this->getFromDBByCrit([$item_fk => $item->getID()]);
         if ($this->isNewItem()) {
             $input = [
-                $item_fk => $item->getID()
+                $item_fk => $item->getID(),
             ];
             $types = Type::getImpactTypes();
             foreach ($types as $type) {
@@ -168,7 +168,7 @@ class AbstractModel extends CommonDBChild
             'field'              => 'id',
             'name'               => __('ID'),
             'massiveaction'      => false, // implicit field is id
-            'datatype'           => 'number'
+            'datatype'           => 'number',
         ];
 
         $tab[] = [

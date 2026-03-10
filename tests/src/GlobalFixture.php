@@ -32,9 +32,9 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
-use Plugin;
 use Config;
 use DbUtils;
+use Plugin;
 
 class GlobalFixture
 {
@@ -53,7 +53,7 @@ class GlobalFixture
         $version = '1.0.0';
 
         if (!Plugin::isPluginActive(TEST_PLUGIN_NAME)) {
-        // Plugin not activated yet
+            // Plugin not activated yet
             return;
         }
 
@@ -77,7 +77,7 @@ class GlobalFixture
             'SELECT' => ['id'],
             'FROM' => $source_table,
             'WHERE' => [
-                'name' => $fake_source_name
+                'name' => $fake_source_name,
             ],
         ]);
         if ($iterator->count() === 0) {
@@ -95,7 +95,7 @@ class GlobalFixture
             'SELECT' => ['id'],
             'FROM' => $zone_table,
             'WHERE' => [
-                'name' => $fake_zone_name
+                'name' => $fake_zone_name,
             ],
         ]);
         if ($iterator->count() === 0) {

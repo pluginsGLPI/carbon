@@ -32,19 +32,17 @@
 
 namespace GlpiPlugin\Carbon;
 
-use ArrayIterator;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DBmysql;
 use Glpi\Dashboard\Dashboard as GlpiDashboard;
-use Infocom;
-use Location;
-use SeekableIterator;
 use Glpi\DBAL\QueryExpression;
 use Glpi\DBAL\QuerySubQuery;
 use Glpi\DBAL\QueryUnion;
+use Infocom;
+use Location;
 use Mexitek\PHPColors\Color;
 
 class Toolbox
@@ -87,8 +85,8 @@ class Toolbox
                                 $infocom_table => 'items_id',
                                 $item_table    => 'id',
                                 ['AND' => ['itemtype' => $itemtype]],
-                            ]
-                        ]
+                            ],
+                        ],
                     ],
                     'WHERE' => $crit,
                 ])->current();
@@ -100,7 +98,7 @@ class Toolbox
                 ?? null;
                 if ($oldest_date === null) {
                     $oldest_date = $itemtype_oldest_date;
-                } else if ($itemtype_oldest_date !== null) {
+                } elseif ($itemtype_oldest_date !== null) {
                     $oldest_date = min($oldest_date, $itemtype_oldest_date);
                 }
             }
@@ -151,8 +149,8 @@ class Toolbox
                                 $infocom_table => 'items_id',
                                 $item_table    => 'id',
                                 ['AND' => ['itemtype' => $itemtype]],
-                            ]
-                        ]
+                            ],
+                        ],
                     ],
                     'WHERE' => $crit,
                 ])->current();
@@ -160,7 +158,7 @@ class Toolbox
                 ?? null;
                 if ($latest_date === null) {
                     $latest_date = $itemtype_latest_date;
-                } else if ($itemtype_latest_date !== null) {
+                } elseif ($itemtype_latest_date !== null) {
                     $latest_date = max($latest_date, $itemtype_latest_date);
                 }
             }
@@ -199,7 +197,7 @@ class Toolbox
      **/
     public static function getWeight(float $weight): string
     {
-       //TRANS: list of unit (o for octet)
+        //TRANS: list of unit (o for octet)
         $units = [
             __('g', 'carbon'),
             __('Kg', 'carbon'),
@@ -223,7 +221,7 @@ class Toolbox
 
         $weight = self::dynamicRound($weight);
 
-       //TRANS: %1$s is a number maybe float or string and %2$s the unit
+        //TRANS: %1$s is a number maybe float or string and %2$s the unit
         return sprintf(__('%1$s %2$s'), $weight, $human_readable_unit);
     }
 
@@ -236,7 +234,7 @@ class Toolbox
      **/
     public static function getPower(float $p): string
     {
-       //TRANS: list of unit (W for watt)
+        //TRANS: list of unit (W for watt)
         $units = [
             __('W', 'carbon'),
             __('KW', 'carbon'),
@@ -258,7 +256,7 @@ class Toolbox
 
         $p = self::dynamicRound($p);
 
-       //TRANS: %1$s is a number maybe float or string and %2$s the unit
+        //TRANS: %1$s is a number maybe float or string and %2$s the unit
         return sprintf(__('%1$s %2$s'), $p, $human_readable_unit);
     }
 
@@ -271,7 +269,7 @@ class Toolbox
      **/
     public static function getEnergy(float $p): string
     {
-       //TRANS: list of unit (Wh for watt.hour)
+        //TRANS: list of unit (Wh for watt.hour)
         $units = [
             __('Wh', 'carbon'),
             __('KWh', 'carbon'),
@@ -293,7 +291,7 @@ class Toolbox
 
         $p = self::dynamicRound($p);
 
-       //TRANS: %1$s is a number maybe float or string and %2$s the unit
+        //TRANS: %1$s is a number maybe float or string and %2$s the unit
         return sprintf(__('%1$s %2$s'), $p, $human_readable_unit);
     }
 
@@ -301,7 +299,7 @@ class Toolbox
     {
         if ($number < 10) {
             $number = round($number, 2);
-        } else if ($number < 100) {
+        } elseif ($number < 100) {
             $number = round($number, 1);
         } else {
             $number = round($number, 0);
@@ -356,7 +354,7 @@ class Toolbox
         foreach ($serie as $value) {
             if (is_scalar($value)) {
                 $average += $value;
-            } else if (is_array($value)) {
+            } elseif (is_array($value)) {
                 $average += $value['y'];
             } else {
                 continue;
@@ -379,7 +377,7 @@ class Toolbox
         foreach ($serie as &$number) {
             if (is_scalar($number)) {
                 $number = number_format($number / ($multiple ** $power), PLUGIN_CARBON_DECIMALS, '.', '');
-            } else if (is_array($number)) {
+            } elseif (is_array($number)) {
                 $number['y'] = number_format($number['y'] / ($multiple ** $power), PLUGIN_CARBON_DECIMALS, '.', '');
             }
         }
@@ -399,7 +397,7 @@ class Toolbox
         foreach (PLUGIN_CARBON_TYPES as $itemtype) {
             $type = implode('\\', [
                 $base_namespace,
-                $itemtype
+                $itemtype,
             ]);
             if (!class_exists($type)) {
                 continue;
@@ -423,7 +421,7 @@ class Toolbox
         foreach (PLUGIN_CARBON_TYPES as $itemtype) {
             $type = implode('\\', [
                 $base_namespace,
-                $itemtype
+                $itemtype,
             ]);
             if (!class_exists($type)) {
                 continue;
@@ -446,7 +444,7 @@ class Toolbox
         foreach (PLUGIN_CARBON_TYPES as $itemtype) {
             $history_type = implode('\\', [
                 $base_namespace,
-                $itemtype
+                $itemtype,
             ]);
             if (!class_exists($history_type)) {
                 continue;
@@ -527,7 +525,7 @@ class Toolbox
         $records_query = new QuerySubQuery([
             'SELECT' => [
                 'date',
-                new QueryExpression('LAG(`date`) OVER (ORDER BY `date`) AS `prev_date`')
+                new QueryExpression('LAG(`date`) OVER (ORDER BY `date`) AS `prev_date`'),
             ],
             'FROM' => $table,
             'WHERE' => $common_criterias,
@@ -538,38 +536,38 @@ class Toolbox
             [
                 'SELECT' => [
                     new QueryExpression('`prev_date` + ' . $sql_interval . ' AS `start`'),
-                    'date AS `end`'
+                    'date AS `end`',
                 ],
                 'FROM' => $records_query,
                 'WHERE' => [
                     'NOT'  => ['prev_date' => null],
-                    new QueryExpression('DATE_ADD(`records`.`prev_date`, ' . $sql_interval . ') < `date`')
+                    new QueryExpression('DATE_ADD(`records`.`prev_date`, ' . $sql_interval . ') < `date`'),
                 ],
             ],
 
             // Gap before the beginning of the serie
             [
                 'SELECT' => [
-                    new queryExpression('\'' . $start_string . '\' AS start'),
-                    new queryExpression('MIN(`date`) AS `end`')
+                    new QueryExpression('\'' . $start_string . '\' AS start'),
+                    new QueryExpression('MIN(`date`) AS `end`'),
                 ],
                 'FROM'  => $table,
                 'WHERE' => $common_criterias,
                 'HAVING' => [
-                    new QueryExpression("'" . $start_string . "' < MIN(`date`)")
+                    new QueryExpression("'" . $start_string . "' < MIN(`date`)"),
                 ],
             ],
 
             // Gap after the end of the serie
             [
                 'SELECT' => [
-                    new queryExpression('MAX(`date`) + ' . $sql_interval . ' AS `start`'),
-                    new queryExpression('\'' . $stop_string . '\' AS `end`'),
+                    new QueryExpression('MAX(`date`) + ' . $sql_interval . ' AS `start`'),
+                    new QueryExpression('\'' . $stop_string . '\' AS `end`'),
                 ],
                 'FROM' => $table,
                 'WHERE' => $common_criterias,
                 'HAVING' => [
-                    new QueryExpression("DATE_SUB('" . $stop_string . "', " . $sql_interval . ") > MAX(`date`)")
+                    new QueryExpression("DATE_SUB('" . $stop_string . "', " . $sql_interval . ") > MAX(`date`)"),
                 ],
             ],
 
@@ -577,19 +575,19 @@ class Toolbox
             [
                 'SELECT' => [
                     new QueryExpression('\'' . $start_string . '\' AS `start`'),
-                    new QueryExpression('\'' . $stop_string  . '\' AS `end`'),
+                    new QueryExpression('\'' . $stop_string . '\' AS `end`'),
                 ],
                 'FROM' => $table,
                 'WHERE' => $common_criterias,
                 'HAVING' => [
                     new QueryExpression('COUNT(*) = 0'),
                 ],
-            ]
+            ],
         ], true);
 
         $result = $DB->request([
             'FROM'  => $request,
-            'ORDER' => 'start'
+            'ORDER' => 'start',
         ]);
 
         // Filter out gaps caused by DST switch
@@ -669,7 +667,7 @@ class Toolbox
      * @param string $bg_color
      * @param string $fg_color
      * @param float $target_ratio
-     * @param integer $max_steps
+     * @param int $max_steps
      * @return string
      */
     public static function getAdaptedFgColor(string $bg_color, string $fg_color, $target_ratio = 4.5, $max_steps = 100): string

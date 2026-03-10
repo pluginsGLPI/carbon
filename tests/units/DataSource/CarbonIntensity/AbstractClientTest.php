@@ -46,7 +46,7 @@ class AbstractClientTest extends DbTestCase
             new DateTimeImmutable('2020-12-01'),
             new DateTimeImmutable('2020-01-31'),
             [
-            ]
+            ],
         ];
 
         yield [
@@ -57,7 +57,7 @@ class AbstractClientTest extends DbTestCase
                     'start' => new DateTimeImmutable('2020-01-01'),
                     'stop'  => new DateTimeImmutable('2020-02-01'),
                 ],
-            ]
+            ],
         ];
 
         yield [
@@ -68,7 +68,7 @@ class AbstractClientTest extends DbTestCase
                     'start' => new DateTimeImmutable('2020-01-14'),
                     'stop'  => new DateTimeImmutable('2020-01-31'),
                 ],
-            ]
+            ],
         ];
 
         yield [
@@ -79,7 +79,7 @@ class AbstractClientTest extends DbTestCase
                     'start' => new DateTimeImmutable('2020-01-01'),
                     'stop'  => new DateTimeImmutable('2020-01-14'),
                 ],
-            ]
+            ],
         ];
 
         // Bissextile year
@@ -99,7 +99,7 @@ class AbstractClientTest extends DbTestCase
                     'start' => new DateTimeImmutable('2020-01-14'),
                     'stop'  => new DateTimeImmutable('2020-02-01'),
                 ],
-            ]
+            ],
         ];
 
         yield [
@@ -118,14 +118,14 @@ class AbstractClientTest extends DbTestCase
                     'start' => new DateTimeImmutable('2021-01-14'),
                     'stop'  => new DateTimeImmutable('2021-02-01'),
                 ],
-            ]
+            ],
         ];
     }
 
     public function testSliceDateRangeByMonth()
     {
         foreach ($this->sliceDateRangeByMonthProvider() as $data) {
-            list ($start, $stop, $expected) = $data;
+            [$start, $stop, $expected] = $data;
             $stub = $this->getMockBuilder(AbstractClient::class)->getMock();
             $output = $this->callPrivateMethod($stub, 'sliceDateRangeByMonth', $start, $stop);
 
@@ -148,7 +148,7 @@ class AbstractClientTest extends DbTestCase
             new DateTimeImmutable('2021-01-29'),
             new DateTimeImmutable('2021-01-14'),
             [
-            ]
+            ],
         ];
 
         yield [
@@ -156,7 +156,7 @@ class AbstractClientTest extends DbTestCase
             new DateTimeImmutable('2021-01-14'),
             [
                 new DateTimeImmutable('2021-01-14'),
-            ]
+            ],
         ];
 
         yield [
@@ -167,14 +167,14 @@ class AbstractClientTest extends DbTestCase
                 new DateTimeImmutable('2021-01-15'),
                 new DateTimeImmutable('2021-01-16'),
                 new DateTimeImmutable('2021-01-17'),
-            ]
+            ],
         ];
     }
 
     public function testSliceDateRangeByDay()
     {
         foreach ($this->sliceDateRangeByDayProvider() as $data) {
-            list ($start, $stop, $expected) = $data;
+            [$start, $stop, $expected] = $data;
             $stub = $this->getMockBuilder(AbstractClient::class)->getMock();
             $output = $this->callPrivateMethod($stub, 'sliceDateRangeByDay', $start, $stop);
 

@@ -39,15 +39,17 @@ use Config as GlpiConfig;
 use DBmysql;
 use DBmysqlIterator;
 use DbUtils;
+use Geocoder\Exception\Exception;
+use Geocoder\Exception\QuotaExceeded;
 use Geocoder\Geocoder;
 use Geocoder\Query\GeocodeQuery;
-use Html;
-use Location as GlpiLocation;
-use MassiveAction;
 use Glpi\Application\View\TemplateRenderer;
 use Glpi\DBAL\QueryExpression;
 use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\Client as BoaviztapiClient;
+use Html;
 use League\ISO3166\ISO3166;
+use Location as GlpiLocation;
+use MassiveAction;
 
 /**
  * Additional data for a location. Extends the Location object from GLPI with aditional fields
@@ -138,13 +140,13 @@ class Location extends CommonDBChild
                     'FKEY' => [
                         $source_zone_table => 'plugin_carbon_sources_id',
                         $source_table => 'id',
-                    ]
-                ]
+                    ],
+                ],
             ],
             'WHERE' => [
                 'is_carbon_intensity_source' => 1,
                 Source_Zone::getTableField('id') => $this->fields['plugin_carbon_sources_zones_id'],
-            ]
+            ],
         ]);
         $row = $iterator->current();
         $source_id = $row['sources_id'] ?? 0;
@@ -260,7 +262,7 @@ class Location extends CommonDBChild
             if (!isset($item->input['_boavizta_zone']) || $item->input['_boavizta_zone'] == '' || $item->input['_boavizta_zone'] == '0') {
                 try {
                     $item->input['_boavizta_zone'] = $this->getCountryCode($item, $geocoder);
-                } catch (\Geocoder\Exception\QuotaExceeded $e) {
+                } catch (QuotaExceeded $e) {
                     trigger_error($e->getMessage(), E_USER_WARNING);
                 }
             }
@@ -293,7 +295,7 @@ class Location extends CommonDBChild
             if (!isset($item->input['_boavizta_zone']) ||  $item->input['_boavizta_zone'] == '0') {
                 try {
                     $item->input['_boavizta_zone'] = $this->getCountryCode($item, $geocoder);
-                } catch (\Geocoder\Exception\QuotaExceeded $e) {
+                } catch (QuotaExceeded $e) {
                     trigger_error($e->getMessage(), E_USER_WARNING);
                 }
             }
@@ -322,7 +324,7 @@ class Location extends CommonDBChild
      * Tells if the carbon intensity download is enabled
      *
      * @param CommonDBTM $item
-     * @return boolean
+     * @return bool
      */
     public function isCarbonIntensityDownloadEnabled(CommonDBTM $item): bool
     {
@@ -356,8 +358,8 @@ class Location extends CommonDBChild
                 $source_zone_table => [
                     'ON' => [
                         $source_zone_table => 'id',
-                        $location_table => $source_zone_fk
-                    ]
+                        $location_table => $source_zone_fk,
+                    ],
                 ],
                 $source_table => [
                     'ON' => [
@@ -366,9 +368,9 @@ class Location extends CommonDBChild
                         [
                             'AND' => [
                                 Source::getTableField('is_carbon_intensity_source') => 1,
-                            ]
-                        ]
-                    ]
+                            ],
+                        ],
+                    ],
                 ],
             ],
             'LEFT JOIN' => [
@@ -376,7 +378,7 @@ class Location extends CommonDBChild
                     'ON' => [
                         $source_zone_table => 'plugin_carbon_zones_id',
                         'alternate_sources_zones' => 'plugin_carbon_zones_id',
-                    ]
+                    ],
                 ],
                 $source_table . ' AS alternate_sources' => [
                     'ON' => [
@@ -386,9 +388,9 @@ class Location extends CommonDBChild
                             'AND' => [
                                 'alternate_sources.is_carbon_intensity_source' => 1,
                                 'alternate_sources.fallback_level' => ['>', new QueryExpression(Source::getTableField('fallback_level'))],
-                            ]
-                        ]
-                    ]
+                            ],
+                        ],
+                    ],
                 ],
                 $carbon_intensity_table => [
                     'ON' => [
@@ -399,13 +401,13 @@ class Location extends CommonDBChild
                                 'OR' => [
                                     [CarbonIntensity::getTableField($source_fk) => new QueryExpression(Source_Zone::getTableField($source_fk))],
                                     [CarbonIntensity::getTableField($source_fk) => new QueryExpression('alternate_sources_zones.' . $source_fk)],
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
             ],
-            'WHERE' => $crit
+            'WHERE' => $crit,
         ];
 
         return $request;
@@ -415,7 +417,7 @@ class Location extends CommonDBChild
      * Tells if a location has fallback carbon intensity data
      *
      * @param CommonDBTM $item
-     * @return boolean
+     * @return bool
      */
     public function hasFallbackCarbonIntensityData(CommonDBTM $item): bool
     {
@@ -433,7 +435,7 @@ class Location extends CommonDBChild
             'OR' => [
                 // Primary source is a fallback or alternate source is a fallback
                 'NOT' => ['alternate_sources.id' => null],
-                Source::getTableField('fallback_level') => ['>', 0]
+                Source::getTableField('fallback_level') => ['>', 0],
             ],
         ]);
 
@@ -490,7 +492,7 @@ class Location extends CommonDBChild
      * @param Geocoder $geocoder
      * @return string
      *
-     * @throws \Geocoder\Exception\Exception
+     * @throws Exception
      */
     public function getCountryCode(CommonDBTM $item, Geocoder $geocoder): string
     {
@@ -507,9 +509,9 @@ class Location extends CommonDBChild
         $location_string = implode(', ', $location_elements);
         try {
             $result = $geocoder->geocodeQuery(GeocodeQuery::create($location_string));
-        } catch (\Geocoder\Exception\QuotaExceeded $e) {
+        } catch (QuotaExceeded $e) {
             throw $e;
-        } catch (\Geocoder\Exception\Exception $e) {
+        } catch (Exception $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
             return '';
         }
@@ -556,17 +558,17 @@ class Location extends CommonDBChild
                     'ON' => [
                         $location_table => 'locations_id',
                         $glpi_location_table => 'id',
-                    ]
-                ]
+                    ],
+                ],
             ],
             'WHERE' => [
                 [
                     'OR' => [
                         ['boavizta_zone' => null],
                         ['boavizta_zone' => ''],
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ];
         $request = array_merge_recursive($request, $where);
         $result = $DB->request($request);
@@ -603,15 +605,15 @@ class Location extends CommonDBChild
                     'FKEY' => [
                         $glpi_location_table => 'id',
                         $location_table => 'locations_id',
-                    ]
-                ]
+                    ],
+                ],
             ],
             'WHERE' => [
                 GlpiLocation::getTableField('id') => $ancestors,
-                self::getTableField('plugin_carbon_sources_zones_id') => ['>', 0]
+                self::getTableField('plugin_carbon_sources_zones_id') => ['>', 0],
             ],
             'ORDER' => 'level DESC',
-            'LIMIT' => '1'
+            'LIMIT' => '1',
         ];
         $iterator = $DB->request($request);
         if ($iterator->count() === 0) {

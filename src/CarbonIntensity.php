@@ -33,14 +33,11 @@
 namespace GlpiPlugin\Carbon;
 
 use CommonDropdown;
-use DateTime;
 use DateInterval;
+use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DBmysql;
-use SeekableIterator;
-use GlpiPlugin\Carbon\Source;
-use GlpiPlugin\Carbon\Zone;
 use Glpi\DBAL\QueryParam;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -142,18 +139,18 @@ class CarbonIntensity extends CommonDropdown
                     'FKEY' => [
                         $intensity_table => Source::getForeignKeyField(),
                         $source_table => 'id',
-                    ]
+                    ],
                 ],
                 $zone_table => [
                     'FKEY' => [
                         $intensity_table => Zone::getForeignKeyField(),
                         $zone_table => 'id',
-                    ]
-                ]
+                    ],
+                ],
             ],
             'WHERE' => [
                 Source::getTableField('name') => $source_name,
-                Zone::getTableField('name') => $zone_name
+                Zone::getTableField('name') => $zone_name,
             ],
         ];
     }
@@ -208,9 +205,9 @@ class CarbonIntensity extends CommonDropdown
      *
      * @param ClientInterface $data_source
      * @param string $zone_name zone name
-     * @param integer $limit maximum count of items to process
+     * @param int $limit maximum count of items to process
      * @param ProgressBar $progress_bar progress bar to update (CLI mode only)
-     * @return integer count of item downloaded
+     * @return int count of item downloaded
      */
     public function downloadOneZone(ClientInterface $data_source, string $zone_name, int $limit = 0, ?ProgressBar $progress_bar = null): int
     {
@@ -308,7 +305,7 @@ class CarbonIntensity extends CommonDropdown
      * @param string $zone_name name of the zone to store intensities
      * @param string $source_name name of the source to store intensities
      * @param array $data as an array of arrays ['datetime' => string, 'intensity' => float]
-     * @return integer count of actually saved items,
+     * @return int count of actually saved items,
      */
     public function save(string $zone_name, string $source_name, array $data): int
     {
@@ -372,8 +369,8 @@ class CarbonIntensity extends CommonDropdown
     /**
      * Gets date intervals where data are missing
      *
-     * @param integer $source_id
-     * @param integer $zone_id
+     * @param int $source_id
+     * @param int $zone_id
      * @param DateTimeInterface $start
      * @param DateTimeInterface|null $stop
      * @return array

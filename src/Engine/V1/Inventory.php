@@ -32,9 +32,9 @@
 
 namespace GlpiPlugin\Carbon\Engine\V1;
 
-use DateTime;
 use CommonDBTM;
 use Computer as GlpiComputer;
+use DateTime;
 use DbUtils;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\DataTracking\TrackedInt;
@@ -57,8 +57,8 @@ class Inventory implements EngineInterface
      *
      * @template T of CommonDBTM
      * @param class-string<T> $itemtype
-     * @param integer $items_id
-     * @return boolean
+     * @param int $items_id
+     * @return bool
      */
     public function hasItem(string $itemtype, int $items_id)
     {
@@ -71,14 +71,14 @@ class Inventory implements EngineInterface
      *
      * @template T of CommonDBTM
      * @param class-string<T> $itemtype
-     * @return boolean
+     * @return bool
      */
     private static function isAsset(string $itemtype): bool
     {
         /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
-         return in_array($itemtype, $CFG_GLPI["asset_types"]);
+        return in_array($itemtype, $CFG_GLPI["asset_types"]);
     }
 
     /**
@@ -86,8 +86,8 @@ class Inventory implements EngineInterface
      *
      * @template T of CommonDBTM
      * @param class-string<T> $itemtype
-     * @param integer $items_id
-     * @return boolean
+     * @param int $items_id
+     * @return bool
      */
     public function addItem(string $itemtype, int $items_id): bool
     {
@@ -130,7 +130,7 @@ class Inventory implements EngineInterface
      * @template T of CommonDBTM
      * @param class-string<T> $itemtype itemtype of the items to add
      * @param array $crit search criteria of items to add
-     * @return boolean true if success
+     * @return bool true if success
      */
     public function addItemsByCrit(string $itemtype, array $crit = []): bool
     {

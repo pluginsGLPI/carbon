@@ -39,13 +39,11 @@ use DateTimeImmutable;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
-use GlpiPlugin\Carbon\Zone;
-use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\Toolbox;
+use GlpiPlugin\Carbon\Zone;
 use Infocom;
 use Location;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversMethod;
 
 #[CoversClass(Toolbox::class)]
 class ToolboxTest extends DbTestCase
@@ -81,7 +79,7 @@ class ToolboxTest extends DbTestCase
 
         $success = $infocom->update([
             'id' => $infocom->getID(),
-            'buy_date' => '1999-01-01 00:00:00'
+            'buy_date' => '1999-01-01 00:00:00',
         ]);
         $this->assertTrue($success);
         $output = $toolbox->getOldestAssetDate();
@@ -152,7 +150,7 @@ class ToolboxTest extends DbTestCase
             'name' => 'foo',
         ]);
         $this->createItem(Location::class, [
-            'country' => 'foo'
+            'country' => 'foo',
         ]);
         $output = Toolbox::isLocationExistForZone('foo');
         $this->assertTrue($output);
@@ -246,15 +244,15 @@ class ToolboxTest extends DbTestCase
         $expected = [
             [
                 'start' => '2020-01-01 00:00:00',
-                'end'  =>  '2020-06-01 00:00:00'
-            ]
+                'end'  =>  '2020-06-01 00:00:00',
+            ],
         ];
         $this->assertEquals($expected, $result);
 
         // Test when there is a record matching the beginning of the interval,
         // but none matching the end
         $this->createItem(CarbonIntensity::class, [
-            'date' => '2020-01-01 00:00:00'
+            'date' => '2020-01-01 00:00:00',
         ] + $criterias);
         $result = Toolbox::findTemporalGapsInTable(
             $table,
@@ -267,8 +265,8 @@ class ToolboxTest extends DbTestCase
         $expected = [
             [
                 'start' => '2020-01-01 01:00:00',
-                'end'  =>  '2020-06-01 00:00:00'
-            ]
+                'end'  =>  '2020-06-01 00:00:00',
+            ],
         ];
         $this->assertEquals($expected, $result);
 
@@ -285,8 +283,8 @@ class ToolboxTest extends DbTestCase
         $expected = [
             [
                 'start' => '2019-01-01 00:00:00',
-                'end'  =>  '2020-01-01 00:00:00'
-            ]
+                'end'  =>  '2020-01-01 00:00:00',
+            ],
         ];
         $this->assertEquals($expected, $result);
 
@@ -302,18 +300,18 @@ class ToolboxTest extends DbTestCase
         $expected = [
             [
                 'start' => '2019-01-01 00:00:00',
-                'end'  =>  '2020-01-01 00:00:00'
+                'end'  =>  '2020-01-01 00:00:00',
             ],
             [
                 'start' => '2020-01-01 01:00:00',
-                'end'  =>  '2021-01-01 00:00:00'
+                'end'  =>  '2021-01-01 00:00:00',
             ],
         ];
         $this->assertEquals($expected, $result);
 
         // Test when there is are 2 non consecutive records in the requesterd interval
         $this->createItem(CarbonIntensity::class, [
-            'date' => '2020-06-01 00:00:00'
+            'date' => '2020-06-01 00:00:00',
         ] + $criterias);
         $result = Toolbox::findTemporalGapsInTable(
             $table,
@@ -326,15 +324,15 @@ class ToolboxTest extends DbTestCase
         $expected = [
             [
                 'start' => '2019-01-01 00:00:00',
-                'end'  =>  '2020-01-01 00:00:00'
+                'end'  =>  '2020-01-01 00:00:00',
             ],
             [
                 'start' => '2020-01-01 01:00:00',
-                'end'  =>  '2020-06-01 00:00:00'
+                'end'  =>  '2020-06-01 00:00:00',
             ],
             [
                 'start' => '2020-06-01 01:00:00',
-                'end'  =>  '2021-01-01 00:00:00'
+                'end'  =>  '2021-01-01 00:00:00',
             ],
         ];
         $this->assertEquals($expected, $result);
@@ -342,10 +340,10 @@ class ToolboxTest extends DbTestCase
         // Test when there is are 2 consecutive records
         // in 2 separated groups in the requesterd interval
         $this->createItem(CarbonIntensity::class, [
-            'date' => '2020-01-01 01:00:00'
+            'date' => '2020-01-01 01:00:00',
         ] + $criterias);
         $this->createItem(CarbonIntensity::class, [
-            'date' => '2020-06-01 01:00:00'
+            'date' => '2020-06-01 01:00:00',
         ] + $criterias);
         $result = Toolbox::findTemporalGapsInTable(
             $table,
@@ -358,15 +356,15 @@ class ToolboxTest extends DbTestCase
         $expected = [
             [
                 'start' => '2019-01-01 00:00:00',
-                'end'  =>  '2020-01-01 00:00:00'
+                'end'  =>  '2020-01-01 00:00:00',
             ],
             [
                 'start' => '2020-01-01 02:00:00',
-                'end'  =>  '2020-06-01 00:00:00'
+                'end'  =>  '2020-06-01 00:00:00',
             ],
             [
                 'start' => '2020-06-01 02:00:00',
-                'end'  =>  '2021-01-01 00:00:00'
+                'end'  =>  '2021-01-01 00:00:00',
             ],
         ];
         $this->assertEquals($expected, $result);

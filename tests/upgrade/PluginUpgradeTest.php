@@ -33,11 +33,11 @@
 namespace GlpiPlugin\Carbon\Tests;
 
 use Config;
-use GLPIKey;
 use Glpi\Plugin\Hooks;
-use Plugin;
+use GLPIKey;
 use GlpiPlugin\Carbon\Install;
 use PHPUnit\Framework\Attributes\CoversClass;
+use Plugin;
 
 // Load base class
 // TODO: Create common code in tests/src/<someclass>.php

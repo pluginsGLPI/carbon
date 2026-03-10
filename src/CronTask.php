@@ -34,17 +34,17 @@ namespace GlpiPlugin\Carbon;
 
 use CommonDBTM;
 use CommonGLPI;
-use CronTask as GlpiCronTask;
 use Config as GlpiConfig;
+use CronTask as GlpiCronTask;
+use Geocoder\Exception\QuotaExceeded;
 use Geocoder\Geocoder;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientFactory;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientInterface;
 use GlpiPlugin\Carbon\DataSource\CronTaskProvider;
 use GlpiPlugin\Carbon\Impact\Embodied\AbstractEmbodiedImpact;
 use GlpiPlugin\Carbon\Impact\Embodied\Engine as EmbodiedEngine;
-use GlpiPlugin\Carbon\Impact\Usage\UsageImpactInterface as UsageImpactInterface;
 use GlpiPlugin\Carbon\Impact\Usage\Engine as UsageEngine;
-use GlpiPlugin\Carbon\Toolbox;
+use GlpiPlugin\Carbon\Impact\Usage\UsageImpactInterface as UsageImpactInterface;
 use Location as GlpiLocation;
 use Toolbox as GlpiToolbox;
 
@@ -103,17 +103,17 @@ class CronTask extends CommonGLPI
                     'parameter' => __('Maximum number of locations to solve', 'carbon'),
                 ];
 
-            // case 'DownloadRte':
-            //     return [
-            //         'description' => __('Download carbon emissions from RTE', 'carbon'),
-            //         'parameter' => __('Maximum number of entries to download', 'carbon'),
-            //     ];
+                // case 'DownloadRte':
+                //     return [
+                //         'description' => __('Download carbon emissions from RTE', 'carbon'),
+                //         'parameter' => __('Maximum number of entries to download', 'carbon'),
+                //     ];
 
-            // case 'DownloadElectricityMap':
-            //     return [
-            //         'description' => __('Download carbon emissions from ElectricityMap', 'carbon'),
-            //         'parameter' => __('Maximum number of entries to download', 'carbon'),
-            //     ];
+                // case 'DownloadElectricityMap':
+                //     return [
+                //         'description' => __('Download carbon emissions from ElectricityMap', 'carbon'),
+                //         'parameter' => __('Maximum number of entries to download', 'carbon'),
+                //     ];
 
             case 'DownloadWatttime':
                 return [
@@ -139,7 +139,7 @@ class CronTask extends CommonGLPI
      * Calculate usage impact for all assets
      *
      * @param GlpiCronTask $task
-     * @return integer
+     * @return int
      */
     public static function cronUsageImpact(GlpiCronTask $task): int
     {
@@ -180,7 +180,7 @@ class CronTask extends CommonGLPI
      * Calculate embodied impact for all assets
      *
      * @param GlpiCronTask $task
-     * @return integer
+     * @return int
      */
     public static function cronEmbodiedImpact(GlpiCronTask $task): int
     {
@@ -276,7 +276,7 @@ class CronTask extends CommonGLPI
      * @param GlpiCronTask $task
      * @param ClientInterface $data_source
      * @param CarbonIntensity $intensity
-     * @return integer
+     * @return int
      */
     public static function downloadCarbonIntensityFromSource(GlpiCronTask $task, ClientInterface $data_source, CarbonIntensity $intensity): int
     {
@@ -363,7 +363,7 @@ class CronTask extends CommonGLPI
             try {
                 $location = new Location();
                 $country_code = $location->getCountryCode($glpi_location, $geocoder);
-            } catch (\Geocoder\Exception\QuotaExceeded $e) {
+            } catch (QuotaExceeded $e) {
                 // If the quota is exceeded, stop the task
                 break;
             } catch (\RuntimeException $e) {
@@ -380,7 +380,7 @@ class CronTask extends CommonGLPI
             // Set the country code in the location
             $success = $glpi_location->update([
                 'id'             => $glpi_location->getID(),
-                '_boavizta_zone' => $country_code
+                '_boavizta_zone' => $country_code,
             ]);
             if (!$success) {
                 $failure = true;

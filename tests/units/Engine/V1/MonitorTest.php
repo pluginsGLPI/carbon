@@ -35,17 +35,17 @@ namespace GlpiPlugin\Carbon\Engine\V1\Tests;
 use Computer as GlpiComputer;
 use Computer_Item;
 use DateTime;
-use GlpiPlugin\Carbon\Zone;
-use GlpiPlugin\Carbon\Tests\Engine\V1\EngineTestCase;
-use Monitor as GlpiMonitor;
-use MonitorType as GlpiMonitorType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Engine\V1\Monitor;
-use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
+use GlpiPlugin\Carbon\Tests\Engine\V1\EngineTestCase;
+use GlpiPlugin\Carbon\UsageInfo;
+use GlpiPlugin\Carbon\Zone;
+use Monitor as GlpiMonitor;
 use MonitorModel;
+use MonitorType as GlpiMonitorType;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(Monitor::class)]
@@ -61,7 +61,7 @@ class MonitorTest extends EngineTestCase
      * The delta for comparison of computed emission with expected value,
      * as == for float must not be used because of float representation.
      */
-    const EPSILON = 0.001;
+    public const EPSILON = 0.001;
 
     public function testGetUsageProfile()
     {
@@ -150,9 +150,9 @@ class MonitorTest extends EngineTestCase
     {
         $thursday = DateTime::createFromFormat('Y-m-d H:i:s', '1999-12-02 12:00:00');
         $intensity = 1;
-        $source = $this->createItem(source::class, [
+        $source = $this->createItem(Source::class, [
             'is_carbon_intensity_source' => 1,
-            'fallback_level' => 0
+            'fallback_level' => 0,
         ]);
         $zone = $this->createItem(Zone::class);
         $source_zone = $this->createItem(Source_Zone::class, [

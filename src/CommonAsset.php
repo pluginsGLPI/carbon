@@ -71,7 +71,7 @@ abstract class CommonAsset extends CommonDBTM
      * Delete all calculated environmental impacts for the given asset
      *
      * @param CommonDBTM $item
-     * @return boolean
+     * @return bool
      */
     public static function deleteAllImpacts(CommonDBTM $item): bool
     {
@@ -85,7 +85,7 @@ abstract class CommonAsset extends CommonDBTM
      * Delete calculated embodied impact of an asset
      *
      * @param CommonDBTM $item
-     * @return boolean
+     * @return bool
      */
     public static function deleteEmbodiedImpact(CommonDBTM $item): bool
     {
@@ -100,7 +100,7 @@ abstract class CommonAsset extends CommonDBTM
      * Delete calculated usage impact of an asset
      *
      * @param CommonDBTM $item
-     * @return boolean
+     * @return bool
      */
     public static function deleteUsageImpact(CommonDBTM $item): bool
     {

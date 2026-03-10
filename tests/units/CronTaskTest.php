@@ -33,16 +33,16 @@
 namespace GlpiPlugin\Carbon\Tests;
 
 use Config;
-use GlpiPlugin\Carbon\CronTask;
-use GlpiPlugin\Carbon\Tests\DbTestCase;
-use GlpiPlugin\Carbon\CarbonIntensity;
 use CronTask as GlpiCronTask;
+use Geocoder\Exception\QuotaExceeded;
 use Geocoder\Geocoder;
 use Geocoder\Model\AddressCollection;
 use Geocoder\Model\AdminLevel;
 use Geocoder\Model\AdminLevelCollection;
 use Geocoder\Model\Country;
 use Geocoder\Provider\Nominatim\Model\NominatimAddress;
+use GlpiPlugin\Carbon\CarbonIntensity;
+use GlpiPlugin\Carbon\CronTask;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientInterface;
 use Location as GlpiLocation;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -86,7 +86,7 @@ class CronTaskTest extends DbTestCase
     public function testDownloadCarbonIntensityFromSource()
     {
         foreach ($this->downloadSourceProvider() as $data) {
-            list ($data_source, $intensity, $expected) = $data;
+            [$data_source, $intensity, $expected] = $data;
             $cron_task = new CronTask();
             $glpi_cron_task = new GlpiCronTask();
             $glpi_cron_task->fields['param'] = 1000;
@@ -104,7 +104,7 @@ class CronTaskTest extends DbTestCase
             'WHERE' => [
                 'itemtype' => CronTask::class,
                 'name'     => 'LocationCountryCode',
-            ]
+            ],
         ]);
 
         // Mock the getGeocoder method to return a callable that simulates geocoding
@@ -160,7 +160,7 @@ class CronTaskTest extends DbTestCase
         $result = $cron_task->fillIncompleteLocations($glpi_cron_task);
         $this->assertEquals(0, $result);
 
-        $geocoder->method('geocodeQuery')->willThrowException(new \Geocoder\Exception\QuotaExceeded("Quota exceeded"));
+        $geocoder->method('geocodeQuery')->willThrowException(new QuotaExceeded("Quota exceeded"));
         $result = $cron_task->fillIncompleteLocations($glpi_cron_task);
         $this->assertEquals(0, $result);
 

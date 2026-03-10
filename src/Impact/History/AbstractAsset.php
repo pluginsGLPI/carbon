@@ -77,7 +77,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      * Get request in Query builder format to find evaluable items
      *
      * @param array $crit
-     * @param boolean $entity_restrict
+     * @param bool $entity_restrict
      * @return array
      */
     abstract public function getEvaluableQuery(array $crit = [], bool $entity_restrict = true): array;
@@ -93,7 +93,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      * Is it possible to historize carbon emissions for the item
      * @param int $id : ID of the item to examinate
      *
-     * @return boolean
+     * @return bool
      */
     public function canHistorize(int $id): bool
     {
@@ -126,10 +126,10 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
 
         $itemtype = static::$itemtype;
         if ($itemtype === '') {
-            throw new \LogicException('Itemtype not set');
+            throw new LogicException('Itemtype not set');
         }
         if (!is_subclass_of($itemtype, CommonDBTM::class)) {
-            throw new \LogicException('Itemtype does not inherits from ' . CommonDBTM::class);
+            throw new LogicException('Itemtype does not inherits from ' . CommonDBTM::class);
         }
         $iterator = $DB->request($this->getEvaluableQuery([], false));
 
@@ -159,7 +159,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      * Historize environmental impact data of an asset
      * Days interval is [$start_date, $end_date[
      *
-     * @param integer  $id
+     * @param int  $id
      * @param DateTime $start_date First date to compute (if not set, use the latest date found in DB)
      * @param DateTime $end_date   Last date to compute (if not set use now - 1 day)
      * @return int     count of generated entries
@@ -181,7 +181,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
 
         // Determine the last date to compute
         $last_available_date = $this->getStopDate($id);
-        $end_date = $end_date ?? $last_available_date ?? (new DateTime('now'))->sub(new DateInterval(self::$date_end_shift));
+        $end_date ??= $last_available_date ?? (new DateTime('now'))->sub(new DateInterval(self::$date_end_shift));
 
         $engine = static::getEngine($item);
 
@@ -192,7 +192,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         /**
          * Huge quantity of SQL queries will be executed
          * We NEED to check memory usage to avoid running out of memory
-         * @see DbMysql::doQuery()
+         * @see DBmysql::doQuery()
          */
         $memory_limit = GlpiToolbox::getMemoryLimit();
         if ($memory_limit) {
@@ -233,7 +233,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      * @param CommonDBTM $item item to evaluate
      * @param EngineInterface $engine Calculation engine to use
      * @param DateTime $day Day to calculate
-     * @return boolean
+     * @return bool
      */
     protected function evaluateItemPerDay(CommonDBTM $item, EngineInterface $engine, DateTimeInterface $day): bool
     {
@@ -245,7 +245,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         // $zone = new Zone();
 
         // if ($zone->getByAsset($item) === false) {
-            // return false;
+        // return false;
         // }
 
         $emission = new TrackedFloat(0, $energy);
@@ -281,7 +281,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     /**
      * Find the date where daily computation must start
      *
-     * @param integer $id
+     * @param int $id
      * @return DateTimeImmutable|null
      */
     protected function getStartDate(int $id): ?DateTimeImmutable
@@ -293,7 +293,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     /**
      * Find the most accurate date to determine the first use of an asset
      *
-     * @param integer $id id of the asset to examinate
+     * @param int $id id of the asset to examinate
      * @return DateTimeImmutable|null
      */
     protected function getInventoryIncomingDate(int $id): ?DateTimeImmutable
@@ -310,7 +310,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     /**
      * Find the most accurate date to determine the end of use of an asset
      *
-     * @param integer $id
+     * @param int $id
      * @return DateTimeImmutable|null
      */
     protected function getInventoryExitDate(int $id): ?DateTimeImmutable
@@ -327,7 +327,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     /**
      * Find the date where daily computation must stop
      *
-     * @param integer $id
+     * @param int $id
      * @return DateTimeImmutable|null
      */
     protected function getStopDate(int $id): ?DateTimeImmutable
@@ -338,8 +338,8 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     /**
      * Ddelete all calculated usage impact for an asset
      *
-     * @param integer $items_id
-     * @return boolean
+     * @param int $items_id
+     * @return bool
      */
     public function resetForItem(int $items_id): bool
     {
@@ -351,7 +351,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
             CarbonEmission::getTable(),
             [
                 'itemtype' => static::getItemtype(),
-                'items_id' => $items_id
+                'items_id' => $items_id,
             ]
         );
     }
@@ -359,8 +359,8 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     /**
      * Calculate usage impact of an asset
      *
-     * @param integer $items_id
-     * @return boolean
+     * @param int $items_id
+     * @return bool
      */
     public function calculateImpact(int $items_id): bool
     {

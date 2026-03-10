@@ -33,16 +33,15 @@
 namespace GlpiPlugin\Carbon;
 
 use CommonDBRelation;
-use CommonGLPI;
 use CommonDBTM;
+use CommonGLPI;
 use CronTask;
-use DateTimeImmutable;
 use DBmysql;
-use Location as GlpiLocation;
 use Glpi\Application\View\TemplateRenderer;
 use Glpi\DBAL\QueryExpression;
 use Html;
 use InvalidArgumentException;
+use Location as GlpiLocation;
 
 class Source_Zone extends CommonDBRelation
 {
@@ -121,7 +120,7 @@ class Source_Zone extends CommonDBRelation
                 $zone_table => 'name',
                 $source_zone_table => ['id', 'is_download_enabled'],
                 Source::getTableField('name') . ' AS historical_source_name',
-                $source_table => 'fallback_level'
+                $source_table => 'fallback_level',
             ],
             'FROM' => $source_zone_table,
             'INNER JOIN' => [
@@ -176,7 +175,7 @@ class Source_Zone extends CommonDBRelation
                 'is_download_enabled' => 'raw_html',
             ],
             'footers' => [
-                ['', '', '', __('Total'), $total, '']
+                ['', '', '', __('Total'), $total, ''],
             ],
             'footer_class' => 'fw-bold',
             'entries' => $entries,
@@ -224,7 +223,7 @@ class Source_Zone extends CommonDBRelation
         $iterator = $DB->request([
             'SELECT' => [
                 $source_table => 'name',
-                $source_zone_table => ['id', 'is_download_enabled']
+                $source_zone_table => ['id', 'is_download_enabled'],
             ],
             'FROM' => $source_zone_table,
             'INNER JOIN' => [
@@ -272,7 +271,7 @@ class Source_Zone extends CommonDBRelation
                 'is_download_enabled' => 'raw_html',
             ],
             'footers' => [
-                ['', '', '', __('Total'), $total, '']
+                ['', '', '', __('Total'), $total, ''],
             ],
             'footer_class' => 'fw-bold',
             'entries' => $entries,
@@ -282,7 +281,7 @@ class Source_Zone extends CommonDBRelation
             'massiveactionparams' => [
                 'num_displayed' => count($entries),
                 'container'     => 'mass' . static::class . mt_rand(),
-            ]
+            ],
         ]);
 
         if (count($entries) !== 0) {
@@ -322,20 +321,20 @@ class Source_Zone extends CommonDBRelation
                     'ON' => [
                         $source_table => 'id',
                         $source_zone_table => Source::getForeignKeyField(),
-                    ]
+                    ],
                 ],
                 $zone_table => [
                     'ON' => [
                         $zone_table => 'id',
                         $source_zone_table => Zone::getForeignKeyField(),
-                    ]
-                ]
+                    ],
+                ],
             ],
             'WHERE' => [
                 Source::getTableField('name') => $source_name,
                 Zone::getTableField('name') => $zone_name,
             ],
-            'LIMIT' => '1'
+            'LIMIT' => '1',
         ];
         $iterator = $DB->request($request);
         if ($iterator->count() !== 1) {
@@ -366,15 +365,15 @@ class Source_Zone extends CommonDBRelation
                     'ON' => [
                         $source_zone_table => 'plugin_carbon_zones_id',
                         'realtime_sources_zones' => 'plugin_carbon_zones_id',
-                        ['AND' => [$source_zone_table . '.id' => ['<>', new QueryExpression('`realtime_sources_zones`.`id`')]]]
-                    ]
+                        ['AND' => [$source_zone_table . '.id' => ['<>', new QueryExpression('`realtime_sources_zones`.`id`')]]],
+                    ],
                 ],
                 // The source associated to the source_zone argument (to find the fallback_level)
                 $source_table . ' AS realtime_source' => [
                     'ON' => [
                         'realtime_sources_zones' => 'plugin_carbon_sources_id',
                         'realtime_source' => 'id',
-                    ]
+                    ],
                 ],
                 // The fallback source (to compare its fallback_level against the other source)
                 $source_table => [
@@ -384,16 +383,16 @@ class Source_Zone extends CommonDBRelation
                         [
                             'AND' => [
                                 Source::getTableField('fallback_level') => ['>', new QueryExpression('`realtime_source`.`fallback_level`')],
-                            ]
-                        ]
-                    ]
+                            ],
+                        ],
+                    ],
                 ],
             ],
             'WHERE' => [
                 'realtime_sources_zones.id' => $source_zone->getID(),
             ],
             'ORDER' => Source::getTableField('fallback_level'),
-            'LIMIT' => 1
+            'LIMIT' => 1,
         ];
 
         return $this->getFromDBByRequest($request);
@@ -402,7 +401,7 @@ class Source_Zone extends CommonDBRelation
     /**
      * Get HTML link to enable / disable the download of carbon intensity data for a source and a zone
      *
-     * @param integer $zone_id
+     * @param int $zone_id
      * @param string|null $state
      * @return string
      */
@@ -416,8 +415,8 @@ class Source_Zone extends CommonDBRelation
     /**
      * Sets or toggles the download for a zone
      *
-     * @param boolean|null $state if not null, don't toggle and force the state of the download
-     * @return boolean true if the update succeeded
+     * @param bool|null $state if not null, don't toggle and force the state of the download
+     * @return bool true if the update succeeded
      */
     public function toggleZone(?bool $state = null): bool
     {
@@ -435,7 +434,7 @@ class Source_Zone extends CommonDBRelation
 
         $input = [
             'id' => $this->getID(),
-            'is_download_enabled' => $state
+            'is_download_enabled' => $state,
         ];
         return $this->update($input) !== false;
     }
@@ -475,8 +474,8 @@ class Source_Zone extends CommonDBRelation
                 $location_table => [
                     'FKEY' => [
                         $location_table => 'plugin_carbon_sources_zones_id',
-                        $source_zone_table => 'id'
-                    ]
+                        $source_zone_table => 'id',
+                    ],
                 ],
             ],
             'WHERE' => $where,
@@ -539,7 +538,7 @@ TWIG;
                 'end' => __('End', 'carbon'),
             ],
             'footers' => [
-                ['', '', '', __('Total'), $total, '']
+                ['', '', '', __('Total'), $total, ''],
             ],
             'footer_class' => 'fw-bold',
             'entries' => $entries,
@@ -549,7 +548,7 @@ TWIG;
             'massiveactionparams' => [
                 'num_displayed' => $total,
                 'container'     => 'mass' . static::class . mt_rand(),
-            ]
+            ],
         ]);
     }
 }

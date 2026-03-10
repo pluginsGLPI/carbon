@@ -32,8 +32,6 @@
 
 namespace GlpiPlugin\Carbon;
 
-use GlpiPlugin\Carbon\Impact\Type;
-
 class UsageImpact extends AbstractImpact
 {
     public static function getTypeName($nb = 0)

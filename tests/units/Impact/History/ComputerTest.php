@@ -33,27 +33,27 @@
 namespace GlpiPlugin\Carbon\Impact\History\Tests;
 
 use Computer as GlpiComputer;
-use GlpiPlugin\Carbon\Impact\History\Computer;
-use GlpiPlugin\Carbon\Tests\Impact\History\CommonAsset;
-use Location as GlpiLocation;
 use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
 use DateTime;
-use Infocom;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
+use GlpiPlugin\Carbon\Impact\History\Computer;
 use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
+use GlpiPlugin\Carbon\Tests\Impact\History\CommonAsset;
 use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\Zone;
+use Infocom;
+use Location as GlpiLocation;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(Computer::class)]
 class ComputerTest extends CommonAsset
 {
-    protected string $history_type = \GlpiPlugin\Carbon\Impact\History\Computer::class;
+    protected string $history_type = Computer::class;
     protected string $asset_type = GlpiComputer::class;
 
     public function testGetEngine()
@@ -90,20 +90,20 @@ class ComputerTest extends CommonAsset
         ]);
         $source = new Source(); // This source exists after a fresh install
         $source->getFromDBByCrit([
-            'name' => 'Hydro Quebec'
+            'name' => 'Hydro Quebec',
         ]);
         $zone = new Zone(); // This zone exists after a fresh install
         $zone->getFromDBByCrit([
-            'name' => 'Quebec'
+            'name' => 'Quebec',
         ]);
         $source_zone = new Source_Zone(); // the relation source / zone also exists after a fresh install
         $source_zone->getFromDBByCrit([
             $source::getForeignKeyField() => $source->getID(),
-            $zone::getForeignKeyField() => $zone->getID()
+            $zone::getForeignKeyField() => $zone->getID(),
         ]);
         $location = $this->createItem(Location::class, [
             'locations_id' => $glpi_location->getID(),
-            'plugin_carbon_sources_zones_id' => $source_zone->getID()
+            'plugin_carbon_sources_zones_id' => $source_zone->getID(),
         ]);
         $glpi_model = $this->createItem(GlpiComputerModel::class, ['power_consumption' => $model_power]);
         $glpi_type = $this->createItem(GlpiComputerType::class);
@@ -230,16 +230,16 @@ class ComputerTest extends CommonAsset
         // Add a zone to the location
         $source = new Source(); // This source exists after a fresh install
         $source->getFromDBByCrit([
-            'name' => 'RTE'
+            'name' => 'RTE',
         ]);
         $zone = new Zone(); // This zone  exists after a fresh install
         $zone->getFromDBByCrit([
-            'name' => 'France'
+            'name' => 'France',
         ]);
         $source_zone = new Source_Zone(); // the relation source / zone also exists after a fresh install
         $source_zone->getFromDBByCrit([
             $source::getForeignKeyField() => $source->getID(),
-            $zone::getForeignKeyField() => $zone->getID()
+            $zone::getForeignKeyField() => $zone->getID(),
         ]);
         $location = $this->createItem(Location::class, [
             'locations_id' => $glpi_location->getID(),
@@ -466,16 +466,16 @@ class ComputerTest extends CommonAsset
         $glpi_location = $this->createItem(GlpiLocation::class);
         $source = new Source(); // This source exists after a fresh install
         $source->getFromDBByCrit([
-            'name' => 'RTE'
+            'name' => 'RTE',
         ]);
         $zone = new Zone(); // This zone  exists after a fresh install
         $zone->getFromDBByCrit([
-            'name' => 'France'
+            'name' => 'France',
         ]);
         $source_zone = new Source_Zone(); // the relation source / zone also exists after a fresh install
         $source_zone->getFromDBByCrit([
             $source::getForeignKeyField() => $source->getID(),
-            $zone::getForeignKeyField() => $zone->getID()
+            $zone::getForeignKeyField() => $zone->getID(),
         ]);
         $location = $this->createItem(Location::class, [
             'locations_id' => $glpi_location->getID(),
@@ -706,20 +706,20 @@ class ComputerTest extends CommonAsset
         $glpi_location = $this->createItem(GlpiLocation::class);
         $source = new Source(); // This source exists after a fresh install
         $source->getFromDBByCrit([
-            'name' => 'RTE'
+            'name' => 'RTE',
         ]);
         $zone = new Zone(); // This zone  exists after a fresh install
         $zone->getFromDBByCrit([
-            'name' => 'France'
+            'name' => 'France',
         ]);
         $source_zone = new Source_Zone(); // the relation source / zone also exists after a fresh install
         $source_zone->getFromDBByCrit([
             $source::getForeignKeyField() => $source->getID(),
-            $zone::getForeignKeyField() => $zone->getID()
+            $zone::getForeignKeyField() => $zone->getID(),
         ]);
         $location = $this->createItem(Location::class, [
             'locations_id' => $glpi_location->getID(),
-            'plugin_carbon_sources_zones_id' => $source_zone->getID()
+            'plugin_carbon_sources_zones_id' => $source_zone->getID(),
         ]);
         $glpi_computer_type = $this->createItem(GlpiComputerType::class);
         $computer_type = $this->createItem(ComputerType::class, [

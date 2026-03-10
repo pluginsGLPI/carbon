@@ -35,8 +35,8 @@ namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta;
 
 use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\Client;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
-use GlpiPlugin\Carbon\Impact\Type;
 use GlpiPlugin\Carbon\Impact\Embodied\AbstractEmbodiedImpact;
+use GlpiPlugin\Carbon\Impact\Type;
 
 abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInterface
 {

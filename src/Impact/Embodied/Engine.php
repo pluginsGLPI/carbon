@@ -32,8 +32,8 @@
 
 namespace GlpiPlugin\Carbon\Impact\Embodied;
 
-use CommonGLPI;
 use CommonDBTM;
+use CommonGLPI;
 use DBmysql;
 use GlpiPlugin\Carbon\AbstractModel;
 use GlpiPlugin\Carbon\Config;
@@ -128,7 +128,7 @@ class Engine extends CommonGLPI
      * Check if the asset has a model specific dmeodied impact data
      *
      * @param CommonDBTM $item
-     * @return boolean
+     * @return bool
      */
     private static function hasModelData(CommonDBTM $item): bool
     {
@@ -145,7 +145,7 @@ class Engine extends CommonGLPI
         $model_table = getTableForItemType($model_class);
         $glpi_model_id = $item->fields[$glpi_model_class_fk];
         $crit = [
-            $glpi_model_class_fk => $glpi_model_id
+            $glpi_model_class_fk => $glpi_model_id,
         ];
         $types = Type::getImpactTypes();
         foreach ($types as $key => $type) {
@@ -153,7 +153,7 @@ class Engine extends CommonGLPI
                 continue;
             }
             $crit['OR'][] = [
-                $type . '_quality' => ['<>', AbstractTracked::DATA_QUALITY_UNSET_VALUE]
+                $type . '_quality' => ['<>', AbstractTracked::DATA_QUALITY_UNSET_VALUE],
             ];
         }
         $model = new $model_class();

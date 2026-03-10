@@ -32,6 +32,4 @@
 
 namespace GlpiPlugin\Carbon\DataSource\Lca;
 
-abstract class AbstractClient implements ClientInterface
-{
-}
+abstract class AbstractClient implements ClientInterface {}

@@ -46,7 +46,7 @@ $group_base = 1200;
 
 $rows = $display_pref->find([
     'itemtype' => EmbodiedImpact::class,
-    'num'      => 5 // Was GWP, now recalculate flag
+    'num'      => 5, // Was GWP, now recalculate flag
 ]);
 $id = $plugin_so_base + $group_base;
 foreach ($rows as $row) {
@@ -57,7 +57,7 @@ foreach ($rows as $row) {
 $id = $plugin_so_base + $group_base + 2;
 $rows = $display_pref->find([
     'itemtype' => EmbodiedImpact::class,
-    'num'      => 6 // Was ADP, now recalculate flag
+    'num'      => 6, // Was ADP, now recalculate flag
 ]);
 foreach ($rows as $row) {
     $row['num'] = $id;
@@ -67,7 +67,7 @@ foreach ($rows as $row) {
 $id = $plugin_so_base + $group_base + 4;
 $rows = $display_pref->find([
     'itemtype' => EmbodiedImpact::class,
-    'num'      => 7 // Was PE, now recalculate flag
+    'num'      => 7, // Was PE, now recalculate flag
 ]);
 foreach ($rows as $row) {
     $row['num'] = 1204;
@@ -79,7 +79,7 @@ foreach ($rows as $row) {
 //
 $rows = $display_pref->find([
     'itemtype' => EmbodiedImpact::class,
-    'num'      => 128701 // usage GWP
+    'num'      => 128701, // usage GWP
 ]);
 $id = $plugin_so_base + $group_base;
 foreach ($rows as $row) {
@@ -89,7 +89,7 @@ foreach ($rows as $row) {
 
 $rows = $display_pref->find([
     'itemtype' => EmbodiedImpact::class,
-    'num'      => 128702 // usage GWP qiality
+    'num'      => 128702, // usage GWP qiality
 ]);
 $id = $plugin_so_base + $group_base + 1;
 foreach ($rows as $row) {
@@ -99,7 +99,7 @@ foreach ($rows as $row) {
 
 $rows = $display_pref->find([
     'itemtype' => EmbodiedImpact::class,
-    'num'      => 128703 // usage ADP
+    'num'      => 128703, // usage ADP
 ]);
 $id = $plugin_so_base + $group_base + 2;
 foreach ($rows as $row) {
@@ -109,7 +109,7 @@ foreach ($rows as $row) {
 
 $rows = $display_pref->find([
     'itemtype' => EmbodiedImpact::class,
-    'num'      => 128704 // usage ADP qiality
+    'num'      => 128704, // usage ADP qiality
 ]);
 $id = $plugin_so_base + $group_base + 3;
 foreach ($rows as $row) {
@@ -119,7 +119,7 @@ foreach ($rows as $row) {
 
 $rows = $display_pref->find([
     'itemtype' => EmbodiedImpact::class,
-    'num'      => 128705 // usage PE
+    'num'      => 128705, // usage PE
 ]);
 $id = $plugin_so_base + $group_base + 4;
 foreach ($rows as $row) {
@@ -129,7 +129,7 @@ foreach ($rows as $row) {
 
 $rows = $display_pref->find([
     'itemtype' => EmbodiedImpact::class,
-    'num'      => 128706 // usage PE qiality
+    'num'      => 128706, // usage PE qiality
 ]);
 $id = $plugin_so_base + $group_base + 5;
 foreach ($rows as $row) {

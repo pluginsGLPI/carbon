@@ -37,16 +37,16 @@ use CommonDBTM;
 use DBmysql;
 use DbUtils;
 use Glpi\Application\View\TemplateRenderer;
-use Infocom;
-use Location as GlpiLocation;
-use NetworkEquipment as GlpiNetworkEquipment;
-use NetworkEquipmentType as GlpiNetworkEquipmentType;
-use NetworkEquipmentModel as GlpiNetworkEquipmentModel;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Engine\V1\NetworkEquipment as EngineNetworkEquipment;
 use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
 use GlpiPlugin\Carbon\UsageImpact;
+use Infocom;
+use Location as GlpiLocation;
+use NetworkEquipment as GlpiNetworkEquipment;
+use NetworkEquipmentModel as GlpiNetworkEquipmentModel;
+use NetworkEquipmentType as GlpiNetworkEquipmentType;
 
 class NetworkEquipment extends AbstractAsset
 {
@@ -77,25 +77,25 @@ class NetworkEquipment extends AbstractAsset
                     'FKEY'   => [
                         $item_table  => 'networkequipmentmodels_id',
                         $item_model_table => 'id',
-                    ]
+                    ],
                 ],
                 $glpi_location_table => [
                     'FKEY'   => [
                         $item_table  => 'locations_id',
                         $glpi_location_table => 'id',
-                    ]
+                    ],
                 ],
                 $location_table => [
                     'FKEY' => [
                         $location_table => 'locations_id',
                         $glpi_location_table => 'id',
-                    ]
+                    ],
                 ],
                 $item_glpitype_table => [
                     'FKEY'   => [
                         $item_table  => 'networkequipmenttypes_id',
                         $item_glpitype_table => 'id',
-                    ]
+                    ],
                 ],
             ],
             'LEFT JOIN' => [
@@ -106,16 +106,16 @@ class NetworkEquipment extends AbstractAsset
                         [
                             'AND' => [
                                 'NOT' => [GlpiNetworkEquipmentType::getTableField('id') => null],
-                            ]
-                        ]
-                    ]
+                            ],
+                        ],
+                    ],
                 ],
                 $infocom_table => [
                     'FKEY' => [
                         $infocom_table => 'items_id',
                         $item_table => 'id',
                         ['AND' => ['itemtype' => self::$itemtype]],
-                    ]
+                    ],
                 ],
             ],
             'WHERE' => [
@@ -139,9 +139,9 @@ class NetworkEquipment extends AbstractAsset
                         ['NOT' => [Infocom::getTableField('buy_date') => null]],
                         ['NOT' => [Infocom::getTableField('date_creation') => null]],
                         // ['NOT' => [Infocom::getTableField('date_mod') => null]],
-                    ]
-                ]
-            ] + $crit
+                    ],
+                ],
+            ] + $crit,
         ];
 
         if ($entity_restrict) {
@@ -185,7 +185,7 @@ class NetworkEquipment extends AbstractAsset
                 $infocom_table => 'items_id',
                 $item_table => 'id',
                 ['AND' => [Infocom::getTableField('itemtype') => self::$itemtype]],
-            ]
+            ],
         ];
         // Change inner joins into left joins to identify missing data
         $request['LEFT JOIN'] = $request['INNER JOIN'] + $request['LEFT JOIN'];

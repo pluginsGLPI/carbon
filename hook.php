@@ -31,31 +31,31 @@
  */
 
 use Computer as GlpiComputer;
-use Monitor as GlpiMonitor;
-use NetworkEquipment as GlpiNetworkEquipment;
-use Glpi\Dashboard\Right as GlpiDashboardRight;
-use GlpiPlugin\Carbon\ComputerType;
-use GlpiPlugin\Carbon\ComputerUsageProfile;
-use GlpiPlugin\Carbon\Install;
-use GlpiPlugin\Carbon\Uninstall;
-use GlpiPlugin\Carbon\UsageInfo;
-use GlpiPlugin\Carbon\Source;
-use GlpiPlugin\Carbon\Zone;
 use ComputerType as GlpiComputerType;
+use Glpi\Dashboard\Right as GlpiDashboardRight;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CommonAsset;
-use MonitorType as GlpiMonitorType;
-use NetworkEquipmentType as GlpiNetworkEquipmentType;
-use GlpiPlugin\Carbon\Source_Zone;
+use GlpiPlugin\Carbon\ComputerType;
+use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\EmbodiedImpact;
+use GlpiPlugin\Carbon\Install;
 use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
 use GlpiPlugin\Carbon\SearchOptions;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Toolbox;
+use GlpiPlugin\Carbon\Uninstall;
+use GlpiPlugin\Carbon\UsageInfo;
+use GlpiPlugin\Carbon\Zone;
 use Location as GlpiLocation;
+use Monitor as GlpiMonitor;
+use MonitorType as GlpiMonitorType;
+use NetworkEquipment as GlpiNetworkEquipment;
+use NetworkEquipmentType as GlpiNetworkEquipmentType;
 use Profile as GlpiProfile;
 use Toolbox as GlpiToolbox;
 
@@ -67,7 +67,7 @@ use Toolbox as GlpiToolbox;
  *   -p version                : specifi the version to begin a forced upgrade
  *   -p reset-report-dashboard : delete then recreate the dashboard of the reporting page
  *
- * @return boolean
+ * @return bool
  */
 function plugin_carbon_install(array $args = []): bool
 {
@@ -90,7 +90,7 @@ function plugin_carbon_install(array $args = []): bool
         } else {
             $success = $install->upgrade($version, $args);
         }
-    } catch (\RuntimeException $e) {
+    } catch (RuntimeException $e) {
         if (isCommandLine()) {
             throw $e;
         }
@@ -109,7 +109,7 @@ function plugin_carbon_install(array $args = []): bool
 /**
  * Plugin uninstall process
  *
- * @return boolean
+ * @return bool
  */
 function plugin_carbon_uninstall(): bool
 {
@@ -120,7 +120,7 @@ function plugin_carbon_uninstall(): bool
     $uninstall = new Uninstall();
     try {
         $uninstall->uninstall();
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
         $backtrace = GlpiToolbox::backtrace('');
         trigger_error($e->getMessage() . PHP_EOL . $backtrace, E_USER_WARNING);
         return false;
@@ -213,18 +213,18 @@ function plugin_carbon_hook_update_asset(CommonDBTM $item)
                 'ON' => [
                     $source_zone_table => 'id',
                     $location_table => 'plugin_carbon_sources_zones_id',
-                ]
+                ],
             ],
             $item_table => [
                 'ON' => [
                     $item_table => 'locations_id',
                     $location_table => 'locations_id',
-                ]
+                ],
             ],
         ],
         'WHERE' => [
             $item::getTableField('id') => $item->getID(),
-        ]
+        ],
     ];
 
     $source_zone = new Source_Zone();
@@ -251,19 +251,19 @@ function plugin_carbon_hook_pre_purge_asset(CommonDBTM $item)
     $carbon_emission = new CarbonEmission();
     $carbon_emission->deleteByCriteria([
         'itemtype' => $itemtype,
-        'items_id' => $item_id
+        'items_id' => $item_id,
     ]);
 
     $embodied_impact = new EmbodiedImpact();
     $embodied_impact->deleteByCriteria([
         'itemtype' => $itemtype,
-        'items_id' => $item_id
+        'items_id' => $item_id,
     ]);
 
     $usage_info = new UsageInfo();
     $usage_info->deleteByCriteria([
         'itemtype' => $itemtype,
-        'items_id' => $item_id
+        'items_id' => $item_id,
     ]);
 }
 

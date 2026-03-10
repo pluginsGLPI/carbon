@@ -32,7 +32,7 @@
 
 use CronTask as GLPICronTask;
 
-$task = new GlpiCronTask();
+$task = new GLPICronTask();
 $task->getFromDBByCrit([
     'itemtype' => 'GlpiPlugin\\Carbon\\CronTask',
     'name'     => 'DownloadRte',
@@ -44,7 +44,7 @@ if (!$task->isNewItem()) {
     ]);
 }
 
-$task = new GlpiCronTask();
+$task = new GLPICronTask();
 $task->getFromDBByCrit([
     'itemtype' => 'GlpiPlugin\\Carbon\\CronTask',
     'name'     => 'DownloadElectricityMap',

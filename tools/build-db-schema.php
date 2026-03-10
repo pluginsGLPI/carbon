@@ -156,7 +156,7 @@ function completeMissingData(&$schema_tables)
                     [
                         'int',
                         'id',
-                    ]
+                    ],
                 ],
             ];
         }
@@ -298,7 +298,7 @@ function getRelationType(&$schema_tables, $table, $field_name): ?array
  * is the table a relation table with additional properties ?
  *
  * @param string $table
- * @return boolean
+ * @return bool
  */
 function isRelationTableWithProperties($table): bool
 {

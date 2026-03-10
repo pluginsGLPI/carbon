@@ -50,7 +50,7 @@ abstract class EngineTestCase extends DbTestCase
      * The delta for comparison of computed emission with expected value,
      * as == for float must not be used because of float representation.
      */
-    const EPSILON = 0.001;
+    public const EPSILON = 0.001;
 
     public function getPowerProvider(): \Generator
     {
@@ -58,7 +58,7 @@ abstract class EngineTestCase extends DbTestCase
         $engine = new static::$engine_class($item);
         yield 'item without model nor type' => [
             $engine,
-            0
+            0,
         ];
 
         $model = $this->createItem(static::$model_class);
@@ -73,7 +73,7 @@ abstract class EngineTestCase extends DbTestCase
         $engine = new static::$engine_class($item);
         yield 'item with empty power data' => [
             $engine,
-            0
+            0,
         ];
 
         $model = $this->createItem(static::$model_class, ['power_consumption' => 20]);
@@ -84,14 +84,14 @@ abstract class EngineTestCase extends DbTestCase
         $engine = new static::$engine_class($item);
         yield 'item with power data in model' => [
             $engine,
-            20
+            20,
         ];
 
         $model = $this->createItem(static::$model_class);
         $glpi_type = $this->createItem(static::$glpi_type_class);
         $type = $this->createItem(static::$type_class, [
             static::$glpi_type_class::getForeignKeyField() => $glpi_type->getID(),
-            'power_consumption' => 40
+            'power_consumption' => 40,
         ]);
         $item = $this->createItem(static::$itemtype_class, [
             static::$glpi_type_class::getForeignKeyField() => $glpi_type->getID(),
@@ -100,7 +100,7 @@ abstract class EngineTestCase extends DbTestCase
         $engine = new static::$engine_class($item);
         yield 'item with power data in type' => [
             $engine,
-            40
+            40,
         ];
 
         $model = $this->createItem(static::$model_class, ['power_consumption' => 20]);
@@ -111,14 +111,14 @@ abstract class EngineTestCase extends DbTestCase
         $engine = new static::$engine_class($item);
         yield 'item with power data in model and type' => [
             $engine,
-            20
+            20,
         ];
     }
 
     public function testGetPower()
     {
         foreach ($this->getPowerProvider() as $data) {
-            list ($engine, $expected_power) = $data;
+            [$engine, $expected_power] = $data;
             $actual_power = $engine->getPower();
             $this->assertEquals($expected_power, $actual_power->getValue());
         }
@@ -127,7 +127,7 @@ abstract class EngineTestCase extends DbTestCase
     public function testGetEnergyPerDay()
     {
         foreach ($this->getEnergyPerDayProvider() as $data) {
-            list($engine, $date, $expected_energy) = $data;
+            [$engine, $date, $expected_energy] = $data;
             $output = $engine->getEnergyPerDay($date);
             $this->assertEquals($expected_energy, $output->getValue());
         }
@@ -136,7 +136,7 @@ abstract class EngineTestCase extends DbTestCase
     public function testGetCarbonEmissionPerDay()
     {
         foreach ($this->getCarbonEmissionPerDateProvider() as $data) {
-            list($engine, $day, $source_zone, $expected_emission) = $data;
+            [$engine, $day, $source_zone, $expected_emission] = $data;
             $emission = $engine->getCarbonEmissionPerDay($day, $source_zone);
             $this->assertEqualsWithDelta($expected_emission, $emission->getValue(), self::EPSILON);
         }

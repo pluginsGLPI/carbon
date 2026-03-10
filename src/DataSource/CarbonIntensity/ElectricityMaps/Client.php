@@ -34,19 +34,19 @@ namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\ElectricityMaps;
 
 use DateInterval;
 use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
-use DateTimeImmutable;
-use GlpiPlugin\Carbon\CarbonIntensity;
-use GlpiPlugin\Carbon\Source;
-use GlpiPlugin\Carbon\Zone;
-use GlpiPlugin\Carbon\Source_Zone;
 use GLPIKey;
+use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\AbortException;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\AbstractClient;
 use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Toolbox;
+use GlpiPlugin\Carbon\Zone;
 use Safe\Exceptions\FilesystemException;
 use Symfony\Component\Console\Helper\ProgressBar;
 
@@ -58,9 +58,9 @@ use Symfony\Component\Console\Helper\ProgressBar;
  */
 class Client extends AbstractClient
 {
-    const HISTORY_URL = '/carbon-intensity/history';
-    const PAST_URL    = '/carbon-intensity/past-range';
-    const ZONES_URL   = '/zones'; // Do not send API token
+    public const HISTORY_URL = '/carbon-intensity/history';
+    public const PAST_URL    = '/carbon-intensity/past-range';
+    public const ZONES_URL   = '/zones'; // Do not send API token
 
     private RestApiClientInterface $client;
 
@@ -103,7 +103,7 @@ class Client extends AbstractClient
     {
         $source = new Source();
         $source->getOrCreate([], [
-            ['name' => $this->getSourceName()]
+            ['name' => $this->getSourceName()],
         ]);
         if ($source->isNewItem()) {
             return -1;
@@ -215,7 +215,7 @@ class Client extends AbstractClient
             'headers' => [
                 'auth-token' => $this->getToken(),
             ],
-            'query' => $params
+            'query' => $params,
         ];
 
         $response = $this->client->request('GET', $this->base_url . self::HISTORY_URL, $options);
@@ -284,7 +284,7 @@ class Client extends AbstractClient
             $cache_dir = dirname($cache_file);
             if (!is_dir($cache_dir)) {
                 try {
-                    mkdir($cache_dir, 0755, true);
+                    mkdir($cache_dir, 0o755, true);
                 } catch (FilesystemException $e) {
                     trigger_error($e->getMessage(), E_USER_WARNING);
                 }
@@ -357,7 +357,7 @@ class Client extends AbstractClient
      * Try ti determine the data quality of record
      *
      * @param array $record
-     * @return integer
+     * @return int
      */
     protected function getDataQuality(array $record): int
     {

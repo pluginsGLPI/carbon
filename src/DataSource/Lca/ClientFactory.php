@@ -32,8 +32,8 @@
 
 namespace GlpiPlugin\Carbon\DataSource\Lca;
 
-use GlpiPlugin\Carbon\DataSource\RestApiClient;
 use GlpiPlugin\Carbon\DataSource\ConfigInterface;
+use GlpiPlugin\Carbon\DataSource\RestApiClient;
 
 class ClientFactory
 {

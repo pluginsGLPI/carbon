@@ -32,11 +32,10 @@
 
 namespace GlpiPlugin\Carbon;
 
-use CommonDropdown;
 use CommonDBTM;
+use CommonDropdown;
 use CommonGLPI;
 use DateTime;
-use DBmysql;
 use DbUtils;
 use Location as GlpiLocation;
 use LogicException;
@@ -129,7 +128,7 @@ class Zone extends CommonDropdown
             'datatype'      => 'bool',
             'joinparams'    => [
                 'jointype' => 'child',
-            ]
+            ],
         ];
 
         return $tab;
@@ -167,25 +166,25 @@ class Zone extends CommonDropdown
     //  */
     // private static function getByLocationRequest(): array
     // {
-        // $location_table = Location::getTable();
-        // $source_zone_table = Source_Zone::getTable();
-        // $zone_table = Zone::getTable();
-        // return [
-        //     'INNER JOIN' => [
-        //         $source_zone_table => [
-        //             'FKEY' => [
-        //                 $zone_table => 'id',
-        //                 $source_zone_table => 'plugin_carbon_zones_id',
-        //             ]
-        //         ],
-        //         $location_table => [
-        //             'FKEY' => [
-        //                 $location_table => 'plugin_carbon_sources_zones_id',
-        //                 $source_zone_table => 'id'
-        //             ]
-        //         ],
-        //     ],
-        // ];
+    // $location_table = Location::getTable();
+    // $source_zone_table = Source_Zone::getTable();
+    // $zone_table = Zone::getTable();
+    // return [
+    //     'INNER JOIN' => [
+    //         $source_zone_table => [
+    //             'FKEY' => [
+    //                 $zone_table => 'id',
+    //                 $source_zone_table => 'plugin_carbon_zones_id',
+    //             ]
+    //         ],
+    //         $location_table => [
+    //             'FKEY' => [
+    //                 $location_table => 'plugin_carbon_sources_zones_id',
+    //                 $source_zone_table => 'id'
+    //             ]
+    //         ],
+    //     ],
+    // ];
     // }
 
     /**
@@ -207,20 +206,20 @@ class Zone extends CommonDropdown
                     'FKEY' => [
                         $zone_table => 'id',
                         $source_zone_table => 'plugin_carbon_zones_id',
-                    ]
+                    ],
                 ],
                 $location_table => [
                     'FKEY' => [
                         $location_table => 'plugin_carbon_sources_zones_id',
-                        $source_zone_table => 'id'
-                    ]
+                        $source_zone_table => 'id',
+                    ],
                 ],
                 $itemtype_table => [
                     'FKEY' => [
                         $itemtype_table => 'locations_id',
                         $location_table => 'locations_id',
-                    ]
-                ]
+                    ],
+                ],
             ],
         ];
 
@@ -272,20 +271,20 @@ class Zone extends CommonDropdown
                     'ON' => [
                         $source_table => 'id',
                         $source_zone_table => getForeignKeyFieldForItemType(Source::class),
-                    ]
+                    ],
                 ],
                 $zone_table => [
                     'ON' => [
                         $zone_table => 'id',
-                        $source_zone_table => self::getForeignKeyField()
-                    ]
-                ]
+                        $source_zone_table => self::getForeignKeyField(),
+                    ],
+                ],
             ],
             'WHERE' => [
                 self::getTableField('id') => $this->fields['id'],
                 Source::getTableField('is_carbon_intensity_source') => 1,
                 Source::getTableField('fallback_level') => 0,
-            ]
+            ],
         ]);
     }
 
@@ -323,11 +322,11 @@ class Zone extends CommonDropdown
                             $item_table => GlpiLocation::getForeignKeyField(),
                             $glpi_location_table => 'id',
                         ],
-                    ]
+                    ],
                 ],
                 'WHERE' => [
-                    $item_table . '.id' => $item->getID()
-                ]
+                    $item_table . '.id' => $item->getID(),
+                ],
             ];
             $found = false;
             if (!$use_country) {
@@ -349,7 +348,7 @@ class Zone extends CommonDropdown
     /**
      * Undocumented function
      *
-     * @param integer $source_id
+     * @param int $source_id
      * @return array a request fragment
      */
     public static function getRestrictBySourceCondition(int $source_id): array
@@ -362,12 +361,12 @@ class Zone extends CommonDropdown
                     'FKEY' => [
                         $source_zone_table => 'plugin_carbon_zones_id',
                         $zone_table => 'id',
-                    ]
-                ]
+                    ],
+                ],
             ],
             'WHERE' => [
                 Source_Zone::getTableField('plugin_carbon_sources_id') => $source_id,
-            ]
+            ],
         ];
     }
 

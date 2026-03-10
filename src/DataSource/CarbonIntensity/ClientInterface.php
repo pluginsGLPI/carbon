@@ -96,7 +96,7 @@ interface ClientInterface
     /**
      * Is the setup of zones complete ?
      *
-     * @return boolean
+     * @return bool
      */
     public function isZoneSetupComplete(): bool;
 
@@ -104,14 +104,14 @@ interface ClientInterface
      * Is the download of the zone complete (except daily updates)
      *
      * @param string $zone_name
-     * @return boolean
+     * @return bool
      */
     public function isZoneDownloadComplete(string $zone_name): bool;
 
     /**
      * are all zones fully downloaded (except dayli updates)
      *
-     * @return boolean
+     * @return bool
      */
     // public function isDownloadComplete(): bool;
 
@@ -125,7 +125,7 @@ interface ClientInterface
     /**
      * Create zones handled by the data source
      *
-     * @return integer count if item processed
+     * @return int count if item processed
      */
     public function createZones(): int;
 
@@ -179,9 +179,9 @@ interface ClientInterface
      * @param DateTimeImmutable $start_date date where the download must start
      * @param DateTimeImmutable $stop_date date where the download must start
      * @param CarbonIntensity $intensity Instance used to update the database
-     * @param integer $limit
+     * @param int $limit
      * @param ProgressBar $progress progress bar to update during the download (CLI)
-     * @return integer count of successfully saved items
+     * @return int count of successfully saved items
      */
     public function fullDownload(string $zone, DateTimeImmutable $start_date, DateTimeImmutable $stop_date, CarbonIntensity $intensity, int $limit = 0, ?ProgressBar $progress = null): int;
 
@@ -191,8 +191,8 @@ interface ClientInterface
      * @param string $zone zone to process
      * @param DateTimeImmutable $start_date DAte where the downlos must begin
      * @param CarbonIntensity $intensity Instance of CarbonIntensity to use to save data
-     * @param integer $limit maximum count of items to process
-     * @return integer count of processed items. Negative count on failure
+     * @param int $limit maximum count of items to process
+     * @return int count of processed items. Negative count on failure
      */
     public function incrementalDownload(string $zone, DateTimeImmutable $start_date, CarbonIntensity $intensity, int $limit = 0): int;
 }

@@ -33,11 +33,11 @@
 namespace GlpiPlugin\Carbon\Engine\V1\Tests;
 
 use DateTime;
-use GlpiPlugin\Carbon\Tests\Engine\V1\EngineTestCase;
 use GlpiPlugin\Carbon\Engine\V1\NetworkEquipment;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
+use GlpiPlugin\Carbon\Tests\Engine\V1\EngineTestCase;
 use GlpiPlugin\Carbon\Zone;
 use NetworkEquipment as GlpiNetworkEquipment;
 use NetworkEquipmentModel;
@@ -57,7 +57,7 @@ class NetworkEquipmentTest extends EngineTestCase
      * The delta for comparison of computed emission with expected value,
      * as == for float must not be used because of float representation.
      */
-    const EPSILON = 0.001;
+    public const EPSILON = 0.001;
 
     public function getEnergyPerDayProvider(): \Generator
     {
@@ -76,7 +76,7 @@ class NetworkEquipmentTest extends EngineTestCase
     public function testGetEnergyPerDay()
     {
         foreach ($this->getEnergyPerDayProvider() as $data) {
-            list ($engine, $date, $expected_energy) = $data;
+            [$engine, $date, $expected_energy] = $data;
             $output = $engine->getEnergyPerDay($date);
             $this->assertEquals($expected_energy, $output->getValue());
         }
@@ -86,9 +86,9 @@ class NetworkEquipmentTest extends EngineTestCase
     {
         $intensity = 1;
         $thursday = DateTime::createFromFormat('Y-m-d H:i:s', '1999-12-02 12:00:00');
-        $source = $this->createItem(source::class, [
+        $source = $this->createItem(Source::class, [
             'is_carbon_intensity_source' => 1,
-            'fallback_level' => 0
+            'fallback_level' => 0,
         ]);
         $zone = $this->createItem(Zone::class);
         $source_zone = $this->createItem(Source_Zone::class, [

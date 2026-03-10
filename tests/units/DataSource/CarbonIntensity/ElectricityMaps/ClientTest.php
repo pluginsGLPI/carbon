@@ -34,17 +34,14 @@ namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\ElectricityMaps;
 
 use DateInterval;
 use DateTime;
-use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ElectricityMaps\Client;
-use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
-use GlpiPlugin\Carbon\Source;
-use GlpiPlugin\Carbon\Zone;
-use GlpiPlugin\Carbon\Tests\DbTestCase;
 use DateTimeImmutable;
 use DateTimeInterface;
+use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
+use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
+use GlpiPlugin\Carbon\Tests\DbTestCase;
+use GlpiPlugin\Carbon\Zone;
 use PHPUnit\Framework\Attributes\CoversClass;
-
-use function PHPUnit\Framework\assertCount;
 
 #[CoversClass(Client::class)]
 class ClientTest extends DbTestCase
@@ -79,7 +76,7 @@ class ClientTest extends DbTestCase
         $source_zone = $this->createItem(Source_Zone::class, [
             Source::getForeignKeyField() => $source->getID(),
             Zone::getForeignKeyField() => $zone->getID(),
-            'code' => 'FR'
+            'code' => 'FR',
         ]);
 
         $date = new DateTimeImmutable('5 days ago');
@@ -150,7 +147,7 @@ class ClientTest extends DbTestCase
         $source_zone = $this->createItem(Source_Zone::class, [
             Source::getForeignKeyField() => $source->getID(),
             Zone::getForeignKeyField() => $zone->getID(),
-            'code' => 'FR'
+            'code' => 'FR',
         ]);
 
         $intensities = $data_source->fetchRange(

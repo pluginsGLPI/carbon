@@ -34,18 +34,18 @@ namespace GlpiPlugin\Carbon;
 
 use CommonDBTM;
 use Computer as GlpiComputer;
-use Location as GlpiLocation;
-use ComputerType as GlpiComputerType;
 use ComputerModel;
+use ComputerType as GlpiComputerType;
 use Glpi\Asset\Asset_PeripheralAsset;
 use Glpi\DBAL\QueryExpression;
 use Glpi\DBAL\QuerySubQuery;
+use Location as GlpiLocation;
 use Monitor as GlpiMonitor;
-use MonitorType as GlpiMonitorType;
 use MonitorModel;
+use MonitorType as GlpiMonitorType;
 use NetworkEquipment;
-use NetworkEquipmentType as GlpiNetworkEquipmentType;
 use NetworkEquipmentModel;
+use NetworkEquipmentType as GlpiNetworkEquipmentType;
 
 /**
  * This file is *REQUIRED* in the whole life time of the plugin
@@ -171,8 +171,8 @@ class SearchOptions
                             'table' => $glpi_item_type_table,
                             'joinparams' => [
                                 'jointype' => 'child',
-                            ]
-                        ]
+                            ],
+                        ],
                     ],
                     'computation' => "COALESCE(TABLE.`power_consumption`, 0)",
                 ];
@@ -191,8 +191,8 @@ class SearchOptions
                             'table' => $glpi_item_type_table,
                             'joinparams' => [
                                 'jointype' => 'child',
-                            ]
-                        ]
+                            ],
+                        ],
                     ],
                     'computation' => "COALESCE(TABLE.`is_ignore`, 0)",
                 ];
@@ -213,13 +213,13 @@ class SearchOptions
                         'table'    => UsageInfo::getTable(),
                         'joinparams' => [
                             'jointype' => 'child',
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ];
 
             $fallback_carbon_intensity_subquery = Location::getCarbonIntensityDataSourceRequest([
-                Location::getTableField('id') => new QueryExpression('glpi_plugin_carbon_locations_3d6da7fccf9233a3f1a4e41183391a41.id')
+                Location::getTableField('id') => new QueryExpression('glpi_plugin_carbon_locations_3d6da7fccf9233a3f1a4e41183391a41.id'),
             ]);
             $fallback_carbon_intensity_subquery = (new QuerySubQuery($fallback_carbon_intensity_subquery))->getQuery();
             $computation = "IF(`glpi_computers_id_963cd5e903dddc7ab00a3b70933369df`.`is_deleted` = 0
@@ -253,9 +253,9 @@ class SearchOptions
                                     'table' => GlpiLocation::getTable(),
                                     'joinparams' => [
                                         'jointype' => 'empty',
-                                    ]
-                                ]
-                            ]
+                                    ],
+                                ],
+                            ],
                         ],
                         [
                             'table' => ComputerType::getTable(),
@@ -266,16 +266,16 @@ class SearchOptions
                                     'table' => GlpiComputerType::getTable(),
                                     'joinparams' => [
                                         'jointype' => 'empty',
-                                    ]
-                                ]
-                            ]
+                                    ],
+                                ],
+                            ],
                         ],
                         [
                             'table' => ComputerModel::getTable(),
                             'joinparams' => [
                                 'jointype' => 'empty',
                                 'nolink'   => true,
-                            ]
+                            ],
                         ],
                         [
                             'table' => ComputerUsageProfile::getTable(),
@@ -286,15 +286,15 @@ class SearchOptions
                                     'table' => UsageInfo::getTable(),
                                     'joinparams' => [
                                         'jointype' => 'itemtype_item',
-                                    ]
-                                ]
-                            ]
+                                    ],
+                                ],
+                            ],
                         ],
                     ],
                 ],
                 'computation' => $computation,
             ];
-        } else if ($itemtype === GlpiComputerType::class && in_array(GlpiComputer::class, PLUGIN_CARBON_TYPES)) {
+        } elseif ($itemtype === GlpiComputerType::class && in_array(GlpiComputer::class, PLUGIN_CARBON_TYPES)) {
             $computer_type_table = getTableForItemType(ComputerType::class);
             $sopt[] = [
                 'id'             => SearchOptions::COMPUTER_TYPE_CATEGORY,
@@ -305,8 +305,8 @@ class SearchOptions
                 'searchtype'     => ['equals', 'notequals'],
                 'massiveaction'  => false,
                 'joinparams'     => [
-                    'jointype'   => 'child'
-                ]
+                    'jointype'   => 'child',
+                ],
             ];
 
             $sopt[] = [
@@ -317,11 +317,11 @@ class SearchOptions
                 'datatype'     => 'bool',
                 'massiveaction' => false,
                 'joinparams'     => [
-                    'jointype'   => 'child'
+                    'jointype'   => 'child',
                 ],
                 'computation' => "COALESCE(TABLE.`is_ignore`, 0)",
             ];
-        } else if ($itemtype === GlpiMonitorType::class && in_array(GlpiMonitor::class, PLUGIN_CARBON_TYPES)) {
+        } elseif ($itemtype === GlpiMonitorType::class && in_array(GlpiMonitor::class, PLUGIN_CARBON_TYPES)) {
             $sopt[] = [
                 'id'           => SearchOptions::MONITOR_TYPE_IS_IGNORED,
                 'table'        => getTableForItemType(MonitorType::class),
@@ -330,11 +330,11 @@ class SearchOptions
                 'datatype'     => 'bool',
                 'massiveaction' => false,
                 'joinparams'     => [
-                    'jointype'   => 'child'
+                    'jointype'   => 'child',
                 ],
                 'computation' => "COALESCE(TABLE.`is_ignore`, 0)",
             ];
-        } else if ($itemtype === GlpiNetworkEquipmentType::class && in_array(NetworkEquipment::class, PLUGIN_CARBON_TYPES)) {
+        } elseif ($itemtype === GlpiNetworkEquipmentType::class && in_array(NetworkEquipment::class, PLUGIN_CARBON_TYPES)) {
             $sopt[] = [
                 'id'           => SearchOptions::NETEQUIP_TYPE_IS_IGNORED,
                 'table'        => getTableForItemType(NetworkEquipmentType::class),
@@ -343,11 +343,11 @@ class SearchOptions
                 'datatype'     => 'bool',
                 'massiveaction' => false,
                 'joinparams'     => [
-                    'jointype'   => 'child'
+                    'jointype'   => 'child',
                 ],
                 'computation' => "COALESCE(TABLE.`is_ignore`, 0)",
             ];
-        } else if ($itemtype === GlpiMonitor::class && in_array($itemtype, PLUGIN_CARBON_TYPES)) {
+        } elseif ($itemtype === GlpiMonitor::class && in_array($itemtype, PLUGIN_CARBON_TYPES)) {
             $computation = "IF(`glpi_monitors_id_b24d2115745b49f0b5cdaf2ebb5e9ffe`.`is_deleted` = 0
             AND `glpi_monitors_id_b24d2115745b49f0b5cdaf2ebb5e9ffe`.`is_template` = 0
             AND `glpi_plugin_carbon_locations_3d6da7fccf9233a3f1a4e41183391a41`.`plugin_carbon_sources_zones_id` > 0"
@@ -392,15 +392,15 @@ class SearchOptions
                                                             ],
                                                             'AND' => [
                                                                 'itemtype_peripheral' => GlpiMonitor::getType(),
-                                                            ]
+                                                            ],
                                                         ],
-                                                    ]
-                                                ]
-                                            ]
-                                        ]
-                                    ]
-                                ]
-                            ]
+                                                    ],
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
                         ],
                         [
                             'table' => MonitorType::getTable(),
@@ -410,21 +410,21 @@ class SearchOptions
                                     'table' => GlpiMonitorType::getTable(),
                                     'joinparams' => [
                                         'jointype' => 'empty',
-                                    ]
-                                ]
-                            ]
+                                    ],
+                                ],
+                            ],
                         ],
                         [
                             'table' => MonitorModel::getTable(),
                             'joinparams' => [
                                 'jointype' => 'empty',
-                            ]
+                            ],
                         ],
                     ],
                 ],
                 'computation' => $computation,
             ];
-        } else if ($itemtype === NetworkEquipment::class && in_array($itemtype, PLUGIN_CARBON_TYPES)) {
+        } elseif ($itemtype === NetworkEquipment::class && in_array($itemtype, PLUGIN_CARBON_TYPES)) {
             $computation = "IF(`glpi_networkequipments_id_401e18dd2eaa15834dcd21d0f6fc677c`.`is_deleted` = 0
             AND `glpi_networkequipments_id_401e18dd2eaa15834dcd21d0f6fc677c`.`is_template` = 0
             AND `glpi_plugin_carbon_locations_3d6da7fccf9233a3f1a4e41183391a41`.`plugin_carbon_sources_zones_id` > 0"
@@ -454,9 +454,9 @@ class SearchOptions
                                     'table' => GlpiLocation::getTable(),
                                     'joinparams' => [
                                         'jointype' => 'empty',
-                                    ]
-                                ]
-                            ]
+                                    ],
+                                ],
+                            ],
                         ],
                         [
                             'table' => NetworkEquipmentType::getTable(),
@@ -467,16 +467,16 @@ class SearchOptions
                                     'table' => GlpiNetworkEquipmentType::getTable(),
                                     'joinparams' => [
                                         'jointype' => 'empty',
-                                    ]
-                                ]
-                            ]
+                                    ],
+                                ],
+                            ],
                         ],
                         [
                             'table' => NetworkEquipmentModel::getTable(),
                             'joinparams' => [
                                 'jointype' => 'empty',
                                 'nolink'   => true,
-                            ]
+                            ],
                         ],
                     ],
                 ],

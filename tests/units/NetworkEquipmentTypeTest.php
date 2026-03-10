@@ -32,10 +32,10 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
+use GlpiPlugin\Carbon\AbstractType;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
 use MassiveAction;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
-use GlpiPlugin\Carbon\AbstractType;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Session;
 use Symfony\Component\DomCrawler\Crawler;
@@ -119,7 +119,7 @@ class NetworkEquipmentTypeTest extends DbTestCase
             ->getMock();
         $massive_action->method('getAction')->willReturn('MassUpdatePower');
         $massive_action->method('getItems')->willReturn([
-            NetworkEquipmentType::class => $this->createItem(GlpiNetworkEquipmentType::class)
+            NetworkEquipmentType::class => $this->createItem(GlpiNetworkEquipmentType::class),
         ]);
         ob_start(function ($buffer) {
             return $buffer;
@@ -147,7 +147,7 @@ class NetworkEquipmentTypeTest extends DbTestCase
             ->getMock();
         $massive_action->method('getAction')->willReturn('');
         $massive_action->method('getItems')->willReturn([
-            NetworkEquipmentType::class => $this->createItem(GlpiNetworkEquipmentType::class)
+            NetworkEquipmentType::class => $this->createItem(GlpiNetworkEquipmentType::class),
         ]);
         ob_start(function ($buffer) {
             return $buffer;

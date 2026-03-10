@@ -37,8 +37,8 @@ use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 use Log;
-use Session;
 use PHPUnit\Framework\Attributes\CoversClass;
+use Session;
 
 #[CoversClass(Source::class)]
 class SourceTest extends DbTestCase
@@ -146,7 +146,7 @@ class SourceTest extends DbTestCase
         $source = $this->createItem(Source::class);
         $source_zone = $this->createItem(Source_Zone::class, [
             $item::getForeignKeyField() => $item->getID(),
-            $source::getForeignKeyField() => $source->getID()
+            $source::getForeignKeyField() => $source->getID(),
         ]);
         ob_start(function ($buffer) {
             return $buffer;
@@ -161,7 +161,7 @@ class SourceTest extends DbTestCase
     {
         $instance = new Source();
         $original_count = $instance->getDownloadableSources();
-        $source = $this->createItem(source::class, [
+        $source = $this->createItem(Source::class, [
             'name'           => 'foo',
             'fallback_level' => 0,
         ]);
@@ -170,7 +170,7 @@ class SourceTest extends DbTestCase
 
         $instance = new Source();
         $original_count = $instance->getDownloadableSources();
-        $source = $this->createItem(source::class, [
+        $source = $this->createItem(Source::class, [
             'name'           => 'foo 2',
             'fallback_level' => 1,
         ]);
@@ -193,7 +193,7 @@ class SourceTest extends DbTestCase
         $this->assertSame($instance->getID(), $instance_2->getID());
 
         // Test we can update an existing item
-        $instance_3 = new source();
+        $instance_3 = new Source();
         $instance_3->getOrCreate(['fallback_level' => 2], $where);
         $this->assertEquals(2, $instance_3->fields['fallback_level']);
     }

@@ -32,15 +32,15 @@
 
 namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\ElectricityMaps;
 
-use GlpiPlugin\Carbon\DataSource\ConfigInterface;
 use GlpiPlugin\Carbon\Config as PluginConfig;
+use GlpiPlugin\Carbon\DataSource\ConfigInterface;
 
 class Config implements ConfigInterface
 {
     public static function getSecuredConfigs(): array
     {
         return [
-            'electricitymap_api_key'
+            'electricitymap_api_key',
         ];
     }
 

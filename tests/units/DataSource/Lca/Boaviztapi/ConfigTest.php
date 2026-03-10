@@ -34,7 +34,6 @@ namespace GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi;
 
 use Config as GlpiConfig;
 use Glpi\Application\View\TemplateRenderer;
-use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\Config;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -57,7 +56,7 @@ class ConfigTest extends DbTestCase
             'current_config' => [
                 'boaviztapi_base_url' => 'foo',
                 'geocoding_enabled'   => true,
-            ]
+            ],
         ];
         $this->login('glpi', 'glpi');
         $instance = new Config();
@@ -91,7 +90,7 @@ class ConfigTest extends DbTestCase
                 'boaviztapi_base_url' => '',
             ], [
                 'boaviztapi_base_url' => '',
-            ]
+            ],
         ];
 
         // TODO: requires code change to test boaviztapi_base_url with a not-empty value
@@ -110,7 +109,7 @@ class ConfigTest extends DbTestCase
         global $CFG_GLPI;
 
         $CFG_GLPI['plugi:carbon']['lca_datasources'] = [
-            Client::class
+            Client::class,
         ];
 
         $result = (new Config())->configUpdate($input);
@@ -121,7 +120,7 @@ class ConfigTest extends DbTestCase
     {
         // Test an overridable configuration value, not overriden
         GlpiConfig::setConfigurationValues('plugin:carbon', [
-            'boaviztapi_base_url' => 'bar'
+            'boaviztapi_base_url' => 'bar',
         ]);
         putenv(Config::ENV_BOAVIZTAPI_BASE_URL); // Env var unset
         $result = Config::getConfigurationValue('boaviztapi_base_url');
@@ -129,7 +128,7 @@ class ConfigTest extends DbTestCase
 
         // Test an overridable configuration value, overriden by an env var
         GlpiConfig::setConfigurationValues('plugin:carbon', [
-            'boaviztapi_base_url' => 'baz'
+            'boaviztapi_base_url' => 'baz',
         ]);
         putenv(Config::ENV_BOAVIZTAPI_BASE_URL . '=bar');
         $result = Config::getConfigurationValue('boaviztapi_base_url');

@@ -33,13 +33,13 @@
 
 namespace GlpiPlugin\Carbon\Impact\Usage;
 
-use DBmysql;
-use DbUtils;
 use CommonDBTM;
+use DBmysql;
 use DBmysqlIterator;
+use DbUtils;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
-use GlpiPlugin\Carbon\UsageImpact;
 use GlpiPlugin\Carbon\Impact\Type;
+use GlpiPlugin\Carbon\UsageImpact;
 use Location as GlpiLocation;
 use Toolbox as GlpiToolbox;
 
@@ -75,8 +75,8 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
     /**
      * Get the unit of an impact
      *
-     * @param integer $type
-     * @param boolean $short
+     * @param int $type
+     * @param bool $short
      * @return string|null
      */
     final public function getUnit(int $type, bool $short = true): ?string
@@ -120,7 +120,7 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
             'OR' => [
                 UsageImpact::getTableField('id') => null,
                 UsageImpact::getTableField('recalculate') => 1,
-            ]
+            ],
         ];
         $crit[UsageImpact::getTableField('id')] = null;
         $iterator = $DB->request($this->getEvaluableQuery($crit, false));
@@ -133,7 +133,7 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
         /**
          * Huge quantity of SQL queries will be executed
          * We NEED to check memory usage to avoid running out of memory
-         * @see DbMysql::doQuery()
+         * @see DBmysql::doQuery()
          */
         $memory_limit = GlpiToolbox::getMemoryLimit() - 8 * 1024 * 1024;
         if ($memory_limit < 0) {
@@ -246,10 +246,10 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
                     'FKEY' => [
                         $usage_impact_table => 'items_id',
                         $item_table            => 'id',
-                        ['AND' =>
-                            [
+                        ['AND'
+                            => [
                                 UsageImpact::getTableField('itemtype') => $itemtype,
-                            ]
+                            ],
                         ],
                     ],
                 ],
@@ -257,7 +257,7 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
                     'FKEY' => [
                         $glpi_location_table => 'id',
                         $item_table => 'locations_id',
-                    ]
+                    ],
                 ],
             ],
             'WHERE' => [

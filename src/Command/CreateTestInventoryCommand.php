@@ -32,26 +32,25 @@
 
 namespace GlpiPlugin\Carbon\Command;
 
-use DateTime;
 use CommonDBTM;
 use Computer as GlpiComputer;
-use ComputerType as GlpiComputerType;
 use ComputerModel as GlpiComputerModel;
+use ComputerType as GlpiComputerType;
 use Entity;
-use Location;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\UsageInfo;
+use Location;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class CreateTestInventoryCommand extends Command
 {
-    const TEST_LOCATION_NAME = 'Test location';
-    const TEST_LOCATION_COUNTRY = 'France';
-    const TEST_INVENTORY_DATA = [
+    public const TEST_LOCATION_NAME = 'Test location';
+    public const TEST_LOCATION_COUNTRY = 'France';
+    public const TEST_INVENTORY_DATA = [
         'Desktop' => [
             'usage_profile' => [
                 'name' => 'Test desktop usage profile',

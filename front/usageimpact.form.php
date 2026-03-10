@@ -33,10 +33,10 @@
 use Glpi\Event;
 use Glpi\Exception\Http\NotFoundHttpException;
 use GlpiPlugin\Carbon\CommonAsset;
-use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\Impact\History\AbstractAsset;
 use GlpiPlugin\Carbon\Impact\Usage\Engine;
 use GlpiPlugin\Carbon\UsageImpact;
+use GlpiPlugin\Carbon\UsageInfo;
 
 include(__DIR__ . '/../../../inc/includes.php');
 
@@ -61,7 +61,7 @@ if (isset($_POST['update'])) {
         sprintf(__('%s updates an item'), $_SESSION['glpiname'])
     );
     Html::back();
-} else if (isset($_POST['reset'])) {
+} elseif (isset($_POST['reset'])) {
     if (!isset($_POST['itemtype']) || !isset($_POST['items_id'])) {
         Session::addMessageAfterRedirect(__('Missing arguments in request.', 'carbon'), false, ERROR);
         Html::back();
@@ -95,7 +95,7 @@ if (isset($_POST['update'])) {
         Session::addMessageAfterRedirect(__('Reset failed.', 'carbon'), false, ERROR);
         Html::back();
     }
-} else if (isset($_POST['calculate'])) {
+} elseif (isset($_POST['calculate'])) {
     if (!isset($_POST['itemtype']) || !isset($_POST['items_id'])) {
         Session::addMessageAfterRedirect(__('Missing arguments in request.', 'carbon'), false, ERROR);
         Html::back();

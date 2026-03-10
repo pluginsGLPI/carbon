@@ -40,11 +40,11 @@ use DateTimeZone;
 use DBmysql;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\AbstractClient;
 use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
+use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
-use GlpiPlugin\Carbon\Zone;
-use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\Toolbox;
+use GlpiPlugin\Carbon\Zone;
 use Safe\Exceptions\FilesystemException;
 
 use function Safe\mkdir;
@@ -67,11 +67,11 @@ use function Safe\mkdir;
  */
 class Client extends AbstractClient
 {
-    const EXPORT_URL_REALTIME      = '/eco2mix-national-tr/exports/json';
-    const EXPORT_URL_CONSOLIDATED  = '/eco2mix-national-cons-def/exports/json';
+    public const EXPORT_URL_REALTIME      = '/eco2mix-national-tr/exports/json';
+    public const EXPORT_URL_CONSOLIDATED  = '/eco2mix-national-cons-def/exports/json';
 
-    const DATASET_REALTIME = 0;
-    const DATASET_CONSOLIDATED = 1;
+    public const DATASET_REALTIME = 0;
+    public const DATASET_CONSOLIDATED = 1;
 
     private RestApiClientInterface $client;
 
@@ -112,13 +112,13 @@ class Client extends AbstractClient
     public function getSupportedZones(): array
     {
         return [
-            null => 'France'
+            null => 'France',
         ];
     }
 
     public function createZones(): int
     {
-        $source = new source();
+        $source = new Source();
         $source->getOrCreate([], [
             'name' => $this->getSourceName(),
         ]);
@@ -129,7 +129,7 @@ class Client extends AbstractClient
 
         $zone = new Zone();
         $zone->getOrCreate([], [
-            'name' => 'France'
+            'name' => 'France',
         ]);
         if ($zone->isNewItem()) {
             return -1;
@@ -139,10 +139,10 @@ class Client extends AbstractClient
         $source_zone = new Source_Zone();
         $source_zone->getOrCreate([
             'code' => '',
-            'is_download_enabled' => Toolbox::isLocationExistForZone($zone->fields['name'])
+            'is_download_enabled' => Toolbox::isLocationExistForZone($zone->fields['name']),
         ], [
             Source::getForeignKeyField() => $source_id,
-            Zone::getForeignKeyField() => $zone_id
+            Zone::getForeignKeyField() => $zone_id,
         ]);
         if ($source_zone->isNewItem()) {
             return -1;
@@ -272,7 +272,7 @@ class Client extends AbstractClient
             $cache_dir = dirname($cache_file);
             if (!is_dir($cache_dir)) {
                 try {
-                    mkdir($cache_dir, 0755, true);
+                    mkdir($cache_dir, 0o755, true);
                 } catch (FilesystemException $e) {
                     trigger_error($e->getMessage(), E_USER_WARNING);
                 }
@@ -287,7 +287,7 @@ class Client extends AbstractClient
             'select' => 'date_heure,taux_co2',
             'where' => $where,
             'order_by' => 'date_heure asc',
-            'timezone' => $timezone->getName()
+            'timezone' => $timezone->getName(),
         ];
         $response = $this->client->request('GET', $url, ['timeout' => 8, 'query' => $params]);
         $this->step = $this->detectStep($response);
@@ -314,7 +314,7 @@ class Client extends AbstractClient
      * It is assumed  that the records are chronologically sorted
      *
      * @param array $response
-     * @param integer $step
+     * @param int $step
      * @return array
      */
     protected function formatOutput(array $response, int $step): array
@@ -353,7 +353,7 @@ class Client extends AbstractClient
      */
     protected function shiftToLocalTimezone(array $response): array
     {
-        /** @var DBMysql $DB */
+        /** @var DBmysql $DB */
         global $DB;
 
         $shifted_response = [];
@@ -401,7 +401,7 @@ class Client extends AbstractClient
      * Get the temporal distance between records
      *
      * @param array $records
-     * @return integer step in minutes
+     * @return int step in minutes
      */
     protected function detectStep(array $records): ?int
     {

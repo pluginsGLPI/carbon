@@ -31,7 +31,6 @@
  */
 
 use Glpi\DBAL\QuerySubQuery;
-use GlpiPlugin\Carbon\CarbonEmission;
 
 /** @var DBmysql $DB */
 global $DB;
@@ -45,12 +44,12 @@ $source_zone_table = 'glpi_plugin_carbon_carbonintensitysources_zones';
 $source_iterator = $DB->request([
     'SELECT' => 'id',
     'FROM' => $source_table,
-    'WHERE' => ['name' => 'Hydro Quebec']
+    'WHERE' => ['name' => 'Hydro Quebec'],
 ]);
 $zone_iterator = $DB->request([
     'SELECT' => 'id',
     'FROM' => $zone_table,
-    'WHERE' => ['name' => 'Quebec']
+    'WHERE' => ['name' => 'Quebec'],
 ]);
 if ($source_iterator->count() && $zone_iterator->count()) {
     $DB->update($source_zone_table, [
@@ -64,7 +63,7 @@ if ($source_iterator->count() && $zone_iterator->count()) {
 $itemtypes = [
     Computer::class,
     Monitor::class,
-    NetworkEquipment::class
+    NetworkEquipment::class,
 ];
 
 $carbon_emission_table = 'glpi_plugin_carbon_carbonemissions';
@@ -78,20 +77,20 @@ foreach ($itemtypes as $itemtype) {
             $location_table => [
                 'FKEY' => [
                     $location_table => 'id',
-                    $item_table     => 'locations_id'
-                ]
-            ]
+                    $item_table     => 'locations_id',
+                ],
+            ],
         ],
         'WHERE' => [
             Location::getTableField('state') => 'Quebec',
-        ]
+        ],
     ];
     $subquery = new QuerySubQuery($request);
     $DB->delete(
         $carbon_emission_table,
         [
             'itemtype' => $itemtype,
-            'items_id' => $subquery
+            'items_id' => $subquery,
         ]
     );
 }

@@ -36,13 +36,12 @@ use Config;
 use CronTask;
 use DisplayPreference;
 use Glpi\Dashboard\Dashboard;
-use Glpi\Dashboard\Dashboard_Item;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\Uninstall;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Plugin;
 use ProfileRight;
-use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(Uninstall::class)]
 class PluginUninstallTest extends CommonTestCase

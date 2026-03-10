@@ -50,10 +50,10 @@ class SearchTest extends DbTestCase
             'criteria' => [
                 ['field' => SearchOptions::IS_HISTORIZABLE,
                     'searchtype' => 'equals',
-                    'value'      => '1'
+                    'value'      => '1',
                 ],
             ],
-            'reset'    => 'reset'
+            'reset'    => 'reset',
         ];
 
         $data = Search::getDatas(Computer::class, $criterias);
@@ -64,10 +64,10 @@ class SearchTest extends DbTestCase
             'criteria' => [
                 ['field' => SearchOptions::IS_HISTORIZABLE,
                     'searchtype' => 'equals',
-                    'value'      => '1'
+                    'value'      => '1',
                 ],
             ],
-            'reset'    => 'reset'
+            'reset'    => 'reset',
         ];
 
         $data = Search::getDatas(NetworkEquipment::class, $criterias);
@@ -78,10 +78,10 @@ class SearchTest extends DbTestCase
             'criteria' => [
                 ['field' => SearchOptions::IS_HISTORIZABLE,
                     'searchtype' => 'equals',
-                    'value'      => '1'
+                    'value'      => '1',
                 ],
             ],
-            'reset'    => 'reset'
+            'reset'    => 'reset',
         ];
 
         $data = Search::getDatas(Monitor::class, $criterias);
