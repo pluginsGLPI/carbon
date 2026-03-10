@@ -35,7 +35,7 @@ namespace GlpiPlugin\Carbon;
 use CommonDBTM;
 use DBmysql;
 use DBmysqlIterator;
-use Glpi\DBAL\QuerySubQuery;
+use Toolbox as GlpiToolbox;
 
 /**
  * Embodied impact of assets
@@ -44,6 +44,11 @@ use Glpi\DBAL\QuerySubQuery;
  */
 class EmbodiedImpact extends AbstractImpact
 {
+    public static function getTypeName($nb = 0)
+    {
+        return _n("Embodied impact", "Embodied impacts", $nb, 'carbon');
+    }
+
     public function canEdit($ID): bool
     {
         return false;
@@ -63,9 +68,9 @@ class EmbodiedImpact extends AbstractImpact
         global $DB;
 
         // Check $itemtype inherits from CommonDBTM
-        // if (!is_subclass_of($itemtype, CommonDBTM::class)) {
-        //     throw new \LogicException('itemtype is not a CommonDBTM object');
-        // }
+        if (!GlpiToolbox::isCommonDBTM($itemtype)) {
+            throw new \LogicException('itemtype is not a CommonDBTM object');
+        }
 
         // clean $crit array: remove mostly SELECT, FROM
         $crit = array_intersect_key($crit, array_flip([
@@ -79,27 +84,30 @@ class EmbodiedImpact extends AbstractImpact
             'LIMIT',
         ]));
 
-        // Add itemtype to criteria
-        $crit['WHERE']['itemtype'] = $itemtype;
-
         $table = self::getTable();
         $itemtype_table = $itemtype::getTable();
-        // Prepare sub query to filter out items already calculated
-        $sub_query = [
+
+        $iterator = $DB->request(array_merge_recursive([
             'SELECT' => [
-                'items_id',
-            ],
-            'FROM' => $table,
-        ] + $crit;
-        $iterator = $DB->request([
-            'SELECT' => [
-                'id',
+                $itemtype::getTableField('id'),
             ],
             'FROM' => $itemtype_table,
-            'WHERE' => [
-                ['NOT' => ['id' =>  new QuerySubQuery($sub_query)]],
+            'LEFT JOIN' => [
+                $table => [
+                    'FKEY' => [
+                        $table => 'items_id',
+                        $itemtype_table => 'id',
+
+                    ],
+                    'AND' => [
+                        'itemtype' => $itemtype,
+                    ],
+                ],
             ],
-        ]);
+            'WHERE' => [
+                self::getTableField('items_id') => null,
+            ],
+        ], $crit));
 
         return $iterator;
     }
