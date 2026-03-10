@@ -33,9 +33,9 @@
 namespace GlpiPlugin\Carbon\Tests;
 
 use GlpiPlugin\Carbon\Profile;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Profile as GlpiProfile;
 use Symfony\Component\DomCrawler\Crawler;
-use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(Profile::class)]
 class ProfileTest extends DbTestCase

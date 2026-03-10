@@ -58,7 +58,7 @@ if (isset($_POST['update'])) {
         sprintf(__('%s updates an item'), $_SESSION['glpiname'])
     );
     Html::back();
-} else if (isset($_POST['reset'])) {
+} elseif (isset($_POST['reset'])) {
     if (!isset($_POST['id'])) {
         Session::addMessageAfterRedirect(__('Missing arguments in request.', 'carbon'), false, ERROR);
         Html::back();
@@ -81,7 +81,7 @@ if (isset($_POST['update'])) {
     if (!$embodied_impact->delete($embodied_impact->fields)) {
         Session::addMessageAfterRedirect(__('Reset failed.', 'carbon'), false, ERROR);
     }
-} else if (isset($_POST['calculate'])) {
+} elseif (isset($_POST['calculate'])) {
     if (!isset($_POST['itemtype']) || !isset($_POST['items_id'])) {
         Session::addMessageAfterRedirect(__('Missing arguments in request.', 'carbon'), false, ERROR);
         Html::back();

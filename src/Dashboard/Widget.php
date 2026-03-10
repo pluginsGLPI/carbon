@@ -36,16 +36,13 @@ use Computer;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
-use Html;
 use Glpi\Application\View\TemplateRenderer;
 use Glpi\Dashboard\Widget as GlpiDashboardWidget;
-use GlpiPlugin\Carbon\Documentation;
 use GlpiPlugin\Carbon\Impact\Type;
-use GlpiPlugin\Carbon\Report;
 use GlpiPlugin\Carbon\Toolbox;
+use Html;
 use Monitor;
 use NetworkEquipment;
-use Plugin;
 use Toolbox as GlpiToolbox;
 
 class Widget extends GlpiDashboardWidget
@@ -135,7 +132,7 @@ class Widget extends GlpiDashboardWidget
                 'image'      => '',
                 'width'    => 6,
                 'height'   => 3,
-            ]
+            ],
         ];
 
         // Data diagnostic
@@ -180,7 +177,7 @@ class Widget extends GlpiDashboardWidget
                 'image'    => '',
                 'width'    => 4,
                 'height'   => 4,
-            ]
+            ],
         ];
         // 'graphpertype' => [
         //     'label'    => __('Carbon Emission Per Type', 'carbon'),
@@ -529,7 +526,7 @@ class Widget extends GlpiDashboardWidget
                 'bar' => [
                     'horizontal' => false,
                     'columnWidth' => '55%',
-                    'endingShape' => 'rounded'
+                    'endingShape' => 'rounded',
                 ],
             ],
             'dataLabels' => [
@@ -542,22 +539,22 @@ class Widget extends GlpiDashboardWidget
             'labels' => [],
             'stroke' => [
                 'width' => [0, 4],
-                'curve' => 'smooth'
+                'curve' => 'smooth',
             ],
             'series' => [
                 [
                     'name' =>  __('Carbon emission', 'carbon'),
                     'type' => 'bar',
-                    'data' => []
+                    'data' => [],
                 ],
                 [
                     'name' => __('Consumed energy', 'carbon'),
                     'type' => 'line',
-                    'data' => []
+                    'data' => [],
                 ],
             ],
             'xaxis' => [
-                'categories' => []
+                'categories' => [],
             ],
             'yaxis' => [
                 [
@@ -565,7 +562,7 @@ class Widget extends GlpiDashboardWidget
                 ], [
                     'opposite' => true,
                     'title' => ['text' => __('Consumed energy', 'carbon')],
-                ]
+                ],
             ],
             'markers' => [
                 'size' => [3, 3],
@@ -627,28 +624,28 @@ class Widget extends GlpiDashboardWidget
                 'pie' => [
                     'startAngle' => -90,
                     'endAngle' => 90,
-                    'offsetY' => 10
-                ]
+                    'offsetY' => 10,
+                ],
             ],
             'grid' => [
                 'padding' => [
-                    'bottom' => -80
-                ]
+                    'bottom' => -80,
+                ],
             ],
             'responsive' => [[
                 'breakpoint' => 480,
                 'options' => [
                     'chart' => [
-                        'width' => 200
+                        'width' => 200,
                     ],
                     'legend' => [
-                        'position' => 'bottom'
-                    ]
-                ]
-            ]
+                        'position' => 'bottom',
+                    ],
+                ],
+            ],
             ],
             'subtitle' => [
-                'style' => []
+                'style' => [],
             ],
             'series' => [],
             'labels' => [],
@@ -798,7 +795,7 @@ class Widget extends GlpiDashboardWidget
             'filters' => [], // TODO: Not implemented yet (is this useful ?)
         ];
         $p = array_merge($default, $params);
-        list($start_date, $end_date) = (new Toolbox())->yearToLastMonth(new DateTimeImmutable('now'));
+        [$start_date, $end_date] = (new Toolbox())->yearToLastMonth(new DateTimeImmutable('now'));
         $end_date->setDate((int) $end_date->format('Y'), (int) $end_date->format('m'), 0);
         $date_format = 'Y F';
         switch ($_SESSION['glpidate_format'] ?? 0) {
@@ -1082,7 +1079,7 @@ class Widget extends GlpiDashboardWidget
             'rand'         => mt_rand(),
         ];
         $p = array_merge($default, $params);
-        $p['cache_key'] = $p['cache_key'] ?? $p['rand'];
+        $p['cache_key'] ??= $p['rand'];
 
         $nodata   = isset($p['data']['nodata']) && $p['data']['nodata'];
 
@@ -1146,9 +1143,9 @@ class Widget extends GlpiDashboardWidget
                 'text' => $p['label'],
             ],
             'dataLabels' => [
-            //     'style' => [
-            //         'colors' => [$fg_color],
-            //     ]
+                //     'style' => [
+                //         'colors' => [$fg_color],
+                //     ]
                 'background' => [
                     'enabled' => true,
                     'foreColor' => $fg_color,

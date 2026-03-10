@@ -78,7 +78,7 @@ class DemoProvider
         ];
         $params = array_merge($default_params, $params);
 
-        list($start_date, $end_date) = (new Toolbox())->yearToLastMonth(new DateTimeImmutable('now'));
+        [$start_date, $end_date] = (new Toolbox())->yearToLastMonth(new DateTimeImmutable('now'));
         $params['args']['apply_filters']['dates'][0] = $start_date->format('Y-m-d\TH:i:s.v\Z');
         $params['args']['apply_filters']['dates'][1] = $end_date->format('Y-m-d\TH:i:s.v\Z');
 
@@ -203,10 +203,10 @@ class DemoProvider
                     'data' => [
                         [
                             'x' => 114.840,
-                            'y' => '2025-02'
+                            'y' => '2025-02',
                         ], [
                             'x' => 126.342,
-                            'y' => '2025-03'
+                            'y' => '2025-03',
                         ],
                     ],
                     'unit' => 'KWh',
@@ -225,7 +225,7 @@ class DemoProvider
             'date_interval' => [
                 $start_date->format($date_format),
                 $end_date->format($date_format),
-            ]
+            ],
         ];
 
         return [
@@ -238,8 +238,8 @@ class DemoProvider
     {
         $itemtype_name = $itemtype::getTypeName(Session::getPluralNumber());
         $itemtype_name = strtolower($itemtype_name);
-        $label = $handled ?
-            __("plugin carbon - handled %s", 'carbon')
+        $label = $handled
+            ? __("plugin carbon - handled %s", 'carbon')
             : __("plugin carbon - unhandled %s", 'carbon');
         $default_params = [
             'label' => sprintf($label, $itemtype_name),
@@ -284,7 +284,7 @@ class DemoProvider
 
         $data = [
             'labels' => [],
-            'series' => []
+            'series' => [],
         ];
         foreach ($itemtypes as $itemtype) {
             $itemtype_name = $itemtype::getTypeName(Session::getPluralNumber());
@@ -297,7 +297,7 @@ class DemoProvider
             $data['series'][0]['name'] = __('Handled', 'carbon');
             $data['series'][0]['data'][] = [
                 'value' => $handled['number'],
-                'url'   => $handled['url']
+                'url'   => $handled['url'],
             ];
             $data['series'][1]['name'] = __('Unhandled', 'carbon');
             $data['series'][1]['data'][] = [
@@ -358,7 +358,7 @@ class DemoProvider
         ];
 
         return [
-            'data' => $data
+            'data' => $data,
         ];
     }
 

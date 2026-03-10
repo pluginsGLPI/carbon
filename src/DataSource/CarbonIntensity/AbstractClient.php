@@ -33,16 +33,16 @@
 namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity;
 
 use Config as GlpiConfig;
-use DBmysql;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
-use Toolbox as GlpiToolbox;
+use DBmysql;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 use Symfony\Component\Console\Helper\ProgressBar;
+use Toolbox as GlpiToolbox;
 
 abstract class AbstractClient implements ClientInterface
 {
@@ -145,13 +145,13 @@ abstract class AbstractClient implements ClientInterface
                     'ON' => [
                         $zone_table => 'id',
                         $source_zone_table => $zone_fk,
-                    ]
+                    ],
                 ],
                 $source_table => [
                     'ON' => [
                         $source_table => 'id',
                         $source_zone_table => $source_fk,
-                    ]
+                    ],
                 ],
             ],
             'WHERE' => [
@@ -179,7 +179,7 @@ abstract class AbstractClient implements ClientInterface
         /**
          * Huge quantity of SQL queries will be executed
          * We NEED to check memory usage to avoid running out of memory
-         * @see DbMysql::doQuery()
+         * @see DBmysql::doQuery()
          */
         $memory_limit = GlpiToolbox::getMemoryLimit() - 8 * 1024 * 1024;
         if ($memory_limit < 0) {

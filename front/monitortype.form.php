@@ -32,8 +32,8 @@
 
 include(__DIR__ . "/../../../inc/includes.php");
 
-use GlpiPlugin\Carbon\MonitorType;
 use Glpi\Exception\Http\NotFoundHttpException;
+use GlpiPlugin\Carbon\MonitorType;
 use MonitorType as GlpiMonitorType;
 
 if (!Plugin::isPluginActive('carbon')) {

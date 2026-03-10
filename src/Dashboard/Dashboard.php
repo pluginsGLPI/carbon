@@ -33,7 +33,6 @@
 namespace GlpiPlugin\Carbon\Dashboard;
 
 use ComputerModel;
-use GlpiPlugin\Carbon\Toolbox;
 
 class Dashboard
 {

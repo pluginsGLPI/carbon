@@ -33,13 +33,11 @@
 namespace GlpiPlugin\Carbon;
 
 use Config;
+use CronTask as GlpiCronTask;
 use DBmysql;
 use DisplayPreference;
-use Migration;
-use ProfileRight;
-use CronTask as GlpiCronTask;
 use Glpi\Dashboard\Dashboard;
-use GlpiPlugin\Carbon\CronTask;
+use ProfileRight;
 
 class Uninstall
 {

@@ -35,8 +35,8 @@ namespace GlpiPlugin\Carbon;
 use CommonDBChild;
 use CommonDBTM;
 use CommonGLPI;
-use Session;
 use Glpi\Application\View\TemplateRenderer;
+use Session;
 
 abstract class AbstractType extends CommonDBChild
 {
@@ -70,8 +70,8 @@ abstract class AbstractType extends CommonDBChild
      * Undocumented function
      *
      * @param CommonGLPI $item
-     * @param integer $tabnum
-     * @param integer $withtemplate
+     * @param int $tabnum
+     * @param int $withtemplate
      * @return void
      */
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
@@ -99,7 +99,7 @@ abstract class AbstractType extends CommonDBChild
         $this->getFromDBByCrit([$item_fk => $item->getID()]);
         if ($this->isNewItem()) {
             $this->add([
-                $item_fk => $item->getID()
+                $item_fk => $item->getID(),
             ]);
         }
         return $this->isNewItem();

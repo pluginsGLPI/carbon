@@ -33,10 +33,10 @@
 namespace GlpiPlugin\Carbon\Impact\Embodied\Internal;
 
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
-use NetworkEquipment as GlpiNetworkEquipment;
-use NetworkEquipmentModel as GlpiNetworkEquipmentModel;
 use GlpiPlugin\Carbon\Impact\Type;
 use GlpiPlugin\Carbon\NetworkEquipmentModel;
+use NetworkEquipment as GlpiNetworkEquipment;
+use NetworkEquipmentModel as GlpiNetworkEquipmentModel;
 
 /**
  * This embodied impact
@@ -53,7 +53,7 @@ class NetworkEquipment extends AbstractAsset
 
         $model = new NetworkEquipmentModel();
         $success = $model->getFromDBByCrit([
-            'networkequipmentmodels_id' => $this->item->fields['networkequipmentmodels_id']
+            'networkequipmentmodels_id' => $this->item->fields['networkequipmentmodels_id'],
         ]);
         if ($success === false) {
             return [];

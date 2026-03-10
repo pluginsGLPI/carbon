@@ -32,10 +32,10 @@
 
 namespace GlpiPlugin\Carbon;
 
-use Computer as GlpiComputer;
 use CommonDBChild;
 use CommonDBTM;
 use CommonGLPI;
+use Computer as GlpiComputer;
 use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\Dashboard\Provider;
 use GlpiPlugin\Carbon\Dashboard\Widget;
@@ -98,8 +98,8 @@ class UsageInfo extends CommonDBChild
      * Undocumented function
      *
      * @param CommonGLPI $item
-     * @param integer $tabnum
-     * @param integer $withtemplate
+     * @param int $tabnum
+     * @param int $withtemplate
      * @return void
      */
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
@@ -110,13 +110,13 @@ class UsageInfo extends CommonDBChild
             $usage_info = new self();
             $usage_info->getFromDBByCrit([
                 'itemtype' => $item->getType(),
-                'items_id' => $item->getID()
+                'items_id' => $item->getID(),
             ]);
             if ($usage_info->isNewItem()) {
                 $usage_info->add(
                     [
                         'itemtype' => $item->getType(),
-                        'items_id' => $item->getID()
+                        'items_id' => $item->getID(),
                     ],
                     [],
                     false

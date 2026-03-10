@@ -34,7 +34,6 @@ namespace GlpiPlugin\Carbon;
 
 use CommonDBTM;
 use CommonDropdown;
-use CommonGLPI;
 use Computer as GlpiComputer;
 use Entity;
 use Glpi\Application\View\TemplateRenderer;
@@ -62,12 +61,12 @@ class ComputerUsageProfile extends CommonDropdown
         $this->initForm($ID, $options);
         $new_item = static::isNewID($ID);
         $in_modal = (bool) ($_GET['_in_modal'] ?? false);
-        $this->fields['time_start'] = $this->fields['time_start'] ?? '00:00:00';
-        $this->fields['time_stop'] = $this->fields['time_stop'] ?? '00:00:00';
+        $this->fields['time_start'] ??= '00:00:00';
+        $this->fields['time_stop'] ??= '00:00:00';
         TemplateRenderer::getInstance()->display('@carbon/computerusageprofile.html.twig', [
             'item'   => $this,
             'params' => $options,
-            'no_header' => !$new_item && !$in_modal
+            'no_header' => !$new_item && !$in_modal,
         ]);
         return true;
     }
@@ -107,7 +106,7 @@ class ComputerUsageProfile extends CommonDropdown
      * Check format of time string against HH:MM:SS pattern
      *
      * @param string $time
-     * @return boolean
+     * @return bool
      */
     protected function isValidTime(string $time): bool
     {
@@ -123,14 +122,14 @@ class ComputerUsageProfile extends CommonDropdown
                 'name'      => 'time_start',
                 'type'      => 'dropdownValue',
                 'label'     => __('Start time', 'carbon'),
-                'list'      => false
+                'list'      => false,
             ],
             [
                 'name'      => 'time_stop',
                 'type'      => 'parent',
                 'label'     => __('As child of'),
-                'list'      => false
-            ]
+                'list'      => false,
+            ],
         ];
     }
 

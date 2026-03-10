@@ -89,7 +89,7 @@ abstract class AbstractTracked
      *
      * @param string $name
      * @param array $options
-     * @return integer|string
+     * @return int|string
      */
     public static function dropdownQuality(string $name, array $options = [])
     {

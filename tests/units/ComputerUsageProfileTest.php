@@ -35,10 +35,9 @@ namespace GlpiPlugin\Carbon\Tests;
 use CommonDBTM;
 use Computer as GlpiComputer;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
-use GlpiPlugin\Carbon\Tests\DbTestCase;
 use MassiveAction;
-use Symfony\Component\DomCrawler\Crawler;
 use PHPUnit\Framework\Attributes\CoversClass;
+use Symfony\Component\DomCrawler\Crawler;
 
 #[CoversClass(ComputerUsageProfile::class)]
 class ComputerUsageProfileTest extends DbTestCase
@@ -150,8 +149,7 @@ class ComputerUsageProfileTest extends DbTestCase
      */
     public function testAssignToItem()
     {
-        $invalid_item = new class extends CommonDBTM {
-        };
+        $invalid_item = new class extends CommonDBTM {};
         /** @var ComputerUsageProfile $usage_profile */
         $usage_profile = $this->createItem(ComputerUsageProfile::class, ['name' => 'Test Usage Profile']);
         $result = $usage_profile->assignToItem($invalid_item);
@@ -178,7 +176,7 @@ class ComputerUsageProfileTest extends DbTestCase
             ->getMock();
         $massive_action->method('getAction')->willReturn('MassAssociateItems');
         $massive_action->method('getItems')->willReturn([
-            GlpiComputer::class => $this->createItem(GlpiComputer::class)
+            GlpiComputer::class => $this->createItem(GlpiComputer::class),
         ]);
         ob_start(function ($buffer) {
             return $buffer;

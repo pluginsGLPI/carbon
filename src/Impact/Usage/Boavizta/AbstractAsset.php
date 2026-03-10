@@ -38,8 +38,8 @@ use DateTime;
 use DbUtils;
 use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\Client;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
-use GlpiPlugin\Carbon\Impact\Usage\AbstractUsageImpact;
 use GlpiPlugin\Carbon\Impact\Type;
+use GlpiPlugin\Carbon\Impact\Usage\AbstractUsageImpact;
 use GlpiPlugin\Carbon\Location;
 use Location as GlpiLocation;
 
@@ -243,7 +243,7 @@ abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterfa
                 ],
                 'WHERE' => [
                     GlpiLocation::getTableField('id') => $item->fields['locations_id'],
-                ]
+                ],
             ]);
 
             if ($found === false) {

@@ -35,7 +35,6 @@ namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\ElectricityMaps;
 use Config as GlpiConfig;
 use Glpi\Application\View\TemplateRenderer;
 use GLPIKey;
-use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ElectricityMaps\Config;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -57,7 +56,7 @@ class ConfigTest extends DbTestCase
         $context = [
             'current_config' => [
                 'electricitymap_api_key' => 'foo',
-            ]
+            ],
         ];
         $this->login('glpi', 'glpi');
         $instance = new Config();
@@ -77,7 +76,7 @@ class ConfigTest extends DbTestCase
         yield [
             [
                 'electricitymap_api_key' => '',
-            ], []
+            ], [],
         ];
 
         yield [
@@ -85,7 +84,7 @@ class ConfigTest extends DbTestCase
                 'electricitymap_api_key' => 'foo',
             ], [
                 'electricitymap_api_key' => 'foo',
-            ]
+            ],
         ];
     }
 
@@ -101,7 +100,7 @@ class ConfigTest extends DbTestCase
         global $CFG_GLPI;
 
         $CFG_GLPI['plugi:carbon']['lca_datasources'] = [
-            Client::class
+            Client::class,
         ];
 
         $instance = new Config();
@@ -113,7 +112,7 @@ class ConfigTest extends DbTestCase
     {
         // Test an overridable configuration value, not overriden
         GlpiConfig::setConfigurationValues('plugin:carbon', [
-            'electricitymap_api_key' => 'bar'
+            'electricitymap_api_key' => 'bar',
         ]);
         $result = Config::getConfigurationValue('electricitymap_api_key');
         $glpi_key = new GLPIKey();

@@ -41,7 +41,7 @@ $migration->addField(
     [
         'after'     => 'is_fallback',
         'update'    => 1,
-        'condition' => "WHERE `name` IN ('RTE', 'ElectricityMap', 'Ember - Energy Institute', 'Hydro Quebec')"
+        'condition' => "WHERE `name` IN ('RTE', 'ElectricityMap', 'Ember - Energy Institute', 'Hydro Quebec')",
     ]
 );
 $migration->changeField(
@@ -57,7 +57,7 @@ $migration->addField(
     'plugin_carbon_sources_zones_id',
     'fkey',
     [
-        'after'     => 'boavizta_zone'
+        'after'     => 'boavizta_zone',
     ]
 );
 $migration->migrationOneTable($table);
@@ -69,7 +69,7 @@ $migration->addField(
     'is_ignore',
     'bool',
     [
-        'after'     => 'category'
+        'after'     => 'category',
     ]
 );
 
@@ -79,7 +79,7 @@ $migration->addField(
     'is_ignore',
     'bool',
     [
-        'after'     => 'power_consumption'
+        'after'     => 'power_consumption',
     ]
 );
 
@@ -89,6 +89,6 @@ $migration->addField(
     'is_ignore',
     'bool',
     [
-        'after'     => 'power_consumption'
+        'after'     => 'power_consumption',
     ]
 );

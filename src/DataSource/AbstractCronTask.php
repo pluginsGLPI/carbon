@@ -32,9 +32,7 @@
 
 namespace GlpiPlugin\Carbon\DataSource;
 
-use CommonDBTM;
 use CommonGLPI;
-use GlpiPlugin\Carbon\Source_Zone;
 
 abstract class AbstractCronTask extends CommonGLPI implements CronTaskInterface
 {

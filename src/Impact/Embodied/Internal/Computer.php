@@ -33,9 +33,9 @@
 namespace GlpiPlugin\Carbon\Impact\Embodied\Internal;
 
 use Computer as GlpiComputer;
-use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use ComputerModel as GlpiComputerModel;
 use GlpiPlugin\Carbon\ComputerModel;
+use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\Impact\Type;
 
 /**
@@ -53,7 +53,7 @@ class Computer extends AbstractAsset
 
         $model = new ComputerModel();
         $model->getFromDBByCrit([
-            'computermodels_id' => $this->item->fields['computermodels_id']
+            'computermodels_id' => $this->item->fields['computermodels_id'],
         ]);
         if ($model->isNewItem()) {
             return [];

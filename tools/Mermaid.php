@@ -40,7 +40,7 @@ if (PHP_SAPI != 'cli') {
 
 class Mermaid
 {
-    const CARDINALITY = [
+    public const CARDINALITY = [
         '0,1' => ['|o', 'o|'],
         '1'   => ['||', '||'],
         '0,n' => ['}o', 'o{'],

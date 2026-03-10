@@ -1,5 +1,7 @@
 <?php
 
+use GlpiPlugin\Carbon\CarbonDataProviderFrance;
+
 /**
  * -------------------------------------------------------------------------
  * Carbon plugin for GLPI
@@ -32,6 +34,6 @@
 
 include("../../../inc/includes.php");
 
-$provider = new GlpiPlugin\Carbon\CarbonDataProviderFrance();
+$provider = new CarbonDataProviderFrance();
 
 print_r($provider->getCarbonIntensity('FR', '', '', new DateTime()));

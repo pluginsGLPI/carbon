@@ -32,35 +32,36 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Auth;
 use CommonDBTM;
 use Computer as GlpiComputer;
-use ComputerType as GlpiComputerType;
-use DateTime;
-use DateInterval;
-use DateTimeInterface;
 use ComputerModel as GlpiComputerModel;
-use Glpi\Inventory\Conf;
-use GlpiPlugin\Carbon\UsageInfo;
-use GlpiPlugin\Carbon\ComputerUsageProfile;
-use GlpiPlugin\Carbon\ComputerType;
-use GlpiPlugin\Carbon\Source;
-use GlpiPlugin\Carbon\Zone;
-use GlpiPlugin\Carbon\CarbonIntensity;
+use ComputerType as GlpiComputerType;
+use DateInterval;
+use DateTime;
+use DateTimeInterface;
 use Entity;
+use Glpi\Asset\Asset_PeripheralAsset;
+use Glpi\Inventory\Conf;
 use GlpiPlugin\Carbon\CarbonEmission;
+use GlpiPlugin\Carbon\CarbonIntensity;
+use GlpiPlugin\Carbon\ComputerType;
+use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\Location;
+use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
+use GlpiPlugin\Carbon\UsageInfo;
+use GlpiPlugin\Carbon\Zone;
 use Location as GlpiLocation;
+use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 use Session;
 use Toolbox;
 
 class CommonTestCase extends TestCase
 {
-    /** @var integer $debugMode save state of GLPI debug mode */
+    /** @var int $debugMode save state of GLPI debug mode */
     private $debugMode = null;
 
     protected $str = null;
@@ -307,7 +308,7 @@ class CommonTestCase extends TestCase
             $item = $this->createItem(
                 CarbonIntensity::class,
                 $crit + [
-                    'data_quality' => AbstractTracked::DATA_QUALITY_MANUAL
+                    'data_quality' => AbstractTracked::DATA_QUALITY_MANUAL,
                 ],
             );
             $current_date->add($one_hour);
@@ -484,7 +485,7 @@ class CommonTestCase extends TestCase
     {
         if (version_compare(GLPI_VERSION, '11.0.0-beta') >= 0) {
             if ($itemtype === \Computer_Item::class) {
-                $itemtype = \Glpi\Asset\Asset_PeripheralAsset::class;
+                $itemtype = Asset_PeripheralAsset::class;
                 $input['itemtype_asset'] = GlpiComputer::class;
                 $input['items_id_asset'] = $input['computers_id'];
                 $input['itemtype_peripheral'] = $input['itemtype'];
@@ -513,7 +514,7 @@ class CommonTestCase extends TestCase
         $rand        = mt_rand();
         $entities_id = $entity->add([
             'name'        => "test sub entity $rand",
-            'entities_id' => 0
+            'entities_id' => 0,
         ]);
 
         $success = Session::changeActiveEntities($entities_id);

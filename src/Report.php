@@ -36,9 +36,8 @@ use CommonDBTM;
 use DateTime;
 use DateTimeImmutable;
 use Glpi\Application\View\TemplateRenderer;
-use GlpiPlugin\Carbon\Dashboard\Provider;
 use Glpi\Dashboard\Grid as DashboardGrid;
-use Plugin;
+use GlpiPlugin\Carbon\Dashboard\Provider;
 
 class Report extends CommonDBTM
 {
@@ -69,7 +68,7 @@ class Report extends CommonDBTM
                 'links' => [
                     'search' => Report::getSearchURL(),
                     'lists' => '',
-                ]
+                ],
             ];
         }
 
@@ -121,7 +120,7 @@ class Report extends CommonDBTM
     public static function getUsageCarbonEmission(array $params = []): array
     {
         if (!isset($params['args']['apply_filters']['dates'][0]) || !isset($params['args']['apply_filters']['dates'][1])) {
-            list($start_date, $end_date) = (new Toolbox())->yearToLastMonth(new DateTimeImmutable('now'));
+            [$start_date, $end_date] = (new Toolbox())->yearToLastMonth(new DateTimeImmutable('now'));
             $params['apply_filters']['dates'][0] = $start_date->format('Y-m-d\TH:i:s.v\Z');
             $params['apply_filters']['dates'][1] = $end_date->format('Y-m-d\TH:i:s.v\Z');
         } else {
@@ -158,7 +157,7 @@ class Report extends CommonDBTM
     public static function getTotalEmbodiedCarbonEmission(array $params = []): array
     {
         if (!isset($params['args']['apply_filters']['dates'][0]) || !isset($params['args']['apply_filters']['dates'][1])) {
-            list($start_date, $end_date) = (new Toolbox())->yearToLastMonth(new DateTimeImmutable('now'));
+            [$start_date, $end_date] = (new Toolbox())->yearToLastMonth(new DateTimeImmutable('now'));
             $params['args']['apply_filters']['dates'][0] = $start_date->format('Y-m-d\TH:i:s.v\Z');
             $params['args']['apply_filters']['dates'][1] = $end_date->format('Y-m-d\TH:i:s.v\Z');
         } else {

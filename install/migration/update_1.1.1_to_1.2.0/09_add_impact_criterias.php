@@ -97,14 +97,14 @@ foreach ($tables as $table) {
     // Add a recalculate boolean
     $migration->addField($table, 'recalculate', 'bool', [
         'after' => 'date_mod',
-        'update' => 1
+        'update' => 1,
     ]);
 }
 
 // Rename cards for the report
 $dashboard_item = new DashboardItem();
 $rows = $dashboard_item->find([
-    'card_id' => 'plugin_carbon_report_embodied_global_warming'
+    'card_id' => 'plugin_carbon_report_embodied_global_warming',
 ]);
 foreach ($rows as $row) {
     $card_options = json_decode($row['card_options'], true);
@@ -120,7 +120,7 @@ foreach ($rows as $row) {
 
 $dashboard_item = new DashboardItem();
 $rows = $dashboard_item->find([
-    'card_id' => 'plugin_carbon_report_usage_abiotic_depletion'
+    'card_id' => 'plugin_carbon_report_usage_abiotic_depletion',
 ]);
 foreach ($rows as $row) {
     $card_options = json_decode($row['card_options'], true);
@@ -136,7 +136,7 @@ foreach ($rows as $row) {
 
 $dashboard_item = new DashboardItem();
 $rows = $dashboard_item->find([
-    'card_id' => 'plugin_carbon_report_embodied_abiotic_depletion'
+    'card_id' => 'plugin_carbon_report_embodied_abiotic_depletion',
 ]);
 foreach ($rows as $row) {
     $card_options = json_decode($row['card_options'], true);
@@ -152,7 +152,7 @@ foreach ($rows as $row) {
 
 $dashboard_item = new DashboardItem();
 $rows = $dashboard_item->find([
-    'card_id' => 'plugin_carbon_report_embodied_pe_impact'
+    'card_id' => 'plugin_carbon_report_embodied_pe_impact',
 ]);
 foreach ($rows as $row) {
     $card_options = json_decode($row['card_options'], true);
@@ -170,7 +170,7 @@ foreach ($rows as $row) {
 
 $dashboard_item = new DashboardItem();
 $rows = $dashboard_item->find([
-    'card_id' => 'plugin_carbon_total_usage_power'
+    'card_id' => 'plugin_carbon_total_usage_power',
 ]);
 foreach ($rows as $row) {
     $dashboard_item->update([
@@ -181,7 +181,7 @@ foreach ($rows as $row) {
 
 $dashboard_item = new DashboardItem();
 $rows = $dashboard_item->find([
-    'card_id' => 'plugin_carbon_total_usage_carbon_emission'
+    'card_id' => 'plugin_carbon_total_usage_carbon_emission',
 ]);
 foreach ($rows as $row) {
     $dashboard_item->update([
@@ -192,7 +192,7 @@ foreach ($rows as $row) {
 
 $dashboard_item = new DashboardItem();
 $rows = $dashboard_item->find([
-    'card_id' => 'plugin_carbon_total_usage_adp_impact'
+    'card_id' => 'plugin_carbon_total_usage_adp_impact',
 ]);
 foreach ($rows as $row) {
     $dashboard_item->update([
@@ -204,7 +204,7 @@ foreach ($rows as $row) {
 // Rename cards for the standard dashboard : Embodied + usage indicators
 $dashboard_item = new DashboardItem();
 $rows = $dashboard_item->find([
-    'card_id' => 'plugin_carbon_total_gwp_impact'
+    'card_id' => 'plugin_carbon_total_gwp_impact',
 ]);
 foreach ($rows as $row) {
     $dashboard_item->update([
@@ -215,7 +215,7 @@ foreach ($rows as $row) {
 
 $dashboard_item = new DashboardItem();
 $rows = $dashboard_item->find([
-    'card_id' => 'plugin_carbon_total_adp_impact'
+    'card_id' => 'plugin_carbon_total_adp_impact',
 ]);
 foreach ($rows as $row) {
     $dashboard_item->update([

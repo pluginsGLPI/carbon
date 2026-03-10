@@ -32,9 +32,9 @@
 
 namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity;
 
+use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ElectricityMaps\Client as ElectricityMapsClient;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
-use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ElectricityMaps\Client as ElectricityMapsClient;
 
 #[CoversClass(ClientFactory::class)]
 class ClientFactoryTest extends DbTestCase
@@ -70,7 +70,7 @@ class ClientFactoryTest extends DbTestCase
         // This tests takes into account the available data sources
         $result = ClientFactory::getSecuredConfigs();
         $expected = [
-            'electricitymap_api_key'
+            'electricitymap_api_key',
         ];
         $this->assertSame($expected, $result);
     }

@@ -33,13 +33,13 @@
 
 namespace GlpiPlugin\Carbon\Impact\Usage\Boavizta;
 
+use CommonDBTM;
 use DBmysql;
 use DbUtils;
-use CommonDBTM;
-use Monitor as GlpiMonitor;
-use MonitorType as GlpiMonitorType;
-use MonitorModel as GlpiMonitorModel;
 use Glpi\DBAL\QueryExpression;
+use Monitor as GlpiMonitor;
+use MonitorModel as GlpiMonitorModel;
+use MonitorType as GlpiMonitorType;
 
 class Monitor extends AbstractAsset
 {
@@ -60,7 +60,7 @@ class Monitor extends AbstractAsset
         $description = [
             'configuration' => $configuration,
             'usage' => [
-                'avg_power' => 0
+                'avg_power' => 0,
             ],
         ];
         $response = $this->query($description);
@@ -76,7 +76,7 @@ class Monitor extends AbstractAsset
         // Disable usage
         $this->hardware['configuration'] = $configuration;
         $this->hardware['usage'] = [
-            'avg_power' => 0
+            'avg_power' => 0,
         ];
 
         return $configuration;
@@ -107,12 +107,12 @@ class Monitor extends AbstractAsset
                     'FKEY' => [
                         $item_table => $glpi_type_fk,
                         $item_glpi_type_table => 'id',
-                    ]
+                    ],
                 ],
             ],
             'WHERE' => [
-                $itemtype::getTableField('id') => $id
-            ]
+                $itemtype::getTableField('id') => $id,
+            ],
         ];
 
         $result = $DB->request($request);

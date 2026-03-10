@@ -37,19 +37,19 @@ use CommonDBTM;
 use Computer as GlpiComputer;
 use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
-use DeviceProcessor;
-use GlpiPlugin\Carbon\UsageInfo;
-use GlpiPlugin\Carbon\ComputerType;
-use GlpiPlugin\Carbon\ComputerUsageProfile;
 use DBmysql;
 use DbUtils;
+use DeviceProcessor;
+use Glpi\DBAL\QueryExpression;
+use GlpiPlugin\Carbon\ComputerType;
+use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Location;
+use GlpiPlugin\Carbon\UsageInfo;
+use Infocom;
 use Item_DeviceMemory;
 use Item_DeviceProcessor;
 use Item_Devices;
 use Item_Disk;
-use Infocom;
-use Glpi\DBAL\QueryExpression;
 
 class Computer extends AbstractAsset
 {
@@ -80,22 +80,22 @@ class Computer extends AbstractAsset
                     'FKEY'   => [
                         $item_table  => 'locations_id',
                         $location_table => 'id',
-                    ]
+                    ],
                 ],
                 $usage_info_table => [
                     'FKEY'   => [
                         $item_table  => 'id',
                         $usage_info_table => 'items_id',
                         [
-                            'AND' => [UsageInfo::getTableField('itemtype') => self::$itemtype]
-                        ]
-                    ]
+                            'AND' => [UsageInfo::getTableField('itemtype') => self::$itemtype],
+                        ],
+                    ],
                 ],
                 $computerUsageProfile_table => [
                     'FKEY'   => [
                         $usage_info_table  => 'plugin_carbon_computerusageprofiles_id',
                         $computerUsageProfile_table => 'id',
-                    ]
+                    ],
                 ],
             ],
             'LEFT JOIN' => [
@@ -103,13 +103,13 @@ class Computer extends AbstractAsset
                     'FKEY'   => [
                         $item_table  => 'computermodels_id',
                         $item_model_table => 'id',
-                    ]
+                    ],
                 ],
                 $glpi_computertypes_table => [
                     'FKEY'   => [
                         $item_table  => 'computertypes_id',
                         $glpi_computertypes_table => 'id',
-                    ]
+                    ],
                 ],
                 $computertypes_table => [
                     'FKEY'   => [
@@ -118,16 +118,16 @@ class Computer extends AbstractAsset
                         [
                             'AND' => [
                                 'NOT' => [GlpiComputerType::getTableField('id') => null],
-                            ]
-                        ]
-                    ]
+                            ],
+                        ],
+                    ],
                 ],
                 $infocom_table => [
                     'FKEY' => [
                         $infocom_table => 'items_id',
                         $item_table => 'id',
                         ['AND' => [Infocom::getTableField('itemtype') => self::$itemtype]],
-                    ]
+                    ],
                 ],
             ],
             'WHERE' => [
@@ -148,15 +148,15 @@ class Computer extends AbstractAsset
                             ['NOT' => [Infocom::getTableField('buy_date') => null]],
                             ['NOT' => [Infocom::getTableField('date_creation') => null]],
                             ['NOT' => [Infocom::getTableField('date_mod') => null]],
-                        ]
+                        ],
                     ], [
                         'AND' => [
                             ['NOT' => [ComputerType::getTableField('category') => null]],
                             [ComputerType::getTableField('category') => ['>', 0]],
-                        ]
-                    ]
+                        ],
+                    ],
                 ],
-            ] + $crit
+            ] + $crit,
         ];
 
         if ($entity_restrict) {
@@ -192,7 +192,7 @@ class Computer extends AbstractAsset
             'configuration' => $configuration,
             'usage' => [
                 'usage_location' => $zone_code,
-                'avg_power' => $average_power
+                'avg_power' => $average_power,
             ],
         ];
         $response = $this->query($description);
@@ -222,18 +222,18 @@ class Computer extends AbstractAsset
                     'FKEY' => [
                         $computer_type_table => 'computertypes_id',
                         $glpi_computer_type_table => 'id',
-                    ]
+                    ],
                 ],
                 $computer_table => [
                     'FKEY' => [
                         $glpi_computer_type_table => 'id',
-                        $computer_table           => 'computertypes_id'
+                        $computer_table           => 'computertypes_id',
                     ],
                 ],
             ],
             'WHERE' => [
                 GlpiComputer::getTableField('id') => $item->getID(),
-            ]
+            ],
         ]);
         $row_count = $result->count();
         if ($row_count === 0) {
@@ -342,18 +342,18 @@ class Computer extends AbstractAsset
                     'FKEY' => [
                         $item_table => $glpi_type_fk,
                         $item_glpi_type_table => 'id',
-                    ]
+                    ],
                 ],
                 $carbon_item_type_table => [
                     'FKEY' => [
                         $item_glpi_type_table => 'id',
                         $carbon_item_type_table => 'computertypes_id',
-                    ]
-                ]
+                    ],
+                ],
             ],
             'WHERE' => [
-                $itemtype::getTableField('id') => $id
-            ]
+                $itemtype::getTableField('id') => $id,
+            ],
         ];
 
         $result = $DB->request($request);

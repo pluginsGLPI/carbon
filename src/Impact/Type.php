@@ -37,28 +37,28 @@ class Type
 {
     private const BASE_URL = 'https://glpi-plugins.readthedocs.io/%s/latest/carbon';
 
-    const IMPACT_GWP    = 0; // Global warming potential
-    const IMPACT_ADP    = 1; // Abiotic Depletion Potential
-    const IMPACT_PE     = 2; // Primary Energy
-    const IMPACT_GWPPB  = 3;
-    const IMPACT_GWPPF  = 4;
-    const IMPACT_GWPPLU = 5;
-    const IMPACT_IR     = 6;
-    const IMPACT_LU     = 7;
-    const IMPACT_ODP    = 8;
-    const IMPACT_PM     = 9;
-    const IMPACT_POCP   = 10;
-    const IMPACT_WU     = 11;
-    const IMPACT_MIPS   = 12;
-    const IMPACT_ADPE   = 13;
-    const IMPACT_ADPF   = 14;
-    const IMPACT_AP     = 15;
-    const IMPACT_CTUE   = 16;
+    public const IMPACT_GWP    = 0; // Global warming potential
+    public const IMPACT_ADP    = 1; // Abiotic Depletion Potential
+    public const IMPACT_PE     = 2; // Primary Energy
+    public const IMPACT_GWPPB  = 3;
+    public const IMPACT_GWPPF  = 4;
+    public const IMPACT_GWPPLU = 5;
+    public const IMPACT_IR     = 6;
+    public const IMPACT_LU     = 7;
+    public const IMPACT_ODP    = 8;
+    public const IMPACT_PM     = 9;
+    public const IMPACT_POCP   = 10;
+    public const IMPACT_WU     = 11;
+    public const IMPACT_MIPS   = 12;
+    public const IMPACT_ADPE   = 13;
+    public const IMPACT_ADPF   = 14;
+    public const IMPACT_AP     = 15;
+    public const IMPACT_CTUE   = 16;
     // const IMPACT_CTUHC  = 17;
     // const IMPACT_CTUHNC  = 18;
-    const IMPACT_EPF    = 19;
-    const IMPACT_EPM    = 20;
-    const IMPACT_EPT    = 21;
+    public const IMPACT_EPF    = 19;
+    public const IMPACT_EPM    = 20;
+    public const IMPACT_EPT    = 21;
 
     private static array $impact_types = [
         self::IMPACT_GWP    => 'gwp',
@@ -313,7 +313,7 @@ class Type
                 => 'fa-solid fa-skull-crossbones',
 
             default
-                => '', // or 'fa-solid fa-circle-question',
+            => '', // or 'fa-solid fa-circle-question',
         };
     }
 

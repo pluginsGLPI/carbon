@@ -98,7 +98,7 @@ class EmbodiedImpact extends AbstractImpact
             'FROM' => $itemtype_table,
             'WHERE' => [
                 ['NOT' => ['id' =>  new QuerySubQuery($sub_query)]],
-            ]
+            ],
         ]);
 
         return $iterator;

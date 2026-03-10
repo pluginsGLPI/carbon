@@ -32,12 +32,11 @@
 
 namespace GlpiPlugin\Carbon\Impact\Embodied\Internal;
 
-use CommonDBTM;
-use Monitor as GlpiMonitor;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
-use MonitorModel as GlpiMonitorModel;
 use GlpiPlugin\Carbon\Impact\Type;
 use GlpiPlugin\Carbon\MonitorModel;
+use Monitor as GlpiMonitor;
+use MonitorModel as GlpiMonitorModel;
 
 /**
  * This embodied impact
@@ -54,7 +53,7 @@ class Monitor extends AbstractAsset
 
         $model = new MonitorModel();
         $model->getFromDBByCrit([
-            'monitormodels_id' => $this->item->fields['monitormodels_id']
+            'monitormodels_id' => $this->item->fields['monitormodels_id'],
         ]);
         if ($model->isNewItem()) {
             return [];

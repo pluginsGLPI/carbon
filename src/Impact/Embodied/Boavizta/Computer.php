@@ -35,12 +35,12 @@ namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta;
 
 use CommonDBTM;
 use Computer as GlpiComputer;
-use DBmysql;
-use DeviceProcessor;
-use GlpiPlugin\Carbon\ComputerType;
 use ComputerType as GlpiComputerType;
+use DBmysql;
 use DeviceHardDrive;
 use DeviceHardDriveType;
+use DeviceProcessor;
+use GlpiPlugin\Carbon\ComputerType;
 use InterfaceType;
 use Item_DeviceHardDrive;
 use Item_DeviceMemory;
@@ -74,7 +74,7 @@ class Computer extends AbstractAsset
         $description = [
             'configuration' => $configuration,
             'usage' => [
-                'avg_power' => 0
+                'avg_power' => 0,
             ],
         ];
         $response = $this->query($description);
@@ -100,18 +100,18 @@ class Computer extends AbstractAsset
                     'FKEY' => [
                         $computer_type_table => 'computertypes_id',
                         $glpi_computer_type_table => 'id',
-                    ]
+                    ],
                 ],
                 $computer_table => [
                     'FKEY' => [
                         $glpi_computer_type_table => 'id',
-                        $computer_table           => 'computertypes_id'
+                        $computer_table           => 'computertypes_id',
                     ],
                 ],
             ],
             'WHERE' => [
                 GlpiComputer::getTableField('id') => $item->getID(),
-            ]
+            ],
         ]);
         if ($found === false) {
             return ComputerType::CATEGORY_UNDEFINED;
@@ -273,18 +273,18 @@ class Computer extends AbstractAsset
                     'ON' => [
                         $table_device_item => $device_fk,
                         $table_device => 'id',
-                    ]
+                    ],
                 ],
                 $table_manufacturer => [
                     'ON' => [
                         $table_manufacturer => 'id',
                         $table_device  => $manufacturer_fk,
-                    ]
+                    ],
                 ],
             ],
             'WHERE' => [
                 $item->getTableField('id') => $item->getID(),
-            ]
+            ],
         ];
 
         $result = $DB->request($request);

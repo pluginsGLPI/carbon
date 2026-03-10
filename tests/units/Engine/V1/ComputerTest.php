@@ -32,16 +32,16 @@
 
 namespace GlpiPlugin\Carbon\Engine\V1\Tests;
 
-use DateTime;
 use Computer as GlpiComputer;
 use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
-use GlpiPlugin\Carbon\Engine\V1\Computer;
-use GlpiPlugin\Carbon\Zone;
+use DateTime;
 use GlpiPlugin\Carbon\ComputerType;
+use GlpiPlugin\Carbon\Engine\V1\Computer;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Tests\Engine\V1\EngineTestCase;
+use GlpiPlugin\Carbon\Zone;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(Computer::class)]
@@ -53,7 +53,7 @@ class ComputerTest extends EngineTestCase
     protected static string $type_class = ComputerType::class;
     protected static string $model_class = GlpiComputerModel::class;
 
-    const TEST_LAPTOP_USAGE_PROFILE = [
+    public const TEST_LAPTOP_USAGE_PROFILE = [
         'name' => 'Test laptop usage profile',
         'time_start' => "09:00",
         'time_stop' => "17:00",
@@ -65,11 +65,11 @@ class ComputerTest extends EngineTestCase
         'day_6' => 0,
         'day_7' => 0,
     ];
-    const TEST_LAPTOP_POWER = 40 /* Watt */;
+    public const TEST_LAPTOP_POWER = 40 /* Watt */;
     // This computer is up 8 hours per day, from 09:00 to 17:00
-    const TEST_LAPTOP_ENERGY_PER_DAY = (self::TEST_LAPTOP_POWER * 8 /* hours */) / 1000.0  /* kWh */;
+    public const TEST_LAPTOP_ENERGY_PER_DAY = (self::TEST_LAPTOP_POWER * 8 /* hours */) / 1000.0  /* kWh */;
 
-    const TEST_SERVER_USAGE_PROFILE = [
+    public const TEST_SERVER_USAGE_PROFILE = [
         'name' => 'Test server usage profile',
         'time_start' => "00:00",
         'time_stop' => "23:00",
@@ -81,29 +81,29 @@ class ComputerTest extends EngineTestCase
         'day_6' => 1,
         'day_7' => 1,
     ];
-    const TEST_SERVER_POWER = 150 /* Watt */;
+    public const TEST_SERVER_POWER = 150 /* Watt */;
     // This computer is up 24 hours per day, from 00:00 to 00:00 (next day)
-    const TEST_SERVER_ENERGY_PER_DAY = (self::TEST_SERVER_POWER * 23 /* hours */) / 1000.0  /* kWh */;
+    public const TEST_SERVER_ENERGY_PER_DAY = (self::TEST_SERVER_POWER * 23 /* hours */) / 1000.0  /* kWh */;
 
-    const TEST_CARBON_INTENSITY_THURSDAY = 1.0 /* gCO2/kWh */;
-    const TEST_CARBON_INTENSITY_SATURDAY = 2.0 /* gCO2/kWh */;
+    public const TEST_CARBON_INTENSITY_THURSDAY = 1.0 /* gCO2/kWh */;
+    public const TEST_CARBON_INTENSITY_SATURDAY = 2.0 /* gCO2/kWh */;
 
-    const TEST_CARBON_INTENSITY_SOURCE = 'Test source';
+    public const TEST_CARBON_INTENSITY_SOURCE = 'Test source';
 
     // Thursday, December 2, 1999
-    const TEST_DATE_THURSDAY = '1999-12-02 12:00:00';
+    public const TEST_DATE_THURSDAY = '1999-12-02 12:00:00';
     // Saturday, December 4, 1999
-    const TEST_DATE_SATURDAY = '1999-12-04 12:00:00';
+    public const TEST_DATE_SATURDAY = '1999-12-04 12:00:00';
 
-    const MODEL_NO_TYPE_POWER = 1;
-    const NO_MODEL_TYPE_POWER = 2;
-    const MODEL_TYPE_POWER = 3;
+    public const MODEL_NO_TYPE_POWER = 1;
+    public const NO_MODEL_TYPE_POWER = 2;
+    public const MODEL_TYPE_POWER = 3;
 
     /**
      * The delta for comparison of computed emission with expected value,
      * as == for float must not be used because of float representation.
      */
-    const EPSILON = 0.001;
+    public const EPSILON = 0.001;
 
     public function computerUsageProfileProvider(): \Generator
     {
@@ -113,9 +113,9 @@ class ComputerTest extends EngineTestCase
             self::TEST_LAPTOP_USAGE_PROFILE,
         ];
 
-        $source = $this->createItem(source::class, [
+        $source = $this->createItem(Source::class, [
             'is_carbon_intensity_source' => 1,
-            'fallback_level' => 0
+            'fallback_level' => 0,
         ]);
         $zone = $this->createItem(Zone::class);
         $source_zone = $this->createItem(Source_Zone::class, [
@@ -133,7 +133,7 @@ class ComputerTest extends EngineTestCase
     public function testGetUsageProfile()
     {
         foreach ($this->computerUsageProfileProvider() as $data) {
-            list ($computer, $usage_profile_params) = $data;
+            [$computer, $usage_profile_params] = $data;
             $usage_profile = $computer->getUsageProfile();
             $this->assertNotNull($usage_profile);
 
@@ -164,9 +164,9 @@ class ComputerTest extends EngineTestCase
     {
         $thursday = DateTime::createFromFormat('Y-m-d H:i:s', self::TEST_DATE_THURSDAY);
         $saturday = DateTime::createFromFormat('Y-m-d H:i:s', self::TEST_DATE_SATURDAY);
-        $source = $this->createItem(source::class, [
+        $source = $this->createItem(Source::class, [
             'is_carbon_intensity_source' => 1,
-            'fallback_level' => 0
+            'fallback_level' => 0,
         ]);
         $zone = $this->createItem(Zone::class);
         $source_zone = $this->createItem(Source_Zone::class, [

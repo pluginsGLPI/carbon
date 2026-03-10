@@ -63,15 +63,15 @@ class Grid
                 'label'        => __('Handled assets ratio', 'carbon'),
                 'provider'     => Provider::class . '::getHandledAssetsRatio',
                 'args'         => [
-                    'itemtypes'   => PLUGIN_CARBON_TYPES
-                ]
+                    'itemtypes'   => PLUGIN_CARBON_TYPES,
+                ],
             ],
             'plugin_carbon_assets_completeness' => [
                 'widgettype' => ['stackedbars'],
                 'group'      => $group,
                 'label'      => __('Handled assets count', 'carbon'),
                 'provider'   => Provider::class . '::getHandledAssetsCounts',
-            ]
+            ],
         ];
 
         if (Config::isDemoMode()) {
@@ -90,7 +90,7 @@ class Grid
     /**
      * Determine if the user is viewing or editing the reporting dashboard
      *
-     * @return boolean
+     * @return bool
      */
     protected static function in_carbon_report_page(): bool
     {
@@ -168,8 +168,8 @@ class Grid
                 'label'        => Type::getEmbodiedImpactLabel($impact_type),
                 'provider'     => Provider::class . '::getImpactOfEmbodiedCriteria',
                 'args'     => [
-                    'impact_type' => $impact_type
-                ]
+                    'impact_type' => $impact_type,
+                ],
             ];
         }
 
@@ -185,8 +185,8 @@ class Grid
                 'label'        => Type::getUsageImpactLabel($impact_type),
                 'provider'     => Provider::class . '::getImpactOfUsageCriteria',
                 'args'     => [
-                    'impact_type' => $impact_type
-                ]
+                    'impact_type' => $impact_type,
+                ],
             ];
         }
 
@@ -202,8 +202,8 @@ class Grid
                 'label'        => Type::getEmbodiedAndUsageImpactLabel($impact_type),
                 'provider'     => Provider::class . '::getImpactOfEmbodiedAndUsageCriteria',
                 'args'     => [
-                    'impact_type' => $impact_type
-                ]
+                    'impact_type' => $impact_type,
+                ],
             ];
         }
 
@@ -231,7 +231,7 @@ class Grid
                     'group'        => $group,
                     'label'        => sprintf(__('Unhandled %s ratio', 'carbon'), $type_name),
                     'provider'     => Provider::class . '::getHandledAssetsCounts',
-                    'args'         => ['itemtypes' => $itemtype]
+                    'args'         => ['itemtypes' => $itemtype],
                 ],
             ];
         }
@@ -250,8 +250,8 @@ class Grid
                 'label'        => __('Monthly carbon emission', 'carbon'),
                 'provider'     => Provider::class . '::getUsageCarbonEmissionlastTwoMonths',
                 'args'         => [
-                    'crit'        => []
-                ]
+                    'crit'        => [],
+                ],
             ],
             'plugin_carbon_report_usage_carbon_emissions_graph' => [
                 'widgettype'   => ['usage_gwp_monthly'],
@@ -259,8 +259,8 @@ class Grid
                 'label'        => __('Usage global warming potential chart', 'carbon'),
                 'provider'     => Provider::class . '::getUsageCarbonEmissionPerMonth',
                 'args'         => [
-                    'crit'        => []
-                ]
+                    'crit'        => [],
+                ],
             ],
             'plugin_carbon_report_biggest_gwp_per_model' => [
                 'widgettype'   => ['most_gwp_impacting_computer_models'],
@@ -275,7 +275,7 @@ class Grid
                 'provider'     => Provider::class . '::getImpactOfUsageCriteria',
                 'args'         => [
                     'impact_type' => 'adp',
-                ]
+                ],
             ],
         ];
 
@@ -291,8 +291,8 @@ class Grid
                 'label'        => Type::getEmbodiedImpactLabel($impact_type),
                 'provider'     => Provider::class . '::getImpactOfEmbodiedCriteria',
                 'args'     => [
-                    'impact_type' => $impact_type
-                ]
+                    'impact_type' => $impact_type,
+                ],
             ];
         }
 

@@ -37,7 +37,7 @@ global $PLUGIN_HOOKS;
 
 $PLUGIN_HOOKS[Hooks::SECURED_CONFIGS]['carbon'] = [
     'electricitymap_api_key',
-    'co2signal_api_key'
+    'co2signal_api_key',
 ];
 
 $current_config = Config::getConfigurationValues('plugin:carbon');

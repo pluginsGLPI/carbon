@@ -32,19 +32,19 @@
 
 use Config as GlpiConfig;
 use CronTask as GlpiCronTask;
-use GlpiPlugin\Carbon\Dashboard\Widget;
 use Glpi\Plugin\Hooks;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\CronTask;
-use GlpiPlugin\Carbon\UsageInfo;
-use GlpiPlugin\Carbon\Profile;
-use GlpiPlugin\Carbon\Report;
-use Location as GlpiLocation;
-use Profile as GlpiProfile;
 use GlpiPlugin\Carbon\Dashboard\Grid;
+use GlpiPlugin\Carbon\Dashboard\Widget;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientFactory as CarbonIntensityClientFactory;
 use GlpiPlugin\Carbon\DataSource\Lca\ClientFactory as LcaClientFactory;
 use GlpiPlugin\Carbon\Location;
+use GlpiPlugin\Carbon\Profile;
+use GlpiPlugin\Carbon\Report;
+use GlpiPlugin\Carbon\UsageInfo;
+use Location as GlpiLocation;
+use Profile as GlpiProfile;
 
 define('PLUGIN_CARBON_VERSION', '1.2.0-dev');
 define('PLUGIN_CARBON_SCHEMA_VERSION', '1.2.0');
@@ -181,8 +181,8 @@ function plugin_version_carbon()
         'requirements'   => [
             'glpi' => [
                 'min' => PLUGIN_CARBON_MIN_GLPI_VERSION,
-            ]
-        ]
+            ],
+        ],
     ];
 
     $dev_version = strpos(PLUGIN_CARBON_VERSION, '-dev') !== false;
@@ -196,7 +196,7 @@ function plugin_version_carbon()
 /**
  * Check plugin's prerequisites before installation
  *
- * @return boolean
+ * @return bool
  */
 function plugin_carbon_check_prerequisites()
 {
@@ -249,7 +249,7 @@ function plugin_carbon_check_prerequisites()
  */
 function plugin_carbon_getSchemaPath(?string $version = null): ?string
 {
-    $version = $version ?? PLUGIN_CARBON_VERSION;
+    $version ??= PLUGIN_CARBON_VERSION;
 
     // Drop suffixes for alpha, beta, rc versions
     $matches = [];

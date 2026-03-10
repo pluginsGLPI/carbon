@@ -33,7 +33,6 @@
 namespace GlpiPlugin\Carbon\Engine\V1;
 
 use DateTime;
-use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\DataTracking\TrackedInt;
 use GlpiPlugin\Carbon\Source_Zone;

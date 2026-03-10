@@ -32,26 +32,26 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
-use GlpiPlugin\Carbon\CarbonEmission;
-use GlpiPlugin\Carbon\CarbonIntensity;
-use GlpiPlugin\Carbon\Zone;
-use GlpiPlugin\Carbon\ComputerType;
-use GlpiPlugin\Carbon\EmbodiedImpact;
-use GlpiPlugin\Carbon\UsageInfo;
-use GlpiPlugin\Carbon\Location;
-use GlpiPlugin\Carbon\MonitorType;
-use GlpiPlugin\Carbon\NetworkEquipmentType;
-use RecursiveIteratorIterator;
-use RecursiveDirectoryIterator;
 use CommonDBTM;
 use CommonGLPI;
 use DBmysql;
 use DbUtils;
+use GlpiPlugin\Carbon\CarbonEmission;
+use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\ComputerModel;
+use GlpiPlugin\Carbon\ComputerType;
+use GlpiPlugin\Carbon\EmbodiedImpact;
+use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\MonitorModel;
+use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\NetworkEquipmentModel;
-use Plugin;
+use GlpiPlugin\Carbon\NetworkEquipmentType;
+use GlpiPlugin\Carbon\UsageInfo;
+use GlpiPlugin\Carbon\Zone;
 use PHPUnit\Framework\Attributes\CoversMethod;
+use Plugin;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 #[CoversMethod('GlpiPlugin\Carbon\CarbonEmission', 'rawSearchOptions')]
 #[CoversMethod('GlpiPlugin\Carbon\CarbonIntensity', 'rawSearchOptions')]
@@ -75,7 +75,7 @@ class SearchOptionTest extends CommonTestCase
         NetworkEquipmentType::class => [],
         UsageInfo::class => [],
         CarbonIntensity::class => [
-            'data_quality'
+            'data_quality',
         ],
         EmbodiedImpact::class => [
             'gwp_quality',
@@ -106,13 +106,13 @@ class SearchOptionTest extends CommonTestCase
             'entities_id',
         ],
         ComputerModel::class => [
-            'computermodels_id'
+            'computermodels_id',
         ],
         MonitorModel::class => [
-            'monitormodels_id'
+            'monitormodels_id',
         ],
         NetworkEquipmentModel::class => [
-            'networkequipmentmodels_id'
+            'networkequipmentmodels_id',
         ],
     ];
 
@@ -120,7 +120,7 @@ class SearchOptionTest extends CommonTestCase
         CarbonIntensity::class => [
             'plugin_carbon_sources_id' => 'name',
             'plugin_carbon_zones_id'   => 'name',
-        ]
+        ],
     ];
 
     public function testSearchOption()

@@ -32,10 +32,10 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
-use MonitorModel as GlpiMonitorModel;
 use GlpiPlugin\Carbon\MonitorModel;
-use Symfony\Component\DomCrawler\Crawler;
+use MonitorModel as GlpiMonitorModel;
 use PHPUnit\Framework\Attributes\CoversClass;
+use Symfony\Component\DomCrawler\Crawler;
 
 #[CoversClass(MonitorModel::class)]
 class MonitorModelTest extends DbTestCase

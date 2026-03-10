@@ -54,44 +54,44 @@ class HookTest extends DbTestCase
         $computer = $this->createItem(GlpiComputer::class);
         $carbon_emission = $this->createItem(CarbonEmission::class, [
             'itemtype' => $computer->getType(),
-            'items_id' => $computer->getID()
+            'items_id' => $computer->getID(),
         ]);
         $embodied_impact = $this->createItem(EmbodiedImpact::class, [
             'itemtype' => $computer->getType(),
-            'items_id' => $computer->getID()
+            'items_id' => $computer->getID(),
         ]);
         $usage_info = $this->createItem(UsageInfo::class, [
             'itemtype' => $computer->getType(),
-            'items_id' => $computer->getID()
+            'items_id' => $computer->getID(),
         ]);
 
         // Data must remain in DB after a delete
         $computer->delete($computer->fields);
         $count = (new DbUtils())->countElementsInTable($carbon_emission::getTable(), [
             'itemtype' => $computer->getType(),
-            'items_id' => $computer->getID()
+            'items_id' => $computer->getID(),
         ]);
         $this->assertEquals(1, $count);
         $count = (new DbUtils())->countElementsInTable($embodied_impact::getTable(), [
             'itemtype' => $computer->getType(),
-            'items_id' => $computer->getID()
+            'items_id' => $computer->getID(),
         ]);
         $this->assertEquals(1, $count);
         $count = (new DbUtils())->countElementsInTable($usage_info::getTable(), [
             'itemtype' => $computer->getType(),
-            'items_id' => $computer->getID()
+            'items_id' => $computer->getID(),
         ]);
         $this->assertEquals(1, $count);
         // Data must be dropped fron DB after a purge
         $computer->delete($computer->fields, true);
         $count = (new DbUtils())->countElementsInTable($carbon_emission::getTable(), [
             'itemtype' => $computer->getType(),
-            'items_id' => $computer->getID()
+            'items_id' => $computer->getID(),
         ]);
         $this->assertEquals(0, $count);
         $count = (new DbUtils())->countElementsInTable($embodied_impact::getTable(), [
             'itemtype' => $computer->getType(),
-            'items_id' => $computer->getID()
+            'items_id' => $computer->getID(),
         ]);
         $this->assertEquals(0, $count);
     }
@@ -105,7 +105,7 @@ class HookTest extends DbTestCase
 
         $computer_type->delete($computer_type->fields, 1);
         $count = (new DbUtils())->countElementsInTable($carbon_computer_type::getTable(), [
-            'computertypes_id' => $computer_type->getID()
+            'computertypes_id' => $computer_type->getID(),
         ]);
         $this->assertEquals(0, $count);
     }
@@ -120,7 +120,7 @@ class HookTest extends DbTestCase
         $fallback_source = $this->createItem(Source::class, [
             'name' => 'a fallback source',
             'is_carbon_intensity_source' => 1,
-            'fallback_level' => 1
+            'fallback_level' => 1,
         ]);
         $source_zone = $this->createItem(Source_Zone::class, [
             $source::getForeignKeyField() => $source->getID(),

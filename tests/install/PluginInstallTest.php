@@ -36,32 +36,28 @@ use CommonGLPI;
 use Computer;
 use ComputerModel;
 use ComputerType;
-use Session;
 use Config;
 use CronTask as GLPICronTask;
 use DBmysql;
 use DbUtils;
-use Glpi\Dashboard\Dashboard;
 use DisplayPreference;
-use GLPIKey;
-use Plugin;
-use Profile;
-use ProfileRight;
+use Glpi\Dashboard\Dashboard;
 use Glpi\Dashboard\Item;
 use Glpi\Dashboard\Right;
 use Glpi\DBAL\QueryExpression as QueryExpression;
 use Glpi\Plugin\Hooks;
 use Glpi\System\Diagnostic\DatabaseSchemaIntegrityChecker;
-use GlpiPlugin\Carbon\DataSource\CarbonIntensity\Rte\CronTask as RteCronTask;
-use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ElectricityMaps\CronTask as ElectricityMapsCronTask;
+use GLPIKey;
 use GlpiPlugin\Carbon\CarbonIntensity;
+use GlpiPlugin\Carbon\ComputerUsageProfile;
+use GlpiPlugin\Carbon\CronTask;
+use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ElectricityMaps\CronTask as ElectricityMapsCronTask;
+use GlpiPlugin\Carbon\DataSource\CarbonIntensity\Rte\CronTask as RteCronTask;
+use GlpiPlugin\Carbon\Install;
+use GlpiPlugin\Carbon\Report;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
-use GlpiPlugin\Carbon\ComputerUsageProfile;
-use GlpiPlugin\Carbon\CronTask;
-use GlpiPlugin\Carbon\Install;
-use GlpiPlugin\Carbon\Report;
 use Location;
 use Monitor;
 use MonitorModel;
@@ -71,6 +67,10 @@ use NetworkEquipmentModel;
 use NetworkEquipmentType;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversNothing;
+use Plugin;
+use Profile;
+use ProfileRight;
+use Session;
 
 #[CoversClass(Install::class)]
 class PluginInstallTest extends CommonTestCase
@@ -337,7 +337,7 @@ class PluginInstallTest extends CommonTestCase
             ],
             'WHERE' => [
                 ProfileRight::getTableField('name') => $rightname,
-            ]
+            ],
         ];
 
         foreach ($DB->request($request) as $profile_right) {
@@ -367,7 +367,7 @@ class PluginInstallTest extends CommonTestCase
             $source = new Source();
             $source->getFromDBByCrit([
                 'name' => $source_name,
-                'fallback_level' => 0
+                'fallback_level' => 0,
             ]);
             $this->assertFalse($source->isNewItem(), "Source '$source_name' not found");
         }
@@ -377,7 +377,7 @@ class PluginInstallTest extends CommonTestCase
             $source = new Source();
             $source->getFromDBByCrit([
                 'name' => $source_name,
-                'fallback_level' => 1
+                'fallback_level' => 1,
             ]);
             $this->assertFalse($source->isNewItem(), "Source '$source_name' not found");
         }
@@ -387,7 +387,7 @@ class PluginInstallTest extends CommonTestCase
             $source = new Source();
             $source->getFromDBByCrit([
                 'name' => $source_name,
-                'fallback_level' => 2
+                'fallback_level' => 2,
             ]);
             $this->assertFalse($source->isNewItem(), "Source '$source_name' not found");
         }
@@ -455,7 +455,7 @@ class PluginInstallTest extends CommonTestCase
         $source_name = 'Hydro Quebec';
         $source = new Source();
         $source->getFromDBByCrit([
-            'name' => $source_name
+            'name' => $source_name,
         ]);
         if ($source->isNewItem()) {
             $this->fail("$source_name not found");
@@ -483,21 +483,21 @@ class PluginInstallTest extends CommonTestCase
                     'FKEY' => [
                         $source_zone_table => $source_fk,
                         $source_table      => 'id',
-                    ]
+                    ],
                 ],
                 $zone_table => [
                     'FKEY' => [
                         $source_zone_table => $zone_fk,
                         $zone_table        => 'id',
-                    ]
+                    ],
                 ],
             ],
             'WHERE' => [
                 'OR' => [
                     $source_table . '.id' => null,
-                    $zone_table   . '.id' => null,
-                ]
-            ]
+                    $zone_table . '.id' => null,
+                ],
+            ],
         ]);
 
         $this->assertCount(0, $iterator);
@@ -552,13 +552,13 @@ class PluginInstallTest extends CommonTestCase
                         $profile_right_table => 'profiles_id',
                         [
                             'AND' => [ProfileRight::getTableField('name') => [Config::$rightname, Report::$rightname]],
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ],
             'WHERE' => [
                 new QueryExpression($rights),
-            ]
+            ],
         ]);
 
         foreach ($iterator as $profile) {
@@ -798,7 +798,7 @@ class PluginInstallTest extends CommonTestCase
         'Zimbabwe',
         'East Timor',
         'Montenegro',
-        'South Sudan'
+        'South Sudan',
     ];
 
     public function checkSourceZoneRelation()
@@ -818,15 +818,15 @@ class PluginInstallTest extends CommonTestCase
                 $source_table => [
                     'FKEY' => [
                         $source_zone_table => 'plugin_carbon_sources_id',
-                        $source_table => 'id'
-                    ]
+                        $source_table => 'id',
+                    ],
                 ],
                 $zone_table => [
                     'FKEY' => [
                         $source_zone_table => 'plugin_carbon_zones_id',
-                        $zone_table => 'id'
-                    ]
-                ]
+                        $zone_table => 'id',
+                    ],
+                ],
             ],
             'WHERE' => [
                 $source_table . '.name' => 'RTE',
@@ -843,15 +843,15 @@ class PluginInstallTest extends CommonTestCase
                 $source_table => [
                     'FKEY' => [
                         $source_zone_table => 'plugin_carbon_sources_id',
-                        $source_table => 'id'
-                    ]
+                        $source_table => 'id',
+                    ],
                 ],
                 $zone_table => [
                     'FKEY' => [
                         $source_zone_table => 'plugin_carbon_zones_id',
-                        $zone_table => 'id'
-                    ]
-                ]
+                        $zone_table => 'id',
+                    ],
+                ],
             ],
             'WHERE' => [
                 $source_table . '.name' => 'Hydro Quebec',

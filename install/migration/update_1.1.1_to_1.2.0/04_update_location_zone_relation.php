@@ -53,7 +53,7 @@ if ($DB->fieldExists($zone_table, 'plugin_carbon_carbonintensitysources_id_histo
                 'FKEY' => [
                     $zone_table => 'name',
                     $glpi_location_table => 'country',
-                ]
+                ],
             ],
             $source_zone_table => [
                 'FKEY' => [
@@ -62,11 +62,11 @@ if ($DB->fieldExists($zone_table, 'plugin_carbon_carbonintensitysources_id_histo
                     [
                         'AND' => [
                             new QueryExpression('`' . $source_zone_table . '`.`plugin_carbon_sources_id` = `' . $zone_table . '`.`plugin_carbon_carbonintensitysources_id_historical`'),
-                        ]
-                    ]
-                ]
-            ]
-        ]
+                        ],
+                    ],
+                ],
+            ],
+        ],
     ]);
 
     $location_table = 'glpi_plugin_carbon_locations';
@@ -96,7 +96,7 @@ if ($DB->fieldExists($zone_table, 'plugin_carbon_carbonintensitysources_id_histo
                 'FKEY' => [
                     $zone_table => 'name',
                     $glpi_location_table => 'state',
-                ]
+                ],
             ],
             $source_zone_table => [
                 'FKEY' => [
@@ -105,11 +105,11 @@ if ($DB->fieldExists($zone_table, 'plugin_carbon_carbonintensitysources_id_histo
                     [
                         'AND' => [
                             new QueryExpression('`' . $source_zone_table . '`.`plugin_carbon_sources_id` = `' . $zone_table . '`.`plugin_carbon_carbonintensitysources_id_historical`'),
-                        ]
-                    ]
-                ]
-            ]
-        ]
+                        ],
+                    ],
+                ],
+            ],
+        ],
     ]);
 
     foreach ($iterator as $row) {

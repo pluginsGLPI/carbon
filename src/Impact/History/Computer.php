@@ -34,19 +34,19 @@
 namespace GlpiPlugin\Carbon\Impact\History;
 
 use CommonDBTM;
-use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
-use GlpiPlugin\Carbon\Engine\V1\Computer as EngineComputer;
 use Computer as GlpiComputer;
-use GlpiPlugin\Carbon\ComputerType;
 use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
 use DBmysql;
 use DbUtils;
 use Glpi\Application\View\TemplateRenderer;
-use GlpiPlugin\Carbon\UsageInfo;
+use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
+use GlpiPlugin\Carbon\Engine\V1\Computer as EngineComputer;
+use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\UsageImpact;
+use GlpiPlugin\Carbon\UsageInfo;
 use Infocom;
 use Location as GlpiLocation;
 
@@ -83,13 +83,13 @@ class Computer extends AbstractAsset
                     'FKEY'   => [
                         $item_table  => 'locations_id',
                         $glpi_location_table => 'id',
-                    ]
+                    ],
                 ],
                 $location_table => [
                     'FKEY' => [
                         $location_table => 'locations_id',
                         $glpi_location_table => 'id',
-                    ]
+                    ],
                 ],
                 $usage_table => [
                     'FKEY'   => [
@@ -98,15 +98,15 @@ class Computer extends AbstractAsset
                         [
                             'AND' => [
                                 UsageInfo::getTableField('itemtype') => GlpiComputer::class,
-                            ]
-                        ]
-                    ]
+                            ],
+                        ],
+                    ],
                 ],
                 $computerUsageProfile_table => [
                     'FKEY'   => [
                         $usage_table  => 'plugin_carbon_computerusageprofiles_id',
                         $computerUsageProfile_table => 'id',
-                    ]
+                    ],
                 ],
             ],
             'LEFT JOIN' => [
@@ -114,13 +114,13 @@ class Computer extends AbstractAsset
                     'FKEY'   => [
                         $item_table  => 'computermodels_id',
                         $item_model_table => 'id',
-                    ]
+                    ],
                 ],
                 $glpi_computertypes_table => [
                     'FKEY'   => [
                         $item_table  => 'computertypes_id',
                         $glpi_computertypes_table => 'id',
-                    ]
+                    ],
                 ],
                 $computertypes_table => [
                     'FKEY'   => [
@@ -129,16 +129,16 @@ class Computer extends AbstractAsset
                         [
                             'AND' => [
                                 'NOT' => [GlpiComputerType::getTableField('id') => null],
-                            ]
-                        ]
-                    ]
+                            ],
+                        ],
+                    ],
                 ],
                 $infocom_table => [
                     'FKEY' => [
                         $infocom_table => 'items_id',
                         $item_table => 'id',
                         ['AND' => [Infocom::getTableField('itemtype') => self::$itemtype]],
-                    ]
+                    ],
                 ],
             ],
             'WHERE' => [
@@ -162,10 +162,10 @@ class Computer extends AbstractAsset
                             ['NOT' => [Infocom::getTableField('buy_date') => null]],
                             ['NOT' => [Infocom::getTableField('date_creation') => null]],
                             // ['NOT' => [Infocom::getTableField('date_mod') => null]],
-                        ]
-                    ]
+                        ],
+                    ],
                 ],
-            ] + $crit
+            ] + $crit,
         ];
 
         if ($entity_restrict) {

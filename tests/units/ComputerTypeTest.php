@@ -35,9 +35,9 @@ namespace GlpiPlugin\Carbon\Tests;
 use ComputerType as GlpiComputerType;
 use GlpiPlugin\Carbon\ComputerType;
 use MassiveAction;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Session;
 use Symfony\Component\DomCrawler\Crawler;
-use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(ComputerType::class)]
 class ComputerTypeTest extends DbTestCase
@@ -154,7 +154,7 @@ class ComputerTypeTest extends DbTestCase
             ->getMock();
         $massive_action->method('getAction')->willReturn('MassUpdatePower');
         $massive_action->method('getItems')->willReturn([
-            ComputerType::class => $this->createItem(GlpiComputerType::class)
+            ComputerType::class => $this->createItem(GlpiComputerType::class),
         ]);
         ob_start(function ($buffer) {
             return $buffer;
@@ -183,7 +183,7 @@ class ComputerTypeTest extends DbTestCase
             ->getMock();
         $massive_action->method('getAction')->willReturn('MassUpdateCategory');
         $massive_action->method('getItems')->willReturn([
-            ComputerType::class => $this->createItem(GlpiComputerType::class)
+            ComputerType::class => $this->createItem(GlpiComputerType::class),
         ]);
         ob_start(function ($buffer) {
             return $buffer;
@@ -211,7 +211,7 @@ class ComputerTypeTest extends DbTestCase
             ->getMock();
         $massive_action->method('getAction')->willReturn('');
         $massive_action->method('getItems')->willReturn([
-            ComputerType::class => $this->createItem(GlpiComputerType::class)
+            ComputerType::class => $this->createItem(GlpiComputerType::class),
         ]);
         ob_start(function ($buffer) {
             return $buffer;

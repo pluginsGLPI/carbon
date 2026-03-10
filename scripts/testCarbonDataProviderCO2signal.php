@@ -1,5 +1,7 @@
 <?php
 
+use GlpiPlugin\Carbon\CarbonDataProviderCO2signal;
+
 /**
  * -------------------------------------------------------------------------
  * Carbon plugin for GLPI
@@ -32,7 +34,7 @@
 
 include("../../../inc/includes.php");
 
-$provider = new GlpiPlugin\Carbon\CarbonDataProviderCO2signal();
+$provider = new CarbonDataProviderCO2signal();
 $now = new DateTime();
 print_r($provider->getCarbonIntensity('FR', '0', '0', $now));
 echo "\n";

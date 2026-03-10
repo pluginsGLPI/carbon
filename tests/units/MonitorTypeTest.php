@@ -118,7 +118,7 @@ class MonitorTypeTest extends DbTestCase
             ->getMock();
         $massive_action->method('getAction')->willReturn('MassUpdatePower');
         $massive_action->method('getItems')->willReturn([
-            MonitorType::class => $this->createItem(GlpiMonitorType::class)
+            MonitorType::class => $this->createItem(GlpiMonitorType::class),
         ]);
         ob_start(function ($buffer) {
             return $buffer;
@@ -146,7 +146,7 @@ class MonitorTypeTest extends DbTestCase
             ->getMock();
         $massive_action->method('getAction')->willReturn('');
         $massive_action->method('getItems')->willReturn([
-            MonitorType::class => $this->createItem(GlpiMonitorType::class)
+            MonitorType::class => $this->createItem(GlpiMonitorType::class),
         ]);
         ob_start(function ($buffer) {
             return $buffer;

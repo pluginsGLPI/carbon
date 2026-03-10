@@ -32,6 +32,4 @@
 
 namespace GlpiPlugin\Carbon\DataSource;
 
-abstract class AbstractDataSource implements DataSourceInterface
-{
-}
+abstract class AbstractDataSource implements DataSourceInterface {}

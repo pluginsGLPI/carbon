@@ -37,10 +37,10 @@ use CommonDBTM;
 use Computer as GlpiComputer;
 use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
-use Glpi\Asset\Asset_PeripheralAsset;
 use DBmysql;
 use DbUtils;
 use Glpi\Application\View\TemplateRenderer;
+use Glpi\Asset\Asset_PeripheralAsset;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
@@ -52,8 +52,8 @@ use GlpiPlugin\Carbon\UsageInfo;
 use Infocom;
 use Location as GlpiLocation;
 use Monitor as GlpiMonitor;
-use MonitorType as GlpiMonitorType;
 use MonitorModel as GlpiMonitorModel;
+use MonitorType as GlpiMonitorType;
 
 class Monitor extends AbstractAsset
 {
@@ -101,15 +101,15 @@ class Monitor extends AbstractAsset
                 ['AND' => [
                     Asset_PeripheralAsset::getTableField('itemtype_peripheral') => self::$itemtype,
                     Asset_PeripheralAsset::getTableField('itemtype_asset') => GlpiComputer::class,
-                ]
                 ],
-            ]
+                ],
+            ],
         ];
         $request['INNER JOIN'][$computers_table] = [
             'FKEY' => [
                 $computers_table => 'id',
                 $computers_items_table => 'items_id_asset',
-                ['AND' => [Asset_PeripheralAsset::getTableField('itemtype_asset') => GlpiComputer::class]]
+                ['AND' => [Asset_PeripheralAsset::getTableField('itemtype_asset') => GlpiComputer::class]],
             ],
         ];
         $request['LEFT JOIN'][$glpi_monitor_types_table] = [
@@ -135,7 +135,7 @@ class Monitor extends AbstractAsset
                 $infocom_table => 'items_id',
                 $item_table => 'id',
                 ['AND' => [Infocom::getTableField('itemtype') => self::$itemtype]],
-            ]
+            ],
         ];
 
         // re-add inner joins of computer, after those for monitor

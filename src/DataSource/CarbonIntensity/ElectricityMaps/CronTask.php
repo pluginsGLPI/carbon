@@ -69,8 +69,8 @@ class CronTask extends AbstractCronTask implements CronTaskInterface
                     'logs_lifetime' => 30,
                     'comment'       => __('Collect carbon intensities from Electricity Maps', 'carbon'),
                     'param'         => 10000, // Maximum rows to generate per execution
-                ]
-            ]
+                ],
+            ],
         ];
     }
 

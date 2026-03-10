@@ -35,14 +35,13 @@ namespace GlpiPlugin\Carbon\Impact\Embodied;
 
 use CommonDBTM;
 use DBmysqlIterator;
-use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 
 interface EmbodiedImpactInterface
 {
     /**
      * Set the maximum count of items to calculate with evaluateItems()
      *
-     * @param integer $limit
+     * @param int $limit
      * @return void
      */
     public function setLimit(int $limit);
@@ -53,7 +52,7 @@ interface EmbodiedImpactInterface
      * @template T of CommonDBTM
      * @param class-string<T> $itemtype
      * @param array $crit
-     * @param boolean $entity_restrict
+     * @param bool $entity_restrict
      * @return array
      */
     public static function getEvaluableQuery(string $itemtype, array $crit = [], bool $entity_restrict = true): array;

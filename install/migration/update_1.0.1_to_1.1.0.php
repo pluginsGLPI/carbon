@@ -63,7 +63,7 @@ function update101to110(Migration $migration)
     }
     try {
         $DB->runFile($dbFile);
-    } catch (\RuntimeException $e) {
+    } catch (RuntimeException $e) {
         $migration->addWarningMessage("Error creating tables : " . $e->getMessage());
         $updateresult = false;
     }

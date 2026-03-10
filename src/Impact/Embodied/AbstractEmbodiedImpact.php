@@ -33,10 +33,10 @@
 
 namespace GlpiPlugin\Carbon\Impact\Embodied;
 
-use DBmysql;
-use DbUtils;
 use CommonDBTM;
+use DBmysql;
 use DBmysqlIterator;
+use DbUtils;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\EmbodiedImpact;
@@ -80,8 +80,8 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
     /**
      * Get the unit of an impact
      *
-     * @param integer $type
-     * @param boolean $short
+     * @param int $type
+     * @param bool $short
      * @return string|null
      */
     final public function getUnit(int $type, bool $short = true): ?string
@@ -112,7 +112,7 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
             'OR' => [
                 EmbodiedImpact::getTableField('id') => null,
                 EmbodiedImpact::getTableField('recalculate') => 1,
-            ]
+            ],
         ];
         $iterator = $DB->request(self::getEvaluableQuery($itemtype, $crit, false));
 
@@ -197,7 +197,7 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
             'OR' => [
                 $item_type_table . '.is_ignore' => 0,
                 $item_type_table . '.id' => null,
-            ]
+            ],
         ];
 
         $request = [
@@ -210,10 +210,10 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
                     'FKEY' => [
                         $embodied_impact_table => 'items_id',
                         $item_table            => 'id',
-                        ['AND' =>
-                            [
+                        ['AND'
+                            => [
                                 EmbodiedImpact::getTableField('itemtype') => $itemtype,
-                            ]
+                            ],
                         ],
                     ],
                 ],
@@ -248,7 +248,7 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
      * Delete all calculated usage impact for an asset
      *
      * @param CommonDBTM $item
-     * @return boolean
+     * @return bool
      */
     public static function resetForItem(CommonDBTM $item): bool
     {

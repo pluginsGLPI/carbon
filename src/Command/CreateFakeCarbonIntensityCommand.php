@@ -32,12 +32,12 @@
 
 namespace GlpiPlugin\Carbon\Command;
 
-use DateTime;
 use DateInterval;
+use DateTime;
 use DateTimeZone;
 use GlpiPlugin\Carbon\CarbonIntensity;
-use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Zone;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;

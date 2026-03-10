@@ -34,17 +34,17 @@ namespace GlpiPlugin\Carbon\Engine\V1;
 
 use CommonDBTM;
 use DateInterval;
-use DateTimeInterface;
 use DateTimeImmutable;
+use DateTimeInterface;
+use DBmysql;
 use DBmysqlIterator;
 use DbUtils;
-use DBmysql;
+use Glpi\DBAL\QueryExpression;
 use GlpiPlugin\Carbon\CarbonIntensity;
+use GlpiPlugin\Carbon\DataTracking\TrackedInt;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
-use GlpiPlugin\Carbon\DataTracking\TrackedInt;
 use GlpiPlugin\Carbon\Zone;
-use Glpi\DBAL\QueryExpression;
 
 abstract class AbstractAsset implements EngineInterface
 {
@@ -104,7 +104,7 @@ abstract class AbstractAsset implements EngineInterface
             'SELECT' => [
                 CarbonIntensity::getTableField('intensity') . ' AS intensity',
                 $carbon_intensity_date_field . ' AS date',
-                'MIN' => CarbonIntensity::getTableField('data_quality') . ' AS data_quality'
+                'MIN' => CarbonIntensity::getTableField('data_quality') . ' AS data_quality',
             ],
             'FROM' => CarbonIntensity::getTable(),
             'WHERE' => [
@@ -136,8 +136,8 @@ abstract class AbstractAsset implements EngineInterface
         $items_table = $itemtype::getTable();
         $type_fk = static::$type_itemtype::getForeignKeyField();
         $model_fk = static::$model_itemtype::getForeignKeyField();
-        $model_power_consumption_field = DBMysql::QuoteName(CommonDBTM::getTableField('power_consumption', static::$model_itemtype));
-        $type_power_consumption_field = DBMysql::QuoteName(CommonDBTM::getTableField('power_consumption', static::$plugin_type_itemtype));
+        $model_power_consumption_field = DBmysql::QuoteName(CommonDBTM::getTableField('power_consumption', static::$model_itemtype));
+        $type_power_consumption_field = DBmysql::QuoteName(CommonDBTM::getTableField('power_consumption', static::$plugin_type_itemtype));
 
         $request = [
             'SELECT'    => [
@@ -151,14 +151,14 @@ abstract class AbstractAsset implements EngineInterface
                     'FKEY'   => [
                         $itemtype_plugin_types_table  => $type_fk,
                         $items_table => $type_fk,
-                    ]
+                    ],
                 ],
                 $itemtype_models_table => [ // Data for the model of the asset
                     'FKEY'   => [
                         $items_table => $model_fk,
                         $itemtype_models_table  => 'id',
-                    ]
-                ]
+                    ],
+                ],
             ],
             'WHERE' => [
                 $itemtype::getTableField('id') => $this->item->getID(),
@@ -230,14 +230,14 @@ abstract class AbstractAsset implements EngineInterface
                     'FKEY'   => [
                         $carbon_intensity_table => 'plugin_carbon_zones_id',
                         $carbon_intensity_source_zone_table => 'plugin_carbon_zones_id',
-                    ]
+                    ],
                 ],
                 $carbon_intensity_source_table => [
                     'FKEY'   => [
                         $carbon_intensity_source_zone_table => 'plugin_carbon_sources_id',
                         $carbon_intensity_source_table => 'id',
-                    ]
-                ]
+                    ],
+                ],
             ],
             'WHERE' => [
                 Source::getTableField('fallback_level') => 2,
@@ -282,25 +282,25 @@ abstract class AbstractAsset implements EngineInterface
                     'FKEY'   => [
                         $carbon_intensity_table => 'plugin_carbon_zones_id',
                         $carbon_intensity_source_zone_table => 'plugin_carbon_zones_id',
-                    ]
+                    ],
                 ],
                 $carbon_intensity_source_table => [
                     'FKEY'   => [
                         $carbon_intensity_source_zone_table => 'plugin_carbon_sources_id',
                         $carbon_intensity_source_table => 'id',
-                    ]
+                    ],
                 ],
                 $carbon_intensity_zone_table => [
                     'FKEY'   => [
                         $carbon_intensity_table => 'plugin_carbon_zones_id',
                         $carbon_intensity_zone_table => 'id',
-                    ]
+                    ],
                 ],
                 $carbon_intensity_source_table => [
                     'FKEY'   => [
                         $carbon_intensity_table => 'plugin_carbon_sources_id',
                         $carbon_intensity_source_table => 'id',
-                    ]
+                    ],
                 ],
             ],
             'WHERE' => [

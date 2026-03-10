@@ -112,10 +112,10 @@ class AbstractEmbodiedImpactTest extends DbTestCase
         $itemtype_type_fk = getForeignKeyFieldForItemType(static::$itemtype_type);
         $glpi_asset_type = $this->createItem(static::$itemtype_type);
         $asset_type = $this->createItem('GlpiPlugin\\Carbon\\' . static::$itemtype_type, [
-            $itemtype_type_fk => $glpi_asset_type->getID()
+            $itemtype_type_fk => $glpi_asset_type->getID(),
         ]);
         $asset = $this->createItem(static::$itemtype, [
-            $itemtype_type_fk => $glpi_asset_type->getID()
+            $itemtype_type_fk => $glpi_asset_type->getID(),
         ]);
 
         $request = AbstractEmbodiedImpact::getEvaluableQuery(
@@ -138,7 +138,7 @@ class AbstractEmbodiedImpactTest extends DbTestCase
             'is_ignore' => 1,
         ]);
         $asset = $this->createItem(static::$itemtype, [
-            $itemtype_type_fk => $glpi_asset_type->getID()
+            $itemtype_type_fk => $glpi_asset_type->getID(),
         ]);
 
         $request = AbstractEmbodiedImpact::getEvaluableQuery(

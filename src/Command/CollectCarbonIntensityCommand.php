@@ -36,10 +36,10 @@ use Config as GlpiConfig;
 use DateTimeImmutable;
 use Glpi\Console\AbstractCommand;
 use GlpiPlugin\Carbon\CarbonIntensity;
-use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientFactory;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientInterface;
 use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -70,7 +70,7 @@ class CollectCarbonIntensityCommand extends AbstractCommand
            ->addArgument('source', InputArgument::REQUIRED, '')
            ->addArgument('zone', InputArgument::REQUIRED, '')
            ->addOption('cache', null, InputOption::VALUE_NEGATABLE, 'Use cache. Cache is not read is disabled, but still fed by requests.')
-           ;
+        ;
     }
 
     protected function interact(InputInterface $input, OutputInterface $output)
@@ -147,7 +147,7 @@ class CollectCarbonIntensityCommand extends AbstractCommand
         $source_zone = new Source_Zone();
         $input = [
             $data_source::getForeignKeyField() => $data_source->getID(),
-            $zone::getForeignKeyField() => $zone->getID()
+            $zone::getForeignKeyField() => $zone->getID(),
         ];
         $source_zone->getFromDbByCrit($input);
         if ($source_zone->isNewItem()) {

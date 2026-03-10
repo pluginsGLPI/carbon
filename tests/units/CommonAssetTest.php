@@ -37,10 +37,9 @@ use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\CommonAsset;
 use GlpiPlugin\Carbon\EmbodiedImpact;
 use GlpiPlugin\Carbon\UsageImpact;
-use GlpiPlugin\Carbon\Tests\DbTestCase;
 use MassiveAction;
-use Symfony\Component\DomCrawler\Crawler;
 use PHPUnit\Framework\Attributes\CoversClass;
+use Symfony\Component\DomCrawler\Crawler;
 
 #[CoversClass(CommonAsset::class)]
 class CommonAssetTest extends DbTestCase
@@ -53,22 +52,22 @@ class CommonAssetTest extends DbTestCase
             'is_deleted' => 0,
             'action_filter' => [
                 'GlpiPlugin\Carbon\CommonAsset:MassDeleteAllImpacts' => [
-                    0 => GlpiComputer::class
-                ]
+                    0 => GlpiComputer::class,
+                ],
             ],
             'actions' => [
-                'GlpiPlugin\Carbon\CommonAsset:MassDeleteAllImpacts' => 'Delete all calculated environmental impacts'
+                'GlpiPlugin\Carbon\CommonAsset:MassDeleteAllImpacts' => 'Delete all calculated environmental impacts',
             ],
             'items' => [
                 GlpiComputer::class => [
-                    0  => 0 // Un real scenario, a map of ID => ID
-                ]
+                    0  => 0, // Un real scenario, a map of ID => ID
+                ],
             ],
             'initial_items' => [
                 GlpiComputer::class => [
                     0 => 0,
-                ]
-            ]
+                ],
+            ],
         ], [
         ], 'specialize');
         ob_start();
@@ -93,8 +92,8 @@ class CommonAssetTest extends DbTestCase
                 [
                     'itemtype' => GlpiComputer::class,
                     'items_id' => $glpi_computer_2->getID(),
-                ]
-            ]
+                ],
+            ],
         ]);
         $this->createItems([
             UsageImpact::class => [
@@ -105,8 +104,8 @@ class CommonAssetTest extends DbTestCase
                 [
                     'itemtype' => GlpiComputer::class,
                     'items_id' => $glpi_computer_2->getID(),
-                ]
-            ]
+                ],
+            ],
         ]);
         $this->createItems([
             CarbonEmission::class => [
@@ -117,8 +116,8 @@ class CommonAssetTest extends DbTestCase
                 [
                     'itemtype' => GlpiComputer::class,
                     'items_id' => $glpi_computer_2->getID(),
-                ]
-            ]
+                ],
+            ],
         ]);
         $glpi_computer = new GlpiComputer();
         $ids = [
@@ -133,15 +132,15 @@ class CommonAssetTest extends DbTestCase
                     'processor' => 'GlpiPlugin\Carbon\CommonAsset',
                     'is_deleted' => 0,
                     'initial_items' => [
-                        GlpiComputer::class => $ids
+                        GlpiComputer::class => $ids,
                     ],
                     'items' => [
-                        GlpiComputer::class => $ids
+                        GlpiComputer::class => $ids,
                     ],
-                    'action_name' => 'Delete all calculated environmental impacts'
+                    'action_name' => 'Delete all calculated environmental impacts',
                 ],
                 [],
-                'process'
+                'process',
             ])
             ->getMock();
         $massive_action->method('getAction')->willReturn('MassDeleteAllImpacts');
@@ -150,19 +149,19 @@ class CommonAssetTest extends DbTestCase
         $embodied = new EmbodiedImpact();
         $rows = $embodied->find([
             'itemtype' => GlpiComputer::class,
-            'items_id' => $ids
+            'items_id' => $ids,
         ]);
         $this->assertSame(0, count($rows));
         $usage = new UsageImpact();
         $rows = $usage->find([
             'itemtype' => GlpiComputer::class,
-            'items_id' => $ids
+            'items_id' => $ids,
         ]);
         $this->assertSame(0, count($rows));
         $emissions = new CarbonEmission();
         $rows = $emissions->find([
             'itemtype' => GlpiComputer::class,
-            'items_id' => $ids
+            'items_id' => $ids,
         ]);
         $this->assertSame(0, count($rows));
     }

@@ -40,7 +40,7 @@ global $DB;
 $table = 'glpi_plugin_carbon_computerusageprofiles';
 $iterator = $DB->request([
     'SELECT' => ['id', 'time_start', 'time_stop'],
-    'FROM' => $table
+    'FROM' => $table,
 ]);
 foreach ($iterator as $row) {
     $split_start = explode(':', $row['time_start']);
@@ -59,7 +59,7 @@ foreach ($iterator as $row) {
             'time_start' => implode(':', $split_start),
             'time_stop' => implode(':', $split_stop),
         ], [
-            'id' => $row['id']
+            'id' => $row['id'],
         ]);
     }
 }

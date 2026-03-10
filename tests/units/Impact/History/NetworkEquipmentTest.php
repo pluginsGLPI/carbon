@@ -34,24 +34,24 @@ namespace GlpiPlugin\Carbon\Impact\History\Tests;
 
 use DateTime;
 use GlpiPlugin\Carbon\CarbonEmission;
-use GlpiPlugin\Carbon\Tests\Impact\History\CommonAsset;
 use GlpiPlugin\Carbon\Impact\History\NetworkEquipment;
 use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
+use GlpiPlugin\Carbon\Tests\Impact\History\CommonAsset;
 use GlpiPlugin\Carbon\Zone;
 use Infocom;
-use NetworkEquipmentType as GlpiNetworkEquipmentType;
-use NetworkEquipment as GlpiNetworkEquipment;
 use Location as GlpiLocation;
+use NetworkEquipment as GlpiNetworkEquipment;
 use NetworkEquipmentModel as GlpiNetworkEquipmentModel;
+use NetworkEquipmentType as GlpiNetworkEquipmentType;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(NetworkEquipment::class)]
 class NetworkEquipmentTest extends CommonAsset
 {
-    protected string $history_type =  \GlpiPlugin\Carbon\Impact\History\NetworkEquipment::class;
+    protected string $history_type =  NetworkEquipment::class;
     protected string $asset_type = GlpiNetworkEquipment::class;
 
     public function testGetEngine()
@@ -88,20 +88,20 @@ class NetworkEquipmentTest extends CommonAsset
         ]);
         $source = new Source(); // This source exists after a fresh install
         $source->getFromDBByCrit([
-            'name' => 'Hydro Quebec'
+            'name' => 'Hydro Quebec',
         ]);
         $zone = new Zone(); // This zone  exists after a fresh install
         $zone->getFromDBByCrit([
-            'name' => 'Quebec'
+            'name' => 'Quebec',
         ]);
         $source_zone = new Source_Zone(); // the relation source / zone also exists after a fresh install
         $source_zone->getFromDBByCrit([
             $source::getForeignKeyField() => $source->getID(),
-            $zone::getForeignKeyField() => $zone->getID()
+            $zone::getForeignKeyField() => $zone->getID(),
         ]);
         $location = $this->createItem(Location::class, [
             'locations_id' => $glpi_location->getID(),
-            'plugin_carbon_sources_zones_id' => $source_zone->getID()
+            'plugin_carbon_sources_zones_id' => $source_zone->getID(),
         ]);
         $model = $this->createItem(GlpiNetworkEquipmentModel::class, ['power_consumption' => $model_power]);
         $glpi_type = $this->createItem(GlpiNetworkEquipmentType::class);
@@ -312,21 +312,21 @@ class NetworkEquipmentTest extends CommonAsset
 
         $source = new Source(); // This source exists after a fresh install
         $source->getFromDBByCrit([
-            'name' => 'RTE'
+            'name' => 'RTE',
         ]);
         $zone = new Zone(); // This zone  exists after a fresh install
         $zone->getFromDBByCrit([
-            'name' => 'France'
+            'name' => 'France',
         ]);
         $source_zone = new Source_Zone(); // the relation source / zone also exists after a fresh install
         $source_zone->getFromDBByCrit([
             $source::getForeignKeyField() => $source->getID(),
-            $zone::getForeignKeyField() => $zone->getID()
+            $zone::getForeignKeyField() => $zone->getID(),
         ]);
         $glpi_location = $this->createItem(GlpiLocation::class);
         $location = $this->createItem(Location::class, [
             'locations_id' => $glpi_location->getID(),
-            'plugin_carbon_sources_zones_id' => $source_zone->getID()
+            'plugin_carbon_sources_zones_id' => $source_zone->getID(),
         ]);
         $network_equipment = $this->createItem(GlpiNetworkEquipment::class, [
             'locations_id' => $glpi_location->getID(),

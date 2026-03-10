@@ -32,6 +32,4 @@
 
 namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity;
 
-class AbortException extends \RuntimeException
-{
-}
+class AbortException extends \RuntimeException {}

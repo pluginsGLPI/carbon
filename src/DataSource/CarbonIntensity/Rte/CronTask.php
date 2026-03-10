@@ -40,7 +40,6 @@ use GlpiPlugin\Carbon\CronTask as CarbonCronTask;
 use GlpiPlugin\Carbon\DataSource\AbstractCronTask;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientFactory;
 use GlpiPlugin\Carbon\DataSource\CronTaskInterface;
-use GlpiPlugin\Carbon\DataSource\CronTaskProvider;
 use GlpiPlugin\Carbon\DataSource\RestApiClient;
 use GlpiPlugin\Carbon\Source_Zone;
 
@@ -86,8 +85,8 @@ class CronTask extends AbstractCronTask implements CronTaskInterface
                     'logs_lifetime' => 30,
                     'comment'       => __('Collect carbon intensities from RTE', 'carbon'),
                     'param'         => 10000, // Maximum rows to generate per execution
-                ]
-            ]
+                ],
+            ],
         ];
     }
 

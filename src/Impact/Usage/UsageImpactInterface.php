@@ -57,7 +57,7 @@ interface UsageImpactInterface
     /**
      * Set the maximum count of items to calculate with evaluateItems()
      *
-     * @param integer $limit
+     * @param int $limit
      * @return void
      */
     public function setLimit(int $limit);
@@ -89,7 +89,7 @@ interface UsageImpactInterface
     /**
      * Evaluate all impacts of the asset
      *
-     * @param integer    $id
+     * @param int    $id
      * @return bool      true if success, false otherwise
      */
     public function evaluateItem(int $id): bool;

@@ -30,12 +30,12 @@
  * -------------------------------------------------------------------------
  */
 
+use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\Install;
-use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Output\ConsoleOutput;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\StreamOutput;
 
 /** @var DBmysql $DB */
@@ -55,7 +55,7 @@ Install::linkSourceZone($source_id, $zone_id);
 $source_id = Install::getOrCreateSource('ElectricityMap', 0);
 
 $dbUtil = new DbUtils();
-$table = $dbUtil->getTableForItemType(GlpiPlugin\Carbon\CarbonIntensity::class);
+$table = $dbUtil->getTableForItemType(CarbonIntensity::class);
 
 // Expected columns are Entity; Code; Year; Carbon intensity of electricity - gCO2/kWh
 $data_source = dirname(__DIR__) . '/data/carbon_intensity/carbon-intensity-electricity.csv';
@@ -65,9 +65,9 @@ $source_id = Install::getOrCreateSource('Ember - Energy Institute', 2);
 
 try {
     $file = new SplFileObject($data_source, 'r');
-} catch (\RuntimeException $e) {
+} catch (RuntimeException $e) {
     throw $e;
-} catch (\LogicException $e) {
+} catch (LogicException $e) {
     throw $e;
 }
 $file->seek(PHP_INT_MAX); // Go to the end of the file
@@ -92,8 +92,8 @@ while (($line = $file->fgetcsv(',', '"', '\\')) !== false) {
 
     $entity = $line[0];
     $code = $line[1];
-    $year = (int)$line[2];
-    $intensity = (float)$line[3];
+    $year = (int) $line[2];
+    $intensity = (float) $line[3];
 
     // Skip if the code is empty
     if ($code === '') {
@@ -107,15 +107,15 @@ while (($line = $file->fgetcsv(',', '"', '\\')) !== false) {
     try {
         $DB->updateOrInsert($table, [
             'intensity' => $intensity,
-            'data_quality' => 2 // constant GlpiPlugin\Carbon\DataTracking::DATA_QUALITY_ESTIMATED
+            'data_quality' => 2, // constant GlpiPlugin\Carbon\DataTracking::DATA_QUALITY_ESTIMATED
         ], [
             'date' => "$year-01-01 00:00:00",
             'plugin_carbon_sources_id' => $source_id,
             'plugin_carbon_zones_id'   => $zone_id,
         ]);
-    } catch (\RuntimeException $e) {
+    } catch (RuntimeException $e) {
         $file = null; // close the file
-        throw new \RuntimeException("Failed to insert data for year $year; reason: " . $e->getMessage(), $e->getCode(), $e);
+        throw new RuntimeException("Failed to insert data for year $year; reason: " . $e->getMessage(), $e->getCode(), $e);
     }
 }
 if ($progress_bar) {
@@ -132,14 +132,14 @@ foreach ($quebec_carbon_intensity as $year => $intensity) {
     try {
         $DB->updateOrInsert($table, [
             'intensity' => $intensity,
-            'data_quality' => 2 // constant GlpiPlugin\Carbon\DataTracking::DATA_QUALITY_ESTIMATED
+            'data_quality' => 2, // constant GlpiPlugin\Carbon\DataTracking::DATA_QUALITY_ESTIMATED
         ], [
             'date' => "$year-01-01 00:00:00",
             'plugin_carbon_sources_id' => $source_id,
             'plugin_carbon_zones_id' => $zone_id_quebec,
         ]);
-    } catch (\RuntimeException $e) {
+    } catch (RuntimeException $e) {
         $file = null; // close the file
-        throw new \RuntimeException("Failed to insert data for year $year; reason: " . $e->getMessage(), $e->getCode(), $e);
+        throw new RuntimeException("Failed to insert data for year $year; reason: " . $e->getMessage(), $e->getCode(), $e);
     }
 }
