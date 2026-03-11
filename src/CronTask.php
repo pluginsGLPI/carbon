@@ -192,8 +192,9 @@ class CronTask extends CommonGLPI
 
         /** @var int $count count of successfully evaluated assets */
         $count = 0;
+        $limit = ['LIMIT' => $limit_per_type];
         foreach (PLUGIN_CARBON_TYPES as $itemtype) {
-            foreach (AbstractEmbodiedImpact::getItemsToEvaluate($itemtype) as $row) {
+            foreach (AbstractEmbodiedImpact::getItemsToEvaluate($itemtype, $limit) as $row) {
                 $item = new $itemtype();
                 if (!$item->getFromDB($row['id'])) {
                     continue;
@@ -212,11 +213,6 @@ class CronTask extends CommonGLPI
                     // 8 MB memory left, emergency exit
                     // Terminate the task
                     break 2;
-                }
-
-                if ($count >= $limit_per_type) {
-                    // Process next itemtype
-                    break;
                 }
             }
         }
