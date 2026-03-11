@@ -188,11 +188,6 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         $item_type_table = getTableForItemType('GlpiPlugin\\Carbon\\' . $itemtype . 'Type');
         $embodied_impact_table = EmbodiedImpact::getTable();
 
-        // $where = [];
-        // if (!$recalculate) {
-        //     $where = [EmbodiedImpact::getTableField('id') => null];
-        // }
-
         $crit[] = [
             'OR' => [
                 $item_type_table . '.is_ignore' => 0,
