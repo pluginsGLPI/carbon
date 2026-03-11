@@ -105,7 +105,10 @@ class EmbodiedImpact extends AbstractImpact
                 ],
             ],
             'WHERE' => [
-                self::getTableField('items_id') => null,
+                'OR' => [
+                    self::getTableField('items_id') => null,
+                    self::getTableField('recalculate') => 1,
+                ],
             ],
         ], $crit));
 
