@@ -559,4 +559,43 @@ class LocationTest extends DbTestCase
         $result = $location->getSourceZoneId();
         $this->assertEquals($source_zone->getID(), $result);
     }
+
+    public function getZoneCodeTest()
+    {
+        // Test an asset without a location
+        $glpi_computer = $this->createItem(GlpiComputer::class);
+        $result = Location::getZoneCode($glpi_computer);
+        $this->assertNull($result);
+
+        // Test an asset with a location without a plugin location extra data
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $glpi_computer = $this->createItem(GlpiComputer::class, [
+            $glpi_location->getForeignKeyField() => $glpi_location->getID(),
+        ]);
+        $result = Location::getZoneCode($glpi_computer);
+        $this->assertNull($result);
+
+        // Test an asset with a location without a boavizta zone set
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $location = $this->createItem(Location::class, [
+            $glpi_location->getForeignKeyField() => $glpi_location->getID(),
+        ]);
+        $glpi_computer = $this->createItem(GlpiComputer::class, [
+            $glpi_location->getForeignKeyField() => $glpi_location->getID(),
+        ]);
+        $result = Location::getZoneCode($glpi_computer);
+        $this->assertNull($result);
+
+        // Test an asset with a location fully specified
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $location = $this->createItem(Location::class, [
+            $glpi_location->getForeignKeyField() => $glpi_location->getID(),
+            'boavizta_zone' => 'FRA',
+        ]);
+        $glpi_computer = $this->createItem(GlpiComputer::class, [
+            $glpi_location->getForeignKeyField() => $glpi_location->getID(),
+        ]);
+        $result = Location::getZoneCode($glpi_computer);
+        $this->assertEquals('FRA', $result);
+    }
 }
