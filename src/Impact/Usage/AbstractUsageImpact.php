@@ -42,7 +42,6 @@ use GlpiPlugin\Carbon\Impact\Type;
 use GlpiPlugin\Carbon\Toolbox;
 use GlpiPlugin\Carbon\UsageImpact;
 use Location as GlpiLocation;
-use Toolbox as GlpiToolbox;
 
 abstract class AbstractUsageImpact implements UsageImpactInterface
 {
@@ -230,7 +229,7 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
                 $item_type_table . '.is_ignore' => 0,
                 $item_type_table . '.id' => null,
             ],
-            ['NOT' => [GlpiLocation::getTableField('id') => null]]
+            ['NOT' => [GlpiLocation::getTableField('id') => null]],
         ];
 
         $request = [

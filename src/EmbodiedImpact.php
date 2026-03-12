@@ -32,11 +32,6 @@
 
 namespace GlpiPlugin\Carbon;
 
-use CommonDBTM;
-use DBmysql;
-use DBmysqlIterator;
-use Toolbox as GlpiToolbox;
-
 /**
  * Embodied impact of assets
  *
