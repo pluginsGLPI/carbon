@@ -44,6 +44,7 @@ use Glpi\DBAL\QueryExpression;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Location;
+use GlpiPlugin\Carbon\UsageImpact;
 use GlpiPlugin\Carbon\UsageInfo;
 use Infocom;
 use Item_DeviceMemory;
@@ -59,9 +60,9 @@ class Computer extends AbstractAsset
 
     protected string $endpoint        = 'server';
 
-    public function getEvaluableQuery(array $crit = [], bool $entity_restrict = true): array
+    public function getEvaluableQuery(string $itemtype, array $crit = [], bool $entity_restrict = true): array
     {
-        $item_table = self::$itemtype::getTable();
+        $item_table = getTableForItemType($itemtype);
         $item_model_table = self::$model_itemtype::getTable();
         $glpi_computertypes_table = GlpiComputerType::getTable();
         $computertypes_table = ComputerType::getTable();
@@ -69,6 +70,7 @@ class Computer extends AbstractAsset
         $usage_info_table = UsageInfo::getTable();
         $computerUsageProfile_table = ComputerUsageProfile::getTable();
         $infocom_table = Infocom::getTable();
+        $usage_impact_table = UsageImpact::getTable();
 
         $request = [
             'SELECT' => [
@@ -79,7 +81,7 @@ class Computer extends AbstractAsset
                 $location_table => [
                     'FKEY'   => [
                         $item_table  => 'locations_id',
-                        $location_table => 'id',
+                        $location_table => 'locations_id',
                     ],
                 ],
                 $usage_info_table => [
@@ -129,6 +131,17 @@ class Computer extends AbstractAsset
                         ['AND' => [Infocom::getTableField('itemtype') => self::$itemtype]],
                     ],
                 ],
+                $usage_impact_table => [
+                    'FKEY' => [
+                        $usage_impact_table => 'items_id',
+                        $item_table            => 'id',
+                        ['AND'
+                            => [
+                                UsageImpact::getTableField('itemtype') => $itemtype,
+                            ],
+                        ],
+                    ],
+                ],
             ],
             'WHERE' => [
                 'AND' => [
@@ -146,8 +159,8 @@ class Computer extends AbstractAsset
                             ['NOT' => [Infocom::getTableField('use_date') => null]],
                             ['NOT' => [Infocom::getTableField('delivery_date') => null]],
                             ['NOT' => [Infocom::getTableField('buy_date') => null]],
-                            ['NOT' => [Infocom::getTableField('date_creation') => null]],
-                            ['NOT' => [Infocom::getTableField('date_mod') => null]],
+                            // ['NOT' => [Infocom::getTableField('date_creation') => null]],
+                            // ['NOT' => [Infocom::getTableField('date_mod') => null]],
                         ],
                     ], [
                         'AND' => [

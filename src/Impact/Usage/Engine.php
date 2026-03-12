@@ -55,12 +55,13 @@ class Engine extends CommonGLPI
      *
      * Returns null if no engine found
      *
-     * @template T of CommonDBTM
-     * @param class-string<T> $itemtype itemtype of assets to analyze
+     * @param CommonDBTM $item item to analyze
      * @return AbstractUsageImpact|null an instance if an embodied impact calculation object or null on error
      */
-    public static function getEngineFromItemtype(string $itemtype): ?AbstractUsageImpact
+    public static function getEngineFromItemtype(CommonDBTM $item): ?AbstractUsageImpact
     {
+        $itemtype = get_class($item);
+
         $usage_impact_namespace = Config::getUsageImpactEngine();
         $usage_impact_class = $usage_impact_namespace . '\\' . $itemtype;
         if (!class_exists($usage_impact_class) || !is_subclass_of($usage_impact_class, AbstractUsageImpact::class)) {
@@ -68,7 +69,7 @@ class Engine extends CommonGLPI
         }
 
         /** @var AbstractUsageImpact $usage_impact */
-        $usage_impact = new $usage_impact_class();
+        $usage_impact = new $usage_impact_class($item);
         try {
             return self::configureEngine($usage_impact);
         } catch (\RuntimeException $e) {
