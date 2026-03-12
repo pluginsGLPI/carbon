@@ -36,6 +36,7 @@ use CommonDBChild;
 use CommonDBTM;
 use CommonGLPI;
 use Config as GlpiConfig;
+use DateTime;
 use DBmysql;
 use DBmysqlIterator;
 use DbUtils;
@@ -621,5 +622,44 @@ class Location extends CommonDBChild
         }
 
         return $iterator->current()['plugin_carbon_sources_zones_id'];
+    }
+
+    /**
+     * Get the boavizta zone code the asset belongs to
+     *
+     * @param  CommonDBTM $item
+     * @param  DateTime $date Date for which the zone must be found
+     * @return string|null
+     */
+    public static function getZoneCode(CommonDBTM $item, ?DateTime $date = null): ?string
+    {
+        // TODO: use date to find where was the asset at the given date
+        if ($date === null) {
+            $item_table = getTableForItemType($item::class);
+            $glpi_location_table = getTableForItemType(GlpiLocation::class);
+            $location_table = self::getTable();
+            $location = new Location();
+            $found = $location->getFromDBByRequest([
+                'INNER JOIN' => [
+                    $glpi_location_table => [
+                        'FKEY' => [
+                            $location_table => 'locations_id',
+                            $glpi_location_table => 'id',
+                        ],
+                    ],
+                ],
+                'WHERE' => [
+                    GlpiLocation::getTableField('id') => $item->fields['locations_id'],
+                ],
+            ]);
+
+            if ($found === false) {
+                return null;
+            }
+
+            return $location->fields['boavizta_zone'];
+        }
+
+        throw new \LogicException('Not implemented yet');
     }
 }

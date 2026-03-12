@@ -175,8 +175,8 @@ class Computer extends AbstractAsset
         $type = $this->getType($item);
         $this->endpoint = $this->getEndpoint($type);
 
-        // Find boavizta zone  code
-        $zone_code = $this->getZoneCode($item);
+        // Find boavizta zone code
+        $zone_code = Location::getZoneCode($item);
         if ($zone_code === null) {
             return null;
         }
