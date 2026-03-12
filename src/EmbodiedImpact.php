@@ -49,79 +49,13 @@ class EmbodiedImpact extends AbstractImpact
         return _n("Embodied impact", "Embodied impacts", $nb, 'carbon');
     }
 
-    public function canEdit($ID): bool
-    {
-        return false;
-    }
-
-    /**
-     * Get iterator of items without known embodied impact for a specified itemtype
-     *
-     * @template T of CommonDBTM
-     * @param class-string<T> $itemtype
-     * @param array $crit Criteria array of WHERE, ORDER, GROUP BY, LEFT JOIN, INNER JOIN, RIGHT JOIN, HAVING, LIMIT
-     * @return DBmysqlIterator
-     */
-    public static function getAssetsToCalculate(string $itemtype, array $crit = []): DBmysqlIterator
-    {
-        /** @var DBmysql $DB */
-        global $DB;
-
-        // Check $itemtype inherits from CommonDBTM
-        if (!GlpiToolbox::isCommonDBTM($itemtype)) {
-            throw new \LogicException('itemtype is not a CommonDBTM object');
-        }
-
-        // clean $crit array: remove mostly SELECT, FROM
-        $crit = array_intersect_key($crit, array_flip([
-            'WHERE',
-            'ORDER',
-            'GROUP BY',
-            'LEFT JOIN',
-            'INNER JOIN',
-            'RIGHT JOIN',
-            'HAVING',
-            'LIMIT',
-        ]));
-
-        $table = self::getTable();
-        $itemtype_table = $itemtype::getTable();
-
-        $iterator = $DB->request(array_merge_recursive([
-            'SELECT' => [
-                $itemtype::getTableField('id'),
-            ],
-            'FROM' => $itemtype_table,
-            'LEFT JOIN' => [
-                $table => [
-                    'FKEY' => [
-                        $table => 'items_id',
-                        $itemtype_table => 'id',
-
-                    ],
-                    'AND' => [
-                        'itemtype' => $itemtype,
-                    ],
-                ],
-            ],
-            'WHERE' => [
-                'OR' => [
-                    self::getTableField('items_id') => null,
-                    self::getTableField('recalculate') => 1,
-                ],
-            ],
-        ], $crit));
-
-        return $iterator;
-    }
-
     public function calculateImpact(string $lca_type, int $limit = 0): int
     {
         $crit = [];
         if ($limit > 0) {
             $crit['LIMIT'] = $limit;
         }
-        $iterator = $this->getAssetsToCalculate($lca_type::getItemtype(), $crit);
+        $iterator = self::getItemsToEvaluate($lca_type::getItemtype(), $crit);
         $count = 0;
         foreach ($iterator as $item) {
             $lca = new $lca_type($item['id']);

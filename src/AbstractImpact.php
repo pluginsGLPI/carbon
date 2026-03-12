@@ -34,6 +34,10 @@ namespace GlpiPlugin\Carbon;
 
 use CommonDBChild;
 use GlpiPlugin\Carbon\Impact\Type;
+use CommonDBTM;
+use DBmysql;
+use DBmysqlIterator;
+use Toolbox as GlpiToolbox;
 
 abstract class AbstractImpact extends CommonDBChild
 {
@@ -41,6 +45,11 @@ abstract class AbstractImpact extends CommonDBChild
     public static $items_id = 'items_id';
 
     public static $rightname = 'carbon:report';
+
+    public function canEdit($ID): bool
+    {
+        return false;
+    }
 
     public function rawSearchOptions()
     {
@@ -130,6 +139,87 @@ abstract class AbstractImpact extends CommonDBChild
         ];
 
         return $tab;
+    }
+
+    /**
+     * Get iterator of items without known embodied impact for a specified itemtype
+     *
+     * @template T of CommonDBTM
+     * @param class-string<T> $itemtype
+     * @param array $crit Criteria array of WHERE, ORDER, GROUP BY, LEFT JOIN, INNER JOIN, RIGHT JOIN, HAVING, LIMIT
+     * @return DBmysqlIterator
+     */
+    public static function getItemsToEvaluate(string $itemtype, array $crit = []): DBmysqlIterator
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        // Check $itemtype inherits from CommonDBTM
+        if (!GlpiToolbox::isCommonDBTM($itemtype)) {
+            throw new \LogicException('itemtype is not a CommonDBTM object');
+        }
+
+        // clean $crit array: remove mostly SELECT, FROM
+        $crit = array_intersect_key($crit, array_flip([
+            'WHERE',
+            'ORDER',
+            'GROUP BY',
+            'LEFT JOIN',
+            'INNER JOIN',
+            'RIGHT JOIN',
+            'HAVING',
+            'LIMIT',
+        ]));
+
+        $table = self::getTable();
+        $glpi_item_type_table = getTableForItemType($itemtype . 'Type');
+        $glpi_item_type_fk = getForeignKeyFieldForTable($glpi_item_type_table);
+        $item_type_table = getTableForItemType('GlpiPlugin\\Carbon\\' . $itemtype . 'Type');
+        $item_table = $itemtype::getTable();
+
+        $iterator = $DB->request(array_merge_recursive([
+            'SELECT' => [
+                $itemtype::getTableField('id'),
+            ],
+            'FROM' => $item_table,
+            'LEFT JOIN' => [
+                $table => [
+                    'FKEY' => [
+                        $table => 'items_id',
+                        $item_table => 'id',
+
+                    ],
+                    'AND' => [
+                        'itemtype' => $itemtype,
+                    ],
+                ],
+                $item_type_table => [
+                    [
+                        'FKEY' => [
+                            $item_type_table => $glpi_item_type_fk,
+                            $item_table => $glpi_item_type_fk,
+                        ],
+                    ],
+                ],
+            ],
+            'WHERE' => [
+                [
+                    // No calculated data or data to recalculate
+                    'OR' => [
+                        self::getTableField('items_id') => null,
+                        self::getTableField('recalculate') => 1,
+                    ],
+                ], [
+                    // Item not marked to exclude from calculation
+                    'OR' => [
+                        $item_type_table . '.is_ignore' => 0,
+                        $item_type_table . '.id' => null,
+                    ],
+                ]
+            ],
+        ], $crit));
+
+        return $iterator;
     }
 
     /**

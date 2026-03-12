@@ -140,6 +140,13 @@ class CronTask extends CommonGLPI
         // Half of job for GWP, the other half for other impacts
         $limit_per_type = max(1, floor($limit_per_type / 2));
 
+        /**
+         * Huge quantity of SQL queries will be executed
+         * We NEED to check memory usage to avoid running out of memory
+         * @see DbMysql::doQuery()
+         */
+        $memory_limit = Toolbox::getMemoryLimit();
+
         // Calculate GWP
         $count = 0;
         foreach ($usage_impacts as $usage_impact_type) {
@@ -151,14 +158,29 @@ class CronTask extends CommonGLPI
         }
 
         // Calculate other impacts
+        $limit = ['LIMIT' => $limit_per_type];
         foreach (PLUGIN_CARBON_TYPES as $itemtype) {
-            $usage_impact = UsageEngine::getEngineFromItemtype($itemtype);
-            if ($usage_impact === null) {
-                continue;
+            foreach (UsageImpact::getItemsToEvaluate($itemtype, $limit) as $row) {
+                $item = new $itemtype();
+                if (!$item->getFromDB($row['id'])) {
+                    continue;
+                }
+                $usage_impact = UsageEngine::getEngineFromItemtype($item);
+                if ($usage_impact === null) {
+                    // An error occured while configuring the engine
+                    continue;
+                }
+                if ($usage_impact->evaluateItem()) {
+                    $count++;
+                }
+
+                // Check free memory
+                if ($memory_limit && $memory_limit < memory_get_usage()) {
+                    // 8 MB memory left, emergency exit
+                    // Terminate the task
+                    break 2;
+                }
             }
-            $usage_impact->setLimit($limit_per_type);
-            $count = $usage_impact->evaluateItems($usage_impact->getItemsToEvaluate());
-            $task->addVolume($count);
         }
 
         return ($count > 0 ? 1 : 0);
@@ -183,18 +205,13 @@ class CronTask extends CommonGLPI
          * We NEED to check memory usage to avoid running out of memory
          * @see DbMysql::doQuery()
          */
-        $memory_limit = GlpiToolbox::getMemoryLimit() - 8 * 1024 * 1024;
-        if ($memory_limit < 0) {
-            // May happen in test seems that ini_get("memory_limits") returns
-            // enpty string in PHPUnit environment
-            $memory_limit = null;
-        }
+        $memory_limit = Toolbox::getMemoryLimit();
 
         /** @var int $count count of successfully evaluated assets */
         $count = 0;
         $limit = ['LIMIT' => $limit_per_type];
         foreach (PLUGIN_CARBON_TYPES as $itemtype) {
-            foreach (AbstractEmbodiedImpact::getItemsToEvaluate($itemtype, $limit) as $row) {
+            foreach (EmbodiedImpact::getItemsToEvaluate($itemtype, $limit) as $row) {
                 $item = new $itemtype();
                 if (!$item->getFromDB($row['id'])) {
                     continue;

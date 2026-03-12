@@ -64,11 +64,11 @@ class EmbodiedImpactTest extends DbTestCase
             ]);
 
             // Check that we get all not calculated assets for the given itemtype
-            $iterator = EmbodiedImpact::getAssetsToCalculate($itemtype);
+            $iterator = EmbodiedImpact::getItemsToEvaluate($itemtype);
             $this->assertEquals(2, $iterator->count());
 
             // Check that we can filter not calculated assets by ID
-            $iterator = EmbodiedImpact::getAssetsToCalculate($itemtype, [
+            $iterator = EmbodiedImpact::getItemsToEvaluate($itemtype, [
                 'WHERE' => [
                     'NOT' => [$itemtype::getTableField('id') => $not_calculated_asset_2->getID()],
                 ],

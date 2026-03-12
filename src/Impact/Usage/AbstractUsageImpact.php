@@ -39,14 +39,15 @@ use DBmysqlIterator;
 use DbUtils;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\Impact\Type;
+use GlpiPlugin\Carbon\Toolbox;
 use GlpiPlugin\Carbon\UsageImpact;
 use Location as GlpiLocation;
 use Toolbox as GlpiToolbox;
 
 abstract class AbstractUsageImpact implements UsageImpactInterface
 {
-    /** @var string Handled itemtype */
-    protected static string $itemtype = '';
+    /** @var CommonDBTM Item to analyze */
+    protected CommonDBTM $item;
 
     /** @var int maximum number of entries to build */
     protected int $limit = 0;
@@ -63,8 +64,12 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
     /** @var array of TrackedFloat */
     protected array $impacts = [];
 
-    public function __construct()
+    public function __construct(CommonDBTM $item)
     {
+        if ($item->isNewItem()) {
+            throw new \LogicException("Given item is empty");
+        }
+        $this->item = $item;
         foreach (array_flip(Type::getImpactTypes()) as $type) {
             $this->impacts[$type] = null;
         }
@@ -93,22 +98,16 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
         return null;
     }
 
-    public static function getItemtype(): string
-    {
-        return static::$itemtype;
-    }
-
     public function setLimit(int $limit)
     {
         $this->limit = $limit;
     }
 
-    public function getItemsToEvaluate(array $crit = []): DBmysqlIterator
+    public function getItemsToEvaluate(string $itemtype, array $crit = []): DBmysqlIterator
     {
         /** @var DBmysql $DB */
         global $DB;
 
-        $itemtype = static::$itemtype;
         if ($itemtype === '') {
             throw new \LogicException('Itemtype not set');
         }
@@ -122,8 +121,7 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
                 UsageImpact::getTableField('recalculate') => 1,
             ],
         ];
-        $crit[UsageImpact::getTableField('id')] = null;
-        $iterator = $DB->request($this->getEvaluableQuery($crit, false));
+        $iterator = $DB->request($this->getEvaluableQuery($itemtype, $crit, false));
 
         return $iterator;
     }
@@ -135,12 +133,7 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
          * We NEED to check memory usage to avoid running out of memory
          * @see DBmysql::doQuery()
          */
-        $memory_limit = GlpiToolbox::getMemoryLimit() - 8 * 1024 * 1024;
-        if ($memory_limit < 0) {
-            // May happen in test seems that ini_get("memory_limits") returns
-            // enpty string in PHPUnit environment
-            $memory_limit = null;
-        }
+        $memory_limit = Toolbox::getMemoryLimit();
 
         /** @var int $attempts_count count of evaluation attempts */
         $attempts_count = 0;
@@ -168,17 +161,13 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
         return $count;
     }
 
-    public function evaluateItem(int $id): bool
+    public function evaluateItem(): bool
     {
-        $itemtype = static::$itemtype;
-        $item = $itemtype::getById($id);
-        if ($item === false) {
-            return false;
-        }
+        $itemtype = get_class($this->item);
 
         try {
             $this->getVersion();
-            $impacts = $this->doEvaluation($item);
+            $impacts = $this->doEvaluation($this->item);
         } catch (\RuntimeException $e) {
             return false;
         }
@@ -191,7 +180,7 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
         // Find an existing row, if any
         $input = [
             'itemtype' => $itemtype,
-            'items_id' => $id,
+            'items_id' => $this->item->getID(),
         ];
         $usage_impact = new UsageImpact();
         $usage_impact->getFromDBByCrit($input);
@@ -229,12 +218,20 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
         return false;
     }
 
-    public function getEvaluableQuery(array $crit = [], bool $entity_restrict = true): array
+    public function getEvaluableQuery(string $itemtype, array $crit = [], bool $entity_restrict = true): array
     {
-        $itemtype = static::$itemtype;
-        $item_table = $itemtype::getTable();
+        $item_table = getTableForItemType($itemtype);
         $glpi_location_table = GlpiLocation::getTable();
+        $item_type_table = getTableForItemType('GlpiPlugin\\Carbon\\' . $itemtype . 'Type');
         $usage_impact_table = UsageImpact::getTable();
+
+        $crit[] = [
+            'OR' => [
+                $item_type_table . '.is_ignore' => 0,
+                $item_type_table . '.id' => null,
+            ],
+            ['NOT' => [GlpiLocation::getTableField('id') => null]]
+        ];
 
         $request = [
             'SELECT' => [
@@ -260,9 +257,7 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
                     ],
                 ],
             ],
-            'WHERE' => [
-                ['NOT' => [GlpiLocation::getTableField('id') => null]],
-            ] + $crit,
+            'WHERE' => $crit,
         ];
 
         if ($entity_restrict) {

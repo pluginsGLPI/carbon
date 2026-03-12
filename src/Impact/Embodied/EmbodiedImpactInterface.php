@@ -62,7 +62,7 @@ interface EmbodiedImpactInterface
      *
      * @template T of CommonDBTM
      * @param class-string<T> $itemtype
-     * @param array $crit criterias
+     * @param array $crit criteria
      * @return DBmysqlIterator
      */
     public static function getItemsToEvaluate(string $itemtype, array $crit = []): DBmysqlIterator;

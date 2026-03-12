@@ -48,13 +48,6 @@ interface UsageImpactInterface
     // public static function getEngine(CommonDBTM $item): EngineInterface;
 
     /**
-     * Get  the itemtype of the asset handled by this class
-     *
-     * @return string
-     */
-    public static function getItemtype(): string;
-
-    /**
      * Set the maximum count of items to calculate with evaluateItems()
      *
      * @param int $limit
@@ -64,19 +57,24 @@ interface UsageImpactInterface
 
     /**
      * Get query to find items we can evaluate
-     * @param array $crit Criterias to aass to WHERE clause
+     *
+     * @template T of CommonDBTM
+     * @param class-string<T> $itemtype
+     * @param array $crit Criteria
      *
      * @return array
      */
-    public function getEvaluableQuery(array $crit = []): array;
+    public function getEvaluableQuery(string $itemtype, array $crit = []): array;
 
     /**
      * Get an iterator of items to evaluate
      *
-     * @param array $crit
+     * @template T of CommonDBTM
+     * @param class-string<T> $itemtype
+     * @param array $crit criteria
      * @return DBmysqlIterator
      */
-    public function getItemsToEvaluate(array $crit = []): DBmysqlIterator;
+    public function getItemsToEvaluate(string $itemtype, array $crit = []): DBmysqlIterator;
 
     /**
      * Start the evaluation of all items
@@ -89,8 +87,7 @@ interface UsageImpactInterface
     /**
      * Evaluate all impacts of the asset
      *
-     * @param int    $id
      * @return bool      true if success, false otherwise
      */
-    public function evaluateItem(int $id): bool;
+    public function evaluateItem(): bool;
 }
