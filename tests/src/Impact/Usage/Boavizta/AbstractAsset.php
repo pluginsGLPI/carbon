@@ -44,7 +44,6 @@ use GlpiPlugin\Carbon\UsageInfo;
 use Infocom;
 use Location as GlpiLocation;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(AbstractUsageImpact::class)]
 abstract class AbstractAsset extends DbTestCase
@@ -70,17 +69,17 @@ abstract class AbstractAsset extends DbTestCase
         $glpi_location = $this->createItem(GlpiLocation::class);
         $location = $this->createItem(Location::class, [
             $glpi_location->getForeignKeyField() => $glpi_location->getID(),
-            'boavizta_zone' => 'FRA'
+            'boavizta_zone' => 'FRA',
         ]);
         $glpi_asset_type = $this->createItem(static::$itemtype_type);
         $asset_type = $this->createItem('GlpiPlugin\\Carbon\\' . static::$itemtype_type, [
             $glpi_asset_type->getForeignKeyField() => $glpi_asset_type->getID(),
             'power_consumption' => 42,
-            'category' => ComputerType::CATEGORY_DESKTOP
+            'category' => ComputerType::CATEGORY_DESKTOP,
         ]);
         $asset = $this->createItem(static::$itemtype, [
             $glpi_asset_type->getForeignKeyField() => $glpi_asset_type->getID(),
-            $glpi_location->getForeignKeyField() => $glpi_location->getID()
+            $glpi_location->getForeignKeyField() => $glpi_location->getID(),
         ]);
         $infocom = $this->createItem(Infocom::class, [
             'itemtype' => get_class($asset),
@@ -90,7 +89,7 @@ abstract class AbstractAsset extends DbTestCase
         $usage_info = $this->createItem(UsageInfo::class, [
             'itemtype' => get_class($asset),
             'items_id' => $asset->getID(),
-            ComputerUsageProfile::getForeignKeyField() => 2 // Office hours ID
+            ComputerUsageProfile::getForeignKeyField() => 2, // Office hours ID
         ]);
 
         return [

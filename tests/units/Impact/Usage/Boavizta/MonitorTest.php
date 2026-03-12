@@ -32,11 +32,11 @@
 
 namespace GlpiPlugin\Carbon\Impact\Usage\Boavizta\Tests;
 
+use GlpiPlugin\Carbon\Impact\Usage\Boavizta\Monitor as BoaviztaMonitor;
+use GlpiPlugin\Carbon\Tests\Impact\Usage\Boavizta\AbstractAsset;
 use Monitor as GlpiMonitor;
 use MonitorModel as GlpiMonitorModel;
 use MonitorType as GlpiMonitorType;
-use GlpiPlugin\Carbon\Impact\Usage\Boavizta\Monitor as BoaviztaMonitor;
-use GlpiPlugin\Carbon\Tests\Impact\Usage\Boavizta\AbstractAsset;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(BoaviztaMonitor::class)]

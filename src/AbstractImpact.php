@@ -33,10 +33,10 @@
 namespace GlpiPlugin\Carbon;
 
 use CommonDBChild;
-use GlpiPlugin\Carbon\Impact\Type;
 use CommonDBTM;
 use DBmysql;
 use DBmysqlIterator;
+use GlpiPlugin\Carbon\Impact\Type;
 use Toolbox as GlpiToolbox;
 
 abstract class AbstractImpact extends CommonDBChild
@@ -215,7 +215,7 @@ abstract class AbstractImpact extends CommonDBChild
                         $item_type_table . '.is_ignore' => 0,
                         $item_type_table . '.id' => null,
                     ],
-                ]
+                ],
             ],
         ], $crit));
 
