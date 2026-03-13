@@ -33,16 +33,22 @@
 namespace GlpiPlugin\Carbon\Tests\Impact\Usage\Boavizta;
 
 use CommonDBTM;
+use Computer as GlpiComputer;
+use ComputerType as GLPIComputerType;
 use DBmysql;
+use Glpi\Asset\Asset_PeripheralAsset;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Impact\Usage\AbstractUsageImpact;
 use GlpiPlugin\Carbon\Location;
+use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\UsageImpact;
 use GlpiPlugin\Carbon\UsageInfo;
 use Infocom;
 use Location as GlpiLocation;
+use Monitor as GlpiMonitor;
+use MonitorType as GlpiMonitorType;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(AbstractUsageImpact::class)]
@@ -60,95 +66,165 @@ abstract class AbstractAsset extends DbTestCase
     protected static string $itemtype_model = '';
 
     /**
+     * Get an asset with all conditions to be evaluable, with all necessary objects
+     *
+     * @return array ordered list of objects
+     *               - an asset like a computer, a monitor, a network equipment, ...
+     *               - a location
+     *               - a plugin location (extending the locations properties)
+     *               - a type of asset
+     *               - an infocom object (financial information)
+     *               - an isage information object
+     *               - optional: other  objects for more complex case (see monitors, attached to a computer)
+     */
+    abstract protected function getEvaluableAsset(): array;
+
+    /**
      * Create an asset with all required data to make it evaluable
      *
      * @return array<CommonDBTM> An asset and related objects
      */
-    protected function getEvaluableAsset(): array
+    protected function getEvaluableComputer(): array
     {
         $glpi_location = $this->createItem(GlpiLocation::class);
         $location = $this->createItem(Location::class, [
             $glpi_location->getForeignKeyField() => $glpi_location->getID(),
             'boavizta_zone' => 'FRA',
         ]);
-        $glpi_asset_type = $this->createItem(static::$itemtype_type);
-        $asset_type = $this->createItem('GlpiPlugin\\Carbon\\' . static::$itemtype_type, [
-            $glpi_asset_type->getForeignKeyField() => $glpi_asset_type->getID(),
+        $glpi_computer_type = $this->createItem(GLPIComputerType::class);
+        $computer_type = $this->createItem(ComputerType::class, [
+            $glpi_computer_type->getForeignKeyField() => $glpi_computer_type->getID(),
             'power_consumption' => 42,
             'category' => ComputerType::CATEGORY_DESKTOP,
         ]);
-        $asset = $this->createItem(static::$itemtype, [
-            $glpi_asset_type->getForeignKeyField() => $glpi_asset_type->getID(),
+        $computer = $this->createItem(GlpiComputer::class, [
+            $glpi_computer_type->getForeignKeyField() => $glpi_computer_type->getID(),
             $glpi_location->getForeignKeyField() => $glpi_location->getID(),
         ]);
         $infocom = $this->createItem(Infocom::class, [
-            'itemtype' => get_class($asset),
-            'items_id' => $asset->getID(),
+            'itemtype' => get_class($computer),
+            'items_id' => $computer->getID(),
             'use_date' => '2024-01-01',
         ]);
         $usage_info = $this->createItem(UsageInfo::class, [
-            'itemtype' => get_class($asset),
-            'items_id' => $asset->getID(),
+            'itemtype' => get_class($computer),
+            'items_id' => $computer->getID(),
             ComputerUsageProfile::getForeignKeyField() => 2, // Office hours ID
         ]);
 
         return [
-            $asset,
+            $computer,
             $glpi_location,
             $location,
-            $glpi_asset_type,
-            $asset_type,
+            $glpi_computer_type,
+            $computer_type,
             $infocom,
             $usage_info,
         ];
     }
 
-    public function testGetItemsToEvaluate()
+    /**
+     * Create an asset with all required data to make it evaluable
+     *
+     * @return array<CommonDBTM> An asset and related objects
+     */
+    protected function getEvaluableMonitor(): array
     {
-        if (static::$itemtype === '' || static::$itemtype_type === '' || static::$itemtype_model === '') {
-            // Ensure that the inherited test class is properly implemented for this test
-            $this->fail('Itemtype propertiy not set in ' . static::class);
-        }
+        [
+            $glpi_computer,
+            $glpi_location,
+            $location,
+            $glpi_computer_type,
+            $computer_type,
+            $glpi_computer_infocom,
+            $glpi_computer_usage_info,
+        ] = $this->getEvaluableComputer();
 
-        // Test the asset is evaluable when no impact is in the DB
+        $glpi_monitor_type = $this->createItem(GlpiMonitorType::class);
+        $monitor_type = $this->createItem(MonitorType::class, [
+            $glpi_monitor_type->getForeignKeyField() => $glpi_monitor_type->getID(),
+            'power_consumption' => 42,
+        ]);
+        $glpi_monitor = $this->createItem(GlpiMonitor::class, [
+            $glpi_monitor_type->getForeignKeyField() => $glpi_monitor_type->getID(),
+            $glpi_location->getForeignKeyField() => $glpi_location->getID(),
+        ]);
+        $infocom = $this->createItem(Infocom::class, [
+            'itemtype' => get_class($glpi_monitor),
+            'items_id' => $glpi_monitor->getID(),
+            'use_date' => '2024-01-01',
+        ]);
+        $usage_info = $this->createItem(UsageInfo::class, [
+            'itemtype' => get_class($glpi_monitor),
+            'items_id' => $glpi_monitor->getID(),
+        ]);
+
+        // Associate the monitor to the computer
+        $asset_peripheralasset = $this->createItem(Asset_PeripheralAsset::class, [
+            'itemtype_peripheral' => get_class($glpi_monitor),
+            'itemtype_asset'      => get_class($glpi_computer),
+            'items_id_peripheral' => $glpi_monitor->getID(),
+            'items_id_asset'      => $glpi_computer->getID(),
+        ]);
+
+        return [
+            $glpi_monitor,
+            $glpi_location,
+            $location,
+            $glpi_monitor_type,
+            $monitor_type,
+            $infocom,
+            $usage_info,
+            $asset_peripheralasset,
+            $glpi_computer,
+        ];
+    }
+
+    public function test_GetItemsToEvaluate_is_evaluable_when_no_impacts_exists()
+    {
         [$asset] = $this->getEvaluableAsset();
         $instance = new static::$instance_type($asset);
         $iterator = $instance->getItemsToEvaluate(static::$itemtype, [
             $asset->getTableField('id') => $asset->getID(),
         ]);
         $this->assertEquals(1, $iterator->count());
+    }
 
-        // Test the asset is no longer evaluable when there is impact in the DB
+    public function test_GetItemsToEvaluate_is_not_evaluable_when_impacts_exists()
+    {
         [$asset] = $this->getEvaluableAsset();
         $usage_impact = $this->createItem(UsageImpact::class, [
             'itemtype' => $asset->getType(),
             'items_id' => $asset->getID(),
             'recalculate' => 0,
         ]);
+        $instance = new static::$instance_type($asset);
         $iterator = $instance->getItemsToEvaluate(static::$itemtype, [
             $asset::getTableField('id') => $asset->getID(),
         ]);
         $this->assertEquals(0, $iterator->count());
+    }
 
-        // Test the asset is evaluable when there is impact in the DB but recamculate is set
+    public function test_GetItemsToEvaluate_is_not_evaluable_when_impacts_to_recalculate_exists()
+    {
         [$asset] = $this->getEvaluableAsset();
         $usage_impact = $this->createItem(UsageImpact::class, [
             'itemtype' => $asset->getType(),
             'items_id' => $asset->getID(),
             'recalculate' => 1,
         ]);
+        $instance = new static::$instance_type($asset);
         $iterator = $instance->getItemsToEvaluate(static::$itemtype, [
             $asset::getTableField('id') => $asset->getID(),
         ]);
         $this->assertEquals(1, $iterator->count());
     }
 
-    public function testGetEvaluableQuery()
+    public function test_getEvaluableQuery_returns_one_when_asset_mets_all_requirements()
     {
         /** @var DBmysql $DB */
         global $DB;
 
-        // Test an asset with all requirements
         [$asset] = $this->getEvaluableAsset();
         $instance = new static::$instance_type($asset);
         $request = $instance->getEvaluableQuery(
@@ -159,61 +235,13 @@ abstract class AbstractAsset extends DbTestCase
         );
         $iterator = $DB->request($request);
         $this->assertEquals(1, $iterator->count());
+    }
 
-        // Test an asset without a location
-        [$asset, $glpi_location, $location, $glpi_asset_type, $asset_type, $infocom, $usage_info] = $this->getEvaluableAsset();
-        $asset->update(['locations_id' => 0] + $asset->fields);
-        $instance = new static::$instance_type($asset);
-        $request = $instance->getEvaluableQuery(
-            get_class($asset),
-            [
-                $asset::getTableField('id') => $asset->getID(),
-            ]
-        );
-        $iterator = $DB->request($request);
-        $this->assertEquals(0, $iterator->count());
+    public function test_getEvaluableQuery_returns_zero_when_asset_is_in_trash_bin()
+    {
+        /** @var DBmysql $DB */
+        global $DB;
 
-        // Test an asset without a boavizta_zone
-        [$asset, $glpi_location, $location, $glpi_asset_type, $asset_type, $infocom, $usage_info] = $this->getEvaluableAsset();
-        $location->update(['boavizta_zone' => ''] + $location->fields);
-        $instance = new static::$instance_type($asset);
-        $request = $instance->getEvaluableQuery(
-            get_class($asset),
-            [
-                $asset::getTableField('id') => $asset->getID(),
-            ]
-        );
-        $iterator = $DB->request($request);
-        $this->assertEquals(0, $iterator->count());
-
-
-        // Test an asset without usage info
-        [$asset, $glpi_location, $location, $glpi_asset_type, $asset_type, $infocom, $usage_info] = $this->getEvaluableAsset();
-        $usage_info->delete($usage_info->fields, true);
-        $instance = new static::$instance_type($asset);
-        $request = $instance->getEvaluableQuery(
-            get_class($asset),
-            [
-                $asset::getTableField('id') => $asset->getID(),
-            ]
-        );
-        $iterator = $DB->request($request);
-        $this->assertEquals(0, $iterator->count());
-
-        // Test an asset without usage profile
-        [$asset, $glpi_location, $location, $glpi_asset_type, $asset_type, $infocom, $usage_info] = $this->getEvaluableAsset();
-        $usage_info->update(['plugin_carbon_computerusageprofiles_id' => 0] + $usage_info->fields);
-        $instance = new static::$instance_type($asset);
-        $request = $instance->getEvaluableQuery(
-            get_class($asset),
-            [
-                $asset::getTableField('id') => $asset->getID(),
-            ]
-        );
-        $iterator = $DB->request($request);
-        $this->assertEquals(0, $iterator->count());
-
-        // Test an asset in the bin
         [$asset, $glpi_location, $location, $glpi_asset_type, $asset_type, $infocom, $usage_info] = $this->getEvaluableAsset();
         $asset->delete($asset->fields, false);
         $instance = new static::$instance_type($asset);
@@ -225,8 +253,13 @@ abstract class AbstractAsset extends DbTestCase
         );
         $iterator = $DB->request($request);
         $this->assertEquals(0, $iterator->count());
+    }
 
-        // Test an asset set as a template
+    public function test_getEvaluableQuery_returns_zero_when_asset_is_a_template()
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
         [$asset, $glpi_location, $location, $glpi_asset_type, $asset_type, $infocom, $usage_info] = $this->getEvaluableAsset();
         $asset->update(['is_template' => 1] + $asset->fields);
         $instance = new static::$instance_type($asset);
@@ -238,8 +271,49 @@ abstract class AbstractAsset extends DbTestCase
         );
         $iterator = $DB->request($request);
         $this->assertEquals(0, $iterator->count());
+    }
 
-        // Test an asset without a power consumption
+    public function test_getEvaluableQuery_returns_zero_when_asset_has_no_location()
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        [$asset, $glpi_location, $location, $glpi_asset_type, $asset_type, $infocom, $usage_info] = $this->getEvaluableAsset();
+        $asset->update(['locations_id' => 0] + $asset->fields);
+        $instance = new static::$instance_type($asset);
+        $request = $instance->getEvaluableQuery(
+            get_class($asset),
+            [
+                $asset::getTableField('id') => $asset->getID(),
+            ]
+        );
+        $iterator = $DB->request($request);
+        $this->assertEquals(0, $iterator->count());
+    }
+
+    public function test_getEvaluableQuery_returns_zero_when_asset_has_no_boavizta_zone()
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        [$asset, $glpi_location, $location, $glpi_asset_type, $asset_type, $infocom, $usage_info] = $this->getEvaluableAsset();
+        $location->update(['boavizta_zone' => ''] + $location->fields);
+        $instance = new static::$instance_type($asset);
+        $request = $instance->getEvaluableQuery(
+            get_class($asset),
+            [
+                $asset::getTableField('id') => $asset->getID(),
+            ]
+        );
+        $iterator = $DB->request($request);
+        $this->assertEquals(0, $iterator->count());
+    }
+
+    public function test_getEvaluableQuery_returns_zero_when_asset_has_no_power_consumption()
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
         [$asset, $glpi_location, $location, $glpi_asset_type, $asset_type, $infocom, $usage_info] = $this->getEvaluableAsset();
         $asset_type->update(['power_consumption' => 0] + $asset_type->fields);
         $instance = new static::$instance_type($asset);
@@ -251,8 +325,13 @@ abstract class AbstractAsset extends DbTestCase
         );
         $iterator = $DB->request($request);
         $this->assertEquals(0, $iterator->count());
+    }
 
-        // Test an asset without a infocom date
+    public function test_getEvaluableQuery_returns_zero_when_asset_has_no_infocom()
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
         [$asset, $glpi_location, $location, $glpi_asset_type, $asset_type, $infocom, $usage_info] = $this->getEvaluableAsset();
         $infocom->update(['use_date' => null] + $infocom->fields);
         $instance = new static::$instance_type($asset);
@@ -265,18 +344,4 @@ abstract class AbstractAsset extends DbTestCase
         $iterator = $DB->request($request);
         $this->assertEquals(0, $iterator->count());
     }
-
-    // public function testResetForItem()
-    // {
-    //     $asset = $this->createItem(static::$itemtype);
-    //     $instance = $this->createItem(UsageImpact::class, [
-    //         'itemtype' => get_class($asset),
-    //         'items_id' => $asset->getID(),
-    //     ]);
-
-    //     $result = AbstractUsageImpact::resetForItem($asset);
-    //     $this->assertTrue($result);
-    //     $result = UsageImpact::getById($instance->getID());
-    //     $this->assertFalse($result);
-    // }
 }

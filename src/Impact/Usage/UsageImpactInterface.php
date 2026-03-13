@@ -57,6 +57,7 @@ interface UsageImpactInterface
 
     /**
      * Get query to find items we can evaluate
+     * An evaluable item is an item with all required data
      *
      * @template T of CommonDBTM
      * @param class-string<T> $itemtype
@@ -68,6 +69,8 @@ interface UsageImpactInterface
 
     /**
      * Get an iterator of items to evaluate
+     * An item to evaluate is an item with all required data for a successful evaluation
+     * and without any calculation result or with an invalidated calculation result
      *
      * @template T of CommonDBTM
      * @param class-string<T> $itemtype
