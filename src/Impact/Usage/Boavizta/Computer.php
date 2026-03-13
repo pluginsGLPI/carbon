@@ -91,11 +91,9 @@ class Computer extends AbstractAsset
 
     protected function doEvaluation(CommonDBTM $item): ?array
     {
-        // TODO: determine if the computer is a server, a computer, a laptop, a tablet...
-        // then adapt $this->endpoint depending on the result
-
         $type = $this->getType($item);
         $this->endpoint = $this->getEndpoint($type);
+        $this->endpoint .= '?' . $this->getCriteriasQueryString();
 
         // Find boavizta zone code
         $zone_code = Location::getZoneCode($item);
@@ -118,7 +116,7 @@ class Computer extends AbstractAsset
             ],
         ];
         $response = $this->query($description);
-        $impacts = $this->parseResponse($response);
+        $impacts = $this->client->parseResponse($response, 'use');
 
         return $impacts;
     }

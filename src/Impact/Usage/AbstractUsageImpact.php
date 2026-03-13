@@ -106,9 +106,6 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
         /** @var DBmysql $DB */
         global $DB;
 
-        if ($itemtype === '') {
-            throw new \LogicException('Itemtype not set');
-        }
         if (!GlpiToolbox::isCommonDBTM($itemtype)) {
             throw new \LogicException('Itemtype does not inherits from ' . CommonDBTM::class);
         }
@@ -119,7 +116,7 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
                 UsageImpact::getTableField('recalculate') => 1,
             ],
         ];
-        $iterator = $DB->request($this->getEvaluableQuery($itemtype, $crit, false));
+        $iterator = $DB->request($this->getEvaluableQuery($itemtype, $crit));
 
         return $iterator;
     }
