@@ -116,6 +116,17 @@ abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterfa
         return self::$engine_version;
     }
 
+    /**
+     * Get the query string specifying the impact criterias for the HTTP request
+     *
+     * @return string
+     */
+    protected function getCriteriasQueryString(): string
+    {
+        $impact_criteria = array_keys($this->client->getCriteriaUnits());
+        return 'criteria=' . implode('&criteria=', $impact_criteria);
+    }
+
     protected function query($description): array
     {
         try {
@@ -130,91 +141,46 @@ abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterfa
         return $response;
     }
 
-    /**
-     * Read the response to find the impacts provided by Boaviztapi
-     *
-     * @return array
-     */
-    protected function parseResponse(array $response): array
-    {
-        $impacts = [];
-        foreach ($response['impacts'] as $type => $impact) {
-            if (!in_array($type, Type::getImpactTypes())) {
-                trigger_error(sprintf('Unsupported impact type %s in class %s', $type, __CLASS__));
-                continue;
-            }
+    // /**
+    //  * Read the response to find the impacts provided by Boaviztapi
+    //  *
+    //  * @return array
+    //  */
+    // protected function parseResponse(array $response): array
+    // {
+    //     $impacts = [];
+    //     $types = Type::getImpactTypes();
+    //     foreach ($response['impacts'] as $type => $impact) {
+    //         if (!in_array($type, $types)) {
+    //             trigger_error(sprintf('Unsupported impact type %s in class %s', $type, __CLASS__));
+    //             continue;
+    //         }
+    //         $impact_id = Type::getImpactId($type);
+    //         if ($impact_id === false) {
+    //             continue;
+    //         }
+    //         $impacts[$impact_id] = $this->parseCriteria($type, $response['impacts'][$type]);
 
-            switch ($type) {
-                case 'gwp':
-                    // Disabled as Carbon calculates itself carbon emissions
-                    // $impacts[Type::IMPACT_GWP] = $this->parseGwp($response['impacts']['gwp']);
-                    $impacts[Type::IMPACT_GWP] = null;
-                    break;
-                case 'adp':
-                    $impacts[Type::IMPACT_ADP] = $this->parseAdp($response['impacts']['adp']);
-                    break;
-                case 'pe':
-                    $impacts[Type::IMPACT_PE] = $this->parsePe($response['impacts']['pe']);
-                    break;
-            }
-        }
+    //     }
 
-        return $impacts;
-    }
+    //     return $impacts;
+    // }
 
-    protected function parseGwp(array $impact): ?TrackedFloat
-    {
-        if ($impact['use'] === 'not implemented') {
-            return null;
-        }
+    // protected function parseCriteria(string $name, array $impact): ?TrackedFloat
+    // {
+    //     if ($impact['embedded'] === 'not implemented') {
+    //         return null;
+    //     }
 
-        $value = new TrackedFloat(
-            $impact['use']['value'],
-            null,
-            TrackedFloat::DATA_QUALITY_ESTIMATED
-        );
-        if ($impact['unit'] === 'kgCO2eq') {
-            $value->setValue($value->getValue() * 1000);
-        }
+    //     $unit_multiplier = $this->client->getCriteriaUnits()[$name];
+    //     $value = new TrackedFloat(
+    //         $impact['embedded']['value'] * $unit_multiplier,
+    //         null,
+    //         TrackedFloat::DATA_QUALITY_ESTIMATED
+    //     );
 
-        return $value;
-    }
-
-    protected function parseAdp(array $impact): ?TrackedFloat
-    {
-        if ($impact['use'] === 'not implemented') {
-            return null;
-        }
-
-        $value = new TrackedFloat(
-            $impact['use']['value'],
-            null,
-            TrackedFloat::DATA_QUALITY_ESTIMATED
-        );
-        if ($impact['unit'] === 'kgSbeq') {
-            $value->setValue($value->getValue() * 1000);
-        }
-
-        return $value;
-    }
-
-    protected function parsePe(array $impact): ?TrackedFloat
-    {
-        if ($impact['use'] === 'not implemented') {
-            return null;
-        }
-
-        $value = new TrackedFloat(
-            $impact['use']['value'],
-            null,
-            TrackedFloat::DATA_QUALITY_ESTIMATED
-        );
-        if ($impact['unit'] === 'MJ') {
-            $value->setValue($value->getValue() * (1000 ** 2));
-        }
-
-        return $value;
-    }
+    //     return $value;
+    // }
 
     public function getEvaluableQuery(string $itemtype, array $crit = [], bool $entity_restrict = true): array
     {

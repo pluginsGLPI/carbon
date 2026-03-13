@@ -34,9 +34,7 @@
 namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta;
 
 use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\Client;
-use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\Impact\Embodied\AbstractEmbodiedImpact;
-use GlpiPlugin\Carbon\Impact\Type;
 
 abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInterface
 {
@@ -54,32 +52,6 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
 
     /** @var Client instance of the HTTP client */
     protected ?Client $client = null;
-
-    /** @var array Supported impact criterias and the multiplier unit of the value returned by Boaviztapi */
-    protected array $criteria_units = [
-        'gwp'    => 1000,       // Kg
-        'adp'    => 1000,       // Kg
-        'pe'     => 1000000,    // MJ
-        'gwppb'  => 1000,       // Kg
-        'gwppf'  => 1000,       // Kg
-        'gwpplu' => 1000,       // Kg
-        'ir'     => 1000,       // Kg
-        'lu'     => 1,          // (no unit)
-        'odp'    => 1000,       // Kg
-        'pm'     => 1,          // (no unit)
-        'pocp'   => 1000,       // Kg
-        'wu'     => 1000,       // M^3
-        'mips'   => 1000,       // Kg
-        'adpe'   => 1000,       // Kg
-        'adpf'   => 1000000,    // MJ
-        'ap'     => 1,          // mol
-        'ctue'   => 1,          // CTUe
-        // 'ctuh_c' => 1,          // CTUh   request fails when this criteria is added, not a URL encoding issue
-        // 'ctuh_nc' => 1,         // CTUh   request fails when this criteria is added, not a URL encoding issue
-        'epf'    => 1000,       // Kg
-        'epm'    => 1000,       // Kg
-        'ept'    => 1,          // mol
-    ];
 
     // abstract public static function getEngine(CommonDBTM $item): EngineInterface;
 
@@ -125,13 +97,14 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
     }
 
     /**
-     * Get the quety string specifying the impact criterias for the HTTP request
+     * Get the query string specifying the impact criterias for the HTTP request
      *
      * @return string
      */
     protected function getCriteriasQueryString(): string
     {
-        return 'criteria=' . implode('&criteria=', array_keys($this->criteria_units));
+        $impact_criteria = array_keys($this->client->getCriteriaUnits());
+        return 'criteria=' . implode('&criteria=', $impact_criteria);
     }
 
     /**
@@ -152,100 +125,5 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
         }
 
         return $response;
-    }
-
-    /**
-     * Read the response to find the impacts provided by Boaviztapi
-     *
-     * @param array $response
-     * @return array
-     */
-    protected function parseResponse(array $response): array
-    {
-        $impacts = [];
-        $types = Type::getImpactTypes();
-        foreach ($response['impacts'] as $type => $impact) {
-            if (!in_array($type, $types)) {
-                trigger_error(sprintf('Unsupported impact type %s in class %s', $type, __CLASS__));
-                continue;
-            }
-            $impact_id = Type::getImpactId($type);
-            if ($impact_id === false) {
-                continue;
-            }
-            $impacts[$impact_id] = $this->parseCriteria($type, $response['impacts'][$type]);
-        }
-
-        return $impacts;
-    }
-
-    protected function parseCriteria(string $name, array $impact): ?TrackedFloat
-    {
-        if ($impact['embedded'] === 'not implemented') {
-            return null;
-        }
-
-        $unit_multiplier = $this->criteria_units[$name];
-        $value = new TrackedFloat(
-            $impact['embedded']['value'] * $unit_multiplier,
-            null,
-            TrackedFloat::DATA_QUALITY_ESTIMATED
-        );
-
-        return $value;
-    }
-
-    protected function parseGwp(array $impact): ?TrackedFloat
-    {
-        if ($impact['embedded'] === 'not implemented') {
-            return null;
-        }
-
-        $value = new TrackedFloat(
-            $impact['embedded']['value'],
-            null,
-            TrackedFloat::DATA_QUALITY_ESTIMATED
-        );
-        if ($impact['unit'] === 'kgCO2eq') {
-            $value->setValue($value->getValue() * 1000);
-        }
-
-        return $value;
-    }
-
-    protected function parseAdp(array $impact): ?TrackedFloat
-    {
-        if ($impact['embedded'] === 'not implemented') {
-            return null;
-        }
-
-        $value = new TrackedFloat(
-            $impact['embedded']['value'],
-            null,
-            TrackedFloat::DATA_QUALITY_ESTIMATED
-        );
-        if ($impact['unit'] === 'kgSbeq') {
-            $value->setValue($value->getValue() * 1000);
-        }
-
-        return $value;
-    }
-
-    protected function parsePe(array $impact): ?TrackedFloat
-    {
-        if ($impact['embedded'] === 'not implemented') {
-            return null;
-        }
-
-        $value = new TrackedFloat(
-            $impact['embedded']['value'],
-            null,
-            TrackedFloat::DATA_QUALITY_ESTIMATED
-        );
-        if ($impact['unit'] === 'MJ') {
-            $value->setValue($value->getValue() * (1000 ** 2));
-        }
-
-        return $value;
     }
 }

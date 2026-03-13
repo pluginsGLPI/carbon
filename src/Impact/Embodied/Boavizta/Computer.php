@@ -78,7 +78,7 @@ class Computer extends AbstractAsset
             ],
         ];
         $response = $this->query($description);
-        $impacts = $this->parseResponse($response);
+        $impacts = $this->client->parseResponse($response, 'embedded');
 
         return $impacts;
     }

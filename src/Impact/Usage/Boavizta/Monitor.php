@@ -123,7 +123,7 @@ class Monitor extends AbstractAsset
             ],
         ];
         $response = $this->query($description);
-        $impacts = $this->parseResponse($response);
+        $impacts = $this->client->parseResponse($response, 'use');
 
         return $impacts;
     }

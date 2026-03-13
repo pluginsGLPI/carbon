@@ -37,6 +37,8 @@ use Dropdown;
 use GlpiPlugin\Carbon\Config as CarbonConfig;
 use GlpiPlugin\Carbon\DataSource\Lca\AbstractClient;
 use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
+use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
+use GlpiPlugin\Carbon\Impact\Type;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
@@ -47,6 +49,32 @@ class Client extends AbstractClient
 
     private string $base_url;
     private static string $source_name = 'Boaviztapi';
+
+    /** @var array Supported impact criterias and the multiplier unit of the value returned by Boaviztapi */
+    protected array $criteria_units = [
+        'gwp'    => 1000,       // Kg
+        'adp'    => 1000,       // Kg
+        'pe'     => 1000000,    // MJ
+        'gwppb'  => 1000,       // Kg
+        'gwppf'  => 1000,       // Kg
+        'gwpplu' => 1000,       // Kg
+        'ir'     => 1000,       // Kg
+        'lu'     => 1,          // (no unit)
+        'odp'    => 1000,       // Kg
+        'pm'     => 1,          // (no unit)
+        'pocp'   => 1000,       // Kg
+        'wu'     => 1,          // M^3
+        'mips'   => 1000,       // Kg
+        'adpe'   => 1000,       // Kg
+        'adpf'   => 1000000,    // MJ
+        'ap'     => 1,          // mol
+        'ctue'   => 1,          // CTUe
+        // 'ctuh_c' => 1,          // CTUh   request fails when this criteria is added, not a URL encoding issue
+        // 'ctuh_nc' => 1,         // CTUh   request fails when this criteria is added, not a URL encoding issue
+        'epf'    => 1000,       // Kg
+        'epm'    => 1000,       // Kg
+        'ept'    => 1,          // mol
+    ];
 
     public function __construct(RestApiClientInterface $client, string $url = '')
     {
@@ -139,6 +167,11 @@ class Client extends AbstractClient
         return $response;
     }
 
+    public function getCriteriaUnits(): array
+    {
+        return $this->criteria_units;
+    }
+
     /**
      * Save zones into database
      *
@@ -209,6 +242,49 @@ class Client extends AbstractClient
         }
 
         return $zones;
+    }
+
+    /**
+     * Read the response to find the impacts provided by Boaviztapi
+     *
+     * @param array $response
+     * @param string $scope (must be either embedded or use)
+     * @return array
+     */
+    public function parseResponse(array $response, string $scope): array
+    {
+        $impacts = [];
+        $types = Type::getImpactTypes();
+        foreach ($response['impacts'] as $type => $impact) {
+            if (!in_array($type, $types)) {
+                trigger_error(sprintf('Unsupported impact type %s in class %s', $type, __CLASS__));
+                continue;
+            }
+            $impact_id = Type::getImpactId($type);
+            if ($impact_id === false) {
+                continue;
+            }
+            $impacts[$impact_id] = $this->parseCriteria($type, $response['impacts'][$type][$scope]);
+        }
+
+        return $impacts;
+    }
+
+    protected function parseCriteria(string $name, $impact): ?TrackedFloat
+    {
+        if ($impact === 'not implemented') {
+            return null;
+        }
+
+        /** @var array $impact */
+        $unit_multiplier = $this->getCriteriaUnits()[$name];
+        $value = new TrackedFloat(
+            $impact['value'] * $unit_multiplier,
+            null,
+            TrackedFloat::DATA_QUALITY_ESTIMATED
+        );
+
+        return $value;
     }
 
     /**
