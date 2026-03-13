@@ -62,6 +62,8 @@ class Computer extends AbstractAsset
 
     public function getEvaluableQuery(string $itemtype, array $crit = [], bool $entity_restrict = true): array
     {
+        $request = parent::getEvaluableQuery($itemtype);
+
         $item_table = getTableForItemType($itemtype);
         $item_model_table = self::$model_itemtype::getTable();
         $glpi_computertypes_table = GlpiComputerType::getTable();
@@ -69,113 +71,27 @@ class Computer extends AbstractAsset
         $location_table = Location::getTable();
         $usage_info_table = UsageInfo::getTable();
         $computerUsageProfile_table = ComputerUsageProfile::getTable();
-        $infocom_table = Infocom::getTable();
-        $usage_impact_table = UsageImpact::getTable();
-
-        $request = [
-            'SELECT' => [
-                self::$itemtype::getTableField('id'),
-            ],
-            'FROM' => $item_table,
-            'INNER JOIN' => [
-                $location_table => [
-                    'FKEY'   => [
-                        $item_table  => 'locations_id',
-                        $location_table => 'locations_id',
-                    ],
-                ],
-                $usage_info_table => [
-                    'FKEY'   => [
-                        $item_table  => 'id',
-                        $usage_info_table => 'items_id',
-                        [
-                            'AND' => [UsageInfo::getTableField('itemtype') => self::$itemtype],
-                        ],
-                    ],
-                ],
-                $computerUsageProfile_table => [
-                    'FKEY'   => [
-                        $usage_info_table  => 'plugin_carbon_computerusageprofiles_id',
-                        $computerUsageProfile_table => 'id',
-                    ],
+        $usage_info_table = UsageInfo::getTable();
+        $request['INNER JOIN'][$usage_info_table] =  [
+            'FKEY'   => [
+                $item_table  => 'id',
+                $usage_info_table => 'items_id',
+                [
+                    'AND' => [UsageInfo::getTableField('itemtype') => self::$itemtype],
                 ],
             ],
-            'LEFT JOIN' => [
-                $item_model_table => [
-                    'FKEY'   => [
-                        $item_table  => 'computermodels_id',
-                        $item_model_table => 'id',
-                    ],
-                ],
-                $glpi_computertypes_table => [
-                    'FKEY'   => [
-                        $item_table  => 'computertypes_id',
-                        $glpi_computertypes_table => 'id',
-                    ],
-                ],
-                $computertypes_table => [
-                    'FKEY'   => [
-                        $computertypes_table  => 'computertypes_id',
-                        $glpi_computertypes_table => 'id',
-                        [
-                            'AND' => [
-                                'NOT' => [GlpiComputerType::getTableField('id') => null],
-                            ],
-                        ],
-                    ],
-                ],
-                $infocom_table => [
-                    'FKEY' => [
-                        $infocom_table => 'items_id',
-                        $item_table => 'id',
-                        ['AND' => [Infocom::getTableField('itemtype') => self::$itemtype]],
-                    ],
-                ],
-                $usage_impact_table => [
-                    'FKEY' => [
-                        $usage_impact_table => 'items_id',
-                        $item_table            => 'id',
-                        ['AND'
-                            => [
-                                UsageImpact::getTableField('itemtype') => $itemtype,
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-            'WHERE' => [
-                'AND' => [
-                    self::$itemtype::getTableField('is_deleted') => 0,
-                    self::$itemtype::getTableField('is_template') => 0,
-                    ['NOT' => [Location::getTableField('boavizta_zone') => '']],
-                    ['NOT' => [Location::getTableField('boavizta_zone') => null]],
-                    [
-                        'OR' => [
-                            ComputerType::getTableField('power_consumption') => ['>', 0],
-                            self::$model_itemtype::getTableField('power_consumption') => ['>', 0],
-                        ],
-                    ], [
-                        'OR' => [
-                            ['NOT' => [Infocom::getTableField('use_date') => null]],
-                            ['NOT' => [Infocom::getTableField('delivery_date') => null]],
-                            ['NOT' => [Infocom::getTableField('buy_date') => null]],
-                            // ['NOT' => [Infocom::getTableField('date_creation') => null]],
-                            // ['NOT' => [Infocom::getTableField('date_mod') => null]],
-                        ],
-                    ], [
-                        'AND' => [
-                            ['NOT' => [ComputerType::getTableField('category') => null]],
-                            [ComputerType::getTableField('category') => ['>', 0]],
-                        ],
-                    ],
-                ],
-            ] + $crit,
         ];
-
-        if ($entity_restrict) {
-            $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($item_table, '', '', 'auto');
-            $request['WHERE'] += $entity_restrict;
-        }
+        $request['INNER JOIN'][$computerUsageProfile_table] =  [
+            'FKEY'   => [
+                $usage_info_table  => ComputerUsageProfile::getForeignKeyField(),
+                $computerUsageProfile_table => 'id',
+            ],
+        ];
+        $request['WHERE'][] = [
+            ['NOT' => [ComputerType::getTableField('category') => null]],
+            [ComputerType::getTableField('category') => ['>', 0]],
+        ];
+        $request['WHERE'][] = $crit;
 
         return $request;
     }

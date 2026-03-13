@@ -217,56 +217,6 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
         return false;
     }
 
-    public function getEvaluableQuery(string $itemtype, array $crit = [], bool $entity_restrict = true): array
-    {
-        $item_table = getTableForItemType($itemtype);
-        $glpi_location_table = GlpiLocation::getTable();
-        $item_type_table = getTableForItemType('GlpiPlugin\\Carbon\\' . $itemtype . 'Type');
-        $usage_impact_table = UsageImpact::getTable();
-
-        $crit[] = [
-            'OR' => [
-                $item_type_table . '.is_ignore' => 0,
-                $item_type_table . '.id' => null,
-            ],
-            ['NOT' => [GlpiLocation::getTableField('id') => null]],
-        ];
-
-        $request = [
-            'SELECT' => [
-                $itemtype::getTableField('id'),
-            ],
-            'FROM' => $item_table,
-            'LEFT JOIN' => [
-                $usage_impact_table => [
-                    'FKEY' => [
-                        $usage_impact_table => 'items_id',
-                        $item_table            => 'id',
-                        ['AND'
-                            => [
-                                UsageImpact::getTableField('itemtype') => $itemtype,
-                            ],
-                        ],
-                    ],
-                ],
-                $glpi_location_table => [
-                    'FKEY' => [
-                        $glpi_location_table => 'id',
-                        $item_table => 'locations_id',
-                    ],
-                ],
-            ],
-            'WHERE' => $crit,
-        ];
-
-        if ($entity_restrict) {
-            $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($item_table, '', '', 'auto');
-            $request['WHERE'] += $entity_restrict;
-        }
-
-        return $request;
-    }
-
     /**
      * Do the environmental impact evaluation of an asset
      *

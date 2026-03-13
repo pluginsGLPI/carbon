@@ -46,4 +46,64 @@ class MonitorTest extends AbstractAsset
     protected static string $itemtype = GlpiMonitor::class;
     protected static string $itemtype_type = GlpiMonitorType::class;
     protected static string $itemtype_model = GlpiMonitorModel::class;
+
+    protected function getEvaluableAsset(): array
+    {
+        return $this->getEvaluableMonitor();
+    }
+
+    public function test_getEvaluableQuery_returns_zero_when_asset_has_no_linked_computer()
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        [
+            $asset,
+            $glpi_location,
+            $location,
+            $glpi_asset_type,
+            $asset_type,
+            $infocom,
+            $usage_info,
+            $asset_peripheralasset
+        ] = $this->getEvaluableAsset();
+        $asset_peripheralasset->delete($asset_peripheralasset->fields, true);
+        $instance = new static::$instance_type($asset);
+        $request = $instance->getEvaluableQuery(
+            get_class($asset),
+            [
+                $asset::getTableField('id') => $asset->getID(),
+            ]
+        );
+        $iterator = $DB->request($request);
+        $this->assertEquals(0, $iterator->count());
+    }
+
+    public function test_getEvaluableQuery_returns_zero_when_asset_has_broken_computer_link()
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        [
+            $asset,
+            $glpi_location,
+            $location,
+            $glpi_asset_type,
+            $asset_type,
+            $infocom,
+            $usage_info,
+            $asset_peripheralasset,
+            $glpi_computer
+        ] = $this->getEvaluableAsset();
+        $glpi_computer->delete($glpi_computer->fields, true);
+        $instance = new static::$instance_type($asset);
+        $request = $instance->getEvaluableQuery(
+            get_class($asset),
+            [
+                $asset::getTableField('id') => $asset->getID(),
+            ]
+        );
+        $iterator = $DB->request($request);
+        $this->assertEquals(0, $iterator->count());
+    }
 }

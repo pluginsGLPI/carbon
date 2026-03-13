@@ -49,6 +49,62 @@ class Monitor extends AbstractAsset
 
     protected string $endpoint        = 'peripheral/monitor';
 
+    public function getEvaluableQuery(string $itemtype, array $crit = [], bool $entity_restrict = true): array
+    {
+        // TODO : build the evaluable query from the computer evaluable query
+        // the location should behandled like done in History namespace
+
+        $item_table = self::$itemtype::getTable();
+        $item_model_table = self::$model_itemtype::getTable();
+        $assets_items_table = Asset_PeripheralAsset::getTable();
+        $computers_table = GlpiComputer::getTable();
+        $glpi_monitor_types_table = GlpiMonitorType::getTable();
+        $glpi_monitor_types_fk = GlpiMonitorType::getForeignKeyField();
+        $monitor_types_table = MonitorType::getTable();
+
+        $request = parent::getEvaluableQuery($itemtype);
+        $parent_inner_joins = $request['INNER JOIN'];
+        $parent_left_joins  = $request['LEFT JOIN'];
+        unset($request['INNER JOIN'], $request['LEFT JOIN']);
+
+        $request['LEFT JOIN'][$assets_items_table] = [
+            'FKEY' => [
+                $assets_items_table => 'items_id_peripheral',
+                $item_table => 'id',
+                [
+                    'AND' => [
+                        Asset_PeripheralAsset::getTableField('itemtype_peripheral') => self::$itemtype,
+                        Asset_PeripheralAsset::getTableField('itemtype_asset') => GlpiComputer::class,
+                    ],
+                ],
+            ],
+        ];
+        $request['INNER JOIN'][$computers_table] = [
+            'FKEY' => [
+                $computers_table => 'id',
+                $assets_items_table => 'items_id_asset',
+                [
+                    'AND' => [Asset_PeripheralAsset::getTableField('itemtype_asset') => GlpiComputer::class]
+                ],
+            ],
+        ];
+
+        // re-add inner joins of computer, after those for monitor
+        // Needed to join tables before theyr foreign keys are used
+        $request['INNER JOIN'] = array_merge($request['INNER JOIN'], $parent_inner_joins);
+        $request['LEFT JOIN'] = array_merge($request['LEFT JOIN'], $parent_left_joins);
+
+        // Replace SELECT on computer by select on monitor
+        $request['SELECT'] = [
+            self::$itemtype::getTableField('id'),
+        ];
+
+        // Append criteria to the WHERE clause
+        $request['WHERE'][] = $crit;
+
+        return $request;
+    }
+
     protected function doEvaluation(CommonDBTM $item): ?array
     {
         // TODO: determine if the computer is a server, a computer, a laptop, a tablet...

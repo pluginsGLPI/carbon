@@ -211,4 +211,107 @@ abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterfa
 
         return $value;
     }
+
+        public function getEvaluableQuery(string $itemtype, array $crit = [], bool $entity_restrict = true): array
+    {
+        $item_table = getTableForItemType($itemtype);
+        $glpi_asset_type_itemtype = $itemtype . "Type";
+        $glpi_asset_model_itemtype = $itemtype . "Model";
+        $glpi_assettype_table = getTableForItemType($glpi_asset_type_itemtype);
+        $glpi_assetmodel_table = getTableForItemType($glpi_asset_model_itemtype);
+        $glpi_assets_types_fk = getForeignKeyFieldForItemType($glpi_asset_type_itemtype);
+        $glpi_assets_models_fk = getForeignKeyFieldForItemType($glpi_asset_model_itemtype);
+        $asset_type_itemtype = 'GlpiPlugin\\Carbon\\' . $glpi_asset_type_itemtype;
+        $assettype_table = getTableForItemType($asset_type_itemtype);
+        $location_table = Location::getTable();
+        $infocom_table = Infocom::getTable();
+        $usage_impact_table = UsageImpact::getTable();
+
+        $request = [
+            'SELECT' => [
+                $itemtype::getTableField('id'),
+            ],
+            'FROM' => $item_table,
+            'INNER JOIN' => [
+                $location_table => [
+                    'FKEY'   => [
+                        $item_table  => 'locations_id',
+                        $location_table => 'locations_id',
+                    ],
+                ],
+            ],
+            'LEFT JOIN' => [
+                $usage_impact_table => [
+                    'FKEY' => [
+                        $usage_impact_table => 'items_id',
+                        $item_table            => 'id',
+                        ['AND'
+                            => [
+                                UsageImpact::getTableField('itemtype') => $itemtype,
+                            ],
+                        ],
+                    ],
+                ],
+                $glpi_assettype_table => [
+                    'FKEY' => [
+                        $glpi_assettype_table => 'id',
+                        $item_table => $glpi_assets_types_fk,
+                    ],
+                ],
+                $assettype_table => [
+                    'FKEY'   => [
+                        $assettype_table  => $glpi_assets_types_fk,
+                        $glpi_assettype_table => 'id',
+                        [
+                            'AND' => [
+                                'NOT' => [$glpi_assettype_table . '.id' => null],
+                            ],
+                        ],
+                    ],
+                ],
+                $glpi_assetmodel_table => [
+                    'FKEY' => [
+                        $glpi_assetmodel_table => 'id',
+                        $item_table => $glpi_assets_models_fk,
+                    ],
+                ],
+                $infocom_table => [
+                    'FKEY' => [
+                        $infocom_table => 'items_id',
+                        $item_table => 'id',
+                        ['AND' => [Infocom::getTableField('itemtype') => $itemtype]],
+                    ],
+                ],
+            ],
+            'WHERE' => [
+                'AND' => [
+                    $itemtype::getTableField('is_deleted') => 0,
+                    $itemtype::getTableField('is_template') => 0,
+                    ['NOT' => [Location::getTableField('boavizta_zone') => '']],
+                    ['NOT' => [Location::getTableField('boavizta_zone') => null]],
+                    [
+                        'OR' => [
+                            $asset_type_itemtype::getTableField('power_consumption') => ['>', 0],
+                            $glpi_asset_model_itemtype::getTableField('power_consumption') => ['>', 0],
+                        ],
+                    ], [
+                        'OR' => [
+                            ['NOT' => [Infocom::getTableField('use_date') => null]],
+                            ['NOT' => [Infocom::getTableField('delivery_date') => null]],
+                            ['NOT' => [Infocom::getTableField('buy_date') => null]],
+                            // ['NOT' => [Infocom::getTableField('date_creation') => null]],
+                            // ['NOT' => [Infocom::getTableField('date_mod') => null]],
+                        ],
+                    ],
+                ],
+            ] + $crit,
+        ];
+
+        if ($entity_restrict) {
+            $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($item_table, '', '', 'auto');
+            $request['WHERE'] += $entity_restrict;
+        }
+
+        return $request;
+    }
 }

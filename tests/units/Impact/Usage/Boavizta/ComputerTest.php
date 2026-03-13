@@ -47,14 +47,54 @@ class ComputerTest extends AbstractAsset
     protected static string $itemtype_type = GlpiComputerType::class;
     protected static string $itemtype_model = GlpiComputerModel::class;
 
-    public function testGetEvaluableQuery()
+    protected function getEvaluableAsset(): array
     {
-        global $DB;
-        parent::testGetEvaluableQuery();
+        return $this->getEvaluableComputer();
+    }
 
-        // Test an asset without a category
+    public function test_getEvaluableQuery_returns_zero_when_asset_has_no_category_in_type()
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
         [$asset, $glpi_location, $location, $glpi_asset_type, $asset_type, $infocom, $usage_info] = $this->getEvaluableAsset();
         $asset_type->update(['category' => 0] + $asset_type->fields);
+        $instance = new static::$instance_type($asset);
+        $request = $instance->getEvaluableQuery(
+            get_class($asset),
+            [
+                $asset::getTableField('id') => $asset->getID(),
+            ]
+        );
+        $iterator = $DB->request($request);
+        $this->assertEquals(0, $iterator->count());
+    }
+
+    public function test_getEvaluableQuery_returns_zero_when_asset_has_no_usage_profile()
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        [$asset, $glpi_location, $location, $glpi_asset_type, $asset_type, $infocom, $usage_info] = $this->getEvaluableAsset();
+        $usage_info->update(['plugin_carbon_computerusageprofiles_id' => 0] + $usage_info->fields);
+        $instance = new static::$instance_type($asset);
+        $request = $instance->getEvaluableQuery(
+            get_class($asset),
+            [
+                $asset::getTableField('id') => $asset->getID(),
+            ]
+        );
+        $iterator = $DB->request($request);
+        $this->assertEquals(0, $iterator->count());
+    }
+
+    public function test_getEvaluableQuery_returns_zero_when_asset_has_no_usage_info()
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        [$asset, $glpi_location, $location, $glpi_asset_type, $asset_type, $infocom, $usage_info] = $this->getEvaluableAsset();
+        $usage_info->delete($usage_info->fields, true);
         $instance = new static::$instance_type($asset);
         $request = $instance->getEvaluableQuery(
             get_class($asset),
