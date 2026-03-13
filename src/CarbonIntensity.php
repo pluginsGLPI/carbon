@@ -32,16 +32,16 @@
 
 namespace GlpiPlugin\Carbon;
 
-use RuntimeException;
-use Exception;
 use CommonDropdown;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DBmysql;
+use Exception;
 use Glpi\DBAL\QueryParam;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientInterface;
+use RuntimeException;
 use Symfony\Component\Console\Helper\ProgressBar;
 
 /**

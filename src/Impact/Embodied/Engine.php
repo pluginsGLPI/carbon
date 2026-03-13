@@ -32,7 +32,6 @@
 
 namespace GlpiPlugin\Carbon\Impact\Embodied;
 
-use RuntimeException;
 use CommonDBTM;
 use CommonGLPI;
 use DBmysql;
@@ -43,6 +42,7 @@ use GlpiPlugin\Carbon\DataSource\RestApiClient;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\Impact\Embodied\Boavizta\AbstractAsset;
 use GlpiPlugin\Carbon\Impact\Type;
+use RuntimeException;
 
 class Engine extends CommonGLPI
 {

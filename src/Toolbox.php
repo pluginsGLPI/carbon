@@ -32,7 +32,6 @@
 
 namespace GlpiPlugin\Carbon;
 
-use InvalidArgumentException;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
@@ -43,6 +42,7 @@ use Glpi\DBAL\QueryExpression;
 use Glpi\DBAL\QuerySubQuery;
 use Glpi\DBAL\QueryUnion;
 use Infocom;
+use InvalidArgumentException;
 use Location;
 use Mexitek\PHPColors\Color;
 use Toolbox as GlpiToolbox;

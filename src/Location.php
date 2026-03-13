@@ -32,7 +32,6 @@
 
 namespace GlpiPlugin\Carbon;
 
-use LogicException;
 use CommonDBChild;
 use CommonDBTM;
 use CommonGLPI;
@@ -51,6 +50,7 @@ use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\Client as BoaviztapiClient;
 use Html;
 use League\ISO3166\ISO3166;
 use Location as GlpiLocation;
+use LogicException;
 use MassiveAction;
 
 /**

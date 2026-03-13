@@ -32,9 +32,9 @@
 
 namespace GlpiPlugin\Carbon\DataSource\Lca;
 
-use InvalidArgumentException;
 use GlpiPlugin\Carbon\DataSource\ConfigInterface;
 use GlpiPlugin\Carbon\DataSource\RestApiClient;
+use InvalidArgumentException;
 
 class ClientFactory
 {

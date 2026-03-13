@@ -32,12 +32,12 @@
 
 namespace GlpiPlugin\Carbon\Impact\Usage;
 
-use RuntimeException;
 use CommonDBTM;
 use CommonGLPI;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\Client as BoaviztapiClient;
 use GlpiPlugin\Carbon\DataSource\RestApiClient;
+use RuntimeException;
 
 class Engine extends CommonGLPI
 {

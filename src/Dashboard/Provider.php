@@ -32,7 +32,6 @@
 
 namespace GlpiPlugin\Carbon\Dashboard;
 
-use RuntimeException;
 use CommonDBTM;
 use Computer as GlpiComputer;
 use ComputerModel as GlpiComputerModel;
@@ -55,6 +54,7 @@ use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Toolbox;
 use GlpiPlugin\Carbon\UsageImpact;
 use GlpiPlugin\Carbon\Zone;
+use RuntimeException;
 use Search;
 use Session;
 use Toolbox as GlpiToolbox;

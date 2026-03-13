@@ -32,12 +32,12 @@
 
 namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity;
 
-use Generator;
 use Config as GlpiConfig;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
 use DBmysql;
+use Generator;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;

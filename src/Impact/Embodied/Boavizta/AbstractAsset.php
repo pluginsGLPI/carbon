@@ -33,9 +33,9 @@
 
 namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta;
 
-use RuntimeException;
 use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\Client;
 use GlpiPlugin\Carbon\Impact\Embodied\AbstractEmbodiedImpact;
+use RuntimeException;
 
 abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInterface
 {

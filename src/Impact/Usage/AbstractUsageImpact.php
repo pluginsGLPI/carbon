@@ -33,8 +33,6 @@
 
 namespace GlpiPlugin\Carbon\Impact\Usage;
 
-use LogicException;
-use RuntimeException;
 use CommonDBTM;
 use DBmysql;
 use DBmysqlIterator;
@@ -42,6 +40,8 @@ use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\Impact\Type;
 use GlpiPlugin\Carbon\Toolbox;
 use GlpiPlugin\Carbon\UsageImpact;
+use LogicException;
+use RuntimeException;
 use Toolbox as GlpiToolbox;
 
 abstract class AbstractUsageImpact implements UsageImpactInterface

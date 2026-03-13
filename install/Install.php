@@ -32,12 +32,12 @@
 
 namespace GlpiPlugin\Carbon;
 
-use RuntimeException;
 use Config;
 use DBmysql;
 use DirectoryIterator;
 use Migration;
 use Plugin;
+use RuntimeException;
 
 class Install
 {

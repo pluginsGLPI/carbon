@@ -32,7 +32,6 @@
 
 namespace GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi;
 
-use RuntimeException;
 use DBmysql;
 use Dropdown;
 use GlpiPlugin\Carbon\Config as CarbonConfig;
@@ -43,6 +42,7 @@ use GlpiPlugin\Carbon\Impact\Type;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
+use RuntimeException;
 
 class Client extends AbstractClient
 {

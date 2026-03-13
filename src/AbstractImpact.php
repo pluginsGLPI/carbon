@@ -32,12 +32,12 @@
 
 namespace GlpiPlugin\Carbon;
 
-use LogicException;
 use CommonDBChild;
 use CommonDBTM;
 use DBmysql;
 use DBmysqlIterator;
 use GlpiPlugin\Carbon\Impact\Type;
+use LogicException;
 use Toolbox as GlpiToolbox;
 
 abstract class AbstractImpact extends CommonDBChild

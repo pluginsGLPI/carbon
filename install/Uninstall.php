@@ -32,13 +32,13 @@
 
 namespace GlpiPlugin\Carbon;
 
-use RuntimeException;
 use Config;
 use CronTask as GlpiCronTask;
 use DBmysql;
 use DisplayPreference;
 use Glpi\Dashboard\Dashboard;
 use ProfileRight;
+use RuntimeException;
 
 class Uninstall
 {

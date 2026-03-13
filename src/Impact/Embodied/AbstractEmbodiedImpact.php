@@ -33,8 +33,6 @@
 
 namespace GlpiPlugin\Carbon\Impact\Embodied;
 
-use LogicException;
-use RuntimeException;
 use CommonDBTM;
 use DBmysql;
 use DBmysqlIterator;
@@ -44,6 +42,8 @@ use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\EmbodiedImpact;
 use GlpiPlugin\Carbon\Impact\Type;
 use GuzzleHttp\Exception\ConnectException;
+use LogicException;
+use RuntimeException;
 use Session;
 
 abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface

@@ -33,7 +33,6 @@
 
 namespace GlpiPlugin\Carbon\Impact\Usage\Boavizta;
 
-use RuntimeException;
 use CommonDBTM;
 use DbUtils;
 use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\Client;
@@ -41,6 +40,7 @@ use GlpiPlugin\Carbon\Impact\Usage\AbstractUsageImpact;
 use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\UsageImpact;
 use Infocom;
+use RuntimeException;
 
 abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterface
 {

@@ -32,7 +32,6 @@
 
 namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\ElectricityMaps;
 
-use RuntimeException;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
@@ -48,6 +47,7 @@ use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Toolbox;
 use GlpiPlugin\Carbon\Zone;
+use RuntimeException;
 use Safe\Exceptions\FilesystemException;
 use Symfony\Component\Console\Helper\ProgressBar;
 

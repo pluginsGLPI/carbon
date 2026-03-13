@@ -33,7 +33,6 @@
 
 namespace GlpiPlugin\Carbon\Impact\History;
 
-use Exception;
 use CommonDBTM;
 use DateInterval;
 use DateTime;
@@ -41,6 +40,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use DBmysql;
 use DBmysqlIterator;
+use Exception;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;

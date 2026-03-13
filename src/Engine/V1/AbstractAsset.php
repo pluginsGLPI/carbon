@@ -32,7 +32,6 @@
 
 namespace GlpiPlugin\Carbon\Engine\V1;
 
-use LogicException;
 use CommonDBTM;
 use DateInterval;
 use DateTimeImmutable;
@@ -46,6 +45,7 @@ use GlpiPlugin\Carbon\DataTracking\TrackedInt;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
+use LogicException;
 
 abstract class AbstractAsset implements EngineInterface
 {

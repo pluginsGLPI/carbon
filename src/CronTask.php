@@ -32,7 +32,6 @@
 
 namespace GlpiPlugin\Carbon;
 
-use RuntimeException;
 use CommonDBTM;
 use CommonGLPI;
 use Config as GlpiConfig;
@@ -45,6 +44,7 @@ use GlpiPlugin\Carbon\Impact\Embodied\Engine as EmbodiedEngine;
 use GlpiPlugin\Carbon\Impact\History\AssetInterface;
 use GlpiPlugin\Carbon\Impact\Usage\Engine as UsageEngine;
 use Location as GlpiLocation;
+use RuntimeException;
 
 class CronTask extends CommonGLPI
 {
