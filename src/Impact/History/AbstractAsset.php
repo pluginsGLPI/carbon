@@ -47,7 +47,6 @@ use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Toolbox;
 use LogicException;
 use Session;
-use Toolbox as GlpiToolbox;
 
 abstract class AbstractAsset extends CommonDBTM implements AssetInterface
 {
@@ -194,10 +193,8 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
          * We NEED to check memory usage to avoid running out of memory
          * @see DBmysql::doQuery()
          */
-        $memory_limit = GlpiToolbox::getMemoryLimit();
-        if ($memory_limit) {
-            $memory_limit -=  8 * 1024 * 1024;
-        }
+        $memory_limit = Toolbox::getMemoryLimit();
+
         foreach ($gaps as $gap) {
             // $date_cursor = DateTime::createFromFormat('U', $gap['start']);
             // $date_cursor->setTimezone(new DateTimeZone($timezone));

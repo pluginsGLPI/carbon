@@ -51,6 +51,7 @@ use Item_DeviceMemory;
 use Item_DeviceProcessor;
 use Item_Devices;
 use Item_Disk;
+use Location as GlpiLocation;
 
 class Computer extends AbstractAsset
 {
@@ -65,11 +66,6 @@ class Computer extends AbstractAsset
         $request = parent::getEvaluableQuery($itemtype);
 
         $item_table = getTableForItemType($itemtype);
-        $item_model_table = self::$model_itemtype::getTable();
-        $glpi_computertypes_table = GlpiComputerType::getTable();
-        $computertypes_table = ComputerType::getTable();
-        $location_table = Location::getTable();
-        $usage_info_table = UsageInfo::getTable();
         $computerUsageProfile_table = ComputerUsageProfile::getTable();
         $usage_info_table = UsageInfo::getTable();
         $request['INNER JOIN'][$usage_info_table] =  [

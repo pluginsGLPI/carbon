@@ -126,13 +126,13 @@ if (isset($_POST['update'])) {
         }
     }
 
-    $usage_impact = Engine::getEngineFromItemtype($itemtype);
+    $usage_impact = Engine::getEngineFromItemtype($item);
     if ($usage_impact === null) {
         Session::addMessageAfterRedirect(__('Unable to find calculation engine for this asset.', 'carbon'), false, ERROR);
         Html::back();
     }
 
-    if (!$usage_impact->evaluateItem($_POST['items_id'])) {
+    if (!$usage_impact->evaluateItem()) {
         Session::addMessageAfterRedirect(__('Update of usage impact failed.', 'carbon'), false, ERROR);
     }
 }

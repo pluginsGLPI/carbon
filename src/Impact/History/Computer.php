@@ -79,6 +79,9 @@ class Computer extends AbstractAsset
             ],
             'FROM' => $item_table,
             'INNER JOIN' => [
+                // TODO: remove this useless join
+                // Could be optimized by joining the asset and plugin's location
+                // with locations_id FK on both sides
                 $glpi_location_table => [
                     'FKEY'   => [
                         $item_table  => 'locations_id',

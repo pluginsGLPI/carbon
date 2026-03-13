@@ -73,7 +73,7 @@ class Monitor extends AbstractAsset
         $item_table = self::$itemtype::getTable();
         $item_model_table = self::$model_itemtype::getTable();
         $computers_table = GlpiComputer::getTable();
-        $computers_items_table = Asset_PeripheralAsset::getTable();
+        $assets_items_table = Asset_PeripheralAsset::getTable();
         $computer_model_table = GlpiComputerModel::getTable();
         $glpi_monitor_types_table = GlpiMonitorType::getTable();
         $glpi_monitor_types_fk = GlpiMonitorType::getForeignKeyField();
@@ -94,21 +94,22 @@ class Monitor extends AbstractAsset
 
         // Add joins to reach monitor from computer
         $request['FROM'] = $item_table;
-        $request['LEFT JOIN'][$computers_items_table] = [
+        $request['LEFT JOIN'][$assets_items_table] = [
             'FKEY' => [
-                $computers_items_table => 'items_id_peripheral',
+                $assets_items_table => 'items_id_peripheral',
                 $item_table => 'id',
-                ['AND' => [
-                    Asset_PeripheralAsset::getTableField('itemtype_peripheral') => self::$itemtype,
-                    Asset_PeripheralAsset::getTableField('itemtype_asset') => GlpiComputer::class,
-                ],
+                [
+                    'AND' => [
+                        Asset_PeripheralAsset::getTableField('itemtype_peripheral') => self::$itemtype,
+                        Asset_PeripheralAsset::getTableField('itemtype_asset') => GlpiComputer::class,
+                    ],
                 ],
             ],
         ];
         $request['INNER JOIN'][$computers_table] = [
             'FKEY' => [
                 $computers_table => 'id',
-                $computers_items_table => 'items_id_asset',
+                $assets_items_table => 'items_id_asset',
                 ['AND' => [Asset_PeripheralAsset::getTableField('itemtype_asset') => GlpiComputer::class]],
             ],
         ];
