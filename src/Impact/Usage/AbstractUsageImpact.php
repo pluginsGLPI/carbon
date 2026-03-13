@@ -33,6 +33,8 @@
 
 namespace GlpiPlugin\Carbon\Impact\Usage;
 
+use LogicException;
+use RuntimeException;
 use CommonDBTM;
 use DBmysql;
 use DBmysqlIterator;
@@ -65,7 +67,7 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
     public function __construct(CommonDBTM $item)
     {
         if ($item->isNewItem()) {
-            throw new \LogicException("Given item is empty");
+            throw new LogicException("Given item is empty");
         }
         $this->item = $item;
         foreach (array_flip(Type::getImpactTypes()) as $type) {
@@ -107,7 +109,7 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
         global $DB;
 
         if (!GlpiToolbox::isCommonDBTM($itemtype)) {
-            throw new \LogicException('Itemtype does not inherits from ' . CommonDBTM::class);
+            throw new LogicException('Itemtype does not inherits from ' . CommonDBTM::class);
         }
 
         $crit[] = [
@@ -163,7 +165,7 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
         try {
             $this->getVersion();
             $impacts = $this->doEvaluation($this->item);
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             return false;
         }
 

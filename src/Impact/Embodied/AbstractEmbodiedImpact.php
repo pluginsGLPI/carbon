@@ -33,6 +33,8 @@
 
 namespace GlpiPlugin\Carbon\Impact\Embodied;
 
+use LogicException;
+use RuntimeException;
 use CommonDBTM;
 use DBmysql;
 use DBmysqlIterator;
@@ -67,7 +69,7 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
     public function __construct(CommonDBTM $item)
     {
         if ($item->isNewItem()) {
-            throw new \LogicException("Given item is empty");
+            throw new LogicException("Given item is empty");
         }
         $this->item = $item;
         foreach (array_flip(Type::getImpactTypes()) as $type) {
@@ -129,7 +131,7 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         } catch (ConnectException $e) {
             Session::addMessageAfterRedirect(__('Connection to Boavizta failed.', 'carbon'), false, ERROR);
             return false;
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             Session::addMessageAfterRedirect(__('Embodied impact evaluation falied.', 'carbon'), false, ERROR);
             return false;
         }

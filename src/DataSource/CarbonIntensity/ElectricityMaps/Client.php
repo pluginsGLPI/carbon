@@ -32,6 +32,7 @@
 
 namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\ElectricityMaps;
 
+use RuntimeException;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
@@ -112,7 +113,7 @@ class Client extends AbstractClient
 
         try {
             $zones = $this->queryZones();
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             return 0;
         }
 

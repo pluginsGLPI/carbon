@@ -32,9 +32,9 @@
 
 namespace GlpiPlugin\Carbon\DataSource;
 
+use GuzzleHttp\Psr7\Message;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Psr7;
 use Toolbox;
 
 class RestApiClient implements RestApiClientInterface
@@ -73,10 +73,10 @@ class RestApiClient implements RestApiClientInterface
             $this->last_error = [
                 'title'     => "Plugins API error",
                 'exception' => $e->getMessage(),
-                'request'   => Psr7\Message::toString($e->getRequest()),
+                'request'   => Message::toString($e->getRequest()),
             ];
             if ($e->hasResponse()) {
-                $this->last_error['response'] = Psr7\Message::toString($e->getResponse());
+                $this->last_error['response'] = Message::toString($e->getResponse());
             }
 
             Toolbox::logDebug($this->last_error);

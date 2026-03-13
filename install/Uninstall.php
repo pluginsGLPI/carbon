@@ -32,6 +32,7 @@
 
 namespace GlpiPlugin\Carbon;
 
+use RuntimeException;
 use Config;
 use CronTask as GlpiCronTask;
 use DBmysql;
@@ -68,7 +69,7 @@ class Uninstall
     {
         $config = new Config();
         if (!$config->deleteByCriteria(['context' => 'plugin:carbon'])) {
-            throw new \RuntimeException('Error while deleting config');
+            throw new RuntimeException('Error while deleting config');
         }
     }
 
@@ -80,7 +81,7 @@ class Uninstall
                 'name' => ['LIKE', 'carbon:%'],
             ])
         ) {
-            throw new \RuntimeException('Error while deleting rights');
+            throw new RuntimeException('Error while deleting rights');
         }
     }
 
@@ -102,7 +103,7 @@ class Uninstall
     {
         $displayPreference = new DisplayPreference();
         if (!$displayPreference->deleteByCriteria(['itemtype' => CarbonIntensity::class])) {
-            throw new \RuntimeException('Error while deleting display preferences');
+            throw new RuntimeException('Error while deleting display preferences');
         }
     }
 

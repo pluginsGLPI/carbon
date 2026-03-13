@@ -32,6 +32,7 @@
 
 namespace GlpiPlugin\Carbon;
 
+use LogicException;
 use CommonDBChild;
 use CommonDBTM;
 use CommonGLPI;
@@ -68,7 +69,7 @@ class Location extends CommonDBChild
 
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
-        if (is_a($item, GlpiLocation::class)) {
+        if ($item instanceof GlpiLocation) {
             return self::createTabEntry(__('Environmental impact', 'carbon'), 0);
         }
         return '';
@@ -76,7 +77,7 @@ class Location extends CommonDBChild
 
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
-        if (is_a($item, GlpiLocation::class)) {
+        if ($item instanceof GlpiLocation) {
             /** @var GlpiLocation $item */
             $location = new self();
             $location->showForLocation($item);
@@ -660,6 +661,6 @@ class Location extends CommonDBChild
             return $location->fields['boavizta_zone'];
         }
 
-        throw new \LogicException('Not implemented yet');
+        throw new LogicException('Not implemented yet');
     }
 }

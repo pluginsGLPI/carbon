@@ -32,6 +32,7 @@
 
 namespace GlpiPlugin\Carbon;
 
+use RuntimeException;
 use Config;
 use DBmysql;
 use DirectoryIterator;
@@ -112,7 +113,7 @@ class Install
 
         try {
             $DB->runFile($dbFile);
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             $this->migration->addWarningMessage("Error creating tables : " . $e->getMessage());
             return false;
         }
@@ -150,7 +151,7 @@ class Install
         $current_version = $matches[1];
         if (version_compare($db_version, $current_version) > 0) {
             // database more recent than current version
-            $e = new \RuntimeException(sprintf(
+            $e = new RuntimeException(sprintf(
                 'Database of the plugin %s is more recent than the installed version %s.',
                 $db_version,
                 $current_version
@@ -167,19 +168,19 @@ class Install
                 // Check the version os SEMVER compliant
                 $regex = '!^' . self::SEMVER_REGEX . '$!';
                 if (preg_match($regex, $this->force_upgrade_from_version) !== 1) {
-                    $e = new \RuntimeException('Invalid start version for upgrade.');
+                    $e = new RuntimeException('Invalid start version for upgrade.');
                     trigger_error($e->getMessage(), E_USER_WARNING);
                     throw $e;
                 }
                 if (version_compare($this->force_upgrade_from_version, $oldest_upgradable_version) < 0) {
-                    $e = new \RuntimeException('Upgrade is not supported before ' . $this->force_upgrade_from_version . '.');
+                    $e = new RuntimeException('Upgrade is not supported before ' . $this->force_upgrade_from_version . '.');
                     trigger_error($e->getMessage(), E_USER_WARNING);
                     throw $e;
                 }
             }
         } else {
             if (version_compare($from_version, $oldest_upgradable_version, 'lt')) {
-                $e = new \RuntimeException("Upgrade is not supported before $oldest_upgradable_version!");
+                $e = new RuntimeException("Upgrade is not supported before $oldest_upgradable_version!");
                 trigger_error($e->getMessage(), E_USER_WARNING);
                 throw $e;
             }
@@ -288,7 +289,7 @@ class Install
             'name' => $name,
         ]);
         if ($source->isNewItem()) {
-            throw new \RuntimeException("Failed to create carbon intensity source '$name' in DB");
+            throw new RuntimeException("Failed to create carbon intensity source '$name' in DB");
         }
         return $source->getID();
     }
@@ -310,7 +311,7 @@ class Install
         ]);
         $zone->getFromDBByCrit(['name' => $name]);
         if ($zone->isNewItem()) {
-            throw new \RuntimeException("Failed to create zone '$name' in DB");
+            throw new RuntimeException("Failed to create zone '$name' in DB");
         }
         return $zone->getID();
     }

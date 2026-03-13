@@ -32,6 +32,7 @@
 
 namespace GlpiPlugin\Carbon\Impact\Embodied;
 
+use RuntimeException;
 use CommonDBTM;
 use CommonGLPI;
 use DBmysql;
@@ -82,7 +83,7 @@ class Engine extends CommonGLPI
         $embodied_impact = new $embodied_impact_class($item);
         try {
             return self::configureEngine($embodied_impact);
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             // If the engine cannot be configured, it is not usable
             return null;
         }

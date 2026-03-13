@@ -32,6 +32,7 @@
 
 namespace GlpiPlugin\Carbon\DataSource\Lca;
 
+use InvalidArgumentException;
 use GlpiPlugin\Carbon\DataSource\ConfigInterface;
 use GlpiPlugin\Carbon\DataSource\RestApiClient;
 
@@ -120,7 +121,7 @@ class ClientFactory
         $type .= 'Client';
         $client_classes = self::getClientTypes();
         if (!isset($client_classes[$type])) {
-            throw new \InvalidArgumentException("Unknown client type: $type");
+            throw new InvalidArgumentException("Unknown client type: $type");
         }
 
         $class_name = $client_classes[$type];
@@ -138,7 +139,7 @@ class ClientFactory
     {
         $names = self::getClientNames();
         if (!in_array($name, $names)) {
-            throw new \InvalidArgumentException("Unknown client type name: $name");
+            throw new InvalidArgumentException("Unknown client type name: $name");
         }
 
         $class_name = array_search($name, $names);

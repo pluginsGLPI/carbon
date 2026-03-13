@@ -35,7 +35,6 @@ namespace GlpiPlugin\Carbon\Impact\Usage;
 
 use CommonDBTM;
 use DBmysqlIterator;
-use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 
 interface UsageImpactInterface
 {

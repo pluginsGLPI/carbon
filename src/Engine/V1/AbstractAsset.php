@@ -32,6 +32,7 @@
 
 namespace GlpiPlugin\Carbon\Engine\V1;
 
+use LogicException;
 use CommonDBTM;
 use DateInterval;
 use DateTimeImmutable;
@@ -65,10 +66,10 @@ abstract class AbstractAsset implements EngineInterface
         ];
         foreach ($types as $type) {
             if ($type === '') {
-                throw new \LogicException('Itemtype not set');
+                throw new LogicException('Itemtype not set');
             }
             if (!is_subclass_of($type, CommonDBTM::class)) {
-                throw new \LogicException('Itemtype does not inherits from ' . CommonDBTM::class);
+                throw new LogicException('Itemtype does not inherits from ' . CommonDBTM::class);
             }
         }
 
