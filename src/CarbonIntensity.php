@@ -32,6 +32,8 @@
 
 namespace GlpiPlugin\Carbon;
 
+use RuntimeException;
+use Exception;
 use CommonDropdown;
 use DateInterval;
 use DateTime;
@@ -318,7 +320,7 @@ class CarbonIntensity extends CommonDropdown
             'name' => $source_name,
         ]);
         if ($source->isNewItem()) {
-            throw new \RuntimeException('Attempt to save carbon intensity with a source which is not in the database');
+            throw new RuntimeException('Attempt to save carbon intensity with a source which is not in the database');
             // trigger_error('Attempt to save carbon intensity with a source which is not in the database', E_USER_ERROR);
             // return 0;
         }
@@ -327,7 +329,7 @@ class CarbonIntensity extends CommonDropdown
             'name' => $zone_name,
         ]);
         if ($zone->isNewItem()) {
-            throw new \RuntimeException('Attempt to save carbon intensity with a zone which is not in the database');
+            throw new RuntimeException('Attempt to save carbon intensity with a zone which is not in the database');
             // trigger_error('Attempt to save carbon intensity with a zone which is not in the database', E_USER_ERROR);
             // return 0;
         }
@@ -356,7 +358,7 @@ class CarbonIntensity extends CommonDropdown
                 );
                 $DB->executeStatement($stmt);
                 $count++;
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $count++;
                 continue;
             }

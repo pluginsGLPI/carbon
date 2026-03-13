@@ -32,6 +32,7 @@
 
 namespace GlpiPlugin\Carbon\Impact\Usage;
 
+use RuntimeException;
 use CommonDBTM;
 use CommonGLPI;
 use GlpiPlugin\Carbon\Config;
@@ -72,7 +73,7 @@ class Engine extends CommonGLPI
         $usage_impact = new $usage_impact_class($item);
         try {
             return self::configureEngine($usage_impact);
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             return null;
         }
     }

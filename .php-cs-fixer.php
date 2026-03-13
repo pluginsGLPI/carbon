@@ -1,5 +1,9 @@
 <?php
 
+use PhpCsFixer\Finder;
+use PhpCsFixer\Config;
+use PhpCsFixer\Runner\Parallel\ParallelConfigFactory;
+
 /**
  * -------------------------------------------------------------------------
  * Carbon plugin for GLPI
@@ -30,7 +34,7 @@
  * -------------------------------------------------------------------------
  */
 
-$finder = (new PhpCsFixer\Finder())
+$finder = (new Finder())
     ->in(__DIR__)
     ->exclude([
         '.git/',
@@ -41,9 +45,9 @@ $finder = (new PhpCsFixer\Finder())
     ])
 ;
 
-return (new PhpCsFixer\Config())
+return (new Config())
     ->setUnsupportedPhpVersionAllowed(true) // allow upcoming PHP versions
-    ->setParallelConfig(PhpCsFixer\Runner\Parallel\ParallelConfigFactory::detect())
+    ->setParallelConfig(ParallelConfigFactory::detect())
     ->setCacheFile('files/_cache/php-cs-fixer/php-cs-fixer.cache')
     ->setRules([
         '@PER-CS3.0' => true,

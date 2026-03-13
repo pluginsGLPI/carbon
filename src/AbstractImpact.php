@@ -32,6 +32,7 @@
 
 namespace GlpiPlugin\Carbon;
 
+use LogicException;
 use CommonDBChild;
 use CommonDBTM;
 use DBmysql;
@@ -156,7 +157,7 @@ abstract class AbstractImpact extends CommonDBChild
 
         // Check $itemtype inherits from CommonDBTM
         if (!GlpiToolbox::isCommonDBTM($itemtype)) {
-            throw new \LogicException('itemtype is not a CommonDBTM object');
+            throw new LogicException('itemtype is not a CommonDBTM object');
         }
 
         // clean $crit array: remove mostly SELECT, FROM

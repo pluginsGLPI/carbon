@@ -32,6 +32,7 @@
 
 namespace GlpiPlugin\Carbon;
 
+use InvalidArgumentException;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
@@ -507,7 +508,7 @@ class Toolbox
         global $DB;
 
         if ($interval->m !== 0 || $interval->y !== 0) {
-            throw new \InvalidArgumentException('Interval must be in days, hours, minutes or seconds');
+            throw new InvalidArgumentException('Interval must be in days, hours, minutes or seconds');
         }
         if ($stop === null) {
             // Assume stop date is yesterday at midnight

@@ -32,6 +32,7 @@
 
 namespace GlpiPlugin\Carbon\Dashboard;
 
+use RuntimeException;
 use CommonDBTM;
 use Computer as GlpiComputer;
 use ComputerModel as GlpiComputerModel;
@@ -850,7 +851,7 @@ class Provider
         $count_request['COUNT'] = 'c';
         $count = $DB->request($count_request);
         if ($count->numrows() !== 1) {
-            throw new \RuntimeException("Failed to count carbon intensity samples");
+            throw new RuntimeException("Failed to count carbon intensity samples");
         }
         $date = CarbonIntensity::getTableField('date');
         $intensity = CarbonIntensity::getTableField('intensity');

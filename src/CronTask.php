@@ -32,6 +32,7 @@
 
 namespace GlpiPlugin\Carbon;
 
+use RuntimeException;
 use CommonDBTM;
 use CommonGLPI;
 use Config as GlpiConfig;
@@ -54,7 +55,7 @@ class CronTask extends CommonGLPI
         // Delegate to the client's crontask class the tab name to return
         // But keep here the logic to decide if a tab name shall be returned
         // to reduce class loading
-        if (!is_a($item, GlpiCronTask::class)) {
+        if (!$item instanceof GlpiCronTask) {
             return '';
         }
         if (!in_array($item->fields['itemtype'], CronTaskProvider::getCronTaskTypes())) {
@@ -66,7 +67,7 @@ class CronTask extends CommonGLPI
 
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
-        if (is_a($item, GlpiCronTask::class)) {
+        if ($item instanceof GlpiCronTask) {
             /** @var GlpiCronTask $item */
             $cron_task = new self();
             $cron_task->showForCronTask($item);
@@ -284,7 +285,7 @@ class CronTask extends CommonGLPI
             $zone_name = $zone['name'];
             try {
                 $added = $intensity->downloadOneZone($data_source, $zone_name, $limit_per_zone);
-            } catch (\RuntimeException $e) {
+            } catch (RuntimeException $e) {
                 trigger_error($e->getMessage(), E_USER_WARNING);
                 continue;
             }
@@ -342,7 +343,7 @@ class CronTask extends CommonGLPI
             } catch (QuotaExceeded $e) {
                 // If the quota is exceeded, stop the task
                 break;
-            } catch (\RuntimeException $e) {
+            } catch (RuntimeException $e) {
                 // If there is a runtime exception, log it and continue
                 $failure = true;
                 trigger_error($e->getMessage(), E_USER_WARNING);

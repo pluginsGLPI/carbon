@@ -33,6 +33,7 @@
 
 namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta;
 
+use RuntimeException;
 use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\Client;
 use GlpiPlugin\Carbon\Impact\Embodied\AbstractEmbodiedImpact;
 
@@ -81,7 +82,7 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
 
         try {
             $response = $this->client->get('utils/version');
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
             throw $e;
         }
@@ -90,7 +91,7 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
                 'Invalid response from Boavizta API: %s',
                 json_encode($response[0] ?? '')
             ), E_USER_WARNING);
-            throw new \RuntimeException('Invalid response from Boavizta API');
+            throw new RuntimeException('Invalid response from Boavizta API');
         }
         self::$engine_version = $response[0];
         return self::$engine_version;
@@ -119,7 +120,7 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
             $response = $this->client->post($this->endpoint, [
                 'json' => $description,
             ]);
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
             throw $e;
         }

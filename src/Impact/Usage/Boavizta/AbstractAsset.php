@@ -33,11 +33,10 @@
 
 namespace GlpiPlugin\Carbon\Impact\Usage\Boavizta;
 
+use RuntimeException;
 use CommonDBTM;
 use DbUtils;
 use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\Client;
-use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
-use GlpiPlugin\Carbon\Impact\Type;
 use GlpiPlugin\Carbon\Impact\Usage\AbstractUsageImpact;
 use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\UsageImpact;
@@ -101,7 +100,7 @@ abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterfa
 
         try {
             $response = $this->client->get('utils/version');
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
             throw $e;
         }
@@ -110,7 +109,7 @@ abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterfa
                 'Invalid response from Boavizta API: %s',
                 json_encode($response[0] ?? '')
             ), E_USER_WARNING);
-            throw new \RuntimeException('Invalid response from Boavizta API');
+            throw new RuntimeException('Invalid response from Boavizta API');
         }
         self::$engine_version = $response[0];
         return self::$engine_version;
@@ -133,7 +132,7 @@ abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterfa
             $response = $this->client->post($this->endpoint, [
                 'json' => $description,
             ]);
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
             throw $e;
         }

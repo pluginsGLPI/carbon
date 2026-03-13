@@ -32,6 +32,7 @@
 
 namespace GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi;
 
+use RuntimeException;
 use DBmysql;
 use Dropdown;
 use GlpiPlugin\Carbon\Config as CarbonConfig;
@@ -84,7 +85,7 @@ class Client extends AbstractClient
         } else {
             $url = CarbonConfig::getPluginConfigurationValue('boaviztapi_base_url');
             if (!is_string($url) || $url === '') {
-                throw new \RuntimeException('Invalid Boaviztapi base URL');
+                throw new RuntimeException('Invalid Boaviztapi base URL');
             }
             $this->base_url = $url;
         }

@@ -32,6 +32,7 @@
 
 namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity;
 
+use Generator;
 use Config as GlpiConfig;
 use DateInterval;
 use DateTime;
@@ -252,9 +253,9 @@ abstract class AbstractClient implements ClientInterface
      *
      * @param DateTimeImmutable $start
      * @param DateTimeImmutable $stop
-     * @return \Generator
+     * @return Generator
      */
-    protected function sliceDateRangeByMonth(DateTimeImmutable $start, DateTimeImmutable $stop): \Generator
+    protected function sliceDateRangeByMonth(DateTimeImmutable $start, DateTimeImmutable $stop): Generator
     {
         $real_start = $start->setTime((int) $start->format('H'), 0, 0, 0);
         $real_stop = $stop->setTime((int) $stop->format('H'), 0, 0, 0);
@@ -298,7 +299,7 @@ abstract class AbstractClient implements ClientInterface
      *
      * @param DateTimeImmutable $start
      * @param DateTimeImmutable $stop
-     * @return \Generator
+     * @return Generator
      */
     protected function sliceDateRangeByDay(DateTimeImmutable $start, DateTimeImmutable $stop)
     {

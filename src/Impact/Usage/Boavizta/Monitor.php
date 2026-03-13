@@ -39,7 +39,6 @@ use DBmysql;
 use DbUtils;
 use Glpi\Asset\Asset_PeripheralAsset;
 use Glpi\DBAL\QueryExpression;
-use GlpiPlugin\Carbon\MonitorType;
 use Monitor as GlpiMonitor;
 use MonitorModel as GlpiMonitorModel;
 use MonitorType as GlpiMonitorType;
@@ -58,12 +57,9 @@ class Monitor extends AbstractAsset
         // the location should behandled like done in History namespace
 
         $item_table = self::$itemtype::getTable();
-        $item_model_table = self::$model_itemtype::getTable();
+        self::$model_itemtype::getTable();
         $assets_items_table = Asset_PeripheralAsset::getTable();
         $computers_table = GlpiComputer::getTable();
-        $glpi_monitor_types_table = GlpiMonitorType::getTable();
-        $glpi_monitor_types_fk = GlpiMonitorType::getForeignKeyField();
-        $monitor_types_table = MonitorType::getTable();
 
         $request = parent::getEvaluableQuery($itemtype);
         $parent_inner_joins = $request['INNER JOIN'];

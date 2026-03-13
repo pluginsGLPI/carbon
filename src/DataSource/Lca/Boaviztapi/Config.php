@@ -32,6 +32,7 @@
 
 namespace GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi;
 
+use Exception;
 use GlpiPlugin\Carbon\Config as PluginConfig;
 use GlpiPlugin\Carbon\DataSource\ConfigInterface;
 use GlpiPlugin\Carbon\DataSource\RestApiClient;
@@ -87,14 +88,14 @@ TWIG;
 
     public function configUpdate(array $input): array
     {
-        if (isset($input['boaviztapi_base_url']) && strlen($input['boaviztapi_base_url']) > 0) {
+        if (isset($input['boaviztapi_base_url']) && (string) $input['boaviztapi_base_url'] !== '') {
             $old_url = PluginConfig::getPluginConfigurationValue('boaviztapi_base_url');
             if ($old_url != $input['boaviztapi_base_url']) {
                 $boavizta = new Client(new RestApiClient(), $input['boaviztapi_base_url']);
                 $zones = [];
                 try {
                     $zones = $boavizta->queryZones();
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     unset($input['boaviztapi_base_url']);
                     Session::addMessageAfterRedirect(__('Invalid Boavizta API URL', 'carbon'), false, ERROR);
                 }
