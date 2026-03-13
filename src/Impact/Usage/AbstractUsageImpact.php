@@ -36,12 +36,11 @@ namespace GlpiPlugin\Carbon\Impact\Usage;
 use CommonDBTM;
 use DBmysql;
 use DBmysqlIterator;
-use DbUtils;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\Impact\Type;
 use GlpiPlugin\Carbon\Toolbox;
 use GlpiPlugin\Carbon\UsageImpact;
-use Location as GlpiLocation;
+use Toolbox as GlpiToolbox;
 
 abstract class AbstractUsageImpact implements UsageImpactInterface
 {
@@ -110,7 +109,7 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
         if ($itemtype === '') {
             throw new \LogicException('Itemtype not set');
         }
-        if (!is_subclass_of($itemtype, CommonDBTM::class)) {
+        if (!GlpiToolbox::isCommonDBTM($itemtype)) {
             throw new \LogicException('Itemtype does not inherits from ' . CommonDBTM::class);
         }
 

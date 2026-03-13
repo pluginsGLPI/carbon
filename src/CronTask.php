@@ -37,13 +37,12 @@ use CommonGLPI;
 use Config as GlpiConfig;
 use CronTask as GlpiCronTask;
 use Geocoder\Exception\QuotaExceeded;
-use Geocoder\Geocoder;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientFactory;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientInterface;
 use GlpiPlugin\Carbon\DataSource\CronTaskProvider;
 use GlpiPlugin\Carbon\Impact\Embodied\Engine as EmbodiedEngine;
+use GlpiPlugin\Carbon\Impact\History\AssetInterface;
 use GlpiPlugin\Carbon\Impact\Usage\Engine as UsageEngine;
-use GlpiPlugin\Carbon\Impact\Usage\UsageImpactInterface as UsageImpactInterface;
 use Location as GlpiLocation;
 
 class CronTask extends CommonGLPI
@@ -148,7 +147,7 @@ class CronTask extends CommonGLPI
         // Calculate GWP
         $count = 0;
         foreach ($usage_impacts as $usage_impact_type) {
-            /** @var UsageImpactInterface $usage_impact */
+            /** @var AssetInterface $usage_impact */
             $usage_impact = new $usage_impact_type();
             $usage_impact->setLimit($limit_per_type);
             $count = $usage_impact->evaluateItems($usage_impact->getItemsToEvaluate());

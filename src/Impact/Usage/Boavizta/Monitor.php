@@ -34,9 +34,12 @@
 namespace GlpiPlugin\Carbon\Impact\Usage\Boavizta;
 
 use CommonDBTM;
+use Computer as GlpiComputer;
 use DBmysql;
 use DbUtils;
+use Glpi\Asset\Asset_PeripheralAsset;
 use Glpi\DBAL\QueryExpression;
+use GlpiPlugin\Carbon\MonitorType;
 use Monitor as GlpiMonitor;
 use MonitorModel as GlpiMonitorModel;
 use MonitorType as GlpiMonitorType;
