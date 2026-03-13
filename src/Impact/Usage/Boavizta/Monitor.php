@@ -87,7 +87,7 @@ class Monitor extends AbstractAsset
                 $computers_table => 'id',
                 $assets_items_table => 'items_id_asset',
                 [
-                    'AND' => [Asset_PeripheralAsset::getTableField('itemtype_asset') => GlpiComputer::class]
+                    'AND' => [Asset_PeripheralAsset::getTableField('itemtype_asset') => GlpiComputer::class],
                 ],
             ],
         ];
