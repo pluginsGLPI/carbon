@@ -135,7 +135,7 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
         /** @var int $count count of successfully evaluated assets */
         $count = 0;
         foreach ($iterator as $row) {
-            if ($this->evaluateItem($row['id'])) {
+            if ($this->evaluateItem()) {
                 $count++;
             }
             $attempts_count++;
