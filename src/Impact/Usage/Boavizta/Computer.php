@@ -44,14 +44,11 @@ use Glpi\DBAL\QueryExpression;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Location;
-use GlpiPlugin\Carbon\UsageImpact;
 use GlpiPlugin\Carbon\UsageInfo;
-use Infocom;
 use Item_DeviceMemory;
 use Item_DeviceProcessor;
 use Item_Devices;
 use Item_Disk;
-use Location as GlpiLocation;
 
 class Computer extends AbstractAsset
 {

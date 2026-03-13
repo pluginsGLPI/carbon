@@ -216,7 +216,7 @@ abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterfa
         return $value;
     }
 
-        public function getEvaluableQuery(string $itemtype, array $crit = [], bool $entity_restrict = true): array
+    public function getEvaluableQuery(string $itemtype, array $crit = [], bool $entity_restrict = true): array
     {
         $item_table = getTableForItemType($itemtype);
         $glpi_asset_type_itemtype = $itemtype . "Type";
