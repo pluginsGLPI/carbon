@@ -129,7 +129,6 @@ class ComputerTest extends EngineTestCase
         ];
     }
 
-
     public function testGetUsageProfile()
     {
         foreach ($this->computerUsageProfileProvider() as $data) {

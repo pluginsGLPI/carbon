@@ -255,7 +255,7 @@ class CommonTestCase extends TestCase
     {
         $usage_profile = $this->createItem(ComputerUsageProfile::class, $usage_profile_params);
         $glpi_computer = $this->createItem(GlpiComputer::class);
-        $impact = $this->createItem(UsageInfo::class, [
+        $usage_info = $this->createItem(UsageInfo::class, [
             'itemtype' => GlpiComputer::class,
             'items_id' => $glpi_computer->getId(),
             ComputerUsageProfile::getForeignKeyField() => $usage_profile->getID(),
