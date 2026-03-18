@@ -46,6 +46,8 @@ class Monitor extends AbstractAsset
         // TODO: determine if the computer is a server, a computer, a laptop, a tablet...
         // then adapt $this->endpoint depending on the result
 
+        $this->endpoint .= '?' . $this->getCriteriasQueryString();
+
         // Ask for embodied impact only
         $configuration = $this->analyzeHardware();
 
