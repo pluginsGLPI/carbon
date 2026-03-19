@@ -38,20 +38,16 @@ use Computer as GlpiComputer;
 use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
 use DBmysql;
-use DbUtils;
-use DeviceProcessor;
-use Glpi\DBAL\QueryExpression;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
+use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\ComputerModelizationAdapterTrait;
 use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\UsageInfo;
-use Item_DeviceMemory;
-use Item_DeviceProcessor;
-use Item_Devices;
-use Item_Disk;
 
 class Computer extends AbstractAsset
 {
+    use ComputerModelizationAdapterTrait;
+
     protected static string $itemtype = GlpiComputer::class;
     protected static string $type_itemtype  = GlpiComputerType::class;
     protected static string $model_itemtype = GlpiComputerModel::class;
@@ -100,19 +96,27 @@ class Computer extends AbstractAsset
         if ($zone_code === null) {
             return null;
         }
-
         $average_power = $this->getAveragePower($item->getID());
-
         // Ask for usage impact only
-        $configuration = $this->analyzeHardware($item);
+        $configuration = $this->analyzeHardware();
         if (count($configuration) === 0) {
             return null;
         }
+        $lifespan = (new UsageInfo())->getLifespanInHours($item);
+        if ($lifespan === null) {
+            return null;
+        }
+        $use_ratio = $this->getUseRatio();
+        $time_workload = $this->getWorkloadRepartition();
+
         $description = [
             'configuration' => $configuration,
             'usage' => [
                 'usage_location' => $zone_code,
-                'avg_power' => $average_power,
+                'hours_lifetime' => $lifespan,
+                'avg_power'      => $average_power,
+                'use_time_ratio' => $use_ratio,
+                'time_workload'  => $time_workload,
             ],
         ];
         $response = $this->query($description);
@@ -186,101 +190,31 @@ class Computer extends AbstractAsset
         return 'terminal/desktop';
     }
 
-    protected function analyzeHardware(CommonDBTM $item): array
+    /**
+     * Calculate the use time ratio from the usage profile
+     *
+     * @return float Ratio between 0 and 1
+     */
+    protected function getUseRatio(): float
     {
-        $configuration = [];
-        // Yes, string expected here.
-        $iterator = Item_Devices::getItemsAssociatedTo($item->getType(), (string) $item->getID());
-        foreach ($iterator as $item_device) {
-            switch ($item_device->getType()) {
-                case Item_DeviceProcessor::class:
-                    $cpu = DeviceProcessor::getById($item_device->fields['deviceprocessors_id']);
-                    if ($cpu) {
-                        if (isset($configuration['cpu'])) {
-                            // The server does not support several CPU with different specifications
-                            // then, just increment CPU count
-                            $configuration['cpu']['units']++;
-                        } else {
-                            $configuration['cpu'] = [
-                                'units'      => 1,
-                                'name'       => $cpu->fields['designation'],
-                            ];
-                            if (isset($item_device->fields['nbcores'])) {
-                                $configuration['cpu']['core_units'] = $item_device->fields['nbcores'];
-                            }
-                        }
-                    }
-                    break;
-                case Item_DeviceMemory::class:
-                    $configuration['memory'][] = [
-                        'units' => 1,
-                        'capacity' => ceil($item_device->fields['size'] / 1024),
-                    ];
-                    break;
-                case Item_Disk::class:
-                    $configuration['disk'][] = [
-                        'units' => 1,
-                        'capacity' => ceil($item_device->fields['capacity'] / 1024),
-                    ];
-                    break;
-            }
-        }
-
-        return $configuration;
-    }
-
-    protected function getAveragePower(int $id): ?int
-    {
-        /** @var DBmysql $DB */
-        global $DB;
-
-        $dbutil = new DbUtils();
-        $itemtype = static::$itemtype;
-        $glpi_type_fk = static::$type_itemtype::getForeignKeyField();
-        $model_fk = static::$model_itemtype::getForeignKeyField();
-        $item_table = $dbutil->getTableForItemType($itemtype);
-        $item_glpi_type_table  = $dbutil->getTableForItemType(static::$type_itemtype);
-        $item_model_table = $dbutil->getTableForItemType(static::$model_itemtype);
-        $carbon_item_type_table = $dbutil->getTableForItemType(ComputerType::class);
-
-        $type_power  = ComputerType::getTableField('power_consumption');
-        $type_power = DBmysql::quoteName($type_power);
-        $model_power = static::$model_itemtype::getTableField('power_consumption');
-        $model_power = DBmysql::quoteName($model_power);
-
-        $request = [
-            'SELECT' => new QueryExpression("COALESCE({$model_power}, {$type_power}, null) as `power`"),
-            'FROM' => $item_table,
-            'LEFT JOIN' => [
-                $item_model_table => [
+        $usage_profile = new ComputerUsageProfile();
+        $usage_profile_table = ComputerUsageProfile::getTable();
+        $usage_info_table = getTableForItemType(UsageInfo::class);
+        $usage_profile->getFromDBByRequest([
+            'INNER JOIN' => [
+                $usage_info_table => [
                     'FKEY' => [
-                        $item_table => $model_fk,
-                        $item_model_table => 'id',
-                    ],
-                ],
-                $item_glpi_type_table => [
-                    'FKEY' => [
-                        $item_table => $glpi_type_fk,
-                        $item_glpi_type_table => 'id',
-                    ],
-                ],
-                $carbon_item_type_table => [
-                    'FKEY' => [
-                        $item_glpi_type_table => 'id',
-                        $carbon_item_type_table => 'computertypes_id',
+                        $usage_info_table => 'plugin_carbon_computerusageprofiles_id',
+                        $usage_profile_table => 'id',
                     ],
                 ],
             ],
             'WHERE' => [
-                $itemtype::getTableField('id') => $id,
+                UsageInfo::getTableField('itemtype') => static::$itemtype,
+                UsageInfo::getTableField('items_id') => $this->item->getID(),
             ],
-        ];
+        ]);
 
-        $result = $DB->request($request);
-        if ($result->count() === 0) {
-            return null;
-        }
-        $power = $result->current()['power'];
-        return $power ?? 0;
+        return $usage_profile->getPoweredOnRatio();
     }
 }

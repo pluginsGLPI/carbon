@@ -34,7 +34,9 @@
 namespace GlpiPlugin\Carbon\Impact\Usage\Boavizta;
 
 use CommonDBTM;
+use DBmysql;
 use DbUtils;
+use Glpi\DBAL\QueryExpression;
 use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\Client;
 use GlpiPlugin\Carbon\Impact\Usage\AbstractUsageImpact;
 use GlpiPlugin\Carbon\Location;
@@ -67,11 +69,10 @@ abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterfa
 
     /**
      * Analyze the hardware of the asset to prepare the request to the backend
-     * @param CommonDBTM $item asset to analyze
      *
      * @return void
      */
-    abstract protected function analyzeHardware(CommonDBTM $item);
+    abstract protected function analyzeHardware();
 
     /**
      * Get the average power of the asset from the best source available (model or type)
@@ -79,7 +80,7 @@ abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterfa
      * @param int $id ID of the asset (itemtype determined from the class)
      * @return null|int average power in Watt
      */
-    abstract protected function getAveragePower(int $id): ?int;
+    // abstract protected function getAveragePower(int $id): ?int;
 
     /**
      * Set the REST API client to use for requests
@@ -139,47 +140,6 @@ abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterfa
 
         return $response;
     }
-
-    // /**
-    //  * Read the response to find the impacts provided by Boaviztapi
-    //  *
-    //  * @return array
-    //  */
-    // protected function parseResponse(array $response): array
-    // {
-    //     $impacts = [];
-    //     $types = Type::getImpactTypes();
-    //     foreach ($response['impacts'] as $type => $impact) {
-    //         if (!in_array($type, $types)) {
-    //             trigger_error(sprintf('Unsupported impact type %s in class %s', $type, __CLASS__));
-    //             continue;
-    //         }
-    //         $impact_id = Type::getImpactId($type);
-    //         if ($impact_id === false) {
-    //             continue;
-    //         }
-    //         $impacts[$impact_id] = $this->parseCriteria($type, $response['impacts'][$type]);
-
-    //     }
-
-    //     return $impacts;
-    // }
-
-    // protected function parseCriteria(string $name, array $impact): ?TrackedFloat
-    // {
-    //     if ($impact['embedded'] === 'not implemented') {
-    //         return null;
-    //     }
-
-    //     $unit_multiplier = $this->client->getCriteriaUnits()[$name];
-    //     $value = new TrackedFloat(
-    //         $impact['embedded']['value'] * $unit_multiplier,
-    //         null,
-    //         TrackedFloat::DATA_QUALITY_ESTIMATED
-    //     );
-
-    //     return $value;
-    // }
 
     public function getEvaluableQuery(string $itemtype, array $crit = [], bool $entity_restrict = true): array
     {
@@ -282,5 +242,68 @@ abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterfa
         }
 
         return $request;
+    }
+
+    /**
+     * Get a representation of the typical asset load
+     * TODO: implement a real workload repartition, based on data we could collect in the future
+     *
+     * @return array
+     */
+    protected function getWorkloadRepartition(): array
+    {
+        return [[
+            'time_percentage' => 100,
+            'load_percentage' => 100,
+        ]];
+    }
+
+    protected function getAveragePower(int $id): ?int
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        $dbutil = new DbUtils();
+        $itemtype = static::$itemtype;
+        $model_fk = static::$model_itemtype::getForeignKeyField();
+        $item_table = $dbutil->getTableForItemType($itemtype);
+        $item_model_table = $dbutil->getTableForItemType(static::$model_itemtype);
+        $carbon_asset_type = 'GlpiPlugin\\Carbon\\' . static::$type_itemtype;
+        $asset_type_fk = getForeignKeyFieldForItemType(static::$type_itemtype);
+        $carbon_item_type_table = $dbutil->getTableForItemType($carbon_asset_type);
+
+        $type_power  = CommonDBTM::getTableField('power_consumption', $carbon_asset_type);
+        $type_power = DBmysql::quoteName($type_power);
+        $model_power = static::$model_itemtype::getTableField('power_consumption');
+        $model_power = DBmysql::quoteName($model_power);
+
+        $request = [
+            'SELECT' => new QueryExpression("COALESCE({$model_power}, {$type_power}, null) as `power`"),
+            'FROM' => $item_table,
+            'LEFT JOIN' => [
+                $item_model_table => [
+                    'FKEY' => [
+                        $item_table => $model_fk,
+                        $item_model_table => 'id',
+                    ],
+                ],
+                $carbon_item_type_table => [
+                    'FKEY' => [
+                        $item_table => $asset_type_fk,
+                        $carbon_item_type_table => $asset_type_fk,
+                    ],
+                ],
+            ],
+            'WHERE' => [
+                $itemtype::getTableField('id') => $id,
+            ],
+        ];
+
+        $result = $DB->request($request);
+        if ($result->count() === 0) {
+            return null;
+        }
+        $power = $result->current()['power'];
+        return $power ?? 0;
     }
 }

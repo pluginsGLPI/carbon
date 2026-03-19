@@ -118,7 +118,7 @@ if (isset($_POST['update'])) {
     /** @var AbstractAsset $gwp_impact */
     $gwp_impact = new $gwp_impact_class();
 
-    if (!$gwp_impact->canHistorize($_POST['items_id'])) {
+    if ($gwp_impact->getItemsToEvaluate([$item::getTableField('id') => $_POST['items_id']])->count() !== 1) {
         Session::addMessageAfterRedirect(__('Missing data prevents historization of this asset.', 'carbon'), false, ERROR);
     } else {
         if (!$gwp_impact->calculateImpact($_POST['items_id'])) {

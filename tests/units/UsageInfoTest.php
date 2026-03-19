@@ -37,6 +37,7 @@ use Contact;
 use DBmysql;
 use GlpiPlugin\Carbon\EmbodiedImpact;
 use GlpiPlugin\Carbon\UsageInfo;
+use Infocom;
 use Monitor as GlpiMonitor;
 use NetworkEquipment as GlpiNetworkEquipment;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -261,5 +262,103 @@ class UsageInfoTest extends DbTestCase
     {
         $items = $crawler->filter('#plugin_carbon_embodied_impacts #embodied_pe_tip');
         return $items->count() === 1;
+    }
+
+    public function test_getLifespanInHours_returns_null_when_no_decomission_date()
+    {
+        $glpi_computer = $this->createItem(GlpiComputer::class, [
+            'date_creation' => '2024-02-03 11:00:00',
+        ]);
+        $infocom = $this->createItem(Infocom::class, [
+            'itemtype' => get_class($glpi_computer),
+            'items_id' => $glpi_computer->getID(),
+            'delivery_date'     => '2025-02-03',
+            'use_date'          => '2023-02-03',
+            'buy_date'          => '2022-02-03',
+            'decommission_date' => null,
+        ]);
+
+        $usage_info = new UsageInfo();
+        $result = $usage_info->getLifespanInHours($infocom);
+        $this->assertNull($result);
+    }
+
+    public function test_getLifespanInHours_returns_null_when_no_inventory_entry_date()
+    {
+        $glpi_computer = $this->createItem(GlpiComputer::class, [
+            'date_creation' => null,
+        ]);
+        $infocom = $this->createItem(Infocom::class, [
+            'itemtype' => get_class($glpi_computer),
+            'items_id' => $glpi_computer->getID(),
+            'delivery_date'     => null,
+            'use_date'          => null,
+            'buy_date'          => null,
+            'decommission_date' => '2026-02-03 11:00:00',
+        ]);
+
+        $usage_info = new UsageInfo();
+        $result = $usage_info->getLifespanInHours($glpi_computer);
+        $this->assertNull($result);
+    }
+
+    public function test_getLifespanInHours_returns_hours_when_all_data_are_present()
+    {
+        $glpi_computer = $this->createItem(GlpiComputer::class, [
+            'date_creation' => null,
+        ]);
+        $infocom = $this->createItem(Infocom::class, [
+            'itemtype' => get_class($glpi_computer),
+            'items_id' => $glpi_computer->getID(),
+            'delivery_date'     => null,
+            'use_date'          => '2026-02-01 11:00:00', // Time is not stored in DB, will be processed as 00:00:00
+            'buy_date'          => null,
+            'decommission_date' => '2026-02-03 11:00:00',
+        ]);
+
+        $usage_info = new UsageInfo();
+        $result = $usage_info->getLifespanInHours($glpi_computer);
+        $this->assertSame(59, $result);
+    }
+
+    public function test_getLifespanInHours_returns_hours_when_date_creation()
+    {
+        $glpi_computer = $this->createItem(GlpiComputer::class, [
+            'date_creation' => '2022-01-01',
+        ]);
+        $infocom = $this->createItem(Infocom::class, [
+            'itemtype' => get_class($glpi_computer),
+            'items_id' => $glpi_computer->getID(),
+            'delivery_date'     => null,
+            'use_date'          => null,
+            'buy_date'          => null,
+            'decommission_date' => '2026-02-03 11:00:00',
+        ]);
+
+        $usage_info = new UsageInfo();
+        $result = $usage_info->getLifespanInHours($glpi_computer);
+        $this->assertSame(35867, $result);
+    }
+
+    public function test_getLifespanInHours_returns_hours_when_no_decommission_date_but_has_planned_lifetime()
+    {
+        $glpi_computer = $this->createItem(GlpiComputer::class);
+        $infocom = $this->createItem(Infocom::class, [
+            'itemtype' => get_class($glpi_computer),
+            'items_id' => $glpi_computer->getID(),
+            'delivery_date'     => null,
+            'use_date'          => '2022-01-01',
+            'buy_date'          => null,
+            'decommission_date' => null,
+        ]);
+        $usage_info = $this->createItem(UsageInfo::class, [
+            'itemtype' => get_class($glpi_computer),
+            'items_id' => $glpi_computer->getID(),
+            'planned_lifespan'  => 60, // 5 years = 60 months
+        ]);
+
+        $usage_info = new UsageInfo();
+        $result = $usage_info->getLifespanInHours($glpi_computer);
+        $this->assertSame(43824, $result);
     }
 }

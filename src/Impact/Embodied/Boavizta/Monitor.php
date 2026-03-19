@@ -64,12 +64,6 @@ class Monitor extends AbstractAsset
     {
         $configuration = [];
 
-        // Disable usage
-        $this->hardware['configuration'] = $configuration;
-        $this->hardware['usage'] = [
-            'avg_power' => 0,
-        ];
-
         return $configuration;
     }
 }

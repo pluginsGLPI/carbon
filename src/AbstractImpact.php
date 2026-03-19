@@ -102,7 +102,7 @@ abstract class AbstractImpact extends CommonDBChild
                 'field'              => $type,
                 'name'               => Type::getEmbodiedImpactLabel($type),
                 'massiveaction'      => false,
-                'datatype'           => 'number',
+                'datatype'           => 'decimal',
                 'unit'               => implode(' ', Type::getImpactUnit($type)),
             ];
             $id++;

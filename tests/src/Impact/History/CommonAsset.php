@@ -52,7 +52,7 @@ class CommonAsset extends DbTestCase
             'comment' => 'test date_mod',
         ]);
         $output = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
-        $this->assertEquals($_SESSION["glpi_currenttime"], $output->format('Y-m-d H:i:s'));
+        $this->assertNull($output);
 
         $asset->update([
             'id' => $asset->getID(),

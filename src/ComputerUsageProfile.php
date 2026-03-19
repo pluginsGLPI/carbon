@@ -73,12 +73,36 @@ class ComputerUsageProfile extends CommonDropdown
 
     public function prepareInputForAdd($input)
     {
-        return $this->inputIntegrityCheck($input);
+        if (!$this->inputIntegrityCheck($input)) {
+            return [];
+        }
+
+        for ($day_id = 0; $day_id < 7; $day_id++) {
+            $key = "day_{$day_id}";
+            if (!isset($input[$key])) {
+                continue;
+            }
+            $input[$key] = ($input[$key] != 0) ? 1 : 0;
+        }
+
+        return $input;
     }
 
     public function prepareInputForUpdate($input)
     {
-        return $this->inputIntegrityCheck($input);
+        if (!$this->inputIntegrityCheck($input)) {
+            return [];
+        }
+
+        for ($day_id = 0; $day_id < 7; $day_id++) {
+            $key = "day_{$day_id}";
+            if (!isset($input[$key])) {
+                continue;
+            }
+            $input[$key] = ($input[$key] != 0) ? 1 : 0;
+        }
+
+        return $input;
     }
 
     /**
@@ -110,7 +134,7 @@ class ComputerUsageProfile extends CommonDropdown
      */
     protected function isValidTime(string $time): bool
     {
-        $time_pattern = '/^([01]\d|2[0-3]):[0-5]\d$/';
+        $time_pattern = '/^(([01]\d|2[0-3]):[0-5]\d)|(24:00)$/';
         $found = preg_match($time_pattern, $time, $matches);
         return ($found === 1);
     }
@@ -287,5 +311,66 @@ class ComputerUsageProfile extends CommonDropdown
             'id'              => $usage_info->getID(),
             $usage_profile_fk => $this->getID(),
         ]);
+    }
+
+    /**
+     * Count the days an asset is powered on
+     *
+     * @return int
+     */
+    public function countRunningDays(): int
+    {
+        if ($this->isNewItem()) {
+            return 0;
+        }
+        $days = array_intersect_key($this->fields, array_flip([
+            'day_1',
+            'day_2',
+            'day_3',
+            'day_4',
+            'day_5',
+            'day_6',
+            'day_7',
+        ]));
+        $days_on = 0;
+        foreach ($days as $day) {
+            if ($day === 0) {
+                continue;
+            }
+            $days_on++;
+        }
+
+        return $days_on;
+    }
+
+    public function getPoweredOnRatio(): float
+    {
+        if ($this->isNewItem()) {
+            return 0.0;
+        }
+
+        // Assume that start and stop times are HH:ii:ss
+        $seconds_start = explode(':', $this->fields['time_start']);
+        $seconds_stop  = explode(':', $this->fields['time_stop']);
+        // Convert to integers
+        $seconds_start[0] = (int) $seconds_start[0];
+        $seconds_start[1] = (int) $seconds_start[1];
+        $seconds_start[2] = 0;
+        $seconds_stop[0] = (int) $seconds_stop[0];
+        $seconds_stop[1] = (int) $seconds_stop[1];
+        $seconds_stop[2] = 0;
+
+        $seconds_start = $seconds_start[0] * 3600
+            + $seconds_start[1] * 60
+            + $seconds_start[2];
+        $seconds_stop = $seconds_stop[0] * 3600
+            + $seconds_stop[1] * 60
+            + $seconds_stop[2];
+
+        // Count the days the asset is powered on
+        $days = $this->countRunningDays();
+        $week_ratio = ($days * ($seconds_stop - $seconds_start)) / 604800;
+
+        return $week_ratio;
     }
 }

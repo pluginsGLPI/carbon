@@ -98,6 +98,15 @@ class ComputerUsageProfileTest extends DbTestCase
             'time_stop' => '17:00',
         ];
         $this->assertEquals($expected, $result);
+
+        $input = [
+            'time_stop' => '24:00',
+        ];
+        $result = $instance->prepareInputForAdd($input);
+        $expected = [
+            'time_stop' => '24:00',
+        ];
+        $this->assertEquals($expected, $result);
     }
 
     /**
@@ -274,5 +283,99 @@ class ComputerUsageProfileTest extends DbTestCase
             // 2 inputs : checked and unchecked, one of them is hidden
             $this->assertEquals(2, $field->count());
         }
+    }
+
+    public function test_countRunningDays_returns_zero_when_is_new_item()
+    {
+        $instance = new ComputerUsageProfile();
+        $result = $instance->countRunningDays();
+        $this->assertSame(0, $result);
+    }
+
+    public function test_countRunningDays_returns_zero_when_no_day_activated()
+    {
+        $instance = $this->createItem(ComputerUsageProfile::class);
+        $result = $instance->countRunningDays();
+        $this->assertSame(0, $result);
+    }
+
+    public function test_countRunningDays_returns_three_when_three_days_activated()
+    {
+        $instance = $this->createItem(ComputerUsageProfile::class, [
+            'day_2' => 1,
+            'day_4' => 1,
+            'day_6' => 1,
+        ]);
+        $result = $instance->countRunningDays();
+        $this->assertSame(3, $result);
+    }
+
+    public function test_countRunningDays_returns_seven_when_all_days_activated()
+    {
+        $instance = $this->createItem(ComputerUsageProfile::class, [
+            'day_1' => 1,
+            'day_2' => 1,
+            'day_3' => 1,
+            'day_4' => 1,
+            'day_5' => 1,
+            'day_6' => 1,
+            'day_7' => 1,
+        ]);
+        $result = $instance->countRunningDays();
+        $this->assertSame(7, $result);
+    }
+
+    public function test_getPoweredOnRatio_returns_33_percent_when_all_days_activated_with_8_hours()
+    {
+        $instance = $this->createItem(ComputerUsageProfile::class, [
+            'day_1' => 1,
+            'day_2' => 1,
+            'day_3' => 1,
+            'day_4' => 1,
+            'day_5' => 1,
+            'day_6' => 1,
+            'day_7' => 1,
+            'time_start' => '09:00:00',
+            'time_stop'  => '17:00:00',
+        ]);
+        $result = $instance->getPoweredOnRatio();
+        $expected = 7 * 8 * 60 * 60 / 604800;
+        $this->assertEqualsWithDelta($expected, $result, 0.0001);
+    }
+
+    public function test_getPoweredOnRatio_returns_23_percent_when_5_days_activated_with_8_hours()
+    {
+        $instance = $this->createItem(ComputerUsageProfile::class, [
+            'day_1' => 1,
+            'day_2' => 1,
+            'day_3' => 1,
+            'day_4' => 1,
+            'day_5' => 1,
+            'day_6' => 0,
+            'day_7' => 0,
+            'time_start' => '09:00:00',
+            'time_stop'  => '17:00:00',
+        ]);
+        $result = $instance->getPoweredOnRatio();
+        $expected = 5 * 8 * 60 * 60 / 604800;
+        $this->assertEqualsWithDelta($expected, $result, 0.0001);
+    }
+
+    public function test_getPoweredOnRatio_returns_zero_percent_when_0_days_activated_with_8_hours()
+    {
+        $instance = $this->createItem(ComputerUsageProfile::class, [
+            'day_1' => 0,
+            'day_2' => 0,
+            'day_3' => 0,
+            'day_4' => 0,
+            'day_5' => 0,
+            'day_6' => 0,
+            'day_7' => 0,
+            'time_start' => '09:00:00',
+            'time_stop'  => '17:00:00',
+        ]);
+        $result = $instance->getPoweredOnRatio();
+        $expected = 0;
+        $this->assertEqualsWithDelta($expected, $result, 0.0001);
     }
 }
