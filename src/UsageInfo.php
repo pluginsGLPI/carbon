@@ -36,13 +36,17 @@ use CommonDBChild;
 use CommonDBTM;
 use CommonGLPI;
 use Computer as GlpiComputer;
+use DateInterval;
+use DateTime;
 use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\Dashboard\Provider;
 use GlpiPlugin\Carbon\Dashboard\Widget;
 use GlpiPlugin\Carbon\Impact\Type;
 use Html;
+use Infocom;
 use Monitor;
 use NetworkEquipment;
+use Toolbox as GlpiToolbox;
 
 /**
  * Relation between a computer and a usage profile
@@ -140,12 +144,6 @@ class UsageInfo extends CommonDBChild
         /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
-        // TODO: drop this early exit when enabling planned lifespan of assets
-        if ($this->fields['itemtype'] !== GlpiComputer::class) {
-            // Nothing to edit (for now)
-            return;
-        }
-
         // TODO: Design a rights system for the whole plugin
         $canedit = self::canUpdate();
 
@@ -156,9 +154,24 @@ class UsageInfo extends CommonDBChild
             'target'   => $target,
         ];
         $this->initForm($this->getID(), $options);
+        $asset_itemtype = $this->fields['itemtype'];
+        if (!GlpiToolbox::isCommonDBTM($asset_itemtype)) {
+            return;
+        }
+        $asset = new $asset_itemtype();
+        $asset::getById($this->fields['items_id']);
+        $infocom = new Infocom();
+        $infocom->getFromDBByCrit([
+            'itemtype' => $asset_itemtype,
+            'items_id' => $this->fields['items_id'],
+        ]);
+
+        $this->fields['planned_lifespan'] ??= Toolbox::getInfocomLifespanInMonth($infocom);
         TemplateRenderer::getInstance()->display('@carbon/usageinfo.html.twig', [
             'params'   => $options,
             'item'     => $this,
+            'asset'    => $asset,
+            'infocom'  => $infocom,
         ]);
     }
 
@@ -203,7 +216,10 @@ class UsageInfo extends CommonDBChild
         ]);
         if (in_array($asset->getType(), [GlpiComputer::class, NetworkEquipment::class, Monitor::class])) {
             // TODO: decide if we show or not this impact.
-            unset($usage_impact->fields['pe']);
+            unset($usage_impact->fields['gwp']);
+            unset($usage_impact->fields['gwpbb']);
+            unset($usage_impact->fields['gwppf']);
+            unset($usage_impact->fields['gwpplu']);
         }
         $usage_carbon_emission_count = countElementsInTable(CarbonEmission::getTable(), [
             'itemtype' => $asset->getType(),
@@ -261,5 +277,65 @@ class UsageInfo extends CommonDBChild
             'usage_impact_action_url'    => $usage_imapct_action_url,
             'embodied_impact_action_url' => $embodied_impact_action_url,
         ]);
+    }
+
+    /**
+     * Get the lifespan of an asset from its infocom or usage info, in hours
+     *
+     * determine an interval between the best date for interval start and the best date for interval end
+     * interval start comes from, by precedence: date_creation of the asset, then from infocom: use_date, delivery_date, buy_date
+     * interval end comes from, by precedence: decommission_date from infocom, then planned_lifespan from usage info
+     *
+     * @param CommonDBTM $item
+     * @return int|null
+     */
+    public static function getLifespanInHours(CommonDBTM $item): ?int
+    {
+        if ($item->isNewItem()) {
+            return null;
+        }
+
+        $start_date = $item->fields['date_creation'] ?? null;
+
+        $infocom = new Infocom();
+        $infocom->getFromDBByCrit([
+            'itemtype' => get_class($item),
+            'items_id' => $item->getID(),
+        ]);
+        $end_date = null;
+        if (!$infocom->isNewItem()) {
+            // update start date from infocom if use_date, delivery_date or buy_date are set, by precedence
+            $start_date = $infocom->fields['use_date']
+                ?? $infocom->fields['delivery_date']
+                ?? $infocom->fields['buy_date']
+                ?? $start_date;
+
+            if ($infocom->fields['decommission_date'] !== null) {
+                $end_date = new DateTime($infocom->fields['decommission_date']);
+            }
+        }
+
+        if ($start_date === null) {
+            //Failed to find any date to use as start date, then we can't calculate a lifespan, return null
+            return null;
+        }
+
+        if ($end_date === null) {
+            // Try to get end date from usage info and start_date
+            $usage_info = new UsageInfo();
+            $usage_info->getFromDBByCrit([
+                'itemtype' => get_class($item),
+                'items_id' => $item->getID(),
+            ]);
+            if ($usage_info->isNewItem() || $usage_info->fields['planned_lifespan'] <= 0) {
+                // Failed to find a planned lifespan, then we can't calculate a lifespan, return null
+                return null;
+            }
+            $end_date = (new DateTime($start_date))->add(new DateInterval('P' . $usage_info->fields['planned_lifespan'] . 'M'));
+        }
+
+        $interval = $end_date->diff(new DateTime($start_date));
+        $lifespan_in_hours = $interval->days * 24 + $interval->h;
+        return $lifespan_in_hours;
     }
 }

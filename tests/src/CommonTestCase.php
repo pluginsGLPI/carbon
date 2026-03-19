@@ -239,9 +239,16 @@ class CommonTestCase extends TestCase
 
     public function updateItem(CommonDBTM $item, array $input): CommonDBTM
     {
-        $sucess = $item->update(['id' => $item->fields['id']] + $input);
-        $this->assertTrue($sucess);
+        $success = $item->update(['id' => $item->fields['id']] + $input);
+        $this->assertTrue($success);
         return $item;
+    }
+
+    public function deleteItem(CommonDBTM $item, bool $force = false): bool
+    {
+        $success = $item->delete($item->fields, $force);
+        $this->assertTrue($success);
+        return $success;
     }
 
     protected function createComputerUsageProfile(array $usage_profile_params): GlpiComputer

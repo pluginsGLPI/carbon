@@ -88,7 +88,12 @@
                             {% if status.has_location %}
                                 {% set field = ok_field %}
                             {% endif %}
-                            {{ fields.field('', field, __('Has a location', 'carbon')) }}
+                            {% if status.has_computer is defined %}
+                                {% set label = __('Attached computer has a location', 'carbon') %}
+                            {% else %}
+                                {% set label = __('Has a location', 'carbon') %}
+                            {% endif %}
+                            {{ fields.field('', field, label) }}
                         {% endif %}
 
                         {% if status.has_carbon_intensity_zone is defined %}

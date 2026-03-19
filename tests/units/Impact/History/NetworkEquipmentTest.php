@@ -32,14 +32,17 @@
 
 namespace GlpiPlugin\Carbon\Impact\History\Tests;
 
+use CommonDBTM;
 use DateTime;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\Impact\History\NetworkEquipment;
 use GlpiPlugin\Carbon\Location;
+use GlpiPlugin\Carbon\NetworkEquipmentModel;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Tests\Impact\History\CommonAsset;
+use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\Zone;
 use Infocom;
 use Location as GlpiLocation;
@@ -53,6 +56,70 @@ class NetworkEquipmentTest extends CommonAsset
 {
     protected string $history_type =  NetworkEquipment::class;
     protected string $asset_type = GlpiNetworkEquipment::class;
+
+    /**
+     * Create an asset with all required data to make it evaluable
+     *
+     * @return array<CommonDBTM> An asset and related objects
+     */
+    protected function getHistorizableNetworkEquipment(): array
+    {
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $source = new Source(); // This source exists after a fresh install
+        $source->getFromDBByCrit([
+            'name' => 'RTE',
+        ]);
+        $zone = new Zone(); // This zone exists after a fresh install
+        $zone->getFromDBByCrit([
+            'name' => 'France',
+        ]);
+        $source_zone = new Source_Zone(); // the relation source / zone also exists after a fresh install
+        $source_zone->getFromDBByCrit([
+            $source::getForeignKeyField() => $source->getID(),
+            $zone::getForeignKeyField() => $zone->getID(),
+        ]);
+        $location = $this->createItem(Location::class, [
+            'locations_id' => $glpi_location->getID(),
+            'plugin_carbon_sources_zones_id' => $source_zone->getID(),
+        ]);
+        $glpi_networkequipment_type = $this->createItem(GlpiNetworkEquipmentType::class);
+        $networkequipment_type = $this->createItem(NetworkEquipmentType::class, [
+            'power_consumption' => 55,
+            'networkequipmenttypes_id' => $glpi_networkequipment_type->getID(),
+        ]);
+        $glpi_networkequipment_model = $this->createItem(GlpiNetworkEquipmentModel::class, [
+            'power_consumption' => 35,
+        ]);
+        $networkequipment_model = $this->createItem(NetworkEquipmentModel::class, [
+            'networkequipmentmodels_id' => $glpi_networkequipment_model->getID(),
+        ]);
+        $glpi_networkequipment = $this->createItem(GlpiNetworkEquipment::class, [
+            'locations_id' => $glpi_location->getID(),
+            'networkequipmenttypes_id' => $glpi_networkequipment_type->getID(),
+            'networkequipmentmodels_id' => $glpi_networkequipment_model->getID(),
+        ]);
+        $infocom = $this->createItem(Infocom::class, [
+            'itemtype' => $glpi_networkequipment->getType(),
+            'items_id' => $glpi_networkequipment->getID(),
+            'use_date' => '2020-01-01',
+        ]);
+        $impact = $this->createItem(UsageInfo::class, [
+            'itemtype' => $glpi_networkequipment->getType(),
+            'items_id' => $glpi_networkequipment->getID(),
+        ]);
+
+        return [
+            $glpi_networkequipment,
+            $glpi_location,
+            $location,
+            $source_zone,
+            $glpi_networkequipment_model,
+            $glpi_networkequipment_type,
+            $networkequipment_type,
+            $infocom,
+            $zone,
+        ];
+    }
 
     public function testGetEngine()
     {
@@ -143,195 +210,208 @@ class NetworkEquipmentTest extends CommonAsset
     {
         $asset = $this->createItem(GlpiNetworkEquipment::class, ['date_creation' => null, 'date_mod' => null]);
         $instance = new $this->history_type();
-        $output = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
-        $this->assertNull($output);
+        $result = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
+        $this->assertNull($result);
 
         $this->updateItem($asset, [
             'id' => $asset->getID(),
             'comment' => 'test date_mod',
         ]);
-        $output = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
-        $this->assertEquals($_SESSION["glpi_currenttime"], $output->format('Y-m-d H:i:s'));
+        $result = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
+        $this->assertNull($result);
 
         $this->updateItem($asset, [
             'id' => $asset->getID(),
             'date_creation' => '2019-01-01 00:00:00',
         ]);
-        $output = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
-        $this->assertEquals('2019-01-01 00:00:00', $output->format('Y-m-d H:i:s'));
+        $result = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
+        $this->assertEquals('2019-01-01 00:00:00', $result->format('Y-m-d H:i:s'));
 
         $infocom = $this->createItem(Infocom::class, [
             'itemtype' => $asset->getType(),
             'items_id' => $asset->getID(),
         ]);
 
-        $output = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
-        $this->assertEquals('2019-01-01 00:00:00', $output->format('Y-m-d H:i:s'));
+        $result = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
+        $this->assertEquals('2019-01-01 00:00:00', $result->format('Y-m-d H:i:s'));
 
         $this->updateItem($infocom, [
             'id'       => $infocom->getID(),
             'buy_date' => '2018-01-01 00:00:00',
         ]);
-        $output = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
-        $this->assertEquals('2018-01-01 00:00:00', $output->format('Y-m-d H:i:s'));
+        $result = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
+        $this->assertEquals('2018-01-01 00:00:00', $result->format('Y-m-d H:i:s'));
 
         $this->updateItem($infocom, [
             'id'            => $infocom->getID(),
             'delivery_date' => '2018-01-01 00:00:00',
         ]);
-        $output = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
-        $this->assertEquals('2018-01-01 00:00:00', $output->format('Y-m-d H:i:s'));
+        $result = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
+        $this->assertEquals('2018-01-01 00:00:00', $result->format('Y-m-d H:i:s'));
 
         $this->updateItem($infocom, [
             'id'       => $infocom->getID(),
             'use_date' => '2017-01-01 00:00:00',
         ]);
-        $output = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
-        $this->assertEquals('2017-01-01 00:00:00', $output->format('Y-m-d H:i:s'));
+        $result = $this->callPrivateMethod($instance, 'getStartDate', $asset->getID());
+        $this->assertEquals('2017-01-01 00:00:00', $result->format('Y-m-d H:i:s'));
     }
 
-    public function testEmptyItemIsNotHistorizable()
+    public function test_getHistorizableDiagnosis_when_networkequipment_is_historizable()
     {
         $history = new NetworkEquipment();
 
-        $network_equipment = $this->createItem(GlpiNetworkEquipment::class);
-        $result = $history->getHistorizableDiagnosis($network_equipment);
-        $expected = [
-            'is_deleted'                  => true,
-            'is_template'                 => true,
-            'has_location'                => false,
-            'has_carbon_intensity_zone'   => false,
-            'has_model'                   => false,
-            'has_model_power_consumption' => false,
-            'has_type'                    => false,
-            'has_type_power_consumption'  => false,
-            'has_inventory_entry_date'    => false,
-            'ci_download_enabled'         => false,
-            'ci_fallback_available'       => false,
-            'not_is_ignore'               => true,
-        ];
-        $this->assertEquals($expected, $result);
-        $expected = !in_array(false, $result, true);
-        $result = $history->canHistorize($network_equipment->getID());
-        $this->assertFalse($result);
-    }
-
-    public function testNetDeviceWithEmptyInfocomIsNotHistorizable()
-    {
-        $history = new NetworkEquipment();
-
-        $network_equipment = $this->createItem(GlpiNetworkEquipment::class);
-        $infocom = $this->createItem(Infocom::class, [
-            'itemtype'     => $network_equipment->getType(),
-            'items_id'     => $network_equipment->getID(),
-        ]);
-        $result = $history->getHistorizableDiagnosis($network_equipment);
-        $expected = [
-            'is_deleted'                  => true,
-            'is_template'                 => true,
-            'has_location'                => false,
-            'has_carbon_intensity_zone'   => false,
-            'has_model'                   => false,
-            'has_model_power_consumption' => false,
-            'has_type'                    => false,
-            'has_type_power_consumption'  => false,
-            'has_inventory_entry_date'    => false,
-            'ci_download_enabled'         => false,
-            'ci_fallback_available'       => false,
-            'not_is_ignore'               => true,
-        ];
-        $this->assertEquals($expected, $result);
-        $expected = !in_array(false, $result, true);
-        $result = $history->canHistorize($network_equipment->getID());
-        $this->assertFalse($result);
-    }
-
-    public function testNetDeviceWithInfocomIsNotHistorizable()
-    {
-        $history = new NetworkEquipment();
-
-        $network_equipment = $this->createItem(GlpiNetworkEquipment::class);
-        $infocom = $this->createItem(Infocom::class, [
-            'itemtype'     => $network_equipment->getType(),
-            'items_id'     => $network_equipment->getID(),
-            'buy_date'     => '2024-01-01',
-        ]);
-        $result = $history->getHistorizableDiagnosis($network_equipment);
-        $expected = [
-            'is_deleted'                  => true,
-            'is_template'                 => true,
-            'has_location'                => false,
-            'has_carbon_intensity_zone'   => false,
-            'has_model'                   => false,
-            'has_model_power_consumption' => false,
-            'has_type'                    => false,
-            'has_type_power_consumption'  => false,
-            'has_inventory_entry_date'    => true,
-            'ci_download_enabled'         => false,
-            'ci_fallback_available'       => false,
-            'not_is_ignore'               => true,
-        ];
-        $this->assertEquals($expected, $result);
-        $expected = !in_array(false, $result, true);
-        $result = $history->canHistorize($network_equipment->getID());
-        $this->assertFalse($result);
-    }
-
-    public function testNetDeviceWithEmptyLocationIsNotHistorizable()
-    {
-        $history = new NetworkEquipment();
-
-        $glpi_location = $this->createItem(GlpiLocation::class);
-        $network_equipment = $this->createItem(GlpiNetworkEquipment::class, [
-            'locations_id' => $glpi_location->getID(),
-        ]);
-        $result = $history->getHistorizableDiagnosis($network_equipment);
+        [
+            $glpi_networkequipment,
+            $glpi_location,
+            $location,
+            $source_zone,
+            $glpi_networkequipment_model,
+            $glpi_networkequipment_type,
+            $networkequipment_type,
+            $infocom,
+            $zone,
+        ] = $this->getHistorizableNetworkEquipment();
         $expected = [
             'is_deleted'                  => true,
             'is_template'                 => true,
             'has_location'                => true,
-            'has_carbon_intensity_zone'   => false,
-            'has_model'                   => false,
-            'has_model_power_consumption' => false,
-            'has_type'                    => false,
-            'has_type_power_consumption'  => false,
-            'has_inventory_entry_date'    => false,
-            'ci_download_enabled'         => false,
-            'ci_fallback_available'       => false,
+            'has_carbon_intensity_zone'   => true,
+            'has_model'                   => true,
+            'has_model_power_consumption' => true,
+            'has_type'                    => true,
+            'has_type_power_consumption'  => true,
+            'has_inventory_entry_date'    => true,
+            'ci_download_enabled'         => true,
+            'ci_fallback_available'       => true,
             'not_is_ignore'               => true,
         ];
+
+        $result = $history->getHistorizableDiagnosis($glpi_networkequipment);
         $this->assertEquals($expected, $result);
-        $expected = !in_array(false, $result, true);
-        $result = $history->canHistorize($network_equipment->getID());
-        $this->assertFalse($result);
     }
 
-    public function testNetDeviceWithLocationWithZoneIsNotHistorizable()
+    public function test_getHistorizableDiagnosis_when_networkequipment_is_deleted()
     {
         $history = new NetworkEquipment();
 
-        $source = new Source(); // This source exists after a fresh install
-        $source->getFromDBByCrit([
-            'name' => 'RTE',
-        ]);
-        $zone = new Zone(); // This zone  exists after a fresh install
-        $zone->getFromDBByCrit([
-            'name' => 'France',
-        ]);
-        $source_zone = new Source_Zone(); // the relation source / zone also exists after a fresh install
-        $source_zone->getFromDBByCrit([
-            $source::getForeignKeyField() => $source->getID(),
-            $zone::getForeignKeyField() => $zone->getID(),
-        ]);
-        $glpi_location = $this->createItem(GlpiLocation::class);
-        $location = $this->createItem(Location::class, [
-            'locations_id' => $glpi_location->getID(),
-            'plugin_carbon_sources_zones_id' => $source_zone->getID(),
-        ]);
-        $network_equipment = $this->createItem(GlpiNetworkEquipment::class, [
-            'locations_id' => $glpi_location->getID(),
-        ]);
-        $result = $history->getHistorizableDiagnosis($network_equipment);
+        [
+            $glpi_networkequipment,
+            $glpi_location,
+            $location,
+            $source_zone,
+            $glpi_networkequipment_model,
+            $glpi_networkequipment_type,
+            $networkequipment_type,
+            $infocom,
+            $zone,
+        ] = $this->getHistorizableNetworkEquipment();
+        $this->updateItem($glpi_networkequipment, ['is_deleted' => 1]);
+        $expected = [
+            'is_deleted'                  => false,
+            'is_template'                 => true,
+            'has_location'                => true,
+            'has_carbon_intensity_zone'   => true,
+            'has_model'                   => true,
+            'has_model_power_consumption' => true,
+            'has_type'                    => true,
+            'has_type_power_consumption'  => true,
+            'has_inventory_entry_date'    => true,
+            'ci_download_enabled'         => true,
+            'ci_fallback_available'       => true,
+            'not_is_ignore'               => true,
+        ];
+
+        $result = $history->getHistorizableDiagnosis($glpi_networkequipment);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_getHistorizableDiagnosis_when_networkequipment_is_template()
+    {
+        $history = new NetworkEquipment();
+
+        [
+            $glpi_networkequipment,
+            $glpi_location,
+            $location,
+            $source_zone,
+            $glpi_networkequipment_model,
+            $glpi_networkequipment_type,
+            $networkequipment_type,
+            $infocom,
+            $zone,
+        ] = $this->getHistorizableNetworkEquipment();
+        $this->updateItem($glpi_networkequipment, ['is_template' => 1]);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => false,
+            'has_location'                => true,
+            'has_carbon_intensity_zone'   => true,
+            'has_model'                   => true,
+            'has_model_power_consumption' => true,
+            'has_type'                    => true,
+            'has_type_power_consumption'  => true,
+            'has_inventory_entry_date'    => true,
+            'ci_download_enabled'         => true,
+            'ci_fallback_available'       => true,
+            'not_is_ignore'               => true,
+        ];
+
+        $result = $history->getHistorizableDiagnosis($glpi_networkequipment);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_getHistorizableDiagnosis_when_networkequipment_has_no_location()
+    {
+        $history = new NetworkEquipment();
+
+        [
+            $glpi_networkequipment,
+            $glpi_location,
+            $location,
+            $source_zone,
+            $glpi_networkequipment_model,
+            $glpi_networkequipment_type,
+            $networkequipment_type,
+            $infocom,
+            $zone,
+        ] = $this->getHistorizableNetworkEquipment();
+        $this->deleteItem($glpi_location, true);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_location'                => false,
+            'has_carbon_intensity_zone'   => false, // No location cascades this requirement to be not met
+            'has_model'                   => true,
+            'has_model_power_consumption' => true,
+            'has_type'                    => true,
+            'has_type_power_consumption'  => true,
+            'has_inventory_entry_date'    => true,
+            'ci_download_enabled'         => false, // No location cascades this requirement to be not met
+            'ci_fallback_available'       => false, // No location cascades this requirement to be not met
+            'not_is_ignore'               => true,
+        ];
+
+        $result = $history->getHistorizableDiagnosis($glpi_networkequipment);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_getHistorizableDiagnosis_when_networkequipment_has_no_model()
+    {
+        $history = new NetworkEquipment();
+
+        [
+            $glpi_networkequipment,
+            $glpi_location,
+            $location,
+            $source_zone,
+            $glpi_networkequipment_model,
+            $glpi_networkequipment_type,
+            $networkequipment_type,
+            $infocom,
+            $zone,
+        ] = $this->getHistorizableNetworkEquipment();
+        $this->deleteItem($glpi_networkequipment_model, true);
         $expected = [
             'is_deleted'                  => true,
             'is_template'                 => true,
@@ -339,138 +419,298 @@ class NetworkEquipmentTest extends CommonAsset
             'has_carbon_intensity_zone'   => true,
             'has_model'                   => false,
             'has_model_power_consumption' => false,
+            'has_type'                    => true,
+            'has_type_power_consumption'  => true,
+            'has_inventory_entry_date'    => true,
+            'ci_download_enabled'         => true,
+            'ci_fallback_available'       => true,
+            'not_is_ignore'               => true,
+        ];
+
+        $result = $history->getHistorizableDiagnosis($glpi_networkequipment);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_getHistorizableDiagnosis_when_networkequipment_has_no_model_power_consumption()
+    {
+        $history = new NetworkEquipment();
+
+        [
+            $glpi_networkequipment,
+            $glpi_location,
+            $location,
+            $source_zone,
+            $glpi_networkequipment_model,
+            $glpi_networkequipment_type,
+            $networkequipment_type,
+            $infocom,
+            $zone,
+        ] = $this->getHistorizableNetworkEquipment();
+        $this->updateItem($glpi_networkequipment_model, ['power_consumption' => 0]);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_location'                => true,
+            'has_carbon_intensity_zone'   => true,
+            'has_model'                   => true,
+            'has_model_power_consumption' => false,
+            'has_type'                    => true,
+            'has_type_power_consumption'  => true,
+            'has_inventory_entry_date'    => true,
+            'ci_download_enabled'         => true,
+            'ci_fallback_available'       => true,
+            'not_is_ignore'               => true,
+        ];
+
+        $result = $history->getHistorizableDiagnosis($glpi_networkequipment);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_getHistorizableDiagnosis_when_networkequipment_has_no_type()
+    {
+        $history = new NetworkEquipment();
+
+        [
+            $glpi_networkequipment,
+            $glpi_location,
+            $location,
+            $source_zone,
+            $glpi_networkequipment_model,
+            $glpi_networkequipment_type,
+            $networkequipment_type,
+            $infocom,
+            $zone,
+        ] = $this->getHistorizableNetworkEquipment();
+        $this->deleteItem($glpi_networkequipment_type, true);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_location'                => true,
+            'has_carbon_intensity_zone'   => true,
+            'has_model'                   => true,
+            'has_model_power_consumption' => true,
             'has_type'                    => false,
             'has_type_power_consumption'  => false,
+            'has_inventory_entry_date'    => true,
+            'ci_download_enabled'         => true,
+            'ci_fallback_available'       => true,
+            'not_is_ignore'               => true,
+        ];
+
+        $result = $history->getHistorizableDiagnosis($glpi_networkequipment);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_getHistorizableDiagnosis_when_networkequipment_has_no_type_extra_data()
+    {
+        $history = new NetworkEquipment();
+
+        [
+            $glpi_networkequipment,
+            $glpi_location,
+            $location,
+            $source_zone,
+            $glpi_networkequipment_model,
+            $glpi_networkequipment_type,
+            $networkequipment_type,
+            $infocom,
+            $zone,
+        ] = $this->getHistorizableNetworkEquipment();
+        $this->deleteItem($networkequipment_type, true);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_location'                => true,
+            'has_carbon_intensity_zone'   => true,
+            'has_model'                   => true,
+            'has_model_power_consumption' => true,
+            'has_type'                    => true,
+            'has_type_power_consumption'  => false,
+            'has_inventory_entry_date'    => true,
+            'ci_download_enabled'         => true,
+            'ci_fallback_available'       => true,
+            'not_is_ignore'               => true,
+        ];
+
+        $result = $history->getHistorizableDiagnosis($glpi_networkequipment);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_getHistorizableDiagnosis_when_networkequipment_has_no_type_power_consumption()
+    {
+        $history = new NetworkEquipment();
+
+        [
+            $glpi_networkequipment,
+            $glpi_location,
+            $location,
+            $source_zone,
+            $glpi_networkequipment_model,
+            $glpi_networkequipment_type,
+            $networkequipment_type,
+            $infocom,
+            $zone,
+        ] = $this->getHistorizableNetworkEquipment();
+        $this->updateItem($networkequipment_type, ['power_consumption' => 0]);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_location'                => true,
+            'has_carbon_intensity_zone'   => true,
+            'has_model'                   => true,
+            'has_model_power_consumption' => true,
+            'has_type'                    => true,
+            'has_type_power_consumption'  => false,
+            'has_inventory_entry_date'    => true,
+            'ci_download_enabled'         => true,
+            'ci_fallback_available'       => true,
+            'not_is_ignore'               => true,
+        ];
+
+        $result = $history->getHistorizableDiagnosis($glpi_networkequipment);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_getHistorizableDiagnosis_when_networkequipment_has_no_inventory_entry_date()
+    {
+        $history = new NetworkEquipment();
+
+        [
+            $glpi_networkequipment,
+            $glpi_location,
+            $location,
+            $source_zone,
+            $glpi_networkequipment_model,
+            $glpi_networkequipment_type,
+            $networkequipment_type,
+            $infocom,
+            $zone,
+        ] = $this->getHistorizableNetworkEquipment();
+        $this->updateItem($infocom, ['use_date' => null]);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_location'                => true,
+            'has_carbon_intensity_zone'   => true,
+            'has_model'                   => true,
+            'has_model_power_consumption' => true,
+            'has_type'                    => true,
+            'has_type_power_consumption'  => true,
             'has_inventory_entry_date'    => false,
             'ci_download_enabled'         => true,
             'ci_fallback_available'       => true,
             'not_is_ignore'               => true,
         ];
+
+        $result = $history->getHistorizableDiagnosis($glpi_networkequipment);
         $this->assertEquals($expected, $result);
-        $expected = !in_array(false, $result, true);
-        $result = $history->canHistorize($network_equipment->getID());
-        $this->assertFalse($result);
     }
 
-    public function testNetDeviceWithEmptyModelIsNotHistorizable()
+    public function test_getHistorizableDiagnosis_when_networkequipment_has_no_carbon_intensity_download_enabled()
     {
         $history = new NetworkEquipment();
 
-        $glpi_model = $this->createItem(GlpiNetworkEquipmentModel::class);
-        $network_equipment = $this->createItem(GlpiNetworkEquipment::class, [
-            'networkequipmentmodels_id' => $glpi_model->getID(),
-        ]);
+        [
+            $glpi_networkequipment,
+            $glpi_location,
+            $location,
+            $source_zone,
+            $glpi_networkequipment_model,
+            $glpi_networkequipment_type,
+            $networkequipment_type,
+            $infocom,
+            $zone,
+        ] = $this->getHistorizableNetworkEquipment();
+        $this->updateItem($source_zone, ['is_download_enabled' => 0]);
         $expected = [
             'is_deleted'                  => true,
             'is_template'                 => true,
-            'has_location'                => false,
-            'has_carbon_intensity_zone'   => false,
-            'has_model'                   => true,
-            'has_model_power_consumption' => false,
-            'has_type'                    => false,
-            'has_type_power_consumption'  => false,
-            'has_inventory_entry_date'    => false,
-            'ci_download_enabled'         => false,
-            'ci_fallback_available'       => false,
-            'not_is_ignore'               => true,
-        ];
-        $result = $history->getHistorizableDiagnosis($network_equipment);
-        $this->assertEquals($expected, $result);
-        $expected = !in_array(false, $result, true);
-        $result = $history->canHistorize($network_equipment->getID());
-        $this->assertFalse($result);
-    }
-
-    public function testNetDeviceWithModelIsNotHistorizable()
-    {
-        $history = new NetworkEquipment();
-
-        $glpi_model = $this->createItem(GlpiNetworkEquipmentModel::class, [
-            'power_consumption' => 60,
-        ]);
-        $network_equipment = $this->createItem(GlpiNetworkEquipment::class, [
-            'networkequipmentmodels_id' => $glpi_model->getID(),
-        ]);
-        $result = $history->getHistorizableDiagnosis($network_equipment);
-        $expected = [
-            'is_deleted'                  => true,
-            'is_template'                 => true,
-            'has_location'                => false,
-            'has_carbon_intensity_zone'   => false,
+            'has_location'                => true,
+            'has_carbon_intensity_zone'   => true,
             'has_model'                   => true,
             'has_model_power_consumption' => true,
-            'has_type'                    => false,
-            'has_type_power_consumption'  => false,
-            'has_inventory_entry_date'    => false,
-            'ci_download_enabled'         => false,
-            'ci_fallback_available'       => false,
-            'not_is_ignore'               => true,
-        ];
-        $this->assertEquals($expected, $result);
-        $expected = !in_array(false, $result, true);
-        $result = $history->canHistorize($network_equipment->getID());
-        $this->assertFalse($result);
-    }
-
-    public function testNetDeviceWithEmptyTypeIsNotHistorizable()
-    {
-        $history = new NetworkEquipment();
-
-        $glpi_type = $this->createItem(GlpiNetworkEquipmentType::class);
-        $network_equipment = $this->createItem(GlpiNetworkEquipment::class, [
-            'networkequipmenttypes_id' => $glpi_type->getID(),
-        ]);
-        $result = $history->getHistorizableDiagnosis($network_equipment);
-        $expected = [
-            'is_deleted'                  => true,
-            'is_template'                 => true,
-            'has_location'                => false,
-            'has_carbon_intensity_zone'   => false,
-            'has_model'                   => false,
-            'has_model_power_consumption' => false,
-            'has_type'                    => true,
-            'has_type_power_consumption'  => false,
-            'has_inventory_entry_date'    => false,
-            'ci_download_enabled'         => false,
-            'ci_fallback_available'       => false,
-            'not_is_ignore'               => true,
-        ];
-        $this->assertEquals($expected, $result);
-        $expected = !in_array(false, $result, true);
-        $result = $history->canHistorize($network_equipment->getID());
-        $this->assertFalse($result);
-    }
-
-    public function testNetDeviceWithTypeIsNotHistorizable()
-    {
-        $history = new NetworkEquipment();
-
-        $glpi_type = $this->createItem(GlpiNetworkEquipmentType::class);
-        $network_equipment_type = $this->createItem(NetworkEquipmentType::class, [
-            'power_consumption' => 55,
-            'networkequipmenttypes_id' => $glpi_type->getID(),
-        ]);
-        $network_equipment = $this->createItem(GlpiNetworkEquipment::class, [
-            'networkequipmenttypes_id' => $glpi_type->getID(),
-        ]);
-        $result = $history->getHistorizableDiagnosis($network_equipment);
-        $expected = [
-            'is_deleted'                  => true,
-            'is_template'                 => true,
-            'has_location'                => false,
-            'has_carbon_intensity_zone'   => false,
-            'has_model'                   => false,
-            'has_model_power_consumption' => false,
             'has_type'                    => true,
             'has_type_power_consumption'  => true,
-            'has_inventory_entry_date'    => false,
+            'has_inventory_entry_date'    => true,
             'ci_download_enabled'         => false,
+            'ci_fallback_available'       => true,
+            'not_is_ignore'               => true,
+        ];
+
+        $result = $history->getHistorizableDiagnosis($glpi_networkequipment);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_getHistorizableDiagnosis_when_networkequipment_has__no_carbon_intensity_fallback_data()
+    {
+        $history = new NetworkEquipment();
+
+        [
+            $glpi_networkequipment,
+            $glpi_location,
+            $location,
+            $source_zone,
+            $glpi_networkequipment_model,
+            $glpi_networkequipment_type,
+            $networkequipment_type,
+            $infocom,
+            $zone,
+        ] = $this->getHistorizableNetworkEquipment();
+        $source_zone->deleteByCriteria([
+            ['NOT' => ['id' => $source_zone->getID()]],
+        ]);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_location'                => true,
+            'has_carbon_intensity_zone'   => true,
+            'has_model'                   => true,
+            'has_model_power_consumption' => true,
+            'has_type'                    => true,
+            'has_type_power_consumption'  => true,
+            'has_inventory_entry_date'    => true,
+            'ci_download_enabled'         => true,
             'ci_fallback_available'       => false,
             'not_is_ignore'               => true,
         ];
+
+        $result = $history->getHistorizableDiagnosis($glpi_networkequipment);
         $this->assertEquals($expected, $result);
-        $expected = !in_array(false, $result, true);
-        $result = $history->canHistorize($network_equipment->getID());
-        $this->assertFalse($result);
+    }
+
+
+    public function test_getHistorizableDiagnosis_when_networkequipment_is_ignored()
+    {
+        $history = new NetworkEquipment();
+
+        [
+            $glpi_networkequipment,
+            $glpi_location,
+            $location,
+            $source_zone,
+            $glpi_networkequipment_model,
+            $glpi_networkequipment_type,
+            $networkequipment_type,
+            $infocom,
+            $zone,
+        ] = $this->getHistorizableNetworkEquipment();
+        $this->updateItem($networkequipment_type, ['is_ignore' => 1]);
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_location'                => true,
+            'has_carbon_intensity_zone'   => true,
+            'has_model'                   => true,
+            'has_model_power_consumption' => true,
+            'has_type'                    => true,
+            'has_type_power_consumption'  => true,
+            'has_inventory_entry_date'    => true,
+            'ci_download_enabled'         => true,
+            'ci_fallback_available'       => true,
+            'not_is_ignore'               => false,
+        ];
+
+        $result = $history->getHistorizableDiagnosis($glpi_networkequipment);
+        $this->assertEquals($expected, $result);
     }
 }

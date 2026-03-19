@@ -117,8 +117,12 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
 
         $start_time = clone $day;
         $start_time->setTime($seconds_start[0], $seconds_start[1], $seconds_start[2]);
-        $seconds_start = $seconds_start[0] * 3600 + $seconds_start[1] * 60 + $seconds_start[2];
-        $seconds_stop = $seconds_stop[0] * 3600 + $seconds_stop[1] * 60 + $seconds_stop[2];
+        $seconds_start = $seconds_start[0] * 3600
+            + $seconds_start[1] * 60
+            + $seconds_start[2];
+        $seconds_stop = $seconds_stop[0] * 3600
+            + $seconds_stop[1] * 60
+            + $seconds_stop[2];
         $length = new DateInterval('PT' . ($seconds_stop - $seconds_start) . 'S');
         $start_time = DateTimeImmutable::createFromMutable($start_time);
         return $this->computeEmissionPerDay($start_time, $power, $length, $source_zone);

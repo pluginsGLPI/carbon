@@ -89,24 +89,24 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         return static::$itemtype;
     }
 
-    /**
-     * Is it possible to historize carbon emissions for the item
-     * @param int $id : ID of the item to examinate
-     *
-     * @return bool
-     */
-    public function canHistorize(int $id): bool
-    {
-        /** @var DBmysql $DB */
-        global $DB;
+    // /**
+    //  * Is it possible to historize carbon emissions for the item
+    //  * @param int $id : ID of the item to examinate
+    //  *
+    //  * @return bool
+    //  */
+    // public function canHistorize(int $id): bool
+    // {
+    //     /** @var DBmysql $DB */
+    //     global $DB;
 
-        $request = $this->getEvaluableQuery();
-        $request['WHERE'][static::$itemtype::getTableField('id')] = $id;
+    //     $request = $this->getEvaluableQuery();
+    //     $request['WHERE'][static::$itemtype::getTableField('id')] = $id;
 
-        $iterator = $DB->request($request);
+    //     $iterator = $DB->request($request);
 
-        return $iterator->count() > 0;
-    }
+    //     return $iterator->count() > 0;
+    // }
 
     public function setLimit(int $limit)
     {
@@ -131,7 +131,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         if (!is_subclass_of($itemtype, CommonDBTM::class)) {
             throw new LogicException('Itemtype does not inherits from ' . CommonDBTM::class);
         }
-        $iterator = $DB->request($this->getEvaluableQuery([], false));
+        $iterator = $DB->request($this->getEvaluableQuery($crit, false));
 
         return $iterator;
     }

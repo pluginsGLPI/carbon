@@ -48,7 +48,6 @@ use GlpiPlugin\Carbon\Engine\V1\Monitor as EngineMonitor;
 use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\UsageImpact;
-use GlpiPlugin\Carbon\UsageInfo;
 use Infocom;
 use Location as GlpiLocation;
 use Monitor as GlpiMonitor;
@@ -164,6 +163,14 @@ class Monitor extends AbstractAsset
                         MonitorType::getTableField('power_consumption') => ['>', 0],
                         self::$model_itemtype::getTableField('power_consumption') => ['>', 0],
                     ],
+                    // ], [
+                    //     'OR' => [
+                    //         ['NOT' => [Infocom::getTableField('use_date') => null]],
+                    //         ['NOT' => [Infocom::getTableField('delivery_date') => null]],
+                    //         ['NOT' => [Infocom::getTableField('buy_date') => null]],
+                    //         ['NOT' => [self::$itemtype::getTableField('date_creation') => null]],
+                    //         // ['NOT' => [self::$itemtype::getTableField('date_mod') => null]],
+                    //     ],
                 ],
             ],
         ] + $crit;
@@ -188,8 +195,8 @@ class Monitor extends AbstractAsset
             self::$itemtype::getTableField('is_deleted'),
             self::$itemtype::getTableField('is_template'),
             Asset_PeripheralAsset::getTableField('items_id_asset'),
-            UsageInfo::getTableField('plugin_carbon_computerusageprofiles_id'),
-            GlpiLocation::getTableField('id as location_id'),
+            ComputerUsageProfile::getTableField('id as plugin_carbon_computerusageprofiles_id'),
+            GlpiLocation::getTableField('id as locations_id'),
             Location::getTableField('plugin_carbon_sources_zones_id'),
             GlpiMonitorModel::getTableField('id as model_id'),
             GlpiMonitorModel::getTableField('power_consumption as model_power_consumption'),
@@ -200,6 +207,7 @@ class Monitor extends AbstractAsset
             Infocom::getTableField('use_date'),
             Infocom::getTableField('delivery_date'),
             Infocom::getTableField('buy_date'),
+            self::$itemtype::getTableField('date_creation'),
         ];
         // Change inner joins into left joins to identify missing data
         // Warning : the order of the array merge below is important or the resulting SQL query will fail
@@ -217,7 +225,7 @@ class Monitor extends AbstractAsset
         }
 
         $glpi_location = new GlpiLocation();
-        $glpi_location->getFromDB($item->fields['locations_id']);
+        $glpi_location->getFromDB($data['locations_id']);
         $location = new Location();
         $is_carbon_intensity_download_enabled = $location->isCarbonIntensityDownloadEnabled($glpi_location);
         $is_carbon_intensity_fallback_available = $location->hasFallbackCarbonIntensityData($glpi_location);
@@ -228,7 +236,7 @@ class Monitor extends AbstractAsset
         $status['is_template'] = ($data['is_template'] === 0); // Actually the result is whether it is "not template"
         $status['has_computer'] = !GlpiComputer::isNewID($data['items_id_asset']);
         $status['has_usage_profile'] = !ComputerUsageProfile::isNewID($data['plugin_carbon_computerusageprofiles_id']);
-        $status['has_location'] = !GlpiLocation::isNewID($data['location_id']);
+        $status['has_location'] = !GlpiLocation::isNewID($data['locations_id']);
         // $status['has_state_or_country'] = (strlen($data['state'] ?? '') > 0) || (strlen($data['country'] ?? '') > 0);
         $status['has_carbon_intensity_zone'] = (($data['plugin_carbon_sources_zones_id'] ?? 0) !== 0);
         $status['has_model'] = !GlpiMonitorModel::isNewID($data['model_id']);
@@ -239,10 +247,10 @@ class Monitor extends AbstractAsset
         $status['ci_fallback_available'] = $is_carbon_intensity_fallback_available;
         $status['not_is_ignore'] = (($data['is_ignore'] ?? 0) === 0);
 
-        $item_oldest_date = $data['use_date']
-            ?? $data['delivery_date']
+        $item_oldest_date = $data['date_creation']
             ?? $data['buy_date']
-            ?? $data['date_creation']
+            ?? $data['delivery_date']
+            ?? $data['use_date']
             // ?? $data['date_mod']
             ?? null;
         $status['has_inventory_entry_date'] = ($item_oldest_date !== null);

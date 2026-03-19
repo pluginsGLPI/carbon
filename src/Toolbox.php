@@ -68,41 +68,40 @@ class Toolbox
         $oldest_date = null;
         $infocom_table = Infocom::getTable();
         foreach ($itemtypes as $itemtype) {
-            if (Infocom::canApplyOn($itemtype)) {
-                $item_table = getTableForItemType($itemtype);
-                $dates = $DB->request([
-                    'SELECT' => [
-                        'MIN' => [
-                            "$item_table.date_creation as date_creation",
-                            "$item_table.date_mod as date_mod",
-                            "$infocom_table.use_date as use_date",
-                            "$infocom_table.delivery_date as delivery_date",
-                            "$infocom_table.buy_date as buy_date",
+            if (!Infocom::canApplyOn($itemtype)) {
+                continue;
+            }
+            $item_table = getTableForItemType($itemtype);
+            $dates = $DB->request([
+                'SELECT' => [
+                    "$item_table.date_creation as date_creation",
+                    // "$item_table.date_mod as date_mod",
+                    "$infocom_table.use_date as use_date",
+                    "$infocom_table.delivery_date as delivery_date",
+                    "$infocom_table.buy_date as buy_date",
+                ],
+                'FROM' => $item_table,
+                'LEFT JOIN' => [
+                    $infocom_table => [
+                        'FKEY' => [
+                            $infocom_table => 'items_id',
+                            $item_table    => 'id',
+                            ['AND' => ['itemtype' => $itemtype]],
                         ],
                     ],
-                    'FROM' => $item_table,
-                    'LEFT JOIN' => [
-                        $infocom_table => [
-                            'FKEY' => [
-                                $infocom_table => 'items_id',
-                                $item_table    => 'id',
-                                ['AND' => ['itemtype' => $itemtype]],
-                            ],
-                        ],
-                    ],
-                    'WHERE' => $crit,
-                ])->current();
-                $itemtype_oldest_date = $dates['use_date']
-                ?? $dates['delivery_date']
-                ?? $dates['buy_date']
-                ?? $dates['date_creation']
-                ?? $dates['date_mod']
-                ?? null;
-                if ($oldest_date === null) {
-                    $oldest_date = $itemtype_oldest_date;
-                } elseif ($itemtype_oldest_date !== null) {
-                    $oldest_date = min($oldest_date, $itemtype_oldest_date);
-                }
+                ],
+                'WHERE' => $crit,
+            ])->current();
+            $itemtype_oldest_date = $dates['use_date']
+            ?? $dates['delivery_date']
+            ?? $dates['buy_date']
+            ?? $dates['date_creation'] // Date creation of the asset
+            // ?? $dates['date_mod']
+            ?? null;
+            if ($oldest_date === null) {
+                $oldest_date = $itemtype_oldest_date;
+            } elseif ($itemtype_oldest_date !== null) {
+                $oldest_date = min($oldest_date, $itemtype_oldest_date);
             }
         }
         if ($oldest_date === null) {
@@ -136,33 +135,31 @@ class Toolbox
         $latest_date = null;
         $infocom_table = Infocom::getTable();
         foreach ($itemtypes as $itemtype) {
-            if (Infocom::canApplyOn($itemtype)) {
-                $item_table = getTableForItemType($itemtype);
-                $dates = $DB->request([
-                    'SELECT' => [
-                        'MIN' => [
-                            "$infocom_table.decommission_date as decommission_date",
+            if (!Infocom::canApplyOn($itemtype)) {
+                continue;
+            }
+            $item_table = getTableForItemType($itemtype);
+            $dates = $DB->request([
+                'SELECT' => [
+                    "$infocom_table.decommission_date as decommission_date",
+                ],
+                'FROM' => $item_table,
+                'LEFT JOIN' => [
+                    $infocom_table => [
+                        'FKEY' => [
+                            $infocom_table => 'items_id',
+                            $item_table    => 'id',
+                            ['AND' => ['itemtype' => $itemtype]],
                         ],
                     ],
-                    'FROM' => $item_table,
-                    'LEFT JOIN' => [
-                        $infocom_table => [
-                            'FKEY' => [
-                                $infocom_table => 'items_id',
-                                $item_table    => 'id',
-                                ['AND' => ['itemtype' => $itemtype]],
-                            ],
-                        ],
-                    ],
-                    'WHERE' => $crit,
-                ])->current();
-                $itemtype_latest_date = $dates['decommission_date']
-                ?? null;
-                if ($latest_date === null) {
-                    $latest_date = $itemtype_latest_date;
-                } elseif ($itemtype_latest_date !== null) {
-                    $latest_date = max($latest_date, $itemtype_latest_date);
-                }
+                ],
+                'WHERE' => $crit,
+            ])->current();
+            $itemtype_latest_date = $dates['decommission_date'] ?? null;
+            if ($latest_date === null) {
+                $latest_date = $itemtype_latest_date;
+            } elseif ($itemtype_latest_date !== null) {
+                $latest_date = max($latest_date, $itemtype_latest_date);
             }
         }
         if ($latest_date === null) {
@@ -175,6 +172,48 @@ class Toolbox
         }
 
         return $output;
+    }
+
+    /**
+     * Get the lifespan of an asset from its infocom, in months
+     *
+     * @param Infocom $infocom
+     * @return int|null
+     */
+    public static function getInfocomLifespanInMonth(Infocom $infocom): ?int
+    {
+        if ($infocom->isNewItem() || $infocom->fields['decommission_date'] === null) {
+            return null;
+        }
+        $start =   $infocom->fields['buy_date']
+                ?? $infocom->fields['delivery_date']
+                ?? $infocom->fields['use_date']
+                ?? null;
+        if ($start === null) {
+            // Fallback on asset date creation
+            $asset_itemtype = $infocom->fields['itemtype'];
+            if (!GlpiToolbox::isCommonDBTM($asset_itemtype)) {
+                return null;
+            }
+            $asset = $asset_itemtype::getById($infocom->fields['items_id']);
+            $start = $asset->fields['date_creation'] ?? null;
+            if ($start === null) {
+                // Give up
+                return null;
+            }
+        }
+        // Date_creation uses Y-m-d H:i:s and infocom dates use Y-m-d format
+        $start = new DateTime($start);
+        $stop = new DateTime($infocom->fields['decommission_date']);
+
+        $interval = $stop->diff($start);
+        // convert interval into months
+
+        $months = (int) round(12 * $interval->y
+            + $interval->m
+            + $interval->d / 30); // Assume a month is 30 days (not exact, but sufficient)
+
+        return $months;
     }
 
     /**

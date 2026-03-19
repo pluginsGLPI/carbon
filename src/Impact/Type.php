@@ -329,7 +329,7 @@ class Type
             'ir'     => __('', 'carbon'),
             'lu'     => __('', 'carbon'),
             'odp'    => __('', 'carbon'),
-            'pm'     => __('', 'carbon'),
+            'pm'     => __('Incidence of disease', 'carbon'),
             'pocp'   => __('', 'carbon'),
             'wu'     => __('', 'carbon'),
             'mips'   => __('', 'carbon'),
