@@ -180,6 +180,18 @@ class Location extends CommonDBChild
                 echo '</div>';
                 echo '<br /><br />' . Html::submit(_x('button', 'Post'), ['name' => 'massiveaction']);
                 return true;
+            case 'MassUpdateCarbonIntensityFeed':
+                echo '<div>';
+                echo __('Carbon intensity source and zone', 'carbon') . '&nbsp;';
+                $template_renderer = TemplateRenderer::getInstance();
+                $template_renderer->display('@carbon/components/form/source_zone_selector.html.twig', [
+                    'source_id' => 0,
+                    'zone_id'   => 0,
+                    'zone_condition' => [],
+                ]);
+                echo '</div>';
+                echo '<br /><br />' . Html::submit(_x('button', 'Post'), ['name' => 'massiveaction']);
+                return true;
         }
 
         return parent::showMassiveActionsSubForm($ma);
@@ -194,6 +206,27 @@ class Location extends CommonDBChild
                         $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
                     } else {
                         $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
+                    }
+                }
+                return;
+            case 'MassUpdateCarbonIntensityFeed':
+                $source_zone = new Source_Zone();
+                $source_zone->getFromDBByCrit([
+                    'plugin_carbon_sources_id' => $ma->POST['plugin_carbon_sources_id'] ?? 0,
+                    'plugin_carbon_zones_id' => $ma->POST['plugin_carbon_zones_id'] ?? 0,
+                ]);
+                if ($source_zone->isNewItem()) {
+                    $input['plugin_carbon_sources_zones_id'] = $source_zone->getID();
+                    foreach ($ids as $id) {
+                        $ma->itemDone(get_class($item), $id, MassiveAction::ACTION_KO);
+                    }
+                    return;
+                }
+                foreach ($ids as $id) {
+                    if ($item->getFromDB($id) && self::updateCarbonIntensitySourceZone($item, $source_zone)) {
+                        $ma->itemDone(get_class($item), $id, MassiveAction::ACTION_OK);
+                    } else {
+                        $ma->itemDone(get_class($item), $id, MassiveAction::ACTION_KO);
                     }
                 }
                 return;
@@ -226,6 +259,14 @@ class Location extends CommonDBChild
                 'boavizta_zone' => $zone,
             ]);
         }
+    }
+
+    public static function updateCarbonIntensitySourceZone(CommonDBTM $item, Source_Zone $source_zone): bool
+    {
+        return $item->update([
+            'id' => $item->getID(),
+            '_plugin_carbon_sources_zones_id' => $source_zone->getID(),
+        ]);
     }
 
     public static function getSpecificValueToDisplay($field, $values, array $options = [])
@@ -303,6 +344,7 @@ class Location extends CommonDBChild
             }
         }
         $this->setBoaviztaZone($item);
+        $this->setSourceZone($item);
     }
 
     /**
@@ -446,7 +488,7 @@ class Location extends CommonDBChild
     }
 
     /**
-     * Associate a zone for a location (added or updated), for Boavizta
+     * Associate a Boavizta zone for a location (added or updated)
      *
      * @param CommonDBTM $item
      * @return bool true if a zone has been set
@@ -471,6 +513,31 @@ class Location extends CommonDBChild
         return $this->update([
             'id'            => $this->getID(),
             'boavizta_zone' => $item->input['_boavizta_zone'],
+        ]);
+    }
+
+    /**
+     * Associate a Source_Zone object for a location
+     */
+    protected function setSourceZone(CommonDBTM $item): bool
+    {
+        if (!isset($item->input['_plugin_carbon_sources_zones_id'])) {
+            return false;
+        }
+
+        $this->getFromDBByCrit([
+            'locations_id' => $item->getID(),
+        ]);
+
+        if ($this->isNewItem()) {
+            return false !== $this->add([
+                'locations_id' => $item->getID(),
+                'plugin_carbon_sources_zones_id' => $item->input['_plugin_carbon_sources_zones_id'],
+            ]);
+        }
+        return $this->update([
+            'id'            => $this->getID(),
+            'plugin_carbon_sources_zones_id' => $item->input['_plugin_carbon_sources_zones_id'],
         ]);
     }
 

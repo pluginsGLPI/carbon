@@ -322,6 +322,7 @@ function plugin_carbon_MassiveActions($itemtype)
         case GlpiLocation::class:
             return [
                 Location::class . MassiveAction::CLASS_ACTION_SEPARATOR . 'MassUpdateBoaviztaZone' => __('Update zone for Boavizta engine', 'carbon'),
+                Location::class . MassiveAction::CLASS_ACTION_SEPARATOR . 'MassUpdateCarbonIntensityFeed' => __('Update carbon intensity source and zone', 'carbon'),
             ];
     }
 

@@ -31,7 +31,6 @@
 
 {% extends "generic_show_form.html.twig" %}
 
-{% import 'components/form/fields_macros.html.twig' as fields %}
 {% import '@carbon/components/form/fields_macros.html.twig' as carbonFields %}
 
 {% block form_fields %}
@@ -52,44 +51,5 @@
         <span>{{ __('Carbon intensity', 'carbon') }}</span>
     </div>
 
-    {% set plugin_carbon_zones_rand = random() %}
-    {{ fields.dropdownField('GlpiPlugin\\Carbon\\Source',
-        'plugin_carbon_sources_id',
-        source_id,
-        __('Source', 'carbon'),
-        {
-            display_emptychoice: true,
-            multiple: false,
-            disabled: false,
-            condition: {
-                fallback_level: ['<=', '2'],
-                is_carbon_intensity_source: 1
-            },
-            order: 'fallback_level'
-        }) }}
-
-    <script type="text/javascript">
-        $(function() {
-            $('select[name="plugin_carbon_sources_id"]').on("change", function () {
-                var zone_dom_id = $('select[name="plugin_carbon_zones_id"]').prop('id').replace(/\D+/g,'');
-                $('select[name="plugin_carbon_zones_id"]').closest('.btn-group').load(
-                    '{{ config('root_doc') }}/plugins/carbon/ajax/dropdownZone.php', {
-                        plugin_carbon_sources_id: document.querySelector('select[name="plugin_carbon_sources_id"]').value,
-                        dom_id: zone_dom_id
-                    }
-                );
-            })
-        })
-    </script>
-
-    {{ fields.dropdownField('GlpiPlugin\\Carbon\\Zone',
-        'plugin_carbon_zones_id',
-        zone_id,
-        _n('Carbon intensity zone', 'Carbon intensity zones', 1, 'carbon'),
-        {
-            rand: plugin_carbon_zones_rand,
-            display_emptychoice: true,
-            condition: zone_condition,
-            disabled: (source_id == 0)
-        }) }}
+    {% include '@carbon/components/form/source_zone_selector.html.twig' %}
 {% endblock %}
