@@ -36,6 +36,7 @@ use Computer as GlpiComputer;
 use Contact;
 use DBmysql;
 use GlpiPlugin\Carbon\EmbodiedImpact;
+use GlpiPlugin\Carbon\UsageImpact;
 use GlpiPlugin\Carbon\UsageInfo;
 use Infocom;
 use Monitor as GlpiMonitor;
@@ -360,5 +361,50 @@ class UsageInfoTest extends DbTestCase
         $usage_info = new UsageInfo();
         $result = $usage_info->getLifespanInHours($glpi_computer);
         $this->assertSame(43824, $result);
+    }
+
+
+    public function test_post_updateItem_invalidates_usage_impact_when_decommission_date_is_set_and_planned_lifespan_changes()
+    {
+        $glpi_asset = $this->createItem(GlpiComputer::class);
+        $usage_impact = $this->createItem(UsageImpact::class, [
+            'itemtype' => get_class($glpi_asset),
+            'items_id' => $glpi_asset->getID(),
+            'recalculate' => 0,
+        ]);
+        $infocom = $this->createItem(Infocom::class, [
+            'itemtype' => get_class($glpi_asset),
+            'items_id' => $glpi_asset->getID(),
+            'decommission_date' => '2026-06-06',
+        ]);
+        $usage_info = $this->createItem(UsageInfo::class, [
+            'itemtype' => get_class($glpi_asset),
+            'items_id' => $glpi_asset->getID(),
+        ]);
+        $usage_info->update(['planned_lifespan' => 60] + $usage_info->fields);
+        $usage_impact->getFromDB($usage_impact->getID());
+        $this->assertSame(1, $usage_impact->fields['recalculate']);
+    }
+
+    public function test_post_updateItem_does_not_invalidate_usage_impact_when_decommission_date_is_not_set()
+    {
+        $glpi_asset = $this->createItem(GlpiComputer::class);
+        $usage_impact = $this->createItem(UsageImpact::class, [
+            'itemtype' => get_class($glpi_asset),
+            'items_id' => $glpi_asset->getID(),
+            'recalculate' => 0,
+        ]);
+        $infocom = $this->createItem(Infocom::class, [
+            'itemtype' => get_class($glpi_asset),
+            'items_id' => $glpi_asset->getID(),
+            'decommission_date' => null,
+        ]);
+        $usage_info = $this->createItem(UsageInfo::class, [
+            'itemtype' => get_class($glpi_asset),
+            'items_id' => $glpi_asset->getID(),
+        ]);
+        $usage_info->update(['planned_lifespan' => 60] + $usage_info->fields);
+        $usage_impact->getFromDB($usage_impact->getID());
+        $this->assertSame(0, $usage_impact->fields['recalculate']);
     }
 }

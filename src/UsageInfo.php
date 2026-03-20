@@ -39,6 +39,7 @@ use Computer as GlpiComputer;
 use DateInterval;
 use DateTime;
 use Glpi\Application\View\TemplateRenderer;
+use Glpi\DBAL\QueryExpression;
 use GlpiPlugin\Carbon\Dashboard\Provider;
 use GlpiPlugin\Carbon\Dashboard\Widget;
 use GlpiPlugin\Carbon\Impact\Type;
@@ -134,9 +135,40 @@ class UsageInfo extends CommonDBChild
     {
         parent::post_updateItem($history);
 
-        if (!$history) {
+        if (!in_array('planned_lifespan', $this->updates)) {
             return;
         }
+
+        // Planned lifespan has been updated
+        $infocom_table = getTableForItemType(Infocom::class);
+        $usage_impact_table = getTableForItemType(UsageImpact::class);
+        $usage_impact = new UsageImpact();
+        $found = $usage_impact->getFromDBByRequest([
+            'INNER JOIN' => [
+                $infocom_table => [
+                    'ON' => [
+                        $infocom_table => 'items_id',
+                        $usage_impact_table => 'items_id',
+                        [
+                            'AND' => [
+                                new QueryExpression(Infocom::getTableField('itemtype') . ' = ' . UsageImpact::getTableField('itemtype')),
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'WHERE' => [
+                UsageImpact::getTableField('itemtype') => $this->fields['itemtype'],
+                UsageImpact::getTableField('items_id') => $this->fields['items_id'],
+                [
+                    'NOT' => ['decommission_date' => null],
+                ],
+            ],
+        ]);
+        if (!$found) {
+            return;
+        }
+        $usage_impact->update(['recalculate' => 1] + $usage_impact->fields);
     }
 
     public function showForItem($ID, $withtemplate = '')
