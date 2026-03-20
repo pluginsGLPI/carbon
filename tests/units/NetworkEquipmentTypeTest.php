@@ -42,8 +42,10 @@ use Symfony\Component\DomCrawler\Crawler;
 
 #[CoversClass(NetworkEquipmentType::class)]
 #[CoversClass(AbstractType::class)]
-class NetworkEquipmentTypeTest extends DbTestCase
+class NetworkEquipmentTypeTest extends AbstractTypeTest
 {
+    protected static $itemtype = GlpiNetworkEquipmentType::class;
+
     public function testGetTypeName()
     {
         $this->assertEquals('Environmental impact', NetworkEquipmentType::getTypeName(1));

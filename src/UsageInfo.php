@@ -132,10 +132,57 @@ class UsageInfo extends CommonDBChild
 
     public function post_updateItem($history = true)
     {
+        /** @var DBmysql */
+        global $DB;
+
         parent::post_updateItem($history);
 
-        if (!$history) {
-            return;
+        if (isset($this->updates['planned_lifespan'])) {
+            // Planned lifespan has been updated
+            $asset_itemtype = substr(static::$itemtype, 0, -4); // Drop Type suffix
+            $asset_itemtype_table = getTableForItemType($asset_itemtype);
+            $infocom_table = getTableForItemType(Infocom::class);
+            $glpi_type_fk = getForeignKeyFieldForItemType(static::$itemtype);
+            $usage_impact_table = getTableForItemType(UsageImpact::class);
+            $request = [
+                'SELECT' => UsageImpact::getTableField('id'),
+                'FROM' => $usage_impact_table,
+                'INNER JOIN' => [
+                    $infocom_table => [
+                        'FKEY' => [
+                            $infocom_table => 'items_id',
+                            $asset_itemtype_table => 'id',
+                            [
+                                'AND' => [
+                                    Infocom::getTableField('itemtype') => $asset_itemtype,
+                                ]
+                            ]
+                        ]
+                    ],
+                    $usage_impact_table => [
+                        'FKEY' => [
+                            $usage_impact_table => 'items_id',
+                            $asset_itemtype_table => 'id',
+                            [
+                                'AND' => [
+                                    UsageImpact::getTableField('itemtype') => $asset_itemtype,
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'WHERE' => [
+                    $glpi_type_fk => $this->fields[$glpi_type_fk],
+                    'decommission_date' => null,
+                ],
+            ];
+            $usage_impact = new UsageImpact();
+            foreach ($DB->request($request) as $row) {
+                $usage_impact->update([
+                    'id' => $row['id'],
+                    'recalculate' => 1,
+                ]);
+            }
         }
     }
 
