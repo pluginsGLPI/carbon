@@ -45,6 +45,7 @@ use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Toolbox;
 use GlpiPlugin\Carbon\Zone;
+use RuntimeException;
 use Safe\Exceptions\FilesystemException;
 
 use function Safe\mkdir;
@@ -72,6 +73,9 @@ class Client extends AbstractClient
 
     public const DATASET_REALTIME = 0;
     public const DATASET_CONSOLIDATED = 1;
+
+    /** @var float Tolerance ratio of unknown samples */
+    private const UNKNOWN_SAMPLES_WARNING = 0.05;
 
     private RestApiClientInterface $client;
 
@@ -282,14 +286,18 @@ class Client extends AbstractClient
         // Prepare the HTTP request
         // Optimal timezone for returned dates to reduce DST mess in the response
         $timezone = new DateTimeZone('Europe/Paris');
-        $where = "date_heure IN [date'$from' TO date'$to'[ AND taux_co2 is not null";
+        $where = "date_heure IN [date'$from' TO date'$to'[";
         $params = [
             'select' => 'date_heure,taux_co2',
             'where' => $where,
             'order_by' => 'date_heure asc',
             'timezone' => $timezone->getName(),
         ];
-        $response = $this->client->request('GET', $url, ['timeout' => 8, 'query' => $params]);
+        try {
+            $response = $this->client->request('GET', $url, ['timeout' => 8, 'query' => $params]);
+        } catch (RuntimeException $e) {
+            return [];
+        }
         $this->step = $this->detectStep($response);
         $expected_samples_count = $expected_samples_hours * (60 / $this->step);
         $expected_samples_count--; // End boundary is excluded, decreasing the expeected count by 1
@@ -497,9 +505,16 @@ class Client extends AbstractClient
         $downsampled = [];
         $intensity = 0.0;
         $count = 0;
+        $null_count = 0;
+        $last_known_intensity = 0.0;
         foreach ($records as $record) {
             $date = $record['datetime'];
-            $intensity += $record['taux_co2'];
+            if ($record['taux_co2'] === null) {
+                $null_count++;
+            } else {
+                $last_known_intensity = $record['taux_co2'];
+            }
+            $intensity += $last_known_intensity;
             $count++;
             $minute = (int) $date->format('i');
 
@@ -513,6 +528,16 @@ class Client extends AbstractClient
                 $intensity = 0.0;
                 $count = 0;
             }
+        }
+
+        // Warn if too many unknown records
+        if ($null_count / count($records) > self::UNKNOWN_SAMPLES_WARNING) {
+            $begin = reset($records)['datetime']->format('Y-m-d H:i:s');
+            $end = end($records)['datetime']->format('Y-m-d H:i:s');
+            trigger_error(
+                sprintf("Too many unknown carbon intensities between %s and %s", $begin, $end),
+                E_USER_WARNING
+            );
         }
 
         return $downsampled;

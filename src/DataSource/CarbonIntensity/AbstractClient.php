@@ -198,16 +198,18 @@ abstract class AbstractClient implements ClientInterface
             } catch (AbortException $e) {
                 break;
             }
-            $data = $this->formatOutput($data, $this->step);
-            if (!isset($data[$zone])) {
-                break;
-            }
-            $saved = $intensity->save($zone, $this->getSourceName(), $data[$zone]);
-            if ($progress_bar) {
-                $progress_bar->advance($saved);
-            }
+            if (count($data) > 0) {
+                $data = $this->formatOutput($data, $this->step);
+                if (!isset($data[$zone])) {
+                    break;
+                }
+                $saved = $intensity->save($zone, $this->getSourceName(), $data[$zone]);
+                if ($progress_bar) {
+                    $progress_bar->advance($saved);
+                }
 
-            $count += abs($saved);
+                $count += abs($saved);
+            }
             if ($limit > 0 && $count >= $limit) {
                 return $saved > 0 ? $count : -$count;
             }
