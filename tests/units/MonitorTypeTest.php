@@ -32,7 +32,6 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
-use GlpiPlugin\Carbon\AbstractType;
 use GlpiPlugin\Carbon\MonitorType;
 use MassiveAction;
 use MonitorType as GlpiMonitorType;
@@ -40,10 +39,12 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use Session;
 use Symfony\Component\DomCrawler\Crawler;
 
-#[CoversClass(AbstractType::class)]
+
 #[CoversClass(MonitorType::class)]
-class MonitorTypeTest extends DbTestCase
+class MonitorTypeTest extends AbstractTypeTest
 {
+    protected static $itemtype = GlpiMonitorType::class;
+
     public function testGetTypeName()
     {
         $this->assertEquals('Environmental impact', MonitorType::getTypeName(1));

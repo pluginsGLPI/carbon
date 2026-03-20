@@ -40,8 +40,10 @@ use Session;
 use Symfony\Component\DomCrawler\Crawler;
 
 #[CoversClass(ComputerType::class)]
-class ComputerTypeTest extends DbTestCase
+class ComputerTypeTest extends AbstractTypeTest
 {
+    protected static $itemtype = GlpiComputerType::class;
+
     public function testGetTypeName()
     {
         $this->assertEquals('Environmental impact', ComputerType::getTypeName(1));
