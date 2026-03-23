@@ -35,32 +35,32 @@
 
 use Glpi\Dashboard\Item as DashboardItem;
 
-$new_criterias = [
-    'gwppb'   => '(unit g CO2 eq) Climate change - Contribution of biogenic emissions',
-    'gwppf'   => '(unit g CO2 eq) Climate change - Contribution of fossil fuel emissions',
-    'gwpplu'  => '(unit g CO2 eq) Climate change - Contribution of emissions from land use change',
-    'ir'      => '(unit g U235 eq) Emissions of radionizing substances',
-    'lu'      => '(unit none) Land use',
-    'odp'     => '(unit g CFC-11 eq) Depletion of the ozone layer',
-    'pm'      => '(unit Disease occurrence) Fine particle emissions',
-    'pocp'    => '(unit g NMVOC eq) Photochemical ozone formation',
-    'wu'      => '(unit L) Use of water resources',
-    'mips'    => '(unit g) Material input per unit of service',
-    'adpe'    => '(unit g SB eq) Use of mineral and metal resources',
-    'adpf'    => '(unit J) Use of fossil resources (including nuclear)',
-    'ap'      => '(unit mol H+ eq) Acidification',
-    'ctue'    => '(unit CTUe) Freshwater ecotoxicity',
+$new_criteria = [
+    'gwppb'   => '(unit g CO2 eq) Biogenic climate change potential',
+    'gwppf'   => '(unit g CO2 eq) Fossil climate change potential',
+    'gwpplu'  => '(unit g CO2 eq) Land use change climate potential',
+    'ir'      => '(unit g U235 eq) Ionizing radiation potential',
+    'lu'      => '(unit m²a) Land use',
+    'odp'     => '(unit g CFC-11 eq) Ozone depletion potential',
+    'pm'      => '(unit cases) Fine particulate matter potential',
+    'pocp'    => '(unit g NMVOC eq) Photochemical ozone creation potential',
+    'wu'      => '(unit m³) Water use',
+    'mips'    => '(unit g) Material input per service unit',
+    'adpe'    => '(unit g Sb eq) Abiotic depletion potential (elements)',
+    'adpf'    => '(unit J) Abiotic depletion potential (fossil fuels)',
+    'ap'      => '(unit mol H+ eq) Acidification potential',
+    'ctue'    => '(unit CTUe) Freshwater ecotoxicity potential',
     // ctuh_c => '(unit CTUh) Human toxicity - Carcinogenic effects',
     // ctuh_nc => (unit CTUh) Human toxicity - non-carcinogenic effects',
-    'epf'     => '(unit g P eq) Eutrophication of freshwater',
-    'epm'     => '(unit g N eq) Eutrophication of marine waters',
-    'ept'     => '(unit mol N eq) Terrestrial eutrophication',
+    'epf'     => '(unit g P eq) Freshwater eutrophication potential',
+    'epm'     => '(unit g N eq) Marine eutrophication potential',
+    'ept'     => '(unit mol N eq) Terrestrial eutrophication potential',
 ];
 
 $tables = ['glpi_plugin_carbon_embodiedimpacts', 'glpi_plugin_carbon_usageimpacts'];
 foreach ($tables as $table) {
     $previous_criteria = 'pe';
-    foreach ($new_criterias as $criteria => $comment) {
+    foreach ($new_criteria as $criteria => $comment) {
         $migration->addField(
             $table,
             $criteria,
@@ -83,12 +83,12 @@ foreach ($tables as $table) {
     }
 
     // Uniformize existing impact : make floats signed
-    $old_criterias = [
+    $old_criteria = [
         'gwp' => '(unit g CO2 eq) Global warming potential',
         'adp' => '(unit g Sb eq) Abiotic depletion potential',
         'pe'  => '(unit J) Primary energy',
     ];
-    foreach ($old_criterias as $criteria => $comment) {
+    foreach ($old_criteria as $criteria => $comment) {
         $migration->changeField($table, $criteria, $criteria, 'float DEFAULT \'0\'', [
             'comment' => $comment,
         ]);

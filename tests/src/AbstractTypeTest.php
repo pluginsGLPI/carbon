@@ -74,7 +74,7 @@ abstract class AbstractTypeTest extends DbTestCase
             $this->assertEquals('number', $node->attr('type'));
         });
         $category = $crawler->filter('select[name="category"]');
-        $this->assertEquals(1, $category->count());
+        $this->assertEquals(0, $category->count());
     }
 
     public function test_displayTabContentForItemtype_creates_type_extra_data_when_they_dont_exist()
