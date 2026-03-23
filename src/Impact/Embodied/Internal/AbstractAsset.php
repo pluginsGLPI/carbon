@@ -54,10 +54,7 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact
 
     protected function doEvaluation(): array
     {
-        /**
-         * @template TModel of CommonDBTM
-         * @var class-string<TModel>
-         */
+        /** @var class-string<CommonDBTM> */
         $glpi_model_itemtype = static::$itemtype . 'Model';
         $glpi_model_fk = getForeignKeyFieldForItemType($glpi_model_itemtype);
         if ($glpi_model_itemtype::isNewID($this->item->fields[$glpi_model_fk])) {

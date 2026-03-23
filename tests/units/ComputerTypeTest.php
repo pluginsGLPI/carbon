@@ -56,9 +56,31 @@ class ComputerTypeTest extends AbstractTypeTest
         $this->assertEquals('', $result);
     }
 
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\ComputerType::updatePowerConsumption
-     */
+    public function testShowForItemType()
+    {
+        $glpi_type = $this->createItem(static::$glpi_type_itemtype);
+        $glpi_type_fk = $glpi_type::getForeignKeyField();
+        /** @var T $type */
+        $type = $this->createItem(static::$type_itemtype, [
+            $glpi_type_fk => $glpi_type->getID(),
+        ]);
+        $this->login('glpi', 'glpi');
+        ob_start(function ($buffer) {
+            return $buffer;
+        });
+        $type->showForItemType($glpi_type);
+        $output = ob_get_clean();
+        $crawler = new Crawler($output);
+        $power = $crawler->filter('input[name="power_consumption"]');
+        $this->assertEquals(1, $power->count());
+        $power->each(function (Crawler $node) {
+            $this->assertEquals(0, $node->attr('value'));
+            $this->assertEquals('number', $node->attr('type'));
+        });
+        $category = $crawler->filter('select[name="category"]');
+        $this->assertEquals(1, $category->count());
+    }
+
     public function testUpdatePowerConsumption()
     {
         $glpi_computer_type = $this->createItem(GlpiComputerType::class);

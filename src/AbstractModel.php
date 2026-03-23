@@ -131,13 +131,13 @@ class AbstractModel extends CommonDBChild
         ];
         $this->initForm($this->getID(), $options);
 
-        $criterias = [];
+        $criteria = [];
         foreach (Type::getImpactTypes() as $type_id => $type) {
             $unit = '(' . str_replace(' ', '&nbsp;', implode(' ', Type::getImpactUnit($type))) . ')';
 
-            $criterias[$type] = [
+            $criteria[$type] = [
                 'title' => Type::getEmbodiedImpactLabel($type),
-                'label' => Type::getCriteriaTooltip($type),
+                'label' => Type::getEmbodiedImpactLabel($type),
                 'icon'  => Type::getCriteriaIcon($type),
                 'unit'  => $unit,
             ];
@@ -147,7 +147,7 @@ class AbstractModel extends CommonDBChild
         TemplateRenderer::getInstance()->display('@carbon/' . $template, [
             'params'    => $options,
             'item'      => $this,
-            'criterias' => $criterias,
+            'criterias' => $criteria,
         ]);
     }
 
