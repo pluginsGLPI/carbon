@@ -41,24 +41,35 @@
     {% set criteria = key %}
     {% set criteria_source = key ~ '_source' %}
     {% set criteria_quality = key ~ '_quality' %}
+    {% if item.fields[criteria] is defined %}
+        {{ fields.smallTitle(field_description.title) }}
 
-    {{ fields.smallTitle(field_description.title) }}
+        {% set checkbox = _inputs.checkbox(key, false) %}
 
-    {% set checkbox = _inputs.checkbox(key, false) %}
+        {{ fields.numberField(criteria,
+            item.fields[criteria],
+            field_description.label, {
+                min: 0,
+                label_class: 'col-xxl-8',
+                input_class: 'col-xxl-4',
+                tpl_mark: field_description.unit,
+        }) }}
 
-    {{ fields.numberField(criteria,
-        item.fields[criteria],
-        field_description.label, {
-            min: 0
-    }) }}
+        {{ carbonFields.dropdownDataQuaity(criteria_quality,
+            item.fields[criteria_quality],
+            __('Data quality', 'carbon'), {
+                min: 0,
+                label_class: 'col-xxl-8',
+                input_class: 'col-xxl-4',
+        }) }}
 
-    {{ fields.textfield(criteria_source,
-        item.fields[criteria_source],
-        __('Data source', 'carbon'), {}) }}
+        {{ fields.textfield(criteria_source,
+            item.fields[criteria_source],
+            __('Data source', 'carbon'), {
+                field_class: 'col-12 col-sm-12',
+                label_class: 'col-xxl-4',
+                input_class: 'col-xxl-8',
+            }) }}
 
-    {{ carbonFields.dropdownDataQuaity(criteria_quality,
-        item.fields[criteria_quality],
-        __('Data quality', 'carbon'), {
-            min: 0
-    }) }}
+    {% endif %}
 {% endfor %}

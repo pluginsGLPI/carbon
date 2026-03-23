@@ -33,10 +33,6 @@
 namespace GlpiPlugin\Carbon\Impact\Embodied\Internal;
 
 use Computer as GlpiComputer;
-use ComputerModel as GlpiComputerModel;
-use GlpiPlugin\Carbon\ComputerModel;
-use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
-use GlpiPlugin\Carbon\Impact\Type;
 
 /**
  * This embodied impact
@@ -44,57 +40,4 @@ use GlpiPlugin\Carbon\Impact\Type;
 class Computer extends AbstractAsset
 {
     protected static string $itemtype = GlpiComputer::class;
-
-    protected function doEvaluation(): ?array
-    {
-        if (GlpiComputerModel::isNewID($this->item->fields['computermodels_id'])) {
-            return [];
-        }
-
-        $model = new ComputerModel();
-        $model->getFromDBByCrit([
-            'computermodels_id' => $this->item->fields['computermodels_id'],
-        ]);
-        if ($model->isNewItem()) {
-            return [];
-        }
-
-        $impacts = [];
-        $types = Type::getImpactTypes();
-        foreach ($types as $type) {
-            switch ($type) {
-                case 'gwp':
-                    if (!empty($model->fields['gwp'])) {
-                        $impacts[Type::IMPACT_GWP] = new TrackedFloat(
-                            $model->fields['gwp'] * 1000, // UI Field in KgCO2Eq,
-                            null,
-                            $model->fields['gwp_quality']
-                        );
-                    }
-                    break;
-
-                case 'adp':
-                    if (!empty($model->fields['adp'])) {
-                        $impacts[Type::IMPACT_ADP] = new TrackedFloat(
-                            $model->fields['adp'],
-                            null,
-                            $model->fields['adp_quality']
-                        );
-                    }
-                    break;
-
-                case 'pe':
-                    if (!empty($model->fields['pe'])) {
-                        $impacts[Type::IMPACT_PE] = new TrackedFloat(
-                            $model->fields['pe'],
-                            null,
-                            $model->fields['pe_quality']
-                        );
-                    }
-                    break;
-            }
-        }
-
-        return $impacts;
-    }
 }

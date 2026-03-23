@@ -80,9 +80,9 @@ class AbstractModel extends CommonDBChild
             return;
         }
 
-        $type = new static();
-        $type->getOrCreate($item);
-        $type->showForItemType($type->getID());
+        $model = new static();
+        $model->getOrCreate($item);
+        $model->showForItemType($model->getID());
     }
 
     public function prepareInputForUpdate($input)
@@ -131,23 +131,17 @@ class AbstractModel extends CommonDBChild
         ];
         $this->initForm($this->getID(), $options);
 
-        $criterias = [
-            'gwp' => [
-                'title' => __('Global warming potential', 'carbon'),
-                'label' => __('Emissions of CO2 (KgCO2eq)', 'carbon'),
-                'icon'  => '', // 'fa-solid fa-temperature-three-quarters'
-            ],
-            'adp' => [
-                'title' => __('Abiotic depletion potential', 'carbon'),
-                'label' => __('Abiotic depletion potential (gSbEq)', 'carbon'),
-                'icon'  => '', // @todo : find an icon
-            ],
-            'pe' => [
-                'title' => __('Primary energy', 'carbon'),
-                'label' => __('Primary energy (J)', 'carbon'),
-                'icon'  => '', // @todo : find an icon
-            ],
-        ];
+        $criterias = [];
+        foreach (Type::getImpactTypes() as $type_id => $type) {
+            $unit = '(' . str_replace(' ', '&nbsp;', implode(' ', Type::getImpactUnit($type))) . ')';
+
+            $criterias[$type] = [
+                'title' => Type::getEmbodiedImpactLabel($type),
+                'label' => Type::getCriteriaTooltip($type),
+                'icon'  => Type::getCriteriaIcon($type),
+                'unit'  => $unit,
+            ];
+        }
 
         $template = strtolower(basename(str_replace('\\', '/', static::class))) . '.html.twig';
         TemplateRenderer::getInstance()->display('@carbon/' . $template, [
@@ -171,77 +165,41 @@ class AbstractModel extends CommonDBChild
             'datatype'           => 'number',
         ];
 
-        $tab[] = [
-            'id'       => SearchOptions::EMBODIED_IMPACT_GWP,
-            'table'    => $table,
-            'field'    => 'gwp',
-            'name'     => __('Global warming potential', 'carbon'),
-            'datatype' => 'float',
-        ];
+        $id = SearchOptions::IMPACT_BASE;
+        foreach (Type::getImpactTypes() as $type_id => $type) {
+            $id = SearchOptions::IMPACT_BASE + $type_id * 3;
+            $tab[] = [
+                'id'                 => $id,
+                'table'              => $table,
+                'field'              => $type,
+                'name'               => Type::getEmbodiedImpactLabel($type),
+                'massiveaction'      => false,
+                'datatype'           => 'decimal',
+                'unit'               => implode(' ', Type::getImpactUnit($type)),
+            ];
+            $id++;
 
-        $tab[] = [
-            'id'       => SearchOptions::EMBODIED_IMPACT_GWP_SOURCE,
-            'table'    => $table,
-            'field'    => 'gwp_source',
-            'name'     => __('Global warming potential source', 'carbon'),
-            'datatype' => 'string',
-        ];
+            $tab[] = [
+                'id'                 => $id,
+                'table'              => $this->getTable(),
+                'field'              => "{$type}_source",
+                'name'               => __('Source', 'carbon'),
+                'massiveaction'      => false,
+                'datatype'           => 'string',
+                'unit'               => implode(' ', Type::getImpactUnit($type)),
+            ];
+            $id++;
 
-        $tab[] = [
-            'id'       => SearchOptions::EMBODIED_IMPACT_GWP_QUALITY,
-            'table'    => $table,
-            'field'    => 'gwp_quality',
-            'name'     => __('Global warming potential quality', 'carbon'),
-            'datatype' => 'int',
-        ];
-
-        $tab[] = [
-            'id'       => SearchOptions::EMBODIED_IMPACT_ADP,
-            'table'    => $table,
-            'field'    => 'adp',
-            'name'     => __('Abiotic depletion potential', 'carbon'),
-            'datatype' => 'float',
-        ];
-
-        $tab[] = [
-            'id'       => SearchOptions::EMBODIED_IMPACT_ADP_SOURCE,
-            'table'    => $table,
-            'field'    => 'adp_source',
-            'name'     => __('Abiotic depletion potential source', 'carbon'),
-            'datatype' => 'string',
-        ];
-
-        $tab[] = [
-            'id'       => SearchOptions::EMBODIED_IMPACT_ADP_QUALITY,
-            'table'    => $table,
-            'field'    => 'adp_quality',
-            'name'     => __('Abiotic depletion potential quality', 'carbon'),
-            'datatype' => 'int',
-        ];
-
-        $tab[] = [
-            'id'       => SearchOptions::EMBODIED_IMPACT_PE,
-            'table'    => $table,
-            'field'    => 'pe',
-            'name'     => __('Primary energy (J)', 'carbon'),
-            'datatype' => 'float',
-        ];
-
-        $tab[] = [
-            'id'       => SearchOptions::EMBODIED_IMPACT_PE_SOURCE,
-            'table'    => $table,
-            'field'    => 'pe_source',
-            'name'     => __('Primary energy source', 'carbon'),
-            'datatype' => 'string',
-        ];
-
-        $tab[] = [
-            'id'       => SearchOptions::EMBODIED_IMPACT_PE_QUALITY,
-            'table'    => $table,
-            'field'    => 'pe_quality',
-            'name'     => __('Primary energy quality', 'carbon'),
-            'datatype' => 'int',
-        ];
+            $tab[] = [
+                'id'                 => $id,
+                'table'              => $this->getTable(),
+                'field'              => "{$type}_quality",
+                'name'               => __('Quality', 'carbon'),
+                'massiveaction'      => false,
+                'datatype'           => 'int',
+                'unit'               => implode(' ', Type::getImpactUnit($type)),
+            ];
+        }
 
         return $tab;
     }
