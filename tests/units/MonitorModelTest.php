@@ -32,12 +32,13 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
-use MonitorModel as GlpiMonitorModel;
 use GlpiPlugin\Carbon\MonitorModel;
+use MonitorModel as GlpiMonitorModel;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(MonitorModel::class)]
-class MonitorModelTest extends AbstractModelTest {
+class MonitorModelTest extends AbstractModelTest
+{
     protected static string $glpi_model_itemtype = GlpiMonitorModel::class;
 
     protected static string $model_itemtype = MonitorModel::class;
