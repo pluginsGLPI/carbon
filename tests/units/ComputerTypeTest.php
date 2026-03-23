@@ -36,17 +36,13 @@ use ComputerType as GlpiComputerType;
 use GlpiPlugin\Carbon\ComputerType;
 use MassiveAction;
 use PHPUnit\Framework\Attributes\CoversClass;
-use Session;
 use Symfony\Component\DomCrawler\Crawler;
 
 #[CoversClass(ComputerType::class)]
-class ComputerTypeTest extends DbTestCase
+class ComputerTypeTest extends AbstractTypeTest
 {
-    public function testGetTypeName()
-    {
-        $this->assertEquals('Environmental impact', ComputerType::getTypeName(1));
-        $this->assertEquals('Environmental impacts', ComputerType::getTypeName(Session::getPluralNumber()));
-    }
+    protected static string $glpi_type_itemtype = GlpiComputerType::class;
+    protected static string $type_itemtype = ComputerType::class;
 
     public function testGetTabNameForItem()
     {
@@ -58,43 +54,6 @@ class ComputerTypeTest extends DbTestCase
 
         $result = $instance->getTabNameForItem($glpi_computer_type, 1);
         $this->assertEquals('', $result);
-    }
-
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\AbstractType::getOrCreate
-     */
-    public function testGetOrCreate()
-    {
-        $computer_type = $this->createItem(GlpiComputerType::class, ['name' => 'Test Computer Type']);
-        $instance = new ComputerType();
-        $this->callPrivateMethod($instance, 'getOrCreate', $computer_type);
-        $this->assertFalse($instance->isNewItem());
-    }
-
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\AbstractType::showForItemType
-     */
-    public function testShowForItemType()
-    {
-        $glpi_computer_type = $this->createItem(GlpiComputerType::class);
-        $computer_type = $this->createItem(ComputerType::class, [
-            'computertypes_id' => $glpi_computer_type->getID(),
-        ]);
-        $this->login('glpi', 'glpi');
-        ob_start(function ($buffer) {
-            return $buffer;
-        });
-        $computer_type->showForItemType($glpi_computer_type);
-        $output = ob_get_clean();
-        $crawler = new Crawler($output);
-        $power = $crawler->filter('input[name="power_consumption"]');
-        $this->assertEquals(1, $power->count());
-        $power->each(function (Crawler $node) {
-            $this->assertEquals(0, $node->attr('value'));
-            $this->assertEquals('number', $node->attr('type'));
-        });
-        $category = $crawler->filter('select[name="category"]');
-        $this->assertEquals(1, $category->count());
     }
 
     /**
@@ -120,9 +79,6 @@ class ComputerTypeTest extends DbTestCase
         $this->assertEquals(42, $instance->fields['power_consumption']);
     }
 
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\ComputerType::updateCategory
-     */
     public function testUpdateCategory()
     {
         $glpi_computer_type = $this->createItem(GlpiComputerType::class);
@@ -143,9 +99,6 @@ class ComputerTypeTest extends DbTestCase
         $this->assertEquals(ComputerType::CATEGORY_SERVER, $instance->fields['category']);
     }
 
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\ComputerType::showMassiveActionsSubForm
-     */
     public function testShowMassiveActionsSubForm()
     {
         // Test power consumption update form
@@ -222,9 +175,6 @@ class ComputerTypeTest extends DbTestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\ComputerType::processMassiveActionsForOneItemtype
-     */
     public function testProcessMassiveActionForOneItemtype()
     {
         // Test create power consumption

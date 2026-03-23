@@ -90,7 +90,7 @@ abstract class AbstractType extends CommonDBChild
      * Get the type for the item, creating it if it doesn't exist.
      *
      * @param CommonGLPI $item
-     * @return bool
+     * @return bool true if type object has been found or created
      */
     protected function getOrCreate(CommonGLPI $item): bool
     {
