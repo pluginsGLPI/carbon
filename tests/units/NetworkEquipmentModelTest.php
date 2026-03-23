@@ -33,7 +33,13 @@
 namespace GlpiPlugin\Carbon\Tests;
 
 use GlpiPlugin\Carbon\NetworkEquipmentModel;
+use NetworkEquipmentModel as GlpiNetworkEquipmentModel;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(NetworkEquipmentModel::class)]
-class NetworkEquipmentModelTest extends AbstractModelTest {}
+class NetworkEquipmentModelTest extends AbstractModelTest
+{
+    protected static string $glpi_model_itemtype = GlpiNetworkEquipmentModel::class;
+
+    protected static string $model_itemtype = NetworkEquipmentModel::class;
+}
