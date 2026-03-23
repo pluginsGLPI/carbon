@@ -33,39 +33,7 @@
 namespace GlpiPlugin\Carbon\Tests;
 
 use GlpiPlugin\Carbon\MonitorModel;
-use MonitorModel as GlpiMonitorModel;
 use PHPUnit\Framework\Attributes\CoversClass;
-use Symfony\Component\DomCrawler\Crawler;
 
 #[CoversClass(MonitorModel::class)]
-class MonitorModelTest extends DbTestCase
-{
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\AbstractType::showForItemType
-     */
-    public function testShowForItemType()
-    {
-        $glpi_monitor_model = $this->createItem(GlpiMonitorModel::class);
-        $monitor_model = $this->createItem(MonitorModel::class, [
-            'monitormodels_id' => $glpi_monitor_model->getID(),
-        ]);
-        $this->login('glpi', 'glpi');
-        ob_start();
-        $monitor_model->showForItemType($glpi_monitor_model);
-        $output = ob_get_clean();
-        $crawler = new Crawler($output);
-        $gwp = $crawler->filter('input[name="gwp"]');
-        $this->assertEquals(1, $gwp->count());
-        $gwp->each(function (Crawler $node) {
-            $this->assertEquals(0, $node->attr('value'));
-            $this->assertEquals('number', $node->attr('type'));
-        });
-
-        $gwp_source = $crawler->filter('input[name="gwp_source"]');
-        $gwp_source->each(function (Crawler $node) {
-            $this->assertEquals('', $node->attr('value'));
-        });
-
-        $gwp_quality = $crawler->filter('select[name="gwp_quality"]');
-    }
-}
+class MonitorModelTest extends AbstractModelTest {}

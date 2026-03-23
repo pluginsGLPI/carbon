@@ -32,23 +32,17 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
-use GlpiPlugin\Carbon\AbstractType;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
 use MassiveAction;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
 use PHPUnit\Framework\Attributes\CoversClass;
-use Session;
 use Symfony\Component\DomCrawler\Crawler;
 
 #[CoversClass(NetworkEquipmentType::class)]
-#[CoversClass(AbstractType::class)]
-class NetworkEquipmentTypeTest extends DbTestCase
+class NetworkEquipmentTypeTest extends AbstractTypeTest
 {
-    public function testGetTypeName()
-    {
-        $this->assertEquals('Environmental impact', NetworkEquipmentType::getTypeName(1));
-        $this->assertEquals('Environmental impacts', NetworkEquipmentType::getTypeName(Session::getPluralNumber()));
-    }
+    protected static string $glpi_type_itemtype = GlpiNetworkEquipmentType::class;
+    protected static string $type_itemtype = NetworkEquipmentType::class;
 
     public function testGetTabNameForItem()
     {
@@ -60,36 +54,6 @@ class NetworkEquipmentTypeTest extends DbTestCase
 
         $result = $instance->getTabNameForItem($glpi_networkequipment_type, 1);
         $this->assertEquals('', $result);
-    }
-
-    public function testGetOrCreate()
-    {
-        $computer_type = $this->createItem(GlpiNetworkEquipmentType::class, ['name' => 'Test Computer Type']);
-        $instance = new NetworkEquipmentType();
-        $this->callPrivateMethod($instance, 'getOrCreate', $computer_type);
-        $this->assertFalse($instance->isNewItem());
-    }
-
-
-    public function testShowForItemType()
-    {
-        $glpi_networkequipment_type = $this->createItem(GlpiNetworkEquipmentType::class);
-        $networkequipment_type = $this->createItem(NetworkEquipmentType::class, [
-            'networkequipmenttypes_id' => $glpi_networkequipment_type->getID(),
-        ]);
-        $this->login('glpi', 'glpi');
-        ob_start(function ($buffer) {
-            return $buffer;
-        });
-        $networkequipment_type->showForItemType($glpi_networkequipment_type);
-        $output = ob_get_clean();
-        $crawler = new Crawler($output);
-        $power = $crawler->filter('input[name="power_consumption"]');
-        $this->assertEquals(1, $power->count());
-        $power->each(function (Crawler $node) {
-            $this->assertEquals(0, $node->attr('value'));
-            $this->assertEquals('number', $node->attr('type'));
-        });
     }
 
     public function testUpdatePowerConsumption()

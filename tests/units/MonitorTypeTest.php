@@ -32,23 +32,17 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
-use GlpiPlugin\Carbon\AbstractType;
 use GlpiPlugin\Carbon\MonitorType;
 use MassiveAction;
 use MonitorType as GlpiMonitorType;
 use PHPUnit\Framework\Attributes\CoversClass;
-use Session;
 use Symfony\Component\DomCrawler\Crawler;
 
-#[CoversClass(AbstractType::class)]
 #[CoversClass(MonitorType::class)]
-class MonitorTypeTest extends DbTestCase
+class MonitorTypeTest extends AbstractTypeTest
 {
-    public function testGetTypeName()
-    {
-        $this->assertEquals('Environmental impact', MonitorType::getTypeName(1));
-        $this->assertEquals('Environmental impacts', MonitorType::getTypeName(Session::getPluralNumber()));
-    }
+    protected static string $glpi_type_itemtype = GlpiMonitorType::class;
+    protected static string $type_itemtype = MonitorType::class;
 
     public function testGetTabNameForItem()
     {
@@ -60,35 +54,6 @@ class MonitorTypeTest extends DbTestCase
 
         $result = $instance->getTabNameForItem($glpi_monitor_type, 1);
         $this->assertEquals('', $result);
-    }
-
-    public function testGetOrCreate()
-    {
-        $computer_type = $this->createItem(GlpiMonitorType::class, ['name' => 'Test Computer Type']);
-        $instance = new MonitorType();
-        $this->callPrivateMethod($instance, 'getOrCreate', $computer_type);
-        $this->assertFalse($instance->isNewItem());
-    }
-
-    public function testShowForItemType()
-    {
-        $glpi_monitor_type = $this->createItem(GlpiMonitorType::class);
-        $monitor_type = $this->createItem(MonitorType::class, [
-            'monitortypes_id' => $glpi_monitor_type->getID(),
-        ]);
-        $this->login('glpi', 'glpi');
-        ob_start(function ($buffer) {
-            return $buffer;
-        });
-        $monitor_type->showForItemType($glpi_monitor_type);
-        $output = ob_get_clean();
-        $crawler = new Crawler($output);
-        $power = $crawler->filter('input[name="power_consumption"]');
-        $this->assertEquals(1, $power->count());
-        $power->each(function (Crawler $node) {
-            $this->assertEquals(0, $node->attr('value'));
-            $this->assertEquals('number', $node->attr('type'));
-        });
     }
 
     public function testUpdatePowerConsumption()

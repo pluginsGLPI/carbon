@@ -35,37 +35,11 @@ namespace GlpiPlugin\Carbon\Tests;
 use ComputerModel as GlpiComputerModel;
 use GlpiPlugin\Carbon\ComputerModel;
 use PHPUnit\Framework\Attributes\CoversClass;
-use Symfony\Component\DomCrawler\Crawler;
 
 #[CoversClass(ComputerModel::class)]
-class ComputerModelTest extends DbTestCase
+class ComputerModelTest extends AbstractModelTest
 {
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\AbstractType::showForItemType
-     */
-    public function testShowForItemType()
-    {
-        $glpi_computer_model = $this->createItem(GlpiComputerModel::class);
-        $computer_model = $this->createItem(ComputerModel::class, [
-            'computermodels_id' => $glpi_computer_model->getID(),
-        ]);
-        $this->login('glpi', 'glpi');
-        ob_start();
-        $computer_model->showForItemType($glpi_computer_model);
-        $output = ob_get_clean();
-        $crawler = new Crawler($output);
-        $gwp = $crawler->filter('input[name="gwp"]');
-        $this->assertEquals(1, $gwp->count());
-        $gwp->each(function (Crawler $node) {
-            $this->assertEquals(0, $node->attr('value'));
-            $this->assertEquals('number', $node->attr('type'));
-        });
+    protected static string $glpi_model_itemtype = GlpiComputerModel::class;
 
-        $gwp_source = $crawler->filter('input[name="gwp_source"]');
-        $gwp_source->each(function (Crawler $node) {
-            $this->assertEquals('', $node->attr('value'));
-        });
-
-        $gwp_quality = $crawler->filter('select[name="gwp_quality"]');
-    }
+    protected static string $model_itemtype = ComputerModel::class;
 }
