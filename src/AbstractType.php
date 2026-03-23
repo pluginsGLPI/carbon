@@ -52,7 +52,7 @@ abstract class AbstractType extends CommonDBChild
      */
     public static function getTypeName($nb = 0)
     {
-        return _n('Environmental impact', 'Environmental impacts', $nb, 'carbon');
+        return __('Environmental impact', 'carbon');
     }
 
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)

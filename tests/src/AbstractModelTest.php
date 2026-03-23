@@ -52,7 +52,7 @@ abstract class AbstractModelTest extends DbTestCase
     public function testGetTypeName()
     {
         $this->assertEquals('Environmental impact', static::$model_itemtype::getTypeName(1));
-        $this->assertEquals('Environmental impacts', static::$model_itemtype::getTypeName(Session::getPluralNumber()));
+        $this->assertEquals('Environmental impact', static::$model_itemtype::getTypeName(Session::getPluralNumber()));
     }
 
     public function testShowForItemType()
