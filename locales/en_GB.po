@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-23 02:35+0000\n"
-"PO-Revision-Date: 2026-03-23 02:35+0000\n"
+"POT-Creation-Date: 2026-03-24 02:28+0000\n"
+"PO-Revision-Date: 2026-03-24 02:28+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: en_GB\n"
@@ -43,6 +43,7 @@ msgid "Do not evaluate"
 msgstr "Do not evaluate"
 
 #: templates/components/form/source_zone_selector.html.twig
+#: src/AbstractModel.php:186
 msgid "Source"
 msgstr "Source"
 
@@ -325,12 +326,16 @@ msgstr ""
 "processes only."
 
 #: templates/abstractmodel.html.twig
-msgid "Data source"
-msgstr "Data source"
+msgid "Take care of the expected units before setting an impact."
+msgstr "Take care of the expected units before setting an impact."
 
 #: templates/abstractmodel.html.twig
 msgid "Data quality"
 msgstr "Data quality"
+
+#: templates/abstractmodel.html.twig
+msgid "Data source"
+msgstr "Data source"
 
 #: templates/pages/CarbonIntensitySource/tab_zone.html.twig
 msgid "No zone available"
@@ -514,62 +519,16 @@ msgstr "Connection to Boavizta API established"
 #: src/AbstractModel.php:54 src/UsageInfo.php:95 src/AbstractType.php:55
 #: src/Location.php:73 src/Profile.php:45
 msgid "Environmental impact"
-msgid_plural "Environmental impact"
-msgstr[0] "Environmental impact"
-msgstr[1] "Environmental impact"
+msgstr "Environmental impact"
 
 #: src/AbstractModel.php:62 src/AbstractType.php:63 src/Dashboard/Grid.php:58
 #: src/Dashboard/Grid.php:123 src/Dashboard/Grid.php:221
 msgid "Carbon"
 msgstr "Carbon"
 
-#: src/AbstractModel.php:136 src/AbstractModel.php:178
-msgid "Global warming potential"
-msgstr "Global warming potential"
-
-#: src/AbstractModel.php:137
-msgid "Emissions of CO2 (KgCO2eq)"
-msgstr "Emissions of CO2 (KgCO2eq)"
-
-#: src/AbstractModel.php:141 src/AbstractModel.php:202
-msgid "Abiotic depletion potential"
-msgstr "Abiotic depletion potential"
-
-#: src/AbstractModel.php:142
-msgid "Abiotic depletion potential (gSbEq)"
-msgstr "Abiotic depletion potential (gSbEq)"
-
-#: src/AbstractModel.php:146
-msgid "Primary energy"
-msgstr "Primary energy"
-
-#: src/AbstractModel.php:147 src/AbstractModel.php:226
-msgid "Primary energy (J)"
-msgstr "Primary energy (J)"
-
-#: src/AbstractModel.php:186
-msgid "Global warming potential source"
-msgstr "Global warming potential source"
-
-#: src/AbstractModel.php:194
-msgid "Global warming potential quality"
-msgstr "Global warming potential quality"
-
-#: src/AbstractModel.php:210
-msgid "Abiotic depletion potential source"
-msgstr "Abiotic depletion potential source"
-
-#: src/AbstractModel.php:218
-msgid "Abiotic depletion potential quality"
-msgstr "Abiotic depletion potential quality"
-
-#: src/AbstractModel.php:234
-msgid "Primary energy source"
-msgstr "Primary energy source"
-
-#: src/AbstractModel.php:242
-msgid "Primary energy quality"
-msgstr "Primary energy quality"
+#: src/AbstractModel.php:197
+msgid "Quality"
+msgstr "Quality"
 
 #: src/Command/CreateTestInventoryCommand.php:145
 msgid "Creating test inventory"

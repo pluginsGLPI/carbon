@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-23 02:35+0000\n"
+"POT-Creation-Date: 2026-03-24 02:28+0000\n"
 "PO-Revision-Date: 2025-10-29 09:26+0000\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2026\n"
 "Language-Team: Turkish (Turkey) (https://app.transifex.com/teclib/teams/28042/tr_TR/)\n"
@@ -48,6 +48,7 @@ msgid "Do not evaluate"
 msgstr "Değerlendirilmesin"
 
 #: templates/components/form/source_zone_selector.html.twig
+#: src/AbstractModel.php:186
 msgid "Source"
 msgstr "Kaynak"
 
@@ -327,12 +328,16 @@ msgstr ""
 "Aşağıdaki etkiler yalnızca üretim, imha ve geri dönüşüm süreçlerini kapsar."
 
 #: templates/abstractmodel.html.twig
-msgid "Data source"
-msgstr "Veri kaynağı"
+msgid "Take care of the expected units before setting an impact."
+msgstr ""
 
 #: templates/abstractmodel.html.twig
 msgid "Data quality"
 msgstr "Veri kalitesi"
+
+#: templates/abstractmodel.html.twig
+msgid "Data source"
+msgstr "Veri kaynağı"
 
 #: templates/pages/CarbonIntensitySource/tab_zone.html.twig
 msgid "No zone available"
@@ -516,62 +521,16 @@ msgstr "Boavizta API bağlantısı kuruldu"
 #: src/AbstractModel.php:54 src/UsageInfo.php:95 src/AbstractType.php:55
 #: src/Location.php:73 src/Profile.php:45
 msgid "Environmental impact"
-msgid_plural "Environmental impact"
-msgstr[0] "Çevresel etki"
-msgstr[1] "Çevresel etki"
+msgstr "Çevresel etki"
 
 #: src/AbstractModel.php:62 src/AbstractType.php:63 src/Dashboard/Grid.php:58
 #: src/Dashboard/Grid.php:123 src/Dashboard/Grid.php:221
 msgid "Carbon"
 msgstr "Karbon"
 
-#: src/AbstractModel.php:136 src/AbstractModel.php:178
-msgid "Global warming potential"
-msgstr "Küresel ısınma potansiyeli"
-
-#: src/AbstractModel.php:137
-msgid "Emissions of CO2 (KgCO2eq)"
-msgstr "CO2 emisyonları (KgCO2eq)"
-
-#: src/AbstractModel.php:141 src/AbstractModel.php:202
-msgid "Abiotic depletion potential"
-msgstr "Abiyotik tükenme potansiyeli"
-
-#: src/AbstractModel.php:142
-msgid "Abiotic depletion potential (gSbEq)"
-msgstr "Abiyotik tükenme potansiyeli (gSbEq)"
-
-#: src/AbstractModel.php:146
-msgid "Primary energy"
-msgstr "Birincil enerji"
-
-#: src/AbstractModel.php:147 src/AbstractModel.php:226
-msgid "Primary energy (J)"
-msgstr "Birincil enerji (J)"
-
-#: src/AbstractModel.php:186
-msgid "Global warming potential source"
-msgstr "Kürsel ısınma potansiyeli kaynağı"
-
-#: src/AbstractModel.php:194
-msgid "Global warming potential quality"
-msgstr "Küresel ısınma potansiyeli kalitesi"
-
-#: src/AbstractModel.php:210
-msgid "Abiotic depletion potential source"
-msgstr "Abiyotik tükenme potansiyeli kaynağı"
-
-#: src/AbstractModel.php:218
-msgid "Abiotic depletion potential quality"
-msgstr "Abiyotik tükenme potansiyeli kalitesi"
-
-#: src/AbstractModel.php:234
-msgid "Primary energy source"
-msgstr "Birincil enerji kaynağı"
-
-#: src/AbstractModel.php:242
-msgid "Primary energy quality"
-msgstr "Birincil enerji kalitesi"
+#: src/AbstractModel.php:197
+msgid "Quality"
+msgstr ""
 
 #: src/Command/CreateTestInventoryCommand.php:145
 msgid "Creating test inventory"
