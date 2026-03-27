@@ -268,19 +268,10 @@ class Grid
                 'label'        => __('Biggest monthly averaged carbon emission per model', 'carbon'),
                 'provider'     => Provider::class . '::getSumUsageEmissionsPerModel',
             ],
-            'plugin_carbon_report_usage_adp_impact' => [
-                'widgettype'   => ['impact_criteria_number'],
-                'group'        => $group,
-                'label'        => __('Usage abiotic depletion potential', 'carbon'),
-                'provider'     => Provider::class . '::getImpactOfUsageCriteria',
-                'args'         => [
-                    'impact_type' => 'adp',
-                ],
-            ],
         ];
 
-        // Embodied impact
         foreach (Type::getImpactTypes() as $impact_type) {
+            // Embodied impact
             $key = "plugin_carbon_report_embodied_{$impact_type}_impact";
             if (isset($new_cards[$key])) {
                 trigger_error("The card $key already exists", E_USER_WARNING);
@@ -290,6 +281,21 @@ class Grid
                 'group'        => $group,
                 'label'        => Type::getEmbodiedImpactLabel($impact_type),
                 'provider'     => Provider::class . '::getImpactOfEmbodiedCriteria',
+                'args'     => [
+                    'impact_type' => $impact_type,
+                ],
+            ];
+
+            // Usage impact
+            $key = "plugin_carbon_report_usage_{$impact_type}_impact";
+            if (isset($new_cards[$key])) {
+                trigger_error("The card $key already exists", E_USER_WARNING);
+            }
+            $new_cards[$key] = [
+                'widgettype'   => ['impact_criteria_number'],
+                'group'        => $group,
+                'label'        => Type::getUsageImpactLabel($impact_type),
+                'provider'     => Provider::class . '::getImpactOfUsageCriteria',
                 'args'     => [
                     'impact_type' => $impact_type,
                 ],
