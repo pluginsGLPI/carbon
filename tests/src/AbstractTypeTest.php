@@ -33,9 +33,11 @@
 namespace GlpiPlugin\Carbon\Tests;
 
 use GlpiPlugin\Carbon\AbstractType;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Session;
 use Symfony\Component\DomCrawler\Crawler;
 
+#[CoversClass(AbstractType::class)]
 abstract class AbstractTypeTest extends DbTestCase
 {
     protected static string $glpi_type_itemtype;
