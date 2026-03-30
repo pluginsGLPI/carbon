@@ -44,19 +44,4 @@
             item.fields['plugin_carbon_computerusageprofiles_id'],
             _n('Usage profile', 'Usage profiles', 1, 'carbon')) }}
     {% endif %}
-    {% set readonly = false %}
-    {% if (infocom.fields.decommission_date ?? null) is not null %}
-        {% set label = __('lifespan (in months)', 'carbon') %}
-        {% set readonly = true %}
-    {% else %}
-        {% set label = __('planned lifespan (in months)', 'carbon') %}
-    {% endif %}
-    {{ fields.numberField('planned_lifespan',
-        item.fields['planned_lifespan'],
-        label,
-        {
-            display_emptychoice: true,
-            min: 0,
-            readonly: readonly,
-        }) }}
 {% endblock %}

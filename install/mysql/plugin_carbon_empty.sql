@@ -407,7 +407,6 @@ CREATE TABLE IF NOT EXISTS `glpi_plugin_carbon_usageinfos` (
   `itemtype`                               varchar(255) DEFAULT NULL,
   `items_id`                               int unsigned NOT NULL DEFAULT '0',
   `plugin_carbon_computerusageprofiles_id` int unsigned NOT NULL DEFAULT '0',
-  `planned_lifespan`                       int unsigned NOT NULL DEFAULT '0' COMMENT '(unit months)',
   PRIMARY KEY (`id`),
   UNIQUE KEY `unicity` (`itemtype`, `items_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
