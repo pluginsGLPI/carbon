@@ -339,26 +339,4 @@ class UsageInfoTest extends DbTestCase
         $result = $usage_info->getLifespanInHours($glpi_computer);
         $this->assertSame(35867, $result);
     }
-
-    public function test_getLifespanInHours_returns_hours_when_no_decommission_date_but_has_planned_lifetime()
-    {
-        $glpi_computer = $this->createItem(GlpiComputer::class);
-        $infocom = $this->createItem(Infocom::class, [
-            'itemtype' => get_class($glpi_computer),
-            'items_id' => $glpi_computer->getID(),
-            'delivery_date'     => null,
-            'use_date'          => '2022-01-01',
-            'buy_date'          => null,
-            'decommission_date' => null,
-        ]);
-        $usage_info = $this->createItem(UsageInfo::class, [
-            'itemtype' => get_class($glpi_computer),
-            'items_id' => $glpi_computer->getID(),
-            'planned_lifespan'  => 60, // 5 years = 60 months
-        ]);
-
-        $usage_info = new UsageInfo();
-        $result = $usage_info->getLifespanInHours($glpi_computer);
-        $this->assertSame(43824, $result);
-    }
 }

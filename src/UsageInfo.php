@@ -36,7 +36,6 @@ use CommonDBChild;
 use CommonDBTM;
 use CommonGLPI;
 use Computer as GlpiComputer;
-use DateInterval;
 use DateTime;
 use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\Dashboard\Provider;
@@ -166,7 +165,6 @@ class UsageInfo extends CommonDBChild
             'items_id' => $this->fields['items_id'],
         ]);
 
-        $this->fields['planned_lifespan'] ??= Toolbox::getInfocomLifespanInMonth($infocom);
         TemplateRenderer::getInstance()->display('@carbon/usageinfo.html.twig', [
             'params'   => $options,
             'item'     => $this,
@@ -280,11 +278,9 @@ class UsageInfo extends CommonDBChild
     }
 
     /**
-     * Get the lifespan of an asset from its infocom or usage info, in hours
+     * Get the lifespan of an asset from its infocom, in hours
      *
-     * determine an interval between the best date for interval start and the best date for interval end
-     * interval start comes from, by precedence: date_creation of the asset, then from infocom: use_date, delivery_date, buy_date
-     * interval end comes from, by precedence: decommission_date from infocom, then planned_lifespan from usage info
+     * determine an interval between the best date for interval start and the decommission_date
      *
      * @param CommonDBTM $item
      * @return int|null
@@ -315,23 +311,9 @@ class UsageInfo extends CommonDBChild
             }
         }
 
-        if ($start_date === null) {
+        if ($start_date === null || $end_date === null) {
             //Failed to find any date to use as start date, then we can't calculate a lifespan, return null
             return null;
-        }
-
-        if ($end_date === null) {
-            // Try to get end date from usage info and start_date
-            $usage_info = new UsageInfo();
-            $usage_info->getFromDBByCrit([
-                'itemtype' => get_class($item),
-                'items_id' => $item->getID(),
-            ]);
-            if ($usage_info->isNewItem() || $usage_info->fields['planned_lifespan'] <= 0) {
-                // Failed to find a planned lifespan, then we can't calculate a lifespan, return null
-                return null;
-            }
-            $end_date = (new DateTime($start_date))->add(new DateInterval('P' . $usage_info->fields['planned_lifespan'] . 'M'));
         }
 
         $interval = $end_date->diff(new DateTime($start_date));
