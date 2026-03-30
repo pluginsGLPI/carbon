@@ -59,8 +59,20 @@ class Config implements ConfigInterface
 
         {{ fields.passwordField(
             'electricitymap_api_key',
-            current_config['electricitymap_api_key'],
+            '',
             __('Key for electricitymap.org API', 'carbon')
+        ) }}
+
+        {{ fields.checkboxField(
+            'electricitymap_free_plan',
+            current_config['electricitymap_free_plan'] ?? 0,
+            __('Free plan', 'carbon')
+        ) }}
+
+        {{ fields.checkboxField(
+            'electricitymap_fake_data',
+            current_config['electricitymap_fake_data'] ?? 0,
+            __('API key is development key (fake data)', 'carbon')
         ) }}
 TWIG;
 
@@ -69,10 +81,17 @@ TWIG;
 
     public function configUpdate(array $input): array
     {
+        $to_delete = [];
         foreach (self::getSecuredConfigs() as $field) {
             if (isset($input[$field]) && empty($input[$field])) {
                 unset($input[$field]);
             }
+            if (($input['_blank_' . $field] ?? '') === 'on') {
+                $to_delete[] = $field;
+            }
+        }
+        if (count($to_delete)) {
+            PluginConfig::deletePluginConfigurationValues($to_delete);
         }
 
         return $input;

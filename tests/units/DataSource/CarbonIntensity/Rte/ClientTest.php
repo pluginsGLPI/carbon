@@ -36,6 +36,8 @@ use DateTime;
 use DateTimeImmutable;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\Zone;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -45,6 +47,13 @@ class ClientTest extends DbTestCase
 {
     public function testFetchDay()
     {
+        $source = $this->createItem(Source::class, ['name' => 'foo']);
+        $zone = $this->createItem(Zone::class, ['name' => 'bar']);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            getForeignKeyFieldForItemType(Source::class) => $source->getID(),
+            getForeignKeyFieldForItemType(Zone::class) => $zone->getID(),
+        ]);
+
         $client = $this->createStub(RestApiClientInterface::class);
         $fixture_file = TU_FIXTURE_PATH . '/RTE/api-sample.json';
         $response = file_get_contents($fixture_file);
@@ -53,7 +62,7 @@ class ClientTest extends DbTestCase
         $source = new Client($client);
 
         $date = new DateTimeImmutable('5 days ago');
-        $intensities = $source->fetchDay($date, '');
+        $intensities = $source->fetchDay($date, $source_zone);
 
         $this->assertIsArray($intensities);
         $this->assertEquals(96, count($intensities));
@@ -61,6 +70,13 @@ class ClientTest extends DbTestCase
 
     public function testFetchRange()
     {
+        $source = $this->createItem(Source::class, ['name' => 'foo']);
+        $zone = $this->createItem(Zone::class, ['name' => 'bar']);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            getForeignKeyFieldForItemType(Source::class) => $source->getID(),
+            getForeignKeyFieldForItemType(Zone::class) => $zone->getID(),
+        ]);
+
         $client = $this->createStub(RestApiClientInterface::class);
         $response = [];
         $date = new DateTime('2021-03-01 00:00:00');
@@ -78,7 +94,7 @@ class ClientTest extends DbTestCase
 
         $start = new DateTimeImmutable('2021-03-01');
         $stop  = new DateTimeImmutable('2021-03-27');
-        $intensities = $source->fetchRange($start, $stop, '');
+        $intensities = $source->fetchRange($start, $stop, $source_zone);
         $this->assertIsArray($intensities);
         $this->assertIsArray($intensities);
         // There are 2496 intensities in the sample set
@@ -87,6 +103,12 @@ class ClientTest extends DbTestCase
 
     public function testFullDownload()
     {
+        $source = $this->getItem(Source::class, ['name' => 'RTE']);
+        $zone = $this->getItem(Zone::class, ['name' => 'France']);
+        $source_zone = $this->getItem(Source_Zone::class, [
+            getForeignKeyFieldForItemType(Source::class) => $source->getID(),
+            getForeignKeyFieldForItemType(Zone::class) => $zone->getID(),
+        ]);
         $client = $this->createStub(RestApiClientInterface::class);
         $client->method('request')->willReturn([
             [
@@ -111,17 +133,18 @@ class ClientTest extends DbTestCase
         $start_date = new DateTimeImmutable('2024-10-08');
         $stop_date = new DateTimeImmutable('2024-10-09');
         $carbon_intensity = new CarbonIntensity();
-        $output = $instance->fullDownload('France', $start_date, $stop_date, $carbon_intensity);
+        $output = $instance->fullDownload($source_zone, $start_date, $stop_date, $carbon_intensity);
         $this->assertEquals(1, $output);
     }
 
     public function testIncrementalDownload()
     {
-        $zone = new Zone();
-        $zone->getFromDBByCrit(['name' => 'France']);
-        if ($zone->isNewItem()) {
-            $zone = $this->createItem(Zone::class, ['name' => 'France']);
-        }
+        $source = $this->getItem(Source::class, ['name' => 'RTE']);
+        $zone = $this->getItem(Zone::class, ['name' => 'France']);
+        $source_zone = $this->getItem(Source_Zone::class, [
+            getForeignKeyFieldForItemType(Source::class) => $source->getID(),
+            getForeignKeyFieldForItemType(Zone::class) => $zone->getID(),
+        ]);
         $intensity = $this->createMock(CarbonIntensity::class);
 
         // 4 calls to fetchRange [3 days ago; today]
@@ -142,6 +165,6 @@ class ClientTest extends DbTestCase
         $start_date = new DateTime('3 days ago');
         $start_date->setTime(0, 0, 0);
         $start_date = DateTimeImmutable::createFromMutable($start_date);
-        $instance->incrementalDownload('France', $start_date, $intensity);
+        $instance->incrementalDownload($source_zone, $start_date, $intensity);
     }
 }

@@ -99,15 +99,20 @@ class Config extends GlpiConfig
         $canedit        = Session::haveRight(Config::$rightname, UPDATE);
 
         // Get config template foreach LCA data source
+        $secured_config = [];
         $include_configs = [];
         foreach (CarbonIntensityClientFactory::getConfigTypes() as $config_type) {
             $config = new $config_type();
+            $secured_config += $config->getSecuredConfigs();
             $include_configs[] = $config->getConfigTemplate();
         }
         foreach (LcaClientFactory::getConfigTypes() as $config_type) {
             $config = new $config_type();
+            $secured_config += $config->getSecuredConfigs();
             $include_configs[] = $config->getConfigTemplate();
         }
+
+        $current_config = array_diff_key($current_config, array_flip($secured_config));
 
         $hide_boaviztapi_base_url = (getenv(self::ENV_BOAVIZTAPI_BASE_URL) !== false);
         $renderer = TemplateRenderer::getInstance();
@@ -269,11 +274,22 @@ class Config extends GlpiConfig
     /**
      * Set a plugin configuration value
      *
-     * @param array $values key => value pairs to set
+     * @param array<string, string> $values key => value pairs to set
      * @return void
      */
     public static function setPluginConfigurationValues(array $values = []): void
     {
         GlpiConfig::setConfigurationValues(self::CONFIG_CONTEXT, $values);
+    }
+
+    /**
+     * Delete plugin configuration values
+     *
+     * @param array<string> $values names of values to delete
+     * @return void
+     */
+    public static function deletePluginConfigurationValues(array $values)
+    {
+        GlpiConfig::deleteConfigurationValues(self::CONFIG_CONTEXT, $values);
     }
 }

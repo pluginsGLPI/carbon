@@ -68,7 +68,8 @@ class RestApiClient implements RestApiClientInterface
     public function request(string $method = 'GET', string $uri = '', array $options = [])
     {
         try {
-            $response = $this->api_client->request($method, $uri, $options);
+            $request = $this->api_client;
+            $response = $request->request($method, $uri, $options);
         } catch (RequestException $e) {
             $this->last_error = [
                 'title'     => "Plugins API error",

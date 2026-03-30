@@ -80,7 +80,7 @@ class ClientTest extends DbTestCase
         ]);
 
         $date = new DateTimeImmutable('5 days ago');
-        $intensities = $data_source->fetchDay($date, 'France');
+        $intensities = $data_source->fetchDay($date, $source_zone);
 
         $this->assertIsArray($intensities);
         $this->assertArrayHasKey('source', $intensities);
@@ -153,7 +153,7 @@ class ClientTest extends DbTestCase
         $intensities = $data_source->fetchRange(
             DateTimeImmutable::createFromMutable($start),
             DateTimeImmutable::createFromMutable($stop),
-            'France'
+            $source_zone
         );
 
         $this->assertCount(24 * 30 + 2 * 12, $intensities);
