@@ -77,6 +77,8 @@ class Client extends AbstractClient
     /** @var float Tolerance ratio of unknown samples */
     private const UNKNOWN_SAMPLES_WARNING = 0.05;
 
+    private const REQUEST_TIMEZONE = 'Europe/Paris';
+
     private RestApiClientInterface $client;
 
     private string $base_url;
@@ -164,10 +166,10 @@ class Client extends AbstractClient
      * Note that the HOUR-2 seems to be not fully guaranted.
      *
      * @param DateTimeImmutable $day date to download from [00::00:00 to 24:00:00[
-     * @param string $zone
+     * @param Source_Zone $source_zone
      * @return array
      */
-    public function fetchDay(DateTimeImmutable $day, string $zone): array
+    public function fetchDay(DateTimeImmutable $day, Source_Zone $source_zone): array
     {
         $stop = $day->add(new DateInterval('P1D'));
 
@@ -175,10 +177,10 @@ class Client extends AbstractClient
         $from = $day->format($format);
         $to = $stop->format($format);
 
-        $timezone = new DateTimeZone('Europe/Paris');
+        $timezone = new DateTimeZone(self::REQUEST_TIMEZONE);
         $params = [
             'select' => 'date_heure,taux_co2',
-            'where' => "date_heure IN [date'$from' TO date'$to'[ AND taux_co2 is not null",
+            'where' => "date_heure IN [date'$from' TO date'$to'[",
             'order_by' => 'date_heure asc',
             'timezone' => $timezone->getName(),
         ];
@@ -224,14 +226,16 @@ class Client extends AbstractClient
      *
      * @param DateTimeImmutable $start
      * @param DateTimeImmutable $stop
-     * @param string $zone
+     * @param Source_Zone $source_zone
      * @param int $dataset
      * @return array
      */
-    public function fetchRange(DateTimeImmutable $start, DateTimeImmutable $stop, string $zone, int $dataset = self::DATASET_REALTIME): array
+    public function fetchRange(DateTimeImmutable $start, DateTimeImmutable $stop, Source_Zone $source_zone, int $dataset = self::DATASET_REALTIME): array
     {
         // Build realtime and consolidated paths
-        $base_path = GLPI_PLUGIN_DOC_DIR . '/carbon/carbon_intensity/' . $this->getSourceName() . '/' . $zone;
+        $zone = new Zone();
+        $zone->getFromDBByCrit(['id' => $source_zone->fields[Zone::getForeignKeyField()]]);
+        $base_path = GLPI_PLUGIN_DOC_DIR . '/carbon/carbon_intensity/' . $this->getSourceName() . '/' . $zone->fields['name'];
         $consolidated_dir = $base_path . '/consolidated';
         $realtime_dir = $base_path . '/realtime';
 
@@ -260,10 +264,12 @@ class Client extends AbstractClient
                 $cache_dir = $realtime_dir;
                 break;
         }
+        $query_timezone = new DateTimeZone(self::REQUEST_TIMEZONE);
         $cache_file = $this->getCacheFilename(
             $cache_dir,
             $start,
-            $stop
+            $stop,
+            $query_timezone
         );
         $url = $this->base_url . $url;
 
@@ -285,30 +291,33 @@ class Client extends AbstractClient
 
         // Prepare the HTTP request
         // Optimal timezone for returned dates to reduce DST mess in the response
-        $timezone = new DateTimeZone('Europe/Paris');
         $where = "date_heure IN [date'$from' TO date'$to'[";
         $params = [
             'select' => 'date_heure,taux_co2',
             'where' => $where,
             'order_by' => 'date_heure asc',
-            'timezone' => $timezone->getName(),
+            'timezone' => $query_timezone->getName(),
         ];
         try {
             $response = $this->client->request('GET', $url, ['timeout' => 8, 'query' => $params]);
         } catch (RuntimeException $e) {
             return [];
         }
+        if (count($response) === 0) {
+            return [];
+        }
         $this->step = $this->detectStep($response);
         $expected_samples_count = $expected_samples_hours * (60 / $this->step);
         $expected_samples_count--; // End boundary is excluded, decreasing the expeected count by 1
         if (($dataset === self::DATASET_REALTIME && abs(count($response) - $expected_samples_count) > (60 / $this->step))) {
-            $alt_response = $this->fetchRange($start, $stop, $zone, self::DATASET_CONSOLIDATED);
+            $alt_response = $this->fetchRange($start, $stop, $source_zone, self::DATASET_CONSOLIDATED);
             if (!isset($alt_response['error_code']) && count($alt_response) > count($response)) {
                 // Use the alternative response if more samples than the original response
                 $response = $alt_response;
             }
         } else {
-            if (count($response) > 0 && $stop->format('Y-m') < date('Y-m')) {
+            $downloaded_year_month = $start->format('Y-m');
+            if (count($response) > 0 && $downloaded_year_month < date('Y-m')) {
                 // Cache only if the month being processed is older than the month of now
                 $json = json_encode($response);
                 file_put_contents($cache_file, $json);
@@ -338,19 +347,16 @@ class Client extends AbstractClient
             $intensities = $this->downsample($response, $this->step);
         } else {
             $intensities = [];
-            foreach ($response as $local_datetime => $record) {
+            array_walk($response, function ($record) use ($intensities) {
                 $intensities[] = [
-                    'datetime' => $record['date_heure']->format('Y-m-d\TH:00:00??????'),
+                    'datetime' => $record['datetime']->format('Y-m-d\TH:00:00??????'),
                     'intensity' => (float) $record['taux_co2'],
                     'data_quality' => AbstractTracked::DATA_QUALITY_RAW_REAL_TIME_MEASUREMENT,
                 ];
-            }
+            });
         }
 
-        return [
-            'source' => self::getSourceName(),
-            'France' => $intensities,
-        ];
+        return $intensities;
     }
 
     /**
@@ -550,9 +556,9 @@ class Client extends AbstractClient
      */
     private function switchToWinterTime(DateTime $previous, DateTime $date): bool
     {
-        $timezone_paris = new DateTimeZone('Europe/Paris');
-        $previous->setTimezone($timezone_paris);
-        $date->setTimezone($timezone_paris);
+        $timezone = new DateTimeZone(self::REQUEST_TIMEZONE);
+        $previous->setTimezone($timezone);
+        $date->setTimezone($timezone);
         $first_dst = $previous->format('I');
         $second_dst = $date->format('I');
         return $first_dst === '1' && $second_dst === '0';

@@ -117,7 +117,7 @@ class Toolbox
     }
 
     /**
-     * Find the date where an asset leaves the inventory
+     * Find the date where assets leave the inventory
      *
      * @param array $crit
      * @return DateTimeImmutable|null

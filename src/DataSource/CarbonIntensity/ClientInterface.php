@@ -34,6 +34,7 @@ namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity;
 
 use DateTimeImmutable;
 use GlpiPlugin\Carbon\CarbonIntensity;
+use GlpiPlugin\Carbon\Source_Zone;
 use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
@@ -161,6 +162,14 @@ interface ClientInterface
      */
     public function getZones(array $crit = []): array;
 
+    /**
+     * get relations between the source and the zones
+     *
+     * @param array $crit
+     * @return array
+     */
+    public function getSourceZones(array $crit = []): array;
+
     public function getMaxIncrementalAge(): DateTimeImmutable;
 
     /**
@@ -175,7 +184,7 @@ interface ClientInterface
      * If the returned count is negative, then something went wrong
      * and the absolute value of the count tells how many items were saved
      *
-     * @param string $zone
+     * @param Source_Zone $source_zone
      * @param DateTimeImmutable $start_date date where the download must start
      * @param DateTimeImmutable $stop_date date where the download must start
      * @param CarbonIntensity $intensity Instance used to update the database
@@ -183,16 +192,16 @@ interface ClientInterface
      * @param ProgressBar $progress progress bar to update during the download (CLI)
      * @return int count of successfully saved items
      */
-    public function fullDownload(string $zone, DateTimeImmutable $start_date, DateTimeImmutable $stop_date, CarbonIntensity $intensity, int $limit = 0, ?ProgressBar $progress = null): int;
+    public function fullDownload(Source_Zone $source_zone, DateTimeImmutable $start_date, DateTimeImmutable $stop_date, CarbonIntensity $intensity, int $limit = 0, ?ProgressBar $progress = null): int;
 
     /**
      * Download recent carbon intensity data day by day
      *
-     * @param string $zone zone to process
+     * @param Source_Zone $source_zone
      * @param DateTimeImmutable $start_date DAte where the downlos must begin
      * @param CarbonIntensity $intensity Instance of CarbonIntensity to use to save data
      * @param int $limit maximum count of items to process
      * @return int count of processed items. Negative count on failure
      */
-    public function incrementalDownload(string $zone, DateTimeImmutable $start_date, CarbonIntensity $intensity, int $limit = 0): int;
+    public function incrementalDownload(Source_Zone $source_zone, DateTimeImmutable $start_date, CarbonIntensity $intensity, int $limit = 0): int;
 }

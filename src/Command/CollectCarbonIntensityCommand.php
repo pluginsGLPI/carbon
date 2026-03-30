@@ -59,6 +59,8 @@ class CollectCarbonIntensityCommand extends AbstractCommand
 {
     /** @var int ID of the data source being processed */
     private int $source_id;
+    /** @var Source_Zone The relatin between a source and a zone to describe which data to download and save */
+    private Source_Zone $source_zone;
     private ?ClientInterface $client = null;
     private array $zones = [];
 
@@ -122,18 +124,13 @@ class CollectCarbonIntensityCommand extends AbstractCommand
         $message = __('Creating data source name', 'carbon');
         $output->writeln("<info>$message</info>");
 
-        // Create the source if it does not exist
+        // Check the source exists
         $data_source = new Source();
         $source_name = $input->getArgument('source');
         if (!$data_source->getFromDBByCrit(['name' => $source_name])) {
-            $data_source->add([
-                'name' => $source_name,
-            ]);
-            if ($data_source->isNewItem()) {
-                $message = __("Source not found", 'carbon');
-                $output->writeln("<error>$message</error>");
-                return Command::FAILURE;
-            }
+            $message = __("This source does not exist", 'casrbon');
+            $output->writeln("<error>$message</error>");
+            return Command::FAILURE;
         }
         $this->source_id = $data_source->getID();
 
@@ -143,7 +140,7 @@ class CollectCarbonIntensityCommand extends AbstractCommand
         $zone->getFromDBByCrit(['name' => $this->zones[$zone_code]]);
         $carbon_intensity = new CarbonIntensity();
 
-        // Create relation between source and zone if t does not exist
+        // Check the relation between source and zone
         $source_zone = new Source_Zone();
         $input = [
             $data_source::getForeignKeyField() => $data_source->getID(),
@@ -151,14 +148,11 @@ class CollectCarbonIntensityCommand extends AbstractCommand
         ];
         $source_zone->getFromDbByCrit($input);
         if ($source_zone->isNewItem()) {
-            $input['is_download_enabled'] = 1;
-            $input['code'] = $zone_code;
-            if ($source_zone->add($input) === false) {
-                $message = __("Creation of relation between source and zone failed", 'carbon');
-                $output->writeln("<error>$message</error>");
-                return Command::FAILURE;
-            }
+            $message = __("The zone is not handled by the data source", 'casrbon');
+            $output->writeln("<error>$message</error>");
+            return Command::FAILURE;
         }
+        $this->source_zone = $source_zone;
 
         $message = __("Reading data...", 'carbon');
         $output->writeln("<info>$message</info>");
@@ -172,11 +166,11 @@ class CollectCarbonIntensityCommand extends AbstractCommand
             $this->client->disableCache();
         }
 
-        $carbon_intensity->downloadOneZone($this->client, $this->zones[$zone_code], 0, new ProgressBar($this->output));
+        $carbon_intensity->downloadOneZone($this->client, $this->source_zone, 0, new ProgressBar($this->output));
 
         // Find start and stop dates to cover
         $start_date = $carbon_intensity->getDownloadStartDate();
-        $gaps = $carbon_intensity->findGaps($this->source_id, $zone->getID(), $start_date);
+        $gaps = $carbon_intensity->findGaps($this->source_zone, $start_date);
 
         // Count the hours not covered by any sample
         $not_downlaoded_hours = 0;

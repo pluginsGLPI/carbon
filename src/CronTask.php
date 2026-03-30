@@ -273,18 +273,18 @@ class CronTask extends CommonGLPI
             $task->addVolume($done_count);
         }
 
-        $zones = $data_source->getZones(['is_download_enabled' => 1]);
-        if (count($zones) === 0) {
+        $rows = $data_source->getSourceZones(['is_download_enabled' => 1]);
+        if (count($rows) === 0) {
             trigger_error(__('No zone to download', 'carbon'), E_USER_WARNING);
             return 0;
         }
 
-        $limit_per_zone = max(1, floor(($remaining) / count($zones)));
+        $limit_per_zone = max(1, floor(($remaining) / count($rows)));
         $count = 0;
-        foreach ($zones as $zone) {
-            $zone_name = $zone['name'];
+        foreach ($rows as $row) {
+            $source_zone = Source_Zone::getById($row['id']);
             try {
-                $added = $intensity->downloadOneZone($data_source, $zone_name, $limit_per_zone);
+                $added = $intensity->downloadOneZone($data_source, $source_zone, $limit_per_zone);
             } catch (RuntimeException $e) {
                 trigger_error($e->getMessage(), E_USER_WARNING);
                 continue;

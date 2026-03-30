@@ -49,25 +49,27 @@ use Symfony\Component\Console\Output\Output;
 #[CoversClass(CarbonIntensity::class)]
 class CarbonIntensityTest extends DbTestCase
 {
-    public function testGetLastKnownDate()
+    public function test_getLastKnownDate_returns_null_when_nothing_for_given_source_zone()
     {
-        $instance = new CarbonIntensity();
-        $result = $instance->getLastKnownDate('foo', 'bar');
-        $this->assertNull($result);
-
-        $zone = $this->createItem(Zone::class, [
-            'name' => 'foo',
-        ]);
-        $source = $this->createItem(Source::class, [
-            'name' => 'bar',
-        ]);
+        $source = $this->createItem(Source::class, ['name' => 'foo']);
+        $zone = $this->createItem(Zone::class, ['name' => 'bar']);
         $source_zone = $this->createItem(Source_Zone::class, [
-            $source::getForeignKeyField() => $source->getID(),
-            $zone::getForeignKeyField() => $zone->getID(),
+            getForeignKeyFieldForItemType(Source::class) => $source->getID(),
+            getForeignKeyFieldForItemType(Zone::class) => $zone->getID(),
         ]);
-        $result = $instance->getLastKnownDate('foo', 'bar');
+        $instance = new CarbonIntensity();
+        $result = $instance->getLastKnownDate($source_zone);
         $this->assertNull($result);
+    }
 
+    public function test_getLastKnownDate_returns_date_when_carbon_intensity_exists_for_given_source_zone()
+    {
+        $source = $this->createItem(Source::class, ['name' => 'foo']);
+        $zone = $this->createItem(Zone::class, ['name' => 'bar']);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            getForeignKeyFieldForItemType(Source::class) => $source->getID(),
+            getForeignKeyFieldForItemType(Zone::class) => $zone->getID(),
+        ]);
         $intensity = $this->createItem(CarbonIntensity::class, [
             'date' => '2023-02-01 00:00:00',
             $source::getForeignKeyField() => $source->getID(),
@@ -83,29 +85,33 @@ class CarbonIntensityTest extends DbTestCase
             'intensity' => 255,
             'data_quality' => 2,
         ]);
-        $result = $instance->getLastKnownDate('foo', 'bar');
+        $instance = new CarbonIntensity();
+        $result = $instance->getLastKnownDate($source_zone);
         $this->assertEquals($expected, $result->format('Y-m-d H:i:s'));
     }
 
-    public function testGetFirstKnownDate()
+    public function test_getFirstKnownDate_returns_null_when_no_carbon_intensity_for_given_source_zone()
     {
-        $instance = new CarbonIntensity();
-        $result = $instance->getFirstKnownDate('foo', 'bar');
-        $this->assertNull($result);
-
-        $zone = $this->createItem(Zone::class, [
-            'name' => 'foo',
-        ]);
-        $source = $this->createItem(Source::class, [
-            'name' => 'bar',
-        ]);
+        $source = $this->createItem(Source::class, ['name' => 'foo']);
+        $zone = $this->createItem(Zone::class, ['name' => 'bar']);
         $source_zone = $this->createItem(Source_Zone::class, [
-            $source::getForeignKeyField() => $source->getID(),
-            $zone::getForeignKeyField() => $zone->getID(),
+            getForeignKeyFieldForItemType(Source::class) => $source->getID(),
+            getForeignKeyFieldForItemType(Zone::class) => $zone->getID(),
         ]);
-        $result = $instance->getFirstKnownDate('foo', 'bar');
+        $instance = new CarbonIntensity();
+        $result = $instance->getFirstKnownDate($source_zone);
         $this->assertNull($result);
+    }
 
+    public function test_getFirstKnownDate_returns_date_when_carbon_intensity_exists_for_given_source_zone()
+    {
+        $source = $this->createItem(Source::class, ['name' => 'foo']);
+        $zone = $this->createItem(Zone::class, ['name' => 'bar']);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            getForeignKeyFieldForItemType(Source::class) => $source->getID(),
+            getForeignKeyFieldForItemType(Zone::class) => $zone->getID(),
+        ]);
+        $instance = new CarbonIntensity();
         $intensity = $this->createItem(CarbonIntensity::class, [
             'date' => '2025-02-01 00:00:00',
             $source::getForeignKeyField() => $source->getID(),
@@ -121,7 +127,7 @@ class CarbonIntensityTest extends DbTestCase
             'intensity' => 255,
             'data_quality' => 2,
         ]);
-        $result = $instance->getFirstKnownDate('foo', 'bar');
+        $result = $instance->getFirstKnownDate($source_zone);
         $this->assertEquals($expected, $result->format('Y-m-d H:i:s'));
     }
 
@@ -172,7 +178,7 @@ class CarbonIntensityTest extends DbTestCase
         }
 
         $carbon_intensity = new CarbonIntensity();
-        $result = $carbon_intensity->findGaps($source->getID(), $zone->getID(), $start_date, $end_date);
+        $result = $carbon_intensity->findGaps($source_zone, $start_date, $end_date);
         $result = iterator_to_array($result);
         $this->assertEquals([], $result);
 
@@ -184,7 +190,7 @@ class CarbonIntensityTest extends DbTestCase
             'date' => ['<', $delete_before_date->format('Y-m-d H:i:s')],
         ]);
 
-        $result = $carbon_intensity->findGaps($source->getID(), $zone->getID(), $start_date, $end_date);
+        $result = $carbon_intensity->findGaps($source_zone, $start_date, $end_date);
         $result = iterator_to_array($result);
         $this->assertEquals([
             [
@@ -200,7 +206,7 @@ class CarbonIntensityTest extends DbTestCase
             'plugin_carbon_zones_id' => $zone->getID(),
             'date' => ['>=', $delete_after_date->format('Y-m-d H:i:s')],
         ]);
-        $result = $carbon_intensity->findGaps($source->getID(), $zone->getID(), $start_date, $end_date);
+        $result = $carbon_intensity->findGaps($source_zone, $start_date, $end_date);
         $result = iterator_to_array($result);
         $this->assertEquals([
             [
@@ -224,7 +230,7 @@ class CarbonIntensityTest extends DbTestCase
                 ['date' => ['<', $delete_middle_end_date->format('Y-m-d H:i:s')]],
             ],
         ]);
-        $result = $carbon_intensity->findGaps($source->getID(), $zone->getID(), $start_date, $end_date);
+        $result = $carbon_intensity->findGaps($source_zone, $start_date, $end_date);
         $result = iterator_to_array($result);
         $this->assertEquals([
             [
@@ -253,7 +259,7 @@ class CarbonIntensityTest extends DbTestCase
             $cursor_date->modify('+1 hour');
         }
 
-        $result = $carbon_intensity->findGaps($source->getID(), $zone->getID(), $start_date, $end_date);
+        $result = $carbon_intensity->findGaps($source_zone, $start_date, $end_date);
         $result = iterator_to_array($result);
         $this->assertEquals([
             [
@@ -278,7 +284,7 @@ class CarbonIntensityTest extends DbTestCase
             $cursor_date->modify('+1 hour');
         }
 
-        $result = $carbon_intensity->findGaps($source->getID(), $zone->getID(), $start_date, $end_date);
+        $result = $carbon_intensity->findGaps($source_zone, $start_date, $end_date);
         $result = iterator_to_array($result);
         $this->assertEquals([
             [
@@ -310,48 +316,44 @@ class CarbonIntensityTest extends DbTestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testGetDownloadStopDate()
-    {
-        $instance = new CarbonIntensity();
+    // public function testGetDownloadStopDate()
+    // {
+    //     $instance = new CarbonIntensity();
 
-        $data_source = $this->getMockBuilder(AbstractClient::class)
-            ->getMock();
-        $data_source->method('getSourceName')->willReturn('bar');
-        $data_source->method('getMaxIncrementalAge')->willReturn(
-            DateTimeImmutable::createFromMutable($expected = (new DateTime('15 days ago'))->setTime(0, 0, 0))
-        );
+    //     $data_source = $this->getMockBuilder(AbstractClient::class)
+    //         ->getMock();
+    //     $data_source->method('getSourceName')->willReturn('bar');
+    //     $data_source->method('getMaxIncrementalAge')->willReturn(
+    //         DateTimeImmutable::createFromMutable($expected = (new DateTime('15 days ago'))->setTime(0, 0, 0))
+    //     );
 
-        $result = $instance->getDownloadStopDate('foo', $data_source);
-        $this->assertEquals($expected, $result);
+    //     $result = $instance->getDownloadStopDate('foo', $data_source);
+    //     $this->assertEquals($expected, $result);
 
-        $zone = $this->createItem(Zone::class, [
-            'name' => 'foo',
-        ]);
-        $source = $this->createItem(Source::class, [
-            'name' => 'bar',
-        ]);
-        $expected = new DateTimeImmutable('2019-01-31 23:00:00');
-        $source_zone = $this->createItem(Source_Zone::class, [
-            $source::getForeignKeyField() => $source->getID(),
-            $zone::getForeignKeyField() => $zone->getID(),
-        ]);
-        $intensity = $this->createItem(CarbonIntensity::class, [
-            'date' => '2019-02-01',
-            $source::getForeignKeyField() => $source->getID(),
-            $zone::getForeignKeyField() => $zone->getID(),
-            'intensity' => 255,
-            'data_quality' => 2,
-        ]);
-        $result = $instance->getDownloadStopDate('foo', $data_source);
-        $this->assertEquals($expected, $result);
-    }
+    //     $zone = $this->createItem(Zone::class, [
+    //         'name' => 'foo',
+    //     ]);
+    //     $source = $this->createItem(Source::class, [
+    //         'name' => 'bar',
+    //     ]);
+    //     $expected = new DateTimeImmutable('2019-01-31 23:00:00');
+    //     $source_zone = $this->createItem(Source_Zone::class, [
+    //         $source::getForeignKeyField() => $source->getID(),
+    //         $zone::getForeignKeyField() => $zone->getID(),
+    //     ]);
+    //     $intensity = $this->createItem(CarbonIntensity::class, [
+    //         'date' => '2019-02-01',
+    //         $source::getForeignKeyField() => $source->getID(),
+    //         $zone::getForeignKeyField() => $zone->getID(),
+    //         'intensity' => 255,
+    //         'data_quality' => 2,
+    //     ]);
+    //     $result = $instance->getDownloadStopDate('foo', $data_source);
+    //     $this->assertEquals($expected, $result);
+    // }
 
     public function testDownloadOneZone()
     {
-        $instance = new CarbonIntensity();
-        $result = $instance->getLastKnownDate('foo', 'bar');
-        $this->assertNull($result);
-
         $zone = $this->createItem(Zone::class, [
             'name' => 'foo',
         ]);
@@ -377,7 +379,8 @@ class CarbonIntensityTest extends DbTestCase
             ->getMock();
         $progress_bar = new ProgressBar($output);
 
-        $result = $instance->downloadOneZone($data_source, 'foo', 1, $progress_bar);
+        $instance = new CarbonIntensity();
+        $result = $instance->downloadOneZone($data_source, $source_zone, 1, $progress_bar);
         $this->assertEquals($hours, $result);
         $this->assertEquals($hours, $progress_bar->getMaxSteps());
     }

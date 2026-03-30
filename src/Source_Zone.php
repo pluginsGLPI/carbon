@@ -514,8 +514,7 @@ class Source_Zone extends CommonDBRelation
         $carbon_intensity = new CarbonIntensity();
         $zone_id = $this->fields['plugin_carbon_zones_id'];
         $entries = $carbon_intensity->findGaps(
-            $this->fields['plugin_carbon_sources_id'],
-            $this->fields['plugin_carbon_zones_id'],
+            $this,
             $oldest_asset_date
         );
 
