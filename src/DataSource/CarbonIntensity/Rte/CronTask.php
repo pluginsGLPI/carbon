@@ -45,6 +45,9 @@ use GlpiPlugin\Carbon\Source_Zone;
 
 class CronTask extends AbstractCronTask implements CronTaskInterface
 {
+    private const TAB_DIAGNOSIS = 0;
+    private const TAB_CACHE = 1;
+
     public static function getIcon()
     {
         return 'fa-solid fa-gears';
@@ -52,22 +55,32 @@ class CronTask extends AbstractCronTask implements CronTaskInterface
 
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
-        return self::createTabEntry(__('Resource diagnosis', 'carbon'), 0);
+        return [
+            self::TAB_DIAGNOSIS => self::createTabEntry(__('Resource diagnosis', 'carbon'), 0),
+            // self::TAB_CACHE => self::createTabEntry(__('Cache', 'carbon'), 0),
+        ];
     }
 
-    public function showForCronTask(CommonDBTM $item)
+    public function showForCronTask(CommonDBTM $item, int $tabnum)
     {
-        switch ($item->fields['name']) {
-            case 'DownloadRte':
-                $client = new Client(new RestApiClient());
-                $source_name = ($client)->getSourceName();
-                foreach ($client->getSupportedZones() as $zone_name) {
-                    $source_zone = new Source_Zone();
-                    if (!$source_zone->getFromDbBySourceAndZone($source_name, $zone_name)) {
-                        continue;
+        if ($tabnum === self::TAB_DIAGNOSIS) {
+            switch ($item->fields['name']) {
+                case 'DownloadRte':
+                    $client = new Client(new RestApiClient());
+                    $source_name = ($client)->getSourceName();
+                    foreach ($client->getSupportedZones() as $zone_name) {
+                        $source_zone = new Source_Zone();
+                        if (!$source_zone->getFromDbBySourceAndZone($source_name, $zone_name)) {
+                            continue;
+                        }
+                        $source_zone->showGaps();
                     }
-                    $source_zone->showGaps();
-                }
+            }
+        } elseif ($tabnum === self::TAB_CACHE) {
+            switch ($item->fields['name']) {
+                case 'DownloadElectricityMap':
+                    // TODO: implement tab to clear cached data in files/ folder
+            }
         }
     }
 
