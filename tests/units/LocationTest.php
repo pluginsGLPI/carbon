@@ -51,6 +51,47 @@ use PHPUnit\Framework\Attributes\CoversClass;
 #[CoversClass(Location::class)]
 class LocationTest extends DbTestCase
 {
+    public function test_prepareInputForUpdate_sets_source_zone_when_source_and_zone_are_specified()
+    {
+        $source = $this->createItem(Source::class);
+        $zone = $this->createItem(Zone::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            getForeignKeyFieldForItemType(Source::class) => $source->getID(),
+            getForeignKeyFieldForItemType(Zone::class) => $zone->getID(),
+        ]);
+        $input = [
+            'id' => 1,
+            getForeignKeyFieldForItemType(Source::class) => $source->getID(),
+            getForeignKeyFieldForItemType(Zone::class) => $zone->getID(),
+        ];
+        $instance = new Location();
+        $result = $instance->prepareInputForUpdate($input);
+        $expected = [
+            'id' => 1,
+            getForeignKeyFieldForItemType(Source::class) => $source->getID(),
+            getForeignKeyFieldForItemType(Zone::class) => $zone->getID(),
+            getForeignKeyFieldForItemType(Source_Zone::class) => $source_zone->getID(),
+        ];
+        $this->assertSame($expected, $result);
+    }
+
+    public function test_prepareInputForUpdate_resets_source_zone_when_source_is_0()
+    {
+        // This happens when the user removes the affectation of a location to a carbon intensity source and zone
+        $input = [
+            'id' => 1,
+            getForeignKeyFieldForItemType(Source::class) => 0,
+        ];
+        $instance = new Location();
+        $result = $instance->prepareInputForUpdate($input);
+        $expected = [
+            'id' => 1,
+            getForeignKeyFieldForItemType(Source::class) => 0,
+            getForeignKeyFieldForItemType(Source_Zone::class) => 0,
+        ];
+        $this->assertSame($expected, $result);
+    }
+
     /**
      * #CoversMethod GlpiPlugin\Carbon\Location::onGlpiLocationAdd
      * #CoversMethod GlpiPlugin\Carbon\Location::setBoaviztaZone
