@@ -80,13 +80,13 @@ class LocationTest extends DbTestCase
         // This happens when the user removes the affectation of a location to a carbon intensity source and zone
         $input = [
             'id' => 1,
-            getForeignKeyFieldForItemType(Source::class) => 0,
+            getForeignKeyFieldForItemType(Source::class) => '0',
         ];
         $instance = new Location();
         $result = $instance->prepareInputForUpdate($input);
         $expected = [
             'id' => 1,
-            getForeignKeyFieldForItemType(Source::class) => 0,
+            getForeignKeyFieldForItemType(Source::class) => '0',
             getForeignKeyFieldForItemType(Source_Zone::class) => 0,
         ];
         $this->assertSame($expected, $result);
