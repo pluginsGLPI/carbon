@@ -73,7 +73,7 @@ TWIG;
         }
         $twig .= <<<TWIG
         <div>
-            <p>{{ __('Geocoding converts a location into a ISO 3166 (3 letters) code. Boavizta needs this to determine usage impacts of assets. This feature sends the address stored in a location to nominatim.org service. If this is an issue, you can disable it below, and fill the coutry code manually.', 'carbon') }}</p>
+            <p>{{ __('Geocoding converts a location into a ISO 3166 (3 letters) country code. Boavizta needs this to determine usage impacts of assets. This feature sends the address stored in a location to nominatim.org service. If this is an issue, you can disable it below, and fill the coutry code manually.', 'carbon') }}</p>
         </div>
 
         {{ fields.checkboxField(
