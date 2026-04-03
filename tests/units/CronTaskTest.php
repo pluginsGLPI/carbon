@@ -44,56 +44,87 @@ use Geocoder\Provider\Nominatim\Model\NominatimAddress;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CronTask;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientInterface;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
+use GlpiPlugin\Carbon\Zone;
 use Location as GlpiLocation;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(CronTask::class)]
 class CronTaskTest extends DbTestCase
 {
-    public function downloadSourceProvider()
+    public function test_downloadCarbonIntensityFromSource_returns_0_when_no_data_is_downloaded()
     {
-        $data_source1 = $this->createStub(ClientInterface::class);
-        $data_source1->method('getZones')->willReturn([['name' => 'test_zone']]);
-        $intensity1 = $this->createStub(CarbonIntensity::class);
-        $intensity1->method('downloadOneZone')->willReturn(0);
-        yield 'download empty data' => [
-            $data_source1,
-            $intensity1,
-            0,
-        ];
+        $source = $this->createItem(Source::class);
+        $zone = $this->createItem(Zone::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            $source->getForeignKeyField() => $source->getID(),
+            $zone->getForeignKeyField() => $zone->getID(),
+            'code' => 'FOO',
+            'is_download_enabled' => 1,
+        ]);
 
-        $data_source2 = $this->createStub(ClientInterface::class);
-        $data_source2->method('getZones')->willReturn([['name' => 'test_zone']]);
-        $intensity2 = $this->createStub(CarbonIntensity::class);
-        $intensity2->method('downloadOneZone')->willReturn(1024);
-        yield 'download complete' => [
-            $data_source2,
-            $intensity2,
-            1,
-        ];
-
-        $data_source3 = $this->createStub(ClientInterface::class);
-        $data_source3->method('getZones')->willReturn([['name' => 'test_zone']]);
-        $intensity3 = $this->createStub(CarbonIntensity::class);
-        $intensity3->method('downloadOneZone')->willReturn(-5);
-        yield 'download incomplete' => [
-            $data_source3,
-            $intensity3,
-            -1,
-        ];
+        $data_source = $this->createStub(ClientInterface::class);
+        $data_source->method('getZones')->willReturn([['name' => 'FOO']]);
+        $data_source->method('isZoneSetupComplete')->willReturn(true);
+        $data_source->method('getSourceZones')->willReturn([$source_zone->fields]);
+        $carbon_intensity = $this->createStub(CarbonIntensity::class);
+        $carbon_intensity->method('downloadOneZone')->willReturn(0);
+        $cron_task = new CronTask();
+        $glpi_cron_task = new GlpiCronTask();
+        $glpi_cron_task->fields['param'] = 1000;
+        $output = $cron_task->downloadCarbonIntensityFromSource($glpi_cron_task, $data_source, $carbon_intensity);
+        $this->assertEquals(0, $output);
     }
 
-    public function testDownloadCarbonIntensityFromSource()
+    public function test_downloadCarbonIntensityFromSource_returns_1_when_a_positive_count_of_samples_are_downloaded()
     {
-        foreach ($this->downloadSourceProvider() as $data) {
-            [$data_source, $intensity, $expected] = $data;
-            $cron_task = new CronTask();
-            $glpi_cron_task = new GlpiCronTask();
-            $glpi_cron_task->fields['param'] = 1000;
-            $output = $this->callPrivateMethod($cron_task, 'downloadCarbonIntensityFromSource', $glpi_cron_task, $data_source, $intensity);
+        $source = $this->createItem(Source::class);
+        $zone = $this->createItem(Zone::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            $source->getForeignKeyField() => $source->getID(),
+            $zone->getForeignKeyField() => $zone->getID(),
+            'code' => 'FOO',
+            'is_download_enabled' => 1,
+        ]);
 
-            $this->assertEquals($expected, $output);
-        }
+        $data_source = $this->createStub(ClientInterface::class);
+        $data_source->method('getZones')->willReturn([['name' => 'FOO']]);
+        $data_source->method('isZoneSetupComplete')->willReturn(true);
+        $data_source->method('getSourceZones')->willReturn([$source_zone->fields]);
+        $carbon_intensity = $this->createStub(CarbonIntensity::class);
+        $carbon_intensity->method('downloadOneZone')->willReturn(1024);
+        $cron_task = new CronTask();
+        $glpi_cron_task = new GlpiCronTask();
+        $glpi_cron_task->fields['param'] = 1000;
+        $output = $cron_task->downloadCarbonIntensityFromSource($glpi_cron_task, $data_source, $carbon_intensity);
+        $this->assertEquals(1, $output);
+    }
+
+    public function test_downloadCarbonIntensityFromSource_returns_minus_1_when_a_negative_count_of_samples_are_downloaded()
+    {
+        // When the count of downloaded samples is negative the count is this absolute value,
+        // and the negative sign means that an error occurred
+        $source = $this->createItem(Source::class);
+        $zone = $this->createItem(Zone::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            $source->getForeignKeyField() => $source->getID(),
+            $zone->getForeignKeyField() => $zone->getID(),
+            'code' => 'FOO',
+            'is_download_enabled' => 1,
+        ]);
+
+        $data_source = $this->createStub(ClientInterface::class);
+        $data_source->method('getZones')->willReturn([['name' => 'FOO']]);
+        $data_source->method('isZoneSetupComplete')->willReturn(true);
+        $data_source->method('getSourceZones')->willReturn([$source_zone->fields]);
+        $carbon_intensity = $this->createStub(CarbonIntensity::class);
+        $carbon_intensity->method('downloadOneZone')->willReturn(-5);
+        $cron_task = new CronTask();
+        $glpi_cron_task = new GlpiCronTask();
+        $glpi_cron_task->fields['param'] = 1000;
+        $output = $cron_task->downloadCarbonIntensityFromSource($glpi_cron_task, $data_source, $carbon_intensity);
+        $this->assertEquals(-1, $output);
     }
 
     public function testFillIncompleteLocations()

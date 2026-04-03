@@ -114,29 +114,32 @@ class Client extends AbstractClient
         try {
             $zones = $this->queryZones();
         } catch (RuntimeException $e) {
-            return 0;
+            return -1;
         }
 
         $count = 0;
         $failed = false;
         foreach ($zones as $zone_key => $zone_spec) {
-            $zone_input = [
-                'name' => $zone_spec['zoneName'],
-            ];
             $zone = new Zone();
-            if ($zone->getFromDbByCrit($zone_input) === false) {
-                if ($zone->add($zone_input) === false) {
-                    $failed = true;
-                    continue;
-                }
+            $zone->getOrCreate([], [
+                'name' => $zone_spec['zoneName'],
+            ]);
+            if ($zone->isNewItem()) {
+                $failed = true;
+                continue;
             }
             $source_zone = new Source_Zone();
-            $source_zone->add([
-                Source::getForeignKeyField() => $source_id,
-                Zone::getForeignKeyField() => $zone->getID(),
+            $source_zone->getOrCreate([
                 'code' => $zone_key,
                 'is_download_enabled' => Toolbox::isLocationExistForZone($zone->fields['name']),
+            ], [
+                Source::getForeignKeyField() => $source_id,
+                Zone::getForeignKeyField() => $zone->getID(),
             ]);
+            if ($source_zone->isNewItem()) {
+                $failed = true;
+                continue;
+            }
             $count++;
         }
 
@@ -198,10 +201,8 @@ class Client extends AbstractClient
      *
      * The method fetches the intensities for the date range specified in argument.
      */
-    public function fetchDay(DateTimeImmutable $day, string $zone): array
+    public function fetchDay(DateTimeImmutable $day, Source_Zone $source_zone): array
     {
-        $source_zone = new Source_Zone();
-        $source_zone->getFromDbBySourceAndZone($this->getSourceName(), $zone);
         $zone_code = $source_zone->fields['code'];
 
         if ($zone_code === null) {
@@ -252,26 +253,27 @@ class Client extends AbstractClient
 
         // Filter out already existing entries
         $carbon_intensity = new CarbonIntensity();
-        $last_known_date = $carbon_intensity->getLastKnownDate($zone, $this->getSourceName());
+        $last_known_date = $carbon_intensity->getLastKnownDate($source_zone);
         $intensities = array_filter($intensities, function ($intensity) use ($last_known_date) {
             $intensity_date = DateTime::createFromFormat('Y-m-d\TH:i:s', $intensity['datetime']);
             return $intensity_date > $last_known_date;
         });
 
+        $zone = Zone::getById($source_zone->fields[getForeignKeyFieldForItemType(Zone::class)]);
+        $zone_name = $zone->fields['name'];
         return [
             'source' => $this->getSourceName(),
-            $zone => $intensities,
+            $zone_name => $intensities,
         ];
     }
 
-    public function fetchRange(DateTimeImmutable $start, DateTimeImmutable $stop, string $zone): array
+    public function fetchRange(DateTimeImmutable $start, DateTimeImmutable $stop, Source_Zone $source_zone): array
     {
-        // TODO: get zones from GLPI locations
-        $params = [
-            'zone' => $zone,
-        ];
-
-        $base_path = GLPI_PLUGIN_DOC_DIR . '/carbon/carbon_intensity/' . $this->getSourceName() . '/' . $zone;
+        $is_free_plan = Config::getConfigurationValue('electricitymap_fake_data') ?? 0;
+        $dataset = $is_free_plan ? 'fake' : 'real';
+        $zone = new Zone();
+        $zone->getFromDBByCrit(['id' => $source_zone->fields[Zone::getForeignKeyField()]]);
+        $base_path = GLPI_PLUGIN_DOC_DIR . '/carbon/carbon_intensity/' . $this->getSourceName() . '/' . $dataset . '/' . $zone->fields['name'];
         $cache_file = $this->getCacheFilename(
             $base_path,
             $start,
@@ -293,24 +295,47 @@ class Client extends AbstractClient
         }
 
         // Set timezone to +00:00 and extend range by 12 hours on each side
-        $request_start = $start->setTimezone(new DateTimeZone('+0000'))->sub(new DateInterval('PT12H'));
-        $request_stop = $stop->setTimezone(new DateTimeZone('+0000'))->add(new DateInterval('PT12H'));
+        $timezone_z = new DateTimeZone('+0000');
+        $request_start = $start->setTimezone($timezone_z)->sub(new DateInterval('PT12H'));
+        $request_stop = $stop->setTimezone($timezone_z)->add(new DateInterval('PT14H'));
         $this->step = 60;
 
-        $step = new DateInterval('P10D');
+        $step = new DateInterval('PT240H');
         $full_response = [];
         $current_date = DateTime::createFromImmutable($request_start);
+        $glpikey = new GLPIKey();
+        $api_key = Config::getConfigurationValue('electricitymap_api_key');
+        $api_key = $glpikey->decrypt($api_key);
         while ($current_date < $request_stop) {
-            $response = $this->client->request('GET', $this->base_url . self::PAST_URL, ['query' => $params]);
+            $stop = clone $current_date;
+            $stop->add($step);
+            // For some reason, passing the parameters as a query stringthrough Guzzle
+            // Makes the request malformed from the point of view of Electricitymaps
+            // Workarounded by building here the query string
+            // $params = [
+            //     'zone' => $source_zone->fields['code'],
+            //     'start' => $current_date->format('Y-m-d\+H:i'),
+            //     'end' => $stop->format('Y-m-d\+H:i'),
+            // ];
+            $url = $this->base_url . self::PAST_URL;
+            $url .= '?zone=' . $source_zone->fields['code'];
+            $url .= '&start=' . $current_date->format('Y-m-d\+H:i');
+            $url .= '&end=' . $stop->format('Y-m-d\+H:i');
+            $url .= '&temporalGranularity=' . 'hourly';
+            $url .= '&emissionFactorType=' . 'lifecycle';
+            $response = $this->client->request('GET', $url, [/*'query' => $params,*/ 'headers' => ['auth-token' => $api_key]]);
+            if (isset($response['status']) && $response['status'] === 'error') {
+                trigger_error('Electricity maps API error: ' . $response['message'], E_USER_ERROR);
+            }
+            if (isset($response['error'])) {
+                trigger_error('Electricity maps API error: ' . $response['error'], E_USER_ERROR);
+            }
             if (!$full_response) {
                 $full_response = $response;
             } else {
                 $full_response['data'] = array_merge($full_response['data'], $response['data']);
             }
-            $current_date->add($step);
-            if ($current_date > $request_stop) {
-                $current_date = $request_stop;
-            }
+            $current_date = min($request_stop, $stop);
         }
         if (!$full_response) {
             return [];
@@ -325,8 +350,11 @@ class Client extends AbstractClient
             return [];
         }
 
-        $json = json_encode($full_response);
-        file_put_contents($cache_file, $json);
+        $downloaded_year_month = $start->format('Y-m');
+        if (count($full_response) > 0 && $downloaded_year_month < date('Y-m')) {
+            $json = json_encode($full_response);
+            file_put_contents($cache_file, $json);
+        }
         return $full_response['data'];
     }
 
@@ -348,14 +376,11 @@ class Client extends AbstractClient
             ];
         }
 
-        return [
-            'source' => $this->getSourceName(),
-            $response['zone'] => $intensities,
-        ];
+        return $intensities;
     }
 
     /**
-     * Try ti determine the data quality of record
+     * Try to determine the data quality of record
      *
      * @param array $record
      * @return int
@@ -370,32 +395,34 @@ class Client extends AbstractClient
         return $data_quality;
     }
 
-    public function incrementalDownload(string $zone, DateTimeImmutable $start_date, CarbonIntensity $intensity, int $limit = 0): int
+    public function incrementalDownload(Source_Zone $source_zone, DateTimeImmutable $start_date, CarbonIntensity $intensity, int $limit = 0): int
     {
         $count = 0;
         $saved = 0;
         try {
-            $data = $this->fetchDay(new DateTimeImmutable(), $zone);
+            $data = $this->fetchDay(new DateTimeImmutable(), $source_zone);
         } catch (AbortException $e) {
             throw $e;
         }
-        $saved = $intensity->save($zone, $this->getSourceName(), $data[$zone]);
+        $zone = Zone::getById($source_zone->fields[Zone::getForeignKeyField()]);
+        $saved = $intensity->save($source_zone, $data[$zone->fields['name']]);
         $count += abs($saved);
-        if ($limit > 0 && $count >= $limit) {
-            return $saved > 0 ? $count : -$count;
-        }
 
         return $saved > 0 ? $count : -$count;
     }
 
-    public function fullDownload(string $zone, DateTimeImmutable $start_date, DateTimeImmutable $stop_date, CarbonIntensity $intensity, int $limit = 0, ?ProgressBar $progress = null): int
+    public function fullDownload(Source_Zone $source_zone, DateTimeImmutable $start_date, DateTimeImmutable $stop_date, CarbonIntensity $intensity, int $limit = 0, ?ProgressBar $progress = null): int
     {
-        // TODO : implement progress bar
+        $use_free_plan = (int) Config::getConfigurationValue('electricitymap_free_plan');
+        if ($use_free_plan === 0) {
+            return parent::fullDownload($source_zone, $start_date, $stop_date, $intensity, $limit);
+        }
+
         // Disable full download because we miss documentation for PAST_URL endpoint
         $start_date = new DateTime('24 hours ago');
         $start_date->setTime((int) $start_date->format('H'), 0, 0);
         $start_date = DateTimeImmutable::createFromMutable($start_date);
-        return $this->incrementalDownload($zone, $start_date, $intensity, $limit);
+        return $this->incrementalDownload($source_zone, $start_date, $intensity, $limit);
     }
 
     protected function sliceDateRangeByDay(DateTimeImmutable $start, DateTimeImmutable $stop)

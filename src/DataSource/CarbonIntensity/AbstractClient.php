@@ -36,6 +36,7 @@ use Config as GlpiConfig;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
+use DateTimeZone;
 use DBmysql;
 use Generator;
 use GlpiPlugin\Carbon\CarbonIntensity;
@@ -61,24 +62,24 @@ abstract class AbstractClient implements ClientInterface
      * Download all data for a single day from the datasource
      *
      * @param DateTimeImmutable $day
-     * @param string $zone
+     * @param Source_Zone $source_zone
      * @return array
      *
      * @throws AbortException if an error requires to stop all subsequent fetches
      */
-    abstract public function fetchDay(DateTimeImmutable $day, string $zone): array;
+    abstract public function fetchDay(DateTimeImmutable $day, Source_Zone $source_zone): array;
 
     /**
      * Download a range if data from the data source
      *
      * @param DateTimeImmutable $start
      * @param DateTimeImmutable $stop
-     * @param string $zone
+     * @param Source_Zone $source_zone
      * @return array
      *
      * @throws AbortException if an error requires to stop all subsequent fetches
      */
-    abstract public function fetchRange(DateTimeImmutable $start, DateTimeImmutable $stop, string $zone): array;
+    abstract public function fetchRange(DateTimeImmutable $start, DateTimeImmutable $stop, Source_Zone $source_zone): array;
 
     public function disableCache()
     {
@@ -139,7 +140,9 @@ abstract class AbstractClient implements ClientInterface
         $zone_fk = Zone::getForeignKeyField();
         $source_zone_table = Source_Zone::getTable();
         $iterator = $DB->request([
-            'SELECT' => Zone::getTableField('name'),
+            'SELECT' => [
+                Zone::getTableField('name'),
+            ],
             'FROM' => $zone_table,
             'INNER JOIN' => [
                 $source_zone_table => [
@@ -163,7 +166,44 @@ abstract class AbstractClient implements ClientInterface
         return iterator_to_array($iterator);
     }
 
-    public function fullDownload(string $zone, DateTimeImmutable $start_date, DateTimeImmutable $stop_date, CarbonIntensity $intensity, int $limit = 0, ?ProgressBar $progress_bar = null): int
+    public function getSourceZones(array $crit = []): array
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        $source_table = Source::getTable();
+        $source_fk = Source::getForeignKeyField();
+        $zone_table = Zone::getTable();
+        $zone_fk = Zone::getForeignKeyField();
+        $source_zone_table = Source_Zone::getTable();
+        $iterator = $DB->request([
+            'SELECT' => [
+                getTableForItemType(Source_Zone::class) . '.*',
+            ],
+            'FROM' => $zone_table,
+            'INNER JOIN' => [
+                $source_zone_table => [
+                    'ON' => [
+                        $zone_table => 'id',
+                        $source_zone_table => $zone_fk,
+                    ],
+                ],
+                $source_table => [
+                    'ON' => [
+                        $source_table => 'id',
+                        $source_zone_table => $source_fk,
+                    ],
+                ],
+            ],
+            'WHERE' => [
+                Source::getTableField('name') => $this->getSourceName(),
+            ] + $crit,
+        ]);
+
+        return iterator_to_array($iterator);
+    }
+
+    public function fullDownload(Source_Zone $source_zone, DateTimeImmutable $start_date, DateTimeImmutable $stop_date, CarbonIntensity $intensity, int $limit = 0, ?ProgressBar $progress_bar = null): int
     {
         if ($start_date >= $stop_date) {
             return 0;
@@ -193,17 +233,14 @@ abstract class AbstractClient implements ClientInterface
                 $data = $this->fetchRange(
                     DateTimeImmutable::createFromMutable($current_date),
                     DateTimeImmutable::createFromMutable($next_month),
-                    $zone
+                    $source_zone
                 );
             } catch (AbortException $e) {
                 break;
             }
             if (count($data) > 0) {
                 $data = $this->formatOutput($data, $this->step);
-                if (!isset($data[$zone])) {
-                    break;
-                }
-                $saved = $intensity->save($zone, $this->getSourceName(), $data[$zone]);
+                $saved = $intensity->save($source_zone, $data);
                 if ($progress_bar) {
                     $progress_bar->advance($saved);
                 }
@@ -222,7 +259,7 @@ abstract class AbstractClient implements ClientInterface
         return $saved > 0 ? $count : -$count;
     }
 
-    public function incrementalDownload(string $zone, DateTimeImmutable $start_date, CarbonIntensity $intensity, int $limit = 0): int
+    public function incrementalDownload(Source_Zone $source_zone, DateTimeImmutable $start_date, CarbonIntensity $intensity, int $limit = 0): int
     {
         $end_date = new DateTimeImmutable('now');
 
@@ -230,15 +267,12 @@ abstract class AbstractClient implements ClientInterface
         $saved = 0;
         foreach ($this->sliceDateRangeByDay($start_date, $end_date) as $slice) {
             try {
-                $data = $this->fetchDay($slice, $zone);
+                $data = $this->fetchDay($slice, $source_zone);
             } catch (AbortException $e) {
                 throw $e;
             }
             $data = $this->formatOutput($data, $this->step);
-            if (!isset($data[$zone])) {
-                continue;
-            }
-            $saved = $intensity->save($zone, $this->getSourceName(), $data[$zone]);
+            $saved = $intensity->save($source_zone, $data);
             $count += abs($saved);
             if ($limit > 0 && $count >= $limit) {
                 return $saved > 0 ? $count : -$count;
@@ -325,9 +359,9 @@ abstract class AbstractClient implements ClientInterface
         return $source_zone->toggleZone($state);
     }
 
-    protected function getCacheFilename(string $base_dir, DateTimeImmutable $start, DateTimeImmutable $end): string
+    protected function getCacheFilename(string $base_dir, DateTimeImmutable $start, DateTimeImmutable $end, DateTimeZone $timezone): string
     {
-        $timezone_name = $start->getTimezone()->getName();
+        $timezone_name = $timezone->getName();
         $timezone_name = str_replace('/', '-', $timezone_name);
         return sprintf(
             '%s/%s_%s_%s.json',

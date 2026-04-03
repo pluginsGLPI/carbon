@@ -116,7 +116,7 @@ class Location extends CommonDBChild
             }
         }
 
-        if (($input['plugin_carbon_sources_id'] ?? 0) === 0) {
+        if (($input['plugin_carbon_sources_id'] ?? 0) == 0) {
             $input['plugin_carbon_sources_zones_id'] = 0;
         }
 
