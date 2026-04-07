@@ -41,6 +41,7 @@ if (!$task->isNewItem()) {
     $task->update([
         'id' => $task->getID(),
         'itemtype' => 'GlpiPlugin\\Carbon\\DataSource\\CarbonIntensity\\Rte\\CronTask',
+        'name'     => 'Download',
     ]);
 }
 
@@ -53,5 +54,6 @@ if (!$task->isNewItem()) {
     $task->update([
         'id' => $task->getID(),
         'itemtype' => 'GlpiPlugin\\Carbon\\DataSource\\CarbonIntensity\\ElectricityMaps\\CronTask',
+        'name'     => 'Download',
     ]);
 }

@@ -32,12 +32,36 @@
 
 namespace GlpiPlugin\Carbon\DataSource;
 
+use CommonDBTM;
 use CommonGLPI;
+use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientFactory;
+use GlpiPlugin\Carbon\Source_Zone;
 
 abstract class AbstractCronTask extends CommonGLPI implements CronTaskInterface
 {
+    protected static string $client_name;
+
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         return '';
+    }
+
+    public function showForCronTask(CommonDBTM $item)
+    {
+        switch ($item->fields['name']) {
+            case 'Download':
+                $client = ClientFactory::create(static::$client_name);
+                $source_name = $client->getSourceName();
+                foreach ($client->getSupportedZones() as $zone_name) {
+                    $source_zone = new Source_Zone();
+                    if (!$source_zone->getFromDbBySourceAndZone($source_name, $zone_name)) {
+                        continue;
+                    }
+                    if (!$source_zone->fields['is_download_enabled']) {
+                        continue;
+                    }
+                    $source_zone->showGaps();
+                }
+        }
     }
 }

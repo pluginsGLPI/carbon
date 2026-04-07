@@ -32,7 +32,6 @@
 
 namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\Rte;
 
-use CommonDBTM;
 use CommonGLPI;
 use CronTask as GlpiCronTask;
 use GlpiPlugin\Carbon\CarbonIntensity;
@@ -40,11 +39,11 @@ use GlpiPlugin\Carbon\CronTask as CarbonCronTask;
 use GlpiPlugin\Carbon\DataSource\AbstractCronTask;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientFactory;
 use GlpiPlugin\Carbon\DataSource\CronTaskInterface;
-use GlpiPlugin\Carbon\DataSource\RestApiClient;
-use GlpiPlugin\Carbon\Source_Zone;
 
 class CronTask extends AbstractCronTask implements CronTaskInterface
 {
+    protected static string $client_name = 'Rte';
+
     public static function getIcon()
     {
         return 'fa-solid fa-gears';
@@ -55,29 +54,13 @@ class CronTask extends AbstractCronTask implements CronTaskInterface
         return self::createTabEntry(__('Resource diagnosis', 'carbon'), 0);
     }
 
-    public function showForCronTask(CommonDBTM $item)
-    {
-        switch ($item->fields['name']) {
-            case 'DownloadRte':
-                $client = new Client(new RestApiClient());
-                $source_name = ($client)->getSourceName();
-                foreach ($client->getSupportedZones() as $zone_name) {
-                    $source_zone = new Source_Zone();
-                    if (!$source_zone->getFromDbBySourceAndZone($source_name, $zone_name)) {
-                        continue;
-                    }
-                    $source_zone->showGaps();
-                }
-        }
-    }
-
     public static function enumerateTasks(): array
     {
         // TODO: This data shoud replace the occurrence in CronTask::cronInfo()
         return [
             [
                 'itemtype'    => self::class,
-                'name'        => 'DownloadRte',
+                'name'        => 'Download',
                 'frequency'   => DAY_TIMESTAMP,
                 'options'     => [
                     'mode'          => GlpiCronTask::MODE_EXTERNAL,
@@ -99,7 +82,7 @@ class CronTask extends AbstractCronTask implements CronTaskInterface
     public static function cronInfo(string $name): array
     {
         switch ($name) {
-            case 'DownloadRte':
+            case 'Download':
                 return [
                     'description' => __('Download carbon emissions from RTE', 'carbon'),
                     'parameter' => __('Maximum number of entries to download', 'carbon'),
@@ -113,9 +96,9 @@ class CronTask extends AbstractCronTask implements CronTaskInterface
      *
      * @return int
      */
-    public static function cronDownloadRte(GlpiCronTask $task): int
+    public static function cronDownload(GlpiCronTask $task): int
     {
-        $client = ClientFactory::create('Rte');
+        $client = ClientFactory::create(static::$client_name);
         return CarbonCronTask::downloadCarbonIntensityFromSource($task, $client, new CarbonIntensity());
     }
 }

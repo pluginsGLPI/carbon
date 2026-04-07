@@ -58,7 +58,6 @@ define('DATE_MIN', 'P6M');
 class CollectCarbonIntensityCommand extends AbstractCommand
 {
     /** @var int ID of the data source being processed */
-    private int $source_id;
     /** @var Source_Zone The relatin between a source and a zone to describe which data to download and save */
     private Source_Zone $source_zone;
     private ?ClientInterface $client = null;
@@ -132,7 +131,6 @@ class CollectCarbonIntensityCommand extends AbstractCommand
             $output->writeln("<error>$message</error>");
             return Command::FAILURE;
         }
-        $this->source_id = $data_source->getID();
 
         $zone_code = $input->getArgument('zone');
         $use_cache = $input->getOption('cache');

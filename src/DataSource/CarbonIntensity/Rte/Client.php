@@ -317,7 +317,7 @@ class Client extends AbstractClient
             }
         } else {
             $downloaded_year_month = $start->format('Y-m');
-            if (count($response) > 0 && $downloaded_year_month < date('Y-m')) {
+            if ($downloaded_year_month < date('Y-m')) {
                 // Cache only if the month being processed is older than the month of now
                 $json = json_encode($response);
                 file_put_contents($cache_file, $json);

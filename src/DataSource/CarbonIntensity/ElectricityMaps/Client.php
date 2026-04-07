@@ -37,6 +37,7 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
+use DBmysql;
 use GLPIKey;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\AbortException;
@@ -269,6 +270,7 @@ class Client extends AbstractClient
 
     public function fetchRange(DateTimeImmutable $start, DateTimeImmutable $stop, Source_Zone $source_zone): array
     {
+        $this->step = 60;
         $is_free_plan = Config::getConfigurationValue('electricitymap_fake_data') ?? 0;
         $dataset = $is_free_plan ? 'fake' : 'real';
         $zone = new Zone();
@@ -277,7 +279,8 @@ class Client extends AbstractClient
         $cache_file = $this->getCacheFilename(
             $base_path,
             $start,
-            $stop
+            $stop,
+            $start->getTimezone()
         );
         // If cached file exists, use it
         if (file_exists($cache_file)) {
@@ -306,6 +309,7 @@ class Client extends AbstractClient
         $glpikey = new GLPIKey();
         $api_key = Config::getConfigurationValue('electricitymap_api_key');
         $api_key = $glpikey->decrypt($api_key);
+        $format = 'Y-m-d\+H:ip';
         while ($current_date < $request_stop) {
             $stop = clone $current_date;
             $stop->add($step);
@@ -319,8 +323,8 @@ class Client extends AbstractClient
             // ];
             $url = $this->base_url . self::PAST_URL;
             $url .= '?zone=' . $source_zone->fields['code'];
-            $url .= '&start=' . $current_date->format('Y-m-d\+H:i');
-            $url .= '&end=' . $stop->format('Y-m-d\+H:i');
+            $url .= '&start=' . $current_date->format($format);
+            $url .= '&end=' . $stop->format($format);
             $url .= '&temporalGranularity=' . 'hourly';
             $url .= '&emissionFactorType=' . 'lifecycle';
             $response = $this->client->request('GET', $url, [/*'query' => $params,*/ 'headers' => ['auth-token' => $api_key]]);
@@ -360,10 +364,13 @@ class Client extends AbstractClient
 
     protected function formatOutput(array $response, int $step): array
     {
+        // Convert string dates into datetime objects,
+        // using timezone expressed as type Continent/City instead of offset
+        // This is needed to detect later the switching to winter time
+        $response = $this->shiftToLocalTimezone($response);
         $intensities = [];
-        $timezone = new DateTimeZone('UTC');
-        foreach ($response['history'] as $record) {
-            $datetime = DateTime::createFromFormat('Y-m-d\TH:i:s+', $record['datetime'], $timezone);
+        foreach ($response['data'] as $record) {
+            $datetime = $record['datetime'];
             if (!$datetime instanceof DateTimeInterface) {
                 var_dump(DateTime::getLastErrors());
                 continue;
@@ -380,17 +387,41 @@ class Client extends AbstractClient
     }
 
     /**
+     * convert dates to the timezone of GLPI
+     *
+     * @param array $response
+     * @return array array of records: ['date_heure' => string, 'taux_co2' => number, 'datetime' => DateTime]
+     */
+    protected function shiftToLocalTimezone(array $response): array
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        $shifted_response = [];
+        $local_timezone = new DateTimeZone($DB->guessTimezone());
+        array_walk($response['data'], function ($item, $key) use (&$shifted_response, $local_timezone) {
+            $shifted_date_object = DateTime::createFromFormat('Y-m-d\TH:i:s.vp', $item['datetime'])
+                ->setTimezone($local_timezone);
+            $shifted_date_string = $shifted_date_object->format('Y-m-d H:i:sP');
+            if (isset($shifted_response[$shifted_date_string]) && $shifted_response['carbonIntensity'] !== $item['carbonIntensity']) {
+                trigger_error("Duplicate record with different carbon intensity detected.");
+            }
+            $item['datetime'] = $shifted_date_object;
+            $shifted_response[$shifted_date_string] = $item;
+        });
+
+        return ['zone' => $response['zone'], 'data' => $shifted_response];
+    }
+
+    /**
      * Try to determine the data quality of record
      *
      * @param array $record
-     * @return int
+     * @return int see AbstractTracked::DATA_QUALITY_* constants
      */
     protected function getDataQuality(array $record): int
     {
-        $data_quality = 0;
-        if (!$record['isEstimated']) {
-            $data_quality = AbstractTracked::DATA_QUALITY_RAW_REAL_TIME_MEASUREMENT;
-        }
+        $data_quality = $record['isEstimated'] ? AbstractTracked::DATA_QUALITY_ESTIMATED : AbstractTracked::DATA_QUALITY_RAW_REAL_TIME_MEASUREMENT;
 
         return $data_quality;
     }
