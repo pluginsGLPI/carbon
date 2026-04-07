@@ -35,6 +35,7 @@ namespace GlpiPlugin\Carbon\Tests;
 use Computer;
 use DateTime;
 use DateTimeImmutable;
+use DateTimeInterface;
 use DBmysql;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\AbstractClient;
@@ -374,6 +375,9 @@ class CarbonIntensityTest extends DbTestCase
                 $hours = $diff->days * 24 + $diff->h;
                 return $hours;
             }
+        );
+        $data_source->method('getHardStartDate')->willReturn(
+            DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '2021-01-01T00:00:00+00:00'),
         );
         $output = $this->getMockBuilder(Output::class)
             ->getMock();

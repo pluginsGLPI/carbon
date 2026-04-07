@@ -300,11 +300,11 @@ class CarbonIntensity extends CommonDropdown
      * Save in database the carbon intensities
      * Give up on failures
      *
-     * @param Source_zone $source_zone Source_zone
+     * @param Source_Zone $source_zone Source_zone
      * @param array $data as an array of arrays ['datetime' => string, 'intensity' => float]
      * @return int count of actually saved items,
      */
-    public function save(Source_zone $source_zone, array $data): int
+    public function save(Source_Zone $source_zone, array $data): int
     {
         /** @var DBmysql $DB */
         global $DB;

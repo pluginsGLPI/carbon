@@ -58,6 +58,8 @@ abstract class AbstractClient implements ClientInterface
 
     abstract protected function formatOutput(array $response, int $step): array;
 
+    abstract public function getHardStartDate(): DateTimeImmutable;
+
     /**
      * Download all data for a single day from the datasource
      *

@@ -257,14 +257,14 @@ class PluginInstallTest extends CommonTestCase
         $cronTask = new GLPICronTask();
         $cronTask->getFromDBByCrit([
             'itemtype' => RteCronTask::class,
-            'name'     => 'DownloadRte',
+            'name'     => 'Download',
         ]);
         $this->assertFalse($cronTask->isNewItem());
 
         $cronTask = new GLPICronTask();
         $cronTask->getFromDBByCrit([
             'itemtype' => ElectricityMapsCronTask::class,
-            'name'     => 'DownloadElectricityMap',
+            'name'     => 'Download',
         ]);
         $this->assertFalse($cronTask->isNewItem());
 
