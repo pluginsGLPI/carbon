@@ -70,19 +70,19 @@ class CronTask extends CommonGLPI
         if ($item instanceof GlpiCronTask) {
             /** @var GlpiCronTask $item */
             $cron_task = new self();
-            $cron_task->showForCronTask($item);
+            $cron_task->showForCronTask($item, $tabnum);
         }
         return true;
     }
 
-    public function showForCronTask(CommonDBTM $item)
+    public function showForCronTask(CommonDBTM $item, int $tabnum)
     {
         $itemtype = $item->fields['itemtype'];
         if (!in_array($itemtype, CronTaskProvider::getCronTaskTypes())) {
             return;
         }
         $crontask = new $itemtype();
-        $crontask->showForCronTask($item);
+        $crontask->showForCronTask($item, $tabnum);
     }
 
     /**

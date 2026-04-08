@@ -53,7 +53,10 @@ class CronTask extends AbstractCronTask implements CronTaskInterface
 
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
-        return self::createTabEntry(__('Resource diagnosis', 'carbon'), 0);
+        return [
+            self::TAB_DIAGNOSIS => self::createTabEntry(__('Resource diagnosis', 'carbon'), 0),
+            // self::TAB_CACHE => self::createTabEntry(__('Cache', 'carbon'), 0),
+        ];
     }
 
     public static function enumerateTasks(): array
