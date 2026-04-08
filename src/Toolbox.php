@@ -634,7 +634,7 @@ class Toolbox
         // Filter out gaps caused by DST switch
         // In the SQL function DATE_ADD() we may do the following process
         // DATE_ADD('2022-03-27 01:00:00', INTERVAL 1 HOUR) and '2022-03-27 01:00:00' + INTERVAL 1 HOUR
-        // while we use Europe/Paris timezone
+        // while we use Europe/Paris timezone (or any timezone usinf DST)
         // Both expressions return '2022-03-27 02:00:00' and it matches the exact time where we switch to summer time
         // '2022-03-27 02:00:00' should be actually '2022-03-27 03:00:00', but this is not what happens with MySQL 8.0
         // Therefore when the date '2022-03-27 02:00:00' is converted into a DateTime object in PHP with Europe/Paris timezone

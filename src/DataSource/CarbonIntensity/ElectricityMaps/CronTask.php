@@ -34,15 +34,14 @@ namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\ElectricityMaps;
 
 use CommonGLPI;
 use CronTask as GlpiCronTask;
-use GlpiPlugin\Carbon\CarbonIntensity;
-use GlpiPlugin\Carbon\CronTask as CarbonCronTask;
 use GlpiPlugin\Carbon\DataSource\AbstractCronTask;
-use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientFactory;
 use GlpiPlugin\Carbon\DataSource\CronTaskInterface;
 
 class CronTask extends AbstractCronTask implements CronTaskInterface
 {
     protected static string $client_name = 'ElectricityMaps';
+
+    protected static string $downloadMethod = 'DownloadElectricityMaps';
 
     public static function getIcon()
     {
@@ -60,7 +59,7 @@ class CronTask extends AbstractCronTask implements CronTaskInterface
         return [
             [
                 'itemtype'    => self::class,
-                'name'        => 'Download',
+                'name'        => self::$downloadMethod,
                 'frequency'   => DAY_TIMESTAMP / 2,
                 'options'     => [
                     'mode'          => GlpiCronTask::MODE_EXTERNAL,
@@ -82,23 +81,12 @@ class CronTask extends AbstractCronTask implements CronTaskInterface
     public static function cronInfo(string $name): array
     {
         switch ($name) {
-            case 'Download':
+            case self::$downloadMethod:
                 return [
                     'description' => __('Download carbon emissions from Electricity Maps', 'carbon'),
                     'parameter' => __('Maximum number of entries to download', 'carbon'),
                 ];
         }
         return [];
-    }
-
-    /**
-     * Automatic action for Electricity Maps datasource
-     *
-     * @return int
-     */
-    public static function cronDownload(GlpiCronTask $task): int
-    {
-        $client = ClientFactory::create(static::$client_name);
-        return CarbonCronTask::downloadCarbonIntensityFromSource($task, $client, new CarbonIntensity());
     }
 }

@@ -34,12 +34,21 @@ namespace GlpiPlugin\Carbon\DataSource;
 
 use CommonDBTM;
 use CommonGLPI;
+use CronTask as GlpiCronTask;
+use Glpi\Application\View\TemplateRenderer;
+use GlpiPlugin\Carbon\CarbonIntensity;
+use GlpiPlugin\Carbon\CronTask;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientFactory;
 use GlpiPlugin\Carbon\Source_Zone;
+use GlpiPlugin\Carbon\Toolbox;
+use GlpiPlugin\Carbon\Zone;
+use RuntimeException;
 
 abstract class AbstractCronTask extends CommonGLPI implements CronTaskInterface
 {
     protected static string $client_name;
+
+    protected static string $downloadMethod;
 
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
@@ -49,19 +58,95 @@ abstract class AbstractCronTask extends CommonGLPI implements CronTaskInterface
     public function showForCronTask(CommonDBTM $item)
     {
         switch ($item->fields['name']) {
-            case 'Download':
-                $client = ClientFactory::create(static::$client_name);
-                $source_name = $client->getSourceName();
-                foreach ($client->getSupportedZones() as $zone_name) {
-                    $source_zone = new Source_Zone();
-                    if (!$source_zone->getFromDbBySourceAndZone($source_name, $zone_name)) {
-                        continue;
-                    }
-                    if (!$source_zone->fields['is_download_enabled']) {
-                        continue;
-                    }
-                    $source_zone->showGaps();
-                }
+            case static::$downloadMethod:
+                $this->showGapsReport();
         }
+    }
+
+    public function showGapsReport()
+    {
+        $renderer = TemplateRenderer::getInstance();
+        $template = <<<TWIG
+        {% import "components/form/fields_macros.html.twig" as fields %}
+        {{ fields.largeTitle(__('Gaps in carbon intensity time series', 'carbon')) }}
+        <div>{{ __('Only zones with download enabled are displayed.', 'carbon') }}</div>
+        <div>&nbsp;</div>
+TWIG;
+        echo $renderer->renderFromStringTemplate($template);
+        $oldest_asset_date = (new Toolbox())->getOldestAssetDate();
+        $client = ClientFactory::create(static::$client_name);
+        $source_name = $client->getSourceName();
+        foreach ($client->getSupportedZones() as $zone_name) {
+            $source_zone = new Source_Zone();
+            if (!$source_zone->getFromDbBySourceAndZone($source_name, $zone_name)) {
+                continue;
+            }
+            if (!$source_zone->fields['is_download_enabled']) {
+                continue;
+            }
+            $zone_id = $source_zone->fields['plugin_carbon_zones_id'];
+            $carbon_intensity = new CarbonIntensity();
+            $entries = $carbon_intensity->findGaps(
+                $source_zone,
+                $oldest_asset_date
+            );
+            $total = count($entries);
+            $zone = Zone::getById($zone_id);
+
+            $template = <<<TWIG
+            {% import "components/form/fields_macros.html.twig" as fields %}
+            {{ fields.smallTitle(__('Gaps for the zone %s', 'carbon')|format(zone_name)) }}
+TWIG;
+            echo $renderer->renderFromStringTemplate($template, ['zone_name' => $zone->fields['name']]);
+            $renderer->display('components/datatable.html.twig', [
+                'is_tab' => true,
+                'nopager' => true,
+                'nofilter' => true,
+                'nosort' => true,
+                'columns' => [
+                    'start' => __('Start'),
+                    'end' => __('End', 'carbon'),
+                ],
+                'footers' => [
+                    ['', '', '', __('Total'), $total, ''],
+                ],
+                'footer_class' => 'fw-bold',
+                'entries' => $entries,
+                'total_number' => $total,
+                'filtered_number' => $total,
+                'showmassiveactions' => false,
+                'massiveactionparams' => [
+                    'num_displayed' => $total,
+                    'container'     => 'mass' . static::class . mt_rand(),
+                ],
+            ]);
+        }
+    }
+
+    /**
+     * Uniformize download method of carbon intensity clients
+     * The design of \CronTask requires that each cron task to use a unique method name, across itemtypes
+     *
+     * @param string $name
+     * @param array $arguments
+     * @return int
+     */
+    public static function __callStatic($name, $arguments)
+    {
+        if ($name === 'cron' . static::$downloadMethod) {
+            return self::cronDownload(...$arguments);
+        }
+        throw new RuntimeException('Not implemented');
+    }
+
+    /**
+     * Automatic action to download carbon intensity from a data source
+     *
+     * @return int
+     */
+    public static function cronDownload(GlpiCronTask $task): int
+    {
+        $client = ClientFactory::create(static::$client_name);
+        return CronTask::downloadCarbonIntensityFromSource($task, $client, new CarbonIntensity());
     }
 }
