@@ -50,16 +50,27 @@ abstract class AbstractCronTask extends CommonGLPI implements CronTaskInterface
 
     protected static string $downloadMethod;
 
+    protected const TAB_DIAGNOSIS = 0;
+    protected const TAB_CACHE = 1;
+
+
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         return '';
     }
 
-    public function showForCronTask(CommonDBTM $item)
+    public function showForCronTask(CommonDBTM $item, int $tabnum)
     {
-        switch ($item->fields['name']) {
-            case static::$downloadMethod:
-                $this->showGapsReport();
+        if ($tabnum === self::TAB_DIAGNOSIS) {
+            switch ($item->fields['name']) {
+                case static::$downloadMethod:
+                    $this->showGapsReport();
+            }
+        } elseif ($tabnum === self::TAB_CACHE) {
+            switch ($item->fields['name']) {
+                case static::$downloadMethod:
+                    // TODO: implement tab to clear cached data in files/ folder
+            }
         }
     }
 
