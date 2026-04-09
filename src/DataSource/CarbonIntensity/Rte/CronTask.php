@@ -34,7 +34,7 @@ namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\Rte;
 
 use CommonGLPI;
 use CronTask as GlpiCronTask;
-use GlpiPlugin\Carbon\DataSource\AbstractCronTask;
+use GlpiPlugin\Carbon\DataSource\CarbonIntensity\AbstractCronTask;
 use GlpiPlugin\Carbon\DataSource\CronTaskInterface;
 
 /**
