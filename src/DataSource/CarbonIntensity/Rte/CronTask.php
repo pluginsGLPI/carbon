@@ -84,7 +84,7 @@ class CronTask extends AbstractCronTask implements CronTaskInterface
     public static function cronInfo(string $name): array
     {
         switch ($name) {
-            case 'DownloadRte':
+            case self::$downloadMethod:
                 return [
                     'description' => __('Download carbon emissions from RTE', 'carbon'),
                     'parameter' => __('Maximum number of entries to download', 'carbon'),
