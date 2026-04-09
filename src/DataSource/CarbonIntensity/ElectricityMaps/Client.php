@@ -301,6 +301,14 @@ class Client extends AbstractClient
         $timezone_z = new DateTimeZone('+0000');
         $request_start = $start->setTimezone($timezone_z)->sub(new DateInterval('PT12H'));
         $request_stop = $stop->setTimezone($timezone_z)->add(new DateInterval('PT14H'));
+
+        // Prevent downloading in the future
+        $request_stop = min($request_stop, new DateTime('yesterday midnight', $timezone_z));
+        if ($request_start > $request_stop) {
+            return [];
+        }
+        $headers = [];
+
         $this->step = 60;
 
         $step = new DateInterval('PT240H');
@@ -310,6 +318,7 @@ class Client extends AbstractClient
         $api_key = Config::getConfigurationValue('electricitymap_api_key');
         $api_key = $glpikey->decrypt($api_key);
         $format = 'Y-m-d\+H:ip';
+        $headers['auth-token'] = $api_key;
         while ($current_date < $request_stop) {
             $stop = clone $current_date;
             $stop->add($step);
@@ -327,7 +336,11 @@ class Client extends AbstractClient
             $url .= '&end=' . $stop->format($format);
             $url .= '&temporalGranularity=' . 'hourly';
             $url .= '&emissionFactorType=' . 'lifecycle';
-            $response = $this->client->request('GET', $url, [/*'query' => $params,*/ 'headers' => ['auth-token' => $api_key]]);
+            $response = $this->client->request('GET', $url, [
+                'timeout' => 4,
+                /*'query' => $params,*/
+                'headers' => $headers,
+            ]);
             if (isset($response['status']) && $response['status'] === 'error') {
                 trigger_error('Electricity maps API error: ' . $response['message'], E_USER_ERROR);
             }

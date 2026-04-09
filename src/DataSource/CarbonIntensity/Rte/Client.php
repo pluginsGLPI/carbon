@@ -243,6 +243,13 @@ class Client extends AbstractClient
         $timezone_z = new DateTimeZone('+0000');
         $request_start = $start->setTimezone($timezone_z)->sub(new DateInterval('PT12H'));
         $request_stop = $stop->setTimezone($timezone_z)->add(new DateInterval('PT14H'));
+
+        // Prevent downloading in the future
+        $request_stop = min($request_stop, new DateTime('yesterday midnight', $timezone_z));
+        if ($request_start > $request_stop) {
+            return [];
+        }
+
         $format = DateTime::ATOM;
         $from = $request_start->format($format);
         $to = $request_stop->format($format);
@@ -298,8 +305,13 @@ class Client extends AbstractClient
             'order_by' => 'date_heure asc',
             'timezone' => $query_timezone->getName(),
         ];
+        $headers = [];
         try {
-            $response = $this->client->request('GET', $url, ['timeout' => 8, 'query' => $params]);
+            $response = $this->client->request('GET', $url, [
+                'timeout' => 8,
+                'query' => $params,
+                'headers' => $headers,
+            ]);
         } catch (RuntimeException $e) {
             return [];
         }
