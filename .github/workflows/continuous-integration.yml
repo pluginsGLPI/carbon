@@ -35,3 +35,9 @@ jobs:
       glpi-version: "${{ matrix.glpi-version }}"
       php-version: "${{ matrix.php-version }}"
       db-image: "${{ matrix.db-image }}"
+
+  coverage-report:
+    needs: "ci"
+    uses: "froozeify/GLPI_plugin-ci-workflows/.github/workflows/coverage-report.yml@code-coverage"
+    with:
+      plugin-key: "carbon"
