@@ -141,6 +141,7 @@ class PluginInstallTest extends CommonTestCase
         $plugin->init();
         $this->assertTrue(Plugin::isPluginActive(TEST_PLUGIN_NAME), 'Plugin not activated');
         $this->checkSchema(PLUGIN_CARBON_VERSION);
+        $this->checkVersionInAllFiles();
 
         $this->checkConfig();
         $this->checkAutomaticAction();
@@ -910,5 +911,23 @@ class PluginInstallTest extends CommonTestCase
         $result = CommonGLPI::getOtherTabs(NetworkEquipmentModel::class);
         $expected = ['GlpiPlugin\Carbon\NetworkEquipmentModel'];
         $this->assertEquals($expected, $result);
+    }
+
+    #[CoversNothing()]
+    public function checkVersionInAllFiles()
+    {
+        $setup_version = PLUGIN_CARBON_VERSION;
+        $plugin_dir = dirname(__DIR__, 2);
+        $composer_file = $plugin_dir . '/composer.json';
+        $package_file  = $plugin_dir . '/package.json';
+        $package_lock_file  = $plugin_dir . '/package-lock.json';
+
+        $composer = json_decode(file_get_contents($composer_file), true);
+        $package = json_decode(file_get_contents($package_file), true);
+        $package_lock = json_decode(file_get_contents($package_lock_file), true);
+
+        $this->assertSame($setup_version, $composer['version'] ?? null);
+        $this->assertSame($setup_version, $package['version'] ?? null);
+        $this->assertSame($setup_version, $package_lock['version'] ?? null);
     }
 }
