@@ -93,7 +93,7 @@ class PluginInstallTest extends CommonTestCase
         $plugin_name = TEST_PLUGIN_NAME;
         //Drop plugin configuration if exists
         $config = new Config();
-        $config->deleteByCriteria(['context' => $plugin_name]);
+        $config->deleteByCriteria(['context' => 'plugin:' . $plugin_name]);
 
         // Drop tables of the plugin if they exist
         $result = $DB->listTables('glpi_plugin_' . $plugin_name . '_%');
