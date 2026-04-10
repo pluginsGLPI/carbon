@@ -81,6 +81,26 @@ class PluginInstallTest extends CommonTestCase
         self::login('glpi', 'glpi', true);
     }
 
+    /**
+     * Helper method to wipe all plugin data
+     *
+     * @return void
+     */
+    protected function wipePlugin() {
+        /** @var DBmysql */
+        global $DB;
+
+        $plugin_name = TEST_PLUGIN_NAME;
+        //Drop plugin configuration if exists
+        $config = new Config();
+        $config->deleteByCriteria(['context' => 'plugin:' . $plugin_name]);
+
+        // Drop tables of the plugin if they exist
+        $result = $DB->listTables('glpi_plugin_' . $plugin_name . '_%');
+        foreach ($result as $data) {
+            $DB->dropTable($data['TABLE_NAME']);
+        }
+    }
 
     /**
      * Execute plugin installation in the context if tests
@@ -93,16 +113,7 @@ class PluginInstallTest extends CommonTestCase
         $plugin_name = TEST_PLUGIN_NAME;
 
         $this->assertTrue($DB->connected);
-
-        //Drop plugin configuration if exists
-        $config = new Config();
-        $config->deleteByCriteria(['context' => $plugin_name]);
-
-        // Drop tables of the plugin if they exist
-        $result = $DB->listTables('glpi_plugin_' . $plugin_name . '_%');
-        foreach ($result as $data) {
-            $DB->dropTable($data['TABLE_NAME']);
-        }
+        $this->wipePlugin();
 
         // Reset logs
         $this->resetGLPILogs();
@@ -141,6 +152,7 @@ class PluginInstallTest extends CommonTestCase
         $plugin->init();
         $this->assertTrue(Plugin::isPluginActive(TEST_PLUGIN_NAME), 'Plugin not activated');
         $this->checkSchema(PLUGIN_CARBON_VERSION);
+        $this->checkVersionInAllFiles();
 
         $this->checkConfig();
         $this->checkAutomaticAction();
@@ -910,5 +922,23 @@ class PluginInstallTest extends CommonTestCase
         $result = CommonGLPI::getOtherTabs(NetworkEquipmentModel::class);
         $expected = ['GlpiPlugin\Carbon\NetworkEquipmentModel'];
         $this->assertEquals($expected, $result);
+    }
+
+    #[CoversNothing()]
+    public function checkVersionInAllFiles()
+    {
+        $setup_version = PLUGIN_CARBON_VERSION;
+        $plugin_dir = dirname(__DIR__, 2);
+        $composer_file = $plugin_dir . '/composer.json';
+        $package_file  = $plugin_dir . '/package.json';
+        $package_lock_file  = $plugin_dir . '/package-lock.json';
+
+        $composer = json_decode(file_get_contents($composer_file), true);
+        $package = json_decode(file_get_contents($package_file), true);
+        $package_lock = json_decode(file_get_contents($package_lock_file), true);
+
+        $this->assertSame($setup_version, $composer['version'] ?? null);
+        $this->assertSame($setup_version, $package['version'] ?? null);
+        $this->assertSame($setup_version, $package_lock['version'] ?? null);
     }
 }
