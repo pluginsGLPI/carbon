@@ -81,6 +81,26 @@ class PluginInstallTest extends CommonTestCase
         self::login('glpi', 'glpi', true);
     }
 
+    /**
+     * Helper method to wipe all plugin data
+     *
+     * @return void
+     */
+    protected function wipePlugin() {
+        /** @var DBmysql */
+        global $DB;
+
+        $plugin_name = TEST_PLUGIN_NAME;
+        //Drop plugin configuration if exists
+        $config = new Config();
+        $config->deleteByCriteria(['context' => $plugin_name]);
+
+        // Drop tables of the plugin if they exist
+        $result = $DB->listTables('glpi_plugin_' . $plugin_name . '_%');
+        foreach ($result as $data) {
+            $DB->dropTable($data['TABLE_NAME']);
+        }
+    }
 
     /**
      * Execute plugin installation in the context if tests
@@ -93,16 +113,7 @@ class PluginInstallTest extends CommonTestCase
         $plugin_name = TEST_PLUGIN_NAME;
 
         $this->assertTrue($DB->connected);
-
-        //Drop plugin configuration if exists
-        $config = new Config();
-        $config->deleteByCriteria(['context' => $plugin_name]);
-
-        // Drop tables of the plugin if they exist
-        $result = $DB->listTables('glpi_plugin_' . $plugin_name . '_%');
-        foreach ($result as $data) {
-            $DB->dropTable($data['TABLE_NAME']);
-        }
+        $this->wipePlugin();
 
         // Reset logs
         $this->resetGLPILogs();
