@@ -285,7 +285,7 @@ class Client extends AbstractClient
         // If cached file exists, use it
         if (file_exists($cache_file)) {
             $full_response = json_decode(file_get_contents($cache_file), true);
-            return $full_response;
+            return $full_response['data'];
         } else {
             $cache_dir = dirname($cache_file);
             if (!is_dir($cache_dir)) {
@@ -382,19 +382,14 @@ class Client extends AbstractClient
         // This is needed to detect later the switching to winter time
         $response = $this->shiftToLocalTimezone($response);
         $intensities = [];
-        foreach ($response['data'] as $record) {
-            $datetime = $record['datetime'];
-            if (!$datetime instanceof DateTimeInterface) {
-                var_dump(DateTime::getLastErrors());
-                continue;
-            }
+        array_walk($response, function ($record) use (&$intensities) {
             $data_quality = $this->getDataQuality($record);
             $intensities[] = [
-                'datetime'     => $datetime->format(DateTime::ATOM),
+                'datetime'     => $record['datetime']->format('Y-m-d\TH:00:00'),
                 'intensity'    => $record['carbonIntensity'],
                 'data_quality' => $data_quality,
             ];
-        }
+        });
 
         return $intensities;
     }
@@ -403,7 +398,7 @@ class Client extends AbstractClient
      * convert dates to the timezone of GLPI
      *
      * @param array $response
-     * @return array array of records: ['date_heure' => string, 'taux_co2' => number, 'datetime' => DateTime]
+     * @return array array of records: ['datetime' => DateTime, 'carbonintensity' => number]
      */
     protected function shiftToLocalTimezone(array $response): array
     {
@@ -412,7 +407,7 @@ class Client extends AbstractClient
 
         $shifted_response = [];
         $local_timezone = new DateTimeZone($DB->guessTimezone());
-        array_walk($response['data'], function ($item, $key) use (&$shifted_response, $local_timezone) {
+        array_walk($response, function ($item, $key) use (&$shifted_response, $local_timezone) {
             $shifted_date_object = DateTime::createFromFormat('Y-m-d\TH:i:s.vp', $item['datetime'])
                 ->setTimezone($local_timezone);
             $shifted_date_string = $shifted_date_object->format('Y-m-d H:i:sP');
@@ -423,7 +418,7 @@ class Client extends AbstractClient
             $shifted_response[$shifted_date_string] = $item;
         });
 
-        return ['zone' => $response['zone'], 'data' => $shifted_response];
+        return $shifted_response;
     }
 
     /**
