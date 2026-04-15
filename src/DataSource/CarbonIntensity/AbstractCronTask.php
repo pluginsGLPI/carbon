@@ -34,6 +34,7 @@ namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity;
 
 use CommonDBTM;
 use CronTask as GlpiCronTask;
+use DateTimeZone;
 use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CronTask;
@@ -49,6 +50,27 @@ abstract class AbstractCronTask extends DatasourceAbstractCronTask implements Cr
     protected static string $client_name;
 
     protected static string $downloadMethod;
+
+    /**
+     * Filter out the gaps to remove fales gaps caused by DST switch
+     * Needed after a call to Toolbox::findTemporalGapsInTable()
+     * TODO: replace its inner implementation with this method on each call, when necessary
+     * In the SQL function DATE_ADD() we may do the following process
+     * DATE_ADD('2022-03-27 01:00:00', INTERVAL 1 HOUR) and '2022-03-27 01:00:00' + INTERVAL 1 HOUR
+     * while we use Europe/Paris timezone (or any timezone usinf DST)
+     * Both expressions return '2022-03-27 02:00:00' and it matches the exact time where we switch to summer time
+     * '2022-03-27 02:00:00' should be actually '2022-03-27 03:00:00', but this is not what happens with MySQL 8.0
+     * Therefore when the date '2022-03-27 02:00:00' is converted into a DateTime object in PHP with Europe/Paris timezone
+     * it is converted into '2022-03-27 03:00:00'.
+     * When the start of a gap and the end of a gap, both converted into a DateTime object, are equal
+     * then this means that we are switching to summer time and the gap is irrelevant
+     * The code below tracks such intervals and filters them out
+     *
+     * @param array $gaps
+     * @param Source_Zone $source_zone
+     * @return array
+     */
+    abstract protected function dstFilter(array $gaps, Source_Zone $source_zone): array;
 
     public function showForCronTask(CommonDBTM $item)
     {
@@ -85,6 +107,7 @@ TWIG;
                 $source_zone,
                 $oldest_asset_date
             );
+            $entries = $this->dstFilter($entries, $source_zone);
             $total = count($entries);
             $zone = Zone::getById($zone_id);
 
