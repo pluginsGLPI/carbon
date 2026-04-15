@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-10 02:51+0000\n"
+"POT-Creation-Date: 2026-04-14 10:49+0000\n"
 "PO-Revision-Date: 2025-10-29 09:26+0000\n"
 "Last-Translator: Edwin Elias Alvarez <elias986@yahoo.com>, 2026\n"
 "Language-Team: Spanish (Mexico) (https://app.transifex.com/teclib/teams/28042/es_MX/)\n"
@@ -57,14 +57,6 @@ msgid_plural "Usage profiles"
 msgstr[0] "Perfil de uso"
 msgstr[1] "Perfiles de uso"
 msgstr[2] "Perfiles de uso"
-
-#: templates/usageinfo.html.twig
-msgid "lifespan (in months)"
-msgstr "esperanza de vida (en meses)"
-
-#: templates/usageinfo.html.twig
-msgid "planned lifespan (in months)"
-msgstr "esperanza de vida prevista (en meses)"
 
 #: templates/quick-report.html.twig front/report.php:55
 msgid "GLPI Carbon"
@@ -434,16 +426,16 @@ msgstr "Creando inventario de prueba"
 msgid "Power consumption"
 msgstr "Consumo de potencia"
 
-#: src/UsageInfo.php:63
+#: src/UsageInfo.php:62
 msgid "Usage informations"
 msgstr "Información de uso"
 
-#: src/UsageInfo.php:95 src/AbstractModel.php:54 src/Location.php:73
+#: src/UsageInfo.php:94 src/AbstractModel.php:54 src/Location.php:73
 #: src/AbstractType.php:55 src/Profile.php:45
 msgid "Environmental impact"
 msgstr "Impacto ambiental"
 
-#: src/UsageInfo.php:243
+#: src/UsageInfo.php:241
 #, php-format
 msgid "%s More information %s"
 msgstr "%s Más información %s"

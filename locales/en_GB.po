@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-14 02:51+0000\n"
-"PO-Revision-Date: 2026-04-14 02:51+0000\n"
+"POT-Creation-Date: 2026-04-15 02:49+0000\n"
+"PO-Revision-Date: 2026-04-15 02:49+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: en_GB\n"
@@ -52,14 +52,6 @@ msgid "Usage profile"
 msgid_plural "Usage profiles"
 msgstr[0] "Usage profile"
 msgstr[1] "Usage profiles"
-
-#: templates/usageinfo.html.twig
-msgid "lifespan (in months)"
-msgstr "lifespan (in months)"
-
-#: templates/usageinfo.html.twig
-msgid "planned lifespan (in months)"
-msgstr "planned lifespan (in months)"
 
 #: templates/quick-report.html.twig front/report.php:55
 msgid "GLPI Carbon"
@@ -420,16 +412,16 @@ msgstr "Creating test inventory"
 msgid "Power consumption"
 msgstr "Power consumption"
 
-#: src/UsageInfo.php:63
+#: src/UsageInfo.php:62
 msgid "Usage informations"
 msgstr "Usage informations"
 
-#: src/UsageInfo.php:95 src/AbstractModel.php:54 src/Location.php:73
+#: src/UsageInfo.php:94 src/AbstractModel.php:54 src/Location.php:73
 #: src/AbstractType.php:55 src/Profile.php:45
 msgid "Environmental impact"
 msgstr "Environmental impact"
 
-#: src/UsageInfo.php:243
+#: src/UsageInfo.php:241
 #, php-format
 msgid "%s More information %s"
 msgstr "%s More information %s"
