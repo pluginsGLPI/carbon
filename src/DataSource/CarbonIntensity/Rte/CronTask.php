@@ -35,12 +35,10 @@ namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\Rte;
 use CommonGLPI;
 use CronTask as GlpiCronTask;
 use DateTime;
-use DateTimeImmutable;
 use DateTimeZone;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\AbstractCronTask;
 use GlpiPlugin\Carbon\DataSource\CronTaskInterface;
 use GlpiPlugin\Carbon\Source_Zone;
-use GlpiPlugin\Carbon\Toolbox;
 
 /**
  * @method int cronDownloadRte(GlpiCronTask $task)

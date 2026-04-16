@@ -34,7 +34,6 @@ namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity;
 
 use CommonDBTM;
 use CronTask as GlpiCronTask;
-use DateTimeZone;
 use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CronTask;

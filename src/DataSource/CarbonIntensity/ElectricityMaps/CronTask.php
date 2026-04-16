@@ -34,11 +34,9 @@ namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\ElectricityMaps;
 
 use CommonGLPI;
 use CronTask as GlpiCronTask;
-use DateTimeZone;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\AbstractCronTask;
 use GlpiPlugin\Carbon\DataSource\CronTaskInterface;
 use GlpiPlugin\Carbon\Source_Zone;
-use GlpiPlugin\Carbon\Toolbox;
 
 class CronTask extends AbstractCronTask implements CronTaskInterface
 {
