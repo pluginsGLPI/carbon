@@ -36,7 +36,7 @@ use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector as DeadCode;
 use Rector\ValueObject\PhpVersion;
 
-require_once __DIR__ . '/../../src/Plugin.php';
+// require_once __DIR__ . '/../../src/Plugin.php';
 
 return RectorConfig::configure()
     ->withPaths([
