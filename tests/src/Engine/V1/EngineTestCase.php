@@ -32,6 +32,7 @@
 
 namespace GlpiPlugin\Carbon\Tests\Engine\V1;
 
+use Generator;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 
 abstract class EngineTestCase extends DbTestCase
@@ -42,9 +43,9 @@ abstract class EngineTestCase extends DbTestCase
     protected static string $type_class = '';
     protected static string $model_class = '';
 
-    abstract public function getEnergyPerDayProvider(): \Generator;
+    abstract public function getEnergyPerDayProvider(): Generator;
 
-    abstract public function getCarbonEmissionPerDateProvider(): \Generator;
+    abstract public function getCarbonEmissionPerDateProvider(): Generator;
 
     /**
      * The delta for comparison of computed emission with expected value,
@@ -52,7 +53,7 @@ abstract class EngineTestCase extends DbTestCase
      */
     public const EPSILON = 0.001;
 
-    public function getPowerProvider(): \Generator
+    public function getPowerProvider(): Generator
     {
         $item = $this->createItem(static::$itemtype_class);
         $engine = new static::$engine_class($item);

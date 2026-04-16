@@ -46,13 +46,15 @@ use GlpiPlugin\Carbon\UsageInfo;
 use Location as GlpiLocation;
 use Profile as GlpiProfile;
 
-define('PLUGIN_CARBON_VERSION', '1.2.0-dev');
+// Version of the plugin (major.minor.bugfix)
+define('PLUGIN_CARBON_VERSION', '1.2.0-beta.1');
+// Schema version of this version (major.minor.bugfix)
 define('PLUGIN_CARBON_SCHEMA_VERSION', '1.2.0');
 
 // Minimal GLPI version, inclusive
-define("PLUGIN_CARBON_MIN_GLPI_VERSION", "11.0.0-beta");
+define("PLUGIN_CARBON_MIN_GLPI_VERSION", '11.0.0');
 // Maximum GLPI version, exclusive
-define("PLUGIN_CARBON_MAX_GLPI_VERSION", "12.0.0");
+define("PLUGIN_CARBON_MAX_GLPI_VERSION", '12.0.0');
 
 define('PLUGIN_CARBON_DECIMALS', 3);
 
