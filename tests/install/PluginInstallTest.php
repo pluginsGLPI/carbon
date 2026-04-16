@@ -924,4 +924,98 @@ class PluginInstallTest extends CommonTestCase
         $expected = ['GlpiPlugin\Carbon\NetworkEquipmentModel'];
         $this->assertEquals($expected, $result);
     }
+
+    #[CoversNothing()]
+    public function test_version_is_consistent_across_files()
+    {
+        $setup_version = PLUGIN_CARBON_VERSION;
+        $plugin_dir = dirname(__DIR__, 2);
+        $composer_file = $plugin_dir . '/composer.json';
+        $package_file  = $plugin_dir . '/package.json';
+        $package_lock_file  = $plugin_dir . '/package-lock.json';
+
+        $composer = json_decode(file_get_contents($composer_file), true);
+        $package = json_decode(file_get_contents($package_file), true);
+        $package_lock = json_decode(file_get_contents($package_lock_file), true);
+
+        $this->assertSame($setup_version, $composer['version'] ?? null);
+        $this->assertSame($setup_version, $package['version'] ?? null);
+        $this->assertSame($setup_version, $package_lock['version'] ?? null);
+        // Find in packages[] the entry whose name is carbon and check its version is the same as setup_version
+        $carbon_package = null;
+        foreach ($package_lock['packages'] as $package) {
+            if ($package['name'] === 'carbon') {
+                $carbon_package = $package;
+                break;
+            }
+        }
+        $this->assertNotNull($carbon_package, "Carbon package not found in package-lock.json");
+        $this->assertSame($setup_version, $carbon_package['version'] ?? null, "Version mismatch for carbon package");
+    }
+
+    #[CoversNothing()]
+    public function test_tagged_version_is_declared_in_plugin_xml()
+    {
+        // Test that git is available in the system
+        exec('git --version', $output, $return_var);
+        if ($return_var !== 0) {
+            $this->fail('Git is not available in the system');
+            return;
+        }
+
+        // check if HEAD is exactly a tagged commit
+        unset($output);
+        exec('git describe --tags --exact-match 2> /dev/null', $output, $return_var);
+        if ($return_var !== 0) {
+            $this->markTestSkipped('Current commit is not tagged');
+            return;
+        }
+
+        // Test that the version in setup.php is the same as the git tag
+        $tag = $output[0];
+        $setup_version = PLUGIN_CARBON_VERSION;
+        $this->assertSame($tag, $setup_version, "Git tag '$tag' does not match version in setup.php '$setup_version'");
+
+        // Chek that the version is not -dev suffixed
+        $this->assertStringNotContainsString('-dev', $setup_version, "Version '$setup_version' should not be suffixed with -dev");
+
+        // Check that the version is declared in plugin.xml
+        // in root.versions.version[].num field
+        $plugin_dir = dirname(__DIR__, 2);
+        $plugin_xml_file = $plugin_dir . '/plugin.xml';
+        $plugin_xml = simplexml_load_file($plugin_xml_file);
+        $namespaces = $plugin_xml->getNamespaces(true);
+        $versions = $plugin_xml->children($namespaces['root'])->versions->version;
+        $version_found = false;
+        foreach ($versions as $version) {
+            if ((string) $version->num === $setup_version) {
+                $version_found = true;
+                break;
+            }
+        }
+        $this->assertTrue($version_found, "Version '$setup_version' is not declared in plugin.xml");
+    }
+
+    public function test_changelog_is_updated()
+    {
+        // Test that git is available in the system
+        exec('git --version', $output, $return_var);
+        if ($return_var !== 0) {
+            $this->fail('Git is not available in the system');
+            return;
+        }
+
+        // check if HEAD is exactly a tagged commit
+        exec('git describe --tags --exact-match 2> /dev/null', $output, $return_var);
+        if ($return_var !== 0) {
+            $this->markTestSkipped('Current commit is not tagged');
+            return;
+        }
+
+        // Test that the version in setup.php is present in the changelog
+        $setup_version = PLUGIN_CARBON_VERSION;
+        $changelog_file = dirname(__DIR__, 2) . '/CHANGELOG.md';
+        $changelog = file_get_contents($changelog_file);
+        $this->assertStringStartsWith("## [$setup_version]", $changelog, "Version '$setup_version' not found in CHANGELOG.md");
+    }
 }
