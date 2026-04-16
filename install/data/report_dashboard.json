@@ -116,14 +116,14 @@
             "limit": "7"
         }
     },
-    "plugin_carbon_report_usage_abiotic_depletion": {
+    "plugin_carbon_report_usage_adp_impact": {
         "x": 10,
         "y": 3,
         "width": 5,
         "height": 3,
         "card_options": {
             "color": "#fccd3e",
-            "widgettype": "usage_abiotic_depletion",
+            "widgettype": "impact_criteria_number",
             "use_gradient": "0",
             "point_labels": "0",
             "limit": "7"
