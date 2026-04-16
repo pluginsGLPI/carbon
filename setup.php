@@ -46,8 +46,8 @@ use GlpiPlugin\Carbon\UsageInfo;
 use Location as GlpiLocation;
 use Profile as GlpiProfile;
 
-define('PLUGIN_CARBON_VERSION', '1.2.0-dev');
-define('PLUGIN_CARBON_SCHEMA_VERSION', '1.2.0');
+define('PLUGIN_CARBON_VERSION', '1.3.0-dev');
+define('PLUGIN_CARBON_SCHEMA_VERSION', '1.3.0');
 
 // Minimal GLPI version, inclusive
 define("PLUGIN_CARBON_MIN_GLPI_VERSION", "11.0.0-beta");
