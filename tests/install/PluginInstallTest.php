@@ -42,6 +42,7 @@ use DBmysql;
 use DbUtils;
 use DisplayPreference;
 use Glpi\Dashboard\Dashboard;
+use Glpi\Dashboard\Grid;
 use Glpi\Dashboard\Item;
 use Glpi\Dashboard\Right;
 use Glpi\DBAL\QueryExpression as QueryExpression;
@@ -67,6 +68,7 @@ use NetworkEquipmentModel;
 use NetworkEquipmentType;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Depends;
 use Plugin;
 use Profile;
 use ProfileRight;
@@ -129,7 +131,8 @@ class PluginInstallTest extends CommonTestCase
         ob_start();
         $plugin->install($plugin->fields['id']);
         $install_output = ob_get_clean();
-        $this->assertTrue($plugin->isInstalled($plugin_name), $install_output);
+        $session_messages = implode(PHP_EOL, $_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR] ?? []);
+        $this->assertTrue($plugin->isInstalled($plugin_name), $install_output . PHP_EOL . $session_messages);
 
         // Enable the plugin
         $success = $plugin->activate($plugin->fields['id']);
@@ -157,7 +160,6 @@ class PluginInstallTest extends CommonTestCase
 
         $this->checkConfig();
         $this->checkAutomaticAction();
-        $this->checkDashboard();
         $this->checkRights();
         $this->checkInitialDataSources();
         $this->checkInitialZones();
@@ -523,7 +525,7 @@ class PluginInstallTest extends CommonTestCase
         $this->assertEquals(2, count($rows));
     }
 
-    public function checkBuitFiles()
+    public function checkBuiltFiles()
     {
         global $PLUGIN_HOOKS;
 
@@ -536,7 +538,8 @@ class PluginInstallTest extends CommonTestCase
         $this->assertTrue(in_array('lib/apexcharts.js', $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon']));
     }
 
-    public function checkDashboard()
+    #[Depends('testInstallPlugin')]
+    public function test_dashboard_is_configured()
     {
         /** @var DBmysql $DB */
         global $DB;
@@ -594,6 +597,16 @@ class PluginInstallTest extends CommonTestCase
             'dashboards_dashboards_id' => $dashboard->fields['id'],
         ]);
         $this->assertCount($expected_cards_count, $rows);
+
+        // Check that all cards actually generate a valid content
+        // Let the plugin believe we are viewing the reporting page
+        $_SERVER['REQUEST_URI'] = 'https://localhost/carbon/front/report.php';
+        $grid = new Grid();
+        foreach ($rows as $row) {
+            $dashboardItem->getFromDB($row['id']);
+            $html = $grid->getCardHtml($row['card_id'], ['args' => json_decode($row['card_options'], true)]);
+            $this->assertStringNotContainsString('empty card!', $html, "Card with id {$row['card_id']} returns empty content");
+        }
     }
 
     private $zones = [
