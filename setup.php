@@ -47,7 +47,7 @@ use Location as GlpiLocation;
 use Profile as GlpiProfile;
 
 // Version of the plugin (major.minor.bugfix)
-define('PLUGIN_CARBON_VERSION', '1.2.0-beta.1');
+define('PLUGIN_CARBON_VERSION', '1.2.0-beta.2');
 // Schema version of this version (major.minor.bugfix)
 define('PLUGIN_CARBON_SCHEMA_VERSION', '1.2.0');
 
