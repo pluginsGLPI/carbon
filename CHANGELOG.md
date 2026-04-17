@@ -4,6 +4,18 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [1.2.0-beta.2](https://github.com/pluginsGLPI/carbon/compare/1.1.1...1.2.0-beta.2) (2026-04-17)
+
+### Bug Fixes
+
+
+##### Install
+
+* Dashboard card not properly set ([6e861b](https://github.com/pluginsGLPI/carbon/commit/6e861b158f44642f7a79d7b364f3deca1f96d70a))
+
+
+---
+
 ## [1.2.0-beta.1](https://github.com/pluginsGLPI/carbon/compare/1.1.1...1.2.0-beta.1) (2026-04-10)
 
 ### Features
