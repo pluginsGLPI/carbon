@@ -1000,7 +1000,6 @@ class PluginInstallTest extends CommonTestCase
         $plugin_dir = dirname(__DIR__, 2);
         $plugin_xml_file = $plugin_dir . '/plugin.xml';
         $plugin_xml = simplexml_load_file($plugin_xml_file);
-        $namespaces = $plugin_xml->getNamespaces(true);
         $versions = $plugin_xml->versions->version;
         $version_found = false;
         foreach ($versions as $version) {
