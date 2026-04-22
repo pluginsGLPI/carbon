@@ -112,12 +112,6 @@ class MonitorTest extends CommonAsset
         $computer = $this->createItem(GlpiComputer::class, [
             'locations_id' => $glpi_location->getID(),
         ]);
-        // TODO: replace with Asset_PeripheralAsset
-        // $computer_item = $this->createItem(Computer_Item::class, [
-        //     'computers_id' => $computer->getID(),
-        //     'itemtype'     => $glpi_monitor->getType(),
-        //     'items_id'     => $glpi_monitor->getID(),
-        // ]);
         $computer_item = $this->createItem(Asset_PeripheralAsset::class, [
             'itemtype_asset'    => get_class($computer),
             'items_id_asset'    => $computer->getID(),
@@ -128,6 +122,7 @@ class MonitorTest extends CommonAsset
             'itemtype'     => $glpi_monitor->getType(),
             'items_id'     => $glpi_monitor->getID(),
             'buy_date'     => '2024-01-01',
+            'decommission_date' => '2028-05-01',
         ]);
         $usage_profile = $this->createItem(ComputerUsageProfile::class, [
             'time_start'   => '09:00',
@@ -351,6 +346,7 @@ class MonitorTest extends CommonAsset
             'ci_download_enabled'         => true,
             'ci_fallback_available'       => true,
             'not_is_ignore'               => true,
+            'has_decommission_date'       => true,
         ];
         $result = $history->getHistorizableDiagnosis($glpi_monitor);
         $this->assertEquals($expected, $result);
@@ -394,6 +390,7 @@ class MonitorTest extends CommonAsset
             'ci_download_enabled'         => true,
             'ci_fallback_available'       => true,
             'not_is_ignore'               => false,
+            'has_decommission_date'       => true,
         ];
         $result = $history->getHistorizableDiagnosis($glpi_monitor);
         $this->assertEquals($expected, $result);
@@ -437,6 +434,7 @@ class MonitorTest extends CommonAsset
             'ci_download_enabled'         => true,
             'ci_fallback_available'       => true,
             'not_is_ignore'               => true,
+            'has_decommission_date'       => true,
         ];
         $result = $history->getHistorizableDiagnosis($glpi_monitor);
         $this->assertEquals($expected, $result);
@@ -480,6 +478,7 @@ class MonitorTest extends CommonAsset
             'ci_download_enabled'         => true,
             'ci_fallback_available'       => true,
             'not_is_ignore'               => true,
+            'has_decommission_date'       => true,
         ];
         $result = $history->getHistorizableDiagnosis($glpi_monitor);
         $this->assertEquals($expected, $result);
@@ -523,6 +522,7 @@ class MonitorTest extends CommonAsset
             'ci_download_enabled'         => false, // No computer cascades this requirement to be not met
             'ci_fallback_available'       => false, // No computer cascades this requirement to be not met
             'not_is_ignore'               => true,
+            'has_decommission_date'       => true,
         ];
         $result = $history->getHistorizableDiagnosis($glpi_monitor);
         $this->assertEquals($expected, $result);
@@ -565,6 +565,7 @@ class MonitorTest extends CommonAsset
             'ci_download_enabled'         => true,
             'ci_fallback_available'       => true,
             'not_is_ignore'               => true,
+            'has_decommission_date'       => true,
         ];
         $result = $history->getHistorizableDiagnosis($glpi_monitor);
         $this->assertEquals($expected, $result);
@@ -608,6 +609,7 @@ class MonitorTest extends CommonAsset
             'ci_download_enabled'         => false, // No location cascades this requirement to be not met
             'ci_fallback_available'       => false, // No location cascades this requirement to be not met
             'not_is_ignore'               => true,
+            'has_decommission_date'       => true,
         ];
         $result = $history->getHistorizableDiagnosis($glpi_monitor);
         $this->assertEquals($expected, $result);
@@ -651,6 +653,7 @@ class MonitorTest extends CommonAsset
             'ci_download_enabled'         => true,
             'ci_fallback_available'       => true,
             'not_is_ignore'               => true,
+            'has_decommission_date'       => true,
         ];
         $result = $history->getHistorizableDiagnosis($glpi_monitor);
         $this->assertEquals($result, $result);
@@ -694,6 +697,7 @@ class MonitorTest extends CommonAsset
             'ci_download_enabled'         => true,
             'ci_fallback_available'       => true,
             'not_is_ignore'               => true,
+            'has_decommission_date'       => true,
         ];
         $result = $history->getHistorizableDiagnosis($glpi_monitor);
         $this->assertEquals($result, $result);
@@ -736,6 +740,7 @@ class MonitorTest extends CommonAsset
             'ci_download_enabled'         => true,
             'ci_fallback_available'       => true,
             'not_is_ignore'               => true,
+            'has_decommission_date'       => true,
         ];
         $result = $history->getHistorizableDiagnosis($glpi_monitor);
         $this->assertEquals($result, $result);
@@ -778,6 +783,7 @@ class MonitorTest extends CommonAsset
             'ci_download_enabled'         => true,
             'ci_fallback_available'       => true,
             'not_is_ignore'               => true,
+            'has_decommission_date'       => true,
         ];
         $result = $history->getHistorizableDiagnosis($glpi_monitor);
         $this->assertEquals($result, $result);
@@ -820,6 +826,7 @@ class MonitorTest extends CommonAsset
             'ci_download_enabled'         => true,
             'ci_fallback_available'       => true,
             'not_is_ignore'               => true,
+            'has_decommission_date'       => true,
         ];
         $result = $history->getHistorizableDiagnosis($glpi_monitor);
         $this->assertEquals($result, $result);
@@ -861,6 +868,7 @@ class MonitorTest extends CommonAsset
             'ci_download_enabled'         => true,
             'ci_fallback_available'       => true,
             'not_is_ignore'               => true,
+            'has_decommission_date'       => true,
         ];
         $result = $history->getHistorizableDiagnosis($glpi_monitor);
         $this->assertEquals($result, $result);
@@ -902,6 +910,7 @@ class MonitorTest extends CommonAsset
             'ci_download_enabled'         => false,
             'ci_fallback_available'       => true,
             'not_is_ignore'               => true,
+            'has_decommission_date'       => true,
         ];
         $result = $history->getHistorizableDiagnosis($glpi_monitor);
         $this->assertEquals($result, $result);
@@ -943,6 +952,7 @@ class MonitorTest extends CommonAsset
             'ci_download_enabled'         => false,
             'ci_fallback_available'       => true,
             'not_is_ignore'               => true,
+            'has_decommission_date'       => true,
         ];
         $result = $history->getHistorizableDiagnosis($glpi_monitor);
         $this->assertEquals($result, $result);
@@ -986,6 +996,49 @@ class MonitorTest extends CommonAsset
             'ci_download_enabled'         => false,
             'ci_fallback_available'       => false,
             'not_is_ignore'               => true,
+            'has_decommission_date'       => true,
+        ];
+        $result = $history->getHistorizableDiagnosis($glpi_monitor);
+        $this->assertEquals($result, $result);
+        // $result = $history->canHistorize($glpi_monitor->getID());
+        // $this->assertTrue($result);
+    }
+
+    public function test_getHistorizableDiagnosis_when_monitor_has_no_decommission_date()
+    {
+        $history = new Monitor();
+
+        [
+            $glpi_monitor,
+            $glpi_location,
+            $location,
+            $glpi_monitor_model,
+            $glpi_monitor_type,
+            $monitor_type,
+            $infocom,
+            $usage_profile,
+            $zone,
+            $source_zone,
+            $computer,
+        ] = $this->getHistorizableMonitor();
+        $this->updateItem($infocom, ['decommission_date' => null]);
+
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_computer'                => true,
+            'has_usage_profile'           => true,
+            'has_location'                => true,
+            'has_carbon_intensity_zone'   => true,
+            'has_model'                   => true,
+            'has_model_power_consumption' => true,
+            'has_type'                    => true,
+            'has_type_power_consumption'  => true,
+            'has_inventory_entry_date'    => true,
+            'ci_download_enabled'         => false,
+            'ci_fallback_available'       => false,
+            'not_is_ignore'               => true,
+            'has_decommission_date'       => false,
         ];
         $result = $history->getHistorizableDiagnosis($glpi_monitor);
         $this->assertEquals($result, $result);

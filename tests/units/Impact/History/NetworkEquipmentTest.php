@@ -102,6 +102,7 @@ class NetworkEquipmentTest extends CommonAsset
             'itemtype' => $glpi_networkequipment->getType(),
             'items_id' => $glpi_networkequipment->getID(),
             'use_date' => '2020-01-01',
+            'decommission_date' => '2028-05-01',
         ]);
         $impact = $this->createItem(UsageInfo::class, [
             'itemtype' => $glpi_networkequipment->getType(),
@@ -285,6 +286,7 @@ class NetworkEquipmentTest extends CommonAsset
             'ci_download_enabled'         => true,
             'ci_fallback_available'       => true,
             'not_is_ignore'               => true,
+            'has_decommission_date'       => true,
         ];
 
         $result = $history->getHistorizableDiagnosis($glpi_networkequipment);
@@ -320,6 +322,7 @@ class NetworkEquipmentTest extends CommonAsset
             'ci_download_enabled'         => true,
             'ci_fallback_available'       => true,
             'not_is_ignore'               => true,
+            'has_decommission_date'       => true,
         ];
 
         $result = $history->getHistorizableDiagnosis($glpi_networkequipment);
@@ -355,6 +358,7 @@ class NetworkEquipmentTest extends CommonAsset
             'ci_download_enabled'         => true,
             'ci_fallback_available'       => true,
             'not_is_ignore'               => true,
+            'has_decommission_date'       => true,
         ];
 
         $result = $history->getHistorizableDiagnosis($glpi_networkequipment);
@@ -390,6 +394,7 @@ class NetworkEquipmentTest extends CommonAsset
             'ci_download_enabled'         => false, // No location cascades this requirement to be not met
             'ci_fallback_available'       => false, // No location cascades this requirement to be not met
             'not_is_ignore'               => true,
+            'has_decommission_date'       => true,
         ];
 
         $result = $history->getHistorizableDiagnosis($glpi_networkequipment);
@@ -425,6 +430,7 @@ class NetworkEquipmentTest extends CommonAsset
             'ci_download_enabled'         => true,
             'ci_fallback_available'       => true,
             'not_is_ignore'               => true,
+            'has_decommission_date'       => true,
         ];
 
         $result = $history->getHistorizableDiagnosis($glpi_networkequipment);
@@ -460,6 +466,7 @@ class NetworkEquipmentTest extends CommonAsset
             'ci_download_enabled'         => true,
             'ci_fallback_available'       => true,
             'not_is_ignore'               => true,
+            'has_decommission_date'       => true,
         ];
 
         $result = $history->getHistorizableDiagnosis($glpi_networkequipment);
@@ -495,6 +502,7 @@ class NetworkEquipmentTest extends CommonAsset
             'ci_download_enabled'         => true,
             'ci_fallback_available'       => true,
             'not_is_ignore'               => true,
+            'has_decommission_date'       => true,
         ];
 
         $result = $history->getHistorizableDiagnosis($glpi_networkequipment);
@@ -530,6 +538,7 @@ class NetworkEquipmentTest extends CommonAsset
             'ci_download_enabled'         => true,
             'ci_fallback_available'       => true,
             'not_is_ignore'               => true,
+            'has_decommission_date'       => true,
         ];
 
         $result = $history->getHistorizableDiagnosis($glpi_networkequipment);
@@ -565,6 +574,7 @@ class NetworkEquipmentTest extends CommonAsset
             'ci_download_enabled'         => true,
             'ci_fallback_available'       => true,
             'not_is_ignore'               => true,
+            'has_decommission_date'       => true,
         ];
 
         $result = $history->getHistorizableDiagnosis($glpi_networkequipment);
@@ -600,6 +610,7 @@ class NetworkEquipmentTest extends CommonAsset
             'ci_download_enabled'         => true,
             'ci_fallback_available'       => true,
             'not_is_ignore'               => true,
+            'has_decommission_date'       => true,
         ];
 
         $result = $history->getHistorizableDiagnosis($glpi_networkequipment);
@@ -635,6 +646,7 @@ class NetworkEquipmentTest extends CommonAsset
             'ci_download_enabled'         => false,
             'ci_fallback_available'       => true,
             'not_is_ignore'               => true,
+            'has_decommission_date'       => true,
         ];
 
         $result = $history->getHistorizableDiagnosis($glpi_networkequipment);
@@ -672,12 +684,12 @@ class NetworkEquipmentTest extends CommonAsset
             'ci_download_enabled'         => true,
             'ci_fallback_available'       => false,
             'not_is_ignore'               => true,
+            'has_decommission_date'       => true,
         ];
 
         $result = $history->getHistorizableDiagnosis($glpi_networkequipment);
         $this->assertEquals($expected, $result);
     }
-
 
     public function test_getHistorizableDiagnosis_when_networkequipment_is_ignored()
     {
@@ -708,6 +720,44 @@ class NetworkEquipmentTest extends CommonAsset
             'ci_download_enabled'         => true,
             'ci_fallback_available'       => true,
             'not_is_ignore'               => false,
+            'has_decommission_date'       => true,
+        ];
+
+        $result = $history->getHistorizableDiagnosis($glpi_networkequipment);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_getHistorizableDiagnosis_when_networkequipment_has_no_decommission_date()
+    {
+        $history = new NetworkEquipment();
+
+        [
+            $glpi_networkequipment,
+            $glpi_location,
+            $location,
+            $source_zone,
+            $glpi_networkequipment_model,
+            $glpi_networkequipment_type,
+            $networkequipment_type,
+            $infocom,
+            $zone,
+        ] = $this->getHistorizableNetworkEquipment();
+        $this->updateItem($infocom, ['decommission_date' => null]);
+
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_location'                => true,
+            'has_carbon_intensity_zone'   => true,
+            'has_model'                   => true,
+            'has_model_power_consumption' => true,
+            'has_type'                    => true,
+            'has_type_power_consumption'  => true,
+            'has_inventory_entry_date'    => true,
+            'ci_download_enabled'         => true,
+            'ci_fallback_available'       => true,
+            'not_is_ignore'               => true,
+            'has_decommission_date'       => false,
         ];
 
         $result = $history->getHistorizableDiagnosis($glpi_networkequipment);
