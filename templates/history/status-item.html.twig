@@ -209,6 +209,14 @@
                             {{ fields.field('', field, __('The asset has an inventory entry date', 'carbon')) }}
                         {% endif %}
 
+                        {% if status.has_decommission_date is defined %}
+                            {% set field = warning_field %}
+                            {% if status.has_decommission_date %}
+                                {% set field = ok_field %}
+                            {% endif %}
+                            {{ fields.field('', field, __('The asset has a decommission date', 'carbon')) }}
+                        {% endif %}
+
                         {{ fields.smallTitle(__('Legend', 'carbon')) }}
 
                         <div class="legend-grid">

@@ -211,6 +211,7 @@ class Monitor extends AbstractAsset
             Infocom::getTableField('use_date'),
             Infocom::getTableField('delivery_date'),
             Infocom::getTableField('buy_date'),
+            Infocom::getTableField('decommission_date'),
             self::$itemtype::getTableField('date_creation'),
         ];
         // Change inner joins into left joins to identify missing data
@@ -255,9 +256,11 @@ class Monitor extends AbstractAsset
             ?? $data['buy_date']
             ?? $data['delivery_date']
             ?? $data['use_date']
+            // ?? $data['date_creation']
             // ?? $data['date_mod']
             ?? null;
         $status['has_inventory_entry_date'] = ($item_oldest_date !== null);
+        $status['has_decommission_date'] = ($data['decommission_date'] !== null);
 
         return $status;
     }
