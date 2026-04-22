@@ -43,8 +43,8 @@ use GlpiPlugin\Carbon\Dashboard\Widget;
 use GlpiPlugin\Carbon\Impact\Type;
 use Html;
 use Infocom;
-use Monitor;
-use NetworkEquipment;
+use Monitor as GlpiMonitor;
+use NetworkEquipment as GlpiNetworkEquipment;
 use Toolbox as GlpiToolbox;
 
 /**
@@ -212,14 +212,15 @@ class UsageInfo extends CommonDBChild
             'itemtype' => $asset->getType(),
             'items_id' => $asset->getID(),
         ]);
-        if (in_array($asset->getType(), [GlpiComputer::class, NetworkEquipment::class, Monitor::class])) {
+        if (in_array($asset->getType(), [GlpiComputer::class, GlpiNetworkEquipment::class, GlpiMonitor::class])) {
             // TODO: decide if we show or not this impact.
             unset($usage_impact->fields['gwp']);
             unset($usage_impact->fields['gwpbb']);
             unset($usage_impact->fields['gwppf']);
             unset($usage_impact->fields['gwpplu']);
         }
-        $usage_carbon_emission_count = countElementsInTable(CarbonEmission::getTable(), [
+        $usage_impact->fields['gwp'] = CarbonEmission::getTotalUsageEmissionForItem($asset);
+        $usage_carbon_emission_count = countElementsInTable(getTableForItemType(CarbonEmission::class), [
             'itemtype' => $asset->getType(),
             'items_id' => $asset->getID(),
         ]);
