@@ -219,6 +219,7 @@ class Computer extends AbstractAsset
             Infocom::getTableField('use_date'),
             Infocom::getTableField('delivery_date'),
             Infocom::getTableField('buy_date'),
+            Infocom::getTableField('decommission_date'),
             self::$itemtype::getTableField('date_creation'),
             self::$itemtype::getTableField('date_mod'),
         ];
@@ -267,6 +268,7 @@ class Computer extends AbstractAsset
             // ?? $data['date_mod']
             ?? null;
         $status['has_inventory_entry_date'] = ($item_oldest_date !== null);
+        $status['has_decommission_date'] = ($data['decommission_date'] !== null);
 
         return $status;
     }
