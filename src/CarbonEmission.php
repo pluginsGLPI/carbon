@@ -36,6 +36,7 @@ use CommonDBChild;
 use CommonDBTM;
 use DateInterval;
 use DateTimeInterface;
+use DBmysql;
 use Entity;
 use Location;
 
@@ -188,5 +189,23 @@ class CarbonEmission extends CommonDBChild
         ];
         $interval = new DateInterval('P1D');
         return Toolbox::findTemporalGapsInTable(self::getTable(), $start, $interval, $stop, $criteria);
+    }
+
+    public static function getTotalUsageEmissionForItem(CommonDBTM $item): ?float
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        $result = $DB->request([
+            'SELECT' => ['SUM'  => 'emission_per_day as total_emissions'],
+            'FROM' => self::getTable(),
+            'WHERE' => [
+                'itemtype' => $item->getType(),
+                'items_id' => $item->getID(),
+            ],
+        ]);
+        /** @var ?array<float> $row */
+        $row = $result->current();
+        return $row['total_emissions'] ?? null;
     }
 }

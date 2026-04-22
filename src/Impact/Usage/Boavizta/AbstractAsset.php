@@ -248,13 +248,18 @@ abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterfa
      * Get a representation of the typical asset load
      * TODO: implement a real workload repartition, based on data we could collect in the future
      *
-     * @return array
+     * @return array {
+*        list<array {
+     *     'time_percentage': <int>
+     *     'load_percentage': <int>
+     *   }>
+     * }
      */
     protected function getWorkloadRepartition(): array
     {
         return [[
-            'time_percentage' => 100,
-            'load_percentage' => 100,
+            'time_percentage' => 100, // 100% of the used time ratio ...
+            'load_percentage' => 100, // ... the computer is at 100% load
         ]];
     }
 

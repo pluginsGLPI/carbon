@@ -40,6 +40,7 @@ use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\EmbodiedImpact;
+use GlpiPlugin\Carbon\Impact\History\AssetInterface;
 use GlpiPlugin\Carbon\Install;
 use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\MonitorType;
@@ -149,6 +150,7 @@ function plugin_carbon_postShowTab(array $param)
         return;
     }
 
+    /** @var class-string<AssetInterface> $history_class */
     $history_class = 'GlpiPlugin\\Carbon\\Impact\\History\\' . $asset_itemtype;
     $history_class::showHistorizableDiagnosis($param['item']);
     UsageInfo::showCharts($param['item']);

@@ -154,4 +154,43 @@ class CarbonEmissionTest extends DbTestCase
         ];
         $this->assertEquals($expected, $result);
     }
+
+    public function test_GetTotalUsageEmissionForItem_returns_sum_for_item(): void
+    {
+        $asset = $this->createItem(Computer::class, [
+            'date_creation' => '2024-01-01 00:00:00',
+        ]);
+
+        $this->createCarbonEmissionData(
+            $asset,
+            new DateTime('2024-01-01 00:00:00'),
+            new DateInterval('P3D'),
+            20.0,
+            5.5
+        );
+
+        $this->createCarbonEmissionData(
+            $asset,
+            new DateTime('2024-01-04 00:00:00'),
+            new DateInterval('P2D'),
+            12.0,
+            6.0
+        );
+
+        $total = CarbonEmission::getTotalUsageEmissionForItem($asset);
+
+        $expected = 3 * 5.5 + 2 * 6;
+        $this->assertEquals($expected, $total);
+    }
+
+    public function test_GetTotalUsageEmissionForItem_returns_null_when_no_emissions(): void
+    {
+        $asset = $this->createItem(Computer::class, [
+            'date_creation' => '2024-01-01 00:00:00',
+        ]);
+
+        $total = CarbonEmission::getTotalUsageEmissionForItem($asset);
+
+        $this->assertNull($total);
+    }
 }
