@@ -315,13 +315,11 @@ class Client extends AbstractClient
         } catch (RuntimeException $e) {
             return [];
         }
-        if (count($response) === 0) {
-            return [];
-        }
         $this->step = $this->detectStep($response);
         $expected_samples_count = $expected_samples_hours * (60 / $this->step);
         $expected_samples_count--; // End boundary is excluded, decreasing the expeected count by 1
         if (($dataset === self::DATASET_REALTIME && abs(count($response) - $expected_samples_count) > (60 / $this->step))) {
+            // Got less samples than expected, try again with consolidated data set
             $alt_response = $this->fetchRange($start, $stop, $source_zone, self::DATASET_CONSOLIDATED);
             if (!isset($alt_response['error_code']) && count($alt_response) > count($response)) {
                 // Use the alternative response if more samples than the original response
@@ -359,9 +357,9 @@ class Client extends AbstractClient
             $intensities = $this->downsample($response, $this->step);
         } else {
             $intensities = [];
-            array_walk($response, function ($record) use ($intensities) {
+            array_walk($response, function ($record) use (&$intensities) {
                 $intensities[] = [
-                    'datetime' => $record['datetime']->format('Y-m-d\TH:00:00??????'),
+                    'datetime' => $record['datetime']->format('Y-m-d\TH:00:00'),
                     'intensity' => (float) $record['taux_co2'],
                     'data_quality' => AbstractTracked::DATA_QUALITY_RAW_REAL_TIME_MEASUREMENT,
                 ];

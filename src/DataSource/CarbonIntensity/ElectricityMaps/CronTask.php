@@ -36,6 +36,7 @@ use CommonGLPI;
 use CronTask as GlpiCronTask;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\AbstractCronTask;
 use GlpiPlugin\Carbon\DataSource\CronTaskInterface;
+use GlpiPlugin\Carbon\Source_Zone;
 
 class CronTask extends AbstractCronTask implements CronTaskInterface
 {
@@ -88,5 +89,13 @@ class CronTask extends AbstractCronTask implements CronTaskInterface
                 ];
         }
         return [];
+    }
+
+    protected function dstFilter(array $gaps, Source_Zone $source_zone): array
+    {
+        // TODO: find a way to handle electricitymaps territory codes
+        // They don't match any norm (US-CAL, US-CAR)
+        // The codes with a 3rd name (US-CAL-CISO) seems to mention an energy distribution or production entity
+        return $gaps;
     }
 }

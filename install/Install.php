@@ -194,7 +194,7 @@ class Install
             }
         }
 
-        // Cherry pick install sub tasts to run
+        // Cherry pick sub tasts to run from fresh install workflow
         // Useful to rewrite missing data in DB
         $install_dir = __DIR__ . '/install/';
         $update_scripts = scandir($install_dir);

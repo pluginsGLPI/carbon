@@ -54,6 +54,7 @@ abstract class AbstractTracked
     public const DATA_QUALITY_RAW_REAL_TIME_MEASUREMENT_DOWNSAMPLED = 3;
     public const DATA_QUALITY_RAW_REAL_TIME_MEASUREMENT = 4;
 
+    /** @var array<int> $sources Source qualities */
     protected array $sources = [];
 
     abstract public function getValue();
