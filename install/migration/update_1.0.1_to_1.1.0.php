@@ -30,7 +30,7 @@
  * -------------------------------------------------------------------------
  */
 
-function update101to110(Migration $migration)
+function update101to110(Migration $migration): bool
 {
     /** @var DBmysql $DB */
     global $DB;
