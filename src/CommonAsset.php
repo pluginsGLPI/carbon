@@ -35,9 +35,11 @@ namespace GlpiPlugin\Carbon;
 use CommonDBTM;
 use Html;
 use MassiveAction;
+use Override;
 
 abstract class CommonAsset extends CommonDBTM
 {
+    #[Override]
     public static function showMassiveActionsSubForm(MassiveAction $ma): bool
     {
         switch ($ma->getAction()) {
@@ -49,6 +51,7 @@ abstract class CommonAsset extends CommonDBTM
         return parent::showMassiveActionsSubForm($ma);
     }
 
+    #[Override]
     public static function processMassiveActionsForOneItemtype(MassiveAction $ma, CommonDBTM $item, array $ids)
     {
         switch ($ma->getAction()) {

@@ -42,6 +42,7 @@ use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\DataTracking\TrackedInt;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
+use Override;
 
 abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInterface
 {
@@ -67,6 +68,7 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
      *
      * {@inheritDoc}
      */
+    #[Override]
     public function getEnergyPerDay(DateTimeInterface $day): TrackedFloat
     {
         $usage_profile = $this->getUsageProfile();
@@ -94,6 +96,7 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
         );
     }
 
+    #[Override]
     public function getCarbonEmissionPerDay(DateTimeInterface $day, Source_Zone $source_zone): ?TrackedFloat
     {
         $usage_profile = $this->getUsageProfile();

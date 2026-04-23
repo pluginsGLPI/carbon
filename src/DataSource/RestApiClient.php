@@ -35,6 +35,7 @@ namespace GlpiPlugin\Carbon\DataSource;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Message;
+use Override;
 use Toolbox;
 
 class RestApiClient implements RestApiClientInterface
@@ -65,6 +66,7 @@ class RestApiClient implements RestApiClientInterface
         $this->api_client = new Client(array_merge_recursive($local_params, $params));
     }
 
+    #[Override]
     public function request(string $method = 'GET', string $uri = '', array $options = [])
     {
         try {

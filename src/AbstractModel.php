@@ -38,22 +38,26 @@ use CommonGLPI;
 use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\DataTracking\TrackedInt;
 use GlpiPlugin\Carbon\Impact\Type;
+use Override;
 use Session;
 
 class AbstractModel extends CommonDBChild
 {
     public static $rightname = 'dropdown';
 
+    #[Override]
     public static function getIcon(): string
     {
         return 'fa-solid fa-solar-panel';
     }
 
+    #[Override]
     public static function getTypeName($nb = 0)
     {
         return __('Environmental impact', 'carbon');
     }
 
+    #[Override]
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         $tabName = '';
@@ -73,6 +77,7 @@ class AbstractModel extends CommonDBChild
      * @param int $withtemplate
      * @return void
      */
+    #[Override]
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
         /** @var CommonDBTM $item */
@@ -85,6 +90,7 @@ class AbstractModel extends CommonDBChild
         $model->showForItemType($model->getID());
     }
 
+    #[Override]
     public function prepareInputForUpdate($input)
     {
         $keys = Type::getImpactTypes();
@@ -151,6 +157,7 @@ class AbstractModel extends CommonDBChild
         ]);
     }
 
+    #[Override]
     public function rawSearchOptions()
     {
         $tab = parent::rawSearchOptions();

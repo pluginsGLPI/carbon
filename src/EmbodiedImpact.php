@@ -32,6 +32,8 @@
 
 namespace GlpiPlugin\Carbon;
 
+use Override;
+
 /**
  * Embodied impact of assets
  *
@@ -39,6 +41,7 @@ namespace GlpiPlugin\Carbon;
  */
 class EmbodiedImpact extends AbstractImpact
 {
+    #[Override]
     public static function getTypeName($nb = 0)
     {
         return _n("Embodied impact", "Embodied impacts", $nb, 'carbon');

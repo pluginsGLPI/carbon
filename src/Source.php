@@ -37,35 +37,42 @@ use CommonDropdown;
 use CommonGLPI;
 use DBmysql;
 use DbUtils;
+use Override;
 use Session;
 
 class Source extends CommonDropdown
 {
+    #[Override]
     public static function getTypeName($nb = 0)
     {
         return _n("Carbon intensity source", "Carbon intensity sources", $nb, 'carbon');
     }
 
+    #[Override]
     public static function canCreate(): bool
     {
         return false;
     }
 
+    #[Override]
     public static function canUpdate(): bool
     {
         return false;
     }
 
+    #[Override]
     public static function canDelete(): bool
     {
         return false;
     }
 
+    #[Override]
     public static function canPurge(): bool
     {
         return false;
     }
 
+    #[Override]
     public function defineTabs($options = [])
     {
         $tabs = parent::defineTabs($options);
@@ -73,6 +80,7 @@ class Source extends CommonDropdown
         return $tabs;
     }
 
+    #[Override]
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         if (!$withtemplate) {
@@ -93,6 +101,7 @@ class Source extends CommonDropdown
         return '';
     }
 
+    #[Override]
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
         /** @var CommonDBTM $item */
@@ -104,6 +113,7 @@ class Source extends CommonDropdown
         return true;
     }
 
+    #[Override]
     public function rawSearchOptions()
     {
         $tab = parent::rawSearchOptions();

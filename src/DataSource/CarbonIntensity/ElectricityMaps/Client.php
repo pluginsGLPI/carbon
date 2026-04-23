@@ -48,6 +48,7 @@ use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Toolbox;
 use GlpiPlugin\Carbon\Zone;
+use Override;
 use RuntimeException;
 use Safe\Exceptions\FilesystemException;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -78,16 +79,19 @@ class Client extends AbstractClient
         }
     }
 
+    #[Override]
     public function getSourceName(): string
     {
         return 'ElectricityMap';
     }
 
+    #[Override]
     public function getDataInterval(): string
     {
         return 'P60M';
     }
 
+    #[Override]
     public function getMaxIncrementalAge(): DateTimeImmutable
     {
         $recent_limit = new DateTime('1 day ago');
@@ -96,11 +100,13 @@ class Client extends AbstractClient
         return DateTimeImmutable::createFromMutable($recent_limit);
     }
 
+    #[Override]
     public function getHardStartDate(): DateTimeImmutable
     {
         return DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '2021-01-01T00:00:00+00:00');
     }
 
+    #[Override]
     public function createZones(): int
     {
         $source = new Source();
@@ -184,6 +190,7 @@ class Client extends AbstractClient
         return $response;
     }
 
+    #[Override]
     public function getSupportedZones(): array
     {
         $zones = [];
@@ -202,6 +209,7 @@ class Client extends AbstractClient
      *
      * The method fetches the intensities for the date range specified in argument.
      */
+    #[Override]
     public function fetchDay(DateTimeImmutable $day, Source_Zone $source_zone): array
     {
         $zone_code = $source_zone->fields['code'];
@@ -268,6 +276,7 @@ class Client extends AbstractClient
         ];
     }
 
+    #[Override]
     public function fetchRange(DateTimeImmutable $start, DateTimeImmutable $stop, Source_Zone $source_zone): array
     {
         $this->step = 60;
@@ -375,6 +384,7 @@ class Client extends AbstractClient
         return $full_response['data'];
     }
 
+    #[Override]
     protected function formatOutput(array $response, int $step): array
     {
         // Convert string dates into datetime objects,
@@ -434,6 +444,7 @@ class Client extends AbstractClient
         return $data_quality;
     }
 
+    #[Override]
     public function incrementalDownload(Source_Zone $source_zone, DateTimeImmutable $start_date, CarbonIntensity $intensity, int $limit = 0): int
     {
         $count = 0;
@@ -450,6 +461,7 @@ class Client extends AbstractClient
         return $saved > 0 ? $count : -$count;
     }
 
+    #[Override]
     public function fullDownload(Source_Zone $source_zone, DateTimeImmutable $start_date, DateTimeImmutable $stop_date, CarbonIntensity $intensity, int $limit = 0, ?ProgressBar $progress = null): int
     {
         $use_free_plan = (int) Config::getConfigurationValue('electricitymap_free_plan');
@@ -464,6 +476,7 @@ class Client extends AbstractClient
         return $this->incrementalDownload($source_zone, $start_date, $intensity, $limit);
     }
 
+    #[Override]
     protected function sliceDateRangeByDay(DateTimeImmutable $start, DateTimeImmutable $stop)
     {
         $real_start = $start;

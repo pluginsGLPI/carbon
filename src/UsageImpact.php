@@ -32,13 +32,17 @@
 
 namespace GlpiPlugin\Carbon;
 
+use Override;
+
 class UsageImpact extends AbstractImpact
 {
+    #[Override]
     public static function getTypeName($nb = 0)
     {
         return _n("Usage impact", "Usage impacts", $nb, 'carbon');
     }
 
+    #[Override]
     public function prepareInputForAdd($input)
     {
         $input = parent::prepareInputForAdd($input);

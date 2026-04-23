@@ -37,6 +37,7 @@ use ComputerType as GlpiComputerType;
 use Dropdown;
 use Html;
 use MassiveAction;
+use Override;
 
 class ComputerType extends AbstractType
 {
@@ -62,6 +63,7 @@ class ComputerType extends AbstractType
         ];
     }
 
+    #[Override]
     public static function showMassiveActionsSubForm(MassiveAction $ma)
     {
         switch ($ma->getAction()) {
@@ -85,6 +87,7 @@ class ComputerType extends AbstractType
         return parent::showMassiveActionsSubForm($ma);
     }
 
+    #[Override]
     public static function processMassiveActionsForOneItemtype(MassiveAction $ma, CommonDBTM $item, array $ids)
     {
         switch ($ma->getAction()) {
@@ -180,6 +183,7 @@ class ComputerType extends AbstractType
         return Dropdown::showFromArray($name, $items, $options);
     }
 
+    #[Override]
     public static function getSpecificValueToDisplay($field, $values, array $options = [])
     {
         switch ($field) {
@@ -194,6 +198,7 @@ class ComputerType extends AbstractType
         return '';
     }
 
+    #[Override]
     public static function getSpecificValueToSelect($field, $name = '', $values = '', array $options = [])
     {
         if (!is_array($values)) {

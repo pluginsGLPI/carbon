@@ -43,6 +43,7 @@ use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\ComputerModelizationAdapterTrait;
 use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\UsageInfo;
+use Override;
 
 class Computer extends AbstractAsset
 {
@@ -54,6 +55,7 @@ class Computer extends AbstractAsset
 
     protected string $endpoint        = 'server';
 
+    #[Override]
     public function getEvaluableQuery(string $itemtype, array $crit = [], bool $entity_restrict = true): array
     {
         $request = parent::getEvaluableQuery($itemtype);
@@ -85,6 +87,7 @@ class Computer extends AbstractAsset
         return $request;
     }
 
+    #[Override]
     protected function doEvaluation(CommonDBTM $item): ?array
     {
         $type = $this->getType($item);

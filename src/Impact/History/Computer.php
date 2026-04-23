@@ -51,6 +51,7 @@ use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\Zone;
 use Infocom;
 use Location as GlpiLocation;
+use Override;
 
 class Computer extends AbstractAsset
 {
@@ -58,11 +59,13 @@ class Computer extends AbstractAsset
     protected static string $type_itemtype  = GlpiComputerType::class;
     protected static string $model_itemtype = GlpiComputerModel::class;
 
+    #[Override]
     public static function getEngine(CommonDBTM $item): EngineInterface
     {
         return new EngineComputer($item);
     }
 
+    #[Override]
     public function getEvaluableQuery(array $crit = [], bool $entity_restrict = true): array
     {
         $item_table = self::$itemtype::getTable();
@@ -195,6 +198,7 @@ class Computer extends AbstractAsset
         return $request;
     }
 
+    #[Override]
     public static function getHistorizableDiagnosis(CommonDBTM $item): ?array
     {
         /** @var DBmysql $DB */
@@ -271,6 +275,7 @@ class Computer extends AbstractAsset
         return $status;
     }
 
+    #[Override]
     public static function showHistorizableDiagnosis(CommonDBTM $item)
     {
         $status = self::getHistorizableDiagnosis($item);

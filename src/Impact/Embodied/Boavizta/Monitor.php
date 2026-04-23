@@ -34,6 +34,7 @@
 namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta;
 
 use Monitor as GlpiMonitor;
+use Override;
 
 class Monitor extends AbstractAsset
 {
@@ -41,6 +42,7 @@ class Monitor extends AbstractAsset
 
     protected string $endpoint        = 'peripheral/monitor';
 
+    #[Override]
     protected function doEvaluation(): ?array
     {
         $this->endpoint .= '?' . $this->getCriteriasQueryString();
@@ -60,6 +62,7 @@ class Monitor extends AbstractAsset
         return $impacts;
     }
 
+    #[Override]
     protected function analyzeHardware(): array
     {
         $configuration = [];

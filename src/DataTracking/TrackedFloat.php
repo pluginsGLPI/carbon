@@ -32,6 +32,8 @@
 
 namespace GlpiPlugin\Carbon\DataTracking;
 
+use Override;
+
 class TrackedFloat extends AbstractTracked
 {
     private float $value;
@@ -45,6 +47,7 @@ class TrackedFloat extends AbstractTracked
         $this->value = $value;
     }
 
+    #[Override]
     public function getValue()
     {
         return (float) $this->value;

@@ -47,6 +47,7 @@ use GlpiPlugin\Carbon\Impact\Embodied\Engine;
 use GuzzleHttp\Client;
 use Monitor as GlpiMonitor;
 use NetworkEquipment as GlpiNetworkEquipment;
+use Override;
 use Session;
 use Twig\Extension\StringLoaderExtension;
 
@@ -59,11 +60,13 @@ class Config extends GlpiConfig
     public const ENV_BOAVIZTAPI_BASE_URL = 'GLPI_PLUGIN_CARBON_BOAVIZTAPI_BASE_URL';
     private const CONFIG_CONTEXT = 'plugin:carbon';
 
+    #[Override]
     public static function getTypeName($nb = 0)
     {
         return plugin_carbon_getFriendlyName();
     }
 
+    #[Override]
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         $tabName = '';
@@ -83,6 +86,7 @@ class Config extends GlpiConfig
      * @param int $withtemplate
      * @return void
      */
+    #[Override]
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
         /** @var CommonDBTM $item */
@@ -92,6 +96,7 @@ class Config extends GlpiConfig
         }
     }
 
+    #[Override]
     public function showForm($ID, $options = [])
     {
         $current_config = GlpiConfig::getConfigurationValues(self::CONFIG_CONTEXT);

@@ -45,6 +45,7 @@ use Html;
 use Infocom;
 use Monitor as GlpiMonitor;
 use NetworkEquipment as GlpiNetworkEquipment;
+use Override;
 use Toolbox as GlpiToolbox;
 
 /**
@@ -57,16 +58,19 @@ class UsageInfo extends CommonDBChild
 
     public static $rightname = 'carbon:report';
 
+    #[Override]
     public static function getTypeName($nb = 0)
     {
         return __('Usage informations', 'Carbon');
     }
 
+    #[Override]
     public static function getIcon()
     {
         return 'fa-solid fa-solar-panel';
     }
 
+    #[Override]
     public function canPurgeItem(): bool
     {
         if ($this->isNewItem()) {
@@ -86,6 +90,7 @@ class UsageInfo extends CommonDBChild
         return $item->canDelete();
     }
 
+    #[Override]
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         $tabName = '';
@@ -105,6 +110,7 @@ class UsageInfo extends CommonDBChild
      * @param int $withtemplate
      * @return void
      */
+    #[Override]
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
         /** @var CommonDBTM $item */
@@ -129,6 +135,7 @@ class UsageInfo extends CommonDBChild
         }
     }
 
+    #[Override]
     public function post_updateItem($history = true)
     {
         parent::post_updateItem($history);
@@ -173,6 +180,7 @@ class UsageInfo extends CommonDBChild
         ]);
     }
 
+    #[Override]
     public function rawSearchOptions()
     {
         $tab = parent::rawSearchOptions();

@@ -39,6 +39,7 @@ use DateTime;
 use DbUtils;
 use Location as GlpiLocation;
 use LogicException;
+use Override;
 use Session;
 
 /**
@@ -46,31 +47,37 @@ use Session;
  */
 class Zone extends CommonDropdown
 {
+    #[Override]
     public static function getTypeName($nb = 0)
     {
         return _n("Carbon intensity zone", "Carbon intensity zones", $nb, 'carbon');
     }
 
+    #[Override]
     public static function canCreate(): bool
     {
         return false;
     }
 
+    #[Override]
     public static function canUpdate(): bool
     {
         return true;
     }
 
+    #[Override]
     public static function canDelete(): bool
     {
         return false;
     }
 
+    #[Override]
     public static function canPurge(): bool
     {
         return false;
     }
 
+    #[Override]
     public function defineTabs($options = [])
     {
         $tabs = parent::defineTabs($options);
@@ -78,6 +85,7 @@ class Zone extends CommonDropdown
         return $tabs;
     }
 
+    #[Override]
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         if (!$withtemplate) {
@@ -98,6 +106,7 @@ class Zone extends CommonDropdown
         return '';
     }
 
+    #[Override]
     public function prepareInputForUpdate($input)
     {
         unset($input['name']);
@@ -105,6 +114,7 @@ class Zone extends CommonDropdown
         return $input;
     }
 
+    #[Override]
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
         /** @var CommonDBTM $item  */
@@ -116,6 +126,7 @@ class Zone extends CommonDropdown
         return true;
     }
 
+    #[Override]
     public function rawSearchOptions()
     {
         $tab = parent::rawSearchOptions();

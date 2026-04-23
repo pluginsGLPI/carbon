@@ -36,12 +36,14 @@ use CommonDBTM;
 use Html;
 use MassiveAction;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
+use Override;
 
 class NetworkEquipmentType extends AbstractType
 {
     public static $itemtype = GlpiNetworkEquipmentType::class;
     public static $items_id = 'networkequipmenttypes_id';
 
+    #[Override]
     public static function showMassiveActionsSubForm(MassiveAction $ma)
     {
         switch ($ma->getAction()) {
@@ -57,6 +59,7 @@ class NetworkEquipmentType extends AbstractType
         return parent::showMassiveActionsSubForm($ma);
     }
 
+    #[Override]
     public static function processMassiveActionsForOneItemtype(MassiveAction $ma, CommonDBTM $item, array $ids)
     {
         switch ($ma->getAction()) {

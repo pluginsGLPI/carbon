@@ -35,16 +35,19 @@ namespace GlpiPlugin\Carbon;
 use CommonDBTM;
 use CommonGLPI;
 use Html;
+use Override;
 use Profile as GlpiProfile;
 use Session;
 
 class Profile extends GlpiProfile
 {
+    #[Override]
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         return self::createTabEntry(__('Environmental impact', 'carbon'), 0);
     }
 
+    #[Override]
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
         /** @var CommonDBTM $item */
@@ -53,6 +56,7 @@ class Profile extends GlpiProfile
         return true;
     }
 
+    #[Override]
     public function showForm($ID, $options = [])
     {
         if (!self::canView()) {

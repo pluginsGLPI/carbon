@@ -44,6 +44,7 @@ use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Toolbox;
 use GlpiPlugin\Carbon\Zone;
+use Override;
 use Symfony\Component\Console\Helper\ProgressBar;
 
 abstract class AbstractClient implements ClientInterface
@@ -52,12 +53,15 @@ abstract class AbstractClient implements ClientInterface
 
     protected bool $use_cache = true;
 
+    #[Override]
     abstract public function getSourceName(): string;
 
+    #[Override]
     abstract public function getDataInterval(): string;
 
     abstract protected function formatOutput(array $response, int $step): array;
 
+    #[Override]
     abstract public function getHardStartDate(): DateTimeImmutable;
 
     /**
@@ -83,6 +87,7 @@ abstract class AbstractClient implements ClientInterface
      */
     abstract public function fetchRange(DateTimeImmutable $start, DateTimeImmutable $stop, Source_Zone $source_zone): array;
 
+    #[Override]
     public function disableCache()
     {
         $this->use_cache = false;
@@ -103,6 +108,7 @@ abstract class AbstractClient implements ClientInterface
         return $this->getSourceName() . '_zone_setup_complete';
     }
 
+    #[Override]
     public function isZoneSetupComplete(): bool
     {
         $config = $this->getConfigZoneSetupCompleteName();
@@ -120,6 +126,7 @@ abstract class AbstractClient implements ClientInterface
         GlpiConfig::setConfigurationValues('plugin:carbon', [$config => 1]);
     }
 
+    #[Override]
     public function isZoneDownloadComplete(string $zone_name): bool
     {
         $config = $this->getConfigFetchCompleteName($zone_name);
@@ -131,6 +138,7 @@ abstract class AbstractClient implements ClientInterface
         return true;
     }
 
+    #[Override]
     public function getZones(array $crit = []): array
     {
         /** @var DBmysql $DB */
@@ -168,6 +176,7 @@ abstract class AbstractClient implements ClientInterface
         return iterator_to_array($iterator);
     }
 
+    #[Override]
     public function getSourceZones(array $crit = []): array
     {
         /** @var DBmysql $DB */
@@ -205,6 +214,7 @@ abstract class AbstractClient implements ClientInterface
         return iterator_to_array($iterator);
     }
 
+    #[Override]
     public function fullDownload(Source_Zone $source_zone, DateTimeImmutable $start_date, DateTimeImmutable $stop_date, CarbonIntensity $intensity, int $limit = 0, ?ProgressBar $progress_bar = null): int
     {
         if ($start_date >= $stop_date) {
@@ -261,6 +271,7 @@ abstract class AbstractClient implements ClientInterface
         return $saved > 0 ? $count : -$count;
     }
 
+    #[Override]
     public function incrementalDownload(Source_Zone $source_zone, DateTimeImmutable $start_date, CarbonIntensity $intensity, int $limit = 0): int
     {
         $end_date = new DateTimeImmutable('now');
