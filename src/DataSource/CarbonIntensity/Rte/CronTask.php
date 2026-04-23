@@ -34,8 +34,11 @@ namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\Rte;
 
 use CommonGLPI;
 use CronTask as GlpiCronTask;
+use DateTime;
+use DateTimeZone;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\AbstractCronTask;
 use GlpiPlugin\Carbon\DataSource\CronTaskInterface;
+use GlpiPlugin\Carbon\Source_Zone;
 
 /**
  * @method int cronDownloadRte(GlpiCronTask $task)
@@ -91,5 +94,20 @@ class CronTask extends AbstractCronTask implements CronTaskInterface
                 ];
         }
         return [];
+    }
+
+    protected function dstFilter(array $gaps, Source_Zone $source_zone): array
+    {
+        $tz = new DateTimeZone('Europe/Paris');
+        $result = array_filter($gaps, function ($gap) use ($tz) {
+            // Use local timzeone
+            $a = DateTime::createFromFormat('Y-m-d H:i:s', $gap['start']);
+            $b = DateTime::createFromFormat('Y-m-d H:i:s', $gap['end']);
+            // switch to timezone of the data source (this shifts the hour if necessary)
+            $a->setTimezone($tz);
+            $b->setTimezone($tz);
+            return $a->format('Y-m-d H:i:s') != $b->format('Y-m-d H:i:s');
+        });
+        return $result;
     }
 }

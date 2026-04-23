@@ -47,6 +47,7 @@ return RectorConfig::configure()
         __DIR__ . '/src',
         __DIR__ . '/tools',
     ])
+    ->withSkipPath(__DIR__ . '/vendor')
     ->withPhpVersion(PhpVersion::PHP_82)
     ->withCache(
         sys_get_temp_dir() . '/rector',
