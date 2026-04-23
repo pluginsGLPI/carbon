@@ -35,6 +35,7 @@ namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta;
 
 use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\Client;
 use GlpiPlugin\Carbon\Impact\Embodied\AbstractEmbodiedImpact;
+use Override;
 use RuntimeException;
 
 abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInterface
@@ -69,11 +70,13 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
      * @param Client $client
      * @return void
      */
+    #[Override]
     public function setClient(Client $client)
     {
         $this->client = $client;
     }
 
+    #[Override]
     protected function getVersion(): string
     {
         if (self::$engine_version !== 'unknown') {

@@ -36,17 +36,20 @@ use Exception;
 use GlpiPlugin\Carbon\Config as PluginConfig;
 use GlpiPlugin\Carbon\DataSource\ConfigInterface;
 use GlpiPlugin\Carbon\DataSource\RestApiClient;
+use Override;
 use Session;
 
 class Config implements ConfigInterface
 {
     public const ENV_BOAVIZTAPI_BASE_URL = 'GLPI_PLUGIN_CARBON_BOAVIZTAPI_BASE_URL';
 
+    #[Override]
     public static function getSecuredConfigs(): array
     {
         return [];
     }
 
+    #[Override]
     public function getConfigTemplate(): string
     {
         $hide_boaviztapi_base_url = (getenv(self::ENV_BOAVIZTAPI_BASE_URL) !== false);
@@ -86,6 +89,7 @@ TWIG;
         return $twig;
     }
 
+    #[Override]
     public function configUpdate(array $input): array
     {
         if (isset($input['boaviztapi_base_url']) && (string) $input['boaviztapi_base_url'] !== '') {

@@ -36,6 +36,7 @@ use DBmysql;
 use DbUtils;
 use Glpi\Dashboard\Dashboard;
 use Glpi\Dashboard\Item;
+use Override;
 use Plugin;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -49,6 +50,7 @@ class ExportDashboardCommand extends Command
 
     private array $dashboard_description = [];
 
+    #[Override]
     protected function configure()
     {
         $this
@@ -57,6 +59,7 @@ class ExportDashboardCommand extends Command
             ->setHelp('This command exports the report dashboard description to a JSON file');
     }
 
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         /** @var DBmysql $DB */

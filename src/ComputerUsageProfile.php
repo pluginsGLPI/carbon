@@ -39,6 +39,7 @@ use Entity;
 use Glpi\Application\View\TemplateRenderer;
 use Html;
 use MassiveAction;
+use Override;
 use Session;
 
 /**
@@ -46,16 +47,19 @@ use Session;
  */
 class ComputerUsageProfile extends CommonDropdown
 {
+    #[Override]
     public static function getTypeName($nb = 0)
     {
         return _n("Computer usage profile", "Computer usage profiles", $nb, 'carbon');
     }
 
+    #[Override]
     public static function canView(): bool
     {
         return Entity::canView();
     }
 
+    #[Override]
     public function showForm($ID, array $options = [])
     {
         $this->initForm($ID, $options);
@@ -71,6 +75,7 @@ class ComputerUsageProfile extends CommonDropdown
         return true;
     }
 
+    #[Override]
     public function prepareInputForAdd($input)
     {
         if (!$this->inputIntegrityCheck($input)) {
@@ -88,6 +93,7 @@ class ComputerUsageProfile extends CommonDropdown
         return $input;
     }
 
+    #[Override]
     public function prepareInputForUpdate($input)
     {
         if (!$this->inputIntegrityCheck($input)) {
@@ -139,6 +145,7 @@ class ComputerUsageProfile extends CommonDropdown
         return ($found === 1);
     }
 
+    #[Override]
     public function getAdditionalFields()
     {
         return [
@@ -157,6 +164,7 @@ class ComputerUsageProfile extends CommonDropdown
         ];
     }
 
+    #[Override]
     public function rawSearchOptions()
     {
         $tab = parent::rawSearchOptions();
@@ -237,6 +245,7 @@ class ComputerUsageProfile extends CommonDropdown
         return $tab;
     }
 
+    #[Override]
     public static function showMassiveActionsSubForm(MassiveAction $ma)
     {
         switch ($ma->getAction()) {
@@ -249,6 +258,7 @@ class ComputerUsageProfile extends CommonDropdown
         return parent::showMassiveActionsSubForm($ma);
     }
 
+    #[Override]
     public static function processMassiveActionsForOneItemtype(MassiveAction $ma, CommonDBTM $item, array $ids)
     {
         switch ($ma->getAction()) {

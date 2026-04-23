@@ -39,6 +39,7 @@ use DBmysql;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\UsageInfo;
+use Override;
 
 /**
  * Compute CO2 emission of a computer
@@ -51,6 +52,7 @@ class Computer extends AbstractSwitchable
     protected static string $plugin_type_itemtype = ComputerType::class;
 
 
+    #[Override]
     public function getUsageProfile(): ?ComputerUsageProfile
     {
         /** @var DBmysql $DB */

@@ -38,22 +38,26 @@ use DateTimeImmutable;
 use Glpi\Application\View\TemplateRenderer;
 use Glpi\Dashboard\Grid as DashboardGrid;
 use GlpiPlugin\Carbon\Dashboard\Provider;
+use Override;
 
 class Report extends CommonDBTM
 {
     public static $rightname = 'carbon:report';
     protected static $notable   = true;
 
+    #[Override]
     public static function getTypeName($nb = 0)
     {
         return _n("Carbon report", "Carbon reports", $nb, 'carbon');
     }
 
+    #[Override]
     public static function getIcon(): string
     {
         return 'fa-solid fa-solar-panel';
     }
 
+    #[Override]
     public static function getMenuContent()
     {
         $menu = [];
@@ -75,6 +79,7 @@ class Report extends CommonDBTM
         return $menu;
     }
 
+    #[Override]
     public function getRights($interface = 'central')
     {
         $values = parent::getRights();

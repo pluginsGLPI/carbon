@@ -42,6 +42,7 @@ use Glpi\DBAL\QueryExpression;
 use Html;
 use InvalidArgumentException;
 use Location as GlpiLocation;
+use Override;
 
 class Source_Zone extends CommonDBRelation
 {
@@ -53,6 +54,7 @@ class Source_Zone extends CommonDBRelation
     public static $items_id_2 = 'plugin_carbon_zones_id'; // Field name
     public static $checkItem_2_Rights = self::HAVE_SAME_RIGHT_ON_ITEM;
 
+    #[Override]
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         if ($item->getType() === Source::class) {
@@ -61,6 +63,7 @@ class Source_Zone extends CommonDBRelation
         return self::createTabEntry(Source::getTypeName(), 0);
     }
 
+    #[Override]
     public function rawSearchOptions()
     {
         $tab = parent::rawSearchOptions();

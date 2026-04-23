@@ -39,6 +39,7 @@ use DateTimeZone;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\AbstractCronTask;
 use GlpiPlugin\Carbon\DataSource\CronTaskInterface;
 use GlpiPlugin\Carbon\Source_Zone;
+use Override;
 
 /**
  * @method int cronDownloadRte(GlpiCronTask $task)
@@ -54,11 +55,13 @@ class CronTask extends AbstractCronTask implements CronTaskInterface
         return 'fa-solid fa-gears';
     }
 
+    #[Override]
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         return self::createTabEntry(__('Resource diagnosis', 'carbon'), 0);
     }
 
+    #[Override]
     public static function enumerateTasks(): array
     {
         // TODO: This data shoud replace the occurrence in CronTask::cronInfo()
@@ -96,6 +99,7 @@ class CronTask extends AbstractCronTask implements CronTaskInterface
         return [];
     }
 
+    #[Override]
     protected function dstFilter(array $gaps, Source_Zone $source_zone): array
     {
         $tz = new DateTimeZone('Europe/Paris');

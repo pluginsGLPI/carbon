@@ -53,6 +53,7 @@ use Location as GlpiLocation;
 use Monitor as GlpiMonitor;
 use MonitorModel as GlpiMonitorModel;
 use MonitorType as GlpiMonitorType;
+use Override;
 
 class Monitor extends AbstractAsset
 {
@@ -60,11 +61,13 @@ class Monitor extends AbstractAsset
     protected static string $type_itemtype  = GlpiMonitorType::class;
     protected static string $model_itemtype = GlpiMonitorModel::class;
 
+    #[Override]
     public static function getEngine(CommonDBTM $item): EngineInterface
     {
         return new EngineMonitor($item);
     }
 
+    #[Override]
     public function getEvaluableQuery(array $crit = [], bool $entity_restrict = true): array
     {
         // Monitors must be attached to a computer to be used
@@ -183,6 +186,7 @@ class Monitor extends AbstractAsset
         return $request;
     }
 
+    #[Override]
     public static function getHistorizableDiagnosis(CommonDBTM $item): ?array
     {
         /** @var DBmysql $DB */
@@ -258,6 +262,7 @@ class Monitor extends AbstractAsset
         return $status;
     }
 
+    #[Override]
     public static function showHistorizableDiagnosis(CommonDBTM $item)
     {
         $status = self::getHistorizableDiagnosis($item);

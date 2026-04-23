@@ -39,17 +39,20 @@ use DateTimeInterface;
 use DBmysql;
 use Entity;
 use Location;
+use Override;
 
 class CarbonEmission extends CommonDBChild
 {
     public static $itemtype = 'itemtype';
     public static $items_id = 'items_id';
 
+    #[Override]
     public static function getTypeName($nb = 0)
     {
         return _n("Carbon Emission", "Carbon Emissions", $nb, 'carbon');
     }
 
+    #[Override]
     public function prepareInputForAdd($input)
     {
         $input = parent::prepareInputForAdd($input);
@@ -59,6 +62,7 @@ class CarbonEmission extends CommonDBChild
         return $input;
     }
 
+    #[Override]
     public function rawSearchOptions()
     {
         $tab = parent::rawSearchOptions();

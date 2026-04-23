@@ -38,6 +38,7 @@ use DateTimeZone;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Zone;
+use Override;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
@@ -53,6 +54,7 @@ class CreateFakeCarbonIntensityCommand extends Command
 
     private OutputInterface $output;
 
+    #[Override]
     protected function configure()
     {
         $this
@@ -60,6 +62,7 @@ class CreateFakeCarbonIntensityCommand extends Command
            ->setDescription("Create fake carbon intensity data");
     }
 
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->output = $output;

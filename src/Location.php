@@ -52,6 +52,7 @@ use League\ISO3166\ISO3166;
 use Location as GlpiLocation;
 use LogicException;
 use MassiveAction;
+use Override;
 
 /**
  * Additional data for a location. Extends the Location object from GLPI with aditional fields
@@ -62,11 +63,13 @@ class Location extends CommonDBChild
     public static $itemtype       = GlpiLocation::class;
     public static $items_id       = 'locations_id';
 
+    #[Override]
     public static function getIcon()
     {
         return 'ti ti-map-2';
     }
 
+    #[Override]
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         if ($item instanceof GlpiLocation) {
@@ -75,6 +78,7 @@ class Location extends CommonDBChild
         return '';
     }
 
+    #[Override]
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
         if ($item instanceof GlpiLocation) {
@@ -85,6 +89,7 @@ class Location extends CommonDBChild
         return true;
     }
 
+    #[Override]
     public function prepareInputForAdd($input)
     {
         if (isset($input['plugin_carbon_sources_id']) && isset($input['plugin_carbon_zones_id'])) {
@@ -101,6 +106,7 @@ class Location extends CommonDBChild
         return $input;
     }
 
+    #[Override]
     public function prepareInputForUpdate($input)
     {
         if (isset($input['plugin_carbon_sources_id']) && isset($input['plugin_carbon_zones_id'])) {
@@ -174,6 +180,7 @@ class Location extends CommonDBChild
         return true;
     }
 
+    #[Override]
     public static function showMassiveActionsSubForm(MassiveAction $ma)
     {
         switch ($ma->getAction()) {
@@ -201,6 +208,7 @@ class Location extends CommonDBChild
         return parent::showMassiveActionsSubForm($ma);
     }
 
+    #[Override]
     public static function processMassiveActionsForOneItemtype(MassiveAction $ma, CommonDBTM $item, array $ids)
     {
         switch ($ma->getAction()) {
@@ -273,6 +281,7 @@ class Location extends CommonDBChild
         ]);
     }
 
+    #[Override]
     public static function getSpecificValueToDisplay($field, $values, array $options = [])
     {
         switch ($field) {
@@ -284,6 +293,7 @@ class Location extends CommonDBChild
         return '';
     }
 
+    #[Override]
     public static function getSpecificValueToSelect($field, $name = '', $values = '', array $options = [])
     {
         switch ($field) {

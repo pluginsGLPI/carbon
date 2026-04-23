@@ -38,6 +38,7 @@ use Computer as GlpiComputer;
 use ComputerType as GlpiComputerType;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\ComputerModelizationAdapterTrait;
+use Override;
 
 class Computer extends AbstractAsset
 {
@@ -47,6 +48,7 @@ class Computer extends AbstractAsset
 
     protected string $endpoint        = 'server';
 
+    #[Override]
     protected function doEvaluation(): ?array
     {
         // adapt $this->endpoint depending on the type of computer (server, laptop, ...)

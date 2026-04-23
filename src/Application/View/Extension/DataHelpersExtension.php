@@ -37,6 +37,7 @@ namespace GlpiPlugin\Carbon\Application\View\Extension;
 use Glpi\RichText\RichText;
 use Glpi\Toolbox\Sanitizer;
 use Html;
+use Override;
 use Toolbox;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
@@ -46,6 +47,7 @@ use Twig\TwigFilter;
  */
 class DataHelpersExtension extends AbstractExtension
 {
+    #[Override]
     public function getFilters(): array
     {
         return [

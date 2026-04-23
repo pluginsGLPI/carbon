@@ -33,19 +33,23 @@
 namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\Rte;
 
 use GlpiPlugin\Carbon\DataSource\ConfigInterface;
+use Override;
 
 class Config implements ConfigInterface
 {
+    #[Override]
     public static function getSecuredConfigs(): array
     {
         return [];
     }
 
+    #[Override]
     public function getConfigTemplate(): string
     {
         return '';
     }
 
+    #[Override]
     public function configUpdate(array $input): array
     {
         return $input;

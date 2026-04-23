@@ -42,6 +42,7 @@ use GlpiPlugin\Carbon\Impact\Usage\AbstractUsageImpact;
 use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\UsageImpact;
 use Infocom;
+use Override;
 use RuntimeException;
 
 abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterface
@@ -88,11 +89,13 @@ abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterfa
      * @param Client $client
      * @return void
      */
+    #[Override]
     public function setClient(Client $client)
     {
         $this->client = $client;
     }
 
+    #[Override]
     protected function getVersion(): string
     {
         if (self::$engine_version !== 'unknown') {
@@ -141,6 +144,7 @@ abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterfa
         return $response;
     }
 
+    #[Override]
     public function getEvaluableQuery(string $itemtype, array $crit = [], bool $entity_restrict = true): array
     {
         $item_table = getTableForItemType($itemtype);

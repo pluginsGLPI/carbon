@@ -33,9 +33,11 @@
 namespace GlpiPlugin\Carbon\DataSource;
 
 use CommonGLPI;
+use Override;
 
 abstract class AbstractCronTask extends CommonGLPI implements CronTaskInterface
 {
+    #[Override]
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         return '';

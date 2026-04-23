@@ -49,6 +49,7 @@ use Location as GlpiLocation;
 use NetworkEquipment as GlpiNetworkEquipment;
 use NetworkEquipmentModel as GlpiNetworkEquipmentModel;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
+use Override;
 
 class NetworkEquipment extends AbstractAsset
 {
@@ -56,11 +57,13 @@ class NetworkEquipment extends AbstractAsset
     protected static string $type_itemtype  = GlpiNetworkEquipmentType::class;
     protected static string $model_itemtype = GlpiNetworkEquipmentModel::class;
 
+    #[Override]
     public static function getEngine(CommonDBTM $item): EngineInterface
     {
         return new EngineNetworkEquipment($item);
     }
 
+    #[Override]
     public function getEvaluableQuery(array $crit = [], bool $entity_restrict = true): array
     {
         $item_table = self::$itemtype::getTable();
@@ -170,6 +173,7 @@ class NetworkEquipment extends AbstractAsset
     }
 
 
+    #[Override]
     public static function getHistorizableDiagnosis(CommonDBTM $item): ?array
     {
         /** @var DBmysql $DB */
@@ -241,6 +245,7 @@ class NetworkEquipment extends AbstractAsset
         return $status;
     }
 
+    #[Override]
     public static function showHistorizableDiagnosis(CommonDBTM $item)
     {
         $status = self::getHistorizableDiagnosis($item);

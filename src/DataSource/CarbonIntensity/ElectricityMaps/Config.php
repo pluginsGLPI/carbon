@@ -34,9 +34,11 @@ namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\ElectricityMaps;
 
 use GlpiPlugin\Carbon\Config as PluginConfig;
 use GlpiPlugin\Carbon\DataSource\ConfigInterface;
+use Override;
 
 class Config implements ConfigInterface
 {
+    #[Override]
     public static function getSecuredConfigs(): array
     {
         return [
@@ -44,6 +46,7 @@ class Config implements ConfigInterface
         ];
     }
 
+    #[Override]
     public function getConfigTemplate(): string
     {
         $commercial_url = 'https://www.electricitymaps.com/';
@@ -79,6 +82,7 @@ TWIG;
         return $twig;
     }
 
+    #[Override]
     public function configUpdate(array $input): array
     {
         $to_delete = [];

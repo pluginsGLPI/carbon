@@ -38,6 +38,7 @@ use DBmysql;
 use DBmysqlIterator;
 use GlpiPlugin\Carbon\Impact\Type;
 use LogicException;
+use Override;
 use Toolbox as GlpiToolbox;
 
 abstract class AbstractImpact extends CommonDBChild
@@ -47,11 +48,13 @@ abstract class AbstractImpact extends CommonDBChild
 
     public static $rightname = 'carbon:report';
 
+    #[Override]
     public function canEdit($ID): bool
     {
         return false;
     }
 
+    #[Override]
     public function rawSearchOptions()
     {
         $tab = parent::rawSearchOptions();

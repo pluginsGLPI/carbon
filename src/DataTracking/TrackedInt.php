@@ -32,6 +32,8 @@
 
 namespace GlpiPlugin\Carbon\DataTracking;
 
+use Override;
+
 class TrackedInt extends AbstractTracked
 {
     private int $value;
@@ -45,6 +47,7 @@ class TrackedInt extends AbstractTracked
         $this->value = $value;
     }
 
+    #[Override]
     public function getValue()
     {
         return (int) $this->value;

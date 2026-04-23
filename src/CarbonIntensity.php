@@ -41,6 +41,7 @@ use DBmysql;
 use Exception;
 use Glpi\DBAL\QueryParam;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientInterface;
+use Override;
 use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
@@ -60,16 +61,19 @@ class CarbonIntensity extends CommonDropdown
 
     public static $rightname = 'carbon:report';
 
+    #[Override]
     public static function getTypeName($nb = 0)
     {
         return __("Carbon intensity", 'carbon');
     }
 
+    #[Override]
     public static function getIcon(): string
     {
         return 'fa-solid fa-solar-panel';
     }
 
+    #[Override]
     public function rawSearchOptions()
     {
         $tab = parent::rawSearchOptions();

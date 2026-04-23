@@ -36,12 +36,14 @@ use CommonDBTM;
 use Html;
 use MassiveAction;
 use MonitorType as GlpiMonitorType;
+use Override;
 
 class MonitorType extends AbstractType
 {
     public static $itemtype = GlpiMonitorType::class;
     public static $items_id = 'monitortypes_id';
 
+    #[Override]
     public static function showMassiveActionsSubForm(MassiveAction $ma)
     {
         switch ($ma->getAction()) {
@@ -58,6 +60,7 @@ class MonitorType extends AbstractType
     }
 
 
+    #[Override]
     public static function processMassiveActionsForOneItemtype(MassiveAction $ma, CommonDBTM $item, array $ids)
     {
         switch ($ma->getAction()) {

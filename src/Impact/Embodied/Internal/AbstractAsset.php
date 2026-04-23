@@ -36,6 +36,7 @@ use CommonDBTM;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\Impact\Embodied\AbstractEmbodiedImpact;
 use GlpiPlugin\Carbon\Impact\Type;
+use Override;
 
 abstract class AbstractAsset extends AbstractEmbodiedImpact
 {
@@ -47,11 +48,13 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact
     /** @var string $engine_version Version of the calculation engine */
     protected static string $engine_version = '1';
 
+    #[Override]
     protected function getVersion(): string
     {
         return self::$engine_version;
     }
 
+    #[Override]
     protected function doEvaluation(): array
     {
         /** @var class-string<CommonDBTM> */
