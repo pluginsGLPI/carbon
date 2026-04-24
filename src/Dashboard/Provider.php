@@ -691,67 +691,14 @@ class Provider
 
     /**
      * Get usage CO2 emissions
+     * @deprecated 1.2.0
      *
      * @param array $params
      * @return array
      */
     public static function getUsageCarbonEmission(array $params = []): array
     {
-        $default_params = [
-            'label' => __('plugin carbon - Usage carbon emission', 'carbon'),
-            'icon'  => 'fa-solid fa-temperature-arrow-up',
-        ];
-        $params = array_merge($default_params, $params);
-        $crit = [
-            'itemtype' => PLUGIN_CARBON_TYPES,
-        ];
-
-        $gwp = self::getSum(CarbonEmission::getTable(), 'emission_per_day', $params, $crit);
-        if ($gwp === null) {
-            $gwp = 'N/A';
-        } else {
-            $gwp = Toolbox::getWeight($gwp) . __('CO₂eq', 'carbon');
-        }
-
-        return [
-            'number' => $gwp,
-            'label'  => $params['label'],
-            'icon'   => $params['icon'],
-        ];
-    }
-
-    /**
-     * Get usage abiotic depletion potential in antimony equivalent
-     *
-     * @param array $params
-     * @param array $crit
-     * @return array
-     */
-    public static function getUsageAbioticDepletion(array $params = [], array $crit = []): array
-    {
-        $default_params = [
-            'label' => __('Usage abiotic depletion potential', 'carbon'),
-            'icon'  => 'fa-solid fa-temperature-arrow-up',
-        ];
-        $params = array_merge($default_params, $params);
-        if (count($crit['itemtype'] ?? []) === 0) {
-            $crit['itemtype'] = PLUGIN_CARBON_TYPES;
-        } else {
-            $crit['itemtype'] = array_intersect($crit['itemtype'], PLUGIN_CARBON_TYPES);
-        }
-
-        $value = self::getSum(UsageImpact::getTable(), 'adp', $params, $crit);
-        if ($value === null) {
-            $value = 'N/A';
-        } else {
-            $value = Toolbox::getWeight($value) . __('Sbeq', 'carbon');
-        }
-
-        return [
-            'number' => $value,
-            'label'  => $params['label'],
-            'icon'   => $params['icon'],
-        ];
+        return self::getImpactOfUsageCriteria('gwp', $params, ['itemtype' => PLUGIN_CARBON_TYPES]);
     }
 
     /**
@@ -1030,75 +977,6 @@ class Provider
             'doc_url' => Type::getCriteriaInfoLink($impact_type),
         ];
     }
-
-    // /**
-    //  * get Total abiotic depletion potential
-    //  *
-    //  * @param array $params
-    //  * @param array $crit
-    //  * @return array
-    //  */
-    // public static function getTotalAbioticDepletion(array $params = [], array $crit = []): array
-    // {
-    //     $default_params = [
-    //         'label' => __('Total abiotic depletion potential', 'carbon'),
-    //         'icon'  => 'fa-solid fa-temperature-arrow-up',
-    //     ];
-    //     $params = array_merge($default_params, $params);
-    //     if (count($crit['itemtype'] ?? []) === 0) {
-    //         $crit['itemtype'] = PLUGIN_CARBON_TYPES;
-    //     } else {
-    //         $crit['itemtype'] = array_intersect($crit['itemtype'], PLUGIN_CARBON_TYPES);
-    //     }
-
-    //     $embodied_value = self::getSum(EmbodiedImpact::getTable(), 'adp', $params, $crit);
-    //     $usage_value = self::getSum(UsageImpact::getTable(), 'adp', $params, $crit);
-
-    //     return [
-    //         'data'  => [
-    //             [
-    //                 'label' => __('Embodied abiotic depletion potential', 'carbon'),
-    //                 'number' => $embodied_value,
-    //             ], [
-    //                 'label' => __('Total usage abiotic depletion potential', 'carbon'),
-    //                 'number'  => $usage_value,
-    //             ],
-    //         ],
-    //         'label' => $params['label'],
-    //         'icon'  => $params['icon'],
-    //     ];
-    // }
-
-    // public static function getTotalGlobalWarming(array $params = [], array $crit = [])
-    // {
-    //     $default_params = [
-    //         'label' => __('Total global warming potential', 'carbon'),
-    //         'icon'  => 'fa-solid fa-temperature-arrow-up',
-    //     ];
-    //     $params = array_merge($default_params, $params);
-    //     if (count($crit['itemtype'] ?? []) === 0) {
-    //         $crit['itemtype'] = PLUGIN_CARBON_TYPES;
-    //     } else {
-    //         $crit['itemtype'] = array_intersect($crit['itemtype'], PLUGIN_CARBON_TYPES);
-    //     }
-
-    //     $embodied_value = self::getSum(EmbodiedImpact::getTable(), 'gwp', $params, $crit);
-    //     $usage_value = self::getSum(CarbonEmission::getTable(), 'emission_per_day', $params, $crit);
-
-    //     return [
-    //         'data'  => [
-    //             [
-    //                 'label' => __('Embodied global warming potential', 'carbon'),
-    //                 'number' => $embodied_value,
-    //             ], [
-    //                 'label' => __('Total usage global warming potential', 'carbon'),
-    //                 'number'  => $usage_value,
-    //             ],
-    //         ],
-    //         'label' => $params['label'],
-    //         'icon'  => $params['icon'],
-    //     ];
-    // }
 
     /**
      * Get carbon emission per month in the current entity
