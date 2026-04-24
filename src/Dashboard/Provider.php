@@ -775,7 +775,11 @@ class Provider
             $crit['itemtype'] = array_intersect($crit['itemtype'], PLUGIN_CARBON_TYPES);
         }
 
-        $value = self::getSum(UsageImpact::getTable(), 'adp', $params, $crit);
+        if ($impact_type !== 'gwp') {
+            $value = self::getSum(getTableForItemType(UsageImpact::class), $impact_type, $params, $crit);
+        } else {
+            $value = self::getSum(getTableForItemType(CarbonEmission::class), 'emission_per_day', $params, $crit);
+        }
         if ($value === null) {
             $value = 'N/A';
         } else {
@@ -1002,12 +1006,17 @@ class Provider
             $crit['itemtype'] = array_intersect($crit['itemtype'], PLUGIN_CARBON_TYPES);
         }
 
-        $value = self::getSum(EmbodiedImpact::getTable(), $impact_type, $params, $crit);
-        if ($value === null) {
+        $embodied = self::getSum(getTableForItemType(EmbodiedImpact::class), $impact_type, $params, $crit);
+        if ($impact_type !== 'gwp') {
+            $usage = self::getSum(getTableForItemType(UsageImpact::class), $impact_type, $params, $crit);
+        } else {
+            $usage = self::getSum(getTableForItemType(CarbonEmission::class), 'emission_per_day', $params, $crit);
+        }
+        if ($embodied === null && $usage === null) {
             $value = 'N/A';
         } else {
             $value = Toolbox::getHumanReadableValue(
-                $value,
+                $embodied + $usage,
                 Type::getImpactUnit($impact_type)
             );
         }
@@ -1022,74 +1031,74 @@ class Provider
         ];
     }
 
-    /**
-     * get Total abiotic depletion potential
-     *
-     * @param array $params
-     * @param array $crit
-     * @return array
-     */
-    public static function getTotalAbioticDepletion(array $params = [], array $crit = []): array
-    {
-        $default_params = [
-            'label' => __('Total abiotic depletion potential', 'carbon'),
-            'icon'  => 'fa-solid fa-temperature-arrow-up',
-        ];
-        $params = array_merge($default_params, $params);
-        if (count($crit['itemtype'] ?? []) === 0) {
-            $crit['itemtype'] = PLUGIN_CARBON_TYPES;
-        } else {
-            $crit['itemtype'] = array_intersect($crit['itemtype'], PLUGIN_CARBON_TYPES);
-        }
+    // /**
+    //  * get Total abiotic depletion potential
+    //  *
+    //  * @param array $params
+    //  * @param array $crit
+    //  * @return array
+    //  */
+    // public static function getTotalAbioticDepletion(array $params = [], array $crit = []): array
+    // {
+    //     $default_params = [
+    //         'label' => __('Total abiotic depletion potential', 'carbon'),
+    //         'icon'  => 'fa-solid fa-temperature-arrow-up',
+    //     ];
+    //     $params = array_merge($default_params, $params);
+    //     if (count($crit['itemtype'] ?? []) === 0) {
+    //         $crit['itemtype'] = PLUGIN_CARBON_TYPES;
+    //     } else {
+    //         $crit['itemtype'] = array_intersect($crit['itemtype'], PLUGIN_CARBON_TYPES);
+    //     }
 
-        $embodied_value = self::getSum(EmbodiedImpact::getTable(), 'adp', $params, $crit);
-        $usage_value = self::getSum(UsageImpact::getTable(), 'adp', $params, $crit);
+    //     $embodied_value = self::getSum(EmbodiedImpact::getTable(), 'adp', $params, $crit);
+    //     $usage_value = self::getSum(UsageImpact::getTable(), 'adp', $params, $crit);
 
-        return [
-            'data'  => [
-                [
-                    'label' => __('Embodied abiotic depletion potential', 'carbon'),
-                    'number' => $embodied_value,
-                ], [
-                    'label' => __('Total usage abiotic depletion potential', 'carbon'),
-                    'number'  => $usage_value,
-                ],
-            ],
-            'label' => $params['label'],
-            'icon'  => $params['icon'],
-        ];
-    }
+    //     return [
+    //         'data'  => [
+    //             [
+    //                 'label' => __('Embodied abiotic depletion potential', 'carbon'),
+    //                 'number' => $embodied_value,
+    //             ], [
+    //                 'label' => __('Total usage abiotic depletion potential', 'carbon'),
+    //                 'number'  => $usage_value,
+    //             ],
+    //         ],
+    //         'label' => $params['label'],
+    //         'icon'  => $params['icon'],
+    //     ];
+    // }
 
-    public static function getTotalGlobalWarming(array $params = [], array $crit = [])
-    {
-        $default_params = [
-            'label' => __('Total global warming potential', 'carbon'),
-            'icon'  => 'fa-solid fa-temperature-arrow-up',
-        ];
-        $params = array_merge($default_params, $params);
-        if (count($crit['itemtype'] ?? []) === 0) {
-            $crit['itemtype'] = PLUGIN_CARBON_TYPES;
-        } else {
-            $crit['itemtype'] = array_intersect($crit['itemtype'], PLUGIN_CARBON_TYPES);
-        }
+    // public static function getTotalGlobalWarming(array $params = [], array $crit = [])
+    // {
+    //     $default_params = [
+    //         'label' => __('Total global warming potential', 'carbon'),
+    //         'icon'  => 'fa-solid fa-temperature-arrow-up',
+    //     ];
+    //     $params = array_merge($default_params, $params);
+    //     if (count($crit['itemtype'] ?? []) === 0) {
+    //         $crit['itemtype'] = PLUGIN_CARBON_TYPES;
+    //     } else {
+    //         $crit['itemtype'] = array_intersect($crit['itemtype'], PLUGIN_CARBON_TYPES);
+    //     }
 
-        $embodied_value = self::getSum(EmbodiedImpact::getTable(), 'gwp', $params, $crit);
-        $usage_value = self::getSum(CarbonEmission::getTable(), 'emission_per_day', $params, $crit);
+    //     $embodied_value = self::getSum(EmbodiedImpact::getTable(), 'gwp', $params, $crit);
+    //     $usage_value = self::getSum(CarbonEmission::getTable(), 'emission_per_day', $params, $crit);
 
-        return [
-            'data'  => [
-                [
-                    'label' => __('Embodied global warming potential', 'carbon'),
-                    'number' => $embodied_value,
-                ], [
-                    'label' => __('Total usage global warming potential', 'carbon'),
-                    'number'  => $usage_value,
-                ],
-            ],
-            'label' => $params['label'],
-            'icon'  => $params['icon'],
-        ];
-    }
+    //     return [
+    //         'data'  => [
+    //             [
+    //                 'label' => __('Embodied global warming potential', 'carbon'),
+    //                 'number' => $embodied_value,
+    //             ], [
+    //                 'label' => __('Total usage global warming potential', 'carbon'),
+    //                 'number'  => $usage_value,
+    //             ],
+    //         ],
+    //         'label' => $params['label'],
+    //         'icon'  => $params['icon'],
+    //     ];
+    // }
 
     /**
      * Get carbon emission per month in the current entity
