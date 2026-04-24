@@ -101,7 +101,7 @@ class Type
         'lu'     => null,
         'odp'    => ['g', 'CFC-11 eq'],
         'pm'     => null,
-        'pocp'   => ['g', 'U235 eq'],
+        'pocp'   => ['g', 'NMVOC eq'],
         'wu'     => ['m³', ''],
         'mips'   => ['g', ''],
         'adpe'   => ['g', 'SB eq'],
