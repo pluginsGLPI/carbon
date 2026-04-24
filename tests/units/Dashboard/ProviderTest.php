@@ -43,19 +43,21 @@ use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Dashboard\Provider;
+use GlpiPlugin\Carbon\EmbodiedImpact;
 use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
+use GlpiPlugin\Carbon\UsageImpact;
 use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\Zone;
 use Infocom;
 use Location as GlpiLocation;
-use Monitor;
+use Monitor as GlpiMonitor;
 use MonitorType as GlpiMonitorType;
-use NetworkEquipment;
+use NetworkEquipment as GlpiNetworkEquipment;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
 use PHPUnit\Framework\Attributes\CoversClass;
 
@@ -702,7 +704,7 @@ class ProviderTest extends DbTestCase
             'power_consumption' => 50,
             'is_ignore' => 0,
         ]);
-        $monitor = $this->createItem(Monitor::class, [
+        $monitor = $this->createItem(GlpiMonitor::class, [
             'locations_id' => $glpi_location->getID(),
             'monitortypes_id' => $glpi_monitor_type->getID(),
         ]);
@@ -717,7 +719,7 @@ class ProviderTest extends DbTestCase
             'itemtype_peripheral' => $monitor->getType(),
             'items_id_peripheral' => $monitor->getID(),
         ]);
-        $handled_count = Provider::getIgnoredAssetCount(Monitor::class);
+        $handled_count = Provider::getIgnoredAssetCount(GlpiMonitor::class);
         $this->assertEquals(0, $handled_count['number']);
 
         // Test with a monitor which must be ignored
@@ -749,7 +751,7 @@ class ProviderTest extends DbTestCase
             'power_consumption' => 50,
             'is_ignore' => 1,
         ]);
-        $monitor = $this->createItem(Monitor::class, [
+        $monitor = $this->createItem(GlpiMonitor::class, [
             'locations_id' => $glpi_location->getID(),
             'monitortypes_id' => $glpi_monitor_type->getID(),
         ]);
@@ -764,7 +766,7 @@ class ProviderTest extends DbTestCase
             'itemtype_peripheral' => $monitor->getType(),
             'items_id_peripheral' => $monitor->getID(),
         ]);
-        $handled_count = Provider::getIgnoredAssetCount(Monitor::class);
+        $handled_count = Provider::getIgnoredAssetCount(GlpiMonitor::class);
         $this->assertEquals(1, $handled_count['number']);
 
         // Test with a network equipment which must be taken into account
@@ -785,7 +787,7 @@ class ProviderTest extends DbTestCase
             'power_consumption' => 90,
             'is_ignore' => 0,
         ]);
-        $network_equipment = $this->createItem(NetworkEquipment::class, [
+        $network_equipment = $this->createItem(GlpiNetworkEquipment::class, [
             'locations_id' => $glpi_location->getID(),
             'networkequipmenttypes_id' => $glpi_computer_type->getID(),
         ]);
@@ -794,7 +796,7 @@ class ProviderTest extends DbTestCase
             'items_id' => $network_equipment->getID(),
             'buy_date' => '2024-01-01',
         ]);
-        $handled_count = Provider::getIgnoredAssetCount(NetworkEquipment::class);
+        $handled_count = Provider::getIgnoredAssetCount(GlpiNetworkEquipment::class);
         $this->assertEquals(0, $handled_count['number']);
 
         // Test with a network equipment which must be ignored
@@ -815,7 +817,7 @@ class ProviderTest extends DbTestCase
             'power_consumption' => 90,
             'is_ignore' => 1,
         ]);
-        $network_equipment = $this->createItem(NetworkEquipment::class, [
+        $network_equipment = $this->createItem(GlpiNetworkEquipment::class, [
             'locations_id' => $glpi_location->getID(),
             'networkequipmenttypes_id' => $glpi_network_equipment_type->getID(),
         ]);
@@ -824,7 +826,48 @@ class ProviderTest extends DbTestCase
             'items_id' => $network_equipment->getID(),
             'buy_date' => '2024-01-01',
         ]);
-        $handled_count = Provider::getIgnoredAssetCount(NetworkEquipment::class);
+        $handled_count = Provider::getIgnoredAssetCount(GlpiNetworkEquipment::class);
         $this->assertEquals(1, $handled_count['number']);
+    }
+
+    public function test_getImpactOfEmbodiedAndUsageCriteria_returns_total_for_criteria()
+    {
+        $glpi_computer = $this->createItem(GlpiComputer::class);
+        $glpi_monitor = $this->createItem(GlpiMonitor::class);
+        $glpi_network_equipment = $this->createItem(GlpiNetworkEquipment::class);
+
+        $this->createItem(EmbodiedImpact::class, [
+            'itemtype' => get_class($glpi_computer),
+            'items_id' => $glpi_computer->getID(),
+            'adp' => 2,
+        ]);
+        $this->createItem(EmbodiedImpact::class, [
+            'itemtype' => get_class($glpi_monitor),
+            'items_id' => $glpi_monitor->getID(),
+            'adp' => 3,
+        ]);
+        $this->createItem(EmbodiedImpact::class, [
+            'itemtype' => get_class($glpi_network_equipment),
+            'items_id' => $glpi_network_equipment->getID(),
+            'adp' => 4,
+        ]);
+        $this->createItem(UsageImpact::class, [
+            'itemtype' => get_class($glpi_computer),
+            'items_id' => $glpi_computer->getID(),
+            'adp' => 5,
+        ]);
+        $this->createItem(UsageImpact::class, [
+            'itemtype' => get_class($glpi_monitor),
+            'items_id' => $glpi_monitor->getID(),
+            'adp' => 6,
+        ]);
+        $this->createItem(UsageImpact::class, [
+            'itemtype' => get_class($glpi_network_equipment),
+            'items_id' => $glpi_network_equipment->getID(),
+            'adp' => 7,
+        ]);
+
+        $result = Provider::getImpactOfEmbodiedAndUsageCriteria('adp');
+        $this->assertEquals('27 gSB eq', $result['number']);
     }
 }

@@ -300,6 +300,21 @@ class Grid
                     'impact_type' => $impact_type,
                 ],
             ];
+
+            // Embodied + Usage
+            $key = "plugin_carbon_all_scopes_{$impact_type}_impact";
+            if (isset($new_cards[$key])) {
+                trigger_error("The card $key already exists", E_USER_WARNING);
+            }
+            $new_cards[$key] = [
+                'widgettype'   => ['impact_criteria_number'],
+                'group'        => $group,
+                'label'        => Type::getEmbodiedAndUsageImpactLabel($impact_type),
+                'provider'     => Provider::class . '::getImpactOfEmbodiedAndUsageCriteria',
+                'args'     => [
+                    'impact_type' => $impact_type,
+                ],
+            ];
         }
 
         // Informational content

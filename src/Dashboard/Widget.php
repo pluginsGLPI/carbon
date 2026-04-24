@@ -104,28 +104,6 @@ class Widget extends GlpiDashboardWidget
                 'height'   => 3,
             ],
 
-            // Embodied impact
-            // 'embodied_global_warming' => [
-            //     'label'    => __('Embodied carbon emission', 'carbon'),
-            //     'function' => self::class . '::displayEmbodiedCarbonEmission',
-            //     'image'      => '',
-            //     'width'    => 6,
-            //     'height'   => 3,
-            // ],
-            // 'embodied_abiotic_depletion' => [
-            //     'label'    => __('Embodied abiotic depletion potential', 'carbon'),
-            //     'function' => self::class . '::displayEmbodiedAbioticDepletion',
-            //     'image'      => '',
-            //     'width'    => 6,
-            //     'height'   => 3,
-            // ],
-            // 'embodied_primary_energy' => [
-            //     'label'    => __('Embodied consumed primary energy', 'carbon'),
-            //     'function' => self::class . '::displayEmbodiedPrimaryEnergy',
-            //     'image'      => '',
-            //     'width'    => 6,
-            //     'height'   => 3,
-            // ],
             'impact_criteria_number' => [
                 'label'    => __('Impact criteria', 'carbon'),
                 'function' => self::class . '::displayImpactCriteriaNumber',
