@@ -10,10 +10,10 @@
       </short>
       <long>
          <en>
-Carbon is a plugin that aims to assess the environmental impact of your IT infrastructure.
+Carbon is a plugin that aims to assess the environmental impact of your IT infrastructure. It uses external data sources to collect carbon intensity of electricity and environmental impact of each supported asset. It supports up to 20 impact criteria.
          </en>
          <fr>
-Carbon est un plugin permettant d'évaluer l'impact environnemental de votre infrastructure informatique.
+Carbon est un plugin permettant d'évaluer l'impact environnemental de votre infrastructure informatique. Il utilise des sources de données exernes pour collecter l'intensité carbone de l'électricity et l'impact environnemental des équipements pris en charge. Il gère jusqu'à 20 critères d'impact.
          </fr>
       </long>
    </description>
@@ -25,6 +25,11 @@ Carbon est un plugin permettant d'évaluer l'impact environnemental de votre inf
       <author>Teclib'</author>
    </authors>
    <versions>
+      <version>
+         <num>1.2.0</num>
+         <compatibility>~11.0</compatibility>
+         <download_url>https://github.com/pluginsGLPI/carbon/releases/download/1.2.0/glpi-carbon-1.2.0.tar.bz2</download_url>
+      </version>
       <version>
          <num>1.2.0-beta.2</num>
          <compatibility>~11.0</compatibility>
