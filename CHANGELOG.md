@@ -4,6 +4,30 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [1.2.0](https://github.com/pluginsGLPI/carbon/compare/1.2.0-beta.2...1.2.0) (2026-04-30)
+
+### Features
+
+* Show state of decommission_date in history diagnosis ([e7bede](https://github.com/pluginsGLPI/carbon/commit/e7bede83afd2faa76ca1353a526697f59ad6dcfb))
+
+##### Carbon Emission
+
+* Show total carbon emission of an individual asset ([3426fb](https://github.com/pluginsGLPI/carbon/commit/3426fb3cb6d6fb457ad9b23c4ac6e2c06a09a3fd))
+
+### Bug Fixes
+
+
+##### Dashboard\ Provider
+
+* Embodied + usage count of impact criteria ([79a5c1](https://github.com/pluginsGLPI/carbon/commit/79a5c13556a22bf1f4e4c331636c556775bf614a))
+
+##### Impact\ Type
+
+* Wrong unit for photochemical ozone formation ([81a9a5](https://github.com/pluginsGLPI/carbon/commit/81a9a54564264dea9200d6432a244e8040c340c6))
+
+
+---
+
 ## [1.2.0-beta.2](https://github.com/pluginsGLPI/carbon/compare/1.2.0-beta.1...1.2.0-beta.2) (2026-04-17)
 
 ### Bug Fixes
