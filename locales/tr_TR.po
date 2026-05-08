@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-30 08:12+0000\n"
+"POT-Creation-Date: 2026-05-07 03:30+0000\n"
 "PO-Revision-Date: 2025-10-29 09:26+0000\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2026\n"
 "Language-Team: Turkish (Turkey) (https://app.transifex.com/teclib/teams/28042/tr_TR/)\n"
@@ -22,12 +22,12 @@ msgstr ""
 "Language: tr_TR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: templates/computerusageprofile.html.twig src/ComputerUsageProfile.php:148
-#: src/ComputerUsageProfile.php:169
+#: templates/computerusageprofile.html.twig src/ComputerUsageProfile.php:155
+#: src/ComputerUsageProfile.php:177
 msgid "Start time"
 msgstr "Başlangıç zamanı"
 
-#: templates/computerusageprofile.html.twig src/ComputerUsageProfile.php:177
+#: templates/computerusageprofile.html.twig src/ComputerUsageProfile.php:185
 msgid "Stop time"
 msgstr "Bitiş zamanı"
 
@@ -40,11 +40,11 @@ msgstr "Bilgisayarın genellikle çalıştığı haftanın günleri"
 msgid "Boavizta"
 msgstr "Boavizta"
 
-#: templates/location.html.twig src/SearchOptions.php:138 src/Location.php:182
+#: templates/location.html.twig src/SearchOptions.php:138 src/Location.php:189
 msgid "Boavizta zone"
 msgstr "Boavizta bölgesi"
 
-#: templates/location.html.twig src/CarbonIntensity.php:65
+#: templates/location.html.twig src/CarbonIntensity.php:67
 msgid "Carbon intensity"
 msgstr "Karbon yoğunluğu"
 
@@ -63,11 +63,11 @@ msgid "GLPI Carbon"
 msgstr "GLPI Carbon"
 
 #: templates/components/form/source_zone_selector.html.twig
-#: src/AbstractModel.php:186
+#: src/AbstractModel.php:193
 msgid "Source"
 msgstr "Kaynak"
 
-#: templates/components/form/source_zone_selector.html.twig src/Zone.php:51
+#: templates/components/form/source_zone_selector.html.twig src/Zone.php:53
 msgid "Carbon intensity zone"
 msgid_plural "Carbon intensity zones"
 msgstr[0] "Karbon yoğunluğu bölgesi"
@@ -93,7 +93,7 @@ msgstr "Verileri sıfırla"
 msgid "Calculate data"
 msgstr "Verileri hesapla"
 
-#: templates/environmentalimpact-item.html.twig src/EmbodiedImpact.php:44
+#: templates/environmentalimpact-item.html.twig src/EmbodiedImpact.php:47
 msgid "Embodied impact"
 msgid_plural "Embodied impacts"
 msgstr[0] "Gerçekleşen etki"
@@ -184,7 +184,7 @@ msgstr "Varlık envanter kaydı tarihi şu olan"
 
 #: templates/history/status-item.html.twig
 msgid "The asset has a decommission date"
-msgstr ""
+msgstr "Varlık kullanımdan kaldırılma tarihi şu olan"
 
 #: templates/history/status-item.html.twig
 msgid "Legend"
@@ -227,7 +227,7 @@ msgstr ""
 " kullanılır"
 
 #: templates/computertype.html.twig src/SearchOptions.php:303
-#: src/ComputerType.php:78
+#: src/ComputerType.php:80
 msgid "Category"
 msgstr "Kategori"
 
@@ -325,7 +325,7 @@ msgstr ""
 
 #: templates/abstractmodel.html.twig
 msgid "Take care of the expected units before setting an impact."
-msgstr ""
+msgstr "Bir etki ayarlamadan önce beklenen birimlere dikkat edin."
 
 #: templates/abstractmodel.html.twig
 msgid "Data quality"
@@ -343,15 +343,15 @@ msgstr ""
 "Bir ağ aygıtı modelinin gücü bilinmediğinde varsayılan olarak bu güç değeri "
 "kullanılır"
 
-#: src/Command/CollectCarbonIntensityCommand.php:70
+#: src/Command/CollectCarbonIntensityCommand.php:72
 msgid "Read carbon dioxyde intensity from external sources"
 msgstr "Dış kaynaklardan gelen karbon dioksit yoğunluğunu okuyun"
 
-#: src/Command/CollectCarbonIntensityCommand.php:84
+#: src/Command/CollectCarbonIntensityCommand.php:87
 msgid "Source:"
 msgstr "Kaynak:"
 
-#: src/Command/CollectCarbonIntensityCommand.php:95
+#: src/Command/CollectCarbonIntensityCommand.php:98
 msgid ""
 "The selected source does not enumerates its supported zones. Trying to "
 "identify a zone from an address"
@@ -359,128 +359,128 @@ msgstr ""
 "Seçilmiş kaynak, desteklenen bölgeleri belirtmiyor. Adresten bölge "
 "belirlenmeye çalışılıyor"
 
-#: src/Command/CollectCarbonIntensityCommand.php:99
+#: src/Command/CollectCarbonIntensityCommand.php:102
 msgid "Geocoding is not enabled. Cannot resolve an address into a zone"
 msgstr "Coğrafi kodlama açılmamış. Adresten bölge bulunamaz"
 
-#: src/Command/CollectCarbonIntensityCommand.php:104
+#: src/Command/CollectCarbonIntensityCommand.php:107
 msgid "Address:"
 msgstr "Adres:"
 
-#: src/Command/CollectCarbonIntensityCommand.php:107
+#: src/Command/CollectCarbonIntensityCommand.php:110
 msgid "Zone:"
 msgstr "Bölge:"
 
-#: src/Command/CollectCarbonIntensityCommand.php:123
-#: src/Command/CreateFakeCarbonIntensityCommand.php:67
+#: src/Command/CollectCarbonIntensityCommand.php:127
+#: src/Command/CreateFakeCarbonIntensityCommand.php:70
 msgid "Creating data source name"
 msgstr "Veri kaynağı adı oluşturuluyor"
 
-#: src/Command/CollectCarbonIntensityCommand.php:130
+#: src/Command/CollectCarbonIntensityCommand.php:134
 msgid "This source does not exist"
-msgstr ""
+msgstr "Bu kaynak bulunamadı"
 
-#: src/Command/CollectCarbonIntensityCommand.php:149
+#: src/Command/CollectCarbonIntensityCommand.php:153
 msgid "The zone is not handled by the data source"
-msgstr ""
+msgstr "bölge veri kaynağı tarafından işlenmiyor"
 
-#: src/Command/CollectCarbonIntensityCommand.php:155
+#: src/Command/CollectCarbonIntensityCommand.php:159
 msgid "Reading data..."
 msgstr "Veriler okunuyor..."
 
-#: src/Command/CreateFakeCarbonIntensityCommand.php:78
+#: src/Command/CreateFakeCarbonIntensityCommand.php:81
 msgid "Creating data zone name"
 msgstr "Veri bölgesi adı oluşturuluyor"
 
-#: src/Command/CreateFakeCarbonIntensityCommand.php:89
+#: src/Command/CreateFakeCarbonIntensityCommand.php:92
 msgid "Creating fake data..."
 msgstr "Sahte veriler oluşturuluyor..."
 
-#: src/Command/ExportDashboardCommand.php:68
+#: src/Command/ExportDashboardCommand.php:71
 msgid "Updating the report dashboard description"
 msgstr "Rapor panosu açıklaması güncelleniyor"
 
-#: src/Command/ExportDashboardCommand.php:73
+#: src/Command/ExportDashboardCommand.php:76
 msgid "Dashboard not found"
 msgstr "Pano bulunamadı"
 
-#: src/Command/ExportDashboardCommand.php:99
+#: src/Command/ExportDashboardCommand.php:102
 #, php-format
 msgid "Dashboard description saved to %s"
 msgstr "Pano açıklaması %s üzerine kaydedildi"
 
-#: src/Command/CreateTestInventoryCommand.php:145
+#: src/Command/CreateTestInventoryCommand.php:148
 msgid "Creating test inventory"
 msgstr "Sınama envanteri oluşturuluyor"
 
-#: src/NetworkEquipmentType.php:50 src/SearchOptions.php:161
-#: src/ComputerType.php:70 src/MonitorType.php:50
+#: src/NetworkEquipmentType.php:52 src/SearchOptions.php:161
+#: src/ComputerType.php:72 src/MonitorType.php:52
 msgid "Power consumption"
 msgstr "Güç tüketimi"
 
-#: src/UsageInfo.php:62
+#: src/UsageInfo.php:64
 msgid "Usage informations"
 msgstr "Kullanım bilgileri"
 
-#: src/UsageInfo.php:94 src/AbstractModel.php:54 src/Location.php:73
-#: src/AbstractType.php:55 src/Profile.php:45
+#: src/UsageInfo.php:99 src/AbstractModel.php:57 src/Location.php:76
+#: src/AbstractType.php:58 src/Profile.php:47
 msgid "Environmental impact"
 msgstr "Çevresel etki"
 
-#: src/UsageInfo.php:242
+#: src/UsageInfo.php:250
 #, php-format
 msgid "%s More information %s"
 msgstr "%s Diğer bilgiler %s"
 
-#: src/DataSource/Lca/Boaviztapi/Config.php:100
+#: src/DataSource/Lca/Boaviztapi/Config.php:104
 msgid "Invalid Boavizta API URL"
 msgstr "Boavizta API adresi geçersiz"
 
-#: src/DataSource/Lca/Boaviztapi/Config.php:108
+#: src/DataSource/Lca/Boaviztapi/Config.php:112
 msgid "Connection to Boavizta API established"
 msgstr "Boavizta API bağlantısı kuruldu"
 
-#: src/DataSource/CarbonIntensity/Rte/CronTask.php:59
-#: src/DataSource/CarbonIntensity/ElectricityMaps/CronTask.php:54
+#: src/DataSource/CarbonIntensity/Rte/CronTask.php:61
+#: src/DataSource/CarbonIntensity/ElectricityMaps/CronTask.php:56
 msgid "Resource diagnosis"
 msgstr "Kaynak teşhisi"
 
-#: src/DataSource/CarbonIntensity/Rte/CronTask.php:74
+#: src/DataSource/CarbonIntensity/Rte/CronTask.php:77
 msgid "Collect carbon intensities from RTE"
 msgstr "RTE üzerinden karbon yoğunluklarını al"
 
-#: src/DataSource/CarbonIntensity/Rte/CronTask.php:92
+#: src/DataSource/CarbonIntensity/Rte/CronTask.php:95
 msgid "Download carbon emissions from RTE"
 msgstr "RTE üzerinden karbon emisyonlarını indir"
 
-#: src/DataSource/CarbonIntensity/Rte/CronTask.php:93
-#: src/DataSource/CarbonIntensity/ElectricityMaps/CronTask.php:88
-#: src/CronTask.php:107
+#: src/DataSource/CarbonIntensity/Rte/CronTask.php:96
+#: src/DataSource/CarbonIntensity/ElectricityMaps/CronTask.php:91
+#: src/CronTask.php:110
 msgid "Maximum number of entries to download"
 msgstr "İndirilecek en fazla kayıt sayısı"
 
 #: src/DataSource/CarbonIntensity/AbstractCronTask.php:125
-#: src/Source_Zone.php:537
+#: src/Source_Zone.php:540
 msgid "End"
 msgstr "Bitiş"
 
-#: src/DataSource/CarbonIntensity/ElectricityMaps/CronTask.php:69
+#: src/DataSource/CarbonIntensity/ElectricityMaps/CronTask.php:72
 msgid "Collect carbon intensities from Electricity Maps"
 msgstr "Electricity Maps üzerinden karbon yoğunluklarını al"
 
-#: src/DataSource/CarbonIntensity/ElectricityMaps/CronTask.php:87
+#: src/DataSource/CarbonIntensity/ElectricityMaps/CronTask.php:90
 msgid "Download carbon emissions from Electricity Maps"
 msgstr "Electricity Maps üzerinden karbon emisyonlarını indir"
 
-#: src/AbstractImpact.php:125 src/CarbonEmission.php:152
+#: src/AbstractImpact.php:128 src/CarbonEmission.php:156
 msgid "Date of evaluation"
 msgstr "Değerlendirme tarihi"
 
-#: src/AbstractImpact.php:132 src/CarbonEmission.php:159
+#: src/AbstractImpact.php:135 src/CarbonEmission.php:163
 msgid "Engine"
 msgstr "Hesaplayıcı"
 
-#: src/AbstractImpact.php:139 src/CarbonEmission.php:166
+#: src/AbstractImpact.php:142 src/CarbonEmission.php:170
 msgid "Engine version"
 msgstr "Hesaplayıcı sürümü"
 
@@ -508,38 +508,38 @@ msgstr "İndirgenmiş veriler"
 msgid "Measured data"
 msgstr "Ölçülen veriler"
 
-#: src/Impact/Embodied/AbstractEmbodiedImpact.php:93
-#: src/Impact/Usage/AbstractUsageImpact.php:91
+#: src/Impact/Embodied/AbstractEmbodiedImpact.php:94
+#: src/Impact/Usage/AbstractUsageImpact.php:92
 msgid "grams of carbon dioxyde equivalent"
 msgstr "gram karbondioksit eşdeğeri"
 
-#: src/Impact/Embodied/AbstractEmbodiedImpact.php:95
-#: src/Impact/Usage/AbstractUsageImpact.php:93
+#: src/Impact/Embodied/AbstractEmbodiedImpact.php:96
+#: src/Impact/Usage/AbstractUsageImpact.php:94
 msgid "grams of antimony equivalent"
 msgstr "gram antimon eşdeğeri"
 
-#: src/Impact/Embodied/AbstractEmbodiedImpact.php:97
-#: src/Impact/Usage/AbstractUsageImpact.php:95
+#: src/Impact/Embodied/AbstractEmbodiedImpact.php:98
+#: src/Impact/Usage/AbstractUsageImpact.php:96
 msgid "joules"
 msgstr "jul"
 
-#: src/Impact/Embodied/AbstractEmbodiedImpact.php:132
+#: src/Impact/Embodied/AbstractEmbodiedImpact.php:136
 msgid "Connection to Boavizta failed."
 msgstr "Boavizta bağlantısı kurulamadı."
 
-#: src/Impact/Embodied/AbstractEmbodiedImpact.php:135
+#: src/Impact/Embodied/AbstractEmbodiedImpact.php:139
 msgid "Embodied impact evaluation falied."
 msgstr "Birleştirilmiş etki değerlendirmesi yapılamadı."
 
-#: src/Impact/History/AbstractAsset.php:370
+#: src/Impact/History/AbstractAsset.php:375
 msgid "Error while calculating impact"
 msgstr "Etki hesaplanırken sorun çıktı"
 
-#: src/Impact/History/AbstractAsset.php:378
+#: src/Impact/History/AbstractAsset.php:383
 msgid "Nothing to calculate"
 msgstr "Hesaplanacak bir şey yok"
 
-#: src/Impact/History/AbstractAsset.php:384
+#: src/Impact/History/AbstractAsset.php:389
 #, php-format
 msgid "%d entries calculated"
 msgstr "%d kayıt hesaplandı"
@@ -807,7 +807,7 @@ msgstr "Tüketilen birincil enerji."
 msgid "Incidence of disease"
 msgstr "Krizin görülme sıklığı"
 
-#: src/Source.php:46
+#: src/Source.php:48
 msgid "Carbon intensity source"
 msgid_plural "Carbon intensity sources"
 msgstr[0] "Karbon yoğunluğu kaynağı"
@@ -823,49 +823,49 @@ msgstr "Çevresel etkiyi yok say"
 msgid "Is historizable"
 msgstr "Geçmiş oluşturulabilir"
 
-#: src/ComputerType.php:56
+#: src/ComputerType.php:57
 msgid "Unspecified"
 msgstr "Belirtilmemiş"
 
-#: src/ComputerType.php:58
+#: src/ComputerType.php:59
 msgid "Server"
 msgstr "Sunucu"
 
-#: src/ComputerType.php:59
+#: src/ComputerType.php:60
 msgid "Laptop"
 msgstr "Dizüstü"
 
-#: src/ComputerType.php:60
+#: src/ComputerType.php:61
 msgid "Tablet"
 msgstr "Tablet"
 
-#: src/ComputerType.php:61
+#: src/ComputerType.php:62
 msgid "Smartphone"
 msgstr "Akıllı telefon"
 
-#: src/UsageImpact.php:39
+#: src/UsageImpact.php:42
 msgid "Usage impact"
 msgid_plural "Usage impacts"
 msgstr[0] "Kullanım etkisi"
 msgstr[1] "Kullanım etkileri"
 
-#: src/AbstractModel.php:62 src/Dashboard/Grid.php:58
+#: src/AbstractModel.php:66 src/Dashboard/Grid.php:58
 #: src/Dashboard/Grid.php:123 src/Dashboard/Grid.php:221
-#: src/AbstractType.php:63
+#: src/AbstractType.php:67
 msgid "Carbon"
 msgstr "Karbon"
 
-#: src/AbstractModel.php:197
+#: src/AbstractModel.php:204
 msgid "Quality"
-msgstr ""
+msgstr "Kalite"
 
-#: src/Report.php:49
+#: src/Report.php:51
 msgid "Carbon report"
 msgid_plural "Carbon reports"
 msgstr[0] "Karbon raporu"
 msgstr[1] "Karbon raporları"
 
-#: src/Report.php:101
+#: src/Report.php:106
 #, php-format
 msgid ""
 "Demo mode enabled. The data below are not representative of the assets in "
@@ -874,78 +874,78 @@ msgstr ""
 "Tanıtım kipi açık. Aşağıdaki veriler veri tabanındaki varlıkları "
 "göstermiyor. %sTanıtım kipini kapat%s"
 
-#: src/ComputerUsageProfile.php:51
+#: src/ComputerUsageProfile.php:53
 msgid "Computer usage profile"
 msgid_plural "Computer usage profiles"
 msgstr[0] "Bilgisayar kullanım profili"
 msgstr[1] "Bilgisayar kullanım profilleri"
 
-#: src/ComputerUsageProfile.php:117
+#: src/ComputerUsageProfile.php:123
 msgid "Start time is invalid"
 msgstr "Başlangıç zamanı geçersiz"
 
-#: src/ComputerUsageProfile.php:122
+#: src/ComputerUsageProfile.php:128
 msgid "Stop time is invalid"
 msgstr "Bitiş zamanı geçersiz"
 
-#: src/Source_Zone.php:72
+#: src/Source_Zone.php:75
 msgid "Source name"
 msgstr "Kaynak adı"
 
-#: src/Source_Zone.php:80
+#: src/Source_Zone.php:83
 msgid "Zone name"
 msgstr "Bölge adı"
 
-#: src/Source_Zone.php:88 src/Source_Zone.php:171 src/Source_Zone.php:268
-#: src/Zone.php:127
+#: src/Source_Zone.php:91 src/Source_Zone.php:174 src/Source_Zone.php:271
+#: src/Zone.php:138
 msgid "Download enabled"
 msgstr "İndirme açık"
 
-#: src/Source_Zone.php:96
+#: src/Source_Zone.php:99
 msgid "Code"
 msgstr "Kod"
 
-#: src/Source_Zone.php:150
+#: src/Source_Zone.php:153
 msgid "Not downloadable"
 msgstr "İndirilebilir değil"
 
-#: src/Source_Zone.php:150
+#: src/Source_Zone.php:153
 msgid "This is a fallback source, there is no real-time data available"
 msgstr "Bu varsayılan bir kaynaktır. Burada gerçek zamanlı veriler bulunmaz"
 
-#: src/Source_Zone.php:172
+#: src/Source_Zone.php:175
 msgid "Source for historical"
 msgstr "Geçmiş oluşturma kaynağı"
 
-#: src/Source_Zone.php:411
+#: src/Source_Zone.php:414
 msgid "Enable / Disable"
 msgstr "Aç / Kapat"
 
-#: src/CronTask.php:100
+#: src/CronTask.php:103
 msgid "Find the Alpha3 country code (ISO3166)"
 msgstr "Alpha3 ülke kodunu bul (ISO3166)"
 
-#: src/CronTask.php:101
+#: src/CronTask.php:104
 msgid "Maximum number of locations to solve"
 msgstr "Çözülecek en fazla konum sayısı"
 
-#: src/CronTask.php:106
+#: src/CronTask.php:109
 msgid "Download carbon emissions from Watttime"
 msgstr "Watttime üzerinden karbon emisyonlarını indir"
 
-#: src/CronTask.php:112
+#: src/CronTask.php:115
 msgid "Compute usage environmental impact for all assets"
 msgstr "Tüm varlıkların kullanım çevresel etkisini hesapla"
 
-#: src/CronTask.php:113 src/CronTask.php:118
+#: src/CronTask.php:116 src/CronTask.php:121
 msgid "Maximum number of entries to calculate"
 msgstr "Hesaplanacak en fazla kayıt sayısı"
 
-#: src/CronTask.php:117
+#: src/CronTask.php:120
 msgid "Compute embodied environmental impact for all assets"
 msgstr "Tüm varlıkların gerçekleşen çevresel etkisini hesapla"
 
-#: src/CronTask.php:278
+#: src/CronTask.php:281
 msgid "No zone to download"
 msgstr "İndirilecek bir bölge yok"
 
@@ -1232,37 +1232,37 @@ msgstr "Carbon eklentisi - Kullanım karbon emisyonu"
 msgid "Carbon dioxyde intensity"
 msgstr "Karbondioksit yoğunluğu"
 
-#: src/Location.php:189
+#: src/Location.php:196
 msgid "Carbon intensity source and zone"
-msgstr ""
+msgstr "Karbon yoğunluğu kaynağı ve bölge"
 
-#: src/CarbonIntensity.php:87
+#: src/CarbonIntensity.php:91
 msgid "Emission date"
 msgstr "Emisyon tarihi"
 
-#: src/CarbonIntensity.php:114
+#: src/CarbonIntensity.php:118
 msgid "Intensity"
 msgstr "Yoğunluk"
 
-#: src/CarbonEmission.php:50
+#: src/CarbonEmission.php:52
 msgid "Carbon Emission"
 msgid_plural "Carbon Emissions"
 msgstr[0] "Karbon emisyonu"
 msgstr[1] "Karbon emisyonları"
 
-#: src/CarbonEmission.php:121
+#: src/CarbonEmission.php:125
 msgid "Energy"
 msgstr "Enerji"
 
-#: src/CarbonEmission.php:129
+#: src/CarbonEmission.php:133
 msgid "Emission"
 msgstr "Emisyon"
 
-#: src/CarbonEmission.php:137
+#: src/CarbonEmission.php:141
 msgid "Energy quality"
 msgstr "Enerji kalitesi"
 
-#: src/CarbonEmission.php:145
+#: src/CarbonEmission.php:149
 msgid "Emission quality"
 msgstr "Emisyon kalitesi"
 
@@ -1311,7 +1311,7 @@ msgstr "Wh"
 msgid "%1$s %2$s"
 msgstr "%1$s %2$s"
 
-#: setup.php:287
+#: setup.php:298
 msgid "Environmental Impact"
 msgstr "Çevresel etki"
 
@@ -1345,7 +1345,7 @@ msgstr "Boavizta hesaplayıcı bölgesini güncelle"
 
 #: hook.php:327
 msgid "Update carbon intensity source and zone"
-msgstr ""
+msgstr "Karbon yoğunluğu kaynağı ve bölgeyi güncelle"
 
 #: install/install/create_automatic_actions.php:52
 msgid "Find the Alpha3 country code (ISO3166) of locations"
