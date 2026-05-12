@@ -34,7 +34,7 @@
 namespace GlpiPlugin\Carbon\Impact\Usage;
 
 use CommonDBTM;
-use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
+use DBmysqlIterator;
 
 interface UsageImpactInterface
 {
@@ -47,40 +47,49 @@ interface UsageImpactInterface
     // public static function getEngine(CommonDBTM $item): EngineInterface;
 
     /**
-     * Get  the itemtype of the asset handled by this class
-     *
-     * @return string
-     */
-    public static function getItemtype(): string;
-
-    /**
      * Set the maximum count of items to calculate with evaluateItems()
      *
-     * @param integer $limit
+     * @param int $limit
      * @return void
      */
     public function setLimit(int $limit);
 
     /**
      * Get query to find items we can evaluate
-     * @param array $crit Criterias to aass to WHERE clause
+     * An evaluable item is an item with all required data
+     *
+     * @template T of CommonDBTM
+     * @param class-string<T> $itemtype
+     * @param array $crit Criteria
      *
      * @return array
      */
-    public function getEvaluableQuery(array $crit = []): array;
+    public function getEvaluableQuery(string $itemtype, array $crit = []): array;
+
+    /**
+     * Get an iterator of items to evaluate
+     * An item to evaluate is an item with all required data for a successful evaluation
+     * and without any calculation result or with an invalidated calculation result
+     *
+     * @template T of CommonDBTM
+     * @param class-string<T> $itemtype
+     * @param array $crit criteria
+     * @return DBmysqlIterator
+     */
+    public function getItemsToEvaluate(string $itemtype, array $crit = []): DBmysqlIterator;
 
     /**
      * Start the evaluation of all items
      *
+     * @param DBmysqlIterator $iterator assets to evaluate providing their IDs
      * @return int count of successfully evaluated assets
      */
-    public function evaluateItems(): int;
+    public function evaluateItems(DBmysqlIterator $iterator): int;
 
     /**
      * Evaluate all impacts of the asset
      *
-     * @param integer    $id
      * @return bool      true if success, false otherwise
      */
-    public function evaluateItem(int $id): bool;
+    public function evaluateItem(): bool;
 }

@@ -1,0 +1,170 @@
+<?php
+
+/**
+ * -------------------------------------------------------------------------
+ * Carbon plugin for GLPI
+ *
+ * @copyright Copyright (C) 2024-2025 Teclib' and contributors.
+ * @license   https://www.gnu.org/licenses/gpl-3.0.txt GPLv3+
+ * @link      https://github.com/pluginsGLPI/carbon
+ *
+ * -------------------------------------------------------------------------
+ *
+ * LICENSE
+ *
+ * This file is part of Carbon plugin for GLPI.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * -------------------------------------------------------------------------
+ */
+
+namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\Rte;
+
+use DateTime;
+use DateTimeImmutable;
+use GlpiPlugin\Carbon\CarbonIntensity;
+use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
+use GlpiPlugin\Carbon\Tests\DbTestCase;
+use GlpiPlugin\Carbon\Zone;
+use PHPUnit\Framework\Attributes\CoversClass;
+
+#[CoversClass(Client::class)]
+class ClientTest extends DbTestCase
+{
+    public function testFetchDay()
+    {
+        $source = $this->createItem(Source::class, ['name' => 'foo']);
+        $zone = $this->createItem(Zone::class, ['name' => 'bar']);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            getForeignKeyFieldForItemType(Source::class) => $source->getID(),
+            getForeignKeyFieldForItemType(Zone::class) => $zone->getID(),
+        ]);
+
+        $client = $this->createStub(RestApiClientInterface::class);
+        $fixture_file = TU_FIXTURE_PATH . '/RTE/api-sample.json';
+        $response = file_get_contents($fixture_file);
+        $client->method('request')->willReturn(json_decode($response, true));
+
+        $source = new Client($client);
+
+        $date = new DateTimeImmutable('5 days ago');
+        $intensities = $source->fetchDay($date, $source_zone);
+
+        $this->assertIsArray($intensities);
+        $this->assertEquals(96, count($intensities));
+    }
+
+    public function testFetchRange()
+    {
+        $source = $this->createItem(Source::class, ['name' => 'foo']);
+        $zone = $this->createItem(Zone::class, ['name' => 'bar']);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            getForeignKeyFieldForItemType(Source::class) => $source->getID(),
+            getForeignKeyFieldForItemType(Zone::class) => $zone->getID(),
+        ]);
+
+        $client = $this->createStub(RestApiClientInterface::class);
+        $response = [];
+        $date = new DateTime('2021-03-01 00:00:00');
+        $date_increment = new \DateInterval('PT15M'); // 15 minutes interval
+        for ($i = 0; $i < 2496; $i++) {
+            $response[] = [
+                'taux_co2'   => 1,
+                'date_heure' => $date->format('Y-m-d\TH:i:sP'),
+            ];
+            $date->add($date_increment);
+        }
+        $client->method('request')->willReturn($response);
+
+        $source = new Client($client);
+
+        $start = new DateTimeImmutable('2021-03-01');
+        $stop  = new DateTimeImmutable('2021-03-27');
+        $intensities = $source->fetchRange($start, $stop, $source_zone);
+        $this->assertIsArray($intensities);
+        $this->assertIsArray($intensities);
+        // There are 2496 intensities in the sample set
+        $this->assertEquals((2496), count($intensities));
+    }
+
+    public function testFullDownload()
+    {
+        $source = $this->getItem(Source::class, ['name' => 'RTE']);
+        $zone = $this->getItem(Zone::class, ['name' => 'France']);
+        $source_zone = $this->getItem(Source_Zone::class, [
+            getForeignKeyFieldForItemType(Source::class) => $source->getID(),
+            getForeignKeyFieldForItemType(Zone::class) => $zone->getID(),
+        ]);
+        $client = $this->createStub(RestApiClientInterface::class);
+        $client->method('request')->willReturn([
+            [
+                'taux_co2'   => 1,
+                'date_heure' => '2024-10-08T18:00:00+00:00',
+            ],
+            [
+                'taux_co2'   => 1,
+                'date_heure' => '2024-10-08T18:15:00+00:00',
+            ],
+            [
+                'taux_co2'   => 1,
+                'date_heure' => '2024-10-08T18:30:00+00:00',
+            ],
+            [
+                'taux_co2'   => 1,
+                'date_heure' => '2024-10-08T18:45:00+00:00',
+            ],
+        ]);
+        /** @var RestApiClientInterface $client */
+        $instance = new Client($client);
+        $start_date = new DateTimeImmutable('2024-10-08');
+        $stop_date = new DateTimeImmutable('2024-10-09');
+        $carbon_intensity = new CarbonIntensity();
+        $output = $instance->fullDownload($source_zone, $start_date, $stop_date, $carbon_intensity);
+        $this->assertEquals(1, $output);
+    }
+
+    public function testIncrementalDownload()
+    {
+        $source = $this->getItem(Source::class, ['name' => 'RTE']);
+        $zone = $this->getItem(Zone::class, ['name' => 'France']);
+        $source_zone = $this->getItem(Source_Zone::class, [
+            getForeignKeyFieldForItemType(Source::class) => $source->getID(),
+            getForeignKeyFieldForItemType(Zone::class) => $zone->getID(),
+        ]);
+        $intensity = $this->createMock(CarbonIntensity::class);
+
+        // 4 calls to fetchRange [3 days ago; today]
+        $intensity->expects($this->exactly(4))->method('save');
+
+        // $instance = $this->getMockBuilder(CarbonIntensityRTE::class)
+        //     ->disableOriginalConstructor()
+        //     ->getMock();
+        // $instance->method('fetchDay')->willReturn(['FR' => []]);
+        $client = $this->createStub(RestApiClientInterface::class);
+        $client->method('request')->willReturn([
+            [
+                'taux_co2'   => 1,
+                'date_heure' => '2024-10-08T18:00:00+00:00',
+            ],
+        ]);
+        $instance = new Client($client);
+        $start_date = new DateTime('3 days ago');
+        $start_date->setTime(0, 0, 0);
+        $start_date = DateTimeImmutable::createFromMutable($start_date);
+        $instance->incrementalDownload($source_zone, $start_date, $intensity);
+    }
+}

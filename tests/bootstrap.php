@@ -43,6 +43,7 @@ define('GLPI_URI', getenv('GLPI_URI') ?: 'http://localhost');
 
 define('TU_USER', '_test_user');
 define('TU_PASS', 'PhpUnit_4');
+define('TU_FIXTURE_PATH', __DIR__ . '/fixtures');
 
 ini_set('session.use_cookies', 0); //disable session cookies
 
@@ -53,6 +54,23 @@ require_once dirname(__DIR__, 3) . '/src/Glpi/Application/ResourcesChecker.php';
 global $GLPI_CACHE;
 
 require_once dirname(__DIR__, 3) . '/vendor/autoload.php';
+
+// Add a PSR4 loader for test framework classes
+spl_autoload_register(function ($class) {
+    $namespace = 'GlpiPlugin\\Carbon\\Tests\\';
+    $len = strlen($namespace);
+    if (strncmp($namespace, $class, $len) !== 0) {
+        return false;
+    }
+    $relative_class = substr($class, $len);
+    $file = dirname(__FILE__) . '/src/' . str_replace('_', DIRECTORY_SEPARATOR, $relative_class) . '.php';
+    // if the file exists, require it
+    if (file_exists($file)) {
+        require_once $file;
+        return true;
+    }
+    return false;
+});
 
 $kernel = new Kernel(Environment::TESTING->value);
 $kernel->boot();

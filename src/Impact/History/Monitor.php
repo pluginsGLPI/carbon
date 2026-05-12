@@ -37,23 +37,22 @@ use CommonDBTM;
 use Computer as GlpiComputer;
 use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
-use Glpi\Asset\Asset_PeripheralAsset;
 use DBmysql;
 use DbUtils;
 use Glpi\Application\View\TemplateRenderer;
+use Glpi\Asset\Asset_PeripheralAsset;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Engine\V1\Monitor as EngineMonitor;
-use GlpiPlugin\Carbon\Location as CarbonLocation;
+use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\UsageImpact;
-use GlpiPlugin\Carbon\UsageInfo;
 use Infocom;
-use Location;
+use Location as GlpiLocation;
 use Monitor as GlpiMonitor;
-use MonitorType as GlpiMonitorType;
 use MonitorModel as GlpiMonitorModel;
+use MonitorType as GlpiMonitorType;
 
 class Monitor extends AbstractAsset
 {
@@ -73,7 +72,7 @@ class Monitor extends AbstractAsset
         $item_table = self::$itemtype::getTable();
         $item_model_table = self::$model_itemtype::getTable();
         $computers_table = GlpiComputer::getTable();
-        $computers_items_table = Asset_PeripheralAsset::getTable();
+        $assets_items_table = Asset_PeripheralAsset::getTable();
         $computer_model_table = GlpiComputerModel::getTable();
         $glpi_monitor_types_table = GlpiMonitorType::getTable();
         $glpi_monitor_types_fk = GlpiMonitorType::getForeignKeyField();
@@ -94,22 +93,23 @@ class Monitor extends AbstractAsset
 
         // Add joins to reach monitor from computer
         $request['FROM'] = $item_table;
-        $request['LEFT JOIN'][$computers_items_table] = [
+        $request['LEFT JOIN'][$assets_items_table] = [
             'FKEY' => [
-                $computers_items_table => 'items_id_peripheral',
+                $assets_items_table => 'items_id_peripheral',
                 $item_table => 'id',
-                ['AND' => [
-                    Asset_PeripheralAsset::getTableField('itemtype_peripheral') => self::$itemtype,
-                    Asset_PeripheralAsset::getTableField('itemtype_asset') => GlpiComputer::class,
-                ]
+                [
+                    'AND' => [
+                        Asset_PeripheralAsset::getTableField('itemtype_peripheral') => self::$itemtype,
+                        Asset_PeripheralAsset::getTableField('itemtype_asset') => GlpiComputer::class,
+                    ],
                 ],
-            ]
+            ],
         ];
         $request['INNER JOIN'][$computers_table] = [
             'FKEY' => [
                 $computers_table => 'id',
-                $computers_items_table => 'items_id_asset',
-                ['AND' => [Asset_PeripheralAsset::getTableField('itemtype_asset') => GlpiComputer::class]]
+                $assets_items_table => 'items_id_asset',
+                ['AND' => [Asset_PeripheralAsset::getTableField('itemtype_asset') => GlpiComputer::class]],
             ],
         ];
         $request['LEFT JOIN'][$glpi_monitor_types_table] = [
@@ -135,7 +135,7 @@ class Monitor extends AbstractAsset
                 $infocom_table => 'items_id',
                 $item_table => 'id',
                 ['AND' => [Infocom::getTableField('itemtype') => self::$itemtype]],
-            ]
+            ],
         ];
 
         // re-add inner joins of computer, after those for monitor
@@ -153,23 +153,24 @@ class Monitor extends AbstractAsset
                 self::$itemtype::getTableField('is_template') => 0,
                 // Check the monitor is located the same place as the attached computer
                 // self::$itemtype::getTableField('locations_id') => new QueryExpression(DBmysql::quoteName(GlpiComputer::getTableField('locations_id'))),
-                [
-                    'OR' => [
-                        [
-                            ['NOT' => [Location::getTableField('country') => '']],
-                            ['NOT' => [Location::getTableField('country') => null]],
-                        ],
-                        [
-                            ['NOT' => [Location::getTableField('state') => '']],
-                            ['NOT' => [Location::getTableField('state') => null]],
-                        ]
-                    ]
+                Location::getTableField('plugin_carbon_sources_zones_id') => ['>', 0],
+                'OR' => [
+                    [MonitorType::getTableField('is_ignore') => 0],
+                    [MonitorType::getTableField('is_ignore') => null],
                 ],
                 [
                     'OR' => [
                         MonitorType::getTableField('power_consumption') => ['>', 0],
                         self::$model_itemtype::getTableField('power_consumption') => ['>', 0],
                     ],
+                    // ], [
+                    //     'OR' => [
+                    //         ['NOT' => [Infocom::getTableField('use_date') => null]],
+                    //         ['NOT' => [Infocom::getTableField('delivery_date') => null]],
+                    //         ['NOT' => [Infocom::getTableField('buy_date') => null]],
+                    //         ['NOT' => [self::$itemtype::getTableField('date_creation') => null]],
+                    //         // ['NOT' => [self::$itemtype::getTableField('date_mod') => null]],
+                    //     ],
                 ],
             ],
         ] + $crit;
@@ -194,18 +195,20 @@ class Monitor extends AbstractAsset
             self::$itemtype::getTableField('is_deleted'),
             self::$itemtype::getTableField('is_template'),
             Asset_PeripheralAsset::getTableField('items_id_asset'),
-            UsageInfo::getTableField('plugin_carbon_computerusageprofiles_id'),
-            Location::getTableField('id as location_id'),
-            Location::getTableField('state'),
-            Location::getTableField('country'),
+            ComputerUsageProfile::getTableField('id as plugin_carbon_computerusageprofiles_id'),
+            GlpiLocation::getTableField('id as locations_id'),
+            Location::getTableField('plugin_carbon_sources_zones_id'),
             GlpiMonitorModel::getTableField('id as model_id'),
             GlpiMonitorModel::getTableField('power_consumption as model_power_consumption'),
             GlpiMonitorType::getTableField('id as type_id'),
             MonitorType::getTableField('id as plugin_carbon_type_id'),
             MonitorType::getTableField('power_consumption  as type_power_consumption'),
+            MonitorType::getTableField('is_ignore'),
             Infocom::getTableField('use_date'),
             Infocom::getTableField('delivery_date'),
             Infocom::getTableField('buy_date'),
+            Infocom::getTableField('decommission_date'),
+            self::$itemtype::getTableField('date_creation'),
         ];
         // Change inner joins into left joins to identify missing data
         // Warning : the order of the array merge below is important or the resulting SQL query will fail
@@ -222,9 +225,9 @@ class Monitor extends AbstractAsset
             return null;
         }
 
-        $glpi_location = new Location();
-        $glpi_location->getFromDB($item->fields['locations_id']);
-        $location = new CarbonLocation();
+        $glpi_location = new GlpiLocation();
+        $glpi_location->getFromDB($data['locations_id']);
+        $location = new Location();
         $is_carbon_intensity_download_enabled = $location->isCarbonIntensityDownloadEnabled($glpi_location);
         $is_carbon_intensity_fallback_available = $location->hasFallbackCarbonIntensityData($glpi_location);
 
@@ -234,22 +237,26 @@ class Monitor extends AbstractAsset
         $status['is_template'] = ($data['is_template'] === 0); // Actually the result is whether it is "not template"
         $status['has_computer'] = !GlpiComputer::isNewID($data['items_id_asset']);
         $status['has_usage_profile'] = !ComputerUsageProfile::isNewID($data['plugin_carbon_computerusageprofiles_id']);
-        $status['has_location'] = !Location::isNewID($data['location_id']);
-        $status['has_state_or_country'] = (strlen($data['state'] ?? '') > 0) || (strlen($data['country'] ?? '') > 0);
+        $status['has_location'] = !GlpiLocation::isNewID($data['locations_id']);
+        // $status['has_state_or_country'] = (strlen($data['state'] ?? '') > 0) || (strlen($data['country'] ?? '') > 0);
+        $status['has_carbon_intensity_zone'] = (($data['plugin_carbon_sources_zones_id'] ?? 0) !== 0);
         $status['has_model'] = !GlpiMonitorModel::isNewID($data['model_id']);
         $status['has_model_power_consumption'] = !GlpiMonitorType::isNewID($data['model_power_consumption']);
         $status['has_type'] = !GlpiMonitorType::isNewID($data['type_id']);
         $status['has_type_power_consumption'] = (($data['type_power_consumption'] ?? 0) !== 0);
         $status['ci_download_enabled'] = $is_carbon_intensity_download_enabled;
         $status['ci_fallback_available'] = $is_carbon_intensity_fallback_available;
+        $status['not_is_ignore'] = (($data['is_ignore'] ?? 0) === 0);
 
-        $item_oldest_date = $data['use_date']
-            ?? $data['delivery_date']
+        $item_oldest_date = $data['date_creation']
             ?? $data['buy_date']
-            ?? $data['date_creation']
+            ?? $data['delivery_date']
+            ?? $data['use_date']
+            // ?? $data['date_creation']
             // ?? $data['date_mod']
             ?? null;
         $status['has_inventory_entry_date'] = ($item_oldest_date !== null);
+        $status['has_decommission_date'] = ($data['decommission_date'] !== null);
 
         return $status;
     }

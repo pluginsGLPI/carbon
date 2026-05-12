@@ -38,11 +38,14 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use DBmysql;
 use Glpi\Dashboard\Dashboard as GlpiDashboard;
-use Infocom;
-use Location;
 use Glpi\DBAL\QueryExpression;
 use Glpi\DBAL\QuerySubQuery;
+use Glpi\DBAL\QueryUnion;
+use Infocom;
+use InvalidArgumentException;
+use Location;
 use Mexitek\PHPColors\Color;
+use Toolbox as GlpiToolbox;
 
 class Toolbox
 {
@@ -65,41 +68,40 @@ class Toolbox
         $oldest_date = null;
         $infocom_table = Infocom::getTable();
         foreach ($itemtypes as $itemtype) {
-            if (Infocom::canApplyOn($itemtype)) {
-                $item_table = getTableForItemType($itemtype);
-                $dates = $DB->request([
-                    'SELECT' => [
-                        'MIN' => [
-                            "$item_table.date_creation as date_creation",
-                            "$item_table.date_mod as date_mod",
-                            "$infocom_table.use_date as use_date",
-                            "$infocom_table.delivery_date as delivery_date",
-                            "$infocom_table.buy_date as buy_date",
+            if (!Infocom::canApplyOn($itemtype)) {
+                continue;
+            }
+            $item_table = getTableForItemType($itemtype);
+            $dates = $DB->request([
+                'SELECT' => [
+                    "$item_table.date_creation as date_creation",
+                    // "$item_table.date_mod as date_mod",
+                    "$infocom_table.use_date as use_date",
+                    "$infocom_table.delivery_date as delivery_date",
+                    "$infocom_table.buy_date as buy_date",
+                ],
+                'FROM' => $item_table,
+                'LEFT JOIN' => [
+                    $infocom_table => [
+                        'FKEY' => [
+                            $infocom_table => 'items_id',
+                            $item_table    => 'id',
+                            ['AND' => ['itemtype' => $itemtype]],
                         ],
                     ],
-                    'FROM' => $item_table,
-                    'LEFT JOIN' => [
-                        $infocom_table => [
-                            'FKEY' => [
-                                $infocom_table => 'items_id',
-                                $item_table    => 'id',
-                                ['AND' => ['itemtype' => $itemtype]],
-                            ]
-                        ]
-                    ],
-                    'WHERE' => $crit,
-                ])->current();
-                $itemtype_oldest_date = $dates['use_date']
-                ?? $dates['delivery_date']
-                ?? $dates['buy_date']
-                ?? $dates['date_creation']
-                ?? $dates['date_mod']
-                ?? null;
-                if ($oldest_date === null) {
-                    $oldest_date = $itemtype_oldest_date;
-                } else if ($itemtype_oldest_date !== null) {
-                    $oldest_date = min($oldest_date, $itemtype_oldest_date);
-                }
+                ],
+                'WHERE' => $crit,
+            ])->current();
+            $itemtype_oldest_date = $dates['use_date']
+            ?? $dates['delivery_date']
+            ?? $dates['buy_date']
+            ?? $dates['date_creation'] // Date creation of the asset
+            // ?? $dates['date_mod']
+            ?? null;
+            if ($oldest_date === null) {
+                $oldest_date = $itemtype_oldest_date;
+            } elseif ($itemtype_oldest_date !== null) {
+                $oldest_date = min($oldest_date, $itemtype_oldest_date);
             }
         }
         if ($oldest_date === null) {
@@ -115,7 +117,7 @@ class Toolbox
     }
 
     /**
-     * Find the date where an asset leaves the inventory
+     * Find the date where assets leave the inventory
      *
      * @param array $crit
      * @return DateTimeImmutable|null
@@ -133,33 +135,31 @@ class Toolbox
         $latest_date = null;
         $infocom_table = Infocom::getTable();
         foreach ($itemtypes as $itemtype) {
-            if (Infocom::canApplyOn($itemtype)) {
-                $item_table = getTableForItemType($itemtype);
-                $dates = $DB->request([
-                    'SELECT' => [
-                        'MIN' => [
-                            "$infocom_table.decommission_date as decommission_date",
+            if (!Infocom::canApplyOn($itemtype)) {
+                continue;
+            }
+            $item_table = getTableForItemType($itemtype);
+            $dates = $DB->request([
+                'SELECT' => [
+                    "$infocom_table.decommission_date as decommission_date",
+                ],
+                'FROM' => $item_table,
+                'LEFT JOIN' => [
+                    $infocom_table => [
+                        'FKEY' => [
+                            $infocom_table => 'items_id',
+                            $item_table    => 'id',
+                            ['AND' => ['itemtype' => $itemtype]],
                         ],
                     ],
-                    'FROM' => $item_table,
-                    'LEFT JOIN' => [
-                        $infocom_table => [
-                            'FKEY' => [
-                                $infocom_table => 'items_id',
-                                $item_table    => 'id',
-                                ['AND' => ['itemtype' => $itemtype]],
-                            ]
-                        ]
-                    ],
-                    'WHERE' => $crit,
-                ])->current();
-                $itemtype_latest_date = $dates['decommission_date']
-                ?? null;
-                if ($latest_date === null) {
-                    $latest_date = $itemtype_latest_date;
-                } else if ($itemtype_latest_date !== null) {
-                    $latest_date = max($latest_date, $itemtype_latest_date);
-                }
+                ],
+                'WHERE' => $crit,
+            ])->current();
+            $itemtype_latest_date = $dates['decommission_date'] ?? null;
+            if ($latest_date === null) {
+                $latest_date = $itemtype_latest_date;
+            } elseif ($itemtype_latest_date !== null) {
+                $latest_date = max($latest_date, $itemtype_latest_date);
             }
         }
         if ($latest_date === null) {
@@ -172,6 +172,48 @@ class Toolbox
         }
 
         return $output;
+    }
+
+    /**
+     * Get the lifespan of an asset from its infocom, in months
+     *
+     * @param Infocom $infocom
+     * @return int|null
+     */
+    public static function getInfocomLifespanInMonth(Infocom $infocom): ?int
+    {
+        if ($infocom->isNewItem() || $infocom->fields['decommission_date'] === null) {
+            return null;
+        }
+        $start =   $infocom->fields['buy_date']
+                ?? $infocom->fields['delivery_date']
+                ?? $infocom->fields['use_date']
+                ?? null;
+        if ($start === null) {
+            // Fallback on asset date creation
+            $asset_itemtype = $infocom->fields['itemtype'];
+            if (!GlpiToolbox::isCommonDBTM($asset_itemtype)) {
+                return null;
+            }
+            $asset = $asset_itemtype::getById($infocom->fields['items_id']);
+            $start = $asset->fields['date_creation'] ?? null;
+            if ($start === null) {
+                // Give up
+                return null;
+            }
+        }
+        // Date_creation uses Y-m-d H:i:s and infocom dates use Y-m-d format
+        $start = new DateTime($start);
+        $stop = new DateTime($infocom->fields['decommission_date']);
+
+        $interval = $stop->diff($start);
+        // convert interval into months
+
+        $months = (int) round(12 * $interval->y
+            + $interval->m
+            + $interval->d / 30); // Assume a month is 30 days (not exact, but sufficient)
+
+        return $months;
     }
 
     /**
@@ -196,7 +238,7 @@ class Toolbox
      **/
     public static function getWeight(float $weight): string
     {
-       //TRANS: list of unit (o for octet)
+        //TRANS: list of unit (o for octet)
         $units = [
             __('g', 'carbon'),
             __('Kg', 'carbon'),
@@ -220,21 +262,8 @@ class Toolbox
 
         $weight = self::dynamicRound($weight);
 
-       //TRANS: %1$s is a number maybe float or string and %2$s the unit
-        return sprintf(__('%1$s&nbsp;%2$s'), $weight, $human_readable_unit);
-    }
-
-    public static function dynamicRound(float $number): float
-    {
-        if ($number < 10) {
-            $number = round($number, 2);
-        } else if ($number < 100) {
-            $number = round($number, 1);
-        } else {
-            $number = round($number, 0);
-        }
-
-        return $number;
+        //TRANS: %1$s is a number maybe float or string and %2$s the unit
+        return sprintf(__('%1$s %2$s'), $weight, $human_readable_unit);
     }
 
     /**
@@ -246,7 +275,7 @@ class Toolbox
      **/
     public static function getPower(float $p): string
     {
-       //TRANS: list of unit (W for watt)
+        //TRANS: list of unit (W for watt)
         $units = [
             __('W', 'carbon'),
             __('KW', 'carbon'),
@@ -268,20 +297,20 @@ class Toolbox
 
         $p = self::dynamicRound($p);
 
-       //TRANS: %1$s is a number maybe float or string and %2$s the unit
-        return sprintf(__('%1$s&nbsp;%2$s'), $p, $human_readable_unit);
+        //TRANS: %1$s is a number maybe float or string and %2$s the unit
+        return sprintf(__('%1$s %2$s'), $p, $human_readable_unit);
     }
 
     /**
-     * Format a power passing a power in grams
+     * Format a energy in watt.hour
      *
-     * @param float $p  Power in Watt
+     * @param float $p  Energy in watt.hour
      *
-     * @return string  formatted power
+     * @return string  formatted energy
      **/
     public static function getEnergy(float $p): string
     {
-       //TRANS: list of unit (W for watt)
+        //TRANS: list of unit (Wh for watt.hour)
         $units = [
             __('Wh', 'carbon'),
             __('KWh', 'carbon'),
@@ -303,8 +332,50 @@ class Toolbox
 
         $p = self::dynamicRound($p);
 
-       //TRANS: %1$s is a number maybe float or string and %2$s the unit
-        return sprintf(__('%1$s&nbsp;%2$s'), $p, $human_readable_unit);
+        //TRANS: %1$s is a number maybe float or string and %2$s the unit
+        return sprintf(__('%1$s %2$s'), $p, $human_readable_unit);
+    }
+
+    public static function dynamicRound(float $number): float
+    {
+        if ($number < 10) {
+            $number = round($number, 2);
+        } elseif ($number < 100) {
+            $number = round($number, 1);
+        } else {
+            $number = round($number, 0);
+        }
+
+        return $number;
+    }
+
+    /**
+     * Convert a value and its unit into a human readable value
+     *
+     * Unit is an array i.e. ['g', 'CO2 eq'] for grams of carbondioxyde equivalent
+     *
+     * @param float $value value of the quantity to convert
+     * @param array $unit unit splitted into a standard unit and a qualification.
+     * @return string
+     */
+    public static function getHumanReadableValue(float $value, array $unit): string
+    {
+        switch ($unit[0]) {
+            case 'g':
+                return self::getWeight($value) . $unit[1];
+            case 'J':
+                // To be converted into watt.hour
+                return self::getEnergy($value / 3600) . $unit[1];
+            case 'Wh':
+                return self::getEnergy($value) . $unit[1];
+            case 'm³':
+                // Value is in m^3
+                return sprintf(__('%1$s %2$s', 'carbon'), $value * 1000, 'L');
+            case 'mol':
+                break;
+        }
+
+        return sprintf(__('%1$s %2$s', 'carbon'), $value, implode(' ', $unit));
     }
 
     /**
@@ -324,7 +395,7 @@ class Toolbox
         foreach ($serie as $value) {
             if (is_scalar($value)) {
                 $average += $value;
-            } else if (is_array($value)) {
+            } elseif (is_array($value)) {
                 $average += $value['y'];
             } else {
                 continue;
@@ -347,7 +418,7 @@ class Toolbox
         foreach ($serie as &$number) {
             if (is_scalar($number)) {
                 $number = number_format($number / ($multiple ** $power), PLUGIN_CARBON_DECIMALS, '.', '');
-            } else if (is_array($number)) {
+            } elseif (is_array($number)) {
                 $number['y'] = number_format($number['y'] / ($multiple ** $power), PLUGIN_CARBON_DECIMALS, '.', '');
             }
         }
@@ -367,7 +438,7 @@ class Toolbox
         foreach (PLUGIN_CARBON_TYPES as $itemtype) {
             $type = implode('\\', [
                 $base_namespace,
-                $itemtype
+                $itemtype,
             ]);
             if (!class_exists($type)) {
                 continue;
@@ -391,7 +462,7 @@ class Toolbox
         foreach (PLUGIN_CARBON_TYPES as $itemtype) {
             $type = implode('\\', [
                 $base_namespace,
-                $itemtype
+                $itemtype,
             ]);
             if (!class_exists($type)) {
                 continue;
@@ -414,7 +485,7 @@ class Toolbox
         foreach (PLUGIN_CARBON_TYPES as $itemtype) {
             $history_type = implode('\\', [
                 $base_namespace,
-                $itemtype
+                $itemtype,
             ]);
             if (!class_exists($history_type)) {
                 continue;
@@ -460,115 +531,127 @@ class Toolbox
     /**
      * Gets date intervals where data are missing in a table
      * To use with Mysql 8.0+ or MariaDB 10.2+
+     * Gaps are expressed as intervals like [X; Y[
+     * X is the 1st missing row, and Y is the first existing row which ends the gap
      *
-     * @see https://bertwagner.com/posts/gaps-and-islands/
-     *
-     * @param string $table                table to search for gaps
-     * @param DateTimeInterface $start     start date to search
-     * @param DateInterval $interval       Interval between each data sample (do not use intervals in months or years)
-     * @param DateTimeInterface|null $stop stop date to search
-     * @return array                       list of gaps
+     * @param  string                 $table    Table to search for gaps
+     * @param  DateTimeInterface      $start    Start date to search
+     * @param  DateInterval           $interval Interval between each data sample (do not use intervals in months or years)
+     * @param  DateTimeInterface|null $stop     Stop date to search
+     * @param  array                  $criteria Criterias for the SQL query
+     * @return array                            list of gaps
      */
-    public static function findTemporalGapsInTable(string $table, DateTimeInterface $start, DateInterval $interval, ?DateTimeInterface $stop = null, array $criteria = [])
+    public static function findTemporalGapsInTable(string $table, DateTimeInterface $start, DateInterval $interval, ?DateTimeInterface $stop = null, array $criteria = []): array
     {
         /** @var DBmysql $DB */
         global $DB;
 
         if ($interval->m !== 0 || $interval->y !== 0) {
-            throw new \InvalidArgumentException('Interval must be in days, hours, minutes or seconds');
+            throw new InvalidArgumentException('Interval must be in days, hours, minutes or seconds');
         }
-        // $interval_in_seconds = $interval->s + $interval->i * 60 + $interval->h * 3600 + $interval->d * 86400;
-        $sql_interval = self::dateIntervalToMySQLInterval($interval);
-
-        // Get start date as unix timestamp
-        $boundaries[] = new QueryExpression('`date` >= "' . $start->format('Y-m-d H:i:s') . '"');
-
-        // get stop date as unix timestamp
         if ($stop === null) {
             // Assume stop date is yesterday at midnight
-            $stop = new DateTime();
-            $stop->setTime(0, 0, 0);
-            $stop->sub(new DateInterval('P1D'));
+            $stop = new DateTime('yesterday midnight');
         }
-        $boundaries[] = new QueryExpression('`date` <= "' . $stop->format('Y-m-d H:i:s') . '"');
+        $sql_interval = self::dateIntervalToMySQLInterval($interval);
 
-        // prepare sub query to get start and end date of an atomic date range
-        // An atomic date range is set to 1 hour
-        // To reduce problems with DST, we use the unix timestamp of the date
-        $atomic_ranges_subquery = new QuerySubQuery([
+        $start_string = $start->format('Y-m-d H:i:s');
+        $stop_string  = $stop->format('Y-m-d H:i:s');
+        // Get start date as unix timestamp
+        $boundaries[] = new QueryExpression('`date` >= "' . $start_string . '"');
+        $boundaries[] = new QueryExpression('`date` < "' . $stop_string . '"');
+
+        $common_criterias = array_merge($boundaries, $criteria);
+
+        $records_query = new QuerySubQuery([
             'SELECT' => [
-                new QueryExpression('`date` as `start_date`'),
-                new QueryExpression("DATE_ADD(`date`, $sql_interval) as `end_date`"),
+                'date',
+                new QueryExpression('LAG(`date`) OVER (ORDER BY `date`) AS `prev_date`'),
             ],
-            'FROM'   => $table,
-            'WHERE'  => $criteria + $boundaries,
-        ], 'atomic_ranges');
+            'FROM' => $table,
+            'WHERE' => $common_criterias,
+        ], 'records');
 
-        // For each atomic date range, find the end date of previous atomic date range
-        $groups_subquery = new QuerySubQuery([
-            'SELECT' => [
-                new QueryExpression('ROW_NUMBER() OVER (ORDER BY `start_date`, `end_date`) AS `row_number`'),
-                'start_date',
-                'end_date',
-                new QueryExpression('LAG(`end_date`, 1) OVER (ORDER BY `start_date`, `end_date`) AS `previous_end_date`')
+        $request = new QueryUnion([
+            // Internal gaps (between existing records in the requred interval)
+            [
+                'SELECT' => [
+                    new QueryExpression('`prev_date` + ' . $sql_interval . ' AS `start`'),
+                    'date AS `end`',
+                ],
+                'FROM' => $records_query,
+                'WHERE' => [
+                    'NOT'  => ['prev_date' => null],
+                    new QueryExpression('DATE_ADD(`records`.`prev_date`, ' . $sql_interval . ') < `date`'),
+                ],
             ],
-            'FROM' => $atomic_ranges_subquery
-        ], 'groups');
 
-        // For each atomic date range, find if it is the start of an island
-        $islands_subquery = new QuerySubQuery([
-            'SELECT' => [
-                '*',
-                new QueryExpression('SUM(CASE WHEN `groups`.`previous_end_date` >= `start_date` THEN 0 ELSE 1 END) OVER (ORDER BY `groups`.`row_number`) AS `ìsland_id`')
+            // Gap before the beginning of the serie
+            [
+                'SELECT' => [
+                    new QueryExpression('\'' . $start_string . '\' AS start'),
+                    new QueryExpression('MIN(`date`) AS `end`'),
+                ],
+                'FROM'  => $table,
+                'WHERE' => $common_criterias,
+                'HAVING' => [
+                    new QueryExpression("'" . $start_string . "' < MIN(`date`)"),
+                ],
             ],
-            'FROM' => $groups_subquery
-        ], 'islands');
 
-        $request = [
-            'SELECT' => [
-                'MIN' => 'start_date as island_start_date',
-                'MAX' => 'end_date as island_end_date',
+            // Gap after the end of the serie
+            [
+                'SELECT' => [
+                    new QueryExpression('MAX(`date`) + ' . $sql_interval . ' AS `start`'),
+                    new QueryExpression('\'' . $stop_string . '\' AS `end`'),
+                ],
+                'FROM' => $table,
+                'WHERE' => $common_criterias,
+                'HAVING' => [
+                    new QueryExpression("DATE_SUB('" . $stop_string . "', " . $sql_interval . ") > MAX(`date`)"),
+                ],
             ],
-            'FROM' => $islands_subquery,
-            'GROUPBY' => ['ìsland_id'],
-            'ORDER' => ['island_start_date']
-        ];
 
-        $result = $DB->request($request);
-        if ($result->count() === 0) {
-            // No island at all, the whole range is a gap
-            return [
-                [
-                    'start' => $start->format('Y-m-d H:i:s'),
-                    'end'   => $stop->format('Y-m-d H:i:s'),
-                ]
-            ];
-        }
+            // No record between the boundaries
+            [
+                'SELECT' => [
+                    new QueryExpression('\'' . $start_string . '\' AS `start`'),
+                    new QueryExpression('\'' . $stop_string . '\' AS `end`'),
+                ],
+                'FROM' => $table,
+                'WHERE' => $common_criterias,
+                'HAVING' => [
+                    new QueryExpression('COUNT(*) = 0'),
+                ],
+            ],
+        ], true);
 
-        // Find gaps from islands
-        $expected_start_date = $start;
-        $gaps = [];
-        foreach ($result as $row) {
-            if ($expected_start_date < new DateTimeImmutable($row['island_start_date'])) {
-                // The current island starts after the expected start date
-                // Then there is a gap
-                $gaps[] = [
-                    'start' => $expected_start_date->format('Y-m-d H:i:s'),
-                    'end'   => $row['island_start_date'],
-                ];
+        $result = $DB->request([
+            'FROM'  => $request,
+            'ORDER' => 'start',
+        ]);
+
+        // Filter out gaps caused by DST switch
+        // In the SQL function DATE_ADD() we may do the following process
+        // DATE_ADD('2022-03-27 01:00:00', INTERVAL 1 HOUR) and '2022-03-27 01:00:00' + INTERVAL 1 HOUR
+        // while we use Europe/Paris timezone (or any timezone usinf DST)
+        // Both expressions return '2022-03-27 02:00:00' and it matches the exact time where we switch to summer time
+        // '2022-03-27 02:00:00' should be actually '2022-03-27 03:00:00', but this is not what happens with MySQL 8.0
+        // Therefore when the date '2022-03-27 02:00:00' is converted into a DateTime object in PHP with Europe/Paris timezone
+        // it is converted into '2022-03-27 03:00:00'.
+        // When the start of a gap and the end of a gap, both converted into a DateTime object, are equal
+        // then this means that we are switching to summer time and the gap is irrelevant
+        // The code below tracks such intervals and filters them out
+        $filtered_gaps = [];
+        foreach ($result as $gap) {
+            $gap_start = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $gap['start']);
+            $gap_end = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $gap['end']);
+            if ($gap_start == $gap_end) {
+                continue;
             }
-            $expected_start_date = new DateTimeImmutable($row['island_end_date']);
+            $filtered_gaps[] = $gap;
         }
-        if ($expected_start_date < $stop) {
-            // The last island ends before the stop date
-            // Then there is a gap
-            $gaps[] = [
-                'start' => $expected_start_date->format('Y-m-d H:i:s'),
-                'end'   => $stop->format('Y-m-d H:i:s'),
-            ];
-        }
-
-        return $gaps;
+        return $filtered_gaps;
     }
 
     /**
@@ -625,7 +708,7 @@ class Toolbox
      * @param string $bg_color
      * @param string $fg_color
      * @param float $target_ratio
-     * @param integer $max_steps
+     * @param int $max_steps
      * @return string
      */
     public static function getAdaptedFgColor(string $bg_color, string $fg_color, $target_ratio = 4.5, $max_steps = 100): string
@@ -676,5 +759,16 @@ class Toolbox
         $l1 = self::relative_luminance($color_1);
         $l2 = self::relative_luminance($color_2);
         return ($l1 > $l2) ? ($l1 + 0.05) / ($l2 + 0.05) : ($l2 + 0.05) / ($l1 + 0.05);
+    }
+
+    public static function getMemoryLimit(): ?int
+    {
+        $memory_limit = GlpiToolbox::getMemoryLimit() - 8 * 1024 * 1024;
+        if ($memory_limit < 0) {
+            // May happen in test seems that ini_get("memory_limits") returns
+            // enpty string in PHPUnit environment
+            $memory_limit = null;
+        }
+        return $memory_limit;
     }
 }

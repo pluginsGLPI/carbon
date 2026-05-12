@@ -30,28 +30,33 @@
  * -------------------------------------------------------------------------
  */
 
-use Glpi\Dashboard\Right as GlpiDashboardRight;
-use GlpiPlugin\Carbon\ComputerType;
-use GlpiPlugin\Carbon\ComputerUsageProfile;
-use GlpiPlugin\Carbon\Install;
-use GlpiPlugin\Carbon\Uninstall;
-use GlpiPlugin\Carbon\UsageInfo;
-use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\Zone;
+use Computer as GlpiComputer;
 use ComputerType as GlpiComputerType;
+use Glpi\Dashboard\Right as GlpiDashboardRight;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\CarbonIntensity;
-use MonitorType as GlpiMonitorType;
-use NetworkEquipmentType as GlpiNetworkEquipmentType;
-use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
+use GlpiPlugin\Carbon\CommonAsset;
+use GlpiPlugin\Carbon\ComputerType;
+use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\EmbodiedImpact;
+use GlpiPlugin\Carbon\Impact\History\AssetInterface;
+use GlpiPlugin\Carbon\Install;
 use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
 use GlpiPlugin\Carbon\SearchOptions;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Toolbox;
+use GlpiPlugin\Carbon\Uninstall;
+use GlpiPlugin\Carbon\UsageInfo;
+use GlpiPlugin\Carbon\Zone;
 use Location as GlpiLocation;
+use Monitor as GlpiMonitor;
+use MonitorType as GlpiMonitorType;
+use NetworkEquipment as GlpiNetworkEquipment;
+use NetworkEquipmentType as GlpiNetworkEquipmentType;
 use Profile as GlpiProfile;
 use Toolbox as GlpiToolbox;
 
@@ -63,7 +68,7 @@ use Toolbox as GlpiToolbox;
  *   -p version                : specifi the version to begin a forced upgrade
  *   -p reset-report-dashboard : delete then recreate the dashboard of the reporting page
  *
- * @return boolean
+ * @return bool
  */
 function plugin_carbon_install(array $args = []): bool
 {
@@ -80,10 +85,19 @@ function plugin_carbon_install(array $args = []): bool
         // do not output messages
         ob_start();
     }
-    if ($version === '0.0.0') {
-        $success = $install->install($args);
-    } else {
-        $success = $install->upgrade($version, $args);
+    try {
+        if ($version === '0.0.0') {
+            $success = $install->install($args);
+        } else {
+            $success = $install->upgrade($version, $args);
+        }
+    } catch (RuntimeException $e) {
+        if (isCommandLine()) {
+            throw $e;
+        }
+        $error_footer = '<br />' . __('Please check the logs for more details. Fill an issue in the repository of the plugin.', 'carbon');
+        Session::addMessageAfterRedirect($e->getMessage() . $error_footer, false, ERROR);
+        $success = false;
     }
 
     if ($silent) {
@@ -96,7 +110,7 @@ function plugin_carbon_install(array $args = []): bool
 /**
  * Plugin uninstall process
  *
- * @return boolean
+ * @return bool
  */
 function plugin_carbon_uninstall(): bool
 {
@@ -107,7 +121,7 @@ function plugin_carbon_uninstall(): bool
     $uninstall = new Uninstall();
     try {
         $uninstall->uninstall();
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
         $backtrace = GlpiToolbox::backtrace('');
         trigger_error($e->getMessage() . PHP_EOL . $backtrace, E_USER_WARNING);
         return false;
@@ -120,7 +134,7 @@ function plugin_carbon_getDropdown()
 {
     return [
         ComputerUsageProfile::class  => ComputerUsageProfile::getTypeName(),
-        CarbonIntensitySource::class => CarbonIntensitySource::getTypeName(),
+        Source::class => Source::getTypeName(),
         Zone::class   => Zone::getTypeName(),
         CarbonIntensity::class       => CarbonIntensity::getTypeName(),
     ];
@@ -136,6 +150,7 @@ function plugin_carbon_postShowTab(array $param)
         return;
     }
 
+    /** @var class-string<AssetInterface> $history_class */
     $history_class = 'GlpiPlugin\\Carbon\\Impact\\History\\' . $asset_itemtype;
     $history_class::showHistorizableDiagnosis($param['item']);
     UsageInfo::showCharts($param['item']);
@@ -144,7 +159,8 @@ function plugin_carbon_postShowTab(array $param)
 /**
  * Add search options to core itemtypes
  *
- * @param string $itemtype
+* @template T of CommonDBTM
+* @param class-string<T> $itemtype
  * @return array
  */
 function plugin_carbon_getAddSearchOptionsNew($itemtype): array
@@ -153,25 +169,11 @@ function plugin_carbon_getAddSearchOptionsNew($itemtype): array
 }
 
 /**
- * Callback before showing save / update button on an item form
+ * Callback when an object is added into the database
  *
- * @param array $params 'item' => CommonDBTM
- *                       'options => array
+ * @param CommonDBTM $item item being added
  * @return void
  */
-function plugin_carbon_postItemForm(array $params)
-{
-    switch ($params['item']->getType()) {
-        case GlpiLocation::class:
-            $location = new Location();
-            $location->getFromDBByCrit([
-                GlpiLocation::getForeignKeyField() => $params['item']->getID(),
-            ]);
-            $location->showForm($location->getID());
-            break;
-    }
-}
-
 function plugin_carbon_hook_add_asset(CommonDBTM $item)
 {
     if (!in_array($item::getType(), PLUGIN_CARBON_TYPES)) {
@@ -184,43 +186,51 @@ function plugin_carbon_hook_add_asset(CommonDBTM $item)
     if (GlpiLocation::isNewID($item->fields[$location_fk])) {
         return;
     }
-    $zone = Zone::getByAsset($item);
-    if ($zone === null) {
-        return;
-    }
-    $source_zone = new CarbonIntensitySource_Zone();
-    $source_zone->getFromDBByCrit([
-        $zone->getForeignKeyField() => $zone->fields['id'],
-        CarbonIntensitySource::getForeignKeyField() => $zone->fields['plugin_carbon_carbonintensitysources_id_historical'],
-    ]);
-    if ($source_zone->isNewItem()) {
+
+    $source_zone = new Source_Zone();
+    if ($source_zone->getFromDbByItem($item) === false) {
         return;
     }
     $source_zone->toggleZone(true);
 }
 
+/**
+ * Callback when an item is being updated in the database
+ *
+ * @param CommonDBTM $item item being updated
+ * @return void
+ */
 function plugin_carbon_hook_update_asset(CommonDBTM $item)
 {
     if (!in_array($item::getType(), PLUGIN_CARBON_TYPES)) {
         return;
     }
-    $location_fk = GlpiLocation::getForeignKeyField();
-    if (!in_array($location_fk, $item->updates)) {
-        return;
-    }
-    if (GlpiLocation::isNewID($item->fields[$location_fk])) {
-        return;
-    }
-    $zone = Zone::getByAsset($item);
-    if ($zone === null) {
-        return;
-    }
-    $source_zone = new CarbonIntensitySource_Zone();
-    $source_zone->getFromDBByCrit([
-        $zone->getForeignKeyField() => $zone->fields['id'],
-        CarbonIntensitySource::getForeignKeyField() => $zone->fields['plugin_carbon_carbonintensitysources_id_historical'],
-    ]);
-    if ($source_zone->isNewItem()) {
+
+    $item_table = $item::getTable();
+    $location_table = getTableForItemType(Location::class);
+    $source_zone_table = getTableForItemType(Source_Zone::class);
+    $request = [
+        'INNER JOIN' => [
+            $location_table => [
+                'ON' => [
+                    $source_zone_table => 'id',
+                    $location_table => 'plugin_carbon_sources_zones_id',
+                ],
+            ],
+            $item_table => [
+                'ON' => [
+                    $item_table => 'locations_id',
+                    $location_table => 'locations_id',
+                ],
+            ],
+        ],
+        'WHERE' => [
+            $item::getTableField('id') => $item->getID(),
+        ],
+    ];
+
+    $source_zone = new Source_Zone();
+    if (!$source_zone->getFromDBByRequest($request)) {
         return;
     }
     $source_zone->toggleZone(true);
@@ -243,19 +253,19 @@ function plugin_carbon_hook_pre_purge_asset(CommonDBTM $item)
     $carbon_emission = new CarbonEmission();
     $carbon_emission->deleteByCriteria([
         'itemtype' => $itemtype,
-        'items_id' => $item_id
+        'items_id' => $item_id,
     ]);
 
     $embodied_impact = new EmbodiedImpact();
     $embodied_impact->deleteByCriteria([
         'itemtype' => $itemtype,
-        'items_id' => $item_id
+        'items_id' => $item_id,
     ]);
 
     $usage_info = new UsageInfo();
     $usage_info->deleteByCriteria([
         'itemtype' => $itemtype,
-        'items_id' => $item_id
+        'items_id' => $item_id,
     ]);
 }
 
@@ -288,9 +298,15 @@ function plugin_carbon_hook_pre_purge_assettype(CommonDBTM $item)
 function plugin_carbon_MassiveActions($itemtype)
 {
     switch ($itemtype) {
-        case Computer::class:
+        case GlpiComputer::class:
             return [
                 ComputerUsageProfile::class . MassiveAction::CLASS_ACTION_SEPARATOR . 'MassAssociateItems' => __('Associate to an usage profile', 'carbon'),
+                CommonAsset::class . MassiveAction::CLASS_ACTION_SEPARATOR . 'MassDeleteAllImpacts' => __('Delete all calculated environmental impacts', 'carbon'),
+            ];
+        case GlpiMonitor::class:
+        case GlpiNetworkEquipment::class:
+            return [
+                CommonAsset::class . MassiveAction::CLASS_ACTION_SEPARATOR . 'MassDeleteAllImpacts' => __('Delete all calculated environmental impacts', 'carbon'),
             ];
         case GlpiComputerType::class:
             return [
@@ -308,6 +324,7 @@ function plugin_carbon_MassiveActions($itemtype)
         case GlpiLocation::class:
             return [
                 Location::class . MassiveAction::CLASS_ACTION_SEPARATOR . 'MassUpdateBoaviztaZone' => __('Update zone for Boavizta engine', 'carbon'),
+                Location::class . MassiveAction::CLASS_ACTION_SEPARATOR . 'MassUpdateCarbonIntensityFeed' => __('Update carbon intensity source and zone', 'carbon'),
             ];
     }
 

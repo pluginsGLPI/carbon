@@ -88,15 +88,20 @@
                             {% if status.has_location %}
                                 {% set field = ok_field %}
                             {% endif %}
-                            {{ fields.field('', field, __('Has a location', 'carbon')) }}
+                            {% if status.has_computer is defined %}
+                                {% set label = __('Attached computer has a location', 'carbon') %}
+                            {% else %}
+                                {% set label = __('Has a location', 'carbon') %}
+                            {% endif %}
+                            {{ fields.field('', field, label) }}
                         {% endif %}
 
-                        {% if status.has_state_or_country is defined %}
+                        {% if status.has_carbon_intensity_zone is defined %}
                             {% set field = nok_field %}
-                            {% if status.has_state_or_country %}
+                            {% if status.has_carbon_intensity_zone %}
                                 {% set field = ok_field %}
                             {% endif %}
-                            {{ fields.field('', field, __('The location has a state or a country', 'carbon')) }}
+                            {{ fields.field('', field, __('The location has carbon intensity data', 'carbon')) }}
                         {% endif %}
 
                         {% if status.ci_download_enabled is defined %}
@@ -159,6 +164,14 @@
                             {{ fields.field('', field, __('The asset has a type', 'carbon')) }}
                         {% endif %}
 
+                        {% if status.not_is_ignore is defined %}
+                            {% set field = nok_field %}
+                            {% if status.not_is_ignore %}
+                                {% set field = ok_field %}
+                            {% endif %}
+                            {{ fields.field('', field, __('Type is not ignored', 'carbon')) }}
+                        {% endif %}
+
                         {% if status.has_type_power_consumption is defined %}
                             {% set field = nok_field %}
                             {% if status.has_model_power_consumption is defined %}
@@ -194,6 +207,14 @@
                                 {% set field = ok_field %}
                             {% endif %}
                             {{ fields.field('', field, __('The asset has an inventory entry date', 'carbon')) }}
+                        {% endif %}
+
+                        {% if status.has_decommission_date is defined %}
+                            {% set field = warning_field %}
+                            {% if status.has_decommission_date %}
+                                {% set field = ok_field %}
+                            {% endif %}
+                            {{ fields.field('', field, __('The asset has a decommission date', 'carbon')) }}
                         {% endif %}
 
                         {{ fields.smallTitle(__('Legend', 'carbon')) }}

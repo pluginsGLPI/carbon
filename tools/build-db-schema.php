@@ -78,7 +78,7 @@ const CARDINALITY_ONE_N    = '1,n';
 $schema_tables = findTables($argv[1] ?? '');
 findRelations($schema_tables);
 completeMissingData($schema_tables);
-showEntityRelations($schema_tables);
+echo showEntityRelations($schema_tables);
 
 /**
  * Get all tables to analyze
@@ -156,7 +156,7 @@ function completeMissingData(&$schema_tables)
                     [
                         'int',
                         'id',
-                    ]
+                    ],
                 ],
             ];
         }
@@ -298,7 +298,7 @@ function getRelationType(&$schema_tables, $table, $field_name): ?array
  * is the table a relation table with additional properties ?
  *
  * @param string $table
- * @return boolean
+ * @return bool
  */
 function isRelationTableWithProperties($table): bool
 {
@@ -328,8 +328,32 @@ function isRelationTableWithProperties($table): bool
     return false;
 }
 
-function showEntityRelations($schema_tables)
+function showEntityRelations($schema_tables): string
 {
     $generator = new PlantUml();
-    $generator->generate($schema_tables);
+    $pluginVersion = getPluginVersion();
+    return $generator->generate($schema_tables, $pluginVersion);
+}
+
+function getPluginVersion(): string
+{
+    $setupFile = dirname(__DIR__) . '/setup.php';
+    if (!file_exists($setupFile)) {
+        return '';
+    }
+
+    require_once $setupFile;
+
+    $pluginName = basename(dirname(__DIR__));
+    $versionFunction = 'plugin_version_' . $pluginName;
+    if (!is_callable($versionFunction)) {
+        return '';
+    }
+
+    $pluginInfo = $versionFunction();
+    if (!is_array($pluginInfo) || empty($pluginInfo['version'])) {
+        return '';
+    }
+
+    return (string) $pluginInfo['version'];
 }

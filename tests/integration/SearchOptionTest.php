@@ -32,32 +32,37 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
-use GlpiPlugin\Carbon\CarbonEmission;
-use GlpiPlugin\Carbon\CarbonIntensity;
-use GlpiPlugin\Carbon\Zone;
-use GlpiPlugin\Carbon\ComputerType;
-use GlpiPlugin\Carbon\EmbodiedImpact;
-use GlpiPlugin\Carbon\UsageInfo;
-use GlpiPlugin\Carbon\Location;
-use GlpiPlugin\Carbon\MonitorType;
-use GlpiPlugin\Carbon\NetworkEquipmentType;
-use RecursiveIteratorIterator;
-use RecursiveDirectoryIterator;
 use CommonDBTM;
 use CommonGLPI;
+use DBmysql;
 use DbUtils;
-use Plugin;
+use GlpiPlugin\Carbon\CarbonEmission;
+use GlpiPlugin\Carbon\CarbonIntensity;
+use GlpiPlugin\Carbon\ComputerModel;
+use GlpiPlugin\Carbon\ComputerType;
+use GlpiPlugin\Carbon\EmbodiedImpact;
+use GlpiPlugin\Carbon\Location;
+use GlpiPlugin\Carbon\MonitorModel;
+use GlpiPlugin\Carbon\MonitorType;
+use GlpiPlugin\Carbon\NetworkEquipmentModel;
+use GlpiPlugin\Carbon\NetworkEquipmentType;
+use GlpiPlugin\Carbon\UsageInfo;
+use GlpiPlugin\Carbon\Zone;
 use PHPUnit\Framework\Attributes\CoversMethod;
+use Plugin;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 #[CoversMethod('GlpiPlugin\Carbon\CarbonEmission', 'rawSearchOptions')]
 #[CoversMethod('GlpiPlugin\Carbon\CarbonIntensity', 'rawSearchOptions')]
-#[CoversMethod('GlpiPlugin\Carbon\CarbonIntensitySource', 'rawSearchOptions')]
-#[CoversMethod('GlpiPlugin\Carbon\CarbonIntensitySource_Zone', 'rawSearchOptions')]
+#[CoversMethod('GlpiPlugin\Carbon\Source', 'rawSearchOptions')]
+#[CoversMethod('GlpiPlugin\Carbon\Source_Zone', 'rawSearchOptions')]
 #[CoversMethod('GlpiPlugin\Carbon\ComputerUsageProfile', 'rawSearchOptions')]
 #[CoversMethod('GlpiPlugin\Carbon\EmbodiedImpact', 'rawSearchOptions')]
 #[CoversMethod('GlpiPlugin\Carbon\UsageImpact', 'rawSearchOptions')]
 #[CoversMethod('GlpiPlugin\Carbon\UsageInfo', 'rawSearchOptions')]
 #[CoversMethod('GlpiPlugin\Carbon\Zone', 'rawSearchOptions')]
+#[CoversMethod('GlpiPlugin\Carbon\AbstractModel', 'rawSearchOptions')]
 class SearchOptionTest extends CommonTestCase
 {
     private array $exceptions = [
@@ -67,34 +72,60 @@ class SearchOptionTest extends CommonTestCase
         ],
         ComputerType::class => [],
         MonitorType::class => [],
+        NetworkEquipmentType::class => [],
         UsageInfo::class => [],
         CarbonIntensity::class => [
-            'data_quality'
+            'data_quality',
         ],
         EmbodiedImpact::class => [
             'gwp_quality',
             'adp_quality',
             'pe_quality',
+            'gwppb_quality',
+            'gwppf_quality',
+            'gwpplu_quality',
+            'ir_quality',
+            'lu_quality',
+            'odp_quality',
+            'pm_quality',
+            'pocp_quality',
+            'wu_quality',
+            'mips_quality',
+            'adpe_quality',
+            'adpf_quality',
+            'ap_quality',
+            'ctue_quality',
+            'ctuh_c_quality',
+            'ctuh_nc_quality',
+            'epf_quality',
+            'epm_quality',
+            'ept_quality',
         ],
-        NetworkEquipmentType::class => [],
         Location::class => [],
         Zone::class => [
             'entities_id',
+        ],
+        ComputerModel::class => [
+            'computermodels_id',
+        ],
+        MonitorModel::class => [
+            'monitormodels_id',
+        ],
+        NetworkEquipmentModel::class => [
+            'networkequipmentmodels_id',
         ],
     ];
 
     private array $mapping = [
         CarbonIntensity::class => [
-            'plugin_carbon_carbonintensitysources_id' => 'name',
+            'plugin_carbon_sources_id' => 'name',
             'plugin_carbon_zones_id'   => 'name',
         ],
-        Zone::class => [
-            'plugin_carbon_carbonintensitysources_id_historical' => 'name',
-        ]
     ];
 
     public function testSearchOption()
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         // Find each .php file in /src directory and subdirectories

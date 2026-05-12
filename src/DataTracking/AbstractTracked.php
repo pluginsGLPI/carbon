@@ -32,6 +32,7 @@
 
 namespace GlpiPlugin\Carbon\DataTracking;
 
+use Dropdown;
 use LogicException;
 
 /**
@@ -46,12 +47,14 @@ abstract class AbstractTracked
     /**
      * Quality of data, must be ordered from 0 (lowest quality) to highest quality
      */
+    public const DATA_QUALITY_UNSET_VALUE = -1;
     public const DATA_QUALITY_UNSPECIFIED = 0;
     public const DATA_QUALITY_MANUAL = 1;
     public const DATA_QUALITY_ESTIMATED = 2;
     public const DATA_QUALITY_RAW_REAL_TIME_MEASUREMENT_DOWNSAMPLED = 3;
     public const DATA_QUALITY_RAW_REAL_TIME_MEASUREMENT = 4;
 
+    /** @var array<int> $sources Source qualities */
     protected array $sources = [];
 
     abstract public function getValue();
@@ -62,6 +65,37 @@ abstract class AbstractTracked
             return;
         }
         $this->appendSource($source);
+    }
+
+    /**
+     * Get name of data qualities
+     *
+     * @return array
+     */
+    public static function getDataQualities(): array
+    {
+        return [
+            self::DATA_QUALITY_UNSET_VALUE                           => __('Impact not evaluated', 'carbon'),
+            self::DATA_QUALITY_UNSPECIFIED                           => __('Unspecified quality', 'carbon'),
+            self::DATA_QUALITY_MANUAL                                => __('Manual data', 'carbon'),
+            self::DATA_QUALITY_ESTIMATED                             => __('Estimated data', 'carbon'),
+            self::DATA_QUALITY_RAW_REAL_TIME_MEASUREMENT_DOWNSAMPLED => __('Downsampled data', 'carbon'),
+            self::DATA_QUALITY_RAW_REAL_TIME_MEASUREMENT             => __('Measured data', 'carbon'),
+        ];
+    }
+
+    /**
+     * Show or return HTML code displaying a dropdown of data qualities
+     * @see constants DATA_QUALITY_*
+     *
+     * @param string $name
+     * @param array $options
+     * @return int|string
+     */
+    public static function dropdownQuality(string $name, array $options = [])
+    {
+        $items = self::getDataQualities();
+        return Dropdown::showFromArray($name, $items, $options);
     }
 
     public function getSource(): array

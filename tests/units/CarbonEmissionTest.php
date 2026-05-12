@@ -33,14 +33,15 @@
 namespace GlpiPlugin\Carbon\Tests;
 
 use Computer;
-use DateTime;
 use DateInterval;
+use DateTime;
 use DateTimeImmutable;
-use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\CarbonEmission;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use User;
 
+#[CoversClass(CarbonEmission::class)]
 class CarbonEmissionTest extends DbTestCase
 {
     public static function findGapsProvider(): array
@@ -82,7 +83,8 @@ class CarbonEmissionTest extends DbTestCase
 
         $start_date = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $start_date);
         $stop_date =  DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $stop_date);
-        $gaps = $instance->findGaps($itemtype, $asset->getID(), $start_date, $stop_date);
+        $result = $instance->findGaps($itemtype, $asset->getID(), $start_date, $stop_date);
+        $result = iterator_to_array($result);
         $expected = [
             [
                 'start' => '2019-01-01 00:00:00',
@@ -93,7 +95,7 @@ class CarbonEmissionTest extends DbTestCase
                 'end'   => '2023-12-31 00:00:00',
             ],
         ];
-        $this->assertEquals($expected, $gaps);
+        $this->assertEquals($expected, $result);
 
         // Create a gap
         $gap_start = '2020-04-05 00:00:00';
@@ -104,7 +106,8 @@ class CarbonEmissionTest extends DbTestCase
             ['date' => ['<=', $gap_end]],
         ]);
 
-        $gaps = $instance->findGaps($itemtype, $asset->getID(), $start_date, $stop_date);
+        $result = $instance->findGaps($itemtype, $asset->getID(), $start_date, $stop_date);
+        $result = iterator_to_array($result);
         $expected = [
             [
                 'start' => '2019-01-01 00:00:00',
@@ -119,7 +122,7 @@ class CarbonEmissionTest extends DbTestCase
                 'end'   => '2023-12-31 00:00:00',
             ],
         ];
-        $this->assertEquals($expected, $gaps);
+        $this->assertEquals($expected, $result);
 
         // Create an other gap
         $gap_start_2 = '2020-06-20 00:00:00';
@@ -129,7 +132,8 @@ class CarbonEmissionTest extends DbTestCase
             ['date' => ['>=', $gap_start_2]],
             ['date' => ['<=', $gap_end_2]],
         ]);
-        $gaps = $instance->findGaps($itemtype, $asset->getID(), $start_date, $stop_date);
+        $result = $instance->findGaps($itemtype, $asset->getID(), $start_date, $stop_date);
+        $result = iterator_to_array($result);
         $expected = [
             [
                 'start' => '2019-01-01 00:00:00',
@@ -148,6 +152,45 @@ class CarbonEmissionTest extends DbTestCase
                 'end'   => '2023-12-31 00:00:00',
             ],
         ];
-        $this->assertEquals($expected, $gaps);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_GetTotalUsageEmissionForItem_returns_sum_for_item(): void
+    {
+        $asset = $this->createItem(Computer::class, [
+            'date_creation' => '2024-01-01 00:00:00',
+        ]);
+
+        $this->createCarbonEmissionData(
+            $asset,
+            new DateTime('2024-01-01 00:00:00'),
+            new DateInterval('P3D'),
+            20.0,
+            5.5
+        );
+
+        $this->createCarbonEmissionData(
+            $asset,
+            new DateTime('2024-01-04 00:00:00'),
+            new DateInterval('P2D'),
+            12.0,
+            6.0
+        );
+
+        $total = CarbonEmission::getTotalUsageEmissionForItem($asset);
+
+        $expected = 3 * 5.5 + 2 * 6;
+        $this->assertEquals($expected, $total);
+    }
+
+    public function test_GetTotalUsageEmissionForItem_returns_null_when_no_emissions(): void
+    {
+        $asset = $this->createItem(Computer::class, [
+            'date_creation' => '2024-01-01 00:00:00',
+        ]);
+
+        $total = CarbonEmission::getTotalUsageEmissionForItem($asset);
+
+        $this->assertNull($total);
     }
 }

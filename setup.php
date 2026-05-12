@@ -31,27 +31,37 @@
  */
 
 use Config as GlpiConfig;
-use GlpiPlugin\Carbon\Dashboard\Widget;
+use CronTask as GlpiCronTask;
 use Glpi\Plugin\Hooks;
 use GlpiPlugin\Carbon\Config;
-use GlpiPlugin\Carbon\UsageInfo;
+use GlpiPlugin\Carbon\CronTask;
+use GlpiPlugin\Carbon\Dashboard\Grid;
+use GlpiPlugin\Carbon\Dashboard\Widget;
+use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientFactory as CarbonIntensityClientFactory;
+use GlpiPlugin\Carbon\DataSource\Lca\ClientFactory as LcaClientFactory;
+use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\Profile;
 use GlpiPlugin\Carbon\Report;
+use GlpiPlugin\Carbon\UsageInfo;
 use Location as GlpiLocation;
 use Profile as GlpiProfile;
-use GlpiPlugin\Carbon\Dashboard\Grid;
 
-define('PLUGIN_CARBON_VERSION', '1.1.1');
-define('PLUGIN_CARBON_SCHEMA_VERSION', '1.1.0');
+// Version of the plugin (major.minor.bugfix)
+define('PLUGIN_CARBON_VERSION', '1.2.0');
+// Schema version of this version (major.minor.bugfix)
+define('PLUGIN_CARBON_SCHEMA_VERSION', '1.2.0');
 
 // Minimal GLPI version, inclusive
-define("PLUGIN_CARBON_MIN_GLPI_VERSION", "11.0.0-beta");
+define("PLUGIN_CARBON_MIN_GLPI_VERSION", '11.0.0');
 // Maximum GLPI version, exclusive
-define("PLUGIN_CARBON_MAX_GLPI_VERSION", "12.0.0");
+define("PLUGIN_CARBON_MAX_GLPI_VERSION", '12.0.0');
 
 define('PLUGIN_CARBON_DECIMALS', 3);
 
 // Plugin compatible itemtypes
+/**
+ * @var array<class-string<CommonDBTM>> $PLUGIN_CARBON_TYPES
+ */
 define('PLUGIN_CARBON_TYPES', [
     Computer::class,
     Monitor::class,
@@ -88,9 +98,10 @@ function plugin_carbon_setupHooks()
     global $PLUGIN_HOOKS;
 
     // Secured config
-    $PLUGIN_HOOKS[Hooks::SECURED_CONFIGS]['carbon'] = [
-        'electricitymap_api_key',
-    ];
+    $PLUGIN_HOOKS[Hooks::SECURED_CONFIGS]['carbon'] = array_merge(
+        CarbonIntensityClientFactory::getSecuredConfigs(),
+        LcaClientFactory::getSecuredConfigs()
+    );
 
     // add new cards to the dashboard
     $PLUGIN_HOOKS[Hooks::DASHBOARD_CARDS]['carbon'] = [Grid::class, 'getDashboardCards'];
@@ -113,7 +124,7 @@ function plugin_carbon_setupHooks()
         // asset's type
         $PLUGIN_HOOKS[Hooks::PRE_ITEM_PURGE]['carbon'][$itemtype . 'Type'] = 'plugin_carbon_hook_pre_purge_assettype';
     }
-    $PLUGIN_HOOKS[Hooks::POST_ITEM_FORM]['carbon'] = 'plugin_carbon_postItemForm';
+    // $PLUGIN_HOOKS[Hooks::POST_ITEM_FORM]['carbon'] = 'plugin_carbon_postItemForm';
 
     // Actions taken on locations events
     $PLUGIN_HOOKS[Hooks::ITEM_ADD]['carbon'][GlpiLocation::class] = 'plugin_carbon_locationAdd';
@@ -125,6 +136,7 @@ function plugin_carbon_setupHooks()
     $PLUGIN_HOOKS[Hooks::PRE_ITEM_ADD]['carbon'][GlpiProfile::class] = 'plugin_carbon_profileAdd';
 
     $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][] = 'lib/apexcharts.js';
+    $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][] = 'lib/carbon.js';
 
     // Import CSS
     $PLUGIN_HOOKS[Hooks::ADD_CSS]['carbon'][] = 'lib/carbon.css';
@@ -138,12 +150,19 @@ function plugin_carbon_registerClasses()
 {
     Plugin::registerClass(Config::class, ['addtabon' => GlpiConfig::class]);
     Plugin::registerClass(Profile::class, ['addtabon' => GlpiProfile::class]);
+    Plugin::registerClass(Location::class, ['addtabon' => GlpiLocation::class]);
+    Plugin::registerClass(CronTask::class, ['addtabon' => GlpiCronTask::class]);
 
     foreach (PLUGIN_CARBON_TYPES as $itemtype) {
-        $item_type_class = 'GlpiPlugin\\Carbon\\' . $itemtype . 'Type';
         $core_type_class = $itemtype . 'Type';
+        $item_type_class = 'GlpiPlugin\\Carbon\\' . $core_type_class;
         Plugin::registerClass($item_type_class, ['addtabon' => $core_type_class]);
+
         Plugin::registerClass(UsageInfo::class, ['addtabon' => $itemtype]);
+
+        $core_model_class = $itemtype . 'Model';
+        $item_model_class = 'GlpiPlugin\\Carbon\\' . $core_model_class;
+        Plugin::registerClass($item_model_class, ['addtabon' => $core_model_class]);
     }
 }
 
@@ -164,8 +183,8 @@ function plugin_version_carbon()
         'requirements'   => [
             'glpi' => [
                 'min' => PLUGIN_CARBON_MIN_GLPI_VERSION,
-            ]
-        ]
+            ],
+        ],
     ];
 
     $dev_version = strpos(PLUGIN_CARBON_VERSION, '-dev') !== false;
@@ -179,7 +198,7 @@ function plugin_version_carbon()
 /**
  * Check plugin's prerequisites before installation
  *
- * @return boolean
+ * @return bool
  */
 function plugin_carbon_check_prerequisites()
 {
@@ -196,6 +215,11 @@ function plugin_carbon_check_prerequisites()
 
     if (!is_readable(__DIR__ . '/vendor/autoload.php') || !is_file(__DIR__ . '/vendor/autoload.php')) {
         echo "Run composer install --no-dev in the plugin directory<br>";
+        $prerequisitesSuccess = false;
+    }
+
+    if ($DB->use_timezones !== true) {
+        echo "Enable timezones support<br>";
         $prerequisitesSuccess = false;
     }
 
@@ -227,7 +251,7 @@ function plugin_carbon_check_prerequisites()
  */
 function plugin_carbon_getSchemaPath(?string $version = null): ?string
 {
-    $version = $version ?? PLUGIN_CARBON_VERSION;
+    $version ??= PLUGIN_CARBON_VERSION;
 
     // Drop suffixes for alpha, beta, rc versions
     $matches = [];

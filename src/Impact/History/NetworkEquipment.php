@@ -37,16 +37,18 @@ use CommonDBTM;
 use DBmysql;
 use DbUtils;
 use Glpi\Application\View\TemplateRenderer;
-use Infocom;
-use Location;
-use NetworkEquipment as GlpiNetworkEquipment;
-use NetworkEquipmentType as GlpiNetworkEquipmentType;
-use NetworkEquipmentModel as GlpiNetworkEquipmentModel;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Engine\V1\NetworkEquipment as EngineNetworkEquipment;
-use GlpiPlugin\Carbon\Location as CarbonLocation;
+use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\UsageImpact;
+use GlpiPlugin\Carbon\Zone;
+use Infocom;
+use Location as GlpiLocation;
+use NetworkEquipment as GlpiNetworkEquipment;
+use NetworkEquipmentModel as GlpiNetworkEquipmentModel;
+use NetworkEquipmentType as GlpiNetworkEquipmentType;
 
 class NetworkEquipment extends AbstractAsset
 {
@@ -65,6 +67,10 @@ class NetworkEquipment extends AbstractAsset
         $item_model_table = self::$model_itemtype::getTable();
         $item_glpitype_table = self::$type_itemtype::getTable();
         $item_type_table = NetworkEquipmentType::getTable();
+        $glpi_location_table = GlpiLocation::getTable();
+        $location_table = Location::getTable();
+        $source_zone_table = Source_Zone::getTable();
+        $zone_table = Zone::getTable();
         $location_table = Location::getTable();
         $infocom_table = Infocom::getTable();
 
@@ -76,19 +82,37 @@ class NetworkEquipment extends AbstractAsset
                     'FKEY'   => [
                         $item_table  => 'networkequipmentmodels_id',
                         $item_model_table => 'id',
-                    ]
+                    ],
                 ],
-                $location_table => [
+                $glpi_location_table => [
                     'FKEY'   => [
                         $item_table  => 'locations_id',
-                        $location_table => 'id',
-                    ]
+                        $glpi_location_table => 'id',
+                    ],
+                ],
+                $location_table => [
+                    'FKEY' => [
+                        $location_table => 'locations_id',
+                        $glpi_location_table => 'id',
+                    ],
+                ],
+                $source_zone_table => [
+                    'FKEY' => [
+                        $location_table => 'plugin_carbon_sources_zones_id',
+                        $source_zone_table => 'id',
+                    ],
+                ],
+                $zone_table => [
+                    'FKEY' => [
+                        $source_zone_table => 'plugin_carbon_zones_id',
+                        $zone_table => 'id',
+                    ],
                 ],
                 $item_glpitype_table => [
                     'FKEY'   => [
                         $item_table  => 'networkequipmenttypes_id',
                         $item_glpitype_table => 'id',
-                    ]
+                    ],
                 ],
             ],
             'LEFT JOIN' => [
@@ -99,32 +123,25 @@ class NetworkEquipment extends AbstractAsset
                         [
                             'AND' => [
                                 'NOT' => [GlpiNetworkEquipmentType::getTableField('id') => null],
-                            ]
-                        ]
-                    ]
+                            ],
+                        ],
+                    ],
                 ],
                 $infocom_table => [
                     'FKEY' => [
                         $infocom_table => 'items_id',
                         $item_table => 'id',
-                        ['AND' => ['itemtype' => self::$itemtype]],
-                    ]
+                        ['AND' => [Infocom::getTableField('itemtype') => self::$itemtype]],
+                    ],
                 ],
             ],
             'WHERE' => [
                 self::$itemtype::getTableField('is_deleted') => 0,
                 self::$itemtype::getTableField('is_template') => 0,
-                [
-                    'OR' => [
-                        [
-                            ['NOT' => [Location::getTableField('country') => '']],
-                            ['NOT' => [Location::getTableField('country') => null]],
-                        ],
-                        [
-                            ['NOT' => [Location::getTableField('state') => '']],
-                            ['NOT' => [Location::getTableField('state') => null]],
-                        ]
-                    ]
+                Location::getTableField('plugin_carbon_sources_zones_id') => ['>', 0],
+                'OR' => [
+                    [NetworkEquipmentType::getTableField('is_ignore') => 0],
+                    [NetworkEquipmentType::getTableField('is_ignore') => null],
                 ],
                 [
                     'OR' => [
@@ -137,11 +154,11 @@ class NetworkEquipment extends AbstractAsset
                         ['NOT' => [Infocom::getTableField('use_date') => null]],
                         ['NOT' => [Infocom::getTableField('delivery_date') => null]],
                         ['NOT' => [Infocom::getTableField('buy_date') => null]],
-                        ['NOT' => [Infocom::getTableField('date_creation') => null]],
-                        // ['NOT' => [Infocom::getTableField('date_mod') => null]],
-                    ]
-                ]
-            ] + $crit
+                        ['NOT' => [self::$itemtype::getTableField('date_creation') => null]],
+                        // ['NOT' => [self::$itemtype::getTableField('date_mod') => null]],
+                    ],
+                ],
+            ] + $crit,
         ];
 
         if ($entity_restrict) {
@@ -164,28 +181,20 @@ class NetworkEquipment extends AbstractAsset
         $request['SELECT'] = [
             self::$itemtype::getTableField('is_deleted'),
             self::$itemtype::getTableField('is_template'),
-            Location::getTableField('id as location_id'),
-            Location::getTableField('state'),
-            Location::getTableField('country'),
+            GlpiLocation::getTableField('id as location_id'),
+            Location::getTableField('plugin_carbon_sources_zones_id'),
             GlpiNetworkEquipmentModel::getTableField('id as model_id'),
             GlpiNetworkEquipmentModel::getTableField('power_consumption as model_power_consumption'),
             GlpiNetworkEquipmentType::getTableField('id as type_id'),
             NetworkEquipmentType::getTableField('id as plugin_carbon_type_id'),
             NetworkEquipmentType::getTableField('power_consumption  as type_power_consumption'),
+            NetworkEquipmentType::getTableField('is_ignore'),
             Infocom::getTableField('use_date'),
             Infocom::getTableField('delivery_date'),
             Infocom::getTableField('buy_date'),
+            Infocom::getTableField('decommission_date'),
             self::$itemtype::getTableField('date_creation'),
             self::$itemtype::getTableField('date_mod'),
-        ];
-        $infocom_table = Infocom::getTable();
-        $item_table = self::$itemtype::getTable();
-        $request['LEFT JOIN'][$infocom_table] = [
-            'FKEY' => [
-                $infocom_table => 'items_id',
-                $item_table => 'id',
-                ['AND' => [Infocom::getTableField('itemtype') => self::$itemtype]],
-            ]
         ];
         // Change inner joins into left joins to identify missing data
         $request['LEFT JOIN'] = $request['INNER JOIN'] + $request['LEFT JOIN'];
@@ -201,9 +210,9 @@ class NetworkEquipment extends AbstractAsset
             return null;
         }
 
-        $glpi_location = new Location();
+        $glpi_location = new GlpiLocation();
         $glpi_location->getFromDB($item->fields['locations_id']);
-        $location = new CarbonLocation();
+        $location = new Location();
         $is_carbon_intensity_download_enabled = $location->isCarbonIntensityDownloadEnabled($glpi_location);
         $is_carbon_intensity_fallback_available = $location->hasFallbackCarbonIntensityData($glpi_location);
 
@@ -211,22 +220,25 @@ class NetworkEquipment extends AbstractAsset
         // false means that data is missing or invalid for historization
         $status['is_deleted'] = ($data['is_deleted'] === 0);
         $status['is_template'] = ($data['is_template'] === 0);
-        $status['has_location'] = !Location::isNewId($data['location_id']);
-        $status['has_state_or_country'] = (strlen($data['state'] ?? '') > 0) || (strlen($data['country'] ?? '') > 0);
+        $status['has_location'] = !GlpiLocation::isNewId($data['location_id']);
+        // $status['has_state_or_country'] = (strlen($data['state'] ?? '') > 0) || (strlen($data['country'] ?? '') > 0);
+        $status['has_carbon_intensity_zone'] = (($data['plugin_carbon_sources_zones_id'] ?? 0) !== 0);
         $status['has_model'] = !GlpiNetworkEquipmentModel::isNewId($data['model_id']);
         $status['has_model_power_consumption'] = (($data['model_power_consumption'] ?? 0) !== 0);
         $status['has_type'] = !GlpiNetworkEquipmentType::isNewId($data['type_id']);
         $status['has_type_power_consumption'] = (($data['type_power_consumption'] ?? 0) !== 0);
         $status['ci_download_enabled'] = $is_carbon_intensity_download_enabled;
         $status['ci_fallback_available'] = $is_carbon_intensity_fallback_available;
+        $status['not_is_ignore'] = (($data['is_ignore'] ?? 0) === 0);
 
-        $item_oldest_date = $data['use_date']
+        $item_oldest_date = $data['buy_date']
             ?? $data['delivery_date']
-            ?? $data['buy_date']
+            ?? $data['use_date']
             // ?? $data['date_creation']
             // ?? $data['date_mod']
             ?? null;
         $status['has_inventory_entry_date'] = ($item_oldest_date !== null);
+        $status['has_decommission_date'] = ($data['decommission_date'] !== null);
 
         return $status;
     }

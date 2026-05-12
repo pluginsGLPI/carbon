@@ -33,15 +33,15 @@
 
 namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta;
 
-use GlpiPlugin\Carbon\DataSource\Boaviztapi;
+use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\Client;
 
 interface AssetInterface
 {
     /**
      * Set the API client to use for HTTP requests
      *
-     * @param Boaviztapi $client
+     * @param Client $client
      * @return void
      */
-    public function setClient(Boaviztapi $client);
+    public function setClient(Client $client);
 }

@@ -34,25 +34,27 @@ namespace GlpiPlugin\Carbon;
 
 use CommonDBChild;
 use CommonDBTM;
+use CommonGLPI;
 use Config as GlpiConfig;
+use DateTime;
 use DBmysql;
 use DBmysqlIterator;
+use DbUtils;
+use Geocoder\Exception\Exception;
+use Geocoder\Exception\QuotaExceeded;
 use Geocoder\Geocoder;
-use Geocoder\Provider\Nominatim\Nominatim;
 use Geocoder\Query\GeocodeQuery;
-use Geocoder\StatefulGeocoder;
-use GuzzleHttp\Client;
-use Html;
-use Location as GlpiLocation;
-use MassiveAction;
 use Glpi\Application\View\TemplateRenderer;
-use GLPINetwork;
-use GlpiPlugin\Carbon\DataSource\Boaviztapi;
+use Glpi\DBAL\QueryExpression;
+use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\Client as BoaviztapiClient;
+use Html;
 use League\ISO3166\ISO3166;
-use Session;
+use Location as GlpiLocation;
+use LogicException;
+use MassiveAction;
 
 /**
- * Additional data for a location
+ * Additional data for a location. Extends the Location object from GLPI with aditional fields
  */
 class Location extends CommonDBChild
 {
@@ -60,11 +62,113 @@ class Location extends CommonDBChild
     public static $itemtype       = GlpiLocation::class;
     public static $items_id       = 'locations_id';
 
-    public function showForm($ID, array $options = [])
+    public static function getIcon()
     {
-        $this->getFromDB($ID);
+        return 'ti ti-map-2';
+    }
+
+    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    {
+        if ($item instanceof GlpiLocation) {
+            return self::createTabEntry(__('Environmental impact', 'carbon'), 0);
+        }
+        return '';
+    }
+
+    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
+    {
+        if ($item instanceof GlpiLocation) {
+            /** @var GlpiLocation $item */
+            $location = new self();
+            $location->showForLocation($item);
+        }
+        return true;
+    }
+
+    public function prepareInputForAdd($input)
+    {
+        if (isset($input['plugin_carbon_sources_id']) && isset($input['plugin_carbon_zones_id'])) {
+            $source_zone = new Source_Zone();
+            $source_zone->getFromDBByCrit([
+                'plugin_carbon_sources_id' => $input['plugin_carbon_sources_id'],
+                'plugin_carbon_zones_id' => $input['plugin_carbon_zones_id'],
+            ]);
+            if (!$source_zone->isNewItem()) {
+                $input['plugin_carbon_sources_zones_id'] = $source_zone->getID();
+            }
+        }
+
+        return $input;
+    }
+
+    public function prepareInputForUpdate($input)
+    {
+        if (isset($input['plugin_carbon_sources_id']) && isset($input['plugin_carbon_zones_id'])) {
+            $source_zone = new Source_Zone();
+            $source_zone->getFromDBByCrit([
+                'plugin_carbon_sources_id' => $input['plugin_carbon_sources_id'],
+                'plugin_carbon_zones_id' => $input['plugin_carbon_zones_id'],
+            ]);
+            if (!$source_zone->isNewItem()) {
+                $input['plugin_carbon_sources_zones_id'] = $source_zone->getID();
+            } else {
+                $input['plugin_carbon_sources_zones_id'] = 0;
+            }
+        }
+
+        if (($input['plugin_carbon_sources_id'] ?? 0) == 0) {
+            $input['plugin_carbon_sources_zones_id'] = 0;
+        }
+
+        return $input;
+    }
+
+    public function showForLocation(GlpiLocation $item, array $options = [])
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        $this->getFromDBByCrit(['locations_id' => $item->getID()]);
+        if ($this->isNewItem()) {
+            $this->add(['locations_id' => $item->getID()]);
+        }
+
+        $source_zone_table = Source_Zone::getTable();
+        $source_table = Source::getTable();
+        $iterator = $DB->request([
+            'SELECT' => [
+                Source_Zone::getTableField('plugin_carbon_sources_id') . ' AS sources_id',
+                Source_Zone::getTableField('plugin_carbon_zones_id') . ' AS zones_id',
+            ],
+            'FROM' => $source_table,
+            'LEFT JOIN' => [
+                $source_zone_table => [
+                    'FKEY' => [
+                        $source_zone_table => 'plugin_carbon_sources_id',
+                        $source_table => 'id',
+                    ],
+                ],
+            ],
+            'WHERE' => [
+                'is_carbon_intensity_source' => 1,
+                Source_Zone::getTableField('id') => $this->fields['plugin_carbon_sources_zones_id'],
+            ],
+        ]);
+        $row = $iterator->current();
+        $source_id = $row['sources_id'] ?? 0;
+        $zone_id = $row['zones_id'] ?? 0;
+        if ($source_id === 0) {
+            $zone_id = 0;
+        }
+
         TemplateRenderer::getInstance()->display('@carbon/location.html.twig', [
             'item' => $this,
+            'params' => [
+                'candel' => false,
+            ],
+            'source_id' => $source_id,
+            'zone_id'   => $zone_id,
+            'zone_condition' => Zone::getRestrictBySourceCondition($source_id),
         ]);
 
         return true;
@@ -76,7 +180,19 @@ class Location extends CommonDBChild
             case 'MassUpdateBoaviztaZone':
                 echo '<div>';
                 echo __('Boavizta zone', 'carbon') . '&nbsp;';
-                Boaviztapi::dropdownBoaviztaZone('_boavizta_zone');
+                BoaviztapiClient::dropdownBoaviztaZone('_boavizta_zone');
+                echo '</div>';
+                echo '<br /><br />' . Html::submit(_x('button', 'Post'), ['name' => 'massiveaction']);
+                return true;
+            case 'MassUpdateCarbonIntensityFeed':
+                echo '<div>';
+                echo __('Carbon intensity source and zone', 'carbon') . '&nbsp;';
+                $template_renderer = TemplateRenderer::getInstance();
+                $template_renderer->display('@carbon/components/form/source_zone_selector.html.twig', [
+                    'source_id' => 0,
+                    'zone_id'   => 0,
+                    'zone_condition' => [],
+                ]);
                 echo '</div>';
                 echo '<br /><br />' . Html::submit(_x('button', 'Post'), ['name' => 'massiveaction']);
                 return true;
@@ -94,6 +210,27 @@ class Location extends CommonDBChild
                         $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
                     } else {
                         $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
+                    }
+                }
+                return;
+            case 'MassUpdateCarbonIntensityFeed':
+                $source_zone = new Source_Zone();
+                $source_zone->getFromDBByCrit([
+                    'plugin_carbon_sources_id' => $ma->POST['plugin_carbon_sources_id'] ?? 0,
+                    'plugin_carbon_zones_id' => $ma->POST['plugin_carbon_zones_id'] ?? 0,
+                ]);
+                if ($source_zone->isNewItem()) {
+                    $input['plugin_carbon_sources_zones_id'] = $source_zone->getID();
+                    foreach ($ids as $id) {
+                        $ma->itemDone(get_class($item), $id, MassiveAction::ACTION_KO);
+                    }
+                    return;
+                }
+                foreach ($ids as $id) {
+                    if ($item->getFromDB($id) && self::updateCarbonIntensitySourceZone($item, $source_zone)) {
+                        $ma->itemDone(get_class($item), $id, MassiveAction::ACTION_OK);
+                    } else {
+                        $ma->itemDone(get_class($item), $id, MassiveAction::ACTION_KO);
                     }
                 }
                 return;
@@ -128,11 +265,19 @@ class Location extends CommonDBChild
         }
     }
 
+    public static function updateCarbonIntensitySourceZone(CommonDBTM $item, Source_Zone $source_zone): bool
+    {
+        return $item->update([
+            'id' => $item->getID(),
+            '_plugin_carbon_sources_zones_id' => $source_zone->getID(),
+        ]);
+    }
+
     public static function getSpecificValueToDisplay($field, $values, array $options = [])
     {
         switch ($field) {
             case 'boavizta_zone':
-                $categories = Boaviztapi::getZones();
+                $categories = BoaviztapiClient::getZones();
                 return $categories[$values['boavizta_zone']] ?? '';
         }
 
@@ -141,8 +286,13 @@ class Location extends CommonDBChild
 
     public static function getSpecificValueToSelect($field, $name = '', $values = '', array $options = [])
     {
-        $options['values'] = $values;
-        return Boaviztapi::dropdownBoaviztaZone($name, $options);
+        switch ($field) {
+            case 'boavizta_zone':
+                $options['values'] = $values;
+                return BoaviztapiClient::dropdownBoaviztaZone($name, $options);
+        }
+
+        return '';
     }
 
     /**
@@ -154,13 +304,12 @@ class Location extends CommonDBChild
      */
     public function onGlpiLocationAdd(CommonDBTM $item, Geocoder $geocoder)
     {
-        $this->enableCarbonIntensityDownload($item);
         $enabled = GlpiConfig::getConfigurationValue('plugin:carbon', 'geocoding_enabled');
         if (!empty($enabled)) {
             if (!isset($item->input['_boavizta_zone']) || $item->input['_boavizta_zone'] == '' || $item->input['_boavizta_zone'] == '0') {
                 try {
                     $item->input['_boavizta_zone'] = $this->getCountryCode($item, $geocoder);
-                } catch (\Geocoder\Exception\QuotaExceeded $e) {
+                } catch (QuotaExceeded $e) {
                     trigger_error($e->getMessage(), E_USER_WARNING);
                 }
             }
@@ -193,12 +342,13 @@ class Location extends CommonDBChild
             if (!isset($item->input['_boavizta_zone']) ||  $item->input['_boavizta_zone'] == '0') {
                 try {
                     $item->input['_boavizta_zone'] = $this->getCountryCode($item, $geocoder);
-                } catch (\Geocoder\Exception\QuotaExceeded $e) {
+                } catch (QuotaExceeded $e) {
                     trigger_error($e->getMessage(), E_USER_WARNING);
                 }
             }
         }
         $this->setBoaviztaZone($item);
+        $this->setSourceZone($item);
     }
 
     /**
@@ -209,18 +359,9 @@ class Location extends CommonDBChild
      */
     protected function enableCarbonIntensityDownload(CommonDBTM $item): bool
     {
-        if (!in_array('country', array_keys($item->fields))) {
-            return false;
-        }
-        $zone = Zone::getByLocation($item);
-        if ($zone === null) {
-            return false;
-        }
-        $source_zone = new CarbonIntensitySource_Zone();
-        $source_zone->getFromDBByCrit([
-            Zone::getForeignKeyField() => $zone->fields['id'],
-            CarbonIntensitySource::getForeignKeyField() => $zone->fields['plugin_carbon_carbonintensitysources_id_historical'],
-        ]);
+        $source_zone = new Source_Zone();
+        /** @var GlpiLocation $item */
+        $source_zone->getFromDbByItem($item);
         if ($source_zone->isNewItem()) {
             return false;
         }
@@ -231,73 +372,127 @@ class Location extends CommonDBChild
      * Tells if the carbon intensity download is enabled
      *
      * @param CommonDBTM $item
-     * @return boolean
+     * @return bool
      */
     public function isCarbonIntensityDownloadEnabled(CommonDBTM $item): bool
     {
-        $zone = Zone::getByLocation($item);
-        if ($zone === null) {
-            return false;
-        }
-        $source_zone = new CarbonIntensitySource_Zone();
-        $source_zone->getFromDBByCrit([
-            Zone::getForeignKeyField() => $zone->fields['id'],
-            CarbonIntensitySource::getForeignKeyField() => $zone->fields['plugin_carbon_carbonintensitysources_id_historical'],
-        ]);
-        if ($source_zone->isNewItem()) {
+        $source_zone = new Source_Zone();
+        /** @var GlpiLocation $item */
+        if (!$source_zone->getFromDbByItem($item)) {
             return false;
         }
         return $source_zone->fields['is_download_enabled'] === 1;
     }
 
     /**
-     * Tells id a location has fallback carbon intensity data
+     * Get request to find carbon intensity sources
+     *
+     * @param array $crit Criterias
+     * @return array
+     */
+    public static function getCarbonIntensityDataSourceRequest(array $crit = []): array
+    {
+        $carbon_intensity_table = CarbonIntensity::getTable();
+        $source_zone_table = Source_Zone::getTable();
+        $source_table = Source::getTable();
+        $location_table = Location::getTable();
+        $source_zone_fk = Source_Zone::getForeignKeyField();
+        $source_fk = Source::getForeignKeyField();
+        $zone_fk = Zone::getForeignKeyField();
+        $request = [
+            'COUNT' => 'count',
+            'FROM' => $location_table,
+            'INNER JOIN' => [
+                $source_zone_table => [
+                    'ON' => [
+                        $source_zone_table => 'id',
+                        $location_table => $source_zone_fk,
+                    ],
+                ],
+                $source_table => [
+                    'ON' => [
+                        $source_table => 'id',
+                        $source_zone_table => $source_fk,
+                        [
+                            'AND' => [
+                                Source::getTableField('is_carbon_intensity_source') => 1,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'LEFT JOIN' => [
+                $source_zone_table . ' AS alternate_sources_zones' => [
+                    'ON' => [
+                        $source_zone_table => 'plugin_carbon_zones_id',
+                        'alternate_sources_zones' => 'plugin_carbon_zones_id',
+                    ],
+                ],
+                $source_table . ' AS alternate_sources' => [
+                    'ON' => [
+                        'alternate_sources' => 'id',
+                        'alternate_sources_zones' => $source_fk,
+                        [
+                            'AND' => [
+                                'alternate_sources.is_carbon_intensity_source' => 1,
+                                'alternate_sources.fallback_level' => ['>', new QueryExpression(Source::getTableField('fallback_level'))],
+                            ],
+                        ],
+                    ],
+                ],
+                $carbon_intensity_table => [
+                    'ON' => [
+                        $carbon_intensity_table => $zone_fk,
+                        $source_zone_table => $zone_fk,
+                        [
+                            'AND' => [
+                                'OR' => [
+                                    [CarbonIntensity::getTableField($source_fk) => new QueryExpression(Source_Zone::getTableField($source_fk))],
+                                    [CarbonIntensity::getTableField($source_fk) => new QueryExpression('alternate_sources_zones.' . $source_fk)],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'WHERE' => $crit,
+        ];
+
+        return $request;
+    }
+
+    /**
+     * Tells if a location has fallback carbon intensity data
      *
      * @param CommonDBTM $item
-     * @return boolean
+     * @return bool
      */
     public function hasFallbackCarbonIntensityData(CommonDBTM $item): bool
     {
         /** @var DBmysql $DB */
         global $DB;
 
-        $zone = Zone::getByLocation($item);
-        if ($zone === null) {
-            return false;
+        if ($item->getType() === GlpiLocation::class) {
+            $location_id = $item->getID();
+        } else {
+            $location_id = $item->fields['locations_id'];
         }
-        $carbon_intensity_table = CarbonIntensity::getTable();
-        $carbon_intensity_source_zone_table = CarbonIntensitySource_Zone::getTable();
-        $carbon_intensity_source_table = CarbonIntensitySource::getTable();
-        $request = [
-            'COUNT' => 'count',
-            'FROM' => $carbon_intensity_table,
-            'INNER JOIN' => [
-                $carbon_intensity_source_zone_table => [
-                    'FKEY'   => [
-                        $carbon_intensity_table => 'plugin_carbon_zones_id',
-                        $carbon_intensity_source_zone_table => 'plugin_carbon_zones_id',
-                    ]
-                ],
-                $carbon_intensity_source_table => [
-                    'FKEY'   => [
-                        $carbon_intensity_source_zone_table => 'plugin_carbon_carbonintensitysources_id',
-                        $carbon_intensity_source_table => 'id',
-                    ]
-                ]
+
+        $request = self::getCarbonIntensityDataSourceRequest([
+            Location::getTableField('locations_id') => $location_id,
+            'OR' => [
+                // Primary source is a fallback or alternate source is a fallback
+                'NOT' => ['alternate_sources.id' => null],
+                Source::getTableField('fallback_level') => ['>', 0],
             ],
-            'WHERE' => [
-                CarbonIntensitySource::getTableField('is_fallback') => 1,
-                CarbonIntensitySource_Zone::getTableField('plugin_carbon_zones_id') => $zone->getID(),
-            ],
-            'ORDER' => CarbonIntensity::getTableField('date') . ' DESC',
-            'LIMIT' => 1,
-        ];
+        ]);
+
         $result = $DB->request($request);
-        return ($result->count() > 0);
+        return ($result->current()['count'] > 0);
     }
 
     /**
-     * Associate a zone for a location (added or updated), for Boavizta
+     * Associate a Boavizta zone for a location (added or updated)
      *
      * @param CommonDBTM $item
      * @return bool true if a zone has been set
@@ -325,6 +520,31 @@ class Location extends CommonDBChild
         ]);
     }
 
+    /**
+     * Associate a Source_Zone object for a location
+     */
+    protected function setSourceZone(CommonDBTM $item): bool
+    {
+        if (!isset($item->input['_plugin_carbon_sources_zones_id'])) {
+            return false;
+        }
+
+        $this->getFromDBByCrit([
+            'locations_id' => $item->getID(),
+        ]);
+
+        if ($this->isNewItem()) {
+            return false !== $this->add([
+                'locations_id' => $item->getID(),
+                'plugin_carbon_sources_zones_id' => $item->input['_plugin_carbon_sources_zones_id'],
+            ]);
+        }
+        return $this->update([
+            'id'            => $this->getID(),
+            'plugin_carbon_sources_zones_id' => $item->input['_plugin_carbon_sources_zones_id'],
+        ]);
+    }
+
     public function onGlpiLocationPrePurge(CommonDBTM $item): bool
     {
         $this->getFromDBByCrit([
@@ -345,7 +565,7 @@ class Location extends CommonDBChild
      * @param Geocoder $geocoder
      * @return string
      *
-     * @throws \Geocoder\Exception\Exception
+     * @throws Exception
      */
     public function getCountryCode(CommonDBTM $item, Geocoder $geocoder): string
     {
@@ -362,9 +582,9 @@ class Location extends CommonDBChild
         $location_string = implode(', ', $location_elements);
         try {
             $result = $geocoder->geocodeQuery(GeocodeQuery::create($location_string));
-        } catch (\Geocoder\Exception\QuotaExceeded $e) {
+        } catch (QuotaExceeded $e) {
             throw $e;
-        } catch (\Geocoder\Exception\Exception $e) {
+        } catch (Exception $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
             return '';
         }
@@ -387,7 +607,7 @@ class Location extends CommonDBChild
      */
     public static function getIncompleteLocations(array $where = []): DBmysqlIterator
     {
-        /** @var  DBmysql $DB */
+        /** @var DBmysql $DB */
         global $DB;
 
         $where = array_diff_key($where, [
@@ -411,21 +631,107 @@ class Location extends CommonDBChild
                     'ON' => [
                         $location_table => 'locations_id',
                         $glpi_location_table => 'id',
-                    ]
-                ]
+                    ],
+                ],
             ],
             'WHERE' => [
                 [
                     'OR' => [
                         ['boavizta_zone' => null],
                         ['boavizta_zone' => ''],
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ];
         $request = array_merge_recursive($request, $where);
         $result = $DB->request($request);
 
         return $result;
+    }
+
+    public function getSourceZoneId(): int
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        if ($this->isNewItem()) {
+            return 0;
+        }
+
+        if (!Source_Zone::isNewID($this->fields['plugin_carbon_sources_zones_id'])) {
+            return $this->fields['plugin_carbon_sources_zones_id'];
+        }
+
+        $location_table = self::getTable();
+        $glpi_location_table = GlpiLocation::getTable();
+        $ancestors = (new DbUtils())->getAncestorsOf($glpi_location_table, $this->fields['locations_id']);
+        if (count($ancestors) === 0) {
+            return 0;
+        }
+
+        $ancestors = array_values($ancestors); // Drop keys
+        $request = [
+            'SELECT' => self::getTableField('plugin_carbon_sources_zones_id'),
+            'FROM' => $glpi_location_table,
+            'INNER JOIN' => [
+                $location_table => [
+                    'FKEY' => [
+                        $glpi_location_table => 'id',
+                        $location_table => 'locations_id',
+                    ],
+                ],
+            ],
+            'WHERE' => [
+                GlpiLocation::getTableField('id') => $ancestors,
+                self::getTableField('plugin_carbon_sources_zones_id') => ['>', 0],
+            ],
+            'ORDER' => 'level DESC',
+            'LIMIT' => '1',
+        ];
+        $iterator = $DB->request($request);
+        if ($iterator->count() === 0) {
+            return 0;
+        }
+
+        return $iterator->current()['plugin_carbon_sources_zones_id'];
+    }
+
+    /**
+     * Get the boavizta zone code the asset belongs to
+     *
+     * @param  CommonDBTM $item
+     * @param  DateTime $date Date for which the zone must be found
+     * @return string|null
+     */
+    public static function getZoneCode(CommonDBTM $item, ?DateTime $date = null): ?string
+    {
+        // TODO: use date to find where was the asset at the given date
+        if ($date === null) {
+            $item_table = getTableForItemType($item::class);
+            $glpi_location_table = getTableForItemType(GlpiLocation::class);
+            $location_table = self::getTable();
+            $location = new Location();
+            $found = $location->getFromDBByRequest([
+                'INNER JOIN' => [
+                    $glpi_location_table => [
+                        'FKEY' => [
+                            $location_table => 'locations_id',
+                            $glpi_location_table => 'id',
+                        ],
+                    ],
+                ],
+                'WHERE' => [
+                    GlpiLocation::getTableField('id') => $item->fields['locations_id'],
+                ],
+            ]);
+
+            if ($found === false) {
+                return null;
+            }
+
+            return $location->fields['boavizta_zone'];
+        }
+
+        throw new LogicException('Not implemented yet');
     }
 }

@@ -57,7 +57,6 @@ class NetworkEquipmentType extends AbstractType
         return parent::showMassiveActionsSubForm($ma);
     }
 
-
     public static function processMassiveActionsForOneItemtype(MassiveAction $ma, CommonDBTM $item, array $ids)
     {
         switch ($ma->getAction()) {
@@ -78,7 +77,7 @@ class NetworkEquipmentType extends AbstractType
      * Update the power consumption associated to a net equipment type
      *
      * @param CommonDBTM $item Monitor to update
-     * @param integer $power pwoer consumption to set
+     * @param int $power pwoer consumption to set
      * @return bool
      */
     public static function updatePowerConsumption(CommonDBTM $item, int $power)

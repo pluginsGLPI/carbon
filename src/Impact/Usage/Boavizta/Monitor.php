@@ -33,13 +33,19 @@
 
 namespace GlpiPlugin\Carbon\Impact\Usage\Boavizta;
 
+use CommonDBTM;
+use Computer as GlpiComputer;
 use DBmysql;
 use DbUtils;
-use CommonDBTM;
-use Monitor as GlpiMonitor;
-use MonitorType as GlpiMonitorType;
-use MonitorModel as GlpiMonitorModel;
+use Glpi\Asset\Asset_PeripheralAsset;
 use Glpi\DBAL\QueryExpression;
+use GlpiPlugin\Carbon\ComputerUsageProfile;
+use GlpiPlugin\Carbon\Location;
+use GlpiPlugin\Carbon\MonitorType;
+use GlpiPlugin\Carbon\UsageInfo;
+use Monitor as GlpiMonitor;
+use MonitorModel as GlpiMonitorModel;
+use MonitorType as GlpiMonitorType;
 
 class Monitor extends AbstractAsset
 {
@@ -49,70 +55,139 @@ class Monitor extends AbstractAsset
 
     protected string $endpoint        = 'peripheral/monitor';
 
+    public function getEvaluableQuery(string $itemtype, array $crit = [], bool $entity_restrict = true): array
+    {
+        // TODO : build the evaluable query from the computer evaluable query
+        // the location should behandled like done in History namespace
+
+        $item_table = self::$itemtype::getTable();
+        self::$model_itemtype::getTable();
+        $assets_items_table = Asset_PeripheralAsset::getTable();
+        $computers_table = GlpiComputer::getTable();
+
+        $request = parent::getEvaluableQuery($itemtype);
+        $parent_inner_joins = $request['INNER JOIN'];
+        $parent_left_joins  = $request['LEFT JOIN'];
+        unset($request['INNER JOIN'], $request['LEFT JOIN']);
+
+        $request['LEFT JOIN'][$assets_items_table] = [
+            'FKEY' => [
+                $assets_items_table => 'items_id_peripheral',
+                $item_table => 'id',
+                [
+                    'AND' => [
+                        Asset_PeripheralAsset::getTableField('itemtype_peripheral') => self::$itemtype,
+                        Asset_PeripheralAsset::getTableField('itemtype_asset') => GlpiComputer::class,
+                    ],
+                ],
+            ],
+        ];
+        $request['INNER JOIN'][$computers_table] = [
+            'FKEY' => [
+                $computers_table => 'id',
+                $assets_items_table => 'items_id_asset',
+                [
+                    'AND' => [Asset_PeripheralAsset::getTableField('itemtype_asset') => GlpiComputer::class],
+                ],
+            ],
+        ];
+
+        // re-add inner joins of computer, after those for monitor
+        // Needed to join tables before theyr foreign keys are used
+        $request['INNER JOIN'] = array_merge($request['INNER JOIN'], $parent_inner_joins);
+        $request['LEFT JOIN'] = array_merge($request['LEFT JOIN'], $parent_left_joins);
+
+        // Replace SELECT on computer by select on monitor
+        $request['SELECT'] = [
+            self::$itemtype::getTableField('id'),
+        ];
+
+        // Append criteria to the WHERE clause
+        $request['WHERE'][] = $crit;
+
+        return $request;
+    }
+
     protected function doEvaluation(CommonDBTM $item): ?array
     {
-        // TODO: determine if the computer is a server, a computer, a laptop, a tablet...
-        // then adapt $this->endpoint depending on the result
-
         // Ask for embodied impact only
-        $configuration = $this->analyzeHardware($item);
+        $configuration = $this->analyzeHardware();
+        $this->endpoint .= '?' . $this->getCriteriasQueryString();
+
+        // Find boavizta zone code
+        $zone_code = Location::getZoneCode($item);
+        if ($zone_code === null) {
+            return null;
+        }
+        // Calculate the average power
+        $average_power = $this->getAveragePower($item->getID());
+        $lifespan = (new UsageInfo())->getLifespanInHours($item);
+        if ($lifespan === null) {
+            return null;
+        }
+        $use_ratio = $this->getUseRatio();
+        $time_workload = $this->getWorkloadRepartition();
 
         $description = [
             'configuration' => $configuration,
             'usage' => [
-                'avg_power' => 0
+                'avg_power'       => $average_power,
+                'usage_location'  => $zone_code,
+                'use_time_ratio'  => $use_ratio,
+                'hours_life_time' => $lifespan,
+                'time_workload'   => $time_workload,
             ],
         ];
         $response = $this->query($description);
-        $impacts = $this->parseResponse($response);
+        $impacts = $this->client->parseResponse($response, 'use');
 
         return $impacts;
     }
 
-    protected function analyzeHardware(CommonDBTM $item): array
+    protected function analyzeHardware(): array
     {
         $configuration = [];
-
-        // Disable usage
-        $this->hardware['configuration'] = $configuration;
-        $this->hardware['usage'] = [
-            'avg_power' => 0
-        ];
 
         return $configuration;
     }
 
-    protected function getAveragePower(int $id): ?int
+    protected function getAveragePower_disabled(int $id): ?int
     {
         /** @var DBmysql $DB */
         global $DB;
 
         $dbutil = new DbUtils();
         $itemtype = static::$itemtype;
-        $glpi_type_fk = static::$type_itemtype::getForeignKeyField();
         $model_fk = static::$model_itemtype::getForeignKeyField();
         $item_table = $dbutil->getTableForItemType($itemtype);
-        $item_glpi_type_table  = $dbutil->getTableForItemType(static::$type_itemtype);
         $item_model_table = $dbutil->getTableForItemType(static::$model_itemtype);
+        $carbon_item_type_table = $dbutil->getTableForItemType(MonitorType::class);
+
+        $type_power  = MonitorType::getTableField('power_consumption');
+        $type_power = DBmysql::quoteName($type_power);
+        $model_power = static::$model_itemtype::getTableField('power_consumption');
+        $model_power = DBmysql::quoteName($model_power);
 
         $request = [
-            'SELECT' => new QueryExpression('COALESCE() as `power`'),
+            'SELECT' => new QueryExpression("COALESCE({$model_power}, {$type_power}, null) as `power`"),
             'FROM' => $item_table,
             'LEFT JOIN' => [
                 $item_model_table => [
-                    $item_table => $model_fk,
-                    $item_model_table => 'id',
-                ],
-                $item_glpi_type_table => [
                     'FKEY' => [
-                        $item_table => $glpi_type_fk,
-                        $item_glpi_type_table => 'id',
-                    ]
+                        $item_table => $model_fk,
+                        $item_model_table => 'id',
+                    ],
+                ],
+                $carbon_item_type_table => [
+                    'FKEY' => [
+                        $item_table => 'monitortypes_id',
+                        $carbon_item_type_table => 'monitortypes_id',
+                    ],
                 ],
             ],
             'WHERE' => [
-                $itemtype::getTableField('id') => $id
-            ]
+                $itemtype::getTableField('id') => $id,
+            ],
         ];
 
         $result = $DB->request($request);
@@ -121,5 +196,46 @@ class Monitor extends AbstractAsset
         }
         $power = $result->current()['power'];
         return $power ?? 0;
+    }
+
+    /**
+     * Calculate the use time ratio from the usage profile
+     *
+     * @return float Ratio between 0 and 1
+     */
+    protected function getUseRatio(): float
+    {
+        $usage_profile = new ComputerUsageProfile();
+        $usage_profile_table = ComputerUsageProfile::getTable();
+        $usage_info_table = getTableForItemType(UsageInfo::class);
+        $assets_items_table = Asset_PeripheralAsset::getTable();
+        $usage_profile->getFromDBByRequest([
+            'INNER JOIN' => [
+                $usage_info_table => [
+                    'FKEY' => [
+                        $usage_info_table => 'plugin_carbon_computerusageprofiles_id',
+                        $usage_profile_table => 'id',
+                    ],
+                ],
+                $assets_items_table => [
+                    'FKEY' => [
+                        $assets_items_table => 'items_id_asset',
+                        $usage_info_table => 'items_id',
+                        [
+                            'AND' => [
+                                Asset_PeripheralAsset::getTableField('itemtype_peripheral') => self::$itemtype,
+                                Asset_PeripheralAsset::getTableField('itemtype_asset') => GlpiComputer::class,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'WHERE' => [
+                UsageInfo::getTableField('itemtype') => GlpiComputer::class,
+                UsageInfo::getTableField('items_id') => $this->item->getID(),
+            ],
+        ]);
+
+        return $usage_profile->getPoweredOnRatio();
     }
 }

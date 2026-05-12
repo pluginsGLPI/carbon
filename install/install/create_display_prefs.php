@@ -31,8 +31,8 @@
  */
 
 use GlpiPlugin\Carbon\CarbonIntensity;
-use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\SearchOptions;
+use GlpiPlugin\Carbon\Zone;
 
 include_once __DIR__ . '/../../src/SearchOptions.php';
 
@@ -51,7 +51,7 @@ $migration->updateDisplayPrefs(
             3,
             SearchOptions::HISTORICAL_DATA_SOURCE,
             SearchOptions::HISTORICAL_DATA_DL_ENABLED,
-        ]
+        ],
     ],
     [],
     true

@@ -30,10 +30,17 @@
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Carbon\CronTask;
 use CronTask as GlpiCronTask;
+use GlpiPlugin\Carbon\CronTask;
+use GlpiPlugin\Carbon\DataSource\CronTaskProvider;
 
-$automatic_actions = [
+$cron_task_classes = CronTaskProvider::getCronTaskTypes();
+$automatic_actions = [];
+foreach ($cron_task_classes as $cron_task_class) {
+    $automatic_actions = array_merge($automatic_actions, $cron_task_class::enumerateTasks());
+}
+
+$automatic_actions = array_merge($automatic_actions, [
     [
         'itemtype'  => CronTask::class,
         'name'      => 'LocationCountryCode',
@@ -44,7 +51,7 @@ $automatic_actions = [
             'logs_lifetime' => 30,
             'comment' => __('Find the Alpha3 country code (ISO3166) of locations', 'carbon'),
             'param'   => 10, // Maximum rows to generate per execution
-        ]
+        ],
     ],
     [
         'itemtype'  => CronTask::class,
@@ -56,31 +63,7 @@ $automatic_actions = [
             'logs_lifetime' => 30,
             'comment' => __('Compute carbon emissions of computers', 'carbon'),
             'param'   => 10000, // Maximum rows to generate per execution
-        ]
-    ],
-    [
-        'itemtype'  => CronTask::class,
-        'name'      => 'DownloadRte',
-        'frequency' => DAY_TIMESTAMP,
-        'options'   => [
-            'mode' => GlpiCronTask::MODE_EXTERNAL,
-            'allowmode' => GlpiCronTask::MODE_INTERNAL + GlpiCronTask::MODE_EXTERNAL,
-            'logs_lifetime' => 30,
-            'comment' => __('Collect carbon intensities from RTE', 'carbon'),
-            'param'   => 10000, // Maximum rows to generate per execution
-        ]
-    ],
-    [
-        'itemtype'  => CronTask::class,
-        'name'      => 'DownloadElectricityMap',
-        'frequency' => DAY_TIMESTAMP / 2, // Twice a day
-        'options'   => [
-            'mode' => GlpiCronTask::MODE_EXTERNAL,
-            'allowmode' => GlpiCronTask::MODE_INTERNAL + GlpiCronTask::MODE_EXTERNAL,
-            'logs_lifetime' => 30,
-            'comment' => __('Collect carbon intensities from ElectricityMap', 'carbon'),
-            'param'   => 10000, // Maximum rows to generate per execution
-        ]
+        ],
     ],
     [
         'itemtype'  => CronTask::class,
@@ -92,13 +75,17 @@ $automatic_actions = [
             'logs_lifetime' => 30,
             'comment' => __('Compute embodied impact of assets', 'carbon'),
             'param'   => 10000, // Maximum rows to generate per execution
-        ]
+        ],
     ],
-];
+]);
 
 foreach ($automatic_actions as $action) {
     $task = new GlpiCronTask();
-    if ($task->getFromDBByCrit(['name' => $action['name']]) !== false) {
+    $crit = [
+        'itemtype' => $action['itemtype'],
+        'name' => $action['name'],
+    ];
+    if ($task->getFromDBByCrit($crit) !== false) {
         $task->delete(['id' => $task->getID()]);
     }
     $success = GlpiCronTask::Register(
@@ -108,6 +95,6 @@ foreach ($automatic_actions as $action) {
         $action['options']
     );
     if (!$success) {
-        throw new \RuntimeException('Error while creating automatic action: ' . $action['name']);
+        throw new RuntimeException('Error while creating automatic action: ' . $action['name']);
     }
 }

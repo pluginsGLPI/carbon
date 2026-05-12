@@ -33,14 +33,14 @@
 namespace GlpiPlugin\Carbon\Engine\V1;
 
 use Computer as GlpiComputer;
-use Glpi\Asset\Asset_PeripheralAsset;
 use DBmysql;
-use Monitor as GlpiMonitor;
-use MonitorType as GlpiMonitorType;
-use MonitorModel;
+use Glpi\Asset\Asset_PeripheralAsset;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\UsageInfo;
+use Monitor as GlpiMonitor;
+use MonitorModel;
+use MonitorType as GlpiMonitorType;
 
 /**
  * Compute CO2 emission of a computer
@@ -71,11 +71,11 @@ class Monitor extends AbstractSwitchable
                         $computer_item_table => 'items_id_asset',
                         $computers_table     => 'id',
                         ['AND' => [
-                            Asset_PeripheralAsset::getTableField('itemtype_peripheral') => self::$itemtype
+                            Asset_PeripheralAsset::getTableField('itemtype_peripheral') => self::$itemtype,
                         ],
                             Asset_PeripheralAsset::getTableField('itemtype_asset') => GlpiComputer::class,
                         ],
-                    ]
+                    ],
                 ],
                 $usageinfo_table => [
                     'FKEY'   => [
@@ -84,16 +84,16 @@ class Monitor extends AbstractSwitchable
                         [
                             'AND' => [
                                 UsageInfo::getTableField('itemtype') => GlpiComputer::class,
-                            ]
-                        ]
-                    ]
+                            ],
+                        ],
+                    ],
                 ],
                 $computerUsageProfile_table => [
                     'FKEY'   => [
                         $usageinfo_table  => 'plugin_carbon_computerusageprofiles_id',
                         $computerUsageProfile_table => 'id',
-                    ]
-                ]
+                    ],
+                ],
             ],
             'WHERE' => [
                 Asset_PeripheralAsset::getTableField('items_id_peripheral') => $this->item->getID(),

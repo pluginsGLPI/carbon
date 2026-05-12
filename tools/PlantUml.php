@@ -41,35 +41,46 @@ if (PHP_SAPI != 'cli') {
 
 class PlantUml
 {
-    const CARDINALITY = [
+    public const CARDINALITY = [
         '0,1' => ['|o', 'o|'],
         '1'   => ['||', '||'],
         '0,n' => ['}o', 'o{'],
         '1,n' => ['|o', 'o|'],
     ];
 
-    public function generate(array $schema_tables)
+    public function generate(array $schema_tables, string $version = ''): string
     {
-        echo "@startuml" . PHP_EOL;
-        echo "' avoid problems with angled crows feet";
-        echo "skinparam linetype ortho";
+        $source = $this->getPlantUmlSource($schema_tables, $version);
+        return $source;
+    }
+
+    protected function getPlantUmlSource(array $schema_tables, string $version = ''): string
+    {
+        $source = "@startuml" . PHP_EOL;
+        $source .= "' avoid problems with angled crows feet" . PHP_EOL;
+        $source .= "skinparam linetype ortho" . PHP_EOL;
+
+        if ($version !== '') {
+            $escapedVersion = str_replace('"', '\"', $version);
+            $source .= 'title "Carbon plugin version ' . $escapedVersion . '"' . PHP_EOL;
+        }
 
         foreach ($schema_tables as $table_data) {
-            echo PHP_EOL;
+            $source .= PHP_EOL;
             $table_name = $table_data['name'];
             // $itemtype = $db_utils->getItemTypeForTable($table_name);
             // $itemtype_name = $itemtype::getTypeName(1);
-            echo "entity \"$table_name\" as $table_name {" . PHP_EOL;
+            $source .= "entity \"$table_name\" as $table_name {" . PHP_EOL;
             foreach ($table_data['fields'] as $field) {
                 $field_type = $field[0];
                 $field_name = $field[1];
-                echo "    $field_name : $field_type" . PHP_EOL;
+                $source .= "    $field_name : $field_type" . PHP_EOL;
             }
-            echo "}" . PHP_EOL;
+            $source .= "}" . PHP_EOL;
             if (count($table_data['links']) === 0) {
                 continue;
             }
-            echo PHP_EOL;
+            $source .= PHP_EOL;
         }
 
         foreach ($schema_tables as $table_data) {
@@ -79,10 +90,10 @@ class PlantUml
                 $foreign_cardinality = self::CARDINALITY[$link['foreign']][1];
                 $foreign_table = $link['table'];
                 $relation_label = $link['label'];
-                echo "$table_name $local_cardinality--$foreign_cardinality $foreign_table" . PHP_EOL;
+                $source .= "$table_name $local_cardinality--$foreign_cardinality $foreign_table" . PHP_EOL;
             }
         }
 
-        echo "@enduml" . PHP_EOL;
+        return $source . "@enduml";
     }
 }

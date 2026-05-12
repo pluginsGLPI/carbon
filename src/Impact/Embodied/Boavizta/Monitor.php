@@ -33,7 +33,6 @@
 
 namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta;
 
-use CommonDBTM;
 use Monitor as GlpiMonitor;
 
 class Monitor extends AbstractAsset
@@ -42,35 +41,28 @@ class Monitor extends AbstractAsset
 
     protected string $endpoint        = 'peripheral/monitor';
 
-    protected function doEvaluation(CommonDBTM $item): ?array
+    protected function doEvaluation(): ?array
     {
-        // TODO: determine if the computer is a server, a computer, a laptop, a tablet...
-        // then adapt $this->endpoint depending on the result
+        $this->endpoint .= '?' . $this->getCriteriasQueryString();
 
         // Ask for embodied impact only
-        $configuration = $this->analyzeHardware($item);
+        $configuration = $this->analyzeHardware();
 
         $description = [
             'configuration' => $configuration,
             'usage' => [
-                'avg_power' => 0
+                'avg_power' => 0,
             ],
         ];
         $response = $this->query($description);
-        $impacts = $this->parseResponse($response);
+        $impacts = $this->client->parseResponse($response, 'embedded');
 
         return $impacts;
     }
 
-    protected function analyzeHardware(CommonDBTM $item): array
+    protected function analyzeHardware(): array
     {
         $configuration = [];
-
-        // Disable usage
-        $this->hardware['configuration'] = $configuration;
-        $this->hardware['usage'] = [
-            'avg_power' => 0
-        ];
 
         return $configuration;
     }

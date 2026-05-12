@@ -32,10 +32,17 @@
 
 namespace GlpiPlugin\Carbon\Impact\Embodied;
 
+use CommonDBTM;
 use CommonGLPI;
+use DBmysql;
+use GlpiPlugin\Carbon\AbstractModel;
 use GlpiPlugin\Carbon\Config;
-use GlpiPlugin\Carbon\DataSource\Boaviztapi;
+use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\Client;
 use GlpiPlugin\Carbon\DataSource\RestApiClient;
+use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
+use GlpiPlugin\Carbon\Impact\Embodied\Boavizta\AbstractAsset;
+use GlpiPlugin\Carbon\Impact\Type;
+use RuntimeException;
 
 class Engine extends CommonGLPI
 {
@@ -54,39 +61,50 @@ class Engine extends CommonGLPI
      *
      * Returns null if no engine found
      *
-     * @param string $itemtype itemtype of assets to analyze
+     * @param CommonDBTM $item item to analyze
      * @return EmbodiedImpactInterface|null an instance if an embodied impact calculation object or null on error
      */
-    public static function getEngineFromItemtype(string $itemtype): ?EmbodiedImpactInterface
+    public static function getEngineFromItemtype(CommonDBTM $item): ?EmbodiedImpactInterface
     {
-        $embodied_impact_namespace = Config::getEmbodiedImpactEngine();
-        $embodied_impact_class = $embodied_impact_namespace . '\\' . $itemtype;
-        if (!class_exists($embodied_impact_class) || !is_subclass_of($embodied_impact_class, AbstractEmbodiedImpact::class)) {
-            return null;
+        $itemtype = get_class($item);
+
+        if (self::hasModelData($item)) {
+            return self::getInternalEngineFromItemtype($item);
         }
 
-        $embodied_impact = new $embodied_impact_class();
+        $embodied_impact_namespace = Config::getEmbodiedImpactEngine();
+        $embodied_impact_class = $embodied_impact_namespace . '\\' . $itemtype;
+        $must_implement = AbstractEmbodiedImpact::class;
+        if (!class_exists($embodied_impact_class) || !is_subclass_of($embodied_impact_class, $must_implement)) {
+            return self::getInternalEngineFromItemtype($item);
+        }
+
+        /** @var AbstractEmbodiedImpact $embodied_impact */
+        $embodied_impact = new $embodied_impact_class($item);
         try {
             return self::configureEngine($embodied_impact);
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             // If the engine cannot be configured, it is not usable
             return null;
         }
     }
 
-    public static function getEngine(string $engine_class): ?EmbodiedImpactInterface
+    /**
+     * Get an instance of the internal engine to calcilate impacts for the given itemtype
+     * This is a fallback engine
+     *
+     * @param CommonDBTM $item item to analyze
+     * @return ?EmbodiedImpactInterface
+     */
+    public static function getInternalEngineFromItemtype(CommonDBTM $item): ?EmbodiedImpactInterface
     {
-        if (!is_subclass_of($engine_class, EmbodiedImpactInterface::class)) {
+        $itemtype = get_class($item);
+        $embodied_impact_class = 'GlpiPlugin\\Carbon\\Impact\\Embodied\Internal' . '\\' . $itemtype;
+        if (!class_exists($embodied_impact_class) || !is_subclass_of($embodied_impact_class, AbstractEmbodiedImpact::class)) {
             return null;
         }
-        $embodied_impact = new $engine_class();
-
-        try {
-            return self::configureEngine($embodied_impact);
-        } catch (\RuntimeException $e) {
-            // If the engine cannot be configured, it is not usable
-            return null;
-        }
+        $embodied_impact = new $embodied_impact_class($item);
+        return $embodied_impact;
     }
 
     /**
@@ -100,10 +118,46 @@ class Engine extends CommonGLPI
         $embodied_impact_namespace = explode('\\', get_class($engine));
         switch (array_slice($embodied_impact_namespace, -2, 1)[0]) {
             case 'Boavizta':
-                /** @var Boavizta\AbstractAsset $engine  */
-                $engine->setClient(new Boaviztapi(new RestApiClient()));
+                /** @var AbstractAsset $engine  */
+                $engine->setClient(new Client(new RestApiClient()));
         }
 
         return $engine;
+    }
+
+    /**
+     * Check if the asset has a model specific dmeodied impact data
+     *
+     * @param CommonDBTM $item
+     * @return bool
+     */
+    private static function hasModelData(CommonDBTM $item): bool
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        $itemtype = get_class($item);
+        $glpi_model_class = $itemtype . 'Model';
+        $glpi_model_class_fk = getForeignKeyFieldForItemType($glpi_model_class);
+        /**
+         * @var class-string<AbstractModel> $model_class
+         */
+        $model_class = 'GlpiPlugin\\Carbon\\' . $glpi_model_class;
+        $model_table = getTableForItemType($model_class);
+        $glpi_model_id = $item->fields[$glpi_model_class_fk];
+        $crit = [
+            $glpi_model_class_fk => $glpi_model_id,
+        ];
+        $types = Type::getImpactTypes();
+        foreach ($types as $key => $type) {
+            if (!$DB->fieldExists($model_table, $type)) {
+                continue;
+            }
+            $crit['OR'][] = [
+                $type . '_quality' => ['<>', AbstractTracked::DATA_QUALITY_UNSET_VALUE],
+            ];
+        }
+        $model = new $model_class();
+        return $model->getFromDBByCrit($crit);
     }
 }

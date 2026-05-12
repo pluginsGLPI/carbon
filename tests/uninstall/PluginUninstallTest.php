@@ -38,9 +38,12 @@ use DisplayPreference;
 use Glpi\Dashboard\Dashboard;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\CarbonIntensity;
+use GlpiPlugin\Carbon\Uninstall;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Plugin;
 use ProfileRight;
 
+#[CoversClass(Uninstall::class)]
 class PluginUninstallTest extends CommonTestCase
 {
     public function testUninstallPlugin()
@@ -72,7 +75,6 @@ class PluginUninstallTest extends CommonTestCase
         $this->checkConfig();
         // $this->checkRequestType();
         $this->checkAutomaticAction();
-        // $this->checkDashboard();
         $this->checkRights();
         $this->checkDisplayPrefs();
         $this->checkDashboard();

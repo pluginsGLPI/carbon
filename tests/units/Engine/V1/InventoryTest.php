@@ -32,11 +32,13 @@
 
 namespace GlpiPlugin\Carbon\Engine\V1\Tests;
 
-use GlpiPlugin\Carbon\Engine\V1\Inventory;
 use Computer;
-use Plugin;
+use GlpiPlugin\Carbon\Engine\V1\Inventory;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use Plugin;
 
+#[CoversClass(Inventory::class)]
 class InventoryTest extends DbTestCase
 {
     public function testAddItem()
@@ -57,7 +59,7 @@ class InventoryTest extends DbTestCase
         $this->login('glpi', 'glpi');
         $entities_id = $this->isolateInEntity('glpi', 'glpi');
 
-        $computers = $this->getItems([
+        $computers = $this->createItems([
             Computer::class => [
                 [],
                 [],

@@ -32,9 +32,7 @@
 
 use Glpi\Event;
 use Glpi\Exception\Http\NotFoundHttpException;
-use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\EmbodiedImpact;
-use GlpiPlugin\Carbon\Impact\Embodied\AbstractEmbodiedImpact;
 use GlpiPlugin\Carbon\Impact\Embodied\Engine;
 
 include(__DIR__ . '/../../../inc/includes.php');
@@ -60,7 +58,7 @@ if (isset($_POST['update'])) {
         sprintf(__('%s updates an item'), $_SESSION['glpiname'])
     );
     Html::back();
-} else if (isset($_POST['reset'])) {
+} elseif (isset($_POST['reset'])) {
     if (!isset($_POST['id'])) {
         Session::addMessageAfterRedirect(__('Missing arguments in request.', 'carbon'), false, ERROR);
         Html::back();
@@ -83,25 +81,28 @@ if (isset($_POST['update'])) {
     if (!$embodied_impact->delete($embodied_impact->fields)) {
         Session::addMessageAfterRedirect(__('Reset failed.', 'carbon'), false, ERROR);
     }
-} else if (isset($_POST['calculate'])) {
+} elseif (isset($_POST['calculate'])) {
     if (!isset($_POST['itemtype']) || !isset($_POST['items_id'])) {
         Session::addMessageAfterRedirect(__('Missing arguments in request.', 'carbon'), false, ERROR);
         Html::back();
     }
 
-    $embodied_impact = Engine::getEngineFromItemtype($_POST['itemtype']);
+    $itemtype = $_POST['itemtype'];
+    if (!Toolbox::isCommonDBTM($itemtype)) {
+        Session::addMessageAfterRedirect(__('Bad arguments.', 'carbon'), false, ERROR);
+        Html::back();
+    }
+
+    $item = new $itemtype();
+    $item->check($_POST['items_id'], UPDATE);
+
+    $embodied_impact = Engine::getEngineFromItemtype($item);
     if ($embodied_impact === null) {
         Session::addMessageAfterRedirect(__('Unable to find calculation engine for this asset.', 'carbon'), false, ERROR);
         Html::back();
     }
 
-    $itemtype = $embodied_impact::getItemtype();
-    $item = new $itemtype();
-    $item->check($_POST['items_id'], UPDATE);
-
-    if (!$embodied_impact->evaluateItem($_POST['items_id'])) {
-        Session::addMessageAfterRedirect(__('Update failed.', 'carbon'), false, ERROR);
-    }
+    $embodied_impact->evaluateItem();
 }
 
 Html::back();

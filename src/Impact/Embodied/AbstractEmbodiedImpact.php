@@ -33,19 +33,23 @@
 
 namespace GlpiPlugin\Carbon\Impact\Embodied;
 
-use DBmysql;
-use DbUtils;
 use CommonDBTM;
+use DBmysql;
+use DBmysqlIterator;
+use DbUtils;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
+use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\EmbodiedImpact;
 use GlpiPlugin\Carbon\Impact\Type;
-use GlpiPlugin\Carbon\UsageImpact;
-use Toolbox as GlpiToolbox;
+use GuzzleHttp\Exception\ConnectException;
+use LogicException;
+use RuntimeException;
+use Session;
 
 abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
 {
-    /** @var string Handled itemtype */
-    protected static string $itemtype = '';
+    /** @var CommonDBTM Item to analyze */
+    protected CommonDBTM $item;
 
     /** @var int maximum number of entries to build */
     protected int $limit = 0;
@@ -57,23 +61,29 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
     protected string $engine = 'undefined';
 
     /** @var string $engine_version Version of the calculation engine */
-    protected string $engine_version = 'unknown';
+    protected static string $engine_version = 'unknown';
 
     /** @var array of TrackedFloat */
     protected array $impacts = [];
 
-    public function __construct()
+    public function __construct(CommonDBTM $item)
     {
+        if ($item->isNewItem()) {
+            throw new LogicException("Given item is empty");
+        }
+        $this->item = $item;
         foreach (array_flip(Type::getImpactTypes()) as $type) {
             $this->impacts[$type] = null;
         }
     }
 
+    abstract protected function getVersion(): string;
+
     /**
      * Get the unit of an impact
      *
-     * @param integer $type
-     * @param boolean $short
+     * @param int $type
+     * @param bool $short
      * @return string|null
      */
     final public function getUnit(int $type, bool $short = true): ?string
@@ -90,88 +100,43 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         return null;
     }
 
-    public static function getItemtype(): string
-    {
-        return static::$itemtype;
-    }
-
     public function setLimit(int $limit)
     {
         $this->limit = $limit;
     }
 
-    public function evaluateItems(): int
+    public static function getItemsToEvaluate(string $itemtype, array $crit = []): DBmysqlIterator
     {
         /** @var DBmysql $DB */
         global $DB;
 
-        $itemtype = static::$itemtype;
-        if ($itemtype === '') {
-            throw new \LogicException('Itemtype not set');
-        }
-        if (!is_subclass_of($itemtype, CommonDBTM::class)) {
-            throw new \LogicException('Itemtype does not inherits from ' . CommonDBTM::class);
-        }
+        $crit[] = [
+            'OR' => [
+                EmbodiedImpact::getTableField('id') => null,
+                EmbodiedImpact::getTableField('recalculate') => 1,
+            ],
+        ];
+        $iterator = $DB->request(self::getEvaluableQuery($itemtype, $crit, false));
 
-        /**
-         * Huge quantity of SQL queries will be executed
-         * We NEED to check memory usage to avoid running out of memory
-         * @see DbMysql::doQuery()
-         */
-        $memory_limit = GlpiToolbox::getMemoryLimit() - 8 * 1024 * 1024;
-        if ($memory_limit < 0) {
-            // May happen in test seems that ini_get("memory_limits") returns
-            // enpty string in PHPUnit environment
-            $memory_limit = null;
-        }
-
-        /** @var int $attempts_count count of evaluation attempts */
-        $attempts_count = 0;
-        /** @var int $count count of successfully evaluated assets */
-        $count = 0;
-        $iterator = $DB->request($this->getEvaluableQuery([], false));
-        foreach ($iterator as $row) {
-            if ($this->evaluateItem($row['id'])) {
-                $count++;
-            }
-            $attempts_count++;
-            if ($this->limit !== 0 && $attempts_count >= $this->limit) {
-                $this->limit_reached = true;
-                break;
-            }
-            if ($memory_limit && $memory_limit < memory_get_usage()) {
-                // 8 MB memory left, emergency exit
-                $this->limit_reached = true;
-                break;
-            }
-            if ($this->limit_reached) {
-                break;
-            }
-        }
-
-        return $count;
+        return $iterator;
     }
 
-    /**
-     * Evaluate and save tne environmental impact of an asset.
-     *
-     * @param integer $id
-     * @return bool true if sucess, false otherwise
-     */
-    public function evaluateItem(int $id): bool
+    public function evaluateItem(): bool
     {
-        $itemtype = static::$itemtype;
-        $item = $itemtype::getById($id);
-        if ($item === false) {
-            return false;
-        }
+        $itemtype = get_class($this->item);
+
         try {
-            $impacts = $this->doEvaluation($item);
-        } catch (\RuntimeException $e) {
+            $this->getVersion();
+            $impacts = $this->doEvaluation();
+        } catch (ConnectException $e) {
+            Session::addMessageAfterRedirect(__('Connection to Boavizta failed.', 'carbon'), false, ERROR);
+            return false;
+        } catch (RuntimeException $e) {
+            Session::addMessageAfterRedirect(__('Embodied impact evaluation falied.', 'carbon'), false, ERROR);
             return false;
         }
 
-        if ($impacts === null) {
+        if ($impacts === null || count($impacts) === 0) {
             // Nothing calculated
             return false;
         }
@@ -179,14 +144,15 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         // Find an existing row, if any
         $input = [
             'itemtype' => $itemtype,
-            'items_id' => $id,
+            'items_id' => $this->item->getID(),
         ];
         $embodied_impact = new EmbodiedImpact();
         $embodied_impact->getFromDBByCrit($input);
         $impact_types = Type::getImpactTypes();
 
+        $input['recalculate'] = 0;
         $input['engine'] = $this->engine;
-        $input['engine_version'] = $this->engine_version;
+        $input['engine_version'] = self::$engine_version;
 
         // Prepare inputs for add or update
         foreach ($impacts as $type => $value) {
@@ -216,16 +182,20 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         return false;
     }
 
-    public function getEvaluableQuery(array $crit = [], bool $entity_restrict = true): array
+    public static function getEvaluableQuery(string $itemtype, array $crit = [], bool $entity_restrict = true): array
     {
-        $itemtype = static::$itemtype;
-        $item_table = $itemtype::getTable();
+        $item_table = getTableForItemType($itemtype);
+        $glpi_item_type_table = getTableForItemType($itemtype . 'Type');
+        $glpi_item_type_fk = getForeignKeyFieldForTable($glpi_item_type_table);
+        $item_type_table = getTableForItemType('GlpiPlugin\\Carbon\\' . $itemtype . 'Type');
         $embodied_impact_table = EmbodiedImpact::getTable();
 
-        // $where = [];
-        // if (!$recalculate) {
-        //     $where = [EmbodiedImpact::getTableField('id') => null];
-        // }
+        $crit[] = [
+            'OR' => [
+                $item_type_table . '.is_ignore' => 0,
+                $item_type_table . '.id' => null,
+            ],
+        ];
 
         $request = [
             'SELECT' => [
@@ -237,10 +207,18 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
                     'FKEY' => [
                         $embodied_impact_table => 'items_id',
                         $item_table            => 'id',
-                        ['AND' =>
-                            [
+                        ['AND'
+                            => [
                                 EmbodiedImpact::getTableField('itemtype') => $itemtype,
-                            ]
+                            ],
+                        ],
+                    ],
+                ],
+                $item_type_table => [
+                    [
+                        'FKEY' => [
+                            $item_type_table => $glpi_item_type_fk,
+                            $item_table => $glpi_item_type_fk,
                         ],
                     ],
                 ],
@@ -259,23 +237,35 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
     /**
      * Do the environmental impact evaluation of an asset
      *
-     * @param CommonDBTM $item
      * @return ?array
      */
-    abstract protected function doEvaluation(CommonDBTM $item): ?array;
+    abstract protected function doEvaluation(): ?array;
 
     /**
      * Delete all calculated usage impact for an asset
      *
-     * @param integer $items_id
-     * @return boolean
+     * @param CommonDBTM $item
+     * @return bool
      */
-    public function resetForItem(int $items_id): bool
+    public static function resetForItem(CommonDBTM $item): bool
     {
-        $usage_impact = new EmbodiedImpact();
-        return $usage_impact->deleteByCriteria([
-            'itemtype' => static::getItemtype(),
-            'items_id' => $items_id
+        $embodied_impact = new EmbodiedImpact();
+        return $embodied_impact->deleteByCriteria([
+            'itemtype' => get_class($item),
+            'items_id' => $item->getID(),
         ]);
+    }
+
+    protected function getModelImpacts(CommonDBTM $model): array
+    {
+        $impacts = [];
+        $types = Type::getImpactTypes();
+        foreach ($types as $key => $type) {
+            if ($model->fields[$type] === null || $model->fields[$type . '_quality'] === AbstractTracked::DATA_QUALITY_UNSET_VALUE) {
+                continue;
+            }
+            $impacts[$key] = new TrackedFloat($model->fields[$type], null, $model->fields[$type . '_quality']);
+        };
+        return $impacts;
     }
 }
