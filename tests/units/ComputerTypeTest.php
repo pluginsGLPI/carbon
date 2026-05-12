@@ -32,20 +32,17 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
-use Computer;
 use ComputerType as GlpiComputerType;
 use GlpiPlugin\Carbon\ComputerType;
 use MassiveAction;
-use Session;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\DomCrawler\Crawler;
 
-class ComputerTypeTest extends DbTestCase
+#[CoversClass(ComputerType::class)]
+class ComputerTypeTest extends AbstractTypeTest
 {
-    public function testGetTypeName()
-    {
-        $this->assertEquals('Power', ComputerType::getTypeName(1));
-        $this->assertEquals('Powers', ComputerType::getTypeName(Session::getPluralNumber()));
-    }
+    protected static string $glpi_type_itemtype = GlpiComputerType::class;
+    protected static string $type_itemtype = ComputerType::class;
 
     public function testGetTabNameForItem()
     {
@@ -59,31 +56,19 @@ class ComputerTypeTest extends DbTestCase
         $this->assertEquals('', $result);
     }
 
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\AbstractType::getOrCreate
-     */
-    public function testGetOrCreate()
-    {
-        $computer_type = $this->createItem(GlpiComputerType::class, ['name' => 'Test Computer Type']);
-        $instance = new ComputerType();
-        $this->callPrivateMethod($instance, 'getOrCreate', $computer_type);
-        $this->assertFalse($instance->isNewItem());
-    }
-
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\AbstractType::showForItemType
-     */
     public function testShowForItemType()
     {
-        $glpi_computer_type = $this->createItem(GlpiComputerType::class);
-        $computer_type = $this->createItem(ComputerType::class, [
-            'computertypes_id' => $glpi_computer_type->getID(),
+        $glpi_type = $this->createItem(static::$glpi_type_itemtype);
+        $glpi_type_fk = $glpi_type::getForeignKeyField();
+        /** @var T $type */
+        $type = $this->createItem(static::$type_itemtype, [
+            $glpi_type_fk => $glpi_type->getID(),
         ]);
         $this->login('glpi', 'glpi');
         ob_start(function ($buffer) {
             return $buffer;
         });
-        $computer_type->showForItemType($glpi_computer_type);
+        $type->showForItemType($glpi_type);
         $output = ob_get_clean();
         $crawler = new Crawler($output);
         $power = $crawler->filter('input[name="power_consumption"]');
@@ -96,9 +81,6 @@ class ComputerTypeTest extends DbTestCase
         $this->assertEquals(1, $category->count());
     }
 
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\ComputerType::updatePowerConsumption
-     */
     public function testUpdatePowerConsumption()
     {
         $glpi_computer_type = $this->createItem(GlpiComputerType::class);
@@ -119,9 +101,6 @@ class ComputerTypeTest extends DbTestCase
         $this->assertEquals(42, $instance->fields['power_consumption']);
     }
 
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\ComputerType::updateCategory
-     */
     public function testUpdateCategory()
     {
         $glpi_computer_type = $this->createItem(GlpiComputerType::class);
@@ -142,9 +121,6 @@ class ComputerTypeTest extends DbTestCase
         $this->assertEquals(ComputerType::CATEGORY_SERVER, $instance->fields['category']);
     }
 
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\ComputerType::showMassiveActionsSubForm
-     */
     public function testShowMassiveActionsSubForm()
     {
         // Test power consumption update form
@@ -153,7 +129,7 @@ class ComputerTypeTest extends DbTestCase
             ->getMock();
         $massive_action->method('getAction')->willReturn('MassUpdatePower');
         $massive_action->method('getItems')->willReturn([
-            ComputerType::class => $this->createItem(GlpiComputerType::class)
+            ComputerType::class => $this->createItem(GlpiComputerType::class),
         ]);
         ob_start(function ($buffer) {
             return $buffer;
@@ -182,7 +158,7 @@ class ComputerTypeTest extends DbTestCase
             ->getMock();
         $massive_action->method('getAction')->willReturn('MassUpdateCategory');
         $massive_action->method('getItems')->willReturn([
-            ComputerType::class => $this->createItem(GlpiComputerType::class)
+            ComputerType::class => $this->createItem(GlpiComputerType::class),
         ]);
         ob_start(function ($buffer) {
             return $buffer;
@@ -210,7 +186,7 @@ class ComputerTypeTest extends DbTestCase
             ->getMock();
         $massive_action->method('getAction')->willReturn('');
         $massive_action->method('getItems')->willReturn([
-            ComputerType::class => $this->createItem(GlpiComputerType::class)
+            ComputerType::class => $this->createItem(GlpiComputerType::class),
         ]);
         ob_start(function ($buffer) {
             return $buffer;
@@ -221,9 +197,6 @@ class ComputerTypeTest extends DbTestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\ComputerType::processMassiveActionsForOneItemtype
-     */
     public function testProcessMassiveActionForOneItemtype()
     {
         // Test create power consumption

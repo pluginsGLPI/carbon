@@ -31,10 +31,6 @@
  */
 
 use Glpi\DBAL\QuerySubQuery;
-use GlpiPlugin\Carbon\CarbonEmission;
-use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
-use GlpiPlugin\Carbon\Zone;
 
 /** @var DBmysql $DB */
 global $DB;
@@ -42,18 +38,18 @@ global $DB;
 $db_utils = new DbUtils();
 
 // Update and fix the bad relation
-$source_table = $db_utils->getTableForItemType(CarbonIntensitySource::class);
-$zone_table = $db_utils->getTableForItemType(Zone::class);
-$source_zone_table = $db_utils->getTableForItemType(CarbonIntensitySource_Zone::class);
+$source_table = 'glpi_plugin_carbon_carbonintensitysources';
+$zone_table = 'glpi_plugin_carbon_zones';
+$source_zone_table = 'glpi_plugin_carbon_carbonintensitysources_zones';
 $source_iterator = $DB->request([
     'SELECT' => 'id',
     'FROM' => $source_table,
-    'WHERE' => ['name' => 'Hydro Quebec']
+    'WHERE' => ['name' => 'Hydro Quebec'],
 ]);
 $zone_iterator = $DB->request([
     'SELECT' => 'id',
     'FROM' => $zone_table,
-    'WHERE' => ['name' => 'Quebec']
+    'WHERE' => ['name' => 'Quebec'],
 ]);
 if ($source_iterator->count() && $zone_iterator->count()) {
     $DB->update($source_zone_table, [
@@ -67,10 +63,10 @@ if ($source_iterator->count() && $zone_iterator->count()) {
 $itemtypes = [
     Computer::class,
     Monitor::class,
-    NetworkEquipment::class
+    NetworkEquipment::class,
 ];
 
-$carbon_emission_table = $db_utils->getTableForItemType(CarbonEmission::class);
+$carbon_emission_table = 'glpi_plugin_carbon_carbonemissions';
 $location_table = $db_utils->getTableForItemType(Location::class);
 foreach ($itemtypes as $itemtype) {
     $item_table = $db_utils->getTableForItemType($itemtype);
@@ -81,20 +77,20 @@ foreach ($itemtypes as $itemtype) {
             $location_table => [
                 'FKEY' => [
                     $location_table => 'id',
-                    $item_table     => 'locations_id'
-                ]
-            ]
+                    $item_table     => 'locations_id',
+                ],
+            ],
         ],
         'WHERE' => [
             Location::getTableField('state') => 'Quebec',
-        ]
+        ],
     ];
     $subquery = new QuerySubQuery($request);
     $DB->delete(
         $carbon_emission_table,
         [
             'itemtype' => $itemtype,
-            'items_id' => $subquery
+            'items_id' => $subquery,
         ]
     );
 }

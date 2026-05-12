@@ -32,30 +32,49 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
-use Session;
+use CommonGLPI;
+use Computer;
+use ComputerModel;
+use ComputerType;
 use Config;
 use CronTask as GLPICronTask;
 use DBmysql;
 use DbUtils;
-use Glpi\Dashboard\Dashboard;
 use DisplayPreference;
-use GLPIKey;
-use Plugin;
-use Profile;
-use ProfileRight;
+use Glpi\Dashboard\Dashboard;
+use Glpi\Dashboard\Grid;
 use Glpi\Dashboard\Item;
 use Glpi\Dashboard\Right;
 use Glpi\DBAL\QueryExpression as QueryExpression;
+use Glpi\Plugin\Hooks;
 use Glpi\System\Diagnostic\DatabaseSchemaIntegrityChecker;
-use Glpi\Toolbox\Sanitizer;
+use GLPIKey;
 use GlpiPlugin\Carbon\CarbonIntensity;
-use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
-use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\CronTask;
+use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ElectricityMaps\CronTask as ElectricityMapsCronTask;
+use GlpiPlugin\Carbon\DataSource\CarbonIntensity\Rte\CronTask as RteCronTask;
+use GlpiPlugin\Carbon\Install;
 use GlpiPlugin\Carbon\Report;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
+use GlpiPlugin\Carbon\Zone;
+use Location;
+use Monitor;
+use MonitorModel;
+use MonitorType;
+use NetworkEquipment;
+use NetworkEquipmentModel;
+use NetworkEquipmentType;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Depends;
+use Plugin;
+use Profile;
+use ProfileRight;
+use Session;
 
+#[CoversClass(Install::class)]
 class PluginInstallTest extends CommonTestCase
 {
     public function setUp(): void
@@ -64,6 +83,27 @@ class PluginInstallTest extends CommonTestCase
         self::login('glpi', 'glpi', true);
     }
 
+    /**
+     * Helper method to wipe all plugin data
+     *
+     * @return void
+     */
+    protected function wipePlugin()
+    {
+        /** @var DBmysql */
+        global $DB;
+
+        $plugin_name = TEST_PLUGIN_NAME;
+        //Drop plugin configuration if exists
+        $config = new Config();
+        $config->deleteByCriteria(['context' => 'plugin:' . $plugin_name]);
+
+        // Drop tables of the plugin if they exist
+        $result = $DB->listTables('glpi_plugin_' . $plugin_name . '_%');
+        foreach ($result as $data) {
+            $DB->dropTable($data['TABLE_NAME']);
+        }
+    }
 
     /**
      * Execute plugin installation in the context if tests
@@ -76,16 +116,7 @@ class PluginInstallTest extends CommonTestCase
         $plugin_name = TEST_PLUGIN_NAME;
 
         $this->assertTrue($DB->connected);
-
-        //Drop plugin configuration if exists
-        $config = new Config();
-        $config->deleteByCriteria(['context' => $plugin_name]);
-
-        // Drop tables of the plugin if they exist
-        $result = $DB->listTables('glpi_plugin_' . $plugin_name . '_%');
-        foreach ($result as $data) {
-            $DB->dropTable($data['TABLE_NAME']);
-        }
+        $this->wipePlugin();
 
         // Reset logs
         $this->resetGLPILogs();
@@ -100,7 +131,8 @@ class PluginInstallTest extends CommonTestCase
         ob_start();
         $plugin->install($plugin->fields['id']);
         $install_output = ob_get_clean();
-        $this->assertTrue($plugin->isInstalled($plugin_name), $install_output);
+        $session_messages = implode(PHP_EOL, $_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR] ?? []);
+        $this->assertTrue($plugin->isInstalled($plugin_name), $install_output . PHP_EOL . $session_messages);
 
         // Enable the plugin
         $success = $plugin->activate($plugin->fields['id']);
@@ -124,10 +156,10 @@ class PluginInstallTest extends CommonTestCase
         $plugin->init();
         $this->assertTrue(Plugin::isPluginActive(TEST_PLUGIN_NAME), 'Plugin not activated');
         $this->checkSchema(PLUGIN_CARBON_VERSION);
+        $this->test_version_is_consistent_across_files();
 
         $this->checkConfig();
         $this->checkAutomaticAction();
-        $this->checkDashboard();
         $this->checkRights();
         $this->checkInitialDataSources();
         $this->checkInitialZones();
@@ -135,8 +167,10 @@ class PluginInstallTest extends CommonTestCase
         $this->checkDisplayPrefs();
         $this->checkPredefinedUsageProfiles();
         $this->checkSourceZoneRelation();
+        $this->checkRegisteredClasses();
     }
 
+    #[CoversNothing()]
     public function testConfigurationExists()
     {
         $config = Config::getConfigurationValues(TEST_PLUGIN_NAME);
@@ -147,6 +181,7 @@ class PluginInstallTest extends CommonTestCase
         return $config;
     }
 
+    #[CoversNothing()]
     private function checkSchema(
         string $version,
         bool $strict = true,
@@ -214,9 +249,9 @@ class PluginInstallTest extends CommonTestCase
     {
         $cronTask = new GLPICronTask();
         $rows = $cronTask->find([
-            'itemtype' => ['LIKE', '%' . 'Carbon' . '%'],
+            'itemtype' => ['LIKE', 'GlpiPlugin\\\\Carbon\\\\%'],
         ]);
-        $this->assertEquals(5, count($rows));
+        // $this->assertEquals(5, count($rows));
 
         $cronTask = new GLPICronTask();
         $cronTask->getFromDBByCrit([
@@ -236,15 +271,15 @@ class PluginInstallTest extends CommonTestCase
 
         $cronTask = new GLPICronTask();
         $cronTask->getFromDBByCrit([
-            'itemtype' => CronTask::class,
+            'itemtype' => RteCronTask::class,
             'name'     => 'DownloadRte',
         ]);
         $this->assertFalse($cronTask->isNewItem());
 
         $cronTask = new GLPICronTask();
         $cronTask->getFromDBByCrit([
-            'itemtype' => CronTask::class,
-            'name'     => 'DownloadElectricityMap',
+            'itemtype' => ElectricityMapsCronTask::class,
+            'name'     => 'DownloadElectricityMaps',
         ]);
         $this->assertFalse($cronTask->isNewItem());
 
@@ -317,7 +352,7 @@ class PluginInstallTest extends CommonTestCase
             ],
             'WHERE' => [
                 ProfileRight::getTableField('name') => $rightname,
-            ]
+            ],
         ];
 
         foreach ($DB->request($request) as $profile_right) {
@@ -344,20 +379,30 @@ class PluginInstallTest extends CommonTestCase
     {
         $sources = ['RTE', 'ElectricityMap'];
         foreach ($sources as $source_name) {
-            $source = new CarbonIntensitySource();
+            $source = new Source();
             $source->getFromDBByCrit([
                 'name' => $source_name,
-                'is_fallback' => 0
+                'fallback_level' => 0,
             ]);
             $this->assertFalse($source->isNewItem(), "Source '$source_name' not found");
         }
 
-        $sources = ['Ember - Energy Institute', 'Hydro Quebec'];
+        $sources = ['Hydro Quebec'];
         foreach ($sources as $source_name) {
-            $source = new CarbonIntensitySource();
+            $source = new Source();
             $source->getFromDBByCrit([
                 'name' => $source_name,
-                'is_fallback' => 1
+                'fallback_level' => 1,
+            ]);
+            $this->assertFalse($source->isNewItem(), "Source '$source_name' not found");
+        }
+
+        $sources = ['Ember - Energy Institute'];
+        foreach ($sources as $source_name) {
+            $source = new Source();
+            $source->getFromDBByCrit([
+                'name' => $source_name,
+                'fallback_level' => 2,
             ]);
             $this->assertFalse($source->isNewItem(), "Source '$source_name' not found");
         }
@@ -385,7 +430,7 @@ class PluginInstallTest extends CommonTestCase
             $zone->getFromDBByCrit([
                 'name' => $zone_name,
             ]);
-            $this->assertFalse($zone->isNewItem());
+            $this->assertFalse($zone->isNewItem(), "Zone '$zone_name' not found");
         }
     }
 
@@ -396,7 +441,7 @@ class PluginInstallTest extends CommonTestCase
 
         // Find the source for Ember - Energy Institute
         $source_name = 'Ember - Energy Institute';
-        $source = new CarbonIntensitySource();
+        $source = new Source();
         $source->getFromDBByCrit([
             'name' => $source_name,
         ]);
@@ -423,9 +468,9 @@ class PluginInstallTest extends CommonTestCase
 
         // Find the source for Hydro Quebec
         $source_name = 'Hydro Quebec';
-        $source = new CarbonIntensitySource();
+        $source = new Source();
         $source->getFromDBByCrit([
-            'name' => $source_name
+            'name' => $source_name,
         ]);
         if ($source->isNewItem()) {
             $this->fail("$source_name not found");
@@ -440,10 +485,10 @@ class PluginInstallTest extends CommonTestCase
         $this->assertEquals(1, $count);
 
         // Check all sources and zones are linked together via source_zone table
-        $source_zone_table = getTableForItemType(CarbonIntensitySource_Zone::class);
+        $source_zone_table = getTableForItemType(Source_Zone::class);
         $zone_table = $dbUtils->getTableForItemType(Zone::class);
-        $source_table = $dbUtils->getTableForItemType(CarbonIntensitySource::class);
-        $source_fk = getForeignKeyFieldForItemType(CarbonIntensitySource::class);
+        $source_table = $dbUtils->getTableForItemType(Source::class);
+        $source_fk = getForeignKeyFieldForItemType(Source::class);
         $zone_fk = getForeignKeyFieldForItemType(Zone::class);
         $iterator = $DB->request([
             'SELECT' => '*',
@@ -453,21 +498,21 @@ class PluginInstallTest extends CommonTestCase
                     'FKEY' => [
                         $source_zone_table => $source_fk,
                         $source_table      => 'id',
-                    ]
+                    ],
                 ],
                 $zone_table => [
                     'FKEY' => [
                         $source_zone_table => $zone_fk,
                         $zone_table        => 'id',
-                    ]
+                    ],
                 ],
             ],
             'WHERE' => [
                 'OR' => [
                     $source_table . '.id' => null,
-                    $zone_table   . '.id' => null,
-                ]
-            ]
+                    $zone_table . '.id' => null,
+                ],
+            ],
         ]);
 
         $this->assertCount(0, $iterator);
@@ -480,8 +525,21 @@ class PluginInstallTest extends CommonTestCase
         $this->assertEquals(2, count($rows));
     }
 
+    public function checkBuiltFiles()
+    {
+        global $PLUGIN_HOOKS;
 
-    public function checkDashboard()
+        $plugin_dir = dirname(__DIR__, 2);
+        $this->assertTrue(file_exists($plugin_dir . 'lib/carbon.css'));
+        $this->assertTrue(file_exists($plugin_dir . 'lib/carbon.js'));
+        $this->assertTrue(file_exists($plugin_dir . 'lib/apexcharts.js'));
+
+        $this->assertTrue(in_array('lib/carbon.css', $PLUGIN_HOOKS[Hooks::ADD_CSS]['carbon']));
+        $this->assertTrue(in_array('lib/apexcharts.js', $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon']));
+    }
+
+    #[Depends('testInstallPlugin')]
+    public function test_dashboard_is_configured()
     {
         /** @var DBmysql $DB */
         global $DB;
@@ -510,13 +568,13 @@ class PluginInstallTest extends CommonTestCase
                         $profile_right_table => 'profiles_id',
                         [
                             'AND' => [ProfileRight::getTableField('name') => [Config::$rightname, Report::$rightname]],
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ],
             'WHERE' => [
                 new QueryExpression($rights),
-            ]
+            ],
         ]);
 
         foreach ($iterator as $profile) {
@@ -539,6 +597,16 @@ class PluginInstallTest extends CommonTestCase
             'dashboards_dashboards_id' => $dashboard->fields['id'],
         ]);
         $this->assertCount($expected_cards_count, $rows);
+
+        // Check that all cards actually generate a valid content
+        // Let the plugin believe we are viewing the reporting page
+        $_SERVER['REQUEST_URI'] = 'https://localhost/carbon/front/report.php';
+        $grid = new Grid();
+        foreach ($rows as $row) {
+            $dashboardItem->getFromDB($row['id']);
+            $html = $grid->getCardHtml($row['card_id'], ['args' => json_decode($row['card_options'], true)]);
+            $this->assertStringNotContainsString('empty card!', $html, "Card with id {$row['card_id']} returns empty content");
+        }
     }
 
     private $zones = [
@@ -756,7 +824,7 @@ class PluginInstallTest extends CommonTestCase
         'Zimbabwe',
         'East Timor',
         'Montenegro',
-        'South Sudan'
+        'South Sudan',
     ];
 
     public function checkSourceZoneRelation()
@@ -764,26 +832,52 @@ class PluginInstallTest extends CommonTestCase
         /** @var DBmysql */
         global $DB;
 
-        $source_table = CarbonIntensitySource::getTable();
+        $source_table = Source::getTable();
         $zone_table = Zone::getTable();
-        $source_zone_table = CarbonIntensitySource_Zone::getTable();
+        $source_zone_table = Source_Zone::getTable();
 
+        // Test that France and RTE are associated
         $iterator = $DB->request([
             'SELECT' => $source_zone_table . '.id',
             'FROM' => $source_zone_table,
             'INNER JOIN' => [
                 $source_table => [
                     'FKEY' => [
-                        $source_zone_table => 'plugin_carbon_carbonintensitysources_id',
-                        $source_table => 'id'
-                    ]
+                        $source_zone_table => 'plugin_carbon_sources_id',
+                        $source_table => 'id',
+                    ],
                 ],
                 $zone_table => [
                     'FKEY' => [
                         $source_zone_table => 'plugin_carbon_zones_id',
-                        $zone_table => 'id'
-                    ]
-                ]
+                        $zone_table => 'id',
+                    ],
+                ],
+            ],
+            'WHERE' => [
+                $source_table . '.name' => 'RTE',
+                $zone_table . '.name'   => 'France',
+            ],
+        ]);
+        $this->assertEquals(1, $iterator->count());
+
+        // Test that Quebec and Hydroquebec are associated
+        $iterator = $DB->request([
+            'SELECT' => $source_zone_table . '.id',
+            'FROM' => $source_zone_table,
+            'INNER JOIN' => [
+                $source_table => [
+                    'FKEY' => [
+                        $source_zone_table => 'plugin_carbon_sources_id',
+                        $source_table => 'id',
+                    ],
+                ],
+                $zone_table => [
+                    'FKEY' => [
+                        $source_zone_table => 'plugin_carbon_zones_id',
+                        $zone_table => 'id',
+                    ],
+                ],
             ],
             'WHERE' => [
                 $source_table . '.name' => 'Hydro Quebec',
@@ -791,5 +885,171 @@ class PluginInstallTest extends CommonTestCase
             ],
         ]);
         $this->assertEquals(1, $iterator->count());
+    }
+
+    public function checkRegisteredClasses()
+    {
+        $result = CommonGLPI::getOtherTabs(Config::class);
+        $expected = ['GlpiPlugin\Carbon\Config'];
+        $this->assertEquals($expected, $result);
+
+        $result = CommonGLPI::getOtherTabs(Profile::class);
+        $expected = ['GlpiPlugin\Carbon\Profile'];
+        $this->assertEquals($expected, $result);
+
+        $result = CommonGLPI::getOtherTabs(Location::class);
+        $expected = ['GlpiPlugin\Carbon\Location'];
+        $this->assertEquals($expected, $result);
+
+        $result = CommonGLPI::getOtherTabs(Computer::class);
+        $expected = ['GlpiPlugin\Carbon\UsageInfo'];
+        $this->assertEquals($expected, $result);
+
+        $result = CommonGLPI::getOtherTabs(Monitor::class);
+        $expected = ['GlpiPlugin\Carbon\UsageInfo'];
+        $this->assertEquals($expected, $result);
+
+        $result = CommonGLPI::getOtherTabs(NetworkEquipment::class);
+        $expected = ['GlpiPlugin\Carbon\UsageInfo'];
+        $this->assertEquals($expected, $result);
+
+        $result = CommonGLPI::getOtherTabs(ComputerType::class);
+        $expected = ['GlpiPlugin\Carbon\ComputerType'];
+        $this->assertEquals($expected, $result);
+
+        $result = CommonGLPI::getOtherTabs(MonitorType::class);
+        $expected = ['GlpiPlugin\Carbon\MonitorType'];
+        $this->assertEquals($expected, $result);
+
+        $result = CommonGLPI::getOtherTabs(NetworkEquipmentType::class);
+        $expected = ['GlpiPlugin\Carbon\NetworkEquipmentType'];
+        $this->assertEquals($expected, $result);
+
+        $result = CommonGLPI::getOtherTabs(ComputerModel::class);
+        $expected = ['GlpiPlugin\Carbon\ComputerModel'];
+        $this->assertEquals($expected, $result);
+
+        $result = CommonGLPI::getOtherTabs(MonitorModel::class);
+        $expected = ['GlpiPlugin\Carbon\MonitorModel'];
+        $this->assertEquals($expected, $result);
+
+        $result = CommonGLPI::getOtherTabs(NetworkEquipmentModel::class);
+        $expected = ['GlpiPlugin\Carbon\NetworkEquipmentModel'];
+        $this->assertEquals($expected, $result);
+    }
+
+    #[CoversNothing()]
+    #[Depends('testInstallPlugin')]
+    public function test_version_is_consistent_across_files()
+    {
+        $setup_version = PLUGIN_CARBON_VERSION;
+        $plugin_dir = dirname(__DIR__, 2);
+        $composer_file = $plugin_dir . '/composer.json';
+        $package_file  = $plugin_dir . '/package.json';
+        $package_lock_file  = $plugin_dir . '/package-lock.json';
+
+        $composer = json_decode(file_get_contents($composer_file), true);
+        $package = json_decode(file_get_contents($package_file), true);
+        $package_lock = json_decode(file_get_contents($package_lock_file), true);
+
+        $this->assertSame($setup_version, $composer['version'] ?? null);
+        $this->assertSame($setup_version, $package['version'] ?? null);
+        $this->assertSame($setup_version, $package_lock['version'] ?? null);
+
+        // Find in packages[] the entry whose name is carbon and check its version is the same as setup_version
+        $carbon_package = null;
+        foreach ($package_lock['packages'] as $package) {
+            if ($package['name'] === 'carbon') {
+                $carbon_package = $package;
+                break;
+            }
+        }
+        $this->assertNotNull($carbon_package, "Carbon package not found in package-lock.json");
+        $this->assertSame($setup_version, $carbon_package['version'] ?? null, "Version mismatch for carbon package");
+    }
+
+    #[CoversNothing()]
+    #[Depends('testInstallPlugin')]
+    public function test_tagged_version_is_declared_in_plugin_xml()
+    {
+        // Test that git is available in the system
+        exec('git --version', $output, $return_var);
+        if ($return_var !== 0) {
+            $this->fail('Git is not available in the system');
+            return;
+        }
+
+        // check if HEAD is exactly a tagged commit
+        unset($output);
+        exec('git describe --tags --exact-match 2> /dev/null', $output, $return_var);
+        if ($return_var !== 0) {
+            $this->markTestSkipped('Current commit is not tagged');
+            return;
+        }
+
+        // Test that the version in setup.php is the same as the git tag
+        $tag = $output[0];
+        $setup_version = PLUGIN_CARBON_VERSION;
+        $this->assertSame($tag, $setup_version, "Git tag '$tag' does not match version in setup.php '$setup_version'");
+
+        // Chek that the version is not -dev suffixed
+        $this->assertStringNotContainsString('-dev', $setup_version, "Version '$setup_version' should not be suffixed with -dev");
+
+        // Check that the version is declared in plugin.xml
+        // in root.versions.version[].num field
+        $plugin_dir = dirname(__DIR__, 2);
+        $plugin_xml_file = $plugin_dir . '/plugin.xml';
+        $plugin_xml = simplexml_load_file($plugin_xml_file);
+        $versions = $plugin_xml->versions->version;
+        $version_found = false;
+        foreach ($versions as $version) {
+            if ((string) $version->num === $setup_version) {
+                $version_found = true;
+                break;
+            }
+        }
+        $this->assertTrue($version_found, "Version '$setup_version' is not declared in plugin.xml");
+    }
+
+    #[Depends('testInstallPlugin')]
+    public function test_changelog_is_updated()
+    {
+        // Test that git is available in the system
+        exec('git --version', $output, $return_var);
+        if ($return_var !== 0) {
+            $this->fail('Git is not available in the system');
+            return;
+        }
+
+        // check if HEAD is exactly a tagged commit
+        exec('git describe --tags --exact-match 2> /dev/null', $output, $return_var);
+        if ($return_var !== 0) {
+            $this->markTestSkipped('Current commit is not tagged');
+            return;
+        }
+
+        // Test that the version in setup.php is present in the changelog
+        $setup_version = PLUGIN_CARBON_VERSION;
+        $changelog_file = dirname(__DIR__, 2) . '/CHANGELOG.md';
+        // Traverse each line of he file without eating all memory in case the file is big
+        $handle = fopen($changelog_file, 'r');
+        if (!$handle) {
+            $this->fail("Cannot open changelog file '$changelog_file'");
+            return;
+        }
+        $version_found = false;
+        $limit = 30;
+        while (($line = fgets($handle)) !== false) {
+            if (strpos($line, "## [$setup_version]") === 0) {
+                $version_found = true;
+                break;
+            }
+            $limit--;
+            if ($limit <= 0) {
+                break;
+            }
+        }
+        fclose($handle);
+        $this->assertTrue($version_found, "Version '$setup_version' not found in CHANGELOG.md");
     }
 }

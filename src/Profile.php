@@ -34,8 +34,8 @@ namespace GlpiPlugin\Carbon;
 
 use CommonDBTM;
 use CommonGLPI;
-use Profile as GlpiProfile;
 use Html;
+use Profile as GlpiProfile;
 use Session;
 
 class Profile extends GlpiProfile

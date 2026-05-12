@@ -29,14 +29,27 @@
  # -------------------------------------------------------------------------
  #}
 
-{% import 'components/form/fields_macros.html.twig' as fields %}
+{% extends "generic_show_form.html.twig" %}
+
 {% import '@carbon/components/form/fields_macros.html.twig' as carbonFields %}
 
-{{ fields.smallTitle(__('Environmental impact', 'carbon')) }}
-{{ carbonFields.dropdownBoaviztaZone('_boavizta_zone',
-    item.fields['boavizta_zone'] ?? '',
-    __('Boavizta zone', 'carbon'),
-    {
-        'display_emptychoice': true,
-    })
-}}
+{% block form_fields %}
+    <div class="hr-text">
+        <i class="ti ti-list"></i>
+        <span>{{ __('Boavizta', 'carbon') }}</span>
+    </div>
+
+    {{ carbonFields.dropdownBoaviztaZone('boavizta_zone',
+        item.fields['boavizta_zone'] ?? '',
+        __('Boavizta zone', 'carbon'),
+        {
+            'display_emptychoice': true,
+        }) }}
+
+    <div class="hr-text">
+        <i class="ti ti-list"></i>
+        <span>{{ __('Carbon intensity', 'carbon') }}</span>
+    </div>
+
+    {% include '@carbon/components/form/source_zone_selector.html.twig' %}
+{% endblock %}

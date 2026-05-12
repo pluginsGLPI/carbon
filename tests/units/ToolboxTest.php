@@ -32,43 +32,59 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
-use Computer;
+use Computer as GlpiComputer;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
-use GlpiPlugin\Carbon\Zone;
-use GlpiPlugin\Carbon\Tests\DbTestCase;
+use GlpiPlugin\Carbon\CarbonIntensity;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Toolbox;
+use GlpiPlugin\Carbon\Zone;
 use Infocom;
 use Location;
+use PHPUnit\Framework\Attributes\CoversClass;
 
+#[CoversClass(Toolbox::class)]
 class ToolboxTest extends DbTestCase
 {
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\Toolbox::getOldestAssetDate
-     *
-     * @return void
-     */
-    public function testGetOldestAssetDate()
+    public function test_getOldestAssetDate_returns_null_when_no_asset_is_in_db()
     {
         $toolbox = new Toolbox();
         $output = $toolbox->getOldestAssetDate();
         $expected = null;
         $this->assertEquals($expected, $output);
+    }
 
-        $computer = $this->createItem(Computer::class);
+    public function test_getOldestAssetDate_returns_null_when_no_asset_has_inventory_entry_date()
+    {
+        $toolbox = new Toolbox();
+        $computer = $this->createItem(GlpiComputer::class, [
+            'date_creation' => null,
+        ]);
         $output = $toolbox->getLatestAssetDate();
         $expected = null;
         $this->assertEquals($expected, $output);
+    }
 
+    public function test_getOldestAssetDate_returns_date_creation_when_asset_has_a_date_creation()
+    {
+        $toolbox = new Toolbox();
         $expected = new DateTime('1980-01-01 00:00:00');
-        $computer = $this->createItem(Computer::class, [
+        $computer = $this->createItem(GlpiComputer::class, [
             'date_creation' => $expected->format('Y-m-d H:i:s'),
         ]);
         $output = $toolbox->getOldestAssetDate();
         $this->assertEquals($expected, $output);
+    }
 
+    public function test_getOldestAssetDate_returns_use_date_when_asset_has_a_use_date()
+    {
+        $toolbox = new Toolbox();
         $expected = new DateTime('2000-01-01 00:00:00');
+        $computer = $this->createItem(GlpiComputer::class, [
+            'date_creation' => null,
+        ]);
         $infocom = $this->createItem(Infocom::class, [
             'itemtype'    => $computer->getType(),
             'items_id'    => $computer->getID(),
@@ -77,35 +93,77 @@ class ToolboxTest extends DbTestCase
         ]);
         $output = $toolbox->getOldestAssetDate();
         $this->assertEquals($expected, $output);
+    }
 
-        $success = $infocom->update([
-            'id' => $infocom->getID(),
-            'buy_date' => '1999-01-01 00:00:00'
+    public function test_getOldestAssetDate_returns_use_date_when_asset_has_a_use_date_and_buy_date()
+    {
+        $toolbox = new Toolbox();
+        $computer = $this->createItem(GlpiComputer::class, [
+            'date_creation' => null,
         ]);
-        $this->assertTrue($success);
+        $expected = new DateTime('2000-01-01 00:00:00');
+        $infocom = $this->createItem(Infocom::class, [
+            'itemtype'    => $computer->getType(),
+            'items_id'    => $computer->getID(),
+            'entities_id' => $computer->fields['entities_id'],
+            'use_date'    => $expected->format('Y-m-d H:i:s'),
+            'buy_date'    => '1999-01-01 00:00:00',
+        ]);
         $output = $toolbox->getOldestAssetDate();
         $this->assertEquals($expected, $output);
     }
 
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\Toolbox::getLatestAssetDate
-     *
-     * @return void
-     */
-    public function testGetLatestAssetDate()
+    public function test_getOldestAssetDate_returns_use_date_when_asset_has_a_use_date_and_buy_date_and_delivery_date()
+    {
+        $toolbox = new Toolbox();
+        $computer = $this->createItem(GlpiComputer::class, [
+            'date_creation' => null,
+        ]);
+        $expected = new DateTime('2000-01-01 00:00:00');
+        $infocom = $this->createItem(Infocom::class, [
+            'itemtype'      => $computer->getType(),
+            'items_id'      => $computer->getID(),
+            'entities_id'   => $computer->fields['entities_id'],
+            'use_date'      => $expected->format('Y-m-d H:i:s'),
+            'buy_date'      => '1999-01-01 00:00:00',
+            'delivery_date' => '1998-01-01 00:00:00',
+        ]);
+        $output = $toolbox->getOldestAssetDate();
+        $this->assertEquals($expected, $output);
+    }
+
+    public function test_getLatestAssetDate_returns_null_when_no_asset_is_in_db()
     {
         $toolbox = new Toolbox();
         $output = $toolbox->getLatestAssetDate();
         $expected = null;
         $this->assertEquals($expected, $output);
+    }
 
-        $computer = $this->createItem(Computer::class);
+    public function test_getLatestAssetDate_returns_null_when_no_asset_has_decommission_date()
+    {
+        // Without infocom object
+        $toolbox = new Toolbox();
+        $computer = $this->createItem(GlpiComputer::class);
         $output = $toolbox->getLatestAssetDate();
         $expected = null;
         $this->assertEquals($expected, $output);
 
+        // With infocom object without decommission date
+        $infocom = $this->createItem(Infocom::class, [
+            'itemtype' => $computer->getType(),
+            'items_id' => $computer->getID(),
+        ]);
+        $output = $toolbox->getLatestAssetDate();
+        $expected = null;
+        $this->assertEquals($expected, $output);
+    }
 
+    public function test_getLatestAssetDate_returns_decommission_date_when_asset_has_decommission_date()
+    {
+        $toolbox = new Toolbox();
         $expected = new DateTime('2024-06-15 00:00:00');
+        $computer = $this->createItem(GlpiComputer::class);
         $infocom = $this->createItem(Infocom::class, [
             'itemtype' => $computer->getType(),
             'items_id' => $computer->getID(),
@@ -115,11 +173,6 @@ class ToolboxTest extends DbTestCase
         $this->assertEquals($expected, $output);
     }
 
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\Toolbox::getDefaultCarbonIntensityDownloadDate
-     *
-     * @return void
-     */
     public function testGetDefaultCarbonIntensityDownloadDate()
     {
         $instance = new Toolbox();
@@ -131,11 +184,6 @@ class ToolboxTest extends DbTestCase
         $this->assertEquals($expected, $output);
     }
 
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\Toolbox::yearToLastMonth
-     *
-     * @return void
-     */
     public function testYearToLastMonth()
     {
         $end = new DateTimeImmutable('2023-04-09 13:45:17');
@@ -157,11 +205,6 @@ class ToolboxTest extends DbTestCase
         $this->assertEquals($expected, $output);
     }
 
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\Toolbox::isLocationExistForZone
-     *
-     * @return void
-     */
     public function testIsLocationExistsForZone()
     {
         $output = Toolbox::isLocationExistForZone('foo');
@@ -171,17 +214,12 @@ class ToolboxTest extends DbTestCase
             'name' => 'foo',
         ]);
         $this->createItem(Location::class, [
-            'country' => 'foo'
+            'country' => 'foo',
         ]);
         $output = Toolbox::isLocationExistForZone('foo');
         $this->assertTrue($output);
     }
 
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\Toolbox::getGwpUsageImpactClasses
-     *
-     * @return void
-     */
     public function testGetGwpUsageImpactClasses()
     {
         $output = Toolbox::getGwpUsageImpactClasses();
@@ -193,11 +231,6 @@ class ToolboxTest extends DbTestCase
         ], $output);
     }
 
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\Toolbox::getUsageImpactClasses
-     *
-     * @return void
-     */
     public function testGetUsageImpactClasses()
     {
         $output = Toolbox::getUsageImpactClasses();
@@ -209,11 +242,6 @@ class ToolboxTest extends DbTestCase
         ], $output);
     }
 
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\Toolbox::getEmbodiedImpactClasses
-     *
-     * @return void
-     */
     public function testGetEmbodiedImpactClasses()
     {
         $output = Toolbox::getEmbodiedImpactClasses();
@@ -255,5 +283,306 @@ class ToolboxTest extends DbTestCase
         $interval = new DateInterval('P3YT40M');
         $result = Toolbox::dateIntervalToMySQLInterval($interval);
         $this->assertEquals('INTERVAL 3 YEAR + INTERVAL 40 MINUTE', $result);
+    }
+
+    public function test_FindTemporalGapsInTable_returns_the_whole_interval_when_no_rows()
+    {
+        $table = getTableForItemType(CarbonIntensity::class);
+        $source = $this->createItem(Source::class);
+        $zone   = $this->createItem(Zone::class);
+        $criteria = [
+            getForeignKeyFieldForItemType(Source::class) => $source->getID(),
+            getForeignKeyFieldForItemType(Zone::class)   => $zone->getID(),
+        ];
+        $source_zone = $this->createItem(Source_Zone::class, $criteria);
+
+        // Test when no record exists in the requested interval
+        $result = Toolbox::findTemporalGapsInTable(
+            $table,
+            new DateTime('2020-01-01 00:00:00'),
+            new DateInterval('PT1H'),
+            new DateTime('2020-06-01 00:00:00'),
+            $criteria
+        );
+        $result = iterator_to_array($result);
+        $expected = [
+            [
+                'start' => '2020-01-01 00:00:00',
+                'end'  =>  '2020-06-01 00:00:00',
+            ],
+        ];
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_FindTemporalGapsInTable_returns_interval_after_rows_when__rows_are_on_the_beginning()
+    {
+        // Test when there is a record matching the beginning of the interval,
+        // but none matching the end
+        $table = getTableForItemType(CarbonIntensity::class);
+        $source = $this->createItem(Source::class);
+        $zone   = $this->createItem(Zone::class);
+        $criteria = [
+            getForeignKeyFieldForItemType(Source::class) => $source->getID(),
+            getForeignKeyFieldForItemType(Zone::class)   => $zone->getID(),
+        ];
+        $this->createItem(CarbonIntensity::class, [
+            'date' => '2020-01-01 00:00:00',
+        ] + $criteria);
+        $result = Toolbox::findTemporalGapsInTable(
+            $table,
+            new DateTime('2020-01-01 00:00:00'),
+            new DateInterval('PT1H'),
+            new DateTime('2020-06-01 00:00:00'),
+            $criteria
+        );
+        $result = iterator_to_array($result);
+        $expected = [
+            [
+                'start' => '2020-01-01 01:00:00',
+                'end'  =>  '2020-06-01 00:00:00',
+            ],
+        ];
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_FindTemporalGapsInTable_returns_interval_before_rows_when_rows_are_on_the_end()
+    {
+        $table = getTableForItemType(CarbonIntensity::class);
+        $source = $this->createItem(Source::class);
+        $zone   = $this->createItem(Zone::class);
+        $criteria = [
+            getForeignKeyFieldForItemType(Source::class) => $source->getID(),
+            getForeignKeyFieldForItemType(Zone::class)   => $zone->getID(),
+        ];
+        $this->createItem(CarbonIntensity::class, [
+            'date' => '2020-01-01 00:00:00',
+        ] + $criteria);
+        // Test when there is a record matching the end of the interval,
+        // but none matching the beginning
+        $result = Toolbox::findTemporalGapsInTable(
+            $table,
+            new DateTime('2019-01-01 00:00:00'),
+            new DateInterval('PT1H'),
+            new DateTime('2020-01-01 00:00:00'),
+            $criteria
+        );
+        $result = iterator_to_array($result);
+        $expected = [
+            [
+                'start' => '2019-01-01 00:00:00',
+                'end'  =>  '2020-01-01 00:00:00',
+            ],
+        ];
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_FindTemporalGapsInTable_returns_two_intervals_when_row_is_in_tne_middle()
+    {
+        $table = getTableForItemType(CarbonIntensity::class);
+        $source = $this->createItem(Source::class);
+        $zone   = $this->createItem(Zone::class);
+        $criteria = [
+            getForeignKeyFieldForItemType(Source::class) => $source->getID(),
+            getForeignKeyFieldForItemType(Zone::class)   => $zone->getID(),
+        ];
+        $this->createItem(CarbonIntensity::class, [
+            'date' => '2020-01-01 00:00:00',
+        ] + $criteria);
+        // Test when there is a record in the requested interval
+        $result = Toolbox::findTemporalGapsInTable(
+            $table,
+            new DateTime('2019-01-01 00:00:00'),
+            new DateInterval('PT1H'),
+            new DateTime('2021-01-01 00:00:00'),
+            $criteria
+        );
+        $result = iterator_to_array($result);
+        $expected = [
+            [
+                'start' => '2019-01-01 00:00:00',
+                'end'  =>  '2020-01-01 00:00:00',
+            ],
+            [
+                'start' => '2020-01-01 01:00:00',
+                'end'  =>  '2021-01-01 00:00:00',
+            ],
+        ];
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_FindTemporalGapsInTable_returns_three_intervals_when_non_consecutive_rows_are_in_the_middle()
+    {
+        $table = getTableForItemType(CarbonIntensity::class);
+        $source = $this->createItem(Source::class);
+        $zone   = $this->createItem(Zone::class);
+        $criteria = [
+            getForeignKeyFieldForItemType(Source::class) => $source->getID(),
+            getForeignKeyFieldForItemType(Zone::class)   => $zone->getID(),
+        ];
+        // Test when there is are 2 non consecutive records in the requesterd interval
+        $this->createItem(CarbonIntensity::class, [
+            'date' => '2020-01-01 00:00:00',
+        ] + $criteria);
+        $this->createItem(CarbonIntensity::class, [
+            'date' => '2020-06-01 00:00:00',
+        ] + $criteria);
+        $result = Toolbox::findTemporalGapsInTable(
+            $table,
+            new DateTime('2019-01-01 00:00:00'),
+            new DateInterval('PT1H'),
+            new DateTime('2021-01-01 00:00:00'),
+            $criteria
+        );
+        $result = iterator_to_array($result);
+        $expected = [
+            [
+                'start' => '2019-01-01 00:00:00',
+                'end'  =>  '2020-01-01 00:00:00',
+            ],
+            [
+                'start' => '2020-01-01 01:00:00',
+                'end'  =>  '2020-06-01 00:00:00',
+            ],
+            [
+                'start' => '2020-06-01 01:00:00',
+                'end'  =>  '2021-01-01 00:00:00',
+            ],
+        ];
+        $this->assertEquals($expected, $result);
+
+    }
+
+    public function test_FindTemporalGapsInTable_returns_two_intervals_when_consecutive_rows_are_in_the_middle()
+    {
+        $table = getTableForItemType(CarbonIntensity::class);
+        $source = $this->createItem(Source::class);
+        $zone   = $this->createItem(Zone::class);
+        $criteria = [
+            getForeignKeyFieldForItemType(Source::class) => $source->getID(),
+            getForeignKeyFieldForItemType(Zone::class)   => $zone->getID(),
+        ];
+        // Test when there is are 2 consecutive records
+        // in 2 separated groups in the requesterd interval
+        $this->createItem(CarbonIntensity::class, [
+            'date' => '2020-01-01 00:00:00',
+        ] + $criteria);
+        $this->createItem(CarbonIntensity::class, [
+            'date' => '2020-01-01 01:00:00',
+        ] + $criteria);
+        $result = Toolbox::findTemporalGapsInTable(
+            $table,
+            new DateTime('2019-01-01 00:00:00'),
+            new DateInterval('PT1H'),
+            new DateTime('2021-01-01 00:00:00'),
+            $criteria
+        );
+        $result = iterator_to_array($result);
+        $expected = [
+            [
+                'start' => '2019-01-01 00:00:00',
+                'end'  =>  '2020-01-01 00:00:00',
+            ],
+            [
+                'start' => '2020-01-01 02:00:00',
+                'end'  =>  '2021-01-01 00:00:00',
+            ],
+        ];
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_getInfocomLifespanInMonth_returns_interval_when_all_requirements_are_met()
+    {
+        $glpi_computer = $this->createItem(GlpiComputer::class, [
+            'date_creation' => '2025-02-03 11:00:00',
+        ]);
+        $infocom = $this->createItem(Infocom::class, [
+            'itemtype' => get_class($glpi_computer),
+            'items_id' => $glpi_computer->getID(),
+            'decommission_date' => '2026-02-03 11:00:00',
+        ]);
+
+        $result = Toolbox::getInfocomLifespanInMonth($infocom);
+        $this->assertSame(12, $result);
+    }
+    public function test_getInfocomLifespanInMonth_returns_null_when_no_start_date()
+    {
+        $glpi_computer = $this->createItem(GlpiComputer::class, [
+            'date_creation' => '2025-02-03 11:00:00',
+        ]);
+        $this->updateItem($glpi_computer, ['date_creation' => null]);
+        $infocom = $this->createItem(Infocom::class, [
+            'itemtype' => get_class($glpi_computer),
+            'items_id' => $glpi_computer->getID(),
+            'decommission_date' => '2026-02-03 11:00:00',
+        ]);
+
+        $result = Toolbox::getInfocomLifespanInMonth($infocom);
+        $this->assertNull($result);
+    }
+
+    public function test_getInfocomLifespanInMonth_returns_null_when_start_date_of_asset()
+    {
+        $glpi_computer = $this->createItem(GlpiComputer::class, [
+            'date_creation' => '2025-02-03 11:00:00',
+        ]);
+        $infocom = $this->createItem(Infocom::class, [
+            'itemtype' => get_class($glpi_computer),
+            'items_id' => $glpi_computer->getID(),
+            'decommission_date' => '2026-02-03 11:00:00',
+        ]);
+
+        $result = Toolbox::getInfocomLifespanInMonth($infocom);
+        $this->assertSame(12, $result);
+    }
+
+    public function test_getInfocomLifespanInMonth_returns_interval_from_use_date_over_creation_date()
+    {
+        $glpi_computer = $this->createItem(GlpiComputer::class, [
+            'date_creation' => '2024-02-03 11:00:00',
+        ]);
+        $infocom = $this->createItem(Infocom::class, [
+            'itemtype' => get_class($glpi_computer),
+            'items_id' => $glpi_computer->getID(),
+            'use_date' => '2025-02-03',
+            'decommission_date' => '2026-02-03 11:00:00',
+        ]);
+
+        $result = Toolbox::getInfocomLifespanInMonth($infocom);
+        $this->assertSame(12, $result);
+    }
+
+    public function test_getInfocomLifespanInMonth_returns_interval_from_delivery_date_over_creation_date_and_use_date()
+    {
+        $glpi_computer = $this->createItem(GlpiComputer::class, [
+            'date_creation' => '2024-02-03 11:00:00',
+        ]);
+        $infocom = $this->createItem(Infocom::class, [
+            'itemtype' => get_class($glpi_computer),
+            'items_id' => $glpi_computer->getID(),
+            'use_date' => '2025-02-03',
+            'delivery_date' => '2023-02-03',
+            'decommission_date' => '2026-02-03 11:00:00',
+        ]);
+
+        $result = Toolbox::getInfocomLifespanInMonth($infocom);
+        $this->assertSame(36, $result);
+    }
+
+    public function test_getInfocomLifespanInMonth_returns_interval_from_buy_date_over_creation_date_and_delivery_date()
+    {
+        $glpi_computer = $this->createItem(GlpiComputer::class, [
+            'date_creation' => '2024-02-03 11:00:00',
+        ]);
+        $infocom = $this->createItem(Infocom::class, [
+            'itemtype' => get_class($glpi_computer),
+            'items_id' => $glpi_computer->getID(),
+            'delivery_date' => '2025-02-03',
+            'use_date' => '2023-02-03',
+            'buy_date' => '2022-02-03',
+            'decommission_date' => '2026-02-03 11:00:00',
+        ]);
+
+        $result = Toolbox::getInfocomLifespanInMonth($infocom);
+        $this->assertSame(48, $result);
     }
 }

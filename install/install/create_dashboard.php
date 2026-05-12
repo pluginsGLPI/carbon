@@ -83,7 +83,7 @@ foreach ($cards as $key => $card) {
         'width'   => $w,
         'height'  => $h,
         'card_options' => $card['card_options'],
-    ]
+    ],
     ]);
 }
 
@@ -105,13 +105,13 @@ $iterator = $DB->request([
                 $profile_right_table => 'profiles_id',
                 [
                     'AND' => [ProfileRight::getTableField('name') => [Config::$rightname, Report::$rightname]],
-                ]
-            ]
-        ]
+                ],
+            ],
+        ],
     ],
     'WHERE' => [
         new QueryExpression($rights),
-    ]
+    ],
 ]);
 
 foreach ($iterator as $profile) {

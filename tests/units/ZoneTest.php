@@ -33,148 +33,94 @@
 namespace GlpiPlugin\Carbon\Tests;
 
 use Computer;
-use GlpiPlugin\Carbon\CarbonIntensitySource;
+use GlpiPlugin\Carbon\Location;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
-use Location;
+use Location as GlpiLocation;
+use PHPUnit\Framework\Attributes\CoversClass;
 
+#[CoversClass(Zone::class)]
 class ZoneTest extends DbTestCase
 {
-    public function testGetByLocation()
-    {
-        // Test with a new Location object
-        $output = Zone::getByLocation(new Location());
-        $this->assertNull($output);
-
-        // Test with a Location object that has no country or state
-        $location = $this->createItem(Location::class);
-        $output = Zone::getByLocation($location);
-        $this->assertNull($output);
-
-        // Test with a Location object that has a country
-        $location = $this->createItem(Location::class, [
-            'country' => 'foo'
-        ]);
-        $output = Zone::getByLocation($location);
-        $this->assertNull($output);
-
-        // Test with a Location object that has a country and a zoone exists for this location
-        $zone = $this->createItem(Zone::class, [
-            'name' => 'foo'
-        ]);
-        $output = Zone::getByLocation($location);
-        $this->assertEquals($output->getID(), $zone->getID());
-
-        // Test with a Location object that has a state
-        $location = $this->createItem(Location::class, [
-            'state' => 'bar'
-        ]);
-        $output = Zone::getByLocation($location);
-        $this->assertNull($output);
-
-        // Test with a Location object that has a state and a zone exists for this location
-        $zone = $this->createItem(Zone::class, [
-            'name' => 'bar'
-        ]);
-        $output = Zone::getByLocation($location);
-        $this->assertEquals($output->getID(), $zone->getID());
-
-        // Test with a Location object that has both country and state
-        $location = $this->createItem(Location::class, [
-            'country' => 'fooo',
-            'state' => 'baz'
-        ]);
-        $output = Zone::getByLocation($location);
-        $this->assertNull($output);
-        // Test with a Location object that has both country and state and a zone exists for this location
-        $zone = $this->createItem(Zone::class, [
-            'name' => 'baz'
-        ]);
-        $output = Zone::getByLocation($location);
-        $this->assertEquals($output->getID(), $zone->getID());
-    }
-
     public function testGetByAsset()
     {
         // Test with a new Computer object
-        $output = Zone::getByAsset(new Computer());
-        $this->assertNull($output);
+        $zone = new Zone();
+        $output = $zone->getByAsset(new Computer());
+        $this->assertFalse($output);
 
-        // Test with a Computer object that has a location with country and no matching zone
+        // Test with a Computer object that has a location without child location data
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $computer = $this->createItem(Computer::class, [
+            'locations_id' => $glpi_location->getID(),
+        ]);
+        $zone = new Zone();
+        $output = $zone->getByAsset($computer);
+        $this->assertFalse($output);
+
+        // Test with a Computer object that has a location with child location data
+        $zone = $this->createItem(Zone::class);
+        $source = $this->createItem(Source::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            $zone::getForeignKeyField() => $zone->getID(),
+            $source::getForeignKeyField() => $source->getID(),
+        ]);
+        $glpi_location = $this->createItem(GlpiLocation::class);
         $location = $this->createItem(Location::class, [
-            'country' => 'foo'
+            'locations_id' => $glpi_location->getID(),
         ]);
         $computer = $this->createItem(Computer::class, [
-            'locations_id' => $location->getID(),
+            'locations_id' => $glpi_location->getID(),
         ]);
-        $output = Zone::getByAsset($computer);
-        $this->assertNull($output);
+        $zone = new Zone();
+        $output = $zone->getByAsset($computer);
+        $this->assertFalse($output);
 
-        // Test with a Computer object that has a location with country and a matching zone
-        $zone = $this->createItem(Zone::class, [
-            'name' => 'foo'
+        // Test with a Computer object that has a location matching a source_zone
+        $zone = $this->createItem(Zone::class);
+        $source = $this->createItem(Source::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            $zone::getForeignKeyField() => $zone->getID(),
+            $source::getForeignKeyField() => $source->getID(),
         ]);
-        $output = Zone::getByAsset($computer);
-        $this->assertEquals($output->getID(), $zone->getID());
-
-        // Test with a Computer object that has a location with state and no matching zone
+        $glpi_location = $this->createItem(GlpiLocation::class);
         $location = $this->createItem(Location::class, [
-            'state' => 'bar'
+            'locations_id' => $glpi_location->getID(),
+            'plugin_carbon_sources_zones_id' => $source_zone->getID(),
         ]);
         $computer = $this->createItem(Computer::class, [
-            'locations_id' => $location->getID(),
+            'locations_id' => $glpi_location->getID(),
         ]);
-        $output = Zone::getByAsset($computer);
-        $this->assertNull($output);
-
-        // Test with a Computer object that has a location with state and a matching zone
-        $zone = $this->createItem(Zone::class, [
-            'name' => 'bar'
-        ]);
-        $output = Zone::getByAsset($computer);
-        $this->assertEquals($output->getID(), $zone->getID());
-
-        // Test with a Computer object that has a location with both country and state and no matching zone
-        $location = $this->createItem(Location::class, [
-            'country' => 'fooo',
-            'state' => 'baz'
-        ]);
-        $computer = $this->createItem(Computer::class, [
-            'locations_id' => $location->getID(),
-        ]);
-        $output = Zone::getByAsset($computer);
-        $this->assertNull($output);
-
-        // Test with a Computer object that has a location with both country and state and a matching zone
-        $zone = $this->createItem(Zone::class, [
-            'name' => 'baz'
-        ]);
-        $output = Zone::getByAsset($computer);
-        $this->assertEquals($output->getID(), $zone->getID());
+        $zone = new Zone();
+        $output = $zone->getByAsset($computer);
+        $this->assertTrue($output);
     }
 
-    public function testHasHistoricalData()
+    public function testHasHistoricalDataSource()
     {
         // Test with an empty Zone object
         $zone = new Zone();
-        $this->assertFalse($zone->hasHistoricalData());
+        $this->assertFalse($zone->hasHistoricalDataSource());
 
-        // Test with a Zone object without the field
+        // Test with a Zone object without any relation with a source
         $zone = $this->createItem(Zone::class);
-        unset($zone->fields['plugin_carbon_carbonintensitysources_id_historical']);
-        $this->assertFalse($zone->hasHistoricalData());
+        $this->assertFalse($zone->hasHistoricalDataSource());
 
-        // Test with a Zone object that has no historical data
-        /** @var Zone $zone */
-        $zone = $this->createItem(Zone::class);
-        $this->assertFalse($zone->hasHistoricalData());
-
-        $source = $this->createItem(CarbonIntensitySource::class, [
-            'name' => 'foo'
+        // Test with a zone linked to a source
+        $source = $this->createItem(Source::class, [
+            'name' => 'foo',
+            'is_carbon_intensity_source' => 1,
+            'fallback_level' => 0,
         ]);
-        $zone->update(array_merge($zone->fields, [
-            'plugin_carbon_carbonintensitysources_id_historical' => $source->getID(),
-        ]));
-        $this->assertTrue($zone->hasHistoricalData());
+        $zone = $this->createItem(Zone::class, [
+            'name' => 'a zone',
+        ]);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            $source::getForeignKeyField() => $source->getID(),
+            $zone::getForeignKeyField() => $zone->getID(),
+        ]);
+        $this->assertTrue($zone->hasHistoricalDataSource());
     }
 
     public function testGetByItem()
@@ -190,60 +136,60 @@ class ZoneTest extends DbTestCase
         $this->assertFalse($zone->getByItem($item));
 
         // Test with a Computer object that has a location with country and no matching zone
-        $location = $this->createItem(Location::class, [
-            'country' => 'foo'
+        $glpi_location = $this->createItem(GlpiLocation::class, [
+            'country' => 'foo',
         ]);
-        $item->update(['id' => $item->getID(), 'locations_id' => $location->getID()]);
+        $item->update(['id' => $item->getID(), 'locations_id' => $glpi_location->getID()]);
         $zone = new Zone();
         $this->assertFalse($zone->getByItem($item));
 
         // Test with a Computer object that has a location with country and a matching zone
         $expected_zone = $this->createItem(Zone::class, [
-            'name' => 'foo'
+            'name' => 'foo',
         ]);
         $zone = new Zone();
         $this->assertTrue($zone->getByItem($item));
         $this->assertEquals($zone->getID(), $expected_zone->getID());
 
         // Test with a Computer object that has a location with state and no matching zone
-        $location = $this->createItem(Location::class, [
-            'state' => 'bar'
+        $glpi_location = $this->createItem(GlpiLocation::class, [
+            'state' => 'bar',
         ]);
-        $item->update(['id' => $item->getID(), 'locations_id' => $location->getID()]);
+        $item->update(['id' => $item->getID(), 'locations_id' => $glpi_location->getID()]);
         $zone = new Zone();
         $this->assertFalse($zone->getByItem($item));
 
         // Test with a Computer object that has a location with state and a matching zone
         $expected_zone = $this->createItem(Zone::class, [
-            'name' => 'bar'
+            'name' => 'bar',
         ]);
         $zone = new Zone();
         $this->assertTrue($zone->getByItem($item));
         $this->assertEquals($zone->getID(), $expected_zone->getID());
 
         // Test with a Computer object that has a location with both country and state and no matching zone
-        $location = $this->createItem(Location::class, [
+        $glpi_location = $this->createItem(GlpiLocation::class, [
             'country' => 'fooo',
-            'state' => 'baz'
+            'state' => 'baz',
         ]);
-        $item->update(['id' => $item->getID(), 'locations_id' => $location->getID()]);
+        $item->update(['id' => $item->getID(), 'locations_id' => $glpi_location->getID()]);
         $zone = new Zone();
         $this->assertFalse($zone->getByItem($item));
 
         // Test with a Computer object that has a location with both country and state and a matching zone for state
         $expected_zone = $this->createItem(Zone::class, [
-            'name' => 'baz'
+            'name' => 'baz',
         ]);
         $zone = new Zone();
         $this->assertTrue($zone->getByItem($item));
         $this->assertEquals($zone->getID(), $expected_zone->getID());
 
         // Test with a Computer object that has a location with both country and state and a matching zone for state and country
-        $location = $this->createItem(Location::class, [
+        $glpi_location = $this->createItem(GlpiLocation::class, [
             'country' => 'foo',
-            'state' => 'baz'
+            'state' => 'baz',
         ]);
-        $item->update(['id' => $item->getID(), 'locations_id' => $location->getID()]);
+        $item->update(['id' => $item->getID(), 'locations_id' => $glpi_location->getID()]);
         $zone = new Zone();
         $this->assertTrue($zone->getByItem($item));
         $this->assertEquals($zone->getID(), $expected_zone->getID());
@@ -252,5 +198,20 @@ class ZoneTest extends DbTestCase
         $zone = new Zone();
         $this->assertTrue($zone->getByItem($item, null, true));
         $this->assertEquals($zone->getID(), $expected_zone->getID());
+    }
+
+    public function testGetOrCreate()
+    {
+        // Test we can create a non existing item
+        $instance = new Zone();
+        $where = ['name' => 'to becreated'];
+        $this->count(0, $instance->find($where));
+        $instance->getOrCreate([], $where);
+        $this->count(1, $instance->find($where));
+
+        // Test we find an existing instance
+        $instance_2 = new Zone();
+        $instance_2->getOrCreate([], $where);
+        $this->assertSame($instance->getID(), $instance_2->getID());
     }
 }

@@ -34,21 +34,23 @@
 namespace GlpiPlugin\Carbon\Impact\History;
 
 use CommonDBTM;
-use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
-use GlpiPlugin\Carbon\Engine\V1\Computer as EngineComputer;
 use Computer as GlpiComputer;
-use GlpiPlugin\Carbon\ComputerType;
 use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
 use DBmysql;
 use DbUtils;
 use Glpi\Application\View\TemplateRenderer;
-use GlpiPlugin\Carbon\UsageInfo;
+use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
-use GlpiPlugin\Carbon\Location as CarbonLocation;
+use GlpiPlugin\Carbon\Engine\V1\Computer as EngineComputer;
+use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
+use GlpiPlugin\Carbon\Location;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\UsageImpact;
+use GlpiPlugin\Carbon\UsageInfo;
+use GlpiPlugin\Carbon\Zone;
 use Infocom;
-use Location;
+use Location as GlpiLocation;
 
 class Computer extends AbstractAsset
 {
@@ -67,7 +69,10 @@ class Computer extends AbstractAsset
         $item_model_table = self::$model_itemtype::getTable();
         $glpi_computertypes_table = GlpiComputerType::getTable();
         $computertypes_table = ComputerType::getTable();
+        $glpi_location_table = GlpiLocation::getTable();
         $location_table = Location::getTable();
+        $source_zone_table = Source_Zone::getTable();
+        $zone_table = Zone::getTable();
         $usage_table = UsageInfo::getTable();
         $computerUsageProfile_table = ComputerUsageProfile::getTable();
         $infocom_table = Infocom::getTable();
@@ -78,11 +83,32 @@ class Computer extends AbstractAsset
             ],
             'FROM' => $item_table,
             'INNER JOIN' => [
-                $location_table => [
+                // TODO: remove this useless join
+                // Could be optimized by joining the asset and plugin's location
+                // with locations_id FK on both sides
+                $glpi_location_table => [
                     'FKEY'   => [
                         $item_table  => 'locations_id',
-                        $location_table => 'id',
-                    ]
+                        $glpi_location_table => 'id',
+                    ],
+                ],
+                $location_table => [
+                    'FKEY' => [
+                        $location_table => 'locations_id',
+                        $glpi_location_table => 'id',
+                    ],
+                ],
+                $source_zone_table => [
+                    'FKEY' => [
+                        $location_table => 'plugin_carbon_sources_zones_id',
+                        $source_zone_table => 'id',
+                    ],
+                ],
+                $zone_table => [
+                    'FKEY' => [
+                        $source_zone_table => 'plugin_carbon_zones_id',
+                        $zone_table => 'id',
+                    ],
                 ],
                 $usage_table => [
                     'FKEY'   => [
@@ -91,15 +117,15 @@ class Computer extends AbstractAsset
                         [
                             'AND' => [
                                 UsageInfo::getTableField('itemtype') => GlpiComputer::class,
-                            ]
-                        ]
-                    ]
+                            ],
+                        ],
+                    ],
                 ],
                 $computerUsageProfile_table => [
                     'FKEY'   => [
                         $usage_table  => 'plugin_carbon_computerusageprofiles_id',
                         $computerUsageProfile_table => 'id',
-                    ]
+                    ],
                 ],
             ],
             'LEFT JOIN' => [
@@ -107,13 +133,13 @@ class Computer extends AbstractAsset
                     'FKEY'   => [
                         $item_table  => 'computermodels_id',
                         $item_model_table => 'id',
-                    ]
+                    ],
                 ],
                 $glpi_computertypes_table => [
                     'FKEY'   => [
                         $item_table  => 'computertypes_id',
                         $glpi_computertypes_table => 'id',
-                    ]
+                    ],
                 ],
                 $computertypes_table => [
                     'FKEY'   => [
@@ -122,33 +148,26 @@ class Computer extends AbstractAsset
                         [
                             'AND' => [
                                 'NOT' => [GlpiComputerType::getTableField('id') => null],
-                            ]
-                        ]
-                    ]
+                            ],
+                        ],
+                    ],
                 ],
                 $infocom_table => [
                     'FKEY' => [
                         $infocom_table => 'items_id',
                         $item_table => 'id',
                         ['AND' => [Infocom::getTableField('itemtype') => self::$itemtype]],
-                    ]
+                    ],
                 ],
             ],
             'WHERE' => [
                 'AND' => [
                     self::$itemtype::getTableField('is_deleted') => 0,
                     self::$itemtype::getTableField('is_template') => 0,
-                    [
-                        'OR' => [
-                            [
-                                ['NOT' => [Location::getTableField('country') => '']],
-                                ['NOT' => [Location::getTableField('country') => null]],
-                            ],
-                            [
-                                ['NOT' => [Location::getTableField('state') => '']],
-                                ['NOT' => [Location::getTableField('state') => null]],
-                            ]
-                        ]
+                    Location::getTableField('plugin_carbon_sources_zones_id') => ['>', 0],
+                    'OR' => [
+                        [ComputerType::getTableField('is_ignore') => 0],
+                        [ComputerType::getTableField('is_ignore') => null],
                     ],
                     [
                         'OR' => [
@@ -160,12 +179,12 @@ class Computer extends AbstractAsset
                             ['NOT' => [Infocom::getTableField('use_date') => null]],
                             ['NOT' => [Infocom::getTableField('delivery_date') => null]],
                             ['NOT' => [Infocom::getTableField('buy_date') => null]],
-                            ['NOT' => [Infocom::getTableField('date_creation') => null]],
-                            // ['NOT' => [Infocom::getTableField('date_mod') => null]],
-                        ]
-                    ]
+                            ['NOT' => [self::$itemtype::getTableField('date_creation') => null]],
+                            // ['NOT' => [self::$itemtype::getTableField('date_mod') => null]],
+                        ],
+                    ],
                 ],
-            ] + $crit
+            ] + $crit,
         ];
 
         if ($entity_restrict) {
@@ -187,19 +206,20 @@ class Computer extends AbstractAsset
         $request['SELECT'] = [
             self::$itemtype::getTableField('is_deleted'),
             self::$itemtype::getTableField('is_template'),
-            Location::getTableField('id as location_id'),
-            Location::getTableField('state'),
-            Location::getTableField('country'),
+            GlpiLocation::getTableField('id as locations_id'),
+            Zone::getTableField('id as plugin_carbon_zones_id'),
             GlpiComputerModel::getTableField('id as model_id'),
             GlpiComputerModel::getTableField('power_consumption as model_power_consumption'),
             GlpiComputerType::getTableField('id as type_id'),
             ComputerType::getTableField('id as plugin_carbon_type_id'),
             ComputerType::getTableField('power_consumption  as type_power_consumption'),
             ComputerType::getTableField('category'),
-            UsageInfo::getTableField('plugin_carbon_computerusageprofiles_id'),
+            ComputerType::getTableField('is_ignore'),
+            ComputerUsageProfile::getTableField('id as plugin_carbon_computerusageprofiles_id'),
             Infocom::getTableField('use_date'),
             Infocom::getTableField('delivery_date'),
             Infocom::getTableField('buy_date'),
+            Infocom::getTableField('decommission_date'),
             self::$itemtype::getTableField('date_creation'),
             self::$itemtype::getTableField('date_mod'),
         ];
@@ -217,18 +237,20 @@ class Computer extends AbstractAsset
             return null;
         }
 
-        $glpi_location = new Location();
-        $glpi_location->getFromDB($item->fields['locations_id']);
-        $location = new CarbonLocation();
+        $glpi_location = new GlpiLocation();
+        $glpi_location->getFromDB($data['locations_id']);
+        $location = new Location();
         $is_carbon_intensity_download_enabled = $location->isCarbonIntensityDownloadEnabled($glpi_location);
         $is_carbon_intensity_fallback_available = $location->hasFallbackCarbonIntensityData($glpi_location);
 
         // Each state is analyzed, with bool results
         // false means that data is missing or invalid for historization
+        // TODO : rename is_deleted, is_template into is_not_deleted is_not_template
         $status['is_deleted'] = ($data['is_deleted'] === 0);
         $status['is_template'] = ($data['is_template'] === 0);
-        $status['has_location'] = !Location::isNewID($data['location_id']);
-        $status['has_state_or_country'] = (strlen($data['state'] ?? '') > 0) || (strlen($data['country'] ?? '') > 0);
+        $status['has_location'] = !GlpiLocation::isNewID($data['locations_id']);
+        // $status['has_state_or_country'] = (strlen($data['state'] ?? '') > 0) || (strlen($data['country'] ?? '') > 0);
+        $status['has_carbon_intensity_zone'] = (($data['plugin_carbon_zones_id'] ?? 0) !== 0);
         $status['has_model'] = !GlpiComputerModel::isNewID($data['model_id']);
         $status['has_model_power_consumption'] = (($data['model_power_consumption'] ?? 0) !== 0);
         $status['has_type'] = !GlpiComputerType::isNewID($data['type_id']);
@@ -237,14 +259,16 @@ class Computer extends AbstractAsset
         $status['has_category'] = (($data['category'] ?? 0) !== ComputerType::CATEGORY_UNDEFINED);
         $status['ci_download_enabled'] = $is_carbon_intensity_download_enabled;
         $status['ci_fallback_available'] = $is_carbon_intensity_fallback_available;
+        $status['not_is_ignore'] = (($data['is_ignore'] ?? 0) === 0);
 
-        $item_oldest_date = $data['use_date']
+        $item_oldest_date = $data['buy_date']
             ?? $data['delivery_date']
-            ?? $data['buy_date']
+            ?? $data['use_date']
             // ?? $data['date_creation']
             // ?? $data['date_mod']
             ?? null;
         $status['has_inventory_entry_date'] = ($item_oldest_date !== null);
+        $status['has_decommission_date'] = ($data['decommission_date'] !== null);
 
         return $status;
     }

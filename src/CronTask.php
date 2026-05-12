@@ -32,22 +32,58 @@
 
 namespace GlpiPlugin\Carbon;
 
-use CronTask as GlpiCronTask;
+use CommonDBTM;
+use CommonGLPI;
 use Config as GlpiConfig;
-use Geocoder\Geocoder;
-use GlpiPlugin\Carbon\DataSource\RestApiClient;
-use GlpiPlugin\Carbon\DataSource\CarbonIntensityRTE;
-use GlpiPlugin\Carbon\DataSource\CarbonIntensityElectricityMap;
-use GlpiPlugin\Carbon\DataSource\CarbonIntensityInterface;
+use CronTask as GlpiCronTask;
+use Geocoder\Exception\QuotaExceeded;
+use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientFactory;
+use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientInterface;
+use GlpiPlugin\Carbon\DataSource\CronTaskProvider;
 use GlpiPlugin\Carbon\Impact\Embodied\Engine as EmbodiedEngine;
-use GlpiPlugin\Carbon\Impact\Usage\UsageImpactInterface as UsageImpactInterface;
+use GlpiPlugin\Carbon\Impact\History\AssetInterface;
 use GlpiPlugin\Carbon\Impact\Usage\Engine as UsageEngine;
-use GlpiPlugin\Carbon\Toolbox;
 use Location as GlpiLocation;
+use RuntimeException;
 
-class CronTask
+class CronTask extends CommonGLPI
 {
     private $getGeocoder = [Location::class, 'getGeocoder'];
+
+    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    {
+        // Delegate to the client's crontask class the tab name to return
+        // But keep here the logic to decide if a tab name shall be returned
+        // to reduce class loading
+        if (!$item instanceof GlpiCronTask) {
+            return '';
+        }
+        if (!in_array($item->fields['itemtype'], CronTaskProvider::getCronTaskTypes())) {
+            return '';
+        }
+        $client_cron_task = new $item->fields['itemtype']();
+        return $client_cron_task->getTabNameForItem($item);
+    }
+
+    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
+    {
+        if ($item instanceof GlpiCronTask) {
+            /** @var GlpiCronTask $item */
+            $cron_task = new self();
+            $cron_task->showForCronTask($item);
+        }
+        return true;
+    }
+
+    public function showForCronTask(CommonDBTM $item)
+    {
+        $itemtype = $item->fields['itemtype'];
+        if (!in_array($itemtype, CronTaskProvider::getCronTaskTypes())) {
+            return;
+        }
+        $crontask = new $itemtype();
+        $crontask->showForCronTask($item);
+    }
 
     /**
      * Get description of an automatic action
@@ -65,26 +101,20 @@ class CronTask
                     'parameter' => __('Maximum number of locations to solve', 'carbon'),
                 ];
 
-            case 'DownloadRte':
+            case 'DownloadWatttime':
                 return [
-                    'description' => __('Download carbon emissions from RTE', 'carbon'),
-                    'parameter' => __('Maximum number of entries to download', 'carbon'),
-                ];
-
-            case 'DownloadElectricityMap':
-                return [
-                    'description' => __('Download carbon emissions from ElectricityMap', 'carbon'),
+                    'description' => __('Download carbon emissions from Watttime', 'carbon'),
                     'parameter' => __('Maximum number of entries to download', 'carbon'),
                 ];
 
             case 'UsageImpact':
                 return [
-                    'description' => __('Compute usage environnemental impact for all assets', 'carbon'),
+                    'description' => __('Compute usage environmental impact for all assets', 'carbon'),
                     'parameter' => __('Maximum number of entries to calculate', 'carbon'),
                 ];
             case 'EmbodiedImpact':
                 return [
-                    'description' => __('Compute embodied environnemental impact for all assets', 'carbon'),
+                    'description' => __('Compute embodied environmental impact for all assets', 'carbon'),
                     'parameter' => __('Maximum number of entries to calculate', 'carbon'),
                 ];
         }
@@ -95,39 +125,60 @@ class CronTask
      * Calculate usage impact for all assets
      *
      * @param GlpiCronTask $task
-     * @return integer
+     * @return int
      */
     public static function cronUsageImpact(GlpiCronTask $task): int
     {
         $task->setVolume(0); // start with zero
 
         $usage_impacts = Toolbox::getGwpUsageImpactClasses();
+        $task->setVolume(0); // start with zero
         $remaining = $task->fields['param'];
         $limit_per_type = (int) floor(($remaining) / count($usage_impacts));
         // Half of job for GWP, the other half for other impacts
         $limit_per_type = max(1, floor($limit_per_type / 2));
 
+        /**
+         * Huge quantity of SQL queries will be executed
+         * We NEED to check memory usage to avoid running out of memory
+         * @see DbMysql::doQuery()
+         */
+        $memory_limit = Toolbox::getMemoryLimit();
+
         // Calculate GWP
         $count = 0;
         foreach ($usage_impacts as $usage_impact_type) {
-            /** @var UsageImpactInterface $usage_impact */
+            /** @var AssetInterface $usage_impact */
             $usage_impact = new $usage_impact_type();
             $usage_impact->setLimit($limit_per_type);
-            $count = $usage_impact->evaluateItems();
+            $count = $usage_impact->evaluateItems($usage_impact->getItemsToEvaluate());
             $task->addVolume($count);
         }
 
         // Calculate other impacts
-        $usage_impacts = Toolbox::getUsageImpactClasses();
-        foreach ($usage_impacts as $usage_impact_type) {
-            /** @ar UsageImpactInterface $usage_impact */
-            $usage_impact = UsageEngine::getEngine($usage_impact_type);
-            if ($usage_impact === null) {
-                continue;
+        $limit = ['LIMIT' => $limit_per_type];
+        foreach (PLUGIN_CARBON_TYPES as $itemtype) {
+            foreach (UsageImpact::getItemsToEvaluate($itemtype, $limit) as $row) {
+                $item = new $itemtype();
+                if (!$item->getFromDB($row['id'])) {
+                    continue;
+                }
+                $usage_impact = UsageEngine::getEngineFromItemtype($item);
+                if ($usage_impact === null) {
+                    // An error occured while configuring the engine
+                    continue;
+                }
+                if ($usage_impact->evaluateItem()) {
+                    $count++;
+                }
+
+                // Check free memory
+                if ($memory_limit && $memory_limit < memory_get_usage()) {
+                    // 8 MB memory left, emergency exit
+                    // Terminate the task
+                    break 2;
+                }
             }
-            $usage_impact->setLimit($limit_per_type);
-            $count = $usage_impact->evaluateItems();
-            $task->addVolume($count);
         }
 
         return ($count > 0 ? 1 : 0);
@@ -137,58 +188,74 @@ class CronTask
      * Calculate embodied impact for all assets
      *
      * @param GlpiCronTask $task
-     * @return integer
+     * @return int
      */
     public static function cronEmbodiedImpact(GlpiCronTask $task): int
     {
         $count = 0;
-
         $embodied_impacts = Toolbox::getEmbodiedImpactClasses();
         $task->setVolume(0); // start with zero
         $remaining = $task->fields['param'];
         $limit_per_type = max(1, floor(($remaining) / count($embodied_impacts)));
-        foreach ($embodied_impacts as $embodied_impact_type) {
-            $embodied_impact = EmbodiedEngine::getEngine($embodied_impact_type);
-            if ($embodied_impact === null) {
-                // An error occured while configuring the engine
-                continue;
+
+        /**
+         * Huge quantity of SQL queries will be executed
+         * We NEED to check memory usage to avoid running out of memory
+         * @see DbMysql::doQuery()
+         */
+        $memory_limit = Toolbox::getMemoryLimit();
+
+        /** @var int $count count of successfully evaluated assets */
+        $count = 0;
+        $limit = ['LIMIT' => $limit_per_type];
+        foreach (PLUGIN_CARBON_TYPES as $itemtype) {
+            foreach (EmbodiedImpact::getItemsToEvaluate($itemtype, $limit) as $row) {
+                $item = new $itemtype();
+                if (!$item->getFromDB($row['id'])) {
+                    continue;
+                }
+                $embodied_impact = EmbodiedEngine::getEngineFromItemtype($item);
+                if ($embodied_impact === null) {
+                    // An error occured while configuring the engine
+                    continue;
+                }
+                if ($embodied_impact->evaluateItem()) {
+                    $count++;
+                }
+
+                // Check free memory
+                if ($memory_limit && $memory_limit < memory_get_usage()) {
+                    // 8 MB memory left, emergency exit
+                    // Terminate the task
+                    break 2;
+                }
             }
-            $embodied_impact->setLimit($limit_per_type);
-            $count = $embodied_impact->evaluateItems();
-            $task->addVolume($count);
         }
+
+        $task->addVolume($count);
         return ($count > 0 ? 1 : 0);
     }
 
     /**
-     * Automatic action for RTE datasource
+     * Automatic action for Watttime datasource
      *
      * @return int
      */
-    public static function cronDownloadRte(GlpiCronTask $task): int
+    public static function cronDownloadWatttime(GlpiCronTask $task): int
     {
-        return self::downloadCarbonIntensityFromSource($task, new CarbonIntensityRTE(new RestApiClient([])), new CarbonIntensity());
-    }
-
-    /**
-     * Automatic action for ElectricityMap datasource
-     *
-     * @return int
-     */
-    public static function cronDownloadElectricityMap(GlpiCronTask $task): int
-    {
-        return self::downloadCarbonIntensityFromSource($task, new CarbonIntensityElectricityMap(new RestApiClient([])), new CarbonIntensity());
+        $client = ClientFactory::create('Watttime');
+        return self::downloadCarbonIntensityFromSource($task, $client, new CarbonIntensity());
     }
 
     /**
      * Download carbon intensity data from a 3rd party source
      *
      * @param GlpiCronTask $task
-     * @param CarbonIntensityInterface $data_source
+     * @param ClientInterface $data_source
      * @param CarbonIntensity $intensity
-     * @return integer
+     * @return int
      */
-    protected static function downloadCarbonIntensityFromSource(GlpiCronTask $task, CarbonIntensityInterface $data_source, CarbonIntensity $intensity): int
+    public static function downloadCarbonIntensityFromSource(GlpiCronTask $task, ClientInterface $data_source, CarbonIntensity $intensity): int
     {
         $task->setVolume(0); // start with zero
         $remaining = $task->fields['param'];
@@ -206,19 +273,19 @@ class CronTask
             $task->addVolume($done_count);
         }
 
-        $zones = $data_source->getZones(['is_download_enabled' => 1]);
-        if (count($zones) === 0) {
+        $rows = $data_source->getSourceZones(['is_download_enabled' => 1]);
+        if (count($rows) === 0) {
             trigger_error(__('No zone to download', 'carbon'), E_USER_WARNING);
             return 0;
         }
 
-        $limit_per_zone = max(1, floor(($remaining) / count($zones)));
+        $limit_per_zone = max(1, floor(($remaining) / count($rows)));
         $count = 0;
-        foreach ($zones as $zone) {
-            $zone_name = $zone['name'];
+        foreach ($rows as $row) {
+            $source_zone = Source_Zone::getById($row['id']);
             try {
-                $added = $intensity->downloadOneZone($data_source, $zone_name, $limit_per_zone);
-            } catch (\RuntimeException $e) {
+                $added = $intensity->downloadOneZone($data_source, $source_zone, $limit_per_zone);
+            } catch (RuntimeException $e) {
                 trigger_error($e->getMessage(), E_USER_WARNING);
                 continue;
             }
@@ -273,10 +340,10 @@ class CronTask
             try {
                 $location = new Location();
                 $country_code = $location->getCountryCode($glpi_location, $geocoder);
-            } catch (\Geocoder\Exception\QuotaExceeded $e) {
+            } catch (QuotaExceeded $e) {
                 // If the quota is exceeded, stop the task
                 break;
-            } catch (\RuntimeException $e) {
+            } catch (RuntimeException $e) {
                 // If there is a runtime exception, log it and continue
                 $failure = true;
                 trigger_error($e->getMessage(), E_USER_WARNING);
@@ -290,7 +357,7 @@ class CronTask
             // Set the country code in the location
             $success = $glpi_location->update([
                 'id'             => $glpi_location->getID(),
-                '_boavizta_zone' => $country_code
+                '_boavizta_zone' => $country_code,
             ]);
             if (!$success) {
                 $failure = true;

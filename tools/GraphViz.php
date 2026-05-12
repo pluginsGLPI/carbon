@@ -40,17 +40,17 @@ if (PHP_SAPI != 'cli') {
 
 class GraphViz
 {
-    const CARDINALITY = [
+    public const CARDINALITY = [
         '0,1' => 'otee',
         '1'   => 'teetee',
         '0,n' => 'ocrow',
         '1,n' => 'teecrow',
     ];
 
-    const NAME_BACK_COLOR = '#ECECFF';
-    const COLOR = 'black';
-    const ODD_FIELD_BACK_COLOR = '#E3E3E3';
-    const EVEN_FIELD_BACK_COLOR = 'white';
+    public const NAME_BACK_COLOR = '#ECECFF';
+    public const COLOR = 'black';
+    public const ODD_FIELD_BACK_COLOR = '#E3E3E3';
+    public const EVEN_FIELD_BACK_COLOR = 'white';
 
     public function generate(array $schema_tables)
     {
@@ -74,7 +74,7 @@ class GraphViz
                 $port = '';
                 if ($field_name == 'id') {
                     $port = 'port="id"';
-                } else if (($foreign_table = $db_utils->getTableNameForForeignKeyField($field_name)) !== '') {
+                } elseif (($foreign_table = $db_utils->getTableNameForForeignKeyField($field_name)) !== '') {
                     $port = 'port="' . $field_name . '"';
                 }
                 echo "            <tr>" . PHP_EOL;

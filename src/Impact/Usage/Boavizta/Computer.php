@@ -37,166 +37,90 @@ use CommonDBTM;
 use Computer as GlpiComputer;
 use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
-use DeviceProcessor;
-use GlpiPlugin\Carbon\UsageInfo;
+use DBmysql;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
-use DBmysql;
-use DbUtils;
+use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\ComputerModelizationAdapterTrait;
 use GlpiPlugin\Carbon\Location;
-use Item_DeviceMemory;
-use Item_DeviceProcessor;
-use Item_Devices;
-use Item_Disk;
-use Infocom;
-use Glpi\DBAL\QueryExpression;
+use GlpiPlugin\Carbon\UsageInfo;
 
 class Computer extends AbstractAsset
 {
+    use ComputerModelizationAdapterTrait;
+
     protected static string $itemtype = GlpiComputer::class;
     protected static string $type_itemtype  = GlpiComputerType::class;
     protected static string $model_itemtype = GlpiComputerModel::class;
 
     protected string $endpoint        = 'server';
 
-    public function getEvaluableQuery(array $crit = [], bool $entity_restrict = true): array
+    public function getEvaluableQuery(string $itemtype, array $crit = [], bool $entity_restrict = true): array
     {
-        $item_table = self::$itemtype::getTable();
-        $item_model_table = self::$model_itemtype::getTable();
-        $glpi_computertypes_table = GlpiComputerType::getTable();
-        $computertypes_table = ComputerType::getTable();
-        $location_table = Location::getTable();
-        $usage_info_table = UsageInfo::getTable();
+        $request = parent::getEvaluableQuery($itemtype);
+
+        $item_table = getTableForItemType($itemtype);
         $computerUsageProfile_table = ComputerUsageProfile::getTable();
-        $infocom_table = Infocom::getTable();
-
-        $request = [
-            'SELECT' => [
-                self::$itemtype::getTableField('id'),
-            ],
-            'FROM' => $item_table,
-            'INNER JOIN' => [
-                $location_table => [
-                    'FKEY'   => [
-                        $item_table  => 'locations_id',
-                        $location_table => 'id',
-                    ]
-                ],
-                $usage_info_table => [
-                    'FKEY'   => [
-                        $item_table  => 'id',
-                        $usage_info_table => 'items_id',
-                        [
-                            'AND' => [UsageInfo::getTableField('itemtype') => self::$itemtype]
-                        ]
-                    ]
-                ],
-                $computerUsageProfile_table => [
-                    'FKEY'   => [
-                        $usage_info_table  => 'plugin_carbon_computerusageprofiles_id',
-                        $computerUsageProfile_table => 'id',
-                    ]
+        $usage_info_table = UsageInfo::getTable();
+        $request['INNER JOIN'][$usage_info_table] =  [
+            'FKEY'   => [
+                $item_table  => 'id',
+                $usage_info_table => 'items_id',
+                [
+                    'AND' => [UsageInfo::getTableField('itemtype') => self::$itemtype],
                 ],
             ],
-            'LEFT JOIN' => [
-                $item_model_table => [
-                    'FKEY'   => [
-                        $item_table  => 'computermodels_id',
-                        $item_model_table => 'id',
-                    ]
-                ],
-                $glpi_computertypes_table => [
-                    'FKEY'   => [
-                        $item_table  => 'computertypes_id',
-                        $glpi_computertypes_table => 'id',
-                    ]
-                ],
-                $computertypes_table => [
-                    'FKEY'   => [
-                        $computertypes_table  => 'computertypes_id',
-                        $glpi_computertypes_table => 'id',
-                        [
-                            'AND' => [
-                                'NOT' => [GlpiComputerType::getTableField('id') => null],
-                            ]
-                        ]
-                    ]
-                ],
-                $infocom_table => [
-                    'FKEY' => [
-                        $infocom_table => 'items_id',
-                        $item_table => 'id',
-                        ['AND' => [Infocom::getTableField('itemtype') => self::$itemtype]],
-                    ]
-                ],
-            ],
-            'WHERE' => [
-                'AND' => [
-                    self::$itemtype::getTableField('is_deleted') => 0,
-                    self::$itemtype::getTableField('is_template') => 0,
-                    ['NOT' => [Location::getTableField('boavizta_zone') => '']],
-                    ['NOT' => [Location::getTableField('boavizta_zone') => null]],
-                    [
-                        'OR' => [
-                            ComputerType::getTableField('power_consumption') => ['>', 0],
-                            self::$model_itemtype::getTableField('power_consumption') => ['>', 0],
-                        ],
-                    ], [
-                        'OR' => [
-                            ['NOT' => [Infocom::getTableField('use_date') => null]],
-                            ['NOT' => [Infocom::getTableField('delivery_date') => null]],
-                            ['NOT' => [Infocom::getTableField('buy_date') => null]],
-                            ['NOT' => [Infocom::getTableField('date_creation') => null]],
-                            ['NOT' => [Infocom::getTableField('date_mod') => null]],
-                        ]
-                    ], [
-                        'AND' => [
-                            ['NOT' => [ComputerType::getTableField('category') => null]],
-                            [ComputerType::getTableField('category') => ['>', 0]],
-                        ]
-                    ]
-                ],
-            ] + $crit
         ];
-
-        if ($entity_restrict) {
-            $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($item_table, '', '', 'auto');
-            $request['WHERE'] += $entity_restrict;
-        }
+        $request['INNER JOIN'][$computerUsageProfile_table] =  [
+            'FKEY'   => [
+                $usage_info_table  => ComputerUsageProfile::getForeignKeyField(),
+                $computerUsageProfile_table => 'id',
+            ],
+        ];
+        $request['WHERE'][] = [
+            ['NOT' => [ComputerType::getTableField('category') => null]],
+            [ComputerType::getTableField('category') => ['>', 0]],
+        ];
+        $request['WHERE'][] = $crit;
 
         return $request;
     }
 
     protected function doEvaluation(CommonDBTM $item): ?array
     {
-        // TODO: determine if the computer is a server, a computer, a laptop, a tablet...
-        // then adapt $this->endpoint depending on the result
-
         $type = $this->getType($item);
         $this->endpoint = $this->getEndpoint($type);
+        $this->endpoint .= '?' . $this->getCriteriasQueryString();
 
-        // Find boavizta zone  code
-        $zone_code = $this->getZoneCode($item);
+        // Find boavizta zone code
+        $zone_code = Location::getZoneCode($item);
         if ($zone_code === null) {
             return null;
         }
-
         $average_power = $this->getAveragePower($item->getID());
-
-        // Ask for embodied impact only
-        $configuration = $this->analyzeHardware($item);
+        // Ask for usage impact only
+        $configuration = $this->analyzeHardware();
         if (count($configuration) === 0) {
             return null;
         }
+        $lifespan = (new UsageInfo())->getLifespanInHours($item);
+        if ($lifespan === null) {
+            return null;
+        }
+        $use_ratio = $this->getUseRatio();
+        $time_workload = $this->getWorkloadRepartition();
+
         $description = [
             'configuration' => $configuration,
             'usage' => [
                 'usage_location' => $zone_code,
-                'avg_power' => $average_power
+                'hours_lifetime' => $lifespan,
+                'avg_power'      => $average_power,
+                'use_time_ratio' => $use_ratio,
+                'time_workload'  => $time_workload,
             ],
         ];
         $response = $this->query($description);
-        $impacts = $this->parseResponse($response);
+        $impacts = $this->client->parseResponse($response, 'use');
 
         return $impacts;
     }
@@ -222,18 +146,18 @@ class Computer extends AbstractAsset
                     'FKEY' => [
                         $computer_type_table => 'computertypes_id',
                         $glpi_computer_type_table => 'id',
-                    ]
+                    ],
                 ],
                 $computer_table => [
                     'FKEY' => [
                         $glpi_computer_type_table => 'id',
-                        $computer_table           => 'computertypes_id'
+                        $computer_table           => 'computertypes_id',
                     ],
                 ],
             ],
             'WHERE' => [
                 GlpiComputer::getTableField('id') => $item->getID(),
-            ]
+            ],
         ]);
         $row_count = $result->count();
         if ($row_count === 0) {
@@ -266,101 +190,31 @@ class Computer extends AbstractAsset
         return 'terminal/desktop';
     }
 
-    protected function analyzeHardware(CommonDBTM $item): array
+    /**
+     * Calculate the use time ratio from the usage profile
+     *
+     * @return float Ratio between 0 and 1
+     */
+    protected function getUseRatio(): float
     {
-        $configuration = [];
-        // Yes, string expected here.
-        $iterator = Item_Devices::getItemsAssociatedTo($item->getType(), (string) $item->getID());
-        foreach ($iterator as $item_device) {
-            switch ($item_device->getType()) {
-                case Item_DeviceProcessor::class:
-                    $cpu = DeviceProcessor::getById($item_device->fields['deviceprocessors_id']);
-                    if ($cpu) {
-                        if (isset($configuration['cpu'])) {
-                            // The server does not support several CPU with different specifications
-                            // then, just increment CPU count
-                            $configuration['cpu']['units']++;
-                        } else {
-                            $configuration['cpu'] = [
-                                'units'      => 1,
-                                'name'       => $cpu->fields['designation'],
-                            ];
-                            if (isset($item_device->fields['nbcores'])) {
-                                $configuration['cpu']['core_units'] = $item_device->fields['nbcores'];
-                            }
-                        }
-                    }
-                    break;
-                case Item_DeviceMemory::class:
-                    $configuration['memory'][] = [
-                        'units' => 1,
-                        'capacity' => ceil($item_device->fields['size'] / 1024),
-                    ];
-                    break;
-                case Item_Disk::class:
-                    $configuration['disk'][] = [
-                        'units' => 1,
-                        'capacity' => ceil($item_device->fields['capacity'] / 1024),
-                    ];
-                    break;
-            }
-        }
-
-        return $configuration;
-    }
-
-    protected function getAveragePower(int $id): ?int
-    {
-        /** @var DBmysql $DB */
-        global $DB;
-
-        $dbutil = new DbUtils();
-        $itemtype = static::$itemtype;
-        $glpi_type_fk = static::$type_itemtype::getForeignKeyField();
-        $model_fk = static::$model_itemtype::getForeignKeyField();
-        $item_table = $dbutil->getTableForItemType($itemtype);
-        $item_glpi_type_table  = $dbutil->getTableForItemType(static::$type_itemtype);
-        $item_model_table = $dbutil->getTableForItemType(static::$model_itemtype);
-        $carbon_item_type_table = $dbutil->getTableForItemType(ComputerType::class);
-
-        $type_power  = ComputerType::getTableField('power_consumption');
-        $type_power = DBmysql::quoteName($type_power);
-        $model_power = static::$model_itemtype::getTableField('power_consumption');
-        $model_power = DBmysql::quoteName($model_power);
-
-        $request = [
-            'SELECT' => new QueryExpression("COALESCE({$model_power}, {$type_power}, null) as `power`"),
-            'FROM' => $item_table,
-            'LEFT JOIN' => [
-                $item_model_table => [
+        $usage_profile = new ComputerUsageProfile();
+        $usage_profile_table = ComputerUsageProfile::getTable();
+        $usage_info_table = getTableForItemType(UsageInfo::class);
+        $usage_profile->getFromDBByRequest([
+            'INNER JOIN' => [
+                $usage_info_table => [
                     'FKEY' => [
-                        $item_table => $model_fk,
-                        $item_model_table => 'id',
+                        $usage_info_table => 'plugin_carbon_computerusageprofiles_id',
+                        $usage_profile_table => 'id',
                     ],
                 ],
-                $item_glpi_type_table => [
-                    'FKEY' => [
-                        $item_table => $glpi_type_fk,
-                        $item_glpi_type_table => 'id',
-                    ]
-                ],
-                $carbon_item_type_table => [
-                    'FKEY' => [
-                        $item_glpi_type_table => 'id',
-                        $carbon_item_type_table => 'computertypes_id',
-                    ]
-                ]
             ],
             'WHERE' => [
-                $itemtype::getTableField('id') => $id
-            ]
-        ];
+                UsageInfo::getTableField('itemtype') => static::$itemtype,
+                UsageInfo::getTableField('items_id') => $this->item->getID(),
+            ],
+        ]);
 
-        $result = $DB->request($request);
-        if ($result->count() === 0) {
-            return null;
-        }
-        $power = $result->current()['power'];
-        return $power ?? 0;
+        return $usage_profile->getPoweredOnRatio();
     }
 }

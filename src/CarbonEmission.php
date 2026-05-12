@@ -33,8 +33,10 @@
 namespace GlpiPlugin\Carbon;
 
 use CommonDBChild;
+use CommonDBTM;
 use DateInterval;
 use DateTimeInterface;
+use DBmysql;
 use Entity;
 use Location;
 
@@ -67,7 +69,7 @@ class CarbonEmission extends CommonDBChild
             'field'              => 'id',
             'name'               => __('ID'),
             'massiveaction'      => false, // implicit field is id
-            'datatype'           => 'number'
+            'datatype'           => 'number',
         ];
 
         $tab[] = [
@@ -77,7 +79,7 @@ class CarbonEmission extends CommonDBChild
             'name'               => __('Associated item ID'),
             'massiveaction'      => false,
             'datatype'           => 'specific',
-            'additionalfields'   => ['itemtype']
+            'additionalfields'   => ['itemtype'],
         ];
 
         $tab[] = [
@@ -93,7 +95,7 @@ class CarbonEmission extends CommonDBChild
             'id'                 => '5',
             'table'              => self::getTable(),
             'field'              => 'entities_id',
-            'name'               => Entity::getTypeName(1)
+            'name'               => Entity::getTypeName(1),
         ];
 
         $tab[] = [
@@ -109,7 +111,7 @@ class CarbonEmission extends CommonDBChild
             'id'                 => SearchOptions::CARBON_EMISSION_DATE,
             'table'              => self::getTable(),
             'field'              => 'date',
-            'name'               => __('Date')
+            'name'               => __('Date'),
         ];
 
         $tab[] = [
@@ -132,7 +134,7 @@ class CarbonEmission extends CommonDBChild
             'id'                 => SearchOptions::CARBON_EMISSION_ENERGY_QUALITY,
             'table'              => self::getTable(),
             'field'              => 'energy_quality',
-            'name'               => __('Energy quality', 'carbon')
+            'name'               => __('Energy quality', 'carbon'),
 
         ];
 
@@ -140,28 +142,28 @@ class CarbonEmission extends CommonDBChild
             'id'                 => SearchOptions::CARBON_EMISSION_EMISSION_QUALITY,
             'table'              => self::getTable(),
             'field'              => 'emission_quality',
-            'name'               => __('Emission quality', 'carbon')
+            'name'               => __('Emission quality', 'carbon'),
         ];
 
         $tab[] = [
-            'id'                 => SearchOptions::CARBON_EMISSION_CALC_DATE,
+            'id'                 => SearchOptions::CALCULATION_DATE,
             'table'              => self::getTable(),
             'field'              => 'date_mod',
-            'name'               => __('Date of evaluation', 'carbon')
+            'name'               => __('Date of evaluation', 'carbon'),
         ];
 
         $tab[] = [
-            'id'                 => SearchOptions::CARBON_EMISSION_ENGINE,
+            'id'                 => SearchOptions::CALCULATION_ENGINE,
             'table'              => self::getTable(),
             'field'              => 'engine',
-            'name'               => __('Engine', 'carbon')
+            'name'               => __('Engine', 'carbon'),
         ];
 
         $tab[] = [
-            'id'                 => SearchOptions::CARBON_EMISSION_ENGINE_VER,
+            'id'                 => SearchOptions::CALCULATION_ENGINE_VERSION,
             'table'              => self::getTable(),
             'field'              => 'engine_version',
-            'name'               => __('Engine version', 'carbon')
+            'name'               => __('Engine version', 'carbon'),
         ];
 
         return $tab;
@@ -172,7 +174,9 @@ class CarbonEmission extends CommonDBChild
      * Gaps are returned as an array of start and end
      * where start is the 1st msising date and end is the last missing date
      *
-     * @param integer $id
+     * @template T of CommonDBTM
+     * @param class-string<T> $itemtype
+     * @param int $id
      * @param DateTimeInterface|null $start
      * @param DateTimeInterface|null $stop
      * @return array
@@ -185,5 +189,23 @@ class CarbonEmission extends CommonDBChild
         ];
         $interval = new DateInterval('P1D');
         return Toolbox::findTemporalGapsInTable(self::getTable(), $start, $interval, $stop, $criteria);
+    }
+
+    public static function getTotalUsageEmissionForItem(CommonDBTM $item): ?float
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        $result = $DB->request([
+            'SELECT' => ['SUM'  => 'emission_per_day as total_emissions'],
+            'FROM' => self::getTable(),
+            'WHERE' => [
+                'itemtype' => $item->getType(),
+                'items_id' => $item->getID(),
+            ],
+        ]);
+        /** @var ?array<float> $row */
+        $row = $result->current();
+        return $row['total_emissions'] ?? null;
     }
 }

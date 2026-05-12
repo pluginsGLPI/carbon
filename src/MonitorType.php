@@ -34,8 +34,8 @@ namespace GlpiPlugin\Carbon;
 
 use CommonDBTM;
 use Html;
-use MonitorType as GlpiMonitorType;
 use MassiveAction;
+use MonitorType as GlpiMonitorType;
 
 class MonitorType extends AbstractType
 {
@@ -78,7 +78,7 @@ class MonitorType extends AbstractType
      * Update the power consumption associated to a monitor type
      *
      * @param CommonDBTM $item Monitor to update
-     * @param integer $power pwoer consumption to set
+     * @param int $power pwoer consumption to set
      * @return bool
      */
     public static function updatePowerConsumption(CommonDBTM $item, int $power)

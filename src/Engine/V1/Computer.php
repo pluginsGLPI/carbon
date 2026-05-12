@@ -36,9 +36,9 @@ use Computer as GlpiComputer;
 use ComputerModel;
 use ComputerType as GlpiComputerType;
 use DBmysql;
+use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\UsageInfo;
-use GlpiPlugin\Carbon\ComputerType;
 
 /**
  * Compute CO2 emission of a computer
@@ -71,16 +71,16 @@ class Computer extends AbstractSwitchable
                         [
                             'AND' => [
                                 UsageInfo::getTableField('itemtype') => GlpiComputer::class,
-                            ]
-                        ]
-                    ]
+                            ],
+                        ],
+                    ],
                 ],
                 $computerUsageProfile_table => [
                     'FKEY'   => [
                         $usageinfo_table  => 'plugin_carbon_computerusageprofiles_id',
                         $computerUsageProfile_table => 'id',
-                    ]
-                ]
+                    ],
+                ],
             ],
             'WHERE' => [
                 GlpiComputer::getTableField('id') => $this->item->getID(),

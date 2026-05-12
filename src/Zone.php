@@ -32,14 +32,12 @@
 
 namespace GlpiPlugin\Carbon;
 
-use CommonDropdown;
 use CommonDBTM;
+use CommonDropdown;
 use CommonGLPI;
 use DateTime;
-use DBmysql;
 use DbUtils;
-use Glpi\Toolbox\Sanitizer;
-use Location;
+use Location as GlpiLocation;
 use LogicException;
 use Session;
 
@@ -76,7 +74,7 @@ class Zone extends CommonDropdown
     public function defineTabs($options = [])
     {
         $tabs = parent::defineTabs($options);
-        $this->addStandardTab(CarbonIntensitySource::class, $tabs, $options);
+        $this->addStandardTab(Source::class, $tabs, $options);
         return $tabs;
     }
 
@@ -86,11 +84,11 @@ class Zone extends CommonDropdown
             $nb = 0;
             /** @var CommonDBTM $item */
             switch ($item->getType()) {
-                case CarbonIntensitySource::class:
+                case Source::class:
                     if ($_SESSION['glpishow_count_on_tabs']) {
                         $nb = (new DbUtils())->countElementsInTable(
-                            CarbonIntensitySource_Zone::getTable(),
-                            [CarbonIntensitySource::getForeignKeyField() => $item->getID()]
+                            Source_Zone::getTable(),
+                            [Source::getForeignKeyField() => $item->getID()]
                         );
                     }
                     return self::createTabEntry(self::getTypeName(Session::getPluralNumber()), $nb);
@@ -111,23 +109,11 @@ class Zone extends CommonDropdown
     {
         /** @var CommonDBTM $item  */
         switch ($item->getType()) {
-            case CarbonIntensitySource::class:
-                CarbonIntensitySource_Zone::showForSource($item);
+            case Source::class:
+                Source_Zone::showForSource($item);
         }
 
         return true;
-    }
-
-    public function getAdditionalFields()
-    {
-        return [
-            [
-                'name'   => 'plugin_carbon_carbonintensitysources_id_historical',
-                'label'  => __('Data source for historical calculation', 'carbon'),
-                'type'   => 'dropdownValue',
-                'list'   => true
-            ]
-        ];
     }
 
     public function rawSearchOptions()
@@ -135,179 +121,171 @@ class Zone extends CommonDropdown
         $tab = parent::rawSearchOptions();
 
         $tab[] = [
-            'id'            => SearchOptions::HISTORICAL_DATA_SOURCE,
-            'table'         => CarbonIntensitySource::getTable(),
-            'field'         => 'name',
-            'name'          => __('Data source for historical calculation', 'carbon'),
-            'datatype'      => 'dropdown',
-            'joinparams'         => [
-                'beforejoin'    => [
-                    'table'         => CarbonIntensitySource_Zone::getTable(),
-                    'joinparams'    => [
-                        'jointype'      => 'child',
-                    ],
-                ],
-            ],
-        ];
-
-        $tab[] = [
             'id'            => SearchOptions::HISTORICAL_DATA_DL_ENABLED,
-            'table'         => CarbonIntensitySource_Zone::getTable(),
+            'table'         => Source_Zone::getTable(),
             'field'         => 'is_download_enabled',
             'name'          => __('Download enabled', 'carbon'),
             'datatype'      => 'bool',
+            'joinparams'    => [
+                'jointype' => 'child',
+            ],
         ];
 
         return $tab;
     }
 
+    // /**
+    //  * Get a zone by a location criteria
+    //  *
+    //  * @param CommonDBTM $item
+    //  * @return Zone|null
+    //  * @todo : de-staticify the method
+    //  */
+    // public static function getByLocation(CommonDBTM $item): ?Zone
+    // {
+    //     if ($item->isNewItem()) {
+    //         return null;
+    //     }
+
+    //     $request = self::getByLocationRequest();
+    //     $request['WHERE'] = [
+    //         Location::getTableField('locations_id') => $item->getID(),
+    //     ];
+    //     $zone = new self();
+    //     if (!$zone->getFromDBByRequest($request)) {
+    //         return null;
+    //     }
+
+    //     return $zone;
+    // }
+
+    // /**
+    //  * Get the request fragment to find a zone by location
+    //  *
+    //  * @return array Request fragment
+    //  */
+    // private static function getByLocationRequest(): array
+    // {
+    // $location_table = Location::getTable();
+    // $source_zone_table = Source_Zone::getTable();
+    // $zone_table = Zone::getTable();
+    // return [
+    //     'INNER JOIN' => [
+    //         $source_zone_table => [
+    //             'FKEY' => [
+    //                 $zone_table => 'id',
+    //                 $source_zone_table => 'plugin_carbon_zones_id',
+    //             ]
+    //         ],
+    //         $location_table => [
+    //             'FKEY' => [
+    //                 $location_table => 'plugin_carbon_sources_zones_id',
+    //                 $source_zone_table => 'id'
+    //             ]
+    //         ],
+    //     ],
+    // ];
+    // }
+
     /**
-     * Get a zone by a location criteria
-     *
-     * @param CommonDBTM $item
-     * @return Zone|null
+     * Get the request fragment to find a zone by asset
+     * @template T of CommonDBTM
+     * @param class-string<T> $itemtype asset type
+     * @return array Request fragment
      */
-    public static function getByLocation(CommonDBTM $item): ?Zone
+    private static function getByAssetRequest(string $itemtype): array
     {
-        /** @var DBmysql $DB */
-        global $DB;
-
-        if ($item->isNewItem()) {
-            return null;
-        }
-
-        if (($item->fields['country'] ?? '') == '' && ($item->fields['state'] ?? '') == '') {
-            return null;
-        }
-
-        // TODO: support translations
-        $location_table = Location::getTable();
-        $zone_table = Zone::getTable();
+        $dbUtil = new DbUtils();
+        $location_table = $dbUtil->getTableForItemType(Location::class);
+        $source_zone_table = $dbUtil->getTableForItemType(Source_Zone::class);
+        $zone_table = $dbUtil->getTableForItemType(Zone::class);
+        $itemtype_table = $dbUtil->getTableForItemType($itemtype);
         $request = [
-            'SELECT' => Zone::getTableField('id'),
-            'FROM'   => $zone_table,
             'INNER JOIN' => [
+                $source_zone_table => [
+                    'FKEY' => [
+                        $zone_table => 'id',
+                        $source_zone_table => 'plugin_carbon_zones_id',
+                    ],
+                ],
                 $location_table => [
                     'FKEY' => [
-                        $location_table => 'state',
-                        $zone_table => 'name',
+                        $location_table => 'plugin_carbon_sources_zones_id',
+                        $source_zone_table => 'id',
+                    ],
+                ],
+                $itemtype_table => [
+                    'FKEY' => [
+                        $itemtype_table => 'locations_id',
+                        $location_table => 'locations_id',
                     ],
                 ],
             ],
-            'WHERE'  => [
-                Location::getTableField('id') => $item->getID(),
-            ]
         ];
-        $iterator = $DB->request($request);
 
-        if ($iterator->count() !== 1) {
-            // no state found, fallback to country
-            $request['INNER JOIN'][$location_table]['FKEY'][$location_table] = 'country';
-            $iterator = $DB->request($request);
-            if ($iterator->count() !== 1) {
-                // Give up
-                return null;
-            }
-        }
-
-        $zone_id = $iterator->current()['id'];
-        $zone = Zone::getById($zone_id);
-        if ($zone === false) {
-            return null;
-        }
-
-        return $zone;
+        return $request;
     }
 
     /**
      * Get a zone by an asset criteria
      *
      * @param CommonDBTM $item
-     * @return Zone|null
+     * @return bool
      */
-    public static function getByAsset(CommonDBTM $item): ?Zone
+    public function getByAsset(CommonDBTM $item): bool
     {
-        /** @var DBmysql $DB */
-        global $DB;
-
-        if (!isset($item->fields[Location::getForeignKeyField()])) {
-            return null;
+        if (!isset($item->fields[GlpiLocation::getForeignKeyField()])) {
+            return false;
         }
 
         if ($item->isNewItem()) {
-            return null;
+            return false;
         }
 
-        // TODO: support translations
-        $location_table = Location::getTable();
-        $zone_table = Zone::getTable();
-        $item_table = $item::getTable();
-        $state_field = Location::getTableField('state');
-        $request = [
-            'SELECT' => Zone::getTableField('id'),
-            'FROM'   => $zone_table,
-            'INNER JOIN' => [
-                $location_table => [
-                    'FKEY' => [
-                        $location_table => 'state',
-                        $zone_table => 'name',
-                    ],
-                ],
-                $item_table => [
-                    'FKEY' => [
-                        $item_table => 'locations_id',
-                        $location_table => 'id',
-                    ],
-                ],
-            ],
-            'WHERE'  => [
-                $state_field => ['<>', ''],
-                $item::getTableField('id') => $item->getID(),
-            ]
+        $request = self::getByAssetRequest($item->getType());
+        $request['WHERE'] = [
+            $item::getTableField('id') => $item->getID(),
         ];
-        $iterator = $DB->request($request);
 
-        if ($iterator->count() !== 1) {
-            // no state found, fallback to country
-            $request['INNER JOIN'][$location_table]['FKEY'][$location_table] = 'country';
-            unset($request['WHERE'][$state_field]);
-            $request['WHERE'][Location::getTableField('country')] = ['<>', ''];
-            $iterator = $DB->request($request);
-            if ($iterator->count() !== 1) {
-                // Give up
-                return null;
-            }
-        }
-
-        $zone_id = $iterator->current()['id'];
-        $zone = Zone::getById($zone_id);
-        if ($zone === false) {
-            return null;
-        }
-
-        return $zone;
+        return $this->getFromDBByRequest($request);
     }
 
     /**
-     * Check if the zone has a historical data source
+     * Check if the zone has a historical data source.
+     * It does not checks if carbon intensity samples are available.
      *
      * @return bool
      */
-    public function hasHistoricalData(): bool
+    public function hasHistoricalDataSource(): bool
     {
         if ($this->isNewItem()) {
             return false;
         }
-        if (!isset($this->fields['plugin_carbon_carbonintensitysources_id_historical'])) {
-            return false;
-        }
-        $source = new CarbonIntensitySource();
-        if (!$source->getFromDB($this->fields['plugin_carbon_carbonintensitysources_id_historical'])) {
-            // source does not exists
-            return false;
-        }
-
-        return $source->fields['is_fallback'] === 0;
+        $source_zone_table = getTableForItemType(Source_Zone::class);
+        $source_table = getTableForItemType(Source::class);
+        $zone_table = getTableForItemType(Zone::class);
+        $source = new Source();
+        return $source->getFromDBByRequest([
+            'INNER JOIN' => [
+                $source_zone_table => [
+                    'ON' => [
+                        $source_table => 'id',
+                        $source_zone_table => getForeignKeyFieldForItemType(Source::class),
+                    ],
+                ],
+                $zone_table => [
+                    'ON' => [
+                        $zone_table => 'id',
+                        $source_zone_table => self::getForeignKeyField(),
+                    ],
+                ],
+            ],
+            'WHERE' => [
+                self::getTableField('id') => $this->fields['id'],
+                Source::getTableField('is_carbon_intensity_source') => 1,
+                Source::getTableField('fallback_level') => 0,
+            ],
+        ]);
     }
 
     /**
@@ -317,7 +295,7 @@ class Zone extends CommonDropdown
      * @param CommonDBTM $item
      * @param null|DateTime $date Date for which the zone must be found
      * @param bool $use_country Do not search by state first
-     * @return bool
+     * @return bool true if found in DB, false otherwise
      */
     public function getByItem(CommonDBTM $item, ?DateTime $date = null, bool $use_country = false): bool
     {
@@ -328,27 +306,27 @@ class Zone extends CommonDropdown
         // TODO: use date to find where was the asset at the given date
         if ($date === null) {
             $item_table = $item->getTable();
-            $location_table = Location::getTable();
+            $glpi_location_table = GlpiLocation::getTable();
             $zone_table = Zone::getTable();
 
             $request = [
                 'INNER JOIN' => [
-                    $location_table => [
+                    $glpi_location_table => [
                         'FKEY' => [
                             $zone_table => 'name',
-                            $location_table => 'state',
+                            $glpi_location_table => 'state',
                         ],
                     ],
                     $item_table => [
                         'FKEY' => [
-                            $item_table => Location::getForeignKeyField(),
-                            $location_table => 'id',
+                            $item_table => GlpiLocation::getForeignKeyField(),
+                            $glpi_location_table => 'id',
                         ],
-                    ]
+                    ],
                 ],
                 'WHERE' => [
-                    $item_table . '.id' => $item->getID()
-                ]
+                    $item_table . '.id' => $item->getID(),
+                ],
             ];
             $found = false;
             if (!$use_country) {
@@ -360,10 +338,53 @@ class Zone extends CommonDropdown
             }
 
             // no state found, fallback to country
-            $request['INNER JOIN'][$location_table]['FKEY'][$location_table] = 'country';
+            $request['INNER JOIN'][$glpi_location_table]['FKEY'][$glpi_location_table] = 'country';
             return $this->getFromDBByRequest($request);
         }
 
         throw new LogicException('Not implemented yet');
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param int $source_id
+     * @return array a request fragment
+     */
+    public static function getRestrictBySourceCondition(int $source_id): array
+    {
+        $source_zone_table = Source_Zone::getTable();
+        $zone_table = Zone::getTable();
+        return [
+            'LEFT JOIN' => [
+                $source_zone_table => [
+                    'FKEY' => [
+                        $source_zone_table => 'plugin_carbon_zones_id',
+                        $zone_table => 'id',
+                    ],
+                ],
+            ],
+            'WHERE' => [
+                Source_Zone::getTableField('plugin_carbon_sources_id') => $source_id,
+            ],
+        ];
+    }
+
+    /**
+     * get or create an item
+     *
+     * @param array $params
+     * @param array $where
+     * @return self|null
+     */
+    public function getOrCreate(array $params, array $where): ?self
+    {
+        if (!$this->getFromDBByCrit($where)) {
+            $this->add(array_merge($where, $params));
+            return $this;
+        }
+
+        $this->update(array_merge($where, $params, ['id' => $this->getID()]));
+        return $this;
     }
 }

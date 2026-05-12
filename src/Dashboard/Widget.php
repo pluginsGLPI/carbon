@@ -36,15 +36,13 @@ use Computer;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
-use Html;
 use Glpi\Application\View\TemplateRenderer;
 use Glpi\Dashboard\Widget as GlpiDashboardWidget;
-use GlpiPlugin\Carbon\Documentation;
-use GlpiPlugin\Carbon\Report;
+use GlpiPlugin\Carbon\Impact\Type;
 use GlpiPlugin\Carbon\Toolbox;
+use Html;
 use Monitor;
 use NetworkEquipment;
-use Plugin;
 use Toolbox as GlpiToolbox;
 
 class Widget extends GlpiDashboardWidget
@@ -106,24 +104,9 @@ class Widget extends GlpiDashboardWidget
                 'height'   => 3,
             ],
 
-            // Embodied impact
-            'embodied_global_warming' => [
-                'label'    => __('Embodied carbon emission', 'carbon'),
-                'function' => self::class . '::displayEmbodiedCarbonEmission',
-                'image'      => '',
-                'width'    => 6,
-                'height'   => 3,
-            ],
-            'embodied_abiotic_depletion' => [
-                'label'    => __('Embodied abiotic depletion potential', 'carbon'),
-                'function' => self::class . '::displayEmbodiedAbioticDepletion',
-                'image'      => '',
-                'width'    => 6,
-                'height'   => 3,
-            ],
-            'embodied_primary_energy' => [
-                'label'    => __('Embodied consumed primary energy', 'carbon'),
-                'function' => self::class . '::displayEmbodiedPrimaryEnergy',
+            'impact_criteria_number' => [
+                'label'    => __('Impact criteria', 'carbon'),
+                'function' => self::class . '::displayImpactCriteriaNumber',
                 'image'      => '',
                 'width'    => 6,
                 'height'   => 3,
@@ -172,7 +155,7 @@ class Widget extends GlpiDashboardWidget
                 'image'    => '',
                 'width'    => 4,
                 'height'   => 4,
-            ]
+            ],
         ];
         // 'graphpertype' => [
         //     'label'    => __('Carbon Emission Per Type', 'carbon'),
@@ -521,7 +504,7 @@ class Widget extends GlpiDashboardWidget
                 'bar' => [
                     'horizontal' => false,
                     'columnWidth' => '55%',
-                    'endingShape' => 'rounded'
+                    'endingShape' => 'rounded',
                 ],
             ],
             'dataLabels' => [
@@ -534,22 +517,22 @@ class Widget extends GlpiDashboardWidget
             'labels' => [],
             'stroke' => [
                 'width' => [0, 4],
-                'curve' => 'smooth'
+                'curve' => 'smooth',
             ],
             'series' => [
                 [
                     'name' =>  __('Carbon emission', 'carbon'),
                     'type' => 'bar',
-                    'data' => []
+                    'data' => [],
                 ],
                 [
                     'name' => __('Consumed energy', 'carbon'),
                     'type' => 'line',
-                    'data' => []
+                    'data' => [],
                 ],
             ],
             'xaxis' => [
-                'categories' => []
+                'categories' => [],
             ],
             'yaxis' => [
                 [
@@ -557,7 +540,7 @@ class Widget extends GlpiDashboardWidget
                 ], [
                     'opposite' => true,
                     'title' => ['text' => __('Consumed energy', 'carbon')],
-                ]
+                ],
             ],
             'markers' => [
                 'size' => [3, 3],
@@ -619,28 +602,28 @@ class Widget extends GlpiDashboardWidget
                 'pie' => [
                     'startAngle' => -90,
                     'endAngle' => 90,
-                    'offsetY' => 10
-                ]
+                    'offsetY' => 10,
+                ],
             ],
             'grid' => [
                 'padding' => [
-                    'bottom' => -80
-                ]
+                    'bottom' => -80,
+                ],
             ],
             'responsive' => [[
                 'breakpoint' => 480,
                 'options' => [
                     'chart' => [
-                        'width' => 200
+                        'width' => 200,
                     ],
                     'legend' => [
-                        'position' => 'bottom'
-                    ]
-                ]
-            ]
+                        'position' => 'bottom',
+                    ],
+                ],
+            ],
             ],
             'subtitle' => [
-                'style' => []
+                'style' => [],
             ],
             'series' => [],
             'labels' => [],
@@ -737,7 +720,7 @@ class Widget extends GlpiDashboardWidget
             $last_month['series'][0]['unit']
         );
 
-        $url = Documentation::getInfoLink('carbon_emission');
+        $url = Type::getCriteriaInfoLink('gwp');
         $tooltip = __('Evaluates the usage carbon emission in CO₂ equivalent during the last 2 months. %s More information %s', 'carbon');
         $tooltip = sprintf($tooltip, '<br /><a target="_blank" href="' . $url . '">', '</a>');
         $tooltip_html = Html::showToolTip($tooltip, [
@@ -790,7 +773,7 @@ class Widget extends GlpiDashboardWidget
             'filters' => [], // TODO: Not implemented yet (is this useful ?)
         ];
         $p = array_merge($default, $params);
-        list($start_date, $end_date) = (new Toolbox())->yearToLastMonth(new DateTimeImmutable('now'));
+        [$start_date, $end_date] = (new Toolbox())->yearToLastMonth(new DateTimeImmutable('now'));
         $end_date->setDate((int) $end_date->format('Y'), (int) $end_date->format('m'), 0);
         $date_format = 'Y F';
         switch ($_SESSION['glpidate_format'] ?? 0) {
@@ -803,7 +786,7 @@ class Widget extends GlpiDashboardWidget
                 break;
         }
 
-        $url = Documentation::getInfoLink('carbon_emission');
+        $url = Type::getCriteriaInfoLink('gwp');
         $tooltip = __('Evaluates the usage carbon emission in CO₂ equivalent during the last 12 elapsed months. %s More information %s', 'carbon');
         $tooltip = sprintf($tooltip, '<br /><a target="_blank" href="' . $url . '">', '</a>');
         $tooltip_html = Html::showToolTip($tooltip, [
@@ -830,23 +813,24 @@ class Widget extends GlpiDashboardWidget
         ]);
     }
 
-    public static function displayEmbodiedCarbonEmission(array $params = []): string
+    public static function displayImpactCriteriaNumber(array $params = []): string
     {
         $default = [
-            'number'  => 0,
             'url'     => '',
             'label'   => '',
             'alt'     => '',
             'color'   => '',
             'icon'    => '',
-            'id'      => 'plugin_carbon_embodied_carbon_emission_' . mt_rand(),
+            'id'      => 'plugin_carbon_impact_criteria_' . mt_rand(),
             'filters' => [], // TODO: Not implemented yet (is this useful ?)
         ];
         $p = array_merge($default, $params);
 
-        $url = Documentation::getInfoLink('carbon_emission');
-        $tooltip = __('Evaluates the carbon emission in CO₂ equivalent. %s More information %s', 'carbon');
-        $tooltip = sprintf($tooltip, '<br /><a target="_blank" href="' . $url . '">', '</a>');
+        $url = $p['doc_url'];
+        $tooltip = $p['tooltip'];
+        $tooltip .= '<br /><a target="_blank" href="' . $url . '">'
+            . __('More information', 'carbon')
+            . '</a>';
         $tooltip_html = Html::showToolTip($tooltip, [
             'display' => false,
             'applyto' => $p['id'] . '_tip',
@@ -854,43 +838,7 @@ class Widget extends GlpiDashboardWidget
 
         $label_color = '#626976';
         $fg_color = GlpiToolbox::getFgColor($p['color']);
-        return TemplateRenderer::getInstance()->render('@carbon/dashboard/embodied-carbon-emission.html.twig', [
-            'id' => $p['id'],
-            'color' => $p['color'],
-            'fg_color' => $fg_color,
-            'fg_hover_color'  => GlpiToolbox::getFgColor($p['color'], 15),
-            'fg_hover_border' => GlpiToolbox::getFgColor($p['color'], 30),
-            'label_color'     => Toolbox::getAdaptedFgColor($p['color'], $label_color, 4),
-            'dark_label_color' => Toolbox::getAdaptedFgColor($fg_color, $label_color, 4),
-            'number' => $p['number'],
-            'tooltip_html' => $tooltip_html,
-        ]);
-    }
-
-    public static function displayEmbodiedAbioticDepletion(array $params = []): string
-    {
-        $default = [
-            'number'  => 0,
-            'url'     => '',
-            'label'   => '',
-            'alt'     => '',
-            'color'   => '',
-            'icon'    => '',
-            'id'      => 'plugin_carbon_embodied_abiotic_depletion_' . mt_rand(),
-            'filters' => [], // TODO: Not implemented yet (is this useful ?)
-        ];
-        $p = array_merge($default, $params);
-        $url = Documentation::getInfoLink('abiotic_depletion_impact');
-        $tooltip = __('Evaluates the consumption of non renewable resources in Antimony equivalent. %s More information %s', 'carbon');
-        $tooltip = sprintf($tooltip, '<br /><a target="_blank" href="' . $url . '">', '</a>');
-        $tooltip_html = Html::showToolTip($tooltip, [
-            'display' => false,
-            'applyto' => $p['id'] . '_tip',
-        ]);
-
-        $label_color = '#626976';
-        $fg_color = GlpiToolbox::getFgColor($p['color']);
-        return TemplateRenderer::getInstance()->render('@carbon/dashboard/embodied-abiotic-depletion.html.twig', [
+        return TemplateRenderer::getInstance()->render('@carbon/dashboard/impact-criteria.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
             'fg_color' => $fg_color,
@@ -898,8 +846,10 @@ class Widget extends GlpiDashboardWidget
             'fg_hover_border'  => GlpiToolbox::getFgColor($p['color'], 30),
             'label_color'      => Toolbox::getAdaptedFgColor($p['color'], $label_color, 4),
             'dark_label_color' => Toolbox::getAdaptedFgColor($fg_color, $label_color, 4),
+            'label' => $p['label'],
             'number' => $p['number'],
             'tooltip_html' => $tooltip_html,
+            'pictogram_file' => $p['pictogram_file'],
         ]);
     }
 
@@ -917,7 +867,7 @@ class Widget extends GlpiDashboardWidget
         ];
         $p = array_merge($default, $params);
 
-        $url = Documentation::getInfoLink('abiotic_depletion_impact');
+        $url = Type::getCriteriaInfoLink('adp');
         $tooltip = __('Evaluates the consumption of non renewable resources in Antimony equivalent. %s More information %s', 'carbon');
         $tooltip = sprintf($tooltip, '<br /><a target="_blank" href="' . $url . '">', '</a>');
         $tooltip_html = Html::showToolTip($tooltip, [
@@ -1085,42 +1035,6 @@ class Widget extends GlpiDashboardWidget
         ]);
     }
 
-    public static function displayEmbodiedPrimaryEnergy(array $params = []): string
-    {
-        $default = [
-            'url'     => '',
-            'label'   => __('Total embodied primary energy', 'carbon'),
-            'alt'     => '',
-            'color'   => '',
-            'icon'    => '',
-            'id'      => 'plugin_carbon_embodied_primary_energy_' . mt_rand(),
-            'filters' => [], // TODO: Not implemented yet (is this useful ?)
-        ];
-        $p = array_merge($default, $params);
-
-        $url = Documentation::getInfoLink('primary_energy_impact');
-        $tooltip = __('Evaluates the primary energy consumed. %s More information %s', 'carbon');
-        $tooltip = sprintf($tooltip, '<br /><a target="_blank" href="' . $url . '">', '</a>');
-        $tooltip_html = Html::showToolTip($tooltip, [
-            'display' => false,
-            'applyto' => $p['id'] . '_tip',
-        ]);
-
-        $label_color = '#626976';
-        $fg_color = GlpiToolbox::getFgColor($p['color']);
-        return TemplateRenderer::getInstance()->render('@carbon/dashboard/embodied-primary-energy.html.twig', [
-            'id' => $p['id'],
-            'color' => $p['color'],
-            'fg_color' => $fg_color,
-            'fg_hover_color'   => GlpiToolbox::getFgColor($p['color'], 15),
-            'fg_hover_border'  => GlpiToolbox::getFgColor($p['color'], 30),
-            'label_color'      => Toolbox::getAdaptedFgColor($p['color'], $label_color, 4),
-            'dark_label_color' => Toolbox::getAdaptedFgColor($fg_color, $label_color, 4),
-            'number' => $p['number'],
-            'tooltip_html' => $tooltip_html,
-        ]);
-    }
-
     /**
      * Displays a widget with a radar (or web) chart
      *
@@ -1143,7 +1057,7 @@ class Widget extends GlpiDashboardWidget
             'rand'         => mt_rand(),
         ];
         $p = array_merge($default, $params);
-        $p['cache_key'] = $p['cache_key'] ?? $p['rand'];
+        $p['cache_key'] ??= $p['rand'];
 
         $nodata   = isset($p['data']['nodata']) && $p['data']['nodata'];
 
@@ -1207,9 +1121,9 @@ class Widget extends GlpiDashboardWidget
                 'text' => $p['label'],
             ],
             'dataLabels' => [
-            //     'style' => [
-            //         'colors' => [$fg_color],
-            //     ]
+                //     'style' => [
+                //         'colors' => [$fg_color],
+                //     ]
                 'background' => [
                     'enabled' => true,
                     'foreColor' => $fg_color,

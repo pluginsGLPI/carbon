@@ -38,18 +38,16 @@ use DateInterval;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
-use DateTimeZone;
 use DBmysql;
-use DbUtils;
-use GlpiPlugin\Carbon\Zone;
+use DBmysqlIterator;
+use Exception;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Toolbox;
-use Location as GlpiLocation;
 use LogicException;
 use Session;
-use Toolbox as GlpiToolbox;
 
 abstract class AbstractAsset extends CommonDBTM implements AssetInterface
 {
@@ -79,7 +77,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      * Get request in Query builder format to find evaluable items
      *
      * @param array $crit
-     * @param boolean $entity_restrict
+     * @param bool $entity_restrict
      * @return array
      */
     abstract public function getEvaluableQuery(array $crit = [], bool $entity_restrict = true): array;
@@ -91,24 +89,24 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         return static::$itemtype;
     }
 
-    /**
-     * Is it possible to historize carbon emissions for the item
-     * @param int $id : ID of the item to examinate
-     *
-     * @return boolean
-     */
-    public function canHistorize(int $id): bool
-    {
-        /** @var DBmysql $DB */
-        global $DB;
+    // /**
+    //  * Is it possible to historize carbon emissions for the item
+    //  * @param int $id : ID of the item to examinate
+    //  *
+    //  * @return bool
+    //  */
+    // public function canHistorize(int $id): bool
+    // {
+    //     /** @var DBmysql $DB */
+    //     global $DB;
 
-        $request = $this->getEvaluableQuery();
-        $request['WHERE'][static::$itemtype::getTableField('id')] = $id;
+    //     $request = $this->getEvaluableQuery();
+    //     $request['WHERE'][static::$itemtype::getTableField('id')] = $id;
 
-        $iterator = $DB->request($request);
+    //     $iterator = $DB->request($request);
 
-        return $iterator->count() > 0;
-    }
+    //     return $iterator->count() > 0;
+    // }
 
     public function setLimit(int $limit)
     {
@@ -116,26 +114,37 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     }
 
     /**
-     * Start the historization of all items
+     * Get an iterator of items to evaluate
      *
-     * @return int count of entries generated
+     * @param array $crit criterias
+     * @return DBmysqlIterator
      */
-    public function evaluateItems(): int
+    public function getItemsToEvaluate(array $crit = []): DBmysqlIterator
     {
         /** @var DBmysql $DB */
         global $DB;
 
         $itemtype = static::$itemtype;
         if ($itemtype === '') {
-            throw new \LogicException('Itemtype not set');
+            throw new LogicException('Itemtype not set');
         }
         if (!is_subclass_of($itemtype, CommonDBTM::class)) {
-            throw new \LogicException('Itemtype does not inherits from ' . CommonDBTM::class);
+            throw new LogicException('Itemtype does not inherits from ' . CommonDBTM::class);
         }
+        $iterator = $DB->request($this->getEvaluableQuery($crit, false));
 
+        return $iterator;
+    }
+
+    /**
+     * Start the historization of all items
+     *
+     * @return int count of entries generated
+     */
+    public function evaluateItems(DBmysqlIterator $iterator): int
+    {
+        /** @var int $count count of successfully evaluated assets */
         $count = 0;
-
-        $iterator = $DB->request($this->getEvaluableQuery([], false));
         foreach ($iterator as $row) {
             $count += $this->evaluateItem($row['id']);
             if ($this->limit_reached) {
@@ -150,16 +159,13 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      * Historize environmental impact data of an asset
      * Days interval is [$start_date, $end_date[
      *
-     * @param integer  $id
+     * @param int  $id
      * @param DateTime $start_date First date to compute (if not set, use the latest date found in DB)
      * @param DateTime $end_date   Last date to compute (if not set use now - 1 day)
      * @return int     count of generated entries
      */
     public function evaluateItem(int $id, ?DateTime $start_date = null, ?DateTime $end_date = null): int
     {
-        /** @var DBmysql $DB */
-        global $DB;
-
         $itemtype = static::$itemtype;
         $item = $itemtype::getById($id);
         if ($item === false) {
@@ -175,7 +181,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
 
         // Determine the last date to compute
         $last_available_date = $this->getStopDate($id);
-        $end_date = $end_date ?? $last_available_date ?? (new DateTime('now'))->sub(new DateInterval(self::$date_end_shift));
+        $end_date ??= $last_available_date ?? (new DateTime('now'))->sub(new DateInterval(self::$date_end_shift));
 
         $engine = static::getEngine($item);
 
@@ -186,14 +192,10 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         /**
          * Huge quantity of SQL queries will be executed
          * We NEED to check memory usage to avoid running out of memory
-         * @see DbMysql::doQuery()
+         * @see DBmysql::doQuery()
          */
-        $memory_limit = GlpiToolbox::getMemoryLimit() - 8 * 1024 * 1024;
-        if ($memory_limit < 0) {
-            // May happen in test seems that ini_get("memory_limits") returns
-            // enpty string in PHPUnit environment
-            $memory_limit = null;
-        }
+        $memory_limit = Toolbox::getMemoryLimit();
+
         foreach ($gaps as $gap) {
             // $date_cursor = DateTime::createFromFormat('U', $gap['start']);
             // $date_cursor->setTimezone(new DateTimeZone($timezone));
@@ -203,6 +205,11 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
             $date_cursor = DateTime::createFromFormat('Y-m-d H:i:s', $gap['start'])->setTime(0, 0, 0, 0);
             $end_date    = DateTime::createFromFormat('Y-m-d H:i:s', $gap['end'])->setTime(0, 0, 0, 0);
             while ($date_cursor < $end_date) {
+                if ($memory_limit && $memory_limit < memory_get_usage()) {
+                    // 8 MB memory left, emergency exit
+                    $this->limit_reached = true;
+                    break 2;
+                }
                 $success = $this->evaluateItemPerDay($item, $engine, $date_cursor);
                 if ($success) {
                     $count++;
@@ -210,11 +217,6 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
                         $this->limit_reached = true;
                         break 2;
                     }
-                }
-                if ($memory_limit && $memory_limit < memory_get_usage()) {
-                    // 8 MB memory left, emergency exit
-                    $this->limit_reached = true;
-                    break 2;
                 }
                 $date_cursor = $date_cursor->add(new DateInterval(static::$date_increment));
             }
@@ -229,20 +231,24 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      * @param CommonDBTM $item item to evaluate
      * @param EngineInterface $engine Calculation engine to use
      * @param DateTime $day Day to calculate
-     * @return boolean
+     * @return bool
      */
     protected function evaluateItemPerDay(CommonDBTM $item, EngineInterface $engine, DateTimeInterface $day): bool
     {
         $energy = $engine->getEnergyPerDay($day);
-        $zone = new Zone();
-        $zone->getByItem($item /* ,$date_cursor */);
-        if ($zone->isNewItem()) {
+        $source_zone = new Source_Zone();
+        if (!$source_zone->getFromDbByItem($item)) {
             return false;
         }
+        // $zone = new Zone();
+
+        // if ($zone->getByAsset($item) === false) {
+        // return false;
+        // }
 
         $emission = new TrackedFloat(0, $energy);
         if ($energy->getValue() !== 0) {
-            $emission = $engine->getCarbonEmissionPerDay($day, $zone);
+            $emission = $engine->getCarbonEmissionPerDay($day, $source_zone);
             if ($emission === null) {
                 return false;
             }
@@ -273,7 +279,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     /**
      * Find the date where daily computation must start
      *
-     * @param integer $id
+     * @param int $id
      * @return DateTimeImmutable|null
      */
     protected function getStartDate(int $id): ?DateTimeImmutable
@@ -285,7 +291,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     /**
      * Find the most accurate date to determine the first use of an asset
      *
-     * @param integer $id id of the asset to examinate
+     * @param int $id id of the asset to examinate
      * @return DateTimeImmutable|null
      */
     protected function getInventoryIncomingDate(int $id): ?DateTimeImmutable
@@ -302,7 +308,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     /**
      * Find the most accurate date to determine the end of use of an asset
      *
-     * @param integer $id
+     * @param int $id
      * @return DateTimeImmutable|null
      */
     protected function getInventoryExitDate(int $id): ?DateTimeImmutable
@@ -319,7 +325,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     /**
      * Find the date where daily computation must stop
      *
-     * @param integer $id
+     * @param int $id
      * @return DateTimeImmutable|null
      */
     protected function getStopDate(int $id): ?DateTimeImmutable
@@ -330,8 +336,8 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     /**
      * Ddelete all calculated usage impact for an asset
      *
-     * @param integer $items_id
-     * @return boolean
+     * @param int $items_id
+     * @return bool
      */
     public function resetForItem(int $items_id): bool
     {
@@ -343,7 +349,7 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
             CarbonEmission::getTable(),
             [
                 'itemtype' => static::getItemtype(),
-                'items_id' => $items_id
+                'items_id' => $items_id,
             ]
         );
     }
@@ -351,14 +357,14 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     /**
      * Calculate usage impact of an asset
      *
-     * @param integer $items_id
-     * @return boolean
+     * @param int $items_id
+     * @return bool
      */
     public function calculateImpact(int $items_id): bool
     {
         try {
             $calculated = $this->evaluateItem($items_id);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
             Session::addMessageAfterRedirect(
                 __('Error while calculating impact', 'carbon'),

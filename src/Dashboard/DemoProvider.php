@@ -36,6 +36,7 @@ use Computer;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
+use GlpiPlugin\Carbon\Impact\Type;
 use GlpiPlugin\Carbon\Toolbox;
 use Monitor;
 use NetworkEquipment;
@@ -43,69 +44,31 @@ use Session;
 
 class DemoProvider
 {
-    public static function getEmbodiedGlobalWarming(array $params = []): array
-    {
-        $value = 616000000;
-        $value = Toolbox::getWeight($value) . __('CO₂eq', 'carbon');
-
-        $params['icon'] = 'fa-solid fa-temperature-arrow-up';
-
-        return [
-            'number' => $value,
-            'label'  => $params['label'],
-            'icon'   => $params['icon'],
-        ];
-    }
-
-    public static function getEmbodiedPrimaryEnergy(array $params = []): array
-    {
-        $value = 491000000;
-        $value = Toolbox::getEnergy($value / 3600);
-
-        $params['icon'] = 'fa-solid fa-fire-flame-simple';
-
-        return [
-            'number' => $value,
-            'label'  => $params['label'],
-            'icon'   => $params['icon'],
-        ];
-    }
-
-    public static function getEmbodiedAbioticDepletion(array $params = [], array $crit = []): array
-    {
-        $default_params = [
-            'label' => __('Embodied abiotic depletion potential', 'carbon'),
-            'icon'  => 'fa-solid fa-temperature-arrow-up',
-        ];
-        $params = array_merge($default_params, $params);
-
-        $value = 12.748;
-        $value = Toolbox::getWeight($value) . __('Sbeq', 'carbon');
-
-        return [
-            'number'     => $value,
-            'label'      => $params['label'],
-            'icon'       => $params['icon'],
-        ];
-    }
-
-    public static function getUsageAbioticDepletion(array $params = [], array $crit = []): array
-    {
-        $default_params = [
-            'label' => __('Usage abiotic depletion potential', 'carbon'),
-            'icon'  => 'fa-solid fa-temperature-arrow-up',
-        ];
-        $params = array_merge($default_params, $params);
-
-        $value = 2.86;
-        $value = Toolbox::getWeight($value) . __('Sbeq', 'carbon');
-
-        return [
-            'number'     => $value,
-            'label'      => $params['label'],
-            'icon'       => $params['icon'],
-        ];
-    }
+    /** @var array<string, array> $impact_values Embodied and usage impact values*/
+    private static array $impact_values = [
+        'gwp'    => [616000000, 176483],
+        'adp'    => [12.748, 2.86],
+        'pe'     => [491000000, null],
+        'gwppb'  => [null, null],
+        'gwppf'  => [null, null],
+        'gwpplu' => [null, null],
+        'ir'     => [null, null],
+        'lu'     => [-101, null],
+        'odp'    => [null, null],
+        'pm'     => [null, null],
+        'pocp'   => [null, null],
+        'wu'     => [null, null],
+        'mips'   => [null, null],
+        'adpe'   => [null, null],
+        'adpf'   => [null, null],
+        'ap'     => [null, null],
+        'ctue'   => [null, null],
+        // 'ctuh_c' =>  [null, null],
+        // 'ctuh_nc' => [null, null],
+        'epf'    => [null, null],
+        'epm'    => [null, null],
+        'ept'    => [null, null],
+    ];
 
     public static function getUsageCarbonEmissionPerMonth(array $params = [], array $crit = []): array
     {
@@ -115,7 +78,7 @@ class DemoProvider
         ];
         $params = array_merge($default_params, $params);
 
-        list($start_date, $end_date) = (new Toolbox())->yearToLastMonth(new DateTimeImmutable('now'));
+        [$start_date, $end_date] = (new Toolbox())->yearToLastMonth(new DateTimeImmutable('now'));
         $params['args']['apply_filters']['dates'][0] = $start_date->format('Y-m-d\TH:i:s.v\Z');
         $params['args']['apply_filters']['dates'][1] = $end_date->format('Y-m-d\TH:i:s.v\Z');
 
@@ -240,10 +203,10 @@ class DemoProvider
                     'data' => [
                         [
                             'x' => 114.840,
-                            'y' => '2025-02'
+                            'y' => '2025-02',
                         ], [
                             'x' => 126.342,
-                            'y' => '2025-03'
+                            'y' => '2025-03',
                         ],
                     ],
                     'unit' => 'KWh',
@@ -262,7 +225,7 @@ class DemoProvider
             'date_interval' => [
                 $start_date->format($date_format),
                 $end_date->format($date_format),
-            ]
+            ],
         ];
 
         return [
@@ -275,8 +238,8 @@ class DemoProvider
     {
         $itemtype_name = $itemtype::getTypeName(Session::getPluralNumber());
         $itemtype_name = strtolower($itemtype_name);
-        $label = $handled ?
-            __("plugin carbon - handled %s", 'carbon')
+        $label = $handled
+            ? __("plugin carbon - handled %s", 'carbon')
             : __("plugin carbon - unhandled %s", 'carbon');
         $default_params = [
             'label' => sprintf($label, $itemtype_name),
@@ -321,7 +284,7 @@ class DemoProvider
 
         $data = [
             'labels' => [],
-            'series' => []
+            'series' => [],
         ];
         foreach ($itemtypes as $itemtype) {
             $itemtype_name = $itemtype::getTypeName(Session::getPluralNumber());
@@ -334,7 +297,7 @@ class DemoProvider
             $data['series'][0]['name'] = __('Handled', 'carbon');
             $data['series'][0]['data'][] = [
                 'value' => $handled['number'],
-                'url'   => $handled['url']
+                'url'   => $handled['url'],
             ];
             $data['series'][1]['name'] = __('Unhandled', 'carbon');
             $data['series'][1]['data'][] = [
@@ -395,28 +358,127 @@ class DemoProvider
         ];
 
         return [
-            'data' => $data
+            'data' => $data,
         ];
     }
 
     /**
-     * Get usage CO2 emissions
+     * Get the value of an impact criteria for the embodied scope
      *
      * @param array $params
+     * @param array $crit
      * @return array
      */
-    public static function getUsageCarbonEmission(array $params = []): array
+    public static function getImpactOfEmbodiedCriteria(string $impact_type, array $params = [], array $crit = []): array
     {
         $default_params = [
-            'label' => __('plugin carbon - Usage carbon emission', 'carbon'),
-            'icon'  => 'fa-solid fa-temperature-arrow-up',
+            'label' => Type::getEmbodiedImpactLabel($impact_type),
+            'icon'  => Type::getCriteriaIcon($impact_type),
         ];
         $params = array_merge($default_params, $params);
-        $gwp = Toolbox::getWeight(176483) . __('CO₂eq', 'carbon');
+        if (count($crit['itemtype'] ?? []) === 0) {
+            $crit['itemtype'] = PLUGIN_CARBON_TYPES;
+        } else {
+            $crit['itemtype'] = array_intersect($crit['itemtype'], PLUGIN_CARBON_TYPES);
+        }
+
+        $value = self::$impact_values[$impact_type][0];
+        if ($value === null) {
+            $value = 'N/A';
+        } else {
+            $value = Toolbox::getHumanReadableValue(
+                $value,
+                Type::getImpactUnit($impact_type)
+            );
+        }
+
         return [
-            'number' => $gwp,
+            'number' => $value,
             'label'  => $params['label'],
             'icon'   => $params['icon'],
+            'tooltip' => Type::getCriteriaTooltip($impact_type),
+            'pictogram_file' => Type::getCriteriaPictogram($impact_type),
+            'doc_url' => Type::getCriteriaInfoLink($impact_type),
+        ];
+    }
+
+    /**
+     * Get the value of an impact criteria for the usage scope
+     *
+     * @param array $params
+     * @param array $crit
+     * @return array
+     */
+    public static function getImpactOfUsageCriteria(string $impact_type, array $params = [], array $crit = []): array
+    {
+        $default_params = [
+            'label' => Type::getEmbodiedImpactLabel($impact_type),
+            'icon'  => Type::getCriteriaIcon($impact_type),
+        ];
+        $params = array_merge($default_params, $params);
+        if (count($crit['itemtype'] ?? []) === 0) {
+            $crit['itemtype'] = PLUGIN_CARBON_TYPES;
+        } else {
+            $crit['itemtype'] = array_intersect($crit['itemtype'], PLUGIN_CARBON_TYPES);
+        }
+
+        $value = self::$impact_values[$impact_type][1];
+        if ($value === null) {
+            $value = 'N/A';
+        } else {
+            $value = Toolbox::getHumanReadableValue(
+                $value,
+                Type::getImpactUnit($impact_type)
+            );
+        }
+
+        return [
+            'number' => $value,
+            'label'  => $params['label'],
+            'icon'   => $params['icon'],
+            'tooltip' => Type::getCriteriaTooltip($impact_type),
+            'pictogram_file' => Type::getCriteriaPictogram($impact_type),
+            'doc_url' => Type::getCriteriaInfoLink($impact_type),
+        ];
+    }
+
+    /**
+     * Get the value of an impact criteria for the embodied + usage scopes
+     *
+     * @param array $params
+     * @param array $crit
+     * @return array
+     */
+    public static function getImpactOfEmbodiedAndUsageCriteria(string $impact_type, array $params = [], array $crit = []): array
+    {
+        $default_params = [
+            'label' => Type::getEmbodiedImpactLabel($impact_type),
+            'icon'  => Type::getCriteriaIcon($impact_type),
+        ];
+        $params = array_merge($default_params, $params);
+        if (count($crit['itemtype'] ?? []) === 0) {
+            $crit['itemtype'] = PLUGIN_CARBON_TYPES;
+        } else {
+            $crit['itemtype'] = array_intersect($crit['itemtype'], PLUGIN_CARBON_TYPES);
+        }
+
+        if (self::$impact_values[$impact_type][0] === null && self::$impact_values[$impact_type][1] === null) {
+            $value = 'N/A';
+        } else {
+            $value = (self::$impact_values[$impact_type][0] ?? 0) + (self::$impact_values[$impact_type][1] ?? 0);
+            $value = Toolbox::getHumanReadableValue(
+                $value,
+                Type::getImpactUnit($impact_type)
+            );
+        }
+
+        return [
+            'number' => $value,
+            'label'  => $params['label'],
+            'icon'   => $params['icon'],
+            'tooltip' => Type::getCriteriaTooltip($impact_type),
+            'pictogram_file' => Type::getCriteriaPictogram($impact_type),
+            'doc_url' => Type::getCriteriaInfoLink($impact_type),
         ];
     }
 }

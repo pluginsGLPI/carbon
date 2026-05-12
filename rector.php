@@ -36,6 +36,8 @@ use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector as DeadCode;
 use Rector\ValueObject\PhpVersion;
 
+require_once __DIR__ . '/../../src/Plugin.php';
+
 return RectorConfig::configure()
     ->withPaths([
         __DIR__ . '/ajax',
@@ -45,13 +47,21 @@ return RectorConfig::configure()
         __DIR__ . '/src',
         __DIR__ . '/tools',
     ])
+    ->withSkipPath(__DIR__ . '/vendor')
     ->withPhpVersion(PhpVersion::PHP_82)
     ->withCache(
         sys_get_temp_dir() . '/rector',
         FileCacheStorage::class
     )
     ->withParallel(300)
+    ->withRootFiles()
+    ->withImportNames(removeUnusedImports: true)
     // FIXME apply it in another PR, it generates a huge diff ->withImportNames()
+    // ->withPreparedSets(
+    //     deadCode: true,
+    //     codeQuality: true,
+    //     codingStyle: true,
+    // )
     ->withRules([
         CodeQuality\Assign\CombinedAssignRector::class,
         CodeQuality\BooleanAnd\RemoveUselessIsObjectCheckRector::class,

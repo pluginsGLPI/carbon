@@ -32,10 +32,11 @@
 
 use Glpi\Event;
 use Glpi\Exception\Http\NotFoundHttpException;
-use GlpiPlugin\Carbon\UsageInfo;
+use GlpiPlugin\Carbon\CommonAsset;
 use GlpiPlugin\Carbon\Impact\History\AbstractAsset;
 use GlpiPlugin\Carbon\Impact\Usage\Engine;
 use GlpiPlugin\Carbon\UsageImpact;
+use GlpiPlugin\Carbon\UsageInfo;
 
 include(__DIR__ . '/../../../inc/includes.php');
 
@@ -60,7 +61,7 @@ if (isset($_POST['update'])) {
         sprintf(__('%s updates an item'), $_SESSION['glpiname'])
     );
     Html::back();
-} else if (isset($_POST['reset'])) {
+} elseif (isset($_POST['reset'])) {
     if (!isset($_POST['itemtype']) || !isset($_POST['items_id'])) {
         Session::addMessageAfterRedirect(__('Missing arguments in request.', 'carbon'), false, ERROR);
         Html::back();
@@ -90,14 +91,11 @@ if (isset($_POST['update'])) {
         Html::back();
     }
 
-    if (!$gwp_impact->resetForItem($item->getID())) {
+    if (!CommonAsset::deleteUsageImpact($item)) {
         Session::addMessageAfterRedirect(__('Reset failed.', 'carbon'), false, ERROR);
+        Html::back();
     }
-
-    if (!$usage_impact->isNewItem() && !$usage_impact->delete($usage_impact->fields)) {
-        Session::addMessageAfterRedirect(__('Delete of usage impact failed.', 'carbon'), false, ERROR);
-    }
-} else if (isset($_POST['calculate'])) {
+} elseif (isset($_POST['calculate'])) {
     if (!isset($_POST['itemtype']) || !isset($_POST['items_id'])) {
         Session::addMessageAfterRedirect(__('Missing arguments in request.', 'carbon'), false, ERROR);
         Html::back();
@@ -120,7 +118,7 @@ if (isset($_POST['update'])) {
     /** @var AbstractAsset $gwp_impact */
     $gwp_impact = new $gwp_impact_class();
 
-    if (!$gwp_impact->canHistorize($_POST['items_id'])) {
+    if ($gwp_impact->getItemsToEvaluate([$item::getTableField('id') => $_POST['items_id']])->count() !== 1) {
         Session::addMessageAfterRedirect(__('Missing data prevents historization of this asset.', 'carbon'), false, ERROR);
     } else {
         if (!$gwp_impact->calculateImpact($_POST['items_id'])) {
@@ -128,13 +126,13 @@ if (isset($_POST['update'])) {
         }
     }
 
-    $usage_impact = Engine::getEngineFromItemtype($_POST['itemtype']);
+    $usage_impact = Engine::getEngineFromItemtype($item);
     if ($usage_impact === null) {
         Session::addMessageAfterRedirect(__('Unable to find calculation engine for this asset.', 'carbon'), false, ERROR);
         Html::back();
     }
 
-    if (!$usage_impact->evaluateItem($_POST['items_id'])) {
+    if (!$usage_impact->evaluateItem()) {
         Session::addMessageAfterRedirect(__('Update of usage impact failed.', 'carbon'), false, ERROR);
     }
 }

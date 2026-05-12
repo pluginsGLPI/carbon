@@ -36,8 +36,10 @@ use Computer;
 use GlpiPlugin\Carbon\SearchOptions;
 use Monitor;
 use NetworkEquipment;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Search;
 
+#[CoversClass(Search::class)]
 class SearchTest extends DbTestCase
 {
     public function testSearchOptions()
@@ -48,10 +50,10 @@ class SearchTest extends DbTestCase
             'criteria' => [
                 ['field' => SearchOptions::IS_HISTORIZABLE,
                     'searchtype' => 'equals',
-                    'value'      => '1'
+                    'value'      => '1',
                 ],
             ],
-            'reset'    => 'reset'
+            'reset'    => 'reset',
         ];
 
         $data = Search::getDatas(Computer::class, $criterias);
@@ -62,10 +64,10 @@ class SearchTest extends DbTestCase
             'criteria' => [
                 ['field' => SearchOptions::IS_HISTORIZABLE,
                     'searchtype' => 'equals',
-                    'value'      => '1'
+                    'value'      => '1',
                 ],
             ],
-            'reset'    => 'reset'
+            'reset'    => 'reset',
         ];
 
         $data = Search::getDatas(NetworkEquipment::class, $criterias);
@@ -76,10 +78,10 @@ class SearchTest extends DbTestCase
             'criteria' => [
                 ['field' => SearchOptions::IS_HISTORIZABLE,
                     'searchtype' => 'equals',
-                    'value'      => '1'
+                    'value'      => '1',
                 ],
             ],
-            'reset'    => 'reset'
+            'reset'    => 'reset',
         ];
 
         $data = Search::getDatas(Monitor::class, $criterias);

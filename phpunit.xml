@@ -7,9 +7,11 @@
   displayDetailsOnTestsThatTriggerNotices="true"
   displayDetailsOnTestsThatTriggerWarnings="true"
   displayDetailsOnPhpunitDeprecations="true"
+  processIsolation="true"
   backupGlobals="false"
   colors="true"
-  stderr="true">
+  stderr="true"
+  requireCoverageMetadata="true">
   <source>
     <include>
       <directory suffix=".php">src</directory>
@@ -41,6 +43,9 @@
     </testsuite>
     <testsuite name="Upgrade">
       <directory>./tests/upgrade/</directory>
+    </testsuite>
+    <testsuite name="Migration">
+      <directory>./tests/migration/</directory>
     </testsuite>
   </testsuites>
 </phpunit>

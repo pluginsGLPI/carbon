@@ -35,10 +35,9 @@ namespace GlpiPlugin\Carbon;
 use Config;
 use DBmysql;
 use DirectoryIterator;
-use Glpi\Message\MessageType;
-use Glpi\Toolbox\Sanitizer;
 use Migration;
 use Plugin;
+use RuntimeException;
 
 class Install
 {
@@ -52,7 +51,7 @@ class Install
     /**
      * Force upgrade from the previous version to the currrent one
      *
-     * @var boolean
+     * @var bool
      */
     private bool $force_upgrade = false;
 
@@ -99,7 +98,7 @@ class Install
      * Fresh install of the plugin
      *
      * @param array $args
-     * @return boolean
+     * @return bool
      */
     public function install(array $args = []): bool
     {
@@ -107,8 +106,15 @@ class Install
         global $DB;
 
         $dbFile = plugin_carbon_getSchemaPath();
-        if ($dbFile === null || !$DB->runFile($dbFile)) {
+        if ($dbFile === null) {
             $this->migration->addWarningMessage("Error creating tables : " . $DB->error());
+            return false;
+        }
+
+        try {
+            $DB->runFile($dbFile);
+        } catch (RuntimeException $e) {
+            $this->migration->addWarningMessage("Error creating tables : " . $e->getMessage());
             return false;
         }
 
@@ -139,6 +145,21 @@ class Install
     {
         $oldest_upgradable_version = self::OLDEST_UPGRADABLE_VERSION;
 
+        $db_version = Config::getConfigurationValue('plugin:carbon', 'dbversion');
+        $matches = [];
+        preg_match('/^(\d+\.\d+\.\d+)/', PLUGIN_CARBON_VERSION, $matches);
+        $current_version = $matches[1];
+        if (version_compare($db_version, $current_version) > 0) {
+            // database more recent than current version
+            $e = new RuntimeException(sprintf(
+                'Database of the plugin %s is more recent than the installed version %s.',
+                $db_version,
+                $current_version
+            ));
+            trigger_error($e->getMessage(), E_USER_WARNING);
+            throw $e;
+        }
+
         $this->force_upgrade = array_key_exists('force-upgrade', $args);
         if ($this->force_upgrade) {
             $this->force_upgrade_from_version = PLUGIN_CARBON_VERSION;
@@ -147,19 +168,19 @@ class Install
                 // Check the version os SEMVER compliant
                 $regex = '!^' . self::SEMVER_REGEX . '$!';
                 if (preg_match($regex, $this->force_upgrade_from_version) !== 1) {
-                    $e = new \RuntimeException('Invalid start version for upgrade.');
+                    $e = new RuntimeException('Invalid start version for upgrade.');
                     trigger_error($e->getMessage(), E_USER_WARNING);
                     throw $e;
                 }
                 if (version_compare($this->force_upgrade_from_version, $oldest_upgradable_version) < 0) {
-                    $e = new \RuntimeException('Upgrade is not supported before ' . $this->force_upgrade_from_version . '.');
+                    $e = new RuntimeException('Upgrade is not supported before ' . $this->force_upgrade_from_version . '.');
                     trigger_error($e->getMessage(), E_USER_WARNING);
                     throw $e;
                 }
             }
         } else {
             if (version_compare($from_version, $oldest_upgradable_version, 'lt')) {
-                $e = new \RuntimeException("Upgrade is not supported before $oldest_upgradable_version!");
+                $e = new RuntimeException("Upgrade is not supported before $oldest_upgradable_version!");
                 trigger_error($e->getMessage(), E_USER_WARNING);
                 throw $e;
             }
@@ -168,24 +189,17 @@ class Install
         ini_set("max_execution_time", "0");
         $migrations = $this->getMigrationsToDo($from_version);
         foreach ($migrations as $file => $data) {
-            $function = $data['function'];
-            $target_version = $data['target_version'];
-            include_once($file);
-            if ($function($this->migration, $args)) {
-                // Set the version to the target one s it is complete
-                // May be useful if subsequent steps fail and need to run upgrade again, by not running already done steps
-                Config::setConfigurationValues('plugin:carbon', ['dbversion' => $target_version]);
-            } else {
+            if (!$this->upgradeOneVersion($file, $data, $args)) {
                 return false;
             }
         }
 
-        // Cherry pick install sub tasts to run
+        // Cherry pick sub tasts to run from fresh install workflow
         // Useful to rewrite missing data in DB
         $install_dir = __DIR__ . '/install/';
         $update_scripts = scandir($install_dir);
         $whitelist = [
-            'init_datasources.php'
+            'init_datasources.php',
         ];
         foreach ($update_scripts as $update_script) {
             if (!in_array($update_script, $whitelist)) {
@@ -200,6 +214,21 @@ class Install
         return true;
     }
 
+    public function upgradeOneVersion(string $file, array $data, array $args = []): bool
+    {
+        $function = $data['function'];
+        $target_version = $data['target_version'];
+        include_once($file);
+        if ($function($this->migration, $args) === false) {
+            return false;
+        }
+        // Set the version to the target one s it is complete
+        // May be useful if subsequent steps fail and need to run upgrade again, by not running already done steps
+        Config::setConfigurationValues('plugin:carbon', ['dbversion' => $target_version]);
+
+        return true;
+    }
+
     /**
      * Get migrations that have to be ran.
      *
@@ -207,7 +236,7 @@ class Install
      *
      * @return array
      */
-    private function getMigrationsToDo(string $current_version): array
+    public function getMigrationsToDo(string $current_version): array
     {
         $pattern = '/^update_(?<source_version>\d+\.\d+\.(?:\d+|x))_to_(?<target_version>\d+\.\d+\.(?:\d+|x))\.php$/';
         $plugin_directory = Plugin::getPhpDir('carbon') . '/install/migration';
@@ -243,25 +272,24 @@ class Install
     }
 
     /**
-     * Get or create a carbon intensity zone by name
+     * Get or create a carbon intensity source by name
      *
      * @param string $name Name of the zone
-     * @param int $is_fallback Is the zone a fallback zone (1) or not (0)
+     * @param int $fallback_level Is the zone a fallback zone (1) or not (0)
+     * @param int $is_carbon_intensity_source Does the source provide carbon intensity (1) or not (0)
      * @return int ID of the zone
      */
-    public static function getOrCreateSource(string $name, int $is_fallback = 1): int
+    public static function getOrCreateSource(string $name, int $fallback_level = 1, int $is_carbon_intensity_source = 1): int
     {
-        $source = new CarbonIntensitySource();
-        $source->getFromDBByCrit(['name' => $name]);
+        $source = new Source();
+        $source->getOrCreate([
+            'fallback_level' => $fallback_level,
+            'is_carbon_intensity_source' => $is_carbon_intensity_source,
+        ], [
+            'name' => $name,
+        ]);
         if ($source->isNewItem()) {
-            $source->add([
-                'name' => $name,
-                'is_fallback' => $is_fallback,
-            ]);
-            /** @phpstan-ignore if.alwaysTrue */
-            if ($source->isNewItem()) {
-                throw new \RuntimeException("Failed to create carbon intensity source '$name' in DB");
-            }
+            throw new RuntimeException("Failed to create carbon intensity source '$name' in DB");
         }
         return $source->getID();
     }
@@ -276,40 +304,46 @@ class Install
     public static function getOrCreateZone(string $name, int $source_id): int
     {
         $zone = new Zone();
+        $zone->getOrCreate([
+            'plugin_carbon_sources_id_historical' => $source_id,
+        ], [
+            'name' => $name,
+        ]);
         $zone->getFromDBByCrit(['name' => $name]);
         if ($zone->isNewItem()) {
-            $zone->add([
-                'name' => $name,
-                'plugin_carbon_carbonintensitysources_id_historical' => $source_id,
-            ]);
-            /** @phpstan-ignore if.alwaysTrue */
-            if ($zone->isNewItem()) {
-                throw new \RuntimeException("Failed to create zone '$name' in DB");
-            }
+            throw new RuntimeException("Failed to create zone '$name' in DB");
         }
-
         return $zone->getID();
     }
 
     /**
      * Link a carbon intensity source to a zone
      *
-     * @param int $source_id ID of the carbon intensity source
-     * @param int $zone_id ID of the zone
-     * @return int ID of the link
+     * @param int    $source_id ID of the carbon intensity source
+     * @param int    $zone_id ID of the zone
+     * @param string $code Identifier of the zone used by the source
+     * @return int   ID of the link
      */
-    public static function linkSourceZone(int $source_id, int $zone_id): int
+    public static function linkSourceZone(int $source_id, int $zone_id, string $code = ''): int
     {
-        $source_zone = new CarbonIntensitySource_Zone();
+        $source_zone = new Source_Zone();
         $source_zone->getFromDBByCrit([
-            'plugin_carbon_carbonintensitysources_id' => $source_id,
-            'plugin_carbon_zones_id'                  => $zone_id,
+            'plugin_carbon_sources_id' => $source_id,
+            'plugin_carbon_zones_id'   => $zone_id,
         ]);
         if ($source_zone->isNewItem()) {
             $source_zone->add([
-                'plugin_carbon_carbonintensitysources_id' => $source_id,
-                'plugin_carbon_zones_id'                  => $zone_id,
+                'plugin_carbon_sources_id' => $source_id,
+                'plugin_carbon_zones_id'   => $zone_id,
+                'code'                     => $code,
             ]);
+        } else {
+            if ($source_zone->fields['code'] !== $code) {
+                $source_zone->update([
+                    'id'   => $source_zone->getID(),
+                    'code' => $code,
+                ]);
+            }
         }
 
         return $source_zone->getID();

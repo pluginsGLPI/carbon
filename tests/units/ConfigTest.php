@@ -32,18 +32,83 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
-use GlpiPlugin\Carbon\Config;
+use Computer as GlpiComputer;
 use Config as GlpiConfig;
 use Geocoder\Geocoder;
+use GlpiPlugin\Carbon\Config;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Session;
+use Symfony\Component\DomCrawler\Crawler;
 
-#[CoversClass('GlpiPlugin\Carbon\Config')]
+#[CoversClass(Config::class)]
 class ConfigTest extends DbTestCase
 {
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\Config::getEmbodiedImpactEngine
-     */
+    public function testGetTypeName()
+    {
+        $result = Config::getTypeName(0);
+        $this->assertEquals('Environmental Impact', $result);
+
+        $result = Config::getTypeName(1);
+        $this->assertEquals('Environmental Impact', $result);
+
+        $result = Config::getTypeName(Session::getPluralNumber());
+        $this->assertEquals('Environmental Impact', $result);
+    }
+
+    public function testGetTabNameForItem()
+    {
+        $instance = new Config();
+        $result = $instance->getTabNameForItem(new GlpiComputer());
+        $this->assertEquals('', $result);
+
+        $result = $instance->getTabNameForItem(new GlpiConfig());
+        $this->assertEquals('Environmental Impact', $result);
+    }
+
+    public function testDisplayTabContentForItem()
+    {
+        $this->login('glpi', 'glpi');
+
+        ob_start();
+        Config::displayTabContentForItem(new GlpiComputer());
+        $output = ob_get_clean();
+        $this->assertEquals('', $output);
+
+        ob_start();
+        Config::displayTabContentForItem(new GlpiConfig());
+        $output = ob_get_clean();
+        $this->assertNotEquals('', $output);
+    }
+
+    public function testShowForm()
+    {
+        // No right to edit this page
+        $this->logout();
+        ob_start();
+        $instance = new Config();
+        $instance->showForm(-1);
+        $output = ob_get_clean();
+        $this->assertEquals('', trim($output));
+
+        $this->login('glpi', 'glpi');
+        ob_start();
+        $instance = new Config();
+        $instance->showForm(-1);
+        $output = ob_get_clean();
+        $crawler = new Crawler($output);
+        $config_class = $crawler->filter('input[type="hidden"][name="config_class"]');
+        $config_context = $crawler->filter('input[type="hidden"][name="config_context"]');
+        $csrf = $crawler->filter('input[type="hidden"][name="_glpi_csrf_token"]');
+        $this->assertEquals(1, $config_class->count());
+        $this->assertEquals(1, $config_context->count());
+        $this->assertEquals(1, $csrf->count());
+        $electricitymaps_api = $crawler->filter('input[name="electricitymap_api_key"]');
+        $impact_engine = $crawler->filter('select[name="impact_engine"]');
+        $this->assertEquals(1, $electricitymaps_api->count());
+        $this->assertEquals(1, $impact_engine->count());
+    }
+
     public function testGetEmbodiedImpactEngine()
     {
         $configuration_key = 'impact_engines';
@@ -63,9 +128,6 @@ class ConfigTest extends DbTestCase
         $this->assertEquals('GlpiPlugin\\Carbon\\Impact\\Embodied\\Boavizta', $output);
     }
 
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\Config::getUsageImpactEngine
-     */
     public function testGetUsageImpactEngine()
     {
         $configuration_key = 'impact_engines';
@@ -91,7 +153,7 @@ class ConfigTest extends DbTestCase
             [
                 'electricitymap_api_key' => '',
             ], [
-            ]
+            ],
         ];
 
         yield [
@@ -99,7 +161,7 @@ class ConfigTest extends DbTestCase
                 'electricitymap_api_key' => 'foo',
             ], [
                 'electricitymap_api_key' => 'foo',
-            ]
+            ],
         ];
 
         yield [
@@ -107,7 +169,7 @@ class ConfigTest extends DbTestCase
                 'boaviztapi_base_url' => '',
             ], [
                 'boaviztapi_base_url' => '',
-            ]
+            ],
         ];
 
         // TODO: requires code change to test boaviztapi_base_url with a not-empty value
@@ -122,7 +184,7 @@ class ConfigTest extends DbTestCase
      * @param array $expected
      * @return void
      */
-    #[dataProvider('configUpdateProvider')]
+    #[DataProvider('configUpdateProvider')]
     public function testConfigUpdate(array $input, array $expected)
     {
         $result = Config::configUpdate($input);
@@ -172,5 +234,46 @@ class ConfigTest extends DbTestCase
     {
         $result = Config::getGeocoder();
         $this->assertInstanceOf(Geocoder::class, $result);
+    }
+
+    public function testGetPluginConfigurationValue()
+    {
+        // Test reading a regular configuration value
+        $this->createItem(GlpiConfig::class, [
+            'context' => 'plugin:carbon',
+            'name'    => 'foo',
+            'value'   => 'bar',
+        ]);
+        $result = Config::getPluginConfigurationValue('foo');
+        $this->assertEquals('bar', $result);
+
+        // Test an overridable configuration value, not overriden
+        GlpiConfig::setConfigurationValues('plugin:carbon', [
+            'boaviztapi_base_url' => 'bar',
+        ]);
+        $result = Config::getPluginConfigurationValue('boaviztapi_base_url');
+        $this->assertEquals('bar', $result);
+
+        // Test an overridable configuration value, overriden by an env var
+        GlpiConfig::setConfigurationValues('plugin:carbon', [
+            'boaviztapi_base_url' => 'baz',
+        ]);
+        putenv(Config::ENV_BOAVIZTAPI_BASE_URL . '=bar');
+        $result = Config::getPluginConfigurationValue('boaviztapi_base_url');
+        $this->assertEquals('bar', $result);
+    }
+
+    public function testSetPluginConfigurationValues()
+    {
+        Config::setPluginConfigurationValues([
+            'foo' => 'bar',
+        ]);
+        $config = new GlpiConfig();
+        $config->getFromDBByCrit([
+            'context' => 'plugin:carbon',
+            'name'    => 'foo',
+        ]);
+        $this->assertFalse($config->isNewItem());
+        $this->assertEquals('bar', $config->fields['value']);
     }
 }

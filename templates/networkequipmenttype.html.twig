@@ -37,4 +37,10 @@
     {{ fields.numberField('power_consumption', item.fields['power_consumption'], _n('Power', 'Powers', 1, 'carbon'), {
         min: 0
     }) }}
+
+    {{ fields.dropdownYesNo(
+        'is_ignore',
+        item.fields['is_ignore'],
+        __('Do not evaluate', 'carbon'),
+    ) }}
 {% endblock %}

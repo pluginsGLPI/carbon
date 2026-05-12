@@ -32,20 +32,20 @@
 
 include(__DIR__ . "/../../../inc/includes.php");
 
-use GlpiPlugin\Carbon\MonitorType;
 use Glpi\Exception\Http\NotFoundHttpException;
+use GlpiPlugin\Carbon\MonitorType;
+use MonitorType as GlpiMonitorType;
 
 if (!Plugin::isPluginActive('carbon')) {
     throw new NotFoundHttpException();
 }
 
-Session::checkRight('config', UPDATE);
+Session::checkRight(GlpiMonitorType::$rightname, UPDATE);
 
 $item = new MonitorType();
 
 if (isset($_POST['update'])) {
-    // Add a new Form
-    Session::checkRight('entity', UPDATE);
+    Session::checkRight(GlpiMonitorType::$rightname, UPDATE);
     $item->update($_POST);
     Html::back();
 }

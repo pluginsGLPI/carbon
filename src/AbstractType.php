@@ -35,13 +35,12 @@ namespace GlpiPlugin\Carbon;
 use CommonDBChild;
 use CommonDBTM;
 use CommonGLPI;
-use Session;
 use Glpi\Application\View\TemplateRenderer;
+use Session;
 
 abstract class AbstractType extends CommonDBChild
 {
     public static $rightname = 'dropdown';
-
 
     public static function getIcon(): string
     {
@@ -53,7 +52,7 @@ abstract class AbstractType extends CommonDBChild
      */
     public static function getTypeName($nb = 0)
     {
-        return _n("Power", "Powers", $nb, 'carbon');
+        return __('Environmental impact', 'carbon');
     }
 
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
@@ -71,8 +70,8 @@ abstract class AbstractType extends CommonDBChild
      * Undocumented function
      *
      * @param CommonGLPI $item
-     * @param integer $tabnum
-     * @param integer $withtemplate
+     * @param int $tabnum
+     * @param int $withtemplate
      * @return void
      */
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
@@ -91,7 +90,7 @@ abstract class AbstractType extends CommonDBChild
      * Get the type for the item, creating it if it doesn't exist.
      *
      * @param CommonGLPI $item
-     * @return bool
+     * @return bool true if type object has been found or created
      */
     protected function getOrCreate(CommonGLPI $item): bool
     {
@@ -100,7 +99,7 @@ abstract class AbstractType extends CommonDBChild
         $this->getFromDBByCrit([$item_fk => $item->getID()]);
         if ($this->isNewItem()) {
             $this->add([
-                $item_fk => $item->getID()
+                $item_fk => $item->getID(),
             ]);
         }
         return $this->isNewItem();

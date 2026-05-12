@@ -33,21 +33,65 @@
 namespace GlpiPlugin\Carbon\Tests;
 
 use Config;
-use Geocoder\Collection;
+use DateTime;
 use Geocoder\Geocoder;
 use Geocoder\Model\AddressCollection;
 use Geocoder\Model\AdminLevel;
 use Geocoder\Model\AdminLevelCollection;
 use Geocoder\Model\Country;
 use Geocoder\Provider\Nominatim\Model\NominatimAddress;
-use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\CarbonIntensitySource_Zone;
+use GlpiPlugin\Carbon\CarbonIntensity;
+use GlpiPlugin\Carbon\Location;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 use Location as GlpiLocation;
-use GlpiPlugin\Carbon\Location;
+use PHPUnit\Framework\Attributes\CoversClass;
 
+#[CoversClass(Location::class)]
 class LocationTest extends DbTestCase
 {
+    public function test_prepareInputForUpdate_sets_source_zone_when_source_and_zone_are_specified()
+    {
+        $source = $this->createItem(Source::class);
+        $zone = $this->createItem(Zone::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            getForeignKeyFieldForItemType(Source::class) => $source->getID(),
+            getForeignKeyFieldForItemType(Zone::class) => $zone->getID(),
+        ]);
+        $input = [
+            'id' => 1,
+            getForeignKeyFieldForItemType(Source::class) => $source->getID(),
+            getForeignKeyFieldForItemType(Zone::class) => $zone->getID(),
+        ];
+        $instance = new Location();
+        $result = $instance->prepareInputForUpdate($input);
+        $expected = [
+            'id' => 1,
+            getForeignKeyFieldForItemType(Source::class) => $source->getID(),
+            getForeignKeyFieldForItemType(Zone::class) => $zone->getID(),
+            getForeignKeyFieldForItemType(Source_Zone::class) => $source_zone->getID(),
+        ];
+        $this->assertSame($expected, $result);
+    }
+
+    public function test_prepareInputForUpdate_resets_source_zone_when_source_is_0()
+    {
+        // This happens when the user removes the affectation of a location to a carbon intensity source and zone
+        $input = [
+            'id' => 1,
+            getForeignKeyFieldForItemType(Source::class) => '0',
+        ];
+        $instance = new Location();
+        $result = $instance->prepareInputForUpdate($input);
+        $expected = [
+            'id' => 1,
+            getForeignKeyFieldForItemType(Source::class) => '0',
+            getForeignKeyFieldForItemType(Source_Zone::class) => 0,
+        ];
+        $this->assertSame($expected, $result);
+    }
+
     /**
      * #CoversMethod GlpiPlugin\Carbon\Location::onGlpiLocationAdd
      * #CoversMethod GlpiPlugin\Carbon\Location::setBoaviztaZone
@@ -92,7 +136,7 @@ class LocationTest extends DbTestCase
                     null,
                     new Country('Vietnam', 'VN'),
                     null
-                )
+                ),
             ])
         );
         $instance = new Location();
@@ -149,7 +193,7 @@ class LocationTest extends DbTestCase
                     null,
                     new Country('Vietnam', 'VN'),
                     null
-                )
+                ),
             ])
         );
         $glpi_location = $this->createItem(GlpiLocation::class);
@@ -178,13 +222,13 @@ class LocationTest extends DbTestCase
         ]);
         $location = new Location();
         $location->getFromDBByCrit([
-            'locations_id' => $glpi_location->getID()
+            'locations_id' => $glpi_location->getID(),
         ]);
         $this->assertFalse($location->isNewItem());
         $glpi_location->delete($glpi_location->fields);
         $location = new Location();
         $location->getFromDBByCrit([
-            'locations_id' => $glpi_location->getID()
+            'locations_id' => $glpi_location->getID(),
         ]);
         $this->assertTrue($location->isNewItem());
     }
@@ -194,7 +238,7 @@ class LocationTest extends DbTestCase
      *
      * @return void
      */
-    public function testgetIncompleteLocations()
+    public function testGetIncompleteLocations()
     {
         $iterator = Location::getIncompleteLocations();
         $output = $iterator->count();
@@ -246,7 +290,7 @@ class LocationTest extends DbTestCase
         $glpi_location = $this->createItem(GlpiLocation::class, [
             'name' => 'Paris',
             'town'    => 'Paris',
-            'country' => 'France'
+            'country' => 'France',
         ]);
         $instance = new Location();
         $output = $instance->getCountryCode(
@@ -271,45 +315,41 @@ class LocationTest extends DbTestCase
 
         // Test when the location does not matches a zone
         $glpi_location = $this->createItem(GlpiLocation::class, [
-            'country' => 'Non existent country'
+            'country' => 'Non existent country',
         ]);
         $result = $this->callPrivateMethod($instance, 'enableCarbonIntensityDownload', $glpi_location);
         $this->assertFalse($result);
 
         // Test when the zone does not matchs a source
-        $source = $this->createItem(CarbonIntensitySource::class, [
+        $source = $this->createItem(Source::class, [
             'name' => 'bar',
         ]);
         $zone = $this->createItem(Zone::class, [
             'name' => 'foo',
-            'plugin_carbon_carbonintensitysources_id_historical' => 0,
         ]);
-        $source_zone = $this->createItem(CarbonIntensitySource_Zone::class, [
+        $source_zone = $this->createItem(Source_Zone::class, [
             $zone::getForeignKeyField() => $zone->getID(),
             $source::getForeignKeyField() => $source->getID(),
             'is_download_enabled' => 0,
         ]);
         $glpi_location = $this->createItem(GlpiLocation::class, [
-            'country' => 'bar'
+            'country' => 'bar',
         ]);
         $result = $this->callPrivateMethod($instance, 'enableCarbonIntensityDownload', $glpi_location);
         $this->assertFalse($result);
 
         // Test when the zone matches a source and download switches to enabled
-        $source = $this->createItem(CarbonIntensitySource::class, [
-            'name' => 'baz',
-        ]);
-        $zone = $this->createItem(Zone::class, [
-            'name' => 'baz',
-            'plugin_carbon_carbonintensitysources_id_historical' => $source->getID(),
-        ]);
-        $source_zone = $this->createItem(CarbonIntensitySource_Zone::class, [
+        $source = $this->createItem(Source::class);
+        $zone = $this->createItem(Zone::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
             $zone::getForeignKeyField() => $zone->getID(),
             $source::getForeignKeyField() => $source->getID(),
             'is_download_enabled' => 0,
         ]);
-        $glpi_location = $this->createItem(GlpiLocation::class, [
-            'country' => 'baz'
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $location = $this->createItem(Location::class, [
+            $glpi_location::getForeignKeyField() => $glpi_location->getID(),
+            $source_zone::getForeignKeyField() => $source_zone->getID(),
         ]);
         $result = $this->callPrivateMethod($instance, 'enableCarbonIntensityDownload', $glpi_location);
         $this->assertTrue($result);
@@ -317,99 +357,286 @@ class LocationTest extends DbTestCase
 
     public function testIsCarbonIntensityDownloadEnabled()
     {
-        // Test with an enmpty core location
+        // Test with an enmpty core location object
         $glpi_location = new GlpiLocation();
         $location = new Location();
         $result = $location->isCarbonIntensityDownloadEnabled($glpi_location);
         $this->assertFalse($result);
 
-        // Test with a core location without a country
+        // Test with a core location without additional data with the plugin object
         $glpi_location = $this->createItem(GlpiLocation::class);
         $location = new Location();
         $result = $location->isCarbonIntensityDownloadEnabled($glpi_location);
         $this->assertFalse($result);
 
         // Test with a core location with a country
-        $glpi_location = $this->createItem(GlpiLocation::class, [
-            'country' => 'France'
-        ]);
+        $glpi_location = $this->createItem(GlpiLocation::class);
         $location = new Location();
         $result = $location->isCarbonIntensityDownloadEnabled($glpi_location);
         $this->assertFalse($result);
 
         // Test with a core location with a country and the relation zource / zone exists, download disabled
-        $source_zone = new CarbonIntensitySource_Zone();
-        $source = new CarbonIntensitySource();
-        $source->getFromDBByCrit(['name' => 'RTE']);
-        $zone = new Zone();
-        $zone->getFromDBByCrit(['name' => 'France']);
-        $source_zone = $this->createItem(CarbonIntensitySource_Zone::class, [
-            'plugin_carbon_carbonintensitysources_id' => $source->getID(),
+        $source = $this->createItem(Source::class);
+        $zone = $this->createItem(Zone::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            'plugin_carbon_sources_id' => $source->getID(),
             'plugin_carbon_zones_id' => $zone->getID(),
-            'is_download_enabled' => 0,
-        ]);
-        $source_zone->update([
-            'id' => $source_zone->getID(),
             'is_download_enabled' => 0,
         ]);
         $location = new Location();
         $result = $location->isCarbonIntensityDownloadEnabled($glpi_location);
         $this->assertFalse($result);
 
-        // Test with a core location with a country and the relation zource / zone exists, download enabled
-        $source_zone->update([
-            'id' => $source_zone->getID(),
+        // Test with a core location with a relation zource / zone, download enabled
+        $source = $this->createItem(Source::class);
+        $zone = $this->createItem(Zone::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            'plugin_carbon_sources_id' => $source->getID(),
+            'plugin_carbon_zones_id' => $zone->getID(),
             'is_download_enabled' => 1,
         ]);
-        $location = new Location();
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $location = $this->createItem(Location::class, [
+            'locations_id' => $glpi_location->getID(),
+            $source_zone::getForeignKeyField() => $source_zone->getID(),
+        ]);
         $result = $location->isCarbonIntensityDownloadEnabled($glpi_location);
         $this->assertTrue($result);
     }
 
     public function testHasFallbackCarbonIntensityData()
     {
-        // Test with an enmpty core location
+        // Test with an empty core location
         $glpi_location = new GlpiLocation();
         $location = new Location();
         $result = $location->hasFallbackCarbonIntensityData($glpi_location);
         $this->assertFalse($result);
 
-        // Test with a core location without a country
+        // Test with a core location
         $glpi_location = $this->createItem(GlpiLocation::class);
         $location = new Location();
         $result = $location->hasFallbackCarbonIntensityData($glpi_location);
         $this->assertFalse($result);
 
-        // Test with a core location with a non-existing country
-        $glpi_location = $this->createItem(GlpiLocation::class, [
-            'country' => 'Azeroth'
+        // Test with a core location with a relation to a non-fallback source
+        $source =  $this->createItem(Source::class, [
+            'name' => 'a source',
+            'is_carbon_intensity_source' => 1,
+            'fallback_level' => 0,
         ]);
-        $location = new Location();
+        $zone =  $this->createItem(Zone::class, ['name' => 'a zone']);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            Source::getForeignKeyField() => $source->getID(),
+            Zone::getForeignKeyField() => $zone->getID(),
+        ]);
+        $carbon_intensity = $this->createItem(CarbonIntensity::class, [
+            'date' => (new DateTime())->setTime(0, 0)->format('Y-m-d H:i:s'),
+            Source::getForeignKeyField() => $source->getID(),
+            Zone::getForeignKeyField() => $zone->getID(),
+        ]);
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $location = $this->createItem(Location::class, [
+            GlpiLocation::getForeignKeyField() => $glpi_location->getID(),
+            Source_Zone::getForeignKeyField() => $source_zone->getID(),
+        ]);
         $result = $location->hasFallbackCarbonIntensityData($glpi_location);
         $this->assertFalse($result);
 
-        // Test with a core location with a non-existing state
-        $glpi_location = $this->createItem(GlpiLocation::class, [
-            'state' => 'Durotar'
+        // Test with a core location with a relation to a non fallback source, that source having an other fallback source
+        $source =  $this->createItem(Source::class, [
+            'name' => 'a source 2',
+            'is_carbon_intensity_source' => 1,
+            'fallback_level' => 0,
         ]);
-        $location = new Location();
-        $result = $location->hasFallbackCarbonIntensityData($glpi_location);
-        $this->assertFalse($result);
-
-        // Test with a core location with a country
-        $glpi_location = $this->createItem(GlpiLocation::class, [
-            'country' => 'France'
+        $zone =  $this->createItem(Zone::class, ['name' => 'a zone 2']);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            Source::getForeignKeyField() => $source->getID(),
+            Zone::getForeignKeyField() => $zone->getID(),
         ]);
-        $location = new Location();
+        $carbon_intensity = $this->createItem(CarbonIntensity::class, [
+            'date' => (new DateTime())->setTime(0, 0)->format('Y-m-d H:i:s'),
+            Source::getForeignKeyField() => $source->getID(),
+            Zone::getForeignKeyField() => $zone->getID(),
+        ]);
+        $fallback_source = $this->createItem(Source::class, [
+            'name' => 'fallback source 2',
+            'is_carbon_intensity_source' => 1,
+            'fallback_level' => 1,
+        ]);
+        $fallback_source_zone = $this->createItem(Source_Zone::class, [
+            Source::getForeignKeyField() => $fallback_source->getID(),
+            Zone::getForeignKeyField() => $zone->getID(),
+        ]);
+        $fallback_carbon_intensity = $this->createItem(CarbonIntensity::class, [
+            'date' => (new DateTime())->setTime(0, 0)->format('Y-m-d H:i:s'),
+            Source::getForeignKeyField() => $fallback_source->getID(),
+            Zone::getForeignKeyField() =>   $zone->getID(),
+        ]);
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $location = $this->createItem(Location::class, [
+            GlpiLocation::getForeignKeyField() => $glpi_location->getID(),
+            $source_zone::getForeignKeyField() => $source_zone->getID(),
+        ]);
         $result = $location->hasFallbackCarbonIntensityData($glpi_location);
         $this->assertTrue($result);
 
-        // Test with a core location with a state
-        $glpi_location = $this->createItem(GlpiLocation::class, [
-            'state' => 'Quebec'
+        // Test a core location with a relation to a fallback source
+        $source =  $this->createItem(Source::class, [
+            'name' => 'a source 3',
+            'is_carbon_intensity_source' => 1,
+            'fallback_level' => 1,
         ]);
-        $location = new Location();
+        $zone =  $this->createItem(Zone::class, ['name' => 'a zone 3']);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            Source::getForeignKeyField() => $source->getID(),
+            Zone::getForeignKeyField() => $zone->getID(),
+        ]);
+        $carbon_intensity = $this->createItem(CarbonIntensity::class, [
+            'date' => (new DateTime())->setTime(0, 0)->format('Y-m-d H:i:s'),
+            Source::getForeignKeyField() => $source->getID(),
+            Zone::getForeignKeyField() => $zone->getID(),
+        ]);
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $location = $this->createItem(Location::class, [
+            GlpiLocation::getForeignKeyField() => $glpi_location->getID(),
+            Source_Zone::getForeignKeyField() => $source_zone->getID(),
+        ]);
         $result = $location->hasFallbackCarbonIntensityData($glpi_location);
         $this->assertTrue($result);
+
+        // Test with a core location with a relation to a fallback source, that source having an other fallback source
+        $source =  $this->createItem(Source::class, [
+            'name' => 'a source 4',
+            'is_carbon_intensity_source' => 1,
+        ]);
+        $zone =  $this->createItem(Zone::class, ['name' => 'a zone 4']);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            Source::getForeignKeyField() => $source->getID(),
+            Zone::getForeignKeyField() => $zone->getID(),
+        ]);
+        $carbon_intensity = $this->createItem(CarbonIntensity::class, [
+            'date' => (new DateTime())->setTime(0, 0)->format('Y-m-d H:i:s'),
+            Source::getForeignKeyField() => $source->getID(),
+            Zone::getForeignKeyField() => $zone->getID(),
+        ]);
+        $fallback_source = $this->createItem(Source::class, [
+            'name' => 'fallback source 4',
+            'is_carbon_intensity_source' => 1,
+            'fallback_level' => 2,
+        ]);
+        $fallback_source_zone = $this->createItem(Source_Zone::class, [
+            Source::getForeignKeyField() => $fallback_source->getID(),
+            Zone::getForeignKeyField() => $zone->getID(),
+        ]);
+        $fallback_carbon_intensity = $this->createItem(CarbonIntensity::class, [
+            'date' => (new DateTime())->setTime(0, 0)->format('Y-m-d H:i:s'),
+            Source::getForeignKeyField() => $fallback_source->getID(),
+            Zone::getForeignKeyField() =>   $zone->getID(),
+        ]);
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $location = $this->createItem(Location::class, [
+            GlpiLocation::getForeignKeyField() => $glpi_location->getID(),
+            $source_zone::getForeignKeyField() => $source_zone->getID(),
+        ]);
+        $result = $location->hasFallbackCarbonIntensityData($glpi_location);
+        $this->assertTrue($result);
+    }
+
+    public function testGetSourceZoneId()
+    {
+        // Test an unitialized location
+        $location = new Location();
+        $result = $location->getSourceZoneId();
+        $this->assertEquals(0, $result);
+
+        // Test a location without a relation to a source and a zone
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $location = $this->createItem(Location::class, ['locations_id' => $glpi_location->getID()]);
+        $result = $location->getSourceZoneId();
+        $this->assertEquals(0, $result);
+
+        // Test a location associated to a source_zone
+        $source = $this->createItem(Source::class);
+        $zone = $this->createItem(Zone::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            Source::getForeignKeyField() => $source->getID(),
+            Zone::getForeignKeyField() => $zone->getID(),
+        ]);
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $location = $this->createItem(Location::class, [
+            'locations_id' => $glpi_location->getID(),
+            'plugin_carbon_sources_zones_id' => $source_zone->getID(),
+        ]);
+        $result = $location->getSourceZoneId();
+        $this->assertEquals($source_zone->getID(), $result);
+
+        // Test a source_zone associated to the parent of the location
+        $glpi_location_ancestor = $this->createItem(GlpiLocation::class);
+        $glpi_location = $this->createItem(GlpiLocation::class, [
+            'locations_id' => $glpi_location_ancestor->getID(),
+        ]);
+        $location = $this->createItem(Location::class, [
+            'locations_id' => $glpi_location_ancestor->getID(),
+            'plugin_carbon_sources_zones_id' => $source_zone->getID(),
+        ]);
+        $result = $location->getSourceZoneId();
+        $this->assertEquals($source_zone->getID(), $result);
+
+        // Test a source_zone associated to the gand-parent of the location
+        $glpi_location_grand_ancestor = $this->createItem(GlpiLocation::class);
+        $glpi_location_ancestor = $this->createItem(GlpiLocation::class, [
+            'locations_id' => $glpi_location_grand_ancestor->getID(),
+        ]);
+        $glpi_location = $this->createItem(GlpiLocation::class, [
+            'locations_id' => $glpi_location_ancestor->getID(),
+        ]);
+        $location_grand_ancestor = $this->createItem(Location::class, [
+            'locations_id' => $glpi_location_grand_ancestor->getID(),
+            'plugin_carbon_sources_zones_id' => $source_zone->getID(),
+        ]);
+        $location = $this->createItem(Location::class, [
+            'locations_id' => $glpi_location->getID(),
+        ]);
+        $result = $location->getSourceZoneId();
+        $this->assertEquals($source_zone->getID(), $result);
+    }
+
+    public function getZoneCodeTest()
+    {
+        // Test an asset without a location
+        $glpi_computer = $this->createItem(GlpiComputer::class);
+        $result = Location::getZoneCode($glpi_computer);
+        $this->assertNull($result);
+
+        // Test an asset with a location without a plugin location extra data
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $glpi_computer = $this->createItem(GlpiComputer::class, [
+            $glpi_location->getForeignKeyField() => $glpi_location->getID(),
+        ]);
+        $result = Location::getZoneCode($glpi_computer);
+        $this->assertNull($result);
+
+        // Test an asset with a location without a boavizta zone set
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $location = $this->createItem(Location::class, [
+            $glpi_location->getForeignKeyField() => $glpi_location->getID(),
+        ]);
+        $glpi_computer = $this->createItem(GlpiComputer::class, [
+            $glpi_location->getForeignKeyField() => $glpi_location->getID(),
+        ]);
+        $result = Location::getZoneCode($glpi_computer);
+        $this->assertNull($result);
+
+        // Test an asset with a location fully specified
+        $glpi_location = $this->createItem(GlpiLocation::class);
+        $location = $this->createItem(Location::class, [
+            $glpi_location->getForeignKeyField() => $glpi_location->getID(),
+            'boavizta_zone' => 'FRA',
+        ]);
+        $glpi_computer = $this->createItem(GlpiComputer::class, [
+            $glpi_location->getForeignKeyField() => $glpi_location->getID(),
+        ]);
+        $result = Location::getZoneCode($glpi_computer);
+        $this->assertEquals('FRA', $result);
     }
 }

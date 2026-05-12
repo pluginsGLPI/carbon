@@ -32,13 +32,13 @@
 
 namespace GlpiPlugin\Carbon\Engine\V1;
 
-use DateTime;
+use CommonDBTM;
 use Computer as GlpiComputer;
+use DateTime;
 use DbUtils;
-use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\DataTracking\TrackedInt;
-use GlpiPlugin\Carbon\Tests\Engine\V1\EngineTestCase;
+use GlpiPlugin\Carbon\Source_Zone;
 
 /**
  * Compute environmental impact of a whole inventory
@@ -55,9 +55,10 @@ class Inventory implements EngineInterface
     /**
      * Check an item is already in the inventory
      *
-     * @param string $itemtype
-     * @param integer $items_id
-     * @return boolean
+     * @template T of CommonDBTM
+     * @param class-string<T> $itemtype
+     * @param int $items_id
+     * @return bool
      */
     public function hasItem(string $itemtype, int $items_id)
     {
@@ -68,23 +69,25 @@ class Inventory implements EngineInterface
     /**
      * Is the itemtype an asset ?
      *
-     * @param string $itemtype
-     * @return boolean
+     * @template T of CommonDBTM
+     * @param class-string<T> $itemtype
+     * @return bool
      */
     private static function isAsset(string $itemtype): bool
     {
         /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
-         return in_array($itemtype, $CFG_GLPI["asset_types"]);
+        return in_array($itemtype, $CFG_GLPI["asset_types"]);
     }
 
     /**
      * Add an item to the inventory to be processed
      *
-     * @param string $itemtype
-     * @param integer $items_id
-     * @return boolean
+     * @template T of CommonDBTM
+     * @param class-string<T> $itemtype
+     * @param int $items_id
+     * @return bool
      */
     public function addItem(string $itemtype, int $items_id): bool
     {
@@ -124,9 +127,10 @@ class Inventory implements EngineInterface
     /**
      * Add several items to the inventory by itemtype and a search criteria
      *
-     * @param string $itemtype itemtype of the items to add
+     * @template T of CommonDBTM
+     * @param class-string<T> $itemtype itemtype of the items to add
      * @param array $crit search criteria of items to add
-     * @return boolean true if success
+     * @return bool true if success
      */
     public function addItemsByCrit(string $itemtype, array $crit = []): bool
     {
@@ -182,7 +186,7 @@ class Inventory implements EngineInterface
         return $energy->setValue($total_energy);
     }
 
-    public function getCarbonEmissionPerDay(DateTime $day, Zone $zone): ?TrackedFloat
+    public function getCarbonEmissionPerDay(DateTime $day, Source_Zone $source_zone): ?TrackedFloat
     {
         $total_emission = 0;
         $emission = new TrackedFloat();

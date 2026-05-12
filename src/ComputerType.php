@@ -43,12 +43,12 @@ class ComputerType extends AbstractType
     public static $itemtype = GlpiComputerType::class;
     public static $items_id = 'computertypes_id';
 
-    const CATEGORY_UNDEFINED  = 0;
-    const CATEGORY_DESKTOP    = 1;
-    const CATEGORY_SERVER     = 2;
-    const CATEGORY_LAPTOP     = 3;
-    const CATEGORY_TABLET     = 4;
-    const CATEGORY_SMARTPHONE = 5;
+    public const CATEGORY_UNDEFINED  = 0;
+    public const CATEGORY_DESKTOP    = 1;
+    public const CATEGORY_SERVER     = 2;
+    public const CATEGORY_LAPTOP     = 3;
+    public const CATEGORY_TABLET     = 4;
+    public const CATEGORY_SMARTPHONE = 5;
 
     public static function getCategories(): array
     {
@@ -114,7 +114,7 @@ class ComputerType extends AbstractType
      * Update the power consumption associated to a computer type
      *
      * @param CommonDBTM $item Computer to update
-     * @param integer $power pwoer consumption to set
+     * @param int $power pwoer consumption to set
      * @return bool
      */
     public static function updatePowerConsumption(CommonDBTM $item, int $power): bool
@@ -142,7 +142,7 @@ class ComputerType extends AbstractType
      * Update the category of a computer
      *
      * @param CommonDBTM $item Computer to update
-     * @param integer $category pwoer consumption to set
+     * @param int $category pwoer consumption to set
      * @return bool
      */
     public static function updateCategory(CommonDBTM $item, int $category): bool
@@ -172,7 +172,7 @@ class ComputerType extends AbstractType
      *
      * @param string $name
      * @param array $options
-     * @return integer|string
+     * @return int|string
      */
     public static function dropdownType(string $name, array $options = [])
     {
@@ -184,6 +184,9 @@ class ComputerType extends AbstractType
     {
         switch ($field) {
             case 'category':
+                if ($values['category'] === null) {
+                    return '';
+                }
                 $categories = self::getCategories();
                 return $categories[$values['category']] ?? '';
         }

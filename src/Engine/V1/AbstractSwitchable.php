@@ -33,14 +33,15 @@
 namespace GlpiPlugin\Carbon\Engine\V1;
 
 use ArrayObject;
-use DateTime;
 use DateInterval;
+use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
-use GlpiPlugin\Carbon\Zone;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\DataTracking\TrackedInt;
+use GlpiPlugin\Carbon\Source;
+use GlpiPlugin\Carbon\Source_Zone;
 
 abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInterface
 {
@@ -49,7 +50,7 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
      *
      * @param ComputerUsageProfile $usage_profile
      * @param DateTimeInterface $dateTime
-     * @return boolean true if the asset is powered on
+     * @return bool true if the asset is powered on
      */
     protected static function isUsageDay(ComputerUsageProfile $usage_profile, DateTimeInterface $dateTime): bool
     {
@@ -77,8 +78,8 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
         $power = $this->getPower();
 
         $day_s = $day->format('Y-m-d');
-        $start_date = DateTime::createFromFormat('Y-m-d H:i:s', $day_s . ' ' . $usage_profile->fields['time_start']);
-        $stop_date = DateTime::createFromFormat('Y-m-d H:i:s', $day_s . ' ' . $usage_profile->fields['time_stop']);
+        $start_date = DateTime::createFromFormat('Y-m-d H:i:s', $day_s . ' ' . $usage_profile->fields['time_start'] . ':00');
+        $stop_date = DateTime::createFromFormat('Y-m-d H:i:s', $day_s . ' ' . $usage_profile->fields['time_stop'] . ':00');
         $delta_time = $stop_date->getTimestamp() - $start_date->getTimestamp();
 
         // units:
@@ -93,7 +94,7 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
         );
     }
 
-    public function getCarbonEmissionPerDay(DateTimeInterface $day, Zone $zone): ?TrackedFloat
+    public function getCarbonEmissionPerDay(DateTimeInterface $day, Source_Zone $source_zone): ?TrackedFloat
     {
         $usage_profile = $this->getUsageProfile();
 
@@ -109,36 +110,61 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
         // Convert to integers
         $seconds_start[0] = (int) $seconds_start[0];
         $seconds_start[1] = (int) $seconds_start[1];
-        $seconds_start[2] = (int) $seconds_start[2];
+        $seconds_start[2] = 0;
         $seconds_stop[0] = (int) $seconds_stop[0];
         $seconds_stop[1] = (int) $seconds_stop[1];
-        $seconds_stop[2] = (int) $seconds_stop[2];
+        $seconds_stop[2] = 0;
 
         $start_time = clone $day;
         $start_time->setTime($seconds_start[0], $seconds_start[1], $seconds_start[2]);
-        $seconds_start = $seconds_start[0] * 3600 + $seconds_start[1] * 60 + $seconds_start[2];
-        $seconds_stop = $seconds_stop[0] * 3600 + $seconds_stop[1] * 60 + $seconds_stop[2];
+        $seconds_start = $seconds_start[0] * 3600
+            + $seconds_start[1] * 60
+            + $seconds_start[2];
+        $seconds_stop = $seconds_stop[0] * 3600
+            + $seconds_stop[1] * 60
+            + $seconds_stop[2];
         $length = new DateInterval('PT' . ($seconds_stop - $seconds_start) . 'S');
         $start_time = DateTimeImmutable::createFromMutable($start_time);
-        return $this->computeEmissionPerDay($start_time, $power, $length, $zone);
+        return $this->computeEmissionPerDay($start_time, $power, $length, $source_zone);
     }
 
-    protected function computeEmissionPerDay(DateTimeImmutable $start_time, TrackedInt $power, DateInterval $length, Zone $zone): ?TrackedFloat
+    protected function computeEmissionPerDay(DateTimeImmutable $start_time, TrackedInt $power, DateInterval $length, Source_Zone $source_zone): ?TrackedFloat
     {
         if ($power->getValue() === 0) {
             return new TrackedFloat(0);
         }
 
+        $source = Source::getById($source_zone->fields['plugin_carbon_sources_id']);
+        $fallback_source_zone = null;
+        $iterator = null;
+
+        // Try to read real time carbon intensities
+        if ($source->fields['fallback_level'] === 0) {
+            $iterator = $this->requestCarbonIntensitiesPerDay($start_time, $length, $source_zone);
+            if ($iterator->count() === 0) {
+                // Need to fallback to an alternate source
+                $fallback_source_zone = new Source_Zone();
+                if (!$fallback_source_zone->getFallbackFromDB($source_zone)) {
+                    $fallback_source_zone = null;
+                }
+            }
+        } else {
+            // The source is already a fallback (exapmple: Quebec does has any realtime source)
+            $fallback_source_zone = $source_zone;
+        }
+
         $total_seconds = (int) $length->format('%S');
         $expected_count = (int) ceil($total_seconds / 3600);
-        $iterator = $this->requestCarbonIntensitiesPerDay($start_time, $length, $zone);
-        if ($iterator->count() === 0 && !$zone->hasHistoricalData()) {
-            $row = array_fill(0, $expected_count, $this->getFallbackCarbonIntensity($start_time, $zone));
+
+        // Try a fallback source
+        if ($fallback_source_zone !== null) {
+            $row = array_fill(0, $expected_count, $this->getFallbackCarbonIntensity($start_time, $fallback_source_zone));
             $iterator = new ArrayObject($row);
             $iterator = $iterator->getIterator();
         }
-        $count = $iterator->count();
-        if ($iterator->count() != $expected_count) {
+
+        $count = $iterator ? $iterator->count() : 0;
+        if ($count != $expected_count) {
             trigger_error(sprintf(
                 "required count of carbon intensity %d samples not met. Got %d samples for date %s",
                 $expected_count,

@@ -33,19 +33,21 @@
 
 namespace GlpiPlugin\Carbon\Impact\Usage;
 
-use DBmysql;
-use DbUtils;
 use CommonDBTM;
+use DBmysql;
+use DBmysqlIterator;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
-use GlpiPlugin\Carbon\UsageImpact;
 use GlpiPlugin\Carbon\Impact\Type;
-use Location as GlpiLocation;
+use GlpiPlugin\Carbon\Toolbox;
+use GlpiPlugin\Carbon\UsageImpact;
+use LogicException;
+use RuntimeException;
 use Toolbox as GlpiToolbox;
 
 abstract class AbstractUsageImpact implements UsageImpactInterface
 {
-    /** @var string Handled itemtype */
-    protected static string $itemtype = '';
+    /** @var CommonDBTM Item to analyze */
+    protected CommonDBTM $item;
 
     /** @var int maximum number of entries to build */
     protected int $limit = 0;
@@ -57,23 +59,29 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
     protected string $engine = 'undefined';
 
     /** @var string $engine_version Version of the calculation engine */
-    protected string $engine_version = 'unknown';
+    protected static string $engine_version = 'unknown';
 
     /** @var array of TrackedFloat */
     protected array $impacts = [];
 
-    public function __construct()
+    public function __construct(CommonDBTM $item)
     {
+        if ($item->isNewItem()) {
+            throw new LogicException("Given item is empty");
+        }
+        $this->item = $item;
         foreach (array_flip(Type::getImpactTypes()) as $type) {
             $this->impacts[$type] = null;
         }
     }
 
+    abstract protected function getVersion(): string;
+
     /**
      * Get the unit of an impact
      *
-     * @param integer $type
-     * @param boolean $short
+     * @param int $type
+     * @param bool $short
      * @return string|null
      */
     final public function getUnit(int $type, bool $short = true): ?string
@@ -90,48 +98,46 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
         return null;
     }
 
-    public static function getItemtype(): string
-    {
-        return static::$itemtype;
-    }
-
     public function setLimit(int $limit)
     {
         $this->limit = $limit;
     }
 
-    public function evaluateItems(): int
+    public function getItemsToEvaluate(string $itemtype, array $crit = []): DBmysqlIterator
     {
         /** @var DBmysql $DB */
         global $DB;
 
-        $itemtype = static::$itemtype;
-        if ($itemtype === '') {
-            throw new \LogicException('Itemtype not set');
-        }
-        if (!is_subclass_of($itemtype, CommonDBTM::class)) {
-            throw new \LogicException('Itemtype does not inherits from ' . CommonDBTM::class);
+        if (!GlpiToolbox::isCommonDBTM($itemtype)) {
+            throw new LogicException('Itemtype does not inherits from ' . CommonDBTM::class);
         }
 
+        $crit[] = [
+            'OR' => [
+                UsageImpact::getTableField('id') => null,
+                UsageImpact::getTableField('recalculate') => 1,
+            ],
+        ];
+        $iterator = $DB->request($this->getEvaluableQuery($itemtype, $crit));
+
+        return $iterator;
+    }
+
+    public function evaluateItems(DBmysqlIterator $iterator): int
+    {
         /**
          * Huge quantity of SQL queries will be executed
          * We NEED to check memory usage to avoid running out of memory
-         * @see DbMysql::doQuery()
+         * @see DBmysql::doQuery()
          */
-        $memory_limit = GlpiToolbox::getMemoryLimit() - 8 * 1024 * 1024;
-        if ($memory_limit < 0) {
-            // May happen in test seems that ini_get("memory_limits") returns
-            // enpty string in PHPUnit environment
-            $memory_limit = null;
-        }
+        $memory_limit = Toolbox::getMemoryLimit();
 
         /** @var int $attempts_count count of evaluation attempts */
         $attempts_count = 0;
         /** @var int $count count of successfully evaluated assets */
         $count = 0;
-        $iterator = $DB->request($this->getEvaluableQuery());
         foreach ($iterator as $row) {
-            if ($this->evaluateItem($row['id'])) {
+            if ($this->evaluateItem()) {
                 $count++;
             }
             $attempts_count++;
@@ -152,17 +158,14 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
         return $count;
     }
 
-    public function evaluateItem(int $id): bool
+    public function evaluateItem(): bool
     {
-        $itemtype = static::$itemtype;
-        $item = $itemtype::getById($id);
-        if ($item === false) {
-            return false;
-        }
+        $itemtype = get_class($this->item);
 
         try {
-            $impacts = $this->doEvaluation($item);
-        } catch (\RuntimeException $e) {
+            $this->getVersion();
+            $impacts = $this->doEvaluation($this->item);
+        } catch (RuntimeException $e) {
             return false;
         }
 
@@ -174,14 +177,15 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
         // Find an existing row, if any
         $input = [
             'itemtype' => $itemtype,
-            'items_id' => $id,
+            'items_id' => $this->item->getID(),
         ];
         $usage_impact = new UsageImpact();
         $usage_impact->getFromDBByCrit($input);
         $impact_types = Type::getImpactTypes();
 
+        $input['recalculate'] = 0;
         $input['engine'] = $this->engine;
-        $input['engine_version'] = $this->engine_version;
+        $input['engine_version'] = self::$engine_version;
 
         // Prepare inputs for add or update
         foreach ($impacts as $type => $value) {
@@ -209,55 +213,6 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
         }
 
         return false;
-    }
-
-    public function getEvaluableQuery(array $crit = [], bool $entity_restrict = true): array
-    {
-        $itemtype = static::$itemtype;
-        $item_table = $itemtype::getTable();
-        $glpi_location_table = GlpiLocation::getTable();
-        $usage_impact_table = UsageImpact::getTable();
-
-        // $where = [];
-        // if (!$recalculate) {
-        //     $where = [UsageImpact::getTableField('id') => null];
-        // }
-
-        $request = [
-            'SELECT' => [
-                $itemtype::getTableField('id'),
-            ],
-            'FROM' => $item_table,
-            'LEFT JOIN' => [
-                $usage_impact_table => [
-                    'FKEY' => [
-                        $usage_impact_table => 'items_id',
-                        $item_table            => 'id',
-                        ['AND' =>
-                            [
-                                UsageImpact::getTableField('itemtype') => $itemtype,
-                            ]
-                        ],
-                    ],
-                ],
-                $glpi_location_table => [
-                    'FKEY' => [
-                        $glpi_location_table => 'id',
-                        $item_table => 'locations_id',
-                    ]
-                ],
-            ],
-            'WHERE' => [
-                ['NOT' => [GlpiLocation::getTableField('id') => null]],
-            ] + $crit,
-        ];
-
-        if ($entity_restrict) {
-            $entity_restrict = (new DbUtils())->getEntitiesRestrictCriteria($item_table, '', '', 'auto');
-            $request['WHERE'] += $entity_restrict;
-        }
-
-        return $request;
     }
 
     /**

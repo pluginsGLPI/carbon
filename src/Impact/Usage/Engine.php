@@ -32,10 +32,12 @@
 
 namespace GlpiPlugin\Carbon\Impact\Usage;
 
+use CommonDBTM;
 use CommonGLPI;
 use GlpiPlugin\Carbon\Config;
-use GlpiPlugin\Carbon\DataSource\Boaviztapi;
+use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\Client as BoaviztapiClient;
 use GlpiPlugin\Carbon\DataSource\RestApiClient;
+use RuntimeException;
 
 class Engine extends CommonGLPI
 {
@@ -54,35 +56,24 @@ class Engine extends CommonGLPI
      *
      * Returns null if no engine found
      *
-     * @param string $itemtype itemtype of assets to analyze
+     * @param CommonDBTM $item item to analyze
      * @return AbstractUsageImpact|null an instance if an embodied impact calculation object or null on error
      */
-    public static function getEngineFromItemtype(string $itemtype): ?AbstractUsageImpact
+    public static function getEngineFromItemtype(CommonDBTM $item): ?AbstractUsageImpact
     {
+        $itemtype = get_class($item);
+
         $usage_impact_namespace = Config::getUsageImpactEngine();
         $usage_impact_class = $usage_impact_namespace . '\\' . $itemtype;
         if (!class_exists($usage_impact_class) || !is_subclass_of($usage_impact_class, AbstractUsageImpact::class)) {
             return null;
         }
 
-        $usage_impact = new $usage_impact_class();
+        /** @var AbstractUsageImpact $usage_impact */
+        $usage_impact = new $usage_impact_class($item);
         try {
             return self::configureEngine($usage_impact);
-        } catch (\RuntimeException $e) {
-            return null;
-        }
-    }
-
-    public static function getEngine(string $engine_class): ?AbstractUsageImpact
-    {
-        if (!is_subclass_of($engine_class, AbstractUsageImpact::class)) {
-            return null;
-        }
-        $embodied_impact = new $engine_class();
-
-        try {
-            return self::configureEngine($embodied_impact);
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             return null;
         }
     }
@@ -99,7 +90,7 @@ class Engine extends CommonGLPI
         switch (array_slice($embodied_impact_namespace, -2, 1)[0]) {
             case 'Boavizta':
                 /** @var Boavizta\AbstractAsset $engine  */
-                $engine->setClient(new Boaviztapi(new RestApiClient()));
+                $engine->setClient(new BoaviztapiClient(new RestApiClient()));
         }
 
         return $engine;

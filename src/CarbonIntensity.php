@@ -33,15 +33,14 @@
 namespace GlpiPlugin\Carbon;
 
 use CommonDropdown;
-use DateTime;
 use DateInterval;
+use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DBmysql;
-use GlpiPlugin\Carbon\CarbonIntensitySource;
-use GlpiPlugin\Carbon\Zone;
-use GlpiPlugin\Carbon\DataSource\CarbonIntensityInterface;
+use Exception;
 use Glpi\DBAL\QueryParam;
+use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
@@ -92,9 +91,9 @@ class CarbonIntensity extends CommonDropdown
 
         $tab[] = [
             'id'                 => SearchOptions::CARBON_INTENSITY_SOURCE,
-            'table'              => CarbonIntensitySource::getTable(),
+            'table'              => Source::getTable(),
             'field'              => 'name',
-            'name'               => CarbonIntensitySource::getTypeName(1),
+            'name'               => Source::getTypeName(1),
             'massiveaction'      => false, // implicit field is id
             'datatype'           => 'dropdown',
         ];
@@ -115,7 +114,7 @@ class CarbonIntensity extends CommonDropdown
             'name'               => __('Intensity', 'carbon'),
             'massiveaction'      => false, // implicit field is id
             'datatype'           => 'decimal',
-            'unit'               => 'gCO<sub>2</sub>eq/KWh',
+            'unit'               => 'gCO₂eq/KWh',
         ];
 
         return $tab;
@@ -124,35 +123,36 @@ class CarbonIntensity extends CommonDropdown
     /**
      * get carbon intensity dates for a source and a zone
      *
-     * @param string $zone_name   Zone to examinate
-     * @param string $source_name Source to examinate
+     * @param Source_Zone $source_zone Source_Zone to examinate
      * @return array
      */
-    private function getKnownDatesQuery(string $zone_name, string $source_name)
+    private function getKnownDatesQuery(Source_Zone $source_zone)
     {
         $intensity_table = CarbonIntensity::getTable();
-        $source_table = CarbonIntensitySource::getTable();
+        $source_table = Source::getTable();
         $zone_table   = Zone::getTable();
+        $source_fk = getForeignKeyFieldForItemType(Source::class);
+        $zone_fk = getForeignKeyFieldForItemType(Zone::class);
         return [
             'SELECT' => [$intensity_table => ['id', 'date']],
             'FROM'   => $intensity_table,
             'INNER JOIN' => [
                 $source_table => [
                     'FKEY' => [
-                        $intensity_table => CarbonIntensitySource::getForeignKeyField(),
+                        $intensity_table => Source::getForeignKeyField(),
                         $source_table => 'id',
-                    ]
+                    ],
                 ],
                 $zone_table => [
                     'FKEY' => [
                         $intensity_table => Zone::getForeignKeyField(),
                         $zone_table => 'id',
-                    ]
-                ]
+                    ],
+                ],
             ],
             'WHERE' => [
-                CarbonIntensitySource::getTableField('name') => $source_name,
-                Zone::getTableField('name') => $zone_name
+                $source_fk => $source_zone->fields[$source_fk],
+                $zone_fk => $source_zone->fields[$zone_fk],
             ],
         ];
     }
@@ -160,16 +160,15 @@ class CarbonIntensity extends CommonDropdown
     /**
      * Get the last known date of carbon emissiosn
      *
-     * @param string $zone_name   Zone to examinate
-     * @param string $source_name Source to examinate
+     * @param Source_Zone $source_zone   Source_Zone to examinate
      * @return DateTimeImmutable
      */
-    public function getLastKnownDate(string $zone_name, string $source_name): ?DateTimeImmutable
+    public function getLastKnownDate(Source_Zone $source_zone): ?DateTimeImmutable
     {
         /** @var DBmysql $DB */
         global $DB;
 
-        $request = $this->getKnownDatesQuery($zone_name, $source_name);
+        $request = $this->getKnownDatesQuery($source_zone);
         $request['ORDER'] = CarbonIntensity::getTableField('date') . ' DESC';
         $request['LIMIT'] = '1';
         $result = $DB->request($request)->current();
@@ -182,16 +181,15 @@ class CarbonIntensity extends CommonDropdown
     /**
      * Get the first known date of carbon emissiosn
      *
-     * @param string $zone_name Zone to examinate
-     * @param string $source_name Source to examinate
+     * @param Source_Zone $source_zone
      * @return DateTimeImmutable
      */
-    public function getFirstKnownDate(string $zone_name, string $source_name): ?DateTimeImmutable
+    public function getFirstKnownDate(Source_Zone $source_zone): ?DateTimeImmutable
     {
         /** @var DBmysql $DB */
         global $DB;
 
-        $request = $this->getKnownDatesQuery($zone_name, $source_name);
+        $request = $this->getKnownDatesQuery($source_zone);
         $request['ORDER'] = CarbonIntensity::getTableField('date') . ' ASC';
         $request['LIMIT'] = '1';
         $result = $DB->request($request)->current();
@@ -205,30 +203,28 @@ class CarbonIntensity extends CommonDropdown
     /**
      * Download data for a single zone
      *
-     * @param CarbonIntensityInterface $data_source
-     * @param string $zone_name zone name
-     * @param integer $limit maximum count of items to process
+     * @param ClientInterface $data_source
+     * @param Source_Zone $source_zone
+     * @param int $limit maximum count of items to process
      * @param ProgressBar $progress_bar progress bar to update (CLI mode only)
-     * @return integer count of item downloaded
+     * @return int count of item downloaded
      */
-    public function downloadOneZone(CarbonIntensityInterface $data_source, string $zone_name, int $limit = 0, ?ProgressBar $progress_bar = null): int
+    public function downloadOneZone(ClientInterface $data_source, Source_Zone $source_zone, int $limit = 0, ?ProgressBar $progress_bar = null): int
     {
-        $start_date = $this->getDownloadStartDate($zone_name, $data_source);
+        $start_date = max($this->getDownloadStartDate(), $data_source->getHardStartDate());
 
         $total_count = 0;
 
         // Check if there are gaps to fill
-        $source = new CarbonIntensitySource();
-        $source->getFromDBByCrit(['name' => $data_source->getSourceName()]);
-        $zone = new Zone();
-        $zone->getFromDBByCrit(['name' => $zone_name]);
-        $gaps = $this->findGaps($source->getID(), $zone->getID(), $start_date);
+        $gaps = $this->findGaps($source_zone, $start_date);
         if (count($gaps) === 0) {
             // Log a notice specifying the source and the zone
+            $zone = new Zone();
+            $zone->getFromDBByCrit(['id' => $source_zone->fields[Zone::getForeignKeyField()]]);
             trigger_error(sprintf(
                 "No gap to fill for source %s and zone %s between %s and %s",
                 $data_source->getSourceName(),
-                $zone_name,
+                $zone->fields['name'],
                 $start_date->format('Y-m-d'),
                 'now'
             ), E_USER_WARNING);
@@ -249,28 +245,11 @@ class CarbonIntensity extends CommonDropdown
         foreach ($gaps as $gap) {
             $gap_start = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $gap['start']);
             $gap_end = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $gap['end']);
-            $count = $data_source->fullDownload($zone_name, $gap_start, $gap_end, $this, $limit, $progress_bar);
+            $count = $data_source->fullDownload($source_zone, $gap_start, $gap_end, $this, $limit, $progress_bar);
             $total_count += $count;
             if ($total_count >= $limit) {
                 return $total_count;
             }
-        }
-
-        $first_known_intensity_date = $this->getFirstKnownDate($zone_name, $data_source->getSourceName());
-        $incremental = false;
-        if ($first_known_intensity_date !== null) {
-            $incremental = ($start_date >= $first_known_intensity_date);
-        }
-        if ($first_known_intensity_date !== null && $first_known_intensity_date <= $data_source->getHardStartDate()) {
-            // Cannot download older data than absolute start date of the source, then switch to incremetal mode
-            $incremental = true;
-        }
-        if ($incremental) {
-            $start_date = max($data_source->getMaxIncrementalAge(), $this->getLastKnownDate($zone_name, $data_source->getSourceName()));
-            $start_date = $start_date->add(new DateInterval('PT1H'));
-            $count = $data_source->incrementalDownload($zone_name, $start_date, $this, $limit);
-            $total_count += $count;
-            return $total_count;
         }
 
         return $total_count;
@@ -279,11 +258,9 @@ class CarbonIntensity extends CommonDropdown
     /**
      * Get the oldest date where data are required
      *
-     * @param string                   $zone_name   ignored for now; zone to examine
-     * @param CarbonIntensityInterface $data_source ignored for now; data source
      * @return DateTimeImmutable|null
      */
-    public function getDownloadStartDate(string $zone_name, CarbonIntensityInterface $data_source): ?DateTimeImmutable
+    public function getDownloadStartDate(): ?DateTimeImmutable
     {
         // Get the default oldest date od data to download
         $start_date = new DateTime(self::MIN_HISTORY_LENGTH);
@@ -300,65 +277,48 @@ class CarbonIntensity extends CommonDropdown
         return $start_date;
     }
 
-    /**
-     * Get date where data download shall end, excluding the incremental download mode for the specified data source
-     *
-     * @param string                   $zone_name   zone to examine
-     * @param CarbonIntensityInterface $data_source data source
-     * @return DateTimeImmutable
-     */
-    public function getDownloadStopDate(string $zone_name, CarbonIntensityInterface $data_source): DateTimeImmutable
-    {
-        $stop_date = $data_source->getMaxIncrementalAge();
-        $first_known_intensity_date = $this->getFirstKnownDate($zone_name, $data_source->getSourceName());
-        if ($first_known_intensity_date !== null) {
-            $first_known_intensity_date = $first_known_intensity_date->sub(new DateInterval('PT1H'));
-            $stop_date = min($stop_date, $first_known_intensity_date);
-        }
+    // /**
+    //  * Get date where data download shall end, excluding the incremental download mode for the specified data source
+    //  *
+    //  * @param string              $zone_name   zone to examine
+    //  * @param ClientInterface     $data_source data source
+    //  * @return DateTimeImmutable
+    //  */
+    // public function getDownloadStopDate(string $zone_name, ClientInterface $data_source): DateTimeImmutable
+    // {
+    //     $stop_date = $data_source->getMaxIncrementalAge();
+    //     $first_known_intensity_date = $this->getFirstKnownDate($zone_name, $data_source->getSourceName());
+    //     if ($first_known_intensity_date !== null) {
+    //         $first_known_intensity_date = $first_known_intensity_date->sub(new DateInterval('PT1H'));
+    //         $stop_date = min($stop_date, $first_known_intensity_date);
+    //     }
 
-        return $stop_date;
-    }
+    //     return $stop_date;
+    // }
 
     /**
      * Save in database the carbon intensities
      * Give up on failures
      *
-     * @param string $zone_name name of the zone to store intensities
-     * @param string $source_name name of the source to store intensities
+     * @param Source_Zone $source_zone Source_zone
      * @param array $data as an array of arrays ['datetime' => string, 'intensity' => float]
-     * @return integer count of actually saved items,
+     * @return int count of actually saved items,
      */
-    public function save(string $zone_name, string $source_name, array $data): int
+    public function save(Source_Zone $source_zone, array $data): int
     {
         /** @var DBmysql $DB */
         global $DB;
 
         $count = 0;
-        $source = new CarbonIntensitySource();
-        $source->getFromDBByCrit([
-            'name' => $source_name,
-        ]);
-        if ($source->isNewItem()) {
-            throw new \RuntimeException('Attempt to save carbon intensity with a source which is not in the database');
-            // trigger_error('Attempt to save carbon intensity with a source which is not in the database', E_USER_ERROR);
-            // return 0;
-        }
-        $zone = new Zone();
-        $zone->getFromDBByCrit([
-            'name' => $zone_name,
-        ]);
-        if ($zone->isNewItem()) {
-            throw new \RuntimeException('Attempt to save carbon intensity with a zone which is not in the database');
-            // trigger_error('Attempt to save carbon intensity with a zone which is not in the database', E_USER_ERROR);
-            // return 0;
-        }
 
+        $source_fk = getForeignKeyFieldForItemType(Source::class);
+        $zone_fk = getForeignKeyFieldForItemType(Zone::class);
         $query = $DB->buildInsert(
             CarbonIntensity::getTable(),
             [
                 'date' => new QueryParam(),
-                CarbonIntensitySource::getForeignKeyField() => new QueryParam(),
-                Zone::getForeignKeyField() => new QueryParam(),
+                $source_fk => new QueryParam(),
+                $zone_fk => new QueryParam(),
                 'intensity' => new QueryParam(),
                 'data_quality' => new QueryParam(),
             ],
@@ -370,14 +330,14 @@ class CarbonIntensity extends CommonDropdown
                 $stmt->bind_param(
                     'siidi',
                     $intensity['datetime'],
-                    $source->fields['id'],
-                    $zone->fields['id'],
+                    $source_zone->fields[$source_fk],
+                    $source_zone->fields[$zone_fk],
                     $intensity['intensity'],
                     $intensity['data_quality']
                 );
                 $DB->executeStatement($stmt);
                 $count++;
-            } catch (\RuntimeException $e) {
+            } catch (Exception $e) {
                 $count++;
                 continue;
             }
@@ -390,17 +350,18 @@ class CarbonIntensity extends CommonDropdown
     /**
      * Gets date intervals where data are missing
      *
-     * @param integer $source_id
-     * @param integer $zone_id
+     * @param Source_Zone $source_zone
      * @param DateTimeInterface $start
      * @param DateTimeInterface|null $stop
      * @return array
      */
-    public function findGaps(int $source_id, int $zone_id, DateTimeInterface $start, ?DateTimeInterface $stop = null): array
+    public function findGaps(Source_Zone $source_zone, DateTimeInterface $start, ?DateTimeInterface $stop = null): array
     {
+        $source_fk = getForeignKeyFieldForItemType(Source::class);
+        $zone_fk = getForeignKeyFieldForItemType(Zone::class);
         $criteria = [
-            CarbonIntensitySource::getForeignKeyField() => $source_id,
-            Zone::getForeignKeyField() => $zone_id,
+            $source_fk => $source_zone->fields[$source_fk],
+            $zone_fk => $source_zone->fields[$zone_fk],
         ];
         $interval = new DateInterval('PT1H');
         return Toolbox::findTemporalGapsInTable(self::getTable(), $start, $interval, $stop, $criteria);

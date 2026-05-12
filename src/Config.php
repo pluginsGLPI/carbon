@@ -32,23 +32,33 @@
 
 namespace GlpiPlugin\Carbon;
 
-use Config as GlpiConfig;
 use CommonDBTM;
 use CommonGLPI;
 use Computer as GlpiComputer;
+use Config as GlpiConfig;
 use Geocoder\Geocoder;
 use Geocoder\Provider\Nominatim\Nominatim;
 use Geocoder\StatefulGeocoder;
-use Monitor as GlpiMonitor;
-use NetworkEquipment as GlpiNetworkEquipment;
 use Glpi\Application\View\TemplateRenderer;
 use GLPINetwork;
+use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientFactory as CarbonIntensityClientFactory;
+use GlpiPlugin\Carbon\DataSource\Lca\ClientFactory as LcaClientFactory;
 use GlpiPlugin\Carbon\Impact\Embodied\Engine;
 use GuzzleHttp\Client;
+use Monitor as GlpiMonitor;
+use NetworkEquipment as GlpiNetworkEquipment;
 use Session;
+use Twig\Extension\StringLoaderExtension;
 
 class Config extends GlpiConfig
 {
+    /**
+     * Environment variable name to set the boaviztapi base URL
+     * If set, overrides the setting in the database
+     */
+    public const ENV_BOAVIZTAPI_BASE_URL = 'GLPI_PLUGIN_CARBON_BOAVIZTAPI_BASE_URL';
+    private const CONFIG_CONTEXT = 'plugin:carbon';
+
     public static function getTypeName($nb = 0)
     {
         return plugin_carbon_getFriendlyName();
@@ -69,8 +79,8 @@ class Config extends GlpiConfig
      * Undocumented function
      *
      * @param CommonGLPI $item
-     * @param integer $tabnum
-     * @param integer $withtemplate
+     * @param int $tabnum
+     * @param int $withtemplate
      * @return void
      */
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
@@ -84,15 +94,39 @@ class Config extends GlpiConfig
 
     public function showForm($ID, $options = [])
     {
-        $current_config = GlpiConfig::getConfigurationValues('plugin:carbon');
-        $current_config['geocoding_enabled'] = $current_config['geocoding_enabled'] ?? '0';
+        $current_config = GlpiConfig::getConfigurationValues(self::CONFIG_CONTEXT);
+        $current_config['geocoding_enabled'] ??= '0';
         $canedit        = Session::haveRight(Config::$rightname, UPDATE);
 
-        TemplateRenderer::getInstance()->display('@carbon/config.html.twig', [
-            'can_edit'       => $canedit,
-            'current_config' => $current_config,
-            'impact_engines' => Engine::getAvailableBackends(),
-            'action'         => (isset($options['plugin_config']) ? Config::getFormURL() : GlpiConfig::getFormURL()),
+        // Get config template foreach LCA data source
+        $secured_config = [];
+        $include_configs = [];
+        foreach (CarbonIntensityClientFactory::getConfigTypes() as $config_type) {
+            $config = new $config_type();
+            $secured_config += $config->getSecuredConfigs();
+            $include_configs[] = $config->getConfigTemplate();
+        }
+        foreach (LcaClientFactory::getConfigTypes() as $config_type) {
+            $config = new $config_type();
+            $secured_config += $config->getSecuredConfigs();
+            $include_configs[] = $config->getConfigTemplate();
+        }
+
+        $current_config = array_diff_key($current_config, array_flip($secured_config));
+
+        $hide_boaviztapi_base_url = (getenv(self::ENV_BOAVIZTAPI_BASE_URL) !== false);
+        $renderer = TemplateRenderer::getInstance();
+        $environment = $renderer->getEnvironment();
+        if (!$environment->hasExtension(StringLoaderExtension::class)) {
+            $environment->addExtension(new StringLoaderExtension());
+        }
+        $renderer->display('@carbon/config.html.twig', [
+            'can_edit'                 => $canedit,
+            'current_config'           => $current_config,
+            'impact_engines'           => Engine::getAvailableBackends(),
+            'include_configs'          => $include_configs,
+            'hide_boaviztapi_base_url' => $hide_boaviztapi_base_url,
+            'action'                   => (isset($options['plugin_config']) ? Config::getFormURL() : GlpiConfig::getFormURL()),
         ]);
 
         return true;
@@ -117,27 +151,13 @@ class Config extends GlpiConfig
             }
         }
 
-        //Test Boavizta URL by acquiring zones
-        if (isset($input['boaviztapi_base_url']) && strlen($input['boaviztapi_base_url']) > 0) {
-            $old_url = GlpiConfig::getConfigurationValue('plugin:carbon', 'boaviztapi_base_url');
-            if ($old_url != $input['boaviztapi_base_url']) {
-                $boavizta = new DataSource\Boaviztapi(new DataSource\RestApiClient(), $input['boaviztapi_base_url']);
-                $zones = [];
-                try {
-                    $zones = $boavizta->queryZones();
-                } catch (\Exception $e) {
-                    unset($input['boaviztapi_base_url']);
-                    Session::addMessageAfterRedirect(__('Invalid Boavizta API URL', 'carbon'), false, ERROR);
-                }
-                if (count($zones) > 0) {
-                    // Create the source if it does not exists already
-                    if ($boavizta->createSource()) {
-                        // Save zones into database
-                        $boavizta->saveZones($zones);
-                    }
-                    Session::addMessageAfterRedirect(__('Connection to Boavizta API established', 'carbon'), false, INFO);
-                }
-            }
+        foreach (CarbonIntensityClientFactory::getConfigTypes() as $config_type) {
+            $config = new $config_type();
+            $input = $config->configUpdate($input);
+        }
+        foreach (LcaClientFactory::getConfigTypes() as $config_type) {
+            $config = new $config_type();
+            $input = $config->configUpdate($input);
         }
 
         return $input;
@@ -167,9 +187,9 @@ class Config extends GlpiConfig
     public static function getEmbodiedImpactEngine(): string
     {
         $default_engine = 'Boavizta';
-        $engine = GlpiConfig::getConfigurationValue('plugin:carbon', 'impact_engines');
+        $engine = GlpiConfig::getConfigurationValue(self::CONFIG_CONTEXT, 'impact_engines');
         if ($engine === null || $engine === '') {
-            GlpiConfig::setConfigurationValues('plugin:carbon', ['impact_engines' => $default_engine]);
+            GlpiConfig::setConfigurationValues(self::CONFIG_CONTEXT, ['impact_engines' => $default_engine]);
             $engine = $default_engine;
         }
 
@@ -184,9 +204,9 @@ class Config extends GlpiConfig
     public static function getUsageImpactEngine(): string
     {
         $default_engine = 'Boavizta';
-        $engine = GlpiConfig::getConfigurationValue('plugin:carbon', 'impact_engines');
+        $engine = GlpiConfig::getConfigurationValue(self::CONFIG_CONTEXT, 'impact_engines');
         if ($engine === null || $engine === '') {
-            GlpiConfig::setConfigurationValues('plugin:carbon', ['impact_engines' => $default_engine]);
+            GlpiConfig::setConfigurationValues(self::CONFIG_CONTEXT, ['impact_engines' => $default_engine]);
             $engine = $default_engine;
         }
 
@@ -196,11 +216,11 @@ class Config extends GlpiConfig
     /**
      * Get demo mode status
      *
-     * @return boolean true if demo mode enabled
+     * @return bool true if demo mode enabled
      */
     public static function isDemoMode(): bool
     {
-        $demo_mode = GlpiConfig::getConfigurationValue('plugin:carbon', 'demo');
+        $demo_mode = GlpiConfig::getConfigurationValue(self::CONFIG_CONTEXT, 'demo');
 
         return $demo_mode != 0;
     }
@@ -212,7 +232,7 @@ class Config extends GlpiConfig
      */
     public static function exitDemoMode()
     {
-        GlpiConfig::deleteConfigurationValues('plugin:carbon', ['demo']);
+        GlpiConfig::deleteConfigurationValues(self::CONFIG_CONTEXT, ['demo']);
     }
 
     /**
@@ -232,5 +252,44 @@ class Config extends GlpiConfig
         $provider = Nominatim::withOpenStreetMapServer(new Client(), $user_agent);
         $geocoder = new StatefulGeocoder($provider, $locale);
         return $geocoder;
+    }
+
+    /**
+     * Get a plugin configuration value
+     *
+     * @param string $name The name of the configuration value to read
+     * @return null|string The configuration value
+     */
+    public static function getPluginConfigurationValue(string $name): ?string
+    {
+        if ($name === 'boaviztapi_base_url') {
+            $value = getenv(self::ENV_BOAVIZTAPI_BASE_URL);
+            if ($value !== false) {
+                return $value;
+            }
+        }
+        return GlpiConfig::getConfigurationValue(self::CONFIG_CONTEXT, $name);
+    }
+
+    /**
+     * Set a plugin configuration value
+     *
+     * @param array<string, string> $values key => value pairs to set
+     * @return void
+     */
+    public static function setPluginConfigurationValues(array $values = []): void
+    {
+        GlpiConfig::setConfigurationValues(self::CONFIG_CONTEXT, $values);
+    }
+
+    /**
+     * Delete plugin configuration values
+     *
+     * @param array<string> $values names of values to delete
+     * @return void
+     */
+    public static function deletePluginConfigurationValues(array $values)
+    {
+        GlpiConfig::deleteConfigurationValues(self::CONFIG_CONTEXT, $values);
     }
 }

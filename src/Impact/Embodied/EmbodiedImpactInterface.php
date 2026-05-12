@@ -34,29 +34,14 @@
 namespace GlpiPlugin\Carbon\Impact\Embodied;
 
 use CommonDBTM;
-use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
+use DBmysqlIterator;
 
 interface EmbodiedImpactInterface
 {
     /**
-     * Get an instance of the impact calculation engine for the itemtype of the analyzed object
-     *
-     * @param CommonDBTM $item
-     * @return EngineInterface
-     */
-    // public static function getEngine(CommonDBTM $item): EngineInterface;
-
-    /**
-     * Get  the itemtype of the asset handled by this class
-     *
-     * @return string
-     */
-    public static function getItemtype(): string;
-
-    /**
      * Set the maximum count of items to calculate with evaluateItems()
      *
-     * @param integer $limit
+     * @param int $limit
      * @return void
      */
     public function setLimit(int $limit);
@@ -64,24 +49,28 @@ interface EmbodiedImpactInterface
     /**
      * Get query to find items we can evaluate
      *
+     * @template T of CommonDBTM
+     * @param class-string<T> $itemtype
      * @param array $crit
-     * @param boolean $entity_restrict
+     * @param bool $entity_restrict
      * @return array
      */
-    public function getEvaluableQuery(array $crit = [], bool $entity_restrict = true): array;
+    public static function getEvaluableQuery(string $itemtype, array $crit = [], bool $entity_restrict = true): array;
 
     /**
-     * Start the evaluation of all items
+     * Get an iterator of items to evaluate
      *
-     * @return int count of successfully evaluated assets
+     * @template T of CommonDBTM
+     * @param class-string<T> $itemtype
+     * @param array $crit criteria
+     * @return DBmysqlIterator
      */
-    public function evaluateItems(): int;
+    public static function getItemsToEvaluate(string $itemtype, array $crit = []): DBmysqlIterator;
 
     /**
-     * Evaluate all impacts of the asset
+     * Evaluate and save tne environmental impact of an asset
      *
-     * @param integer $id
      * @return bool true if success, false otherwise
      */
-    public function evaluateItem(int $id): bool;
+    public function evaluateItem(): bool;
 }

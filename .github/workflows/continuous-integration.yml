@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - "main"
+      - "develop"
       - "support/*"
-      - "feature/code_quality_rector"
     tags:
        - "*"
   pull_request:

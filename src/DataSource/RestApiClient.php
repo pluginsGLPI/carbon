@@ -34,17 +34,16 @@ namespace GlpiPlugin\Carbon\DataSource;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Psr7;
-use Session;
+use GuzzleHttp\Psr7\Message;
 use Toolbox;
 
 class RestApiClient implements RestApiClientInterface
 {
-    const DEFAULT_TIMEOUT = 5;
-    const DEFAULT_HEADERS = [
+    public const DEFAULT_TIMEOUT = 5;
+    public const DEFAULT_HEADERS = [
         'Accept' => 'application/json; charset=utf-8',
     ];
-    const DEFAULT_HTTP_VERSION = '2.0';
+    public const DEFAULT_HTTP_VERSION = '2.0';
 
     protected $api_client = null;
     protected $last_error = '';
@@ -69,15 +68,16 @@ class RestApiClient implements RestApiClientInterface
     public function request(string $method = 'GET', string $uri = '', array $options = [])
     {
         try {
-            $response = $this->api_client->request($method, $uri, $options);
+            $request = $this->api_client;
+            $response = $request->request($method, $uri, $options);
         } catch (RequestException $e) {
             $this->last_error = [
                 'title'     => "Plugins API error",
                 'exception' => $e->getMessage(),
-                'request'   => Psr7\Message::toString($e->getRequest()),
+                'request'   => Message::toString($e->getRequest()),
             ];
             if ($e->hasResponse()) {
-                $this->last_error['response'] = Psr7\Message::toString($e->getResponse());
+                $this->last_error['response'] = Message::toString($e->getResponse());
             }
 
             Toolbox::logDebug($this->last_error);
