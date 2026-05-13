@@ -32,9 +32,11 @@
 
 use Config as GlpiConfig;
 use CronTask as GlpiCronTask;
+use Datacenter as GlpiDatacenter;
 use Glpi\Plugin\Hooks;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\CronTask;
+use GlpiPlugin\Carbon\Datacenter;
 use GlpiPlugin\Carbon\Dashboard\Grid;
 use GlpiPlugin\Carbon\Dashboard\Widget;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientFactory as CarbonIntensityClientFactory;
@@ -163,6 +165,7 @@ function plugin_carbon_registerClasses()
     Plugin::registerClass(Profile::class, ['addtabon' => GlpiProfile::class]);
     Plugin::registerClass(Location::class, ['addtabon' => GlpiLocation::class]);
     Plugin::registerClass(CronTask::class, ['addtabon' => GlpiCronTask::class]);
+    Plugin::registerClass(Datacenter::class, ['addtabon' => GlpiDatacenter::class]);
 
     foreach (PLUGIN_CARBON_TYPES as $itemtype) {
         $core_type_class = $itemtype . 'Type';
