@@ -3,10 +3,8 @@ name: "Update locales sources"
 on:
   push:
     branches:
-      - "main"
       - "develop"
       - "support/*"
-      - "feature/github_actions"
 
 jobs:
   push-on-transifex:
