@@ -1,0 +1,10 @@
+{
+    "enabled": true,
+    "only_list_changed_files": true,
+    "badge": true,
+    "overall_coverage_fail_threshold": 0,
+    "file_coverage_error_min": 50,
+    "file_coverage_warning_max": 75,
+    "fail_on_negative_difference": false,
+    "retention_days": 90
+}
