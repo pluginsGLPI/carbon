@@ -24,9 +24,6 @@ jobs:
     with:
       glpi-version: "11.0.x"
   ci:
-    if: |
-      startsWith(github.ref_name, 'support/') &&
-      github.ref_name != 'support/1.0.0'
     name: "GLPI ${{ matrix.glpi-version }} - php:${{ matrix.php-version }} - ${{ matrix.db-image }}"
     needs: "generate-ci-matrix"
     strategy:
@@ -38,3 +35,4 @@ jobs:
       glpi-version: "${{ matrix.glpi-version }}"
       php-version: "${{ matrix.php-version }}"
       db-image: "${{ matrix.db-image }}"
+      skip-changelog-check: true

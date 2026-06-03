@@ -52,7 +52,7 @@ class Config implements ConfigInterface
     #[Override]
     public function getConfigTemplate(): string
     {
-        $hide_boaviztapi_base_url = (getenv(self::ENV_BOAVIZTAPI_BASE_URL) !== false);
+        $hide_boaviztapi_base_url = defined(self::ENV_BOAVIZTAPI_BASE_URL) && constant(self::ENV_BOAVIZTAPI_BASE_URL) !== null;
         $commercial_url = 'https://boavizta.org/';
         $twig = <<<TWIG
         {% import "components/form/fields_macros.html.twig" as fields %}
@@ -119,9 +119,9 @@ TWIG;
 
     public static function getConfigurationValue(string $name)
     {
-        if ($name === 'boaviztapi_base_url') {
-            $value = getenv(self::ENV_BOAVIZTAPI_BASE_URL);
-            if ($value !== false) {
+        if ($name === 'boaviztapi_base_url' && defined(self::ENV_BOAVIZTAPI_BASE_URL)) {
+            $value = constant(self::ENV_BOAVIZTAPI_BASE_URL);
+            if ($value !== null) {
                 return $value;
             }
         }
