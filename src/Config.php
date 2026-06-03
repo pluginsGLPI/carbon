@@ -114,7 +114,6 @@ class Config extends GlpiConfig
 
         $current_config = array_diff_key($current_config, array_flip($secured_config));
 
-        $hide_boaviztapi_base_url = (getenv(self::ENV_BOAVIZTAPI_BASE_URL) !== false);
         $renderer = TemplateRenderer::getInstance();
         $environment = $renderer->getEnvironment();
         if (!$environment->hasExtension(StringLoaderExtension::class)) {
@@ -125,7 +124,6 @@ class Config extends GlpiConfig
             'current_config'           => $current_config,
             'impact_engines'           => Engine::getAvailableBackends(),
             'include_configs'          => $include_configs,
-            'hide_boaviztapi_base_url' => $hide_boaviztapi_base_url,
             'action'                   => (isset($options['plugin_config']) ? Config::getFormURL() : GlpiConfig::getFormURL()),
         ]);
 
@@ -262,12 +260,6 @@ class Config extends GlpiConfig
      */
     public static function getPluginConfigurationValue(string $name): ?string
     {
-        if ($name === 'boaviztapi_base_url') {
-            $value = getenv(self::ENV_BOAVIZTAPI_BASE_URL);
-            if ($value !== false) {
-                return $value;
-            }
-        }
         return GlpiConfig::getConfigurationValue(self::CONFIG_CONTEXT, $name);
     }
 
