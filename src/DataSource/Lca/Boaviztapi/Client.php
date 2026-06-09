@@ -37,6 +37,7 @@ use Dropdown;
 use GlpiPlugin\Carbon\Config as CarbonConfig;
 use GlpiPlugin\Carbon\DataSource\Lca\AbstractClient;
 use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
+use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\Impact\Type;
 use GlpiPlugin\Carbon\Source;
@@ -252,7 +253,7 @@ class Client extends AbstractClient
      *
      * @param array $response
      * @param string $scope (must be either embedded or use)
-     * @return array
+     * @return array<int, null|AbstractTracked>
      */
     public function parseResponse(array $response, string $scope): array
     {
@@ -273,7 +274,7 @@ class Client extends AbstractClient
         return $impacts;
     }
 
-    protected function parseCriteria(string $name, $impact): ?TrackedFloat
+    protected function parseCriteria(string $name, string|array $impact): ?TrackedFloat
     {
         if ($impact === 'not implemented') {
             return null;

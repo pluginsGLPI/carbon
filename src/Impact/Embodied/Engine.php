@@ -68,10 +68,6 @@ class Engine extends CommonGLPI
     {
         $itemtype = get_class($item);
 
-        if (self::hasModelData($item)) {
-            return self::getInternalEngineFromItemtype($item);
-        }
-
         $embodied_impact_namespace = Config::getEmbodiedImpactEngine();
         /** @var class-string<AbstractEmbodiedImpact> $embodied_impact_class */
         $embodied_impact_class = $embodied_impact_namespace . '\\' . $itemtype;
@@ -80,14 +76,18 @@ class Engine extends CommonGLPI
             return self::getInternalEngineFromItemtype($item);
         }
 
-        /** @var AbstractEmbodiedImpact $embodied_impact */
-        $embodied_impact = new $embodied_impact_class($item);
+        /** @var AbstractEmbodiedImpact $external_embodied_impact_engine */
+        $external_embodied_impact_engine = new $embodied_impact_class($item);
         try {
-            return self::configureEngine($embodied_impact);
+            $external_embodied_impact_engine = self::configureEngine($external_embodied_impact_engine);
         } catch (RuntimeException $e) {
-            // If the engine cannot be configured, it is not usable
-            return null;
+            $external_embodied_impact_engine = null;
         }
+        if (self::hasModelData($item)) {
+            return self::getInternalEngineFromItemtype($item, $external_embodied_impact_engine);
+        }
+
+        return $external_embodied_impact_engine;
     }
 
     /**
@@ -95,16 +95,17 @@ class Engine extends CommonGLPI
      * This is a fallback engine
      *
      * @param CommonDBTM $item item to analyze
+     * @param ?EmbodiedImpactInterface $external_embodied_impact_engine
      * @return ?EmbodiedImpactInterface
      */
-    public static function getInternalEngineFromItemtype(CommonDBTM $item): ?EmbodiedImpactInterface
+    public static function getInternalEngineFromItemtype(CommonDBTM $item, ?EmbodiedImpactInterface $external_embodied_impact_engine = null): ?EmbodiedImpactInterface
     {
         $itemtype = get_class($item);
         $embodied_impact_class = 'GlpiPlugin\\Carbon\\Impact\\Embodied\Internal' . '\\' . $itemtype;
         if (!class_exists($embodied_impact_class) || !is_subclass_of($embodied_impact_class, AbstractEmbodiedImpact::class)) {
             return null;
         }
-        $embodied_impact = new $embodied_impact_class($item);
+        $embodied_impact = new $embodied_impact_class($item, $external_embodied_impact_engine);
         return $embodied_impact;
     }
 
