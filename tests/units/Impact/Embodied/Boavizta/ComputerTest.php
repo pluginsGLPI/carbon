@@ -36,7 +36,7 @@ use Computer as GlpiComputer;
 use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
 use GlpiPlugin\Carbon\Impact\Embodied\Boavizta\Computer as BoaviztaComputer;
-use GlpiPlugin\Carbon\Tests\Impact\Embodied\AbstractEmbodiedImpactTest;
+use GlpiPlugin\Carbon\Tests\Impact\Embodied\Boavizta\AbstractEmbodiedImpactTest;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(BoaviztaComputer::class)]
