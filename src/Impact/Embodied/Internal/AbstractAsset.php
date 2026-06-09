@@ -64,8 +64,8 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact
             return [];
         }
 
-        /** @var CommonDBTM $model */
-        $model = getItemForItemtype($glpi_model_itemtype);
+        /** @var CommonDBTM|false $model */
+        $model = getItemForItemtype('GlpiPlugin\\Carbon\\' . $glpi_model_itemtype);
         $model->getFromDBByCrit([
             $glpi_model_fk => $this->item->fields[$glpi_model_fk],
         ]);
