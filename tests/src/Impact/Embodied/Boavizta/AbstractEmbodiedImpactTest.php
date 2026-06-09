@@ -30,19 +30,16 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta\Tests;
+namespace GlpiPlugin\Carbon\Tests\Impact\Embodied\Boavizta;
 
-use GlpiPlugin\Carbon\Impact\Embodied\Boavizta\Monitor as BoaviztaMonitor;
-use GlpiPlugin\Carbon\Tests\Impact\Embodied\Boavizta\AbstractEmbodiedImpactTest;
-use Monitor as GlpiMonitor;
-use MonitorModel as glpiMonitorModel;
-use MonitorType as GlpiMonitorType;
+use GlpiPlugin\Carbon\Impact\Embodied\AbstractEmbodiedImpact;
+use GlpiPlugin\Carbon\Tests\Impact\Embodied\AbstractCommonEmbodiedImpactTest;
 use PHPUnit\Framework\Attributes\CoversClass;
 
-#[CoversClass(BoaviztaMonitor::class)]
-class MonitorTest extends AbstractEmbodiedImpactTest
+#[CoversClass(AbstractEmbodiedImpact::class)]
+class AbstractEmbodiedImpactTest extends AbstractCommonEmbodiedImpactTest
 {
-    protected static string $itemtype = GlpiMonitor::class;
-    protected static string $itemtype_type = GlpiMonitorType::class;
-    protected static string $itemtype_model = glpiMonitorModel::class;
+    protected static string $itemtype = '';
+    protected static string $itemtype_type = '';
+    protected static string $itemtype_model = '';
 }

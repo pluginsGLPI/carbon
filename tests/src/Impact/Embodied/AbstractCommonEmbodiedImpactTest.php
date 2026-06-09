@@ -39,19 +39,22 @@ use GlpiPlugin\Carbon\Tests\DbTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(AbstractEmbodiedImpact::class)]
-class AbstractEmbodiedImpactTest extends DbTestCase
+class AbstractCommonEmbodiedImpactTest extends DbTestCase
 {
     protected static string $itemtype = '';
     protected static string $itemtype_type = '';
     protected static string $itemtype_model = '';
 
-    public function testGetItemsToEvaluate()
+    public static function setUpBeforeClass(): void
     {
         if (static::$itemtype === '' || static::$itemtype_type === '' || static::$itemtype_model === '') {
             // Ensure that the inherited test class is properly implemented for this test
-            $this->fail('Itemtype properties not set in ' . static::class);
+            self::fail('Itemtype properties not set in ' . static::class);
         }
+    }
 
+    public function test_GetItemsToEvaluate_evaluates_asset_when_no_embodied_impact_exists()
+    {
         // Test the asset is evaluable when no embodied impact is in the DB
         $glpi_asset_type = $this->createItem(static::$itemtype_type);
         $asset_type = $this->createItem('GlpiPlugin\\Carbon\\' . static::$itemtype_type, [
@@ -64,7 +67,10 @@ class AbstractEmbodiedImpactTest extends DbTestCase
             $asset->getTableField('id') => $asset->getID(),
         ]);
         $this->assertEquals(1, $iterator->count());
+    }
 
+    public function test_GetItemsToEvaluate_does_not_evaluates_asset_when_embodied_impact_exists()
+    {
         // Test the asset is no longer evaluable when there is embodied impact in the DB
         $glpi_asset_type = $this->createItem(static::$itemtype_type);
         $asset_type = $this->createItem('GlpiPlugin\\Carbon\\' . static::$itemtype_type, [
@@ -82,8 +88,11 @@ class AbstractEmbodiedImpactTest extends DbTestCase
             $asset::getTableField('id') => $asset->getID(),
         ]);
         $this->assertEquals(0, $iterator->count());
+    }
 
-        // Test the asset is evaluable when there is embodied impact in the DB but recamculate is set
+    public function test_GetItemsToEvaluate_evaluates_asset_when_embodied_impact_exists_and_marked_for_recalculation()
+    {
+        // Test the asset is evaluable when there is embodied impact in the DB but recalculate is set
         $glpi_asset_type = $this->createItem(static::$itemtype_type);
         $asset_type = $this->createItem('GlpiPlugin\\Carbon\\' . static::$itemtype_type, [
             getForeignKeyFieldForItemType(static::$itemtype_type) => $glpi_asset_type->getID(),
