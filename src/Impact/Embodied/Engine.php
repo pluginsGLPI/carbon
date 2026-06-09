@@ -57,7 +57,7 @@ class Engine extends CommonGLPI
     }
 
     /**
-     * Get an instance of the engine to calculate imapcts for the given itemtype
+     * Get an instance of the engine to calculate impacts for the given itemtype
      *
      * Returns null if no engine found
      *
