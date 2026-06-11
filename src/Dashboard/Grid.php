@@ -40,9 +40,8 @@ use Session;
 
 class Grid
 {
-    public static function getDashboardCards(): array
+    public static function getDashboardCards(array $cards = []): array
     {
-        $cards = [];
         // Declare the following cards only if we show / edit the quick report page of the plugin
         $in_carbon_report_page = self::in_carbon_report_page();
 
