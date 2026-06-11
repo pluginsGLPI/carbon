@@ -78,27 +78,6 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
 
     abstract protected function getVersion(): string;
 
-    /**
-     * Get the unit of an impact
-     *
-     * @param int $type
-     * @param bool $short
-     * @return string|null
-     */
-    final public function getUnit(int $type, bool $short = true): ?string
-    {
-        switch ($type) {
-            case Type::IMPACT_GWP:
-                return $short ? 'gCO2eq' : __('grams of carbon dioxyde equivalent', 'carbon');
-            case Type::IMPACT_ADP:
-                return $short ? 'gSbeq' : __('grams of antimony equivalent', 'carbon');
-            case Type::IMPACT_PE:
-                return $short ? 'J' : __('joules', 'carbon');
-        }
-
-        return null;
-    }
-
     #[Override]
     public function setLimit(int $limit)
     {
