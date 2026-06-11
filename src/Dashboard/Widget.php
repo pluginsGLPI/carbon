@@ -47,9 +47,9 @@ use Toolbox as GlpiToolbox;
 
 class Widget extends GlpiDashboardWidget
 {
-    public static function WidgetTypes(array $types = []): array
+    public static function WidgetTypes(?array $types = null): array
     {
-        $types = array_merge($types, [
+        $types = array_merge($types ?? [], [
             // Informative
             'information_video' => [
                 'label'    => __('Environmental impact information video', 'carbon'),
