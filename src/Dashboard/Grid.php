@@ -46,9 +46,8 @@ class Grid
      * @param null|array $cards existing cards
      * @return array
      */
-    public static function getDashboardCards($cards): array
+    public static function getDashboardCards(array $cards = []): array
     {
-        $cards = $cards ?? [];
         // Declare the following cards only if we show / edit the quick report page of the plugin
         $in_carbon_report_page = self::in_carbon_report_page();
 
