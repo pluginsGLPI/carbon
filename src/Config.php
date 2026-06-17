@@ -45,6 +45,7 @@ use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientFactory as CarbonIntensit
 use GlpiPlugin\Carbon\DataSource\Lca\ClientFactory as LcaClientFactory;
 use GlpiPlugin\Carbon\Impact\Embodied\Engine;
 use GuzzleHttp\Client;
+use Html;
 use Monitor as GlpiMonitor;
 use NetworkEquipment as GlpiNetworkEquipment;
 use Override;
@@ -99,6 +100,9 @@ class Config extends GlpiConfig
     #[Override]
     public function showForm($ID, $options = [])
     {
+        /** @var array $CFG_GLPI */
+        global $CFG_GLPI;
+
         $current_config = GlpiConfig::getConfigurationValues(self::CONFIG_CONTEXT);
         $current_config['geocoding_enabled'] ??= '0';
         $canedit        = Session::haveRight(Config::$rightname, UPDATE);
@@ -118,18 +122,27 @@ class Config extends GlpiConfig
         }
 
         $current_config = array_diff_key($current_config, array_flip($secured_config));
+        $reset_args = json_encode([
+            '_glpi_csrf_token' => Session::getNewCSRFToken(),
+            'reset_all'        => '',
+        ]);
+        $usage_imapct_action_url    = 'submitGetLink("' . $CFG_GLPI['root_doc'] . '/plugins/carbon/front/usageimpact.form.php", ' . $reset_args . ')';
+        $embodied_impact_action_url = 'submitGetLink("' . $CFG_GLPI['root_doc'] . '/plugins/carbon/front/embodiedimpact.form.php", ' . $reset_args . ')';
 
         $renderer = TemplateRenderer::getInstance();
         $environment = $renderer->getEnvironment();
         if (!$environment->hasExtension(StringLoaderExtension::class)) {
             $environment->addExtension(new StringLoaderExtension());
         }
+        $confirm_message = __('This action cannot be undone. Are you sure?', 'carbon');
         $renderer->display('@carbon/config.html.twig', [
-            'can_edit'                 => $canedit,
-            'current_config'           => $current_config,
-            'impact_engines'           => Engine::getAvailableBackends(),
-            'include_configs'          => $include_configs,
-            'action'                   => (isset($options['plugin_config']) ? Config::getFormURL() : GlpiConfig::getFormURL()),
+            'can_edit'                   => $canedit,
+            'current_config'             => $current_config,
+            'impact_engines'             => Engine::getAvailableBackends(),
+            'include_configs'            => $include_configs,
+            'action'                     => (isset($options['plugin_config']) ? Config::getFormURL() : GlpiConfig::getFormURL()),
+            'usage_imapct_action_url'    => Html::getConfirmationOnActionScript($confirm_message, $usage_imapct_action_url),
+            'embodied_impact_action_url' => Html::getConfirmationOnActionScript($confirm_message, $embodied_impact_action_url),
         ]);
 
         return true;

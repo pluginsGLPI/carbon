@@ -39,6 +39,7 @@ use DBmysqlIterator;
 use GlpiPlugin\Carbon\Impact\Type;
 use LogicException;
 use Override;
+use Session;
 use Toolbox as GlpiToolbox;
 
 abstract class AbstractImpact extends CommonDBChild
@@ -237,5 +238,23 @@ abstract class AbstractImpact extends CommonDBChild
             $this->fields[$field],
             Type::getImpactUnit($field)
         );
+    }
+
+    /**
+     * Delete all data
+     *
+     * @return bool true on succcess
+     */
+    public function truncate(): bool
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        if (!Session::haveRight(Config::$rightname, READ) || !static::canPurge()) {
+            Session::addMessageAfterRedirect(__('Full reset denied.', 'carbon'), false, ERROR);
+            return false;
+        }
+
+        return $DB->delete(static::getTable(), [1]);
     }
 }
