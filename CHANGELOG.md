@@ -4,6 +4,35 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [1.3.0](https://github.com/pluginsGLPI/carbon/compare/1.2.0...1.3.0) (2026-06-17)
+
+### Features
+
+
+##### Carbon Emission, Usage Impact, Embodied Impact
+
+* Clear data ([7e30a5](https://github.com/pluginsGLPI/carbon/commit/7e30a5a6d0bf8834fd993c2be0dd77c4e6625dd0))
+
+##### Data Source\ Lca\ Boavistappi\ Config
+
+* Change URL override method ([8c1702](https://github.com/pluginsGLPI/carbon/commit/8c1702d33fab0f266b362088e87dbc49b37b7402))
+
+### Bug Fixes
+
+* Invalid homepage URL in xml file ([9d219e](https://github.com/pluginsGLPI/carbon/commit/9d219eea0bcce70e3626c4e9610486fec7bc7c83))
+* Tests ([06bd09](https://github.com/pluginsGLPI/carbon/commit/06bd09ee9f9e8baa7a7cb15f290a9f23ba1f075d))
+
+##### Dashboard
+
+* Merge cards and widget instead of redefine ([c396fc](https://github.com/pluginsGLPI/carbon/commit/c396fcc749a2b780946b275ef30ce79c3d5dc0ff))
+
+##### Dashboard\ Grid
+
+* Loss of other plugins cards for dashboard ([1abe09](https://github.com/pluginsGLPI/carbon/commit/1abe09d505b40cfe64ddee04ec3d33b1676a34ba))
+
+
+---
+
 ## [1.2.0](https://github.com/pluginsGLPI/carbon/compare/1.2.0-beta.2...1.2.0) (2026-04-30)
 
 ### Features
