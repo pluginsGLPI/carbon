@@ -36,6 +36,7 @@ use Computer;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
+use DBmysql;
 use GlpiPlugin\Carbon\CarbonEmission;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -192,5 +193,49 @@ class CarbonEmissionTest extends DbTestCase
         $total = CarbonEmission::getTotalUsageEmissionForItem($asset);
 
         $this->assertNull($total);
+    }
+
+    public function test_truncate_fails_when_not_logged_in()
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        $table = CarbonEmission::getTable();
+        $this->assertTrue($DB->insert($table, []));
+
+        $instance = new CarbonEmission();
+        $success = $instance->truncate();
+        $this->assertFalse($success);
+        $this->assertEquals(1, countElementsInTable($table));
+    }
+
+    public function test_truncate_fails_when_user_has_all_required_rights()
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        $this->login('glpi', 'glpi');
+        $table = CarbonEmission::getTable();
+        $this->assertTrue($DB->insert($table, []));
+
+        $instance = new CarbonEmission();
+        $success = $instance->truncate();
+        $this->assertTrue($success);
+        $this->assertEquals(0, countElementsInTable($table));
+    }
+
+    public function test_truncate_fails_when_user_has_not_required_rights()
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        $this->login('tech', 'tech');
+        $table = CarbonEmission::getTable();
+        $this->assertTrue($DB->insert($table, []));
+
+        $instance = new CarbonEmission();
+        $success = $instance->truncate();
+        $this->assertFalse($success);
+        $this->assertEquals(1, countElementsInTable($table));
     }
 }

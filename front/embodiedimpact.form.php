@@ -58,6 +58,10 @@ if (isset($_POST['update'])) {
         sprintf(__('%s updates an item'), $_SESSION['glpiname'])
     );
     Html::back();
+} elseif (isset($_POST['reset_all'])) {
+    // Rights checks are in the method
+    $embodied_impact->truncate();
+
 } elseif (isset($_POST['reset'])) {
     if (!isset($_POST['id'])) {
         Session::addMessageAfterRedirect(__('Missing arguments in request.', 'carbon'), false, ERROR);
