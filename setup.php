@@ -117,6 +117,7 @@ function plugin_carbon_setupHooks()
     // add new cards to the dashboard
     $PLUGIN_HOOKS[Hooks::DASHBOARD_CARDS]['carbon'] = [Grid::class, 'getDashboardCards'];
     $PLUGIN_HOOKS[Hooks::DASHBOARD_TYPES]['carbon'] = [Widget::class, 'WidgetTypes'];
+    $PLUGIN_HOOKS[Hooks::DASHBOARD_DEFAULTS]['carbon'] = [Grid::class, 'getDefaults'];
 
     if (Session::haveRight('config', UPDATE)) {
         $PLUGIN_HOOKS['config_page']['carbon'] = 'front/config.form.php';
