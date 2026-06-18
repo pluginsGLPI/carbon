@@ -47,6 +47,12 @@ use Toolbox as GlpiToolbox;
 
 class Widget extends GlpiDashboardWidget
 {
+    /**
+     * Get the description of additional widget types
+     *
+     * @param null|array $types existing types
+     * @return array
+     */
     public static function WidgetTypes(?array $types = null): array
     {
         $types = array_merge($types ?? [], [

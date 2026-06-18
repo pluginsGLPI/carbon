@@ -40,6 +40,12 @@ use Session;
 
 class Grid
 {
+    /**
+     * Get the description of additional cards
+     *
+     * @param null|array $cards existing types
+     * @return array
+     */
     public static function getDashboardCards(?array $cards = null): array
     {
         $cards ??= [];
