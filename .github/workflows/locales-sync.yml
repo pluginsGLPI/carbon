@@ -7,9 +7,6 @@ on:
 
 jobs:
   sync-with-transifex:
-    if: |
-      startsWith(github.ref_name, 'support/') &&
-      github.ref_name != 'support/1.0.0'
     name: "Sync with transifex"
     uses: "glpi-project/plugin-translation-workflows/.github/workflows/transifex-sync.yml@v1"
     secrets:
