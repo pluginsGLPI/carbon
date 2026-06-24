@@ -38,7 +38,7 @@ use MassiveAction;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
 use Override;
 
-class NetworkEquipmentType extends AbstractType
+class NetworkEquipmentType extends AbstractChildDropdown
 {
     public static $itemtype = GlpiNetworkEquipmentType::class;
     public static $items_id = 'networkequipmenttypes_id';
