@@ -39,7 +39,7 @@ use Glpi\Application\View\TemplateRenderer;
 use Override;
 use Session;
 
-abstract class AbstractType extends CommonDBChild
+abstract class AbstractChildDropdown extends CommonDBChild
 {
     public static $rightname = 'dropdown';
 
@@ -71,7 +71,7 @@ abstract class AbstractType extends CommonDBChild
     }
 
     /**
-     * Undocumented function
+     * Select the tab to display
      *
      * @param CommonGLPI $item
      * @param int $tabnum

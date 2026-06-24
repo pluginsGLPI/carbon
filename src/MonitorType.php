@@ -38,7 +38,7 @@ use MassiveAction;
 use MonitorType as GlpiMonitorType;
 use Override;
 
-class MonitorType extends AbstractType
+class MonitorType extends AbstractChildDropdown
 {
     public static $itemtype = GlpiMonitorType::class;
     public static $items_id = 'monitortypes_id';

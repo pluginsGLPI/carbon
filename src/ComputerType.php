@@ -39,7 +39,7 @@ use Html;
 use MassiveAction;
 use Override;
 
-class ComputerType extends AbstractType
+class ComputerType extends AbstractChildDropdown
 {
     public static $itemtype = GlpiComputerType::class;
     public static $items_id = 'computertypes_id';
