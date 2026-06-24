@@ -38,7 +38,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 #[CoversClass(UsageImpact::class)]
 class UsageImpactTest extends AbstractImpactTest
 {
-    public static function typeProvider()
+    public static function typeProvider(): array
     {
         return [[UsageImpact::class]];
     }
