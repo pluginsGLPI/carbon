@@ -38,7 +38,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 #[CoversClass(EmbodiedImpact::class)]
 class EmbodiedImpactTest extends AbstractImpactTest
 {
-    public static function typeProvider()
+    public static function typeProvider(): array
     {
         return [[EmbodiedImpact::class]];
     }

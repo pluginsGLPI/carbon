@@ -39,8 +39,15 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(AbstractImpact::class)]
-class AbstractImpactTest extends DbTestCase
+abstract class AbstractImpactTest extends DbTestCase
 {
+    /**
+     * Data provider of the itemtype to test
+     *
+     * @return array[][class-string]
+     */
+    abstract public static function typeProvider(): array;
+
     #[DataProvider('typeProvider')]
     public function testCanEdit(string $tested_type)
     {
