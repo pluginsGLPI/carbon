@@ -33,6 +33,7 @@
 use Config as GlpiConfig;
 use CronTask as GlpiCronTask;
 use Glpi\Plugin\Hooks;
+use GlpiPlugin\Carbon\CloudInventoryConnector;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\CronTask;
 use GlpiPlugin\Carbon\Dashboard\Grid;
@@ -114,6 +115,8 @@ function plugin_carbon_setupHooks()
         CarbonIntensityClientFactory::getSecuredConfigs(),
         LcaClientFactory::getSecuredConfigs()
     );
+
+    $PLUGIN_HOOKS[Hooks::POST_INIT]['carbon'] = [CloudInventoryConnector::class, 'checkPluginAvailability'];
 
     // add new cards to the dashboard
     $PLUGIN_HOOKS[Hooks::DASHBOARD_CARDS]['carbon'] = [Grid::class, 'getDashboardCards'];
