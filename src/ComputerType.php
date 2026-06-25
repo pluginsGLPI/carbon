@@ -50,6 +50,7 @@ class ComputerType extends AbstractChildDropdown
     public const CATEGORY_LAPTOP     = 3;
     public const CATEGORY_TABLET     = 4;
     public const CATEGORY_SMARTPHONE = 5;
+    public const CATEGORY_CLOUD      = 6;
 
     public static function getCategories(): array
     {
@@ -60,6 +61,7 @@ class ComputerType extends AbstractChildDropdown
             self::CATEGORY_LAPTOP     => __('Laptop', 'carbon'),
             self::CATEGORY_TABLET     => __('Tablet', 'carbon'),
             self::CATEGORY_SMARTPHONE => __('Smartphone', 'carbon'),
+            self::CATEGORY_CLOUD      => __('Cloud server', 'carbon'),
         ];
     }
 

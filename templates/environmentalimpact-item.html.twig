@@ -73,6 +73,12 @@
     'fas fa-chart-pie'
 ) }}
 
+{% if ((embodied_impact.fields['engine'] is defined) and (embodied_impact.fields['engine_version'] is defined)) %}
+  {{ fields.smallTitle(
+      embodied_impact.fields['engine'] ~ ' ' ~ embodied_impact.fields['engine_version'],
+  ) }}
+{% endif %}
+
 <div class="card-body d-flex flex-wrap" id="plugin_carbon_embodied_impacts">
   <div class="col-12 col-xxl-12 flex-column">
     <div class="d-flex flex-row flex-wrap flex-xl-nowrap">
