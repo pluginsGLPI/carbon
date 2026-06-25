@@ -64,7 +64,7 @@ class CommonTestCase extends TestCase
     /** @var int $debugMode save state of GLPI debug mode */
     private $debugMode = null;
 
-    protected $str = null;
+    protected ?string $str = null;
 
     protected function disableDebug()
     {
@@ -115,7 +115,7 @@ class CommonTestCase extends TestCase
         return;
     }
 
-    protected function login($name, $password, $noauto = false)
+    protected function login(string $name, string $password, $noauto = false)
     {
         Session::start();
         $auth = new Auth();
@@ -539,7 +539,7 @@ class CommonTestCase extends TestCase
      *
      * @return mixed
      */
-    protected function callPrivateMethod($instance, string $methodName, ...$args)
+    protected function callPrivateMethod($instance, string $methodName, mixed ...$args)
     {
         $method = new ReflectionMethod($instance, $methodName);
         if (version_compare(PHP_VERSION, '8.1.0') < 0) {

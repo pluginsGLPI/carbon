@@ -44,6 +44,7 @@ use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 use Override;
 use RuntimeException;
+use Session;
 
 use function Safe\json_encode;
 
@@ -261,6 +262,16 @@ class Client extends AbstractClient
     public function parseResponse(array $response, string $scope): array
     {
         $impacts = [];
+        if (!isset($response['impacts'])) {
+            if (Session::getLoginUserID(true)) {
+                $message = __('An error occured while processing the response from Boaviztapi', 'carbon');
+                $message .= '<br>' . ($response['detail'] ?? 'unknown error');
+                Session::addMessageAfterRedirect($message, true, ERROR);
+            }
+            trigger_error('Error parsing the response ' . var_export($response, true), E_USER_WARNING);
+            return $impacts;
+        }
+
         $types = Type::getImpactTypes();
         foreach ($response['impacts'] as $type => $impact) {
             if (!in_array($type, $types)) {
@@ -303,5 +314,20 @@ class Client extends AbstractClient
     public static function dropdownBoaviztaZone(string $name, array $options = [])
     {
         return Dropdown::showFromArray($name, self::getZones(), $options);
+    }
+
+    /**
+     * Get instances known types of a cloud provider
+     *
+     * @param string $provider
+     * @return array isntances types
+     */
+    public function getCloudInstances(string $provider): array
+    {
+        $response = $this->get('cloud/instance/all_instances', [
+            'query' => ['provider' => $provider],
+        ]);
+
+        return $response;
     }
 }
