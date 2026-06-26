@@ -303,6 +303,7 @@ class PluginInstallTest extends CommonTestCase
             'demo'                   => '1',
             'geocoding_enabled'      => '0',
             'dbversion'              => PLUGIN_CARBON_SCHEMA_VERSION,
+            'ember_dataset_date'     => EMBER_DATASET_DATE,
         ];
 
         $config = Config::getConfigurationValues('plugin:' . TEST_PLUGIN_NAME);
