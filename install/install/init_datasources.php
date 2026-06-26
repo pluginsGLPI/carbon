@@ -31,6 +31,7 @@
  */
 
 use GlpiPlugin\Carbon\CarbonIntensity;
+use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\Install;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
@@ -57,71 +58,76 @@ $source_id = Install::getOrCreateSource('ElectricityMap', 0);
 $dbUtil = new DbUtils();
 $table = $dbUtil->getTableForItemType(CarbonIntensity::class);
 
-// Expected columns are Entity; Code; Year; Carbon intensity of electricity - gCO2/kWh
-$data_source = dirname(__DIR__) . '/data/carbon_intensity/carbon-intensity-electricity.csv';
+$ember_dataset_version = Config::getPluginConfigurationValue('ember_dataset_date');
+if ($ember_dataset_version === null || EMBER_DATASET_DATE > $ember_dataset_version) {
+    // Expected columns are Entity; Code; Year; Carbon intensity of electricity - gCO2/kWh
+    $data_source = dirname(__DIR__) . '/data/carbon_intensity/carbon-intensity-electricity.csv';
 
-// Create data source in DB
-$source_id = Install::getOrCreateSource('Ember - Energy Institute', 2);
+    // Create data source in DB
+    $source_id = Install::getOrCreateSource('Ember - Energy Institute', 2);
 
-try {
-    $file = new SplFileObject($data_source, 'r');
-} catch (RuntimeException $e) {
-    throw $e;
-} catch (LogicException $e) {
-    throw $e;
-}
-$file->seek(PHP_INT_MAX); // Go to the end of the file
-$rows_count = $file->key() - 1; // Get the line number ignoring headers line (aka count rows)
-$file->rewind();
-$file->setFlags(SplFileObject::READ_CSV);
-$progress_bar = null;
-if (isCommandLine()) {
-    $output = new StreamOutput(fopen('php://stdout', 'w'));
-    $output->writeln("Writing fallback carbon intensity data");
-    $progress_bar = new ProgressBar($output, $rows_count);
-}
-$line_number = 0;
-while (($line = $file->fgetcsv(',', '"', '\\')) !== false) {
-    $line_number++;
-    if ($progress_bar) {
-        $progress_bar->advance();
-    }
-    if ($line_number === 1 || count($line) < 4) {
-        continue; // Skip header or  lines with insufficient data
-    }
-
-    $entity = $line[0];
-    $code = $line[1];
-    $year = (int) $line[2];
-    $intensity = (float) $line[3];
-
-    // Skip if the code is empty
-    if ($code === '') {
-        continue;
-    }
-
-    $zone_id = Install::getOrCreateZone($entity, $source_id);
-    Install::linkSourceZone($source_id, $zone_id, $code);
-
-    // Insert into the database
     try {
-        $DB->updateOrInsert($table, [
-            'intensity' => $intensity,
-            'data_quality' => 2, // constant GlpiPlugin\Carbon\DataTracking::DATA_QUALITY_ESTIMATED
-        ], [
-            'date' => "$year-01-01 00:00:00",
-            'plugin_carbon_sources_id' => $source_id,
-            'plugin_carbon_zones_id'   => $zone_id,
-        ]);
+        $file = new SplFileObject($data_source, 'r');
     } catch (RuntimeException $e) {
-        $file = null; // close the file
-        throw new RuntimeException("Failed to insert data for year $year; reason: " . $e->getMessage(), $e->getCode(), $e);
+        throw $e;
+    } catch (LogicException $e) {
+        throw $e;
     }
+    $file->seek(PHP_INT_MAX); // Go to the end of the file
+    $rows_count = $file->key() - 1; // Get the line number ignoring headers line (aka count rows)
+    $file->rewind();
+    $file->setFlags(SplFileObject::READ_CSV);
+    $progress_bar = null;
+    if (isCommandLine()) {
+        $output = new StreamOutput(fopen('php://stdout', 'w'));
+        $output->writeln("Writing fallback carbon intensity data");
+        $progress_bar = new ProgressBar($output, $rows_count);
+    }
+    $line_number = 0;
+    while (($line = $file->fgetcsv(',', '"', '\\')) !== false) {
+        $line_number++;
+        if ($progress_bar) {
+            $progress_bar->advance();
+        }
+        if ($line_number === 1 || count($line) < 4) {
+            continue; // Skip header or  lines with insufficient data
+        }
+
+        $entity = $line[0];
+        $code = $line[1];
+        $year = (int) $line[2];
+        $intensity = (float) $line[3];
+
+        // Skip if the code is empty
+        if ($code === '') {
+            continue;
+        }
+
+        $zone_id = Install::getOrCreateZone($entity, $source_id);
+        Install::linkSourceZone($source_id, $zone_id, $code);
+
+        // Insert into the database
+        try {
+            $DB->updateOrInsert($table, [
+                'intensity' => $intensity,
+                'data_quality' => 2, // constant GlpiPlugin\Carbon\DataTracking::DATA_QUALITY_ESTIMATED
+            ], [
+                'date' => "$year-01-01 00:00:00",
+                'plugin_carbon_sources_id' => $source_id,
+                'plugin_carbon_zones_id'   => $zone_id,
+            ]);
+        } catch (RuntimeException $e) {
+            $file = null; // close the file
+            throw new RuntimeException("Failed to insert data for year $year; reason: " . $e->getMessage(), $e->getCode(), $e);
+        }
+    }
+    if ($progress_bar) {
+        $progress_bar->setProgress($rows_count);
+    }
+    $file = null; // close the file
+
+    Config::setPluginConfigurationValues(['ember_dataset_date' => EMBER_DATASET_DATE]);
 }
-if ($progress_bar) {
-    $progress_bar->setProgress($rows_count);
-}
-$file = null; // close the file
 
 $source_id = Install::getOrCreateSource('Hydro Quebec', 1, 0);
 $zone_id_quebec = Install::getOrCreateZone('Quebec', $source_id);

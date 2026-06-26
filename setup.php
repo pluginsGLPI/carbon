@@ -68,6 +68,7 @@ define('PLUGIN_CARBON_MIN_GLPI_VERSION', '11.0.0');
 define('PLUGIN_CARBON_MAX_GLPI_VERSION', '12.0.0');
 
 define('PLUGIN_CARBON_DECIMALS', 3);
+define('EMBER_DATASET_DATE', '2025-07-30');
 
 // Plugin compatible itemtypes
 /**
