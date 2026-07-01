@@ -140,9 +140,7 @@ class Computer extends AbstractAsset
 
         $this->description = [
             'configuration' => $this->analyzeHardware(),
-            'usage' => [
-                'avg_power' => 0,
-            ],
+            'usage' => self::USAGE_NULL,
         ];
     }
 
@@ -158,9 +156,7 @@ class Computer extends AbstractAsset
         $this->endpoint = 'cloud/instance';
 
         $this->description = [
-            'usage'    => [
-                'avg_power' => 0,
-            ],
+            'usage'    => self::USAGE_NULL,
         ];
         $this->description['provider'] = $provider;
         $this->description['instance_type'] = $model;
