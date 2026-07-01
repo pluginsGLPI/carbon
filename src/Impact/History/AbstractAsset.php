@@ -41,11 +41,13 @@ use DateTimeInterface;
 use DBmysql;
 use DBmysqlIterator;
 use Exception;
+use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Toolbox;
+use GlpiPlugin\Carbon\UsageImpact;
 use LogicException;
 use Override;
 use Session;
@@ -389,5 +391,20 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
             sprintf(__('%d entries calculated', 'carbon'), $calculated),
         );
         return true;
+    }
+
+    #[Override]
+    public static function showHistorizableDiagnosis(CommonDBTM $item)
+    {
+        $status = static::getHistorizableDiagnosis($item);
+        $usage_impact = new UsageImpact();
+        $usage_impact->getFromDBByCrit([
+            'itemtype' => $item::getType(),
+            'items_id' => $item->getID(),
+        ]);
+        TemplateRenderer::getInstance()->display('@carbon/history/status-item.html.twig', [
+            'has_status' => ($status !== null),
+            'status' => $status,
+        ]);
     }
 }
