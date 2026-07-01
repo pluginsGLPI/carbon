@@ -39,7 +39,6 @@ use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
 use DBmysql;
 use DbUtils;
-use Glpi\Application\View\TemplateRenderer;
 use Glpi\Asset\Asset_PeripheralAsset;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
@@ -47,7 +46,6 @@ use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Engine\V1\Monitor as EngineMonitor;
 use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\MonitorType;
-use GlpiPlugin\Carbon\UsageImpact;
 use Infocom;
 use Location as GlpiLocation;
 use Monitor as GlpiMonitor;
@@ -263,20 +261,5 @@ class Monitor extends AbstractAsset
         $status['has_decommission_date'] = ($data['decommission_date'] !== null);
 
         return $status;
-    }
-
-    #[Override]
-    public static function showHistorizableDiagnosis(CommonDBTM $item)
-    {
-        $status = self::getHistorizableDiagnosis($item);
-        $usage_impact = new UsageImpact();
-        $usage_impact->getFromDBByCrit([
-            'itemtype' => $item::getType(),
-            'items_id' => $item->getID(),
-        ]);
-        TemplateRenderer::getInstance()->display('@carbon/history/status-item.html.twig', [
-            'has_status' => ($status !== null),
-            'status' => $status,
-        ]);
     }
 }
