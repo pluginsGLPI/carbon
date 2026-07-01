@@ -61,22 +61,4 @@ class Dashboard
     {
         return Provider::getSumPowerPerModel([ComputerModel::getTableField('power_consumption') => ['>', '0']]);
     }
-
-    public static function cardCarbonintensityProvider(array $params = [])
-    {
-        $default_params = [
-            'label' => __('Carbon dioxyde intensity', 'carbon'),
-            'icon'  => "fas fa-computer",
-            'color' => '#ea9999',
-        ];
-        $params = array_merge($default_params, $params);
-
-        $data = Provider::getCarbonIntensity($params);
-
-        return [
-            'data'  => $data,
-            'label' => $params['label'],
-            'icon'  => $params['icon'],
-        ];
-    }
 }
