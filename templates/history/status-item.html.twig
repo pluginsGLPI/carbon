@@ -193,6 +193,14 @@
                             {{ fields.field('', field, __('The asset has a category', 'carbon')) }}
                         {% endif %}
 
+                        {% if status.is_category_not_cloud is defined %}
+                            {% set field = nok_field %}
+                            {% if status.is_category_not_cloud %}
+                                {% set field = ok_field %}
+                            {% endif %}
+                            {{ fields.field('', field, __('The asset is not in a cloud', 'carbon')) }}
+                        {% endif %}
+
                         {% if status.has_usage_profile is defined %}
                             {% set field = nok_field %}
                             {% if status.has_usage_profile %}
