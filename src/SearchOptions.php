@@ -130,6 +130,11 @@ class SearchOptions
     {
         $sopt = [];
 
+        $sopt[] = [
+            'id'        => 'carbon',
+            'name'      =>  __('Environmental impact', 'carbon'),
+        ];
+
         if ($itemtype === GlpiLocation::class) {
             $sopt[] = [
                 'id'           => SearchOptions::LOCATION_BOAVIZTA_ZONE,
