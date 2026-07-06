@@ -67,6 +67,10 @@ class Config implements ConfigInterface
 TWIG;
         if (!$hide_boaviztapi_base_url) {
             $twig .= <<<TWIG
+            {{ fields.smallTitle(
+                __('Boavizta does not provide any service. You are responsible for hosting the server. Read the documentation of the plugin.', 'carbon'),
+            ) }}
+
             {{ fields.textField(
                 'boaviztapi_base_url',
                 current_config['boaviztapi_base_url'],
