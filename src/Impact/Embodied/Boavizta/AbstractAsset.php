@@ -55,8 +55,6 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
     /** @var Client instance of the HTTP client */
     protected ?Client $client = null;
 
-    // abstract public static function getEngine(CommonDBTM $item): EngineInterface;
-
     /**
      * Analyze the hardware of the asset to prepare the request to the backend
      *
