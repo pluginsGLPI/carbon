@@ -4,31 +4,63 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
-## [1.3.0](https://github.com/pluginsGLPI/carbon/compare/1.2.0...1.3.0) (2026-06-17)
+## [1.3.0](https://github.com/pluginsGLPI/carbon/compare/1.2.0...1.3.0) (2026-07-09)
 
 ### Features
 
+* Show state of decommission_date in history diagnosis ([106755](https://github.com/pluginsGLPI/carbon/commit/10675570de8c38180e37a8b14d15d510530242e6))
+
+##### Carbon Emission
+
+* Show total carbon emission of an individual asset ([0f26d3](https://github.com/pluginsGLPI/carbon/commit/0f26d3d2adf595d1050c818c3ed7027f5a2b4b0f))
 
 ##### Carbon Emission, Usage Impact, Embodied Impact
 
-* Clear data ([7e30a5](https://github.com/pluginsGLPI/carbon/commit/7e30a5a6d0bf8834fd993c2be0dd77c4e6625dd0))
-
-##### Data Source\ Lca\ Boavistappi\ Config
-
-* Change URL override method ([8c1702](https://github.com/pluginsGLPI/carbon/commit/8c1702d33fab0f266b362088e87dbc49b37b7402))
-
-### Bug Fixes
-
-* Invalid homepage URL in xml file ([9d219e](https://github.com/pluginsGLPI/carbon/commit/9d219eea0bcce70e3626c4e9610486fec7bc7c83))
-* Tests ([06bd09](https://github.com/pluginsGLPI/carbon/commit/06bd09ee9f9e8baa7a7cb15f290a9f23ba1f075d))
-
-##### Dashboard
-
-* Merge cards and widget instead of redefine ([c396fc](https://github.com/pluginsGLPI/carbon/commit/c396fcc749a2b780946b275ef30ce79c3d5dc0ff))
+* Clear data ([da46a4](https://github.com/pluginsGLPI/carbon/commit/da46a4f9d693012246e5ddd860a31da84c90543a))
 
 ##### Dashboard\ Grid
 
-* Loss of other plugins cards for dashboard ([1abe09](https://github.com/pluginsGLPI/carbon/commit/1abe09d505b40cfe64ddee04ec3d33b1676a34ba))
+* Dashboard reset ([47a1a8](https://github.com/pluginsGLPI/carbon/commit/47a1a85f4a4263eb8ff87a2b989d54f0dde188c4))
+
+##### Data Source\ Lca\ Boavistappi\ Config
+
+* Change URL override method ([bc2d4c](https://github.com/pluginsGLPI/carbon/commit/bc2d4c52a1da650ab1b69c7370d41d399afc1db5))
+
+### Bug Fixes
+
+* Bad handling of volume, may lead to huge numbers ([688990](https://github.com/pluginsGLPI/carbon/commit/6889900ee458d00992333c1e106840f3846d0230))
+* Check GLPI version before using new hook ([dcba1e](https://github.com/pluginsGLPI/carbon/commit/dcba1e0c004bd0567cb219ee52560da392a74659))
+* Invalid homepage URL in xml file ([6d22a1](https://github.com/pluginsGLPI/carbon/commit/6d22a12323d373b96a7440b246832cc0d866cb4c))
+* Tests ([080313](https://github.com/pluginsGLPI/carbon/commit/080313e3339f7cf1a3752e89e5596f8bb035b70a))
+
+##### Dashboard
+
+* Merge cards and widget instead of redefine ([14176d](https://github.com/pluginsGLPI/carbon/commit/14176d150a4055258ca47de256e9da2d88b43309))
+
+##### Dashboard\ Provider
+
+* Embodied + usage count of impact criteria ([b8b7be](https://github.com/pluginsGLPI/carbon/commit/b8b7bed7f6e8592ad38d6742df00f40a21dd9116))
+
+##### Datasource\ Lca\ Boaviztapi\ Client
+
+* Method type hinting ([116eaf](https://github.com/pluginsGLPI/carbon/commit/116eaf080515d78f1819971d2da97577e3e29db7))
+
+##### Impact\ Embodied\ Internal\ Abstract Asset
+
+* Bad key used in SQL query ([d417b5](https://github.com/pluginsGLPI/carbon/commit/d417b5e6b6073e6001ee632890b3dabc7eaf079c))
+
+##### Impact\ Type
+
+* Wrong unit for photochemical ozone formation ([d79733](https://github.com/pluginsGLPI/carbon/commit/d797332d7e6576b120945c94f0de612eb321260e))
+
+##### Search Oprions
+
+* Better group title ([1c0f53](https://github.com/pluginsGLPI/carbon/commit/1c0f53d97a5fc1d0cfaed5e698c9ff8c6ea39ab9))
+
+##### Toolbox
+
+* Dynamically round numbers without dimension ([62b28b](https://github.com/pluginsGLPI/carbon/commit/62b28b43dcaeab231ba76d8f09fa026bbe1a8deb))
+* Round mol * dimensionned quantity ([83a7e2](https://github.com/pluginsGLPI/carbon/commit/83a7e2bf2e5b14b046b9fa00688f57d84054957c))
 
 
 ---
