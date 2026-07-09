@@ -376,20 +376,16 @@ class Toolbox
             case 'g':
                 return self::getWeight($value) . $unit[1];
             case 'J':
-                // To be converted into watt.hour
+                // Value is in J, convert it into Wh
                 return self::getEnergy($value / 3600) . $unit[1];
             case 'Wh':
                 return self::getEnergy($value) . $unit[1];
             case 'm³':
-                // Value is in m^3
+                // Value is in m^3, convert it into L
                 return self::getVolume($value * 1000) . $unit[1];
-            case 'mol':
-                return self::dynamicRound($value) . ' ' . implode(' ', $unit);
-            default:
-                return self::dynamicRound($value);
         }
 
-        return sprintf(__('%1$s %2$s', 'carbon'), $value, implode(' ', $unit));
+        return sprintf(__('%1$s %2$s', 'carbon'), self::dynamicRound($value), implode(' ', $unit));
     }
 
     /**
