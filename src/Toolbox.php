@@ -384,7 +384,7 @@ class Toolbox
                 // Value is in m^3
                 return self::getVolume($value * 1000) . $unit[1];
             case 'mol':
-                break;
+                return self::dynamicRound($value) . ' ' . implode(' ', $unit);
             default:
                 return self::dynamicRound($value);
         }
