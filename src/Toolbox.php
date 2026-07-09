@@ -385,6 +385,8 @@ class Toolbox
                 return self::getVolume($value * 1000) . $unit[1];
             case 'mol':
                 break;
+            default:
+                return self::dynamicRound($value);
         }
 
         return sprintf(__('%1$s %2$s', 'carbon'), $value, implode(' ', $unit));
