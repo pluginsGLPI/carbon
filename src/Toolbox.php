@@ -385,7 +385,7 @@ class Toolbox
                 return self::getVolume($value * 1000) . $unit[1];
         }
 
-        return sprintf(__('%1$s %2$s', 'carbon'), self::dynamicRound($value), implode(' ', $unit));
+        return self::dynamicRound($value) . ' ' . implode(' ', $unit);
     }
 
     /**
