@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-24 03:52+0000\n"
+"POT-Creation-Date: 2026-07-10 03:36+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,7 +23,7 @@ msgstr ""
 msgid "Boavizta"
 msgstr ""
 
-#: templates/location.html.twig src/SearchOptions.php:138 src/Location.php:189
+#: templates/location.html.twig src/SearchOptions.php:143 src/Location.php:189
 msgid "Boavizta zone"
 msgstr ""
 
@@ -44,7 +44,7 @@ msgid_plural "Powers"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/computertype.html.twig src/SearchOptions.php:303
+#: templates/computertype.html.twig src/SearchOptions.php:308
 #: src/ComputerType.php:80
 msgid "Category"
 msgstr ""
@@ -140,7 +140,7 @@ msgid ""
 msgstr ""
 
 #: templates/components/form/source_zone_selector.html.twig
-#: src/AbstractModel.php:193
+#: src/AbstractModel.php:145
 msgid "Source"
 msgstr ""
 
@@ -404,8 +404,9 @@ msgstr ""
 msgid "No zone to download"
 msgstr ""
 
-#: src/Profile.php:47 src/UsageInfo.php:99 src/Location.php:76
-#: src/AbstractModel.php:57 src/AbstractType.php:58
+#: src/Profile.php:47 src/UsageInfo.php:99 src/Dashboard/Grid.php:367
+#: src/AbstractChildDropdown.php:58 src/SearchOptions.php:135
+#: src/Location.php:76 install/install/create_dashboard.php:48
 msgid "Environmental impact"
 msgstr ""
 
@@ -477,7 +478,7 @@ msgstr ""
 msgid "Dashboard not found"
 msgstr ""
 
-#: src/Command/ExportDashboardCommand.php:102
+#: src/Command/ExportDashboardCommand.php:100
 #, php-format
 msgid "Dashboard description saved to %s"
 msgstr ""
@@ -494,15 +495,15 @@ msgstr ""
 msgid "Embodied impact evaluation falied."
 msgstr ""
 
-#: src/Impact/History/AbstractAsset.php:375
+#: src/Impact/History/AbstractAsset.php:377
 msgid "Error while calculating impact"
 msgstr ""
 
-#: src/Impact/History/AbstractAsset.php:383
+#: src/Impact/History/AbstractAsset.php:385
 msgid "Nothing to calculate"
 msgstr ""
 
-#: src/Impact/History/AbstractAsset.php:389
+#: src/Impact/History/AbstractAsset.php:391
 #, php-format
 msgid "%d entries calculated"
 msgstr ""
@@ -840,188 +841,208 @@ msgstr ""
 msgid "End"
 msgstr ""
 
-#: src/Toolbox.php:243 src/Dashboard/Provider.php:195
+#: src/Toolbox.php:242 src/Dashboard/Provider.php:195
 #: src/Dashboard/Provider.php:318 src/Dashboard/Provider.php:1086
 msgid "g"
 msgstr ""
 
-#: src/Toolbox.php:244 src/Dashboard/Provider.php:196
+#: src/Toolbox.php:243 src/Dashboard/Provider.php:196
 #: src/Dashboard/Provider.php:319 src/Dashboard/Provider.php:1087
 msgid "Kg"
 msgstr ""
 
-#: src/Toolbox.php:245 src/Dashboard/Provider.php:197
+#: src/Toolbox.php:244 src/Dashboard/Provider.php:197
 #: src/Dashboard/Provider.php:320 src/Dashboard/Provider.php:1088
 msgid "t"
 msgstr ""
 
-#: src/Toolbox.php:246 src/Dashboard/Provider.php:198
+#: src/Toolbox.php:245 src/Dashboard/Provider.php:198
 #: src/Dashboard/Provider.php:321 src/Dashboard/Provider.php:1089
 msgid "Kt"
 msgstr ""
 
-#: src/Toolbox.php:247 src/Dashboard/Provider.php:199
+#: src/Toolbox.php:246 src/Dashboard/Provider.php:199
 #: src/Dashboard/Provider.php:322 src/Dashboard/Provider.php:1090
 msgid "Mt"
 msgstr ""
 
-#: src/Toolbox.php:248 src/Dashboard/Provider.php:200
+#: src/Toolbox.php:247 src/Dashboard/Provider.php:200
 #: src/Dashboard/Provider.php:323 src/Dashboard/Provider.php:1091
 msgid "Gt"
 msgstr ""
 
-#: src/Toolbox.php:249 src/Dashboard/Provider.php:201
+#: src/Toolbox.php:248 src/Dashboard/Provider.php:201
 #: src/Dashboard/Provider.php:324 src/Dashboard/Provider.php:1092
 msgid "Tt"
 msgstr ""
 
-#: src/Toolbox.php:250 src/Dashboard/Provider.php:202
+#: src/Toolbox.php:249 src/Dashboard/Provider.php:202
 #: src/Dashboard/Provider.php:325 src/Dashboard/Provider.php:1093
 msgid "Pt"
 msgstr ""
 
-#: src/Toolbox.php:251 src/Dashboard/Provider.php:203
+#: src/Toolbox.php:250 src/Dashboard/Provider.php:203
 #: src/Dashboard/Provider.php:326 src/Dashboard/Provider.php:1094
 msgid "Et"
 msgstr ""
 
-#: src/Toolbox.php:252 src/Dashboard/Provider.php:204
+#: src/Toolbox.php:251 src/Dashboard/Provider.php:204
 #: src/Dashboard/Provider.php:327 src/Dashboard/Provider.php:1095
 msgid "Zt"
 msgstr ""
 
-#: src/Toolbox.php:253 src/Dashboard/Provider.php:205
+#: src/Toolbox.php:252 src/Dashboard/Provider.php:205
 #: src/Dashboard/Provider.php:328 src/Dashboard/Provider.php:1096
 msgid "Yt"
 msgstr ""
 
-#: src/Toolbox.php:280
+#: src/Toolbox.php:268
 msgid "W"
 msgstr ""
 
-#: src/Toolbox.php:281
+#: src/Toolbox.php:269
 msgid "KW"
 msgstr ""
 
-#: src/Toolbox.php:282
+#: src/Toolbox.php:270
 msgid "MW"
 msgstr ""
 
-#: src/Toolbox.php:283
+#: src/Toolbox.php:271
 msgid "GW"
 msgstr ""
 
-#: src/Toolbox.php:284
+#: src/Toolbox.php:272
 msgid "TW"
 msgstr ""
 
-#: src/Toolbox.php:285
+#: src/Toolbox.php:273
 msgid "PW"
 msgstr ""
 
-#: src/Toolbox.php:286
+#: src/Toolbox.php:274
 msgid "EW"
 msgstr ""
 
-#: src/Toolbox.php:287
+#: src/Toolbox.php:275
 msgid "ZW"
 msgstr ""
 
-#: src/Toolbox.php:288
+#: src/Toolbox.php:276
 msgid "YW"
 msgstr ""
 
-#: src/Toolbox.php:315
+#: src/Toolbox.php:292
 msgid "Wh"
 msgstr ""
 
-#: src/Toolbox.php:316 src/Dashboard/Provider.php:1105
+#: src/Toolbox.php:293 src/Dashboard/Provider.php:1105
 msgid "KWh"
 msgstr ""
 
-#: src/Toolbox.php:317 src/Dashboard/Provider.php:1106
+#: src/Toolbox.php:294 src/Dashboard/Provider.php:1106
 msgid "MWh"
 msgstr ""
 
-#: src/Toolbox.php:318 src/Dashboard/Provider.php:1107
+#: src/Toolbox.php:295 src/Dashboard/Provider.php:1107
 msgid "GWh"
 msgstr ""
 
-#: src/Toolbox.php:319 src/Dashboard/Provider.php:1108
+#: src/Toolbox.php:296 src/Dashboard/Provider.php:1108
 msgid "TWh"
 msgstr ""
 
-#: src/Toolbox.php:320 src/Dashboard/Provider.php:1109
+#: src/Toolbox.php:297 src/Dashboard/Provider.php:1109
 msgid "PWh"
 msgstr ""
 
-#: src/Toolbox.php:321 src/Dashboard/Provider.php:1110
+#: src/Toolbox.php:298 src/Dashboard/Provider.php:1110
 msgid "EWh"
 msgstr ""
 
-#: src/Toolbox.php:322 src/Dashboard/Provider.php:1111
+#: src/Toolbox.php:299 src/Dashboard/Provider.php:1111
 msgid "ZWh"
 msgstr ""
 
-#: src/Toolbox.php:323 src/Dashboard/Provider.php:1112
+#: src/Toolbox.php:300 src/Dashboard/Provider.php:1112
 msgid "YWh"
 msgstr ""
 
-#: src/Toolbox.php:373 src/Toolbox.php:378
+#: src/Toolbox.php:316
+msgid "L"
+msgstr ""
+
+#: src/Toolbox.php:317
+msgid "m³"
+msgstr ""
+
+#: src/Toolbox.php:318
+msgid "dam³"
+msgstr ""
+
+#: src/Toolbox.php:319
+msgid "hm³"
+msgstr ""
+
+#: src/Toolbox.php:320
+msgid "Km³"
+msgstr ""
+
+#: src/Toolbox.php:388
 #, php-format
 msgid "%1$s %2$s"
 msgstr ""
 
-#: src/Dashboard/Grid.php:64 src/Dashboard/Grid.php:129
-#: src/Dashboard/Grid.php:227 src/AbstractModel.php:66 src/AbstractType.php:67
+#: src/Dashboard/Grid.php:69 src/Dashboard/Grid.php:134
+#: src/Dashboard/Grid.php:232 src/AbstractChildDropdown.php:67
 msgid "Carbon"
 msgstr ""
 
-#: src/Dashboard/Grid.php:69 src/Dashboard/Provider.php:473
+#: src/Dashboard/Grid.php:74 src/Dashboard/Provider.php:473
 msgid "Handled assets ratio"
 msgstr ""
 
-#: src/Dashboard/Grid.php:78
+#: src/Dashboard/Grid.php:83
 msgid "Handled assets count"
 msgstr ""
 
-#: src/Dashboard/Grid.php:141
+#: src/Dashboard/Grid.php:146
 #, php-format
 msgid "Handled %s"
 msgstr ""
 
-#: src/Dashboard/Grid.php:152
+#: src/Dashboard/Grid.php:157
 #, php-format
 msgid "Unhandled %s"
 msgstr ""
 
-#: src/Dashboard/Grid.php:238
+#: src/Dashboard/Grid.php:243
 #, php-format
 msgid "Unhandled %s ratio"
 msgstr ""
 
-#: src/Dashboard/Grid.php:250
+#: src/Dashboard/Grid.php:255
 msgid "Usage carbon emission year to date"
 msgstr ""
 
-#: src/Dashboard/Grid.php:256
+#: src/Dashboard/Grid.php:261
 msgid "Monthly carbon emission"
 msgstr ""
 
-#: src/Dashboard/Grid.php:265
+#: src/Dashboard/Grid.php:270
 msgid "Usage global warming potential chart"
 msgstr ""
 
-#: src/Dashboard/Grid.php:274 src/Dashboard/Widget.php:91
+#: src/Dashboard/Grid.php:279 src/Dashboard/Widget.php:91
 #: src/Dashboard/Widget.php:588
 msgid "Biggest monthly averaged carbon emission per model"
 msgstr ""
 
-#: src/Dashboard/Grid.php:331 src/Dashboard/Widget.php:61
+#: src/Dashboard/Grid.php:336 src/Dashboard/Widget.php:61
 msgid "Environmental impact information video"
 msgstr ""
 
-#: src/Dashboard/Grid.php:336
+#: src/Dashboard/Grid.php:341
 msgid "Environmental impact methodology information"
 msgstr ""
 
@@ -1173,18 +1194,18 @@ msgid_plural "Usage impacts"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/SearchOptions.php:161 src/ComputerType.php:72 src/MonitorType.php:52
+#: src/SearchOptions.php:166 src/ComputerType.php:72 src/MonitorType.php:52
 #: src/NetworkEquipmentType.php:52
 msgid "Power consumption"
 msgstr ""
 
-#: src/SearchOptions.php:184 src/SearchOptions.php:316
-#: src/SearchOptions.php:329 src/SearchOptions.php:342
+#: src/SearchOptions.php:189 src/SearchOptions.php:321
+#: src/SearchOptions.php:334 src/SearchOptions.php:347
 msgid "Ignore environmental impact"
 msgstr ""
 
-#: src/SearchOptions.php:241 src/SearchOptions.php:365
-#: src/SearchOptions.php:442
+#: src/SearchOptions.php:246 src/SearchOptions.php:370
+#: src/SearchOptions.php:447
 msgid "Is historizable"
 msgstr ""
 
@@ -1229,11 +1250,11 @@ msgstr ""
 msgid "Download carbon emissions from Electricity Maps"
 msgstr ""
 
-#: src/DataSource/Lca/Boaviztapi/Config.php:104
+#: src/DataSource/Lca/Boaviztapi/Config.php:108
 msgid "Invalid Boavizta API URL"
 msgstr ""
 
-#: src/DataSource/Lca/Boaviztapi/Config.php:112
+#: src/DataSource/Lca/Boaviztapi/Config.php:116
 msgid "Connection to Boavizta API established"
 msgstr ""
 
@@ -1290,7 +1311,7 @@ msgstr ""
 msgid "This action cannot be undone. Are you sure?"
 msgstr ""
 
-#: src/AbstractModel.php:204
+#: src/AbstractModel.php:156
 msgid "Quality"
 msgstr ""
 
@@ -1340,30 +1361,30 @@ msgid ""
 "the plugin."
 msgstr ""
 
-#: hook.php:303
+#: hook.php:309
 msgid "Associate to an usage profile"
 msgstr ""
 
-#: hook.php:304 hook.php:309
+#: hook.php:310 hook.php:315
 msgid "Delete all calculated environmental impacts"
 msgstr ""
 
-#: hook.php:313 hook.php:318 hook.php:322
+#: hook.php:319 hook.php:324 hook.php:328
 msgid "Update type power consumption"
 msgstr ""
 
-#: hook.php:314
+#: hook.php:320
 msgid "Update category"
 msgstr ""
 
-#: hook.php:326
+#: hook.php:332
 msgid "Update zone for Boavizta engine"
 msgstr ""
 
-#: hook.php:327
+#: hook.php:333
 msgid "Update carbon intensity source and zone"
 msgstr ""
 
-#: setup.php:298
+#: setup.php:303
 msgid "Environmental Impact"
 msgstr ""
