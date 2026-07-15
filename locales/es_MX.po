@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-10 03:36+0000\n"
+"POT-Creation-Date: 2026-07-13 03:18+0000\n"
 "PO-Revision-Date: 2026-07-09 09:55+0000\n"
 "Last-Translator: Edwin Elias Alvarez <elias986@yahoo.com>, 2026\n"
 "Language-Team: Spanish (Mexico) (https://app.transifex.com/teclib/teams/28042/es_MX/)\n"
@@ -1024,23 +1024,23 @@ msgstr "YWh"
 
 #: src/Toolbox.php:316
 msgid "L"
-msgstr ""
+msgstr "L"
 
 #: src/Toolbox.php:317
 msgid "m³"
-msgstr ""
+msgstr "m³"
 
 #: src/Toolbox.php:318
 msgid "dam³"
-msgstr ""
+msgstr "dam³"
 
 #: src/Toolbox.php:319
 msgid "hm³"
-msgstr ""
+msgstr "hm³"
 
 #: src/Toolbox.php:320
 msgid "Km³"
-msgstr ""
+msgstr "Km³"
 
 #: src/Toolbox.php:388
 #, php-format
