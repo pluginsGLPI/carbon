@@ -78,7 +78,7 @@
                         <td>{{ __('Reset usage impacts. This will delete all calculated usage impacts for all assets.', 'carbon') }}</td>
                         <td class="text-end">
                             {% set reset_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', reset_all: ''}" %}
-                            <a class="btn btn-outline-warning me-2" onclick='{{ usage_imapct_action_url|raw }};'>
+                            <a class="btn btn-outline-warning me-2" onclick='{{ usage_impact_action_url|raw }};'>
                                 <i class="ti ti-device-floppy"></i>
                                 <span>{{ _x('button', 'Reset usage impacts') }}</span>
                             </a>
