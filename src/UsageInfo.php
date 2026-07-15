@@ -268,7 +268,7 @@ class UsageInfo extends CommonDBChild
             $usage_labels[$impact_type] = Type::getUsageImpactLabel($impact_type);
         }
 
-        $usage_imapct_action_url    = $CFG_GLPI['root_doc'] . '/plugins/carbon/front/usageimpact.form.php';
+        $usage_impact_action_url    = $CFG_GLPI['root_doc'] . '/plugins/carbon/front/usageimpact.form.php';
         $embodied_impact_action_url = $CFG_GLPI['root_doc'] . '/plugins/carbon/front/embodiedimpact.form.php';
         TemplateRenderer::getInstance()->display('@carbon/environmentalimpact-item.html.twig', [
             'usage_info'      => $usage_info,
@@ -281,7 +281,7 @@ class UsageInfo extends CommonDBChild
             'embodied_tooltips' => $embodied_tooltips,
             'usage_tooltips' => $usage_tooltips,
             'usage_carbon_emission_graph' => Widget::DisplayGraphUsageCarbonEmissionPerMonth($data),
-            'usage_impact_action_url'    => $usage_imapct_action_url,
+            'usage_impact_action_url'    => $usage_impact_action_url,
             'embodied_impact_action_url' => $embodied_impact_action_url,
         ]);
     }
