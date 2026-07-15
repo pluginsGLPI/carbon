@@ -199,6 +199,10 @@ class Source_Zone extends CommonDBRelation
                     fetch(CFG_GLPI["root_doc"] + "/plugins/carbon/ajax/toggleZoneDownload.php?id=" + id).then(response => {
                         if (response.status === 200) {
                             reloadTab();
+                        } else {
+                            response.text().then(function (text) {
+                                glpi_toast_error(text)
+                            });
                         }
                     });
                 };
@@ -294,6 +298,10 @@ class Source_Zone extends CommonDBRelation
                     fetch(CFG_GLPI["root_doc"] + "/plugins/carbon/ajax/toggleZoneDownload.php?id=" + id).then(response => {
                         if (response.status === 200) {
                             reloadTab();
+                        } else {
+                            response.text().then(function (text) {
+                                glpi_toast_error(text)
+                            });
                         }
                     });
                 };
