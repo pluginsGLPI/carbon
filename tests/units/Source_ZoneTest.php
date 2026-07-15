@@ -43,9 +43,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 #[CoversClass(Source_Zone::class)]
 class Source_ZoneTest extends DbTestCase
 {
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\Source_Zone::showForSource
-     */
     public function testShowForSource()
     {
         $source = $this->createItem(Source::class, [
@@ -63,30 +60,25 @@ class Source_ZoneTest extends DbTestCase
 
         $this->logout();
         ob_start();
-        $result = $instance->showForSource($source);
+        $instance->showForSource($source);
         $output = ob_get_clean();
         $this->assertEquals('', $output);
 
         $this->login('glpi', 'glpi');
         ob_start();
-        $result = $instance->showForSource($source);
+        $instance->showForSource($source);
         $output = ob_get_clean();
         $this->assertNotEmpty($output);
     }
 
-    /**
-     * #CoversMethod GlpiPlugin\Carbon\Source_Zone::showForZone
-     */
-    public function testShowForZone()
+    public function test_showForZone_shows_nothing_when_user_cannot_view_the_related_zone()
     {
         $source = $this->createItem(Source::class, [
             'name' => 'foo',
         ]);
-
         $zone = $this->createItem(Zone::class, [
             'name' => 'bar',
         ]);
-
         $instance = $this->createItem(Source_Zone::class, [
             $source::getForeignKeyField() => $source->getID(),
             $zone::getForeignKeyField() => $zone->getID(),
@@ -94,13 +86,27 @@ class Source_ZoneTest extends DbTestCase
 
         $this->logout();
         ob_start();
-        $result = $instance->showForZone($zone);
+        $instance->showForZone($zone);
         $output = ob_get_clean();
         $this->assertEquals('', $output);
+    }
+
+    public function test_showForZone_shows_nothing_when_user_can_view_the_related_zone()
+    {
+        $source = $this->createItem(Source::class, [
+            'name' => 'foo',
+        ]);
+        $zone = $this->createItem(Zone::class, [
+            'name' => 'bar',
+        ]);
+        $instance = $this->createItem(Source_Zone::class, [
+            $source::getForeignKeyField() => $source->getID(),
+            $zone::getForeignKeyField() => $zone->getID(),
+        ]);
 
         $this->login('glpi', 'glpi');
         ob_start();
-        $result = $instance->showForZone($zone);
+        $instance->showForZone($zone);
         $output = ob_get_clean();
         $this->assertNotEmpty($output);
     }
@@ -279,9 +285,9 @@ class Source_ZoneTest extends DbTestCase
             $source_fk => $source->getID(),
             $zone_fk => $zone->getID(),
         ];
-        $this->count(0, $instance->find($where));
+        $this->assertEquals(0, count($instance->find($where)));
         $instance->getOrCreate([], $where);
-        $this->count(1, $instance->find($where));
+        $this->assertEquals(1, count($instance->find($where)));
 
         // Test we find an existing instance
         $instance_2 = new Source_Zone();
@@ -292,5 +298,64 @@ class Source_ZoneTest extends DbTestCase
         $instance_3 = new Source_Zone();
         $instance_3->getOrCreate(['code' => 'FOO'], $where);
         $this->assertEquals('FOO', $instance_3->fields['code']);
+    }
+
+    public function test_toggleZone_flips_the_download_flag()
+    {
+        $zone = $this->createItem(Zone::class);
+        $source = $this->createItem(Source::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            $zone::getForeignKeyField() => $zone->getID(),
+            $source::getForeignKeyField() => $source->getID(),
+        ]);
+
+        $this->assertEquals(0, $source_zone->fields['is_download_enabled']);
+        $success = $source_zone->toggleZone();
+        $this->assertTrue($success);
+        $this->assertEquals(1, $source_zone->fields['is_download_enabled']);
+    }
+
+    public function test_toggleZone_disables_the_download_flag()
+    {
+        $zone = $this->createItem(Zone::class);
+        $source = $this->createItem(Source::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            $zone::getForeignKeyField() => $zone->getID(),
+            $source::getForeignKeyField() => $source->getID(),
+            'is_download_enabled' => 1
+        ]);
+
+        // If the flas is set, it should reset
+        $this->assertEquals(1, $source_zone->fields['is_download_enabled']);
+        $success = $source_zone->toggleZone(false);
+        $this->assertTrue($success);
+        $this->assertEquals(0, $source_zone->fields['is_download_enabled']);
+
+        // If the flag is reset it should stay reset
+        $success = $source_zone->toggleZone(false);
+        $this->assertTrue($success);
+        $this->assertEquals(0, $source_zone->fields['is_download_enabled']);
+    }
+
+    public function test_toggleZone_enables_the_download_flag()
+    {
+        $zone = $this->createItem(Zone::class);
+        $source = $this->createItem(Source::class);
+        $source_zone = $this->createItem(Source_Zone::class, [
+            $zone::getForeignKeyField() => $zone->getID(),
+            $source::getForeignKeyField() => $source->getID(),
+            'is_download_enabled' => 0
+        ]);
+
+        // If the flas is reset, it should set
+        $this->assertEquals(0, $source_zone->fields['is_download_enabled']);
+        $success = $source_zone->toggleZone(true);
+        $this->assertTrue($success);
+        $this->assertEquals(1, $source_zone->fields['is_download_enabled']);
+
+        // If the flas is set, it should stay set
+        $success = $source_zone->toggleZone(true);
+        $this->assertTrue($success);
+        $this->assertEquals(1, $source_zone->fields['is_download_enabled']);
     }
 }
