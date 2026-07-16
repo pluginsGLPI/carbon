@@ -57,13 +57,15 @@
             {{ include(template_from_string(include_config)) }}
         {% endfor %}
 
+        <div class="border-top">&nbsp;</div>
+
         <button type="submit" class="btn btn-primary mx-1" name="update" value="1">
             <i class="ti ti-device-floppy"></i>
             <span>{{ _x('button', 'Save') }}</span>
         </button>
     </form>
 
-    <div style="height: 10em"></div>
+    <div style="height: 5em"></div>
 
     {{ fields.largeTitle(
         __('Danger zone', 'carbon'),
