@@ -5,18 +5,18 @@
 # 
 # Translators:
 # Eduardo Scott <edu.scott01@gmail.com>, 2026
-# Pablo Pierre <pablo.terdulino@gmail.com>, 2026
 # Thierry Bugier <tbugier@teclib.com>, 2026
 # Arthur Schaefer <arthur.r.schaefer@gmail.com>, 2026
+# Pablo Pierre <pablo.terdulino@gmail.com>, 2026
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-10 03:36+0000\n"
+"POT-Creation-Date: 2026-07-16 02:48+0000\n"
 "PO-Revision-Date: 2026-07-09 09:55+0000\n"
-"Last-Translator: Arthur Schaefer <arthur.r.schaefer@gmail.com>, 2026\n"
+"Last-Translator: Pablo Pierre <pablo.terdulino@gmail.com>, 2026\n"
 "Language-Team: Portuguese (Brazil) (https://app.transifex.com/teclib/teams/28042/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -867,7 +867,7 @@ msgstr "Nome da fonte"
 msgid "Zone name"
 msgstr "Nome da zona"
 
-#: src/Source_Zone.php:91 src/Source_Zone.php:174 src/Source_Zone.php:271
+#: src/Source_Zone.php:91 src/Source_Zone.php:174 src/Source_Zone.php:275
 #: src/Zone.php:138
 msgid "Download enabled"
 msgstr "Habilitado download"
@@ -888,11 +888,11 @@ msgstr "Esta é uma fonte alternativa; não há dados em tempo real disponíveis
 msgid "Source for historical"
 msgstr "Fonte para histórico"
 
-#: src/Source_Zone.php:414
+#: src/Source_Zone.php:422
 msgid "Enable / Disable"
 msgstr "Desabilitar / Habilitar"
 
-#: src/Source_Zone.php:540
+#: src/Source_Zone.php:548
 #: src/DataSource/CarbonIntensity/AbstractCronTask.php:125
 msgid "End"
 msgstr "Fim"
@@ -1454,6 +1454,26 @@ msgstr "Atualizar zona para o motor Boavizta"
 #: hook.php:333
 msgid "Update carbon intensity source and zone"
 msgstr "Atualizar a fonte e a zona de intensidade de carbono."
+
+#: ajax/toggleZoneDownload.php:41
+msgid "Not found."
+msgstr ""
+
+#: ajax/toggleZoneDownload.php:48
+msgid "Access denied."
+msgstr ""
+
+#: ajax/toggleZoneDownload.php:54
+msgid "Bad request."
+msgstr ""
+
+#: ajax/toggleZoneDownload.php:61
+msgid "Item not found."
+msgstr ""
+
+#: ajax/toggleZoneDownload.php:66
+msgid "Update failed."
+msgstr ""
 
 #: setup.php:303
 msgid "Environmental Impact"

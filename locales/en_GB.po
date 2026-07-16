@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-10 03:36+0000\n"
+"POT-Creation-Date: 2026-07-16 02:48+0000\n"
 "PO-Revision-Date: 2026-07-09 09:55+0000\n"
 "Last-Translator: Thierry Bugier <tbugier@teclib.com>, 2026\n"
 "Language-Team: English (United Kingdom) (https://app.transifex.com/teclib/teams/28042/en_GB/)\n"
@@ -843,7 +843,7 @@ msgstr "Source name"
 msgid "Zone name"
 msgstr "Zone name"
 
-#: src/Source_Zone.php:91 src/Source_Zone.php:174 src/Source_Zone.php:271
+#: src/Source_Zone.php:91 src/Source_Zone.php:174 src/Source_Zone.php:275
 #: src/Zone.php:138
 msgid "Download enabled"
 msgstr "Download enabled"
@@ -864,11 +864,11 @@ msgstr "This is a fallback source, there is no real-time data available"
 msgid "Source for historical"
 msgstr "Source for historical"
 
-#: src/Source_Zone.php:414
+#: src/Source_Zone.php:422
 msgid "Enable / Disable"
 msgstr "Enable / Disable"
 
-#: src/Source_Zone.php:540
+#: src/Source_Zone.php:548
 #: src/DataSource/CarbonIntensity/AbstractCronTask.php:125
 msgid "End"
 msgstr "End"
@@ -1426,6 +1426,26 @@ msgstr "Update zone for Boavizta engine"
 #: hook.php:333
 msgid "Update carbon intensity source and zone"
 msgstr "Update carbon intensity source and zone"
+
+#: ajax/toggleZoneDownload.php:41
+msgid "Not found."
+msgstr ""
+
+#: ajax/toggleZoneDownload.php:48
+msgid "Access denied."
+msgstr ""
+
+#: ajax/toggleZoneDownload.php:54
+msgid "Bad request."
+msgstr ""
+
+#: ajax/toggleZoneDownload.php:61
+msgid "Item not found."
+msgstr ""
+
+#: ajax/toggleZoneDownload.php:66
+msgid "Update failed."
+msgstr ""
 
 #: setup.php:303
 msgid "Environmental Impact"
