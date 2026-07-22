@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-24 03:52+0000\n"
+"POT-Creation-Date: 2026-07-22 02:51+0000\n"
 "PO-Revision-Date: 2026-07-09 09:55+0000\n"
 "Last-Translator: Milo Ivir <mail@milotype.de>, 2026\n"
 "Language-Team: Croatian (Croatia) (https://app.transifex.com/teclib/teams/28042/hr_HR/)\n"
@@ -22,135 +22,25 @@ msgstr ""
 "Language: hr_HR\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 
-#: templates/location.html.twig src/Impact/Embodied/Engine.php:53
-#: src/Impact/Usage/Engine.php:48
-msgid "Boavizta"
-msgstr "Boavizta"
-
-#: templates/location.html.twig src/SearchOptions.php:138 src/Location.php:189
-msgid "Boavizta zone"
-msgstr "Boavizta zona"
-
-#: templates/location.html.twig src/CarbonIntensity.php:67
-msgid "Carbon intensity"
-msgstr "Intenzitet ugljika"
-
-#: templates/computertype.html.twig
+#: templates/abstractmodel.html.twig
 msgid ""
-"This power value is used as default when the power of a computer model is "
-"unknown"
+"The impacts below shall include the manufacturing, disposal and recycling "
+"processes only."
 msgstr ""
-"Ova vrijednost energije koristi se kao zadana kada je energija modela "
-"računala nepoznata"
+"Utjecaji u nastavku će uključiti samo procese proizvodnje, zbrinjavanja i "
+"recikliranja."
 
-#: templates/computertype.html.twig templates/monitortype.html.twig
-#: templates/networkequipmenttype.html.twig
-msgid "Power"
-msgid_plural "Powers"
-msgstr[0] "Energija"
-msgstr[1] "Energije"
-msgstr[2] "Energijae"
+#: templates/abstractmodel.html.twig
+msgid "Take care of the expected units before setting an impact."
+msgstr "Prije unosa utjecaja provjeri očekivane mjerne jedinice."
 
-#: templates/computertype.html.twig src/SearchOptions.php:303
-#: src/ComputerType.php:80
-msgid "Category"
-msgstr "Kategorija"
+#: templates/abstractmodel.html.twig
+msgid "Data quality"
+msgstr "Kvaliteta podataka"
 
-#: templates/computertype.html.twig templates/monitortype.html.twig
-#: templates/networkequipmenttype.html.twig
-msgid "Do not evaluate"
-msgstr "Nemoj procijeniti"
-
-#: templates/dashboard/information-video-card.html.twig
-msgid "Want to know more ?"
-msgstr "Želiš saznati više?"
-
-#: templates/dashboard/information-video-card.html.twig
-msgid "Here is a video about the impact of numeric on the enviromnent."
-msgstr "Ovdje je video o numeričkom utjecaju na okoliš."
-
-#: templates/dashboard/unhandled-computers-card.html.twig
-#: templates/dashboard/unhandled-network-equipments-card.html.twig
-#: templates/dashboard/unhandled-monitors-card.html.twig
-msgid "Warning"
-msgstr "Upozorenje"
-
-#: templates/dashboard/unhandled-computers-card.html.twig
-#, php-format
-msgid "It represents %s percent of your parc that contains %s computers."
-msgstr "Predstavlja %s posto tvojeg sustava koji sadrži %s računala."
-
-#: templates/dashboard/unhandled-network-equipments-card.html.twig
-#, php-format
-msgid ""
-"It represents %s percent of your parc that contains %s network equipments."
-msgstr "Predstavlja %s posto tvojeg sustava koji sadrži %s mrežne opreme."
-
-#: templates/dashboard/monthly-carbon-emission.html.twig
-msgid "Monthly usage carbon emission"
-msgstr "Emisija ugljika mjesečnog korištenja"
-
-#: templates/dashboard/monthly-carbon-emission.html.twig
-#, php-format
-msgid "Compared to %s"
-msgstr "U usporedbi s %s"
-
-#: templates/dashboard/information-block.html.twig
-msgid "Information"
-msgstr "Informacije"
-
-#: templates/dashboard/information-block.html.twig
-msgid ""
-"Our data is sourced from reliable sources and is meticulously calculated "
-"using industry-standard methodologies. We utilize accurate measurement tools"
-" and algorithms to ensure the precision and reliability of our environmental"
-" metrics."
-msgstr ""
-"Naši podaci potječu iz pouzdanih izvora i pomno se izračunavaju pomoću "
-"industrijskih standardnih metodologija. Koristimo točne mjerne alate i "
-"algoritme kako bismo osigurali preciznost i pouzdanost naših ekoloških "
-"metričnih podataka."
-
-#: templates/dashboard/information-block.html.twig
-msgid ""
-"As we move towards a greener future, businesses will soon be required to "
-"report energy usage and carbon emissions. By 2025, many areas will enforce "
-"these regulations. Adopting these practices now ensures compliance and helps"
-" combat climate change."
-msgstr ""
-"Kako se krećemo prema zelenijoj budućnosti, tvrtke će uskoro morati "
-"izvještavati o potrošnji energije i emisijama ugljika. Do 2025. mnoga će "
-"područja provoditi ove propise. Usvajanjem ovih praksi sada osigurava "
-"usklađenost i pomaže u borbi protiv klimatskih promjena."
-
-#: templates/dashboard/information-block.html.twig
-msgid "Did you know ?"
-msgstr "Je li znaš?"
-
-#: templates/dashboard/information-block.html.twig
-msgid ""
-"1 gram of CO₂ is equivalent to the CO₂ emitted when you drive a car for "
-"about 20 meters."
-msgstr ""
-"1 gram CO₂ ekvivalentan je CO₂ koji se emitira kada voziš automobil oko 20 "
-"metara."
-
-#: templates/dashboard/usage-carbon-emission-last-year.html.twig
-msgid "Yearly Usage Carbon Emission"
-msgstr "Godišnja emisija ugljika zbog korištenja"
-
-#: templates/dashboard/unhandled-monitors-card.html.twig
-#, php-format
-msgid "It represents %s percent of your parc that contains %s monitors."
-msgstr "Predstavlja %s posto tvojeg sustava koji sadrži %s monitora."
-
-#: templates/monitortype.html.twig
-msgid ""
-"This power value is used as default when the power of a monitor model is "
-"unknown"
-msgstr ""
-"Ova vrijednost energije koristi se kao zadana kada je energija modela "
-"monitora nepoznata"
+#: templates/abstractmodel.html.twig
+msgid "Data source"
+msgstr "Izvor podataka"
 
 #: templates/networkequipmenttype.html.twig
 msgid ""
@@ -160,17 +50,42 @@ msgstr ""
 "Ova vrijednost energije koristi se kao zadana kada je energija modela mrežne"
 " opreme nepoznata"
 
-#: templates/components/form/source_zone_selector.html.twig
-#: src/AbstractModel.php:193
-msgid "Source"
-msgstr "Izvor"
+#: templates/networkequipmenttype.html.twig templates/computertype.html.twig
+#: templates/monitortype.html.twig
+msgid "Power"
+msgid_plural "Powers"
+msgstr[0] "Energija"
+msgstr[1] "Energije"
+msgstr[2] "Energijae"
 
-#: templates/components/form/source_zone_selector.html.twig src/Zone.php:53
-msgid "Carbon intensity zone"
-msgid_plural "Carbon intensity zones"
-msgstr[0] "Zona intenziteta ugljika"
-msgstr[1] "Zone intenziteta ugljika"
-msgstr[2] "Zone intenziteta ugljika"
+#: templates/networkequipmenttype.html.twig templates/computertype.html.twig
+#: templates/monitortype.html.twig
+msgid "Do not evaluate"
+msgstr "Nemoj procijeniti"
+
+#: templates/location.html.twig src/Impact/Embodied/Engine.php:53
+#: src/Impact/Usage/Engine.php:48
+msgid "Boavizta"
+msgstr "Boavizta"
+
+#: templates/location.html.twig src/Location.php:189 src/SearchOptions.php:143
+msgid "Boavizta zone"
+msgstr "Boavizta zona"
+
+#: templates/location.html.twig src/CarbonIntensity.php:67
+msgid "Carbon intensity"
+msgstr "Intenzitet ugljika"
+
+#: templates/usageinfo.html.twig
+msgid "Asset usage"
+msgstr "Korištenje sredstva"
+
+#: templates/usageinfo.html.twig
+msgid "Usage profile"
+msgid_plural "Usage profiles"
+msgstr[0] "Profil korištenja"
+msgstr[1] "Profili korištenja"
+msgstr[2] "Profili korištenja"
 
 #: templates/pages/CarbonIntensitySource/tab_zone.html.twig
 msgid "No zone available"
@@ -179,6 +94,47 @@ msgstr "Nijedna zona nije dostupna"
 #: templates/pages/CarbonIntensitySource/tab_zone.html.twig
 msgid "Please run the automatic action to downlaod data from this source."
 msgstr "Pokreni automatsku radnju za uklanjanje podataka iz ovog izvora."
+
+#: templates/computertype.html.twig
+msgid ""
+"This power value is used as default when the power of a computer model is "
+"unknown"
+msgstr ""
+"Ova vrijednost energije koristi se kao zadana kada je energija modela "
+"računala nepoznata"
+
+#: templates/computertype.html.twig src/ComputerType.php:80
+#: src/SearchOptions.php:308
+msgid "Category"
+msgstr "Kategorija"
+
+#: templates/config.html.twig
+msgid "Impact engine"
+msgstr "Utjecajni pogon"
+
+#: templates/config.html.twig
+msgid "Usage carbon emissions are always calculated internally"
+msgstr "Emisije ugljika zbog korištenja se uvijek izračunavaju interno"
+
+#: templates/config.html.twig
+msgid "Danger zone"
+msgstr "Zona opasnosti"
+
+#: templates/config.html.twig
+msgid ""
+"Reset usage impacts. This will delete all calculated usage impacts for all "
+"assets."
+msgstr ""
+"Resetiraj utjecaje upotrebe. Time će se izbrisati svi izračunati utjecaji "
+"upotrebe za sva sredstva."
+
+#: templates/config.html.twig
+msgid ""
+"Reset embodied impacts. This will delete all calculated embodied impacts for"
+" all assets."
+msgstr ""
+"Resetiraj ugrađene utjecaje. Time će se izbrisati svi izračunati ugrađeni "
+"utjecaji za sva sredstva."
 
 #: templates/history/status-item.html.twig
 msgid "Historization status"
@@ -214,7 +170,7 @@ msgstr "Povezano s računalom"
 
 #: templates/history/status-item.html.twig
 msgid "Attached computer has a location"
-msgstr ""
+msgstr "Priključeno računalo ima lokaciju"
 
 #: templates/history/status-item.html.twig
 msgid "Has a location"
@@ -262,15 +218,52 @@ msgstr "Sredstvo ima profil korištenja"
 
 #: templates/history/status-item.html.twig
 msgid "The asset has an inventory entry date"
-msgstr "Sredstvo ima datum unosa inventara"
+msgstr "Sredstvo ima datum unosa u inventar"
 
 #: templates/history/status-item.html.twig
 msgid "The asset has a decommission date"
-msgstr ""
+msgstr "Sredstvo ima datum povlačenja iz upotrebe"
 
 #: templates/history/status-item.html.twig
 msgid "Legend"
 msgstr "Legenda"
+
+#: templates/computerusageprofile.html.twig src/ComputerUsageProfile.php:155
+#: src/ComputerUsageProfile.php:177
+msgid "Start time"
+msgstr "Vrijeme početka"
+
+#: templates/computerusageprofile.html.twig src/ComputerUsageProfile.php:185
+msgid "Stop time"
+msgstr "Vrijeme prekida"
+
+#: templates/computerusageprofile.html.twig
+msgid "Days of week where the computer usually runs"
+msgstr "Dani u tjednu u kojima računalo obično radi"
+
+#: templates/monitortype.html.twig
+msgid ""
+"This power value is used as default when the power of a monitor model is "
+"unknown"
+msgstr ""
+"Ova vrijednost energije koristi se kao zadana kada je energija modela "
+"monitora nepoznata"
+
+#: templates/components/form/source_zone_selector.html.twig
+#: src/AbstractModel.php:145
+msgid "Source"
+msgstr "Izvor"
+
+#: templates/components/form/source_zone_selector.html.twig src/Zone.php:53
+msgid "Carbon intensity zone"
+msgid_plural "Carbon intensity zones"
+msgstr[0] "Zona intenziteta ugljika"
+msgstr[1] "Zone intenziteta ugljika"
+msgstr[2] "Zone intenziteta ugljika"
+
+#: templates/quick-report.html.twig front/report.php:55
+msgid "GLPI Carbon"
+msgstr "GLPI ugljik"
 
 #: templates/environmentalimpact-item.html.twig
 msgid "Usage"
@@ -291,110 +284,295 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: templates/config.html.twig
-msgid "Impact engine"
-msgstr "Utjecajni pogon"
+#: templates/dashboard/monthly-carbon-emission.html.twig
+msgid "Monthly usage carbon emission"
+msgstr "Emisija ugljika mjesečnog korištenja"
 
-#: templates/config.html.twig
-msgid "Usage carbon emissions are always calculated internally"
-msgstr "Emisije ugljika zbog korištenja se uvijek izračunavaju interno"
+#: templates/dashboard/monthly-carbon-emission.html.twig
+#, php-format
+msgid "Compared to %s"
+msgstr "U usporedbi s %s"
 
-#: templates/config.html.twig
-msgid "Danger zone"
-msgstr ""
+#: templates/dashboard/unhandled-network-equipments-card.html.twig
+#: templates/dashboard/unhandled-monitors-card.html.twig
+#: templates/dashboard/unhandled-computers-card.html.twig
+msgid "Warning"
+msgstr "Upozorenje"
 
-#: templates/config.html.twig
+#: templates/dashboard/unhandled-network-equipments-card.html.twig
+#, php-format
 msgid ""
-"Reset usage impacts. This will delete all calculated usage impacts for all "
-"assets."
-msgstr ""
+"It represents %s percent of your parc that contains %s network equipments."
+msgstr "Predstavlja %s posto tvojeg sustava koji sadrži %s mrežne opreme."
 
-#: templates/config.html.twig
+#: templates/dashboard/information-block.html.twig
+msgid "Information"
+msgstr "Informacije"
+
+#: templates/dashboard/information-block.html.twig
 msgid ""
-"Reset embodied impacts. This will delete all calculated embodied impacts for"
-" all assets."
+"Our data is sourced from reliable sources and is meticulously calculated "
+"using industry-standard methodologies. We utilize accurate measurement tools"
+" and algorithms to ensure the precision and reliability of our environmental"
+" metrics."
 msgstr ""
+"Naši podaci potječu iz pouzdanih izvora i pomno se izračunavaju pomoću "
+"industrijskih standardnih metodologija. Koristimo točne mjerne alate i "
+"algoritme kako bismo osigurali preciznost i pouzdanost naših ekoloških "
+"metričnih podataka."
 
-#: templates/usageinfo.html.twig
-msgid "Asset usage"
-msgstr "Korištenje sredstva"
-
-#: templates/usageinfo.html.twig
-msgid "Usage profile"
-msgid_plural "Usage profiles"
-msgstr[0] "Profil korištenja"
-msgstr[1] "Profili korištenja"
-msgstr[2] "Profili korištenja"
-
-#: templates/computerusageprofile.html.twig src/ComputerUsageProfile.php:155
-#: src/ComputerUsageProfile.php:177
-msgid "Start time"
-msgstr "Vrijeme početka"
-
-#: templates/computerusageprofile.html.twig src/ComputerUsageProfile.php:185
-msgid "Stop time"
-msgstr "Vrijeme prekida"
-
-#: templates/computerusageprofile.html.twig
-msgid "Days of week where the computer usually runs"
-msgstr "Dani u tjednu u kojima računalo obično radi"
-
-#: templates/abstractmodel.html.twig
+#: templates/dashboard/information-block.html.twig
 msgid ""
-"The impacts below shall include the manufacturing, disposal and recycling "
-"processes only."
+"As we move towards a greener future, businesses will soon be required to "
+"report energy usage and carbon emissions. By 2025, many areas will enforce "
+"these regulations. Adopting these practices now ensures compliance and helps"
+" combat climate change."
 msgstr ""
+"Kako se krećemo prema zelenijoj budućnosti, tvrtke će uskoro morati "
+"izvještavati o potrošnji energije i emisijama ugljika. Do 2025. mnoga će "
+"područja provoditi ove propise. Usvajanjem ovih praksi sada osigurava "
+"usklađenost i pomaže u borbi protiv klimatskih promjena."
 
-#: templates/abstractmodel.html.twig
-msgid "Take care of the expected units before setting an impact."
+#: templates/dashboard/information-block.html.twig
+msgid "Did you know ?"
+msgstr "Je li znaš?"
+
+#: templates/dashboard/information-block.html.twig
+msgid ""
+"1 gram of CO₂ is equivalent to the CO₂ emitted when you drive a car for "
+"about 20 meters."
 msgstr ""
+"1 gram CO₂ ekvivalentan je CO₂ koji se emitira kada voziš automobil oko 20 "
+"metara."
 
-#: templates/abstractmodel.html.twig
-msgid "Data quality"
-msgstr "Kvaliteta podataka"
+#: templates/dashboard/unhandled-monitors-card.html.twig
+#, php-format
+msgid "It represents %s percent of your parc that contains %s monitors."
+msgstr "Predstavlja %s posto tvojeg sustava koji sadrži %s monitora."
 
-#: templates/abstractmodel.html.twig
-msgid "Data source"
-msgstr "Izvor podataka"
+#: templates/dashboard/usage-carbon-emission-last-year.html.twig
+msgid "Yearly Usage Carbon Emission"
+msgstr "Godišnja emisija ugljika zbog korištenja"
 
-#: templates/quick-report.html.twig front/report.php:55
-msgid "GLPI Carbon"
-msgstr "GLPI ugljik"
+#: templates/dashboard/information-video-card.html.twig
+msgid "Want to know more ?"
+msgstr "Želiš saznati više?"
 
-#: front/embodiedimpact.form.php:67 front/embodiedimpact.form.php:90
-#: front/usageimpact.form.php:74 front/usageimpact.form.php:108
-msgid "Missing arguments in request."
-msgstr "Nedostaju argumenti u zahtjevu."
+#: templates/dashboard/information-video-card.html.twig
+msgid "Here is a video about the impact of numeric on the enviromnent."
+msgstr "Ovdje je video o numeričkom utjecaju na okoliš."
 
-#: front/embodiedimpact.form.php:72 front/embodiedimpact.form.php:81
-#: front/usageimpact.form.php:98
-msgid "Reset denied."
-msgstr "Resetiranje odbijeno."
+#: templates/dashboard/unhandled-computers-card.html.twig
+#, php-format
+msgid "It represents %s percent of your parc that contains %s computers."
+msgstr "Predstavlja %s posto tvojeg sustava koji sadrži %s računala."
 
-#: front/embodiedimpact.form.php:86 front/usageimpact.form.php:103
-msgid "Reset failed."
-msgstr "Resetiranje nije uspjelo."
+#: src/CarbonIntensity.php:91
+msgid "Emission date"
+msgstr "Datum emisije"
 
-#: front/embodiedimpact.form.php:96 front/usageimpact.form.php:88
-#: front/usageimpact.form.php:114 front/usageimpact.form.php:122
-msgid "Bad arguments."
-msgstr "Loši argumenti."
+#: src/CarbonIntensity.php:118
+msgid "Intensity"
+msgstr "Intenzitet"
 
-#: front/embodiedimpact.form.php:105 front/usageimpact.form.php:139
-msgid "Unable to find calculation engine for this asset."
-msgstr "Nije moguće pronaći pogon za izračunavanje za ovo sredtsvo."
+#: src/Toolbox.php:242 src/Dashboard/Provider.php:195
+#: src/Dashboard/Provider.php:318 src/Dashboard/Provider.php:1086
+msgid "g"
+msgstr "g"
 
-#: front/usageimpact.form.php:130
-msgid "Missing data prevents historization of this asset."
-msgstr "Podaci koji nedostaju sprečavaju historizaciju ovog sredstva."
+#: src/Toolbox.php:243 src/Dashboard/Provider.php:196
+#: src/Dashboard/Provider.php:319 src/Dashboard/Provider.php:1087
+msgid "Kg"
+msgstr "Kg"
 
-#: front/usageimpact.form.php:133
-msgid "Update of global warming potential failed."
-msgstr "Aktualiziranje potencijala globalnog zagrijavanja nije uspjelo."
+#: src/Toolbox.php:244 src/Dashboard/Provider.php:197
+#: src/Dashboard/Provider.php:320 src/Dashboard/Provider.php:1088
+msgid "t"
+msgstr "t"
 
-#: front/usageimpact.form.php:144
-msgid "Update of usage impact failed."
-msgstr "Aktualiziranje utjecaja korištenja nije uspjelo."
+#: src/Toolbox.php:245 src/Dashboard/Provider.php:198
+#: src/Dashboard/Provider.php:321 src/Dashboard/Provider.php:1089
+msgid "Kt"
+msgstr "Kt"
+
+#: src/Toolbox.php:246 src/Dashboard/Provider.php:199
+#: src/Dashboard/Provider.php:322 src/Dashboard/Provider.php:1090
+msgid "Mt"
+msgstr "Mt"
+
+#: src/Toolbox.php:247 src/Dashboard/Provider.php:200
+#: src/Dashboard/Provider.php:323 src/Dashboard/Provider.php:1091
+msgid "Gt"
+msgstr "Gt"
+
+#: src/Toolbox.php:248 src/Dashboard/Provider.php:201
+#: src/Dashboard/Provider.php:324 src/Dashboard/Provider.php:1092
+msgid "Tt"
+msgstr "Tt"
+
+#: src/Toolbox.php:249 src/Dashboard/Provider.php:202
+#: src/Dashboard/Provider.php:325 src/Dashboard/Provider.php:1093
+msgid "Pt"
+msgstr "Pt"
+
+#: src/Toolbox.php:250 src/Dashboard/Provider.php:203
+#: src/Dashboard/Provider.php:326 src/Dashboard/Provider.php:1094
+msgid "Et"
+msgstr "Et"
+
+#: src/Toolbox.php:251 src/Dashboard/Provider.php:204
+#: src/Dashboard/Provider.php:327 src/Dashboard/Provider.php:1095
+msgid "Zt"
+msgstr "Zt"
+
+#: src/Toolbox.php:252 src/Dashboard/Provider.php:205
+#: src/Dashboard/Provider.php:328 src/Dashboard/Provider.php:1096
+msgid "Yt"
+msgstr "Yt"
+
+#: src/Toolbox.php:268
+msgid "W"
+msgstr "Š"
+
+#: src/Toolbox.php:269
+msgid "KW"
+msgstr "KW"
+
+#: src/Toolbox.php:270
+msgid "MW"
+msgstr "MW"
+
+#: src/Toolbox.php:271
+msgid "GW"
+msgstr "GW"
+
+#: src/Toolbox.php:272
+msgid "TW"
+msgstr "TW"
+
+#: src/Toolbox.php:273
+msgid "PW"
+msgstr "PW"
+
+#: src/Toolbox.php:274
+msgid "EW"
+msgstr "EW"
+
+#: src/Toolbox.php:275
+msgid "ZW"
+msgstr "ZW"
+
+#: src/Toolbox.php:276
+msgid "YW"
+msgstr "YW"
+
+#: src/Toolbox.php:292
+msgid "Wh"
+msgstr "Wh"
+
+#: src/Toolbox.php:293 src/Dashboard/Provider.php:1105
+msgid "KWh"
+msgstr "KWh"
+
+#: src/Toolbox.php:294 src/Dashboard/Provider.php:1106
+msgid "MWh"
+msgstr "MWh"
+
+#: src/Toolbox.php:295 src/Dashboard/Provider.php:1107
+msgid "GWh"
+msgstr "GWh"
+
+#: src/Toolbox.php:296 src/Dashboard/Provider.php:1108
+msgid "TWh"
+msgstr "TWh"
+
+#: src/Toolbox.php:297 src/Dashboard/Provider.php:1109
+msgid "PWh"
+msgstr "PWh"
+
+#: src/Toolbox.php:298 src/Dashboard/Provider.php:1110
+msgid "EWh"
+msgstr "EWh"
+
+#: src/Toolbox.php:299 src/Dashboard/Provider.php:1111
+msgid "ZWh"
+msgstr "ZWh"
+
+#: src/Toolbox.php:300 src/Dashboard/Provider.php:1112
+msgid "YWh"
+msgstr "YWh"
+
+#: src/Toolbox.php:316
+msgid "L"
+msgstr "L"
+
+#: src/Toolbox.php:317
+msgid "m³"
+msgstr "m³"
+
+#: src/Toolbox.php:318
+msgid "dam³"
+msgstr "dam³"
+
+#: src/Toolbox.php:319
+msgid "hm³"
+msgstr "hm³"
+
+#: src/Toolbox.php:320
+msgid "Km³"
+msgstr "Km³"
+
+#: src/Toolbox.php:388
+#, php-format
+msgid "%1$s %2$s"
+msgstr "%1$s %2$s"
+
+#: src/UsageInfo.php:64
+msgid "Usage informations"
+msgstr "Informacije o korištenju"
+
+#: src/UsageInfo.php:99 src/Location.php:76 src/AbstractChildDropdown.php:58
+#: src/Dashboard/Grid.php:367 src/Profile.php:47 src/SearchOptions.php:135
+#: install/install/create_dashboard.php:48
+msgid "Environmental impact"
+msgstr "Utjecaj na okoliš"
+
+#: src/UsageInfo.php:250
+#, php-format
+msgid "%s More information %s"
+msgstr "%s Više informacija %s"
+
+#: src/Zone.php:138 src/Source_Zone.php:91 src/Source_Zone.php:174
+#: src/Source_Zone.php:275
+msgid "Download enabled"
+msgstr "Preuzimanje aktivirano"
+
+#: src/Location.php:196
+msgid "Carbon intensity source and zone"
+msgstr "Izvor intenziteta ugljika i zona"
+
+#: src/AbstractImpact.php:129 src/CarbonEmission.php:157
+msgid "Date of evaluation"
+msgstr "Datum evaluacije"
+
+#: src/AbstractImpact.php:136 src/CarbonEmission.php:164
+msgid "Engine"
+msgstr "Pogon"
+
+#: src/AbstractImpact.php:143 src/CarbonEmission.php:171
+msgid "Engine version"
+msgstr "Verzija pogona"
+
+#: src/AbstractImpact.php:254 src/CarbonEmission.php:228
+msgid "Full reset denied."
+msgstr "Potpuno resetiranje je odbijeno."
+
+#: src/Source.php:48
+msgid "Carbon intensity source"
+msgid_plural "Carbon intensity sources"
+msgstr[0] "Izvor intenziteta ugljika"
+msgstr[1] "Izvori intenziteta ugljika"
+msgstr[2] "Izvori intenziteta ugljika"
 
 #: src/CronTask.php:103
 msgid "Find the Alpha3 country code (ISO3166)"
@@ -429,19 +607,22 @@ msgstr "Izračunaj ugrađeni utjecaj na okoliš za sva sredstva"
 msgid "No zone to download"
 msgstr "Nema zone za preuzimanje"
 
-#: src/Profile.php:47 src/UsageInfo.php:99 src/Location.php:76
-#: src/AbstractModel.php:57 src/AbstractType.php:58
-msgid "Environmental impact"
-msgstr "Utjecaj na okoliš"
+#: src/Command/CreateTestInventoryCommand.php:148
+msgid "Creating test inventory"
+msgstr "Stvaranje testnog inventara"
 
-#: src/UsageInfo.php:64
-msgid "Usage informations"
-msgstr "Informacije o korištenju"
+#: src/Command/ExportDashboardCommand.php:71
+msgid "Updating the report dashboard description"
+msgstr "Aktualiziranje opisa nadzorne ploče izvještaja"
 
-#: src/UsageInfo.php:250
+#: src/Command/ExportDashboardCommand.php:76
+msgid "Dashboard not found"
+msgstr "Nadzorna ploča nije pronađena"
+
+#: src/Command/ExportDashboardCommand.php:100
 #, php-format
-msgid "%s More information %s"
-msgstr ""
+msgid "Dashboard description saved to %s"
+msgstr "Opis nadzorne ploče spremljen u %s"
 
 #: src/Command/CreateFakeCarbonIntensityCommand.php:70
 #: src/Command/CollectCarbonIntensityCommand.php:127
@@ -486,50 +667,165 @@ msgstr "Zona:"
 
 #: src/Command/CollectCarbonIntensityCommand.php:134
 msgid "This source does not exist"
-msgstr ""
+msgstr "Ovaj izvor ne postoji"
 
 #: src/Command/CollectCarbonIntensityCommand.php:153
 msgid "The zone is not handled by the data source"
-msgstr ""
+msgstr "Zonu ne obrađuje izvor podataka"
 
 #: src/Command/CollectCarbonIntensityCommand.php:159
 msgid "Reading data..."
 msgstr "Čitanje podataka …"
 
-#: src/Command/ExportDashboardCommand.php:71
-msgid "Updating the report dashboard description"
-msgstr "Aktualiziranje opisa nadzorne ploče izvještaja"
+#: src/Source_Zone.php:75
+msgid "Source name"
+msgstr "Ime izvora"
 
-#: src/Command/ExportDashboardCommand.php:76
-msgid "Dashboard not found"
-msgstr "Nadzorna ploča nije pronađena"
+#: src/Source_Zone.php:83
+msgid "Zone name"
+msgstr "Ime zone"
 
-#: src/Command/ExportDashboardCommand.php:102
+#: src/Source_Zone.php:99
+msgid "Code"
+msgstr "Kod"
+
+#: src/Source_Zone.php:153
+msgid "Not downloadable"
+msgstr "Ne može se preuzeti"
+
+#: src/Source_Zone.php:153
+msgid "This is a fallback source, there is no real-time data available"
+msgstr "Ovo je rezervni izvor, nema dostupnih podataka u stvarnom vremenu"
+
+#: src/Source_Zone.php:175
+msgid "Source for historical"
+msgstr "Izvor za povijesne podatke"
+
+#: src/Source_Zone.php:422
+msgid "Enable / Disable"
+msgstr "Aktiviraj / Deaktiviraj"
+
+#: src/Source_Zone.php:548
+#: src/DataSource/CarbonIntensity/AbstractCronTask.php:125
+msgid "End"
+msgstr "Kraj"
+
+#: src/DataSource/Lca/Boaviztapi/Config.php:108
+msgid "Invalid Boavizta API URL"
+msgstr "Nevaljani URL Boavizta API-ja"
+
+#: src/DataSource/Lca/Boaviztapi/Config.php:116
+msgid "Connection to Boavizta API established"
+msgstr "Veza s Boavizta API-jem je uspostavljena"
+
+#: src/DataSource/CarbonIntensity/Rte/CronTask.php:61
+#: src/DataSource/CarbonIntensity/ElectricityMaps/CronTask.php:56
+msgid "Resource diagnosis"
+msgstr "Dijagnoza resursa"
+
+#: src/DataSource/CarbonIntensity/Rte/CronTask.php:77
+msgid "Collect carbon intensities from RTE"
+msgstr "Prikupi intenzitet ugljika od RTE-a"
+
+#: src/DataSource/CarbonIntensity/Rte/CronTask.php:95
+msgid "Download carbon emissions from RTE"
+msgstr "Preuzmi emisije ugljika od RTE-a"
+
+#: src/DataSource/CarbonIntensity/ElectricityMaps/CronTask.php:72
+msgid "Collect carbon intensities from Electricity Maps"
+msgstr "Prikupi intenzitete ugljika s električnih karata"
+
+#: src/DataSource/CarbonIntensity/ElectricityMaps/CronTask.php:90
+msgid "Download carbon emissions from Electricity Maps"
+msgstr "Preuzmi emisije ugljika od električnih karata"
+
+#: src/AbstractChildDropdown.php:67 src/Dashboard/Grid.php:69
+#: src/Dashboard/Grid.php:134 src/Dashboard/Grid.php:232
+msgid "Carbon"
+msgstr "Ugljik"
+
+#: src/DataTracking/AbstractTracked.php:78
+msgid "Impact not evaluated"
+msgstr "Utjecaj nije procijenjen"
+
+#: src/DataTracking/AbstractTracked.php:79
+msgid "Unspecified quality"
+msgstr "Neodređena kvaliteta"
+
+#: src/DataTracking/AbstractTracked.php:80
+msgid "Manual data"
+msgstr "Ručni podaci"
+
+#: src/DataTracking/AbstractTracked.php:81
+msgid "Estimated data"
+msgstr "Procijenjeni podaci"
+
+#: src/DataTracking/AbstractTracked.php:82
+msgid "Downsampled data"
+msgstr "Smanjena količina podataka"
+
+#: src/DataTracking/AbstractTracked.php:83
+msgid "Measured data"
+msgstr "Izmjereni podaci"
+
+#: src/Report.php:51
+msgid "Carbon report"
+msgid_plural "Carbon reports"
+msgstr[0] "Izvještaj o ugljiku"
+msgstr[1] "Izvještaji o ugljiku"
+msgstr[2] "Izvještaji o ugljiku"
+
+#: src/Report.php:106
 #, php-format
-msgid "Dashboard description saved to %s"
-msgstr "Opis nadzorne ploče spremljen u %s"
+msgid ""
+"Demo mode enabled. The data below are not representative of the assets in "
+"the database. %sDisable demo mode%s"
+msgstr ""
+"Aktiviran je demo modus. Podaci u nastavku nisu reprezentativni za sredstva "
+"u bazi podataka. %sDeaktiviraj demo modus%s"
 
-#: src/Command/CreateTestInventoryCommand.php:148
-msgid "Creating test inventory"
-msgstr "Stvaranje testnog inventara"
+#: src/NetworkEquipmentType.php:52 src/ComputerType.php:72
+#: src/SearchOptions.php:166 src/MonitorType.php:52
+msgid "Power consumption"
+msgstr "Potrošnja struje"
+
+#: src/ComputerType.php:57
+msgid "Unspecified"
+msgstr "Nespecificirano"
+
+#: src/ComputerType.php:59
+msgid "Server"
+msgstr "Server"
+
+#: src/ComputerType.php:60
+msgid "Laptop"
+msgstr "Laptop"
+
+#: src/ComputerType.php:61
+msgid "Tablet"
+msgstr "Tablet"
+
+#: src/ComputerType.php:62
+msgid "Smartphone"
+msgstr "Pametni telefon"
 
 #: src/Impact/Embodied/AbstractEmbodiedImpact.php:115
 msgid "Connection to Boavizta failed."
-msgstr ""
+msgstr "Veza s Boavizta API-jem nije uspjela."
 
 #: src/Impact/Embodied/AbstractEmbodiedImpact.php:118
 msgid "Embodied impact evaluation falied."
 msgstr ""
 
-#: src/Impact/History/AbstractAsset.php:375
+#: src/Impact/History/AbstractAsset.php:377
 msgid "Error while calculating impact"
 msgstr "Greška pri izračunavanju utjecaja"
 
-#: src/Impact/History/AbstractAsset.php:383
+#: src/Impact/History/AbstractAsset.php:385
 msgid "Nothing to calculate"
 msgstr "Nema se što izračunati"
 
-#: src/Impact/History/AbstractAsset.php:389
+#: src/Impact/History/AbstractAsset.php:391
 #, php-format
 msgid "%d entries calculated"
 msgstr "izračunati unosi: %d"
@@ -777,329 +1073,88 @@ msgstr ""
 
 #: src/Impact/Type.php:323
 msgid "Carbon emission in CO₂ equivalent"
-msgstr ""
+msgstr "Emisija ugljika u ekvivalentu CO₂"
 
 #: src/Impact/Type.php:324
 msgid "Consumption of non renewable resources in Antimony equivalent."
-msgstr ""
+msgstr "Potrošnja neobnovljivih resursa u ekvivalentu antimona."
 
 #: src/Impact/Type.php:325
 msgid "Primary energy consumed."
-msgstr ""
+msgstr "Potrošena primarna energija."
 
 #: src/Impact/Type.php:332
 msgid "Incidence of disease"
-msgstr ""
+msgstr "Slučajevi bolesti"
 
-#: src/CarbonEmission.php:53
-msgid "Carbon Emission"
-msgid_plural "Carbon Emissions"
-msgstr[0] "Emisija ugljika"
-msgstr[1] "Emisije ugljika"
-msgstr[2] "Emisije ugljika"
+#: src/Config.php:137
+msgid "This action cannot be undone. Are you sure?"
+msgstr "Ovo je nepovratna radnja. Stvarno je želiš izvršiti?"
 
-#: src/CarbonEmission.php:126
-msgid "Energy"
-msgstr "Energija"
-
-#: src/CarbonEmission.php:134
-msgid "Emission"
-msgstr "Emisija"
-
-#: src/CarbonEmission.php:142
-msgid "Energy quality"
-msgstr "Kvaliteta energije"
-
-#: src/CarbonEmission.php:150
-msgid "Emission quality"
-msgstr "Kvaliteta emisije"
-
-#: src/CarbonEmission.php:157 src/AbstractImpact.php:129
-msgid "Date of evaluation"
-msgstr "Datum evaluacije"
-
-#: src/CarbonEmission.php:164 src/AbstractImpact.php:136
-msgid "Engine"
-msgstr "Pogon"
-
-#: src/CarbonEmission.php:171 src/AbstractImpact.php:143
-msgid "Engine version"
-msgstr "Verzija pogona"
-
-#: src/CarbonEmission.php:228 src/AbstractImpact.php:254
-msgid "Full reset denied."
-msgstr ""
-
-#: src/Source_Zone.php:75
-msgid "Source name"
-msgstr "Ime izvora"
-
-#: src/Source_Zone.php:83
-msgid "Zone name"
-msgstr "Ime zone"
-
-#: src/Source_Zone.php:91 src/Source_Zone.php:174 src/Source_Zone.php:271
-#: src/Zone.php:138
-msgid "Download enabled"
-msgstr "Preuzimanje aktivirano"
-
-#: src/Source_Zone.php:99
-msgid "Code"
-msgstr "Kod"
-
-#: src/Source_Zone.php:153
-msgid "Not downloadable"
-msgstr "Ne može se preuzeti"
-
-#: src/Source_Zone.php:153
-msgid "This is a fallback source, there is no real-time data available"
-msgstr "Ovo je rezervni izvor, nema dostupnih podataka u stvarnom vremenu"
-
-#: src/Source_Zone.php:175
-msgid "Source for historical"
-msgstr "Izvor za povijesne podatke"
-
-#: src/Source_Zone.php:414
-msgid "Enable / Disable"
-msgstr "Aktiviraj / Deaktiviraj"
-
-#: src/Source_Zone.php:540
-#: src/DataSource/CarbonIntensity/AbstractCronTask.php:125
-msgid "End"
-msgstr "Kraj"
-
-#: src/Toolbox.php:243 src/Dashboard/Provider.php:195
-#: src/Dashboard/Provider.php:318 src/Dashboard/Provider.php:1086
-msgid "g"
-msgstr "g"
-
-#: src/Toolbox.php:244 src/Dashboard/Provider.php:196
-#: src/Dashboard/Provider.php:319 src/Dashboard/Provider.php:1087
-msgid "Kg"
-msgstr "Kg"
-
-#: src/Toolbox.php:245 src/Dashboard/Provider.php:197
-#: src/Dashboard/Provider.php:320 src/Dashboard/Provider.php:1088
-msgid "t"
-msgstr "t"
-
-#: src/Toolbox.php:246 src/Dashboard/Provider.php:198
-#: src/Dashboard/Provider.php:321 src/Dashboard/Provider.php:1089
-msgid "Kt"
-msgstr "Kt"
-
-#: src/Toolbox.php:247 src/Dashboard/Provider.php:199
-#: src/Dashboard/Provider.php:322 src/Dashboard/Provider.php:1090
-msgid "Mt"
-msgstr "Mt"
-
-#: src/Toolbox.php:248 src/Dashboard/Provider.php:200
-#: src/Dashboard/Provider.php:323 src/Dashboard/Provider.php:1091
-msgid "Gt"
-msgstr "Gt"
-
-#: src/Toolbox.php:249 src/Dashboard/Provider.php:201
-#: src/Dashboard/Provider.php:324 src/Dashboard/Provider.php:1092
-msgid "Tt"
-msgstr "Tt"
-
-#: src/Toolbox.php:250 src/Dashboard/Provider.php:202
-#: src/Dashboard/Provider.php:325 src/Dashboard/Provider.php:1093
-msgid "Pt"
-msgstr "Pt"
-
-#: src/Toolbox.php:251 src/Dashboard/Provider.php:203
-#: src/Dashboard/Provider.php:326 src/Dashboard/Provider.php:1094
-msgid "Et"
-msgstr "Et"
-
-#: src/Toolbox.php:252 src/Dashboard/Provider.php:204
-#: src/Dashboard/Provider.php:327 src/Dashboard/Provider.php:1095
-msgid "Zt"
-msgstr "Zt"
-
-#: src/Toolbox.php:253 src/Dashboard/Provider.php:205
-#: src/Dashboard/Provider.php:328 src/Dashboard/Provider.php:1096
-msgid "Yt"
-msgstr "Yt"
-
-#: src/Toolbox.php:280
-msgid "W"
-msgstr "Š"
-
-#: src/Toolbox.php:281
-msgid "KW"
-msgstr "KW"
-
-#: src/Toolbox.php:282
-msgid "MW"
-msgstr "MW"
-
-#: src/Toolbox.php:283
-msgid "GW"
-msgstr "GW"
-
-#: src/Toolbox.php:284
-msgid "TW"
-msgstr "TW"
-
-#: src/Toolbox.php:285
-msgid "PW"
-msgstr "PW"
-
-#: src/Toolbox.php:286
-msgid "EW"
-msgstr "EW"
-
-#: src/Toolbox.php:287
-msgid "ZW"
-msgstr "ZW"
-
-#: src/Toolbox.php:288
-msgid "YW"
-msgstr "YW"
-
-#: src/Toolbox.php:315
-msgid "Wh"
-msgstr "Wh"
-
-#: src/Toolbox.php:316 src/Dashboard/Provider.php:1105
-msgid "KWh"
-msgstr "KWh"
-
-#: src/Toolbox.php:317 src/Dashboard/Provider.php:1106
-msgid "MWh"
-msgstr "MWh"
-
-#: src/Toolbox.php:318 src/Dashboard/Provider.php:1107
-msgid "GWh"
-msgstr "GWh"
-
-#: src/Toolbox.php:319 src/Dashboard/Provider.php:1108
-msgid "TWh"
-msgstr "TWh"
-
-#: src/Toolbox.php:320 src/Dashboard/Provider.php:1109
-msgid "PWh"
-msgstr "PWh"
-
-#: src/Toolbox.php:321 src/Dashboard/Provider.php:1110
-msgid "EWh"
-msgstr "EWh"
-
-#: src/Toolbox.php:322 src/Dashboard/Provider.php:1111
-msgid "ZWh"
-msgstr "ZWh"
-
-#: src/Toolbox.php:323 src/Dashboard/Provider.php:1112
-msgid "YWh"
-msgstr "YWh"
-
-#: src/Toolbox.php:373 src/Toolbox.php:378
-#, php-format
-msgid "%1$s %2$s"
-msgstr "%1$s %2$s"
-
-#: src/Dashboard/Grid.php:64 src/Dashboard/Grid.php:129
-#: src/Dashboard/Grid.php:227 src/AbstractModel.php:66 src/AbstractType.php:67
-msgid "Carbon"
-msgstr "Ugljik"
-
-#: src/Dashboard/Grid.php:69 src/Dashboard/Provider.php:473
-msgid "Handled assets ratio"
-msgstr "Omjer upravljanih sredstva"
-
-#: src/Dashboard/Grid.php:78
-msgid "Handled assets count"
-msgstr "Broj upravljanih sredstva"
-
-#: src/Dashboard/Grid.php:141
-#, php-format
-msgid "Handled %s"
-msgstr "Upravljani %s"
-
-#: src/Dashboard/Grid.php:152
-#, php-format
-msgid "Unhandled %s"
-msgstr "Neupravljani %s"
-
-#: src/Dashboard/Grid.php:238
-#, php-format
-msgid "Unhandled %s ratio"
-msgstr "Neupravljana %s omjer"
-
-#: src/Dashboard/Grid.php:250
-msgid "Usage carbon emission year to date"
-msgstr "Godina emisija ugljika do danas zbog korištenja"
-
-#: src/Dashboard/Grid.php:256
-msgid "Monthly carbon emission"
-msgstr "Mjesečna emisija ugljika"
-
-#: src/Dashboard/Grid.php:265
-msgid "Usage global warming potential chart"
-msgstr "Dijagram potencijala globalnog zagrijavanje zbog korištenja"
-
-#: src/Dashboard/Grid.php:274 src/Dashboard/Widget.php:91
-#: src/Dashboard/Widget.php:588
-msgid "Biggest monthly averaged carbon emission per model"
-msgstr "Najveća prosječna mjesečna emisija ugljika po modelu"
-
-#: src/Dashboard/Grid.php:331 src/Dashboard/Widget.php:61
-msgid "Environmental impact information video"
-msgstr "Video s informacijama o utjecaju na okoliš"
-
-#: src/Dashboard/Grid.php:336
-msgid "Environmental impact methodology information"
-msgstr "Informacije o metodologiji za utjecaj na okoliš"
-
-#: src/Dashboard/DemoProvider.php:76
-msgid "Usage carbon emission per month"
-msgstr "Mjesečna emisija ugljika zbog korištenja"
-
-#: src/Dashboard/DemoProvider.php:88 src/Dashboard/DemoProvider.php:189
-#: src/Dashboard/Widget.php:530 src/Dashboard/Widget.php:545
-#: src/Dashboard/Provider.php:1099
-msgid "Carbon emission"
-msgstr "Emisija ugljika"
-
-#: src/Dashboard/DemoProvider.php:88 src/Dashboard/DemoProvider.php:189
 #: src/Dashboard/Provider.php:193 src/Dashboard/Provider.php:316
 #: src/Dashboard/Provider.php:1099 src/Dashboard/Provider.php:1101
+#: src/Dashboard/DemoProvider.php:88 src/Dashboard/DemoProvider.php:189
 msgid "CO₂eq"
 msgstr "CO₂eq"
 
-#: src/Dashboard/DemoProvider.php:106 src/Dashboard/DemoProvider.php:202
-#: src/Dashboard/Widget.php:535 src/Dashboard/Widget.php:548
-#: src/Dashboard/Provider.php:1115
-msgid "Consumed energy"
-msgstr "Potrošena energija"
+#: src/Dashboard/Provider.php:427
+msgid "handled assets ratio"
+msgstr "omjer upravljanih sredstva"
 
-#: src/Dashboard/DemoProvider.php:242 src/Dashboard/Provider.php:534
+#: src/Dashboard/Provider.php:473 src/Dashboard/Grid.php:74
+msgid "Handled assets ratio"
+msgstr "Omjer upravljanih sredstva"
+
+#: src/Dashboard/Provider.php:497 src/Dashboard/DemoProvider.php:297
+msgid "Handled"
+msgstr "Upravljani"
+
+#: src/Dashboard/Provider.php:502 src/Dashboard/DemoProvider.php:302
+msgid "Unhandled"
+msgstr "Neupravljano"
+
+#: src/Dashboard/Provider.php:507
+msgid "Ignored"
+msgstr "Zanemareno"
+
+#: src/Dashboard/Provider.php:534 src/Dashboard/DemoProvider.php:242
 #, php-format
 msgid "plugin carbon - handled %s"
 msgstr "dodatak ugljik – upravljani %s"
 
-#: src/Dashboard/DemoProvider.php:243 src/Dashboard/Provider.php:535
+#: src/Dashboard/Provider.php:535 src/Dashboard/DemoProvider.php:243
 #, php-format
 msgid "plugin carbon - unhandled %s"
 msgstr "dodatak ugljik – neupravljani %s"
 
-#: src/Dashboard/DemoProvider.php:274
-msgid "plugin carbon - handled assets ratio"
-msgstr "dodatak ugljik – omjer upravljanih sredstva"
+#: src/Dashboard/Provider.php:584
+#, php-format
+msgid "plugin carbon - ignored %s"
+msgstr "dodatak ugljik – zanemareno %s"
 
-#: src/Dashboard/DemoProvider.php:297 src/Dashboard/Provider.php:497
-msgid "Handled"
-msgstr "Upravljani"
+#: src/Dashboard/Provider.php:632
+msgid "plugin carbon - Total usage power consumption"
+msgstr "dodatak ugljik – Ukupna potrošnja energije korištenja"
 
-#: src/Dashboard/DemoProvider.php:302 src/Dashboard/Provider.php:502
-msgid "Unhandled"
-msgstr "Neupravljano"
+#: src/Dashboard/Provider.php:994 src/Dashboard/Widget.php:485
+msgid "Consumed energy and carbon emission per month"
+msgstr "Potrošena energija i emisija ugljika mjesečno"
 
-#: src/Dashboard/DemoProvider.php:325
-msgid "plugin carbon - Usage carbon emission"
-msgstr "dodatak ugljik – Emisija ugljika korištenja"
+#: src/Dashboard/Provider.php:1099 src/Dashboard/Widget.php:530
+#: src/Dashboard/Widget.php:545 src/Dashboard/DemoProvider.php:88
+#: src/Dashboard/DemoProvider.php:189
+msgid "Carbon emission"
+msgstr "Emisija ugljika"
+
+#: src/Dashboard/Provider.php:1115 src/Dashboard/Widget.php:535
+#: src/Dashboard/Widget.php:548 src/Dashboard/DemoProvider.php:106
+#: src/Dashboard/DemoProvider.php:202
+msgid "Consumed energy"
+msgstr "Potrošena energija"
+
+#: src/Dashboard/Widget.php:61 src/Dashboard/Grid.php:336
+msgid "Environmental impact information video"
+msgstr "Video s informacijama o utjecaju na okoliš"
 
 #: src/Dashboard/Widget.php:68
 msgid "Methodology information"
@@ -1113,6 +1168,11 @@ msgstr "Ukupna emisija ugljika"
 msgid "Monthly Carbon Emission"
 msgstr "Mjesečna emisija ugljika"
 
+#: src/Dashboard/Widget.php:91 src/Dashboard/Widget.php:588
+#: src/Dashboard/Grid.php:279
+msgid "Biggest monthly averaged carbon emission per model"
+msgstr "Najveća prosječna mjesečna emisija ugljika po modelu"
+
 #: src/Dashboard/Widget.php:99
 msgid "Carbon Emission Per month"
 msgstr "Emisija ugljika mjesečno"
@@ -1123,7 +1183,7 @@ msgstr "Potencijal abiotskog iscrpljivanja zbog korištenja"
 
 #: src/Dashboard/Widget.php:114
 msgid "Impact criteria"
-msgstr ""
+msgstr "Kriteriji utjecaja"
 
 #: src/Dashboard/Widget.php:126
 msgid "Unhandled Computers"
@@ -1140,10 +1200,6 @@ msgstr "Neupravljana mrežna oprema"
 #: src/Dashboard/Widget.php:159
 msgid "Radar chart"
 msgstr "Radarski dijagram"
-
-#: src/Dashboard/Widget.php:485 src/Dashboard/Provider.php:994
-msgid "Consumed energy and carbon emission per month"
-msgstr "Potrošena energija i emisija ugljika mjesečno"
 
 #: src/Dashboard/Widget.php:730
 #, php-format
@@ -1180,164 +1236,79 @@ msgstr ""
 msgid "Handled percentage"
 msgstr "Postotak upravljanih"
 
-#: src/Dashboard/Provider.php:427
-msgid "handled assets ratio"
-msgstr "omjer upravljanih sredstva"
-
-#: src/Dashboard/Provider.php:507
-msgid "Ignored"
-msgstr "Zanemareno"
-
-#: src/Dashboard/Provider.php:584
-#, php-format
-msgid "plugin carbon - ignored %s"
-msgstr "dodatak ugljik – zanemareno %s"
-
-#: src/Dashboard/Provider.php:632
-msgid "plugin carbon - Total usage power consumption"
-msgstr "dodatak ugljik – Ukupna potrošnja energije korištenja"
-
 #: src/Dashboard/Dashboard.php:68
 msgid "Carbon dioxyde intensity"
 msgstr "Intenzitet ugljičnog dioksida"
 
-#: src/UsageImpact.php:42
-msgid "Usage impact"
-msgid_plural "Usage impacts"
-msgstr[0] "Utjecaj korištenja"
-msgstr[1] "Utjecaji korištenja"
-msgstr[2] "Utjecaji korištenja"
+#: src/Dashboard/DemoProvider.php:76
+msgid "Usage carbon emission per month"
+msgstr "Mjesečna emisija ugljika zbog korištenja"
 
-#: src/SearchOptions.php:161 src/ComputerType.php:72 src/MonitorType.php:52
-#: src/NetworkEquipmentType.php:52
-msgid "Power consumption"
-msgstr "Potrošnja struje"
+#: src/Dashboard/DemoProvider.php:274
+msgid "plugin carbon - handled assets ratio"
+msgstr "dodatak ugljik – omjer upravljanih sredstva"
 
-#: src/SearchOptions.php:184 src/SearchOptions.php:316
-#: src/SearchOptions.php:329 src/SearchOptions.php:342
-msgid "Ignore environmental impact"
-msgstr "Zanemari utjecaj na okoliš"
+#: src/Dashboard/DemoProvider.php:325
+msgid "plugin carbon - Usage carbon emission"
+msgstr "dodatak ugljik – Emisija ugljika korištenja"
 
-#: src/SearchOptions.php:241 src/SearchOptions.php:365
-#: src/SearchOptions.php:442
-msgid "Is historizable"
-msgstr "Može se historizirati"
+#: src/Dashboard/Grid.php:83
+msgid "Handled assets count"
+msgstr "Broj upravljanih sredstva"
 
-#: src/ComputerType.php:57
-msgid "Unspecified"
-msgstr "Nespecificirano"
-
-#: src/ComputerType.php:59
-msgid "Server"
-msgstr "Server"
-
-#: src/ComputerType.php:60
-msgid "Laptop"
-msgstr "Laptop"
-
-#: src/ComputerType.php:61
-msgid "Tablet"
-msgstr "Tablet"
-
-#: src/ComputerType.php:62
-msgid "Smartphone"
-msgstr "Pametni telefon"
-
-#: src/DataSource/CarbonIntensity/Rte/CronTask.php:61
-#: src/DataSource/CarbonIntensity/ElectricityMaps/CronTask.php:56
-msgid "Resource diagnosis"
-msgstr ""
-
-#: src/DataSource/CarbonIntensity/Rte/CronTask.php:77
-msgid "Collect carbon intensities from RTE"
-msgstr "Prikupi intenzitet ugljika od RTE-a"
-
-#: src/DataSource/CarbonIntensity/Rte/CronTask.php:95
-msgid "Download carbon emissions from RTE"
-msgstr "Preuzmi emisije ugljika od RTE-a"
-
-#: src/DataSource/CarbonIntensity/ElectricityMaps/CronTask.php:72
-msgid "Collect carbon intensities from Electricity Maps"
-msgstr ""
-
-#: src/DataSource/CarbonIntensity/ElectricityMaps/CronTask.php:90
-msgid "Download carbon emissions from Electricity Maps"
-msgstr ""
-
-#: src/DataSource/Lca/Boaviztapi/Config.php:104
-msgid "Invalid Boavizta API URL"
-msgstr "Nevaljani URL Boavizta API-ja"
-
-#: src/DataSource/Lca/Boaviztapi/Config.php:112
-msgid "Connection to Boavizta API established"
-msgstr "Veza s Boavizta API-jem je uspostavljena"
-
-#: src/Report.php:51
-msgid "Carbon report"
-msgid_plural "Carbon reports"
-msgstr[0] "Izvještaj o ugljiku"
-msgstr[1] "Izvještaji o ugljiku"
-msgstr[2] "Izvještaji o ugljiku"
-
-#: src/Report.php:106
+#: src/Dashboard/Grid.php:146
 #, php-format
-msgid ""
-"Demo mode enabled. The data below are not representative of the assets in "
-"the database. %sDisable demo mode%s"
-msgstr ""
-"Aktiviran je demo modus. Podaci u nastavku nisu reprezentativni za sredstva "
-"u bazi podataka. %sDeaktiviraj demo modus%s"
+msgid "Handled %s"
+msgstr "Upravljani %s"
 
-#: src/DataTracking/AbstractTracked.php:78
-msgid "Impact not evaluated"
-msgstr ""
+#: src/Dashboard/Grid.php:157
+#, php-format
+msgid "Unhandled %s"
+msgstr "Neupravljani %s"
 
-#: src/DataTracking/AbstractTracked.php:79
-msgid "Unspecified quality"
-msgstr "Neodređena kvaliteta"
+#: src/Dashboard/Grid.php:243
+#, php-format
+msgid "Unhandled %s ratio"
+msgstr "Neupravljana %s omjer"
 
-#: src/DataTracking/AbstractTracked.php:80
-msgid "Manual data"
-msgstr "Ručni podaci"
+#: src/Dashboard/Grid.php:255
+msgid "Usage carbon emission year to date"
+msgstr "Godina emisija ugljika do danas zbog korištenja"
 
-#: src/DataTracking/AbstractTracked.php:81
-msgid "Estimated data"
-msgstr "Procijenjeni podaci"
+#: src/Dashboard/Grid.php:261
+msgid "Monthly carbon emission"
+msgstr "Mjesečna emisija ugljika"
 
-#: src/DataTracking/AbstractTracked.php:82
-msgid "Downsampled data"
-msgstr "Smanjena količina podataka"
+#: src/Dashboard/Grid.php:270
+msgid "Usage global warming potential chart"
+msgstr "Dijagram potencijala globalnog zagrijavanje zbog korištenja"
 
-#: src/DataTracking/AbstractTracked.php:83
-msgid "Measured data"
-msgstr "Izmjereni podaci"
+#: src/Dashboard/Grid.php:341
+msgid "Environmental impact methodology information"
+msgstr "Informacije o metodologiji za utjecaj na okoliš"
 
-#: src/Location.php:196
-msgid "Carbon intensity source and zone"
-msgstr ""
+#: src/CarbonEmission.php:53
+msgid "Carbon Emission"
+msgid_plural "Carbon Emissions"
+msgstr[0] "Emisija ugljika"
+msgstr[1] "Emisije ugljika"
+msgstr[2] "Emisije ugljika"
 
-#: src/CarbonIntensity.php:91
-msgid "Emission date"
-msgstr "Datum emisije"
+#: src/CarbonEmission.php:126
+msgid "Energy"
+msgstr "Energija"
 
-#: src/CarbonIntensity.php:118
-msgid "Intensity"
-msgstr "Intenzitet"
+#: src/CarbonEmission.php:134
+msgid "Emission"
+msgstr "Emisija"
 
-#: src/Config.php:137
-msgid "This action cannot be undone. Are you sure?"
-msgstr ""
+#: src/CarbonEmission.php:142
+msgid "Energy quality"
+msgstr "Kvaliteta energije"
 
-#: src/AbstractModel.php:204
-msgid "Quality"
-msgstr "Kvaliteta"
-
-#: src/Source.php:48
-msgid "Carbon intensity source"
-msgid_plural "Carbon intensity sources"
-msgstr[0] "Izvor intenziteta ugljika"
-msgstr[1] "Izvori intenziteta ugljika"
-msgstr[2] "Izvori intenziteta ugljika"
+#: src/CarbonEmission.php:150
+msgid "Emission quality"
+msgstr "Kvaliteta emisije"
 
 #: src/ComputerUsageProfile.php:53
 msgid "Computer usage profile"
@@ -1354,13 +1325,92 @@ msgstr "Vrijeme početka nije valjano"
 msgid "Stop time is invalid"
 msgstr "Vrijeme prekida nije valjano"
 
-#: install/install/create_uasge_profiles.php:41
-msgid "Always on"
-msgstr "Uvijek uključeno"
+#: src/UsageImpact.php:42
+msgid "Usage impact"
+msgid_plural "Usage impacts"
+msgstr[0] "Utjecaj korištenja"
+msgstr[1] "Utjecaji korištenja"
+msgstr[2] "Utjecaji korištenja"
 
-#: install/install/create_uasge_profiles.php:52
-msgid "Office hours"
-msgstr "Radno vrijeme"
+#: src/SearchOptions.php:189 src/SearchOptions.php:321
+#: src/SearchOptions.php:334 src/SearchOptions.php:347
+msgid "Ignore environmental impact"
+msgstr "Zanemari utjecaj na okoliš"
+
+#: src/SearchOptions.php:246 src/SearchOptions.php:370
+#: src/SearchOptions.php:447
+msgid "Is historizable"
+msgstr "Može se historizirati"
+
+#: src/AbstractModel.php:156
+msgid "Quality"
+msgstr "Kvaliteta"
+
+#: hook.php:98
+msgid ""
+"Please check the logs for more details. Fill an issue in the repository of "
+"the plugin."
+msgstr ""
+"Za više detalja provjeri zapisnike. Prijavi problem u repozitoriju dodatka."
+
+#: hook.php:309
+msgid "Associate to an usage profile"
+msgstr "Poveži s profilom korištenja"
+
+#: hook.php:310 hook.php:315
+msgid "Delete all calculated environmental impacts"
+msgstr "Izbriši sve izračunate utjecaje okoliša"
+
+#: hook.php:319 hook.php:324 hook.php:328
+msgid "Update type power consumption"
+msgstr "Aktualiziraj vrstu potrošnju energije"
+
+#: hook.php:320
+msgid "Update category"
+msgstr "Aktualiziraj kategoriju"
+
+#: hook.php:332
+msgid "Update zone for Boavizta engine"
+msgstr "Aktualiziranje zonu za Boavizta pogon"
+
+#: hook.php:333
+msgid "Update carbon intensity source and zone"
+msgstr "Aktualiziraj izvor intenziteta ugljika i zonu"
+
+#: front/embodiedimpact.form.php:67 front/embodiedimpact.form.php:90
+#: front/usageimpact.form.php:74 front/usageimpact.form.php:108
+msgid "Missing arguments in request."
+msgstr "Nedostaju argumenti u zahtjevu."
+
+#: front/embodiedimpact.form.php:72 front/embodiedimpact.form.php:81
+#: front/usageimpact.form.php:98
+msgid "Reset denied."
+msgstr "Resetiranje odbijeno."
+
+#: front/embodiedimpact.form.php:86 front/usageimpact.form.php:103
+msgid "Reset failed."
+msgstr "Resetiranje nije uspjelo."
+
+#: front/embodiedimpact.form.php:96 front/usageimpact.form.php:88
+#: front/usageimpact.form.php:114 front/usageimpact.form.php:122
+msgid "Bad arguments."
+msgstr "Loši argumenti."
+
+#: front/embodiedimpact.form.php:105 front/usageimpact.form.php:139
+msgid "Unable to find calculation engine for this asset."
+msgstr "Nije moguće pronaći pogon za izračunavanje za ovo sredtsvo."
+
+#: front/usageimpact.form.php:130
+msgid "Missing data prevents historization of this asset."
+msgstr "Podaci koji nedostaju sprečavaju historizaciju ovog sredstva."
+
+#: front/usageimpact.form.php:133
+msgid "Update of global warming potential failed."
+msgstr "Aktualiziranje potencijala globalnog zagrijavanja nije uspjelo."
+
+#: front/usageimpact.form.php:144
+msgid "Update of usage impact failed."
+msgstr "Aktualiziranje utjecaja korištenja nije uspjelo."
 
 #: install/install/create_automatic_actions.php:52
 msgid "Find the Alpha3 country code (ISO3166) of locations"
@@ -1374,37 +1424,34 @@ msgstr "Izračunaj emisije ugljika računala"
 msgid "Compute embodied impact of assets"
 msgstr "Izračunaj ugrađeni utjecaj sredstva"
 
-#: hook.php:98
-msgid ""
-"Please check the logs for more details. Fill an issue in the repository of "
-"the plugin."
-msgstr ""
-"Za više detalja provjeri zapisnike. Prijavi problem u repozitoriju dodatka."
+#: install/install/create_uasge_profiles.php:41
+msgid "Always on"
+msgstr "Uvijek uključeno"
 
-#: hook.php:303
-msgid "Associate to an usage profile"
-msgstr "Poveži s profilom korištenja"
+#: install/install/create_uasge_profiles.php:52
+msgid "Office hours"
+msgstr "Radno vrijeme"
 
-#: hook.php:304 hook.php:309
-msgid "Delete all calculated environmental impacts"
-msgstr ""
-
-#: hook.php:313 hook.php:318 hook.php:322
-msgid "Update type power consumption"
-msgstr "Aktualiziraj vrstu potrošnju energije"
-
-#: hook.php:314
-msgid "Update category"
-msgstr "Aktualiziraj kategoriju"
-
-#: hook.php:326
-msgid "Update zone for Boavizta engine"
-msgstr "Aktualiziranje zonu za Boavizta pogon"
-
-#: hook.php:327
-msgid "Update carbon intensity source and zone"
-msgstr ""
-
-#: setup.php:298
+#: setup.php:303
 msgid "Environmental Impact"
 msgstr "Utjecaj na okoliš"
+
+#: ajax/toggleZoneDownload.php:41
+msgid "Not found."
+msgstr "Nije pronađeno."
+
+#: ajax/toggleZoneDownload.php:48
+msgid "Access denied."
+msgstr "Pristup odbijen."
+
+#: ajax/toggleZoneDownload.php:54
+msgid "Bad request."
+msgstr "Loš zahtjev."
+
+#: ajax/toggleZoneDownload.php:61
+msgid "Item not found."
+msgstr "Stavka nije pronađena."
+
+#: ajax/toggleZoneDownload.php:66
+msgid "Update failed."
+msgstr "Aktualiziranje neuspjelo."
