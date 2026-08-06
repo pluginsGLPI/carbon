@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-27 03:26+0000\n"
+"POT-Creation-Date: 2026-08-04 02:47+0000\n"
 "PO-Revision-Date: 2026-07-09 09:55+0000\n"
 "Last-Translator: Edwin Elias Alvarez <elias986@yahoo.com>, 2026\n"
 "Language-Team: Spanish (Mexico) (https://app.transifex.com/teclib/teams/28042/es_MX/)\n"
@@ -1456,19 +1456,19 @@ msgstr "Actualizar la fuente y la zona de intensidad de carbono"
 
 #: ajax/toggleZoneDownload.php:41
 msgid "Not found."
-msgstr ""
+msgstr "En econtrado."
 
 #: ajax/toggleZoneDownload.php:48
 msgid "Access denied."
-msgstr ""
+msgstr "Acceso denegado."
 
 #: ajax/toggleZoneDownload.php:54
 msgid "Bad request."
-msgstr ""
+msgstr "Solicitud incorrecta."
 
 #: ajax/toggleZoneDownload.php:61
 msgid "Item not found."
-msgstr ""
+msgstr "Elemento no encontrado."
 
 #: ajax/toggleZoneDownload.php:66
 msgid "Update failed."
