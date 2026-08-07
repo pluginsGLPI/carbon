@@ -1,6 +1,8 @@
 dist/
 node_modules/
 vendor/
+public/images/
+public/lib/
 .vscode/
 .gh_token
 *.min.*

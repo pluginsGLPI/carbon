@@ -36,3 +36,21 @@ jobs:
       php-version: "${{ matrix.php-version }}"
       db-image: "${{ matrix.db-image }}"
       skip-changelog-check: true
+  verify-build-assets:
+    name: "Verify frontend build assets"
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: "actions/checkout@v7"
+      - uses: "actions/setup-node@v7"
+        with:
+          node-version-file: "package.json"
+      - name: "Install dependencies (triggers webpack build)"
+        run: "npm install"
+      - name: "Check generated assets are present"
+        run: |
+          for file in public/lib/apexcharts.js public/lib/carbon.js public/lib/carbon.css; do
+            if [ ! -s "$file" ]; then
+              echo "::error::Missing or empty build asset: $file"
+              exit 1
+            fi
+          done
