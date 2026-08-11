@@ -4,17 +4,17 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 # Translators:
-# Kaya Zeren <kayazeren@gmail.com>, 2026
 # Thierry Bugier <tbugier@teclib.com>, 2026
+# Kaya Zeren <kayazeren@gmail.com>, 2026
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-27 03:26+0000\n"
+"POT-Creation-Date: 2026-08-10 02:00+0000\n"
 "PO-Revision-Date: 2026-07-09 09:55+0000\n"
-"Last-Translator: Thierry Bugier <tbugier@teclib.com>, 2026\n"
+"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2026\n"
 "Language-Team: Turkish (Turkey) (https://app.transifex.com/teclib/teams/28042/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -42,19 +42,23 @@ msgstr "Kullanım kaynaklı karbon emisyonları her zaman içeride hesaplanır"
 
 #: templates/config.html.twig
 msgid "Danger zone"
-msgstr ""
+msgstr "Tehlikeli bölge"
 
 #: templates/config.html.twig
 msgid ""
 "Reset usage impacts. This will delete all calculated usage impacts for all "
 "assets."
 msgstr ""
+"Kullanım etkilerini sıfırlayın. Bu işlem, tüm varlıklar için hesaplanan tüm "
+"kullanım etkilerini silecek."
 
 #: templates/config.html.twig
 msgid ""
 "Reset embodied impacts. This will delete all calculated embodied impacts for"
 " all assets."
 msgstr ""
+"Gerçekleşen etkileri sıfırlayın. Bu işlem, tüm varlıklar için hesaplanan tüm"
+" gerçekleşen etkileri silecek."
 
 #: templates/dashboard/unhandled-computers-card.html.twig
 #: templates/dashboard/unhandled-monitors-card.html.twig
@@ -478,7 +482,7 @@ msgstr "Bitiş"
 
 #: src/Config.php:137
 msgid "This action cannot be undone. Are you sure?"
-msgstr ""
+msgstr "Bu işlem geri alınamaz. Emin misiniz?"
 
 #: src/UsageImpact.php:42
 msgid "Usage impact"
@@ -500,7 +504,7 @@ msgstr "Hesaplayıcı sürümü"
 
 #: src/AbstractImpact.php:254 src/CarbonEmission.php:228
 msgid "Full reset denied."
-msgstr ""
+msgstr "Tam sıfırlama reddedildi."
 
 #: src/Impact/Embodied/AbstractEmbodiedImpact.php:115
 msgid "Connection to Boavizta failed."
@@ -972,23 +976,23 @@ msgstr "YWh"
 
 #: src/Toolbox.php:316
 msgid "L"
-msgstr ""
+msgstr "L"
 
 #: src/Toolbox.php:317
 msgid "m³"
-msgstr ""
+msgstr "m³"
 
 #: src/Toolbox.php:318
 msgid "dam³"
-msgstr ""
+msgstr "dam³"
 
 #: src/Toolbox.php:319
 msgid "hm³"
-msgstr ""
+msgstr "hm³"
 
 #: src/Toolbox.php:320
 msgid "Km³"
-msgstr ""
+msgstr "Km³"
 
 #: src/Toolbox.php:388
 #, php-format
@@ -1429,19 +1433,19 @@ msgstr "Karbon yoğunluğu kaynağı ve bölgeyi güncelle"
 
 #: ajax/toggleZoneDownload.php:41
 msgid "Not found."
-msgstr ""
+msgstr "Bulunamadı."
 
 #: ajax/toggleZoneDownload.php:48
 msgid "Access denied."
-msgstr ""
+msgstr "Erişim reddedildi."
 
 #: ajax/toggleZoneDownload.php:54
 msgid "Bad request."
-msgstr ""
+msgstr "Yanlış istek."
 
 #: ajax/toggleZoneDownload.php:61
 msgid "Item not found."
-msgstr ""
+msgstr "Öge bulunamadı."
 
 #: ajax/toggleZoneDownload.php:66
 msgid "Update failed."
