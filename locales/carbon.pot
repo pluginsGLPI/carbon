@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-07 02:48+0000\n"
+"POT-Creation-Date: 2026-08-18 01:21+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,6 +17,19 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: templates/location.html.twig src/Impact/Usage/Engine.php:48
+#: src/Impact/Embodied/Engine.php:53
+msgid "Boavizta"
+msgstr ""
+
+#: templates/location.html.twig src/Location.php:189 src/SearchOptions.php:143
+msgid "Boavizta zone"
+msgstr ""
+
+#: templates/location.html.twig src/CarbonIntensity.php:67
+msgid "Carbon intensity"
+msgstr ""
 
 #: templates/usageinfo.html.twig
 msgid "Asset usage"
@@ -52,101 +65,6 @@ msgid ""
 "all assets."
 msgstr ""
 
-#: templates/dashboard/unhandled-computers-card.html.twig
-#: templates/dashboard/unhandled-monitors-card.html.twig
-#: templates/dashboard/unhandled-network-equipments-card.html.twig
-msgid "Warning"
-msgstr ""
-
-#: templates/dashboard/unhandled-computers-card.html.twig
-#, php-format
-msgid "It represents %s percent of your parc that contains %s computers."
-msgstr ""
-
-#: templates/dashboard/usage-carbon-emission-last-year.html.twig
-msgid "Yearly Usage Carbon Emission"
-msgstr ""
-
-#: templates/dashboard/unhandled-monitors-card.html.twig
-#, php-format
-msgid "It represents %s percent of your parc that contains %s monitors."
-msgstr ""
-
-#: templates/dashboard/unhandled-network-equipments-card.html.twig
-#, php-format
-msgid ""
-"It represents %s percent of your parc that contains %s network equipments."
-msgstr ""
-
-#: templates/dashboard/information-block.html.twig
-msgid "Information"
-msgstr ""
-
-#: templates/dashboard/information-block.html.twig
-msgid ""
-"Our data is sourced from reliable sources and is meticulously calculated "
-"using industry-standard methodologies. We utilize accurate measurement tools "
-"and algorithms to ensure the precision and reliability of our environmental "
-"metrics."
-msgstr ""
-
-#: templates/dashboard/information-block.html.twig
-msgid ""
-"As we move towards a greener future, businesses will soon be required to "
-"report energy usage and carbon emissions. By 2025, many areas will enforce "
-"these regulations. Adopting these practices now ensures compliance and helps "
-"combat climate change."
-msgstr ""
-
-#: templates/dashboard/information-block.html.twig
-msgid "Did you know ?"
-msgstr ""
-
-#: templates/dashboard/information-block.html.twig
-msgid ""
-"1 gram of CO₂ is equivalent to the CO₂ emitted when you drive a car for "
-"about 20 meters."
-msgstr ""
-
-#: templates/dashboard/monthly-carbon-emission.html.twig
-msgid "Monthly usage carbon emission"
-msgstr ""
-
-#: templates/dashboard/monthly-carbon-emission.html.twig
-#, php-format
-msgid "Compared to %s"
-msgstr ""
-
-#: templates/dashboard/information-video-card.html.twig
-msgid "Want to know more ?"
-msgstr ""
-
-#: templates/dashboard/information-video-card.html.twig
-msgid "Here is a video about the impact of numeric on the enviromnent."
-msgstr ""
-
-#: templates/monitortype.html.twig
-msgid ""
-"This power value is used as default when the power of a monitor model is "
-"unknown"
-msgstr ""
-
-#: templates/monitortype.html.twig templates/computertype.html.twig
-#: templates/networkequipmenttype.html.twig
-msgid "Power"
-msgid_plural "Powers"
-msgstr[0] ""
-msgstr[1] ""
-
-#: templates/monitortype.html.twig templates/computertype.html.twig
-#: templates/networkequipmenttype.html.twig
-msgid "Do not evaluate"
-msgstr ""
-
-#: templates/quick-report.html.twig front/report.php:55
-msgid "GLPI Carbon"
-msgstr ""
-
 #: templates/computerusageprofile.html.twig src/ComputerUsageProfile.php:155
 #: src/ComputerUsageProfile.php:177
 msgid "Start time"
@@ -158,6 +76,68 @@ msgstr ""
 
 #: templates/computerusageprofile.html.twig
 msgid "Days of week where the computer usually runs"
+msgstr ""
+
+#: templates/environmentalimpact-item.html.twig
+msgid "Usage"
+msgstr ""
+
+#: templates/environmentalimpact-item.html.twig
+msgid "Reset data"
+msgstr ""
+
+#: templates/environmentalimpact-item.html.twig
+msgid "Calculate data"
+msgstr ""
+
+#: templates/environmentalimpact-item.html.twig src/EmbodiedImpact.php:47
+msgid "Embodied impact"
+msgid_plural "Embodied impacts"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/abstractmodel.html.twig
+msgid ""
+"The impacts below shall include the manufacturing, disposal and recycling "
+"processes only."
+msgstr ""
+
+#: templates/abstractmodel.html.twig
+msgid "Take care of the expected units before setting an impact."
+msgstr ""
+
+#: templates/abstractmodel.html.twig
+msgid "Data quality"
+msgstr ""
+
+#: templates/abstractmodel.html.twig
+msgid "Data source"
+msgstr ""
+
+#: templates/monitortype.html.twig
+msgid ""
+"This power value is used as default when the power of a monitor model is "
+"unknown"
+msgstr ""
+
+#: templates/monitortype.html.twig templates/networkequipmenttype.html.twig
+#: templates/computertype.html.twig
+msgid "Power"
+msgid_plural "Powers"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/monitortype.html.twig templates/networkequipmenttype.html.twig
+#: templates/computertype.html.twig
+msgid "Do not evaluate"
+msgstr ""
+
+#: templates/pages/CarbonIntensitySource/tab_zone.html.twig
+msgid "No zone available"
+msgstr ""
+
+#: templates/pages/CarbonIntensitySource/tab_zone.html.twig
+msgid "Please run the automatic action to downlaod data from this source."
 msgstr ""
 
 #: templates/history/status-item.html.twig
@@ -251,70 +231,21 @@ msgstr ""
 msgid "Legend"
 msgstr ""
 
-#: templates/computertype.html.twig
-msgid ""
-"This power value is used as default when the power of a computer model is "
-"unknown"
-msgstr ""
-
-#: templates/computertype.html.twig src/SearchOptions.php:308
-#: src/ComputerType.php:80
-msgid "Category"
-msgstr ""
-
-#: templates/environmentalimpact-item.html.twig
-msgid "Usage"
-msgstr ""
-
-#: templates/environmentalimpact-item.html.twig
-msgid "Reset data"
-msgstr ""
-
-#: templates/environmentalimpact-item.html.twig
-msgid "Calculate data"
-msgstr ""
-
-#: templates/environmentalimpact-item.html.twig src/EmbodiedImpact.php:47
-msgid "Embodied impact"
-msgid_plural "Embodied impacts"
-msgstr[0] ""
-msgstr[1] ""
-
 #: templates/networkequipmenttype.html.twig
 msgid ""
 "This power value is used as default when the power of a network equipment "
 "model is unknown"
 msgstr ""
 
-#: templates/location.html.twig src/Impact/Embodied/Engine.php:53
-#: src/Impact/Usage/Engine.php:48
-msgid "Boavizta"
-msgstr ""
-
-#: templates/location.html.twig src/Location.php:189 src/SearchOptions.php:143
-msgid "Boavizta zone"
-msgstr ""
-
-#: templates/location.html.twig src/CarbonIntensity.php:67
-msgid "Carbon intensity"
-msgstr ""
-
-#: templates/abstractmodel.html.twig
+#: templates/computertype.html.twig
 msgid ""
-"The impacts below shall include the manufacturing, disposal and recycling "
-"processes only."
+"This power value is used as default when the power of a computer model is "
+"unknown"
 msgstr ""
 
-#: templates/abstractmodel.html.twig
-msgid "Take care of the expected units before setting an impact."
-msgstr ""
-
-#: templates/abstractmodel.html.twig
-msgid "Data quality"
-msgstr ""
-
-#: templates/abstractmodel.html.twig
-msgid "Data source"
+#: templates/computertype.html.twig src/ComputerType.php:80
+#: src/SearchOptions.php:308
+msgid "Category"
 msgstr ""
 
 #: templates/components/form/source_zone_selector.html.twig
@@ -328,35 +259,100 @@ msgid_plural "Carbon intensity zones"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/pages/CarbonIntensitySource/tab_zone.html.twig
-msgid "No zone available"
+#: templates/dashboard/information-video-card.html.twig
+msgid "Want to know more ?"
 msgstr ""
 
-#: templates/pages/CarbonIntensitySource/tab_zone.html.twig
-msgid "Please run the automatic action to downlaod data from this source."
+#: templates/dashboard/information-video-card.html.twig
+msgid "Here is a video about the impact of numeric on the enviromnent."
 msgstr ""
 
-#: front/embodiedimpact.form.php:67 front/embodiedimpact.form.php:90
+#: templates/dashboard/information-block.html.twig
+msgid "Information"
+msgstr ""
+
+#: templates/dashboard/information-block.html.twig
+msgid ""
+"Our data is sourced from reliable sources and is meticulously calculated "
+"using industry-standard methodologies. We utilize accurate measurement tools "
+"and algorithms to ensure the precision and reliability of our environmental "
+"metrics."
+msgstr ""
+
+#: templates/dashboard/information-block.html.twig
+msgid ""
+"As we move towards a greener future, businesses will soon be required to "
+"report energy usage and carbon emissions. By 2025, many areas will enforce "
+"these regulations. Adopting these practices now ensures compliance and helps "
+"combat climate change."
+msgstr ""
+
+#: templates/dashboard/information-block.html.twig
+msgid "Did you know ?"
+msgstr ""
+
+#: templates/dashboard/information-block.html.twig
+msgid ""
+"1 gram of CO₂ is equivalent to the CO₂ emitted when you drive a car for "
+"about 20 meters."
+msgstr ""
+
+#: templates/dashboard/unhandled-network-equipments-card.html.twig
+#: templates/dashboard/unhandled-computers-card.html.twig
+#: templates/dashboard/unhandled-monitors-card.html.twig
+msgid "Warning"
+msgstr ""
+
+#: templates/dashboard/unhandled-network-equipments-card.html.twig
+#, php-format
+msgid ""
+"It represents %s percent of your parc that contains %s network equipments."
+msgstr ""
+
+#: templates/dashboard/usage-carbon-emission-last-year.html.twig
+msgid "Yearly Usage Carbon Emission"
+msgstr ""
+
+#: templates/dashboard/monthly-carbon-emission.html.twig
+msgid "Monthly usage carbon emission"
+msgstr ""
+
+#: templates/dashboard/monthly-carbon-emission.html.twig
+#, php-format
+msgid "Compared to %s"
+msgstr ""
+
+#: templates/dashboard/unhandled-computers-card.html.twig
+#, php-format
+msgid "It represents %s percent of your parc that contains %s computers."
+msgstr ""
+
+#: templates/dashboard/unhandled-monitors-card.html.twig
+#, php-format
+msgid "It represents %s percent of your parc that contains %s monitors."
+msgstr ""
+
+#: templates/quick-report.html.twig front/report.php:55
+msgid "GLPI Carbon"
+msgstr ""
+
 #: front/usageimpact.form.php:74 front/usageimpact.form.php:108
+#: front/embodiedimpact.form.php:67 front/embodiedimpact.form.php:90
 msgid "Missing arguments in request."
 msgstr ""
 
-#: front/embodiedimpact.form.php:72 front/embodiedimpact.form.php:81
-#: front/usageimpact.form.php:98
-msgid "Reset denied."
-msgstr ""
-
-#: front/embodiedimpact.form.php:86 front/usageimpact.form.php:103
-msgid "Reset failed."
-msgstr ""
-
-#: front/embodiedimpact.form.php:96 front/usageimpact.form.php:88
-#: front/usageimpact.form.php:114 front/usageimpact.form.php:122
+#: front/usageimpact.form.php:88 front/usageimpact.form.php:114
+#: front/usageimpact.form.php:122 front/embodiedimpact.form.php:96
 msgid "Bad arguments."
 msgstr ""
 
-#: front/embodiedimpact.form.php:105 front/usageimpact.form.php:139
-msgid "Unable to find calculation engine for this asset."
+#: front/usageimpact.form.php:98 front/embodiedimpact.form.php:72
+#: front/embodiedimpact.form.php:81
+msgid "Reset denied."
+msgstr ""
+
+#: front/usageimpact.form.php:103 front/embodiedimpact.form.php:86
+msgid "Reset failed."
 msgstr ""
 
 #: front/usageimpact.form.php:130
@@ -367,52 +363,157 @@ msgstr ""
 msgid "Update of global warming potential failed."
 msgstr ""
 
+#: front/usageimpact.form.php:139 front/embodiedimpact.form.php:105
+msgid "Unable to find calculation engine for this asset."
+msgstr ""
+
 #: front/usageimpact.form.php:144
 msgid "Update of usage impact failed."
 msgstr ""
 
-#: install/install/create_uasge_profiles.php:41
-msgid "Always on"
+#: hook.php:98
+msgid ""
+"Please check the logs for more details. Fill an issue in the repository of "
+"the plugin."
 msgstr ""
 
-#: install/install/create_uasge_profiles.php:52
-msgid "Office hours"
+#: hook.php:309
+msgid "Associate to an usage profile"
 msgstr ""
 
-#: install/install/create_automatic_actions.php:52
-msgid "Find the Alpha3 country code (ISO3166) of locations"
+#: hook.php:310 hook.php:315
+msgid "Delete all calculated environmental impacts"
 msgstr ""
 
-#: install/install/create_automatic_actions.php:64
-msgid "Compute carbon emissions of computers"
+#: hook.php:319 hook.php:324 hook.php:328
+msgid "Update type power consumption"
 msgstr ""
 
-#: install/install/create_automatic_actions.php:76
-msgid "Compute embodied impact of assets"
+#: hook.php:320
+msgid "Update category"
 msgstr ""
 
-#: install/install/create_dashboard.php:48 src/Location.php:76
-#: src/Profile.php:47 src/UsageInfo.php:99 src/Dashboard/Grid.php:367
-#: src/SearchOptions.php:135 src/AbstractChildDropdown.php:58
+#: hook.php:332
+msgid "Update zone for Boavizta engine"
+msgstr ""
+
+#: hook.php:333
+msgid "Update carbon intensity source and zone"
+msgstr ""
+
+#: src/Profile.php:47 src/Location.php:76 src/AbstractChildDropdown.php:58
+#: src/UsageInfo.php:99 src/Dashboard/Grid.php:367 src/SearchOptions.php:135
+#: install/install/create_dashboard.php:48
 msgid "Environmental impact"
-msgstr ""
-
-#: src/ComputerUsageProfile.php:53
-msgid "Computer usage profile"
-msgid_plural "Computer usage profiles"
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/ComputerUsageProfile.php:123
-msgid "Start time is invalid"
-msgstr ""
-
-#: src/ComputerUsageProfile.php:128
-msgid "Stop time is invalid"
 msgstr ""
 
 #: src/Location.php:196
 msgid "Carbon intensity source and zone"
+msgstr ""
+
+#: src/DataTracking/AbstractTracked.php:78
+msgid "Impact not evaluated"
+msgstr ""
+
+#: src/DataTracking/AbstractTracked.php:79
+msgid "Unspecified quality"
+msgstr ""
+
+#: src/DataTracking/AbstractTracked.php:80
+msgid "Manual data"
+msgstr ""
+
+#: src/DataTracking/AbstractTracked.php:81
+msgid "Estimated data"
+msgstr ""
+
+#: src/DataTracking/AbstractTracked.php:82
+msgid "Downsampled data"
+msgstr ""
+
+#: src/DataTracking/AbstractTracked.php:83
+msgid "Measured data"
+msgstr ""
+
+#: src/CronTask.php:103
+msgid "Find the Alpha3 country code (ISO3166)"
+msgstr ""
+
+#: src/CronTask.php:104
+msgid "Maximum number of locations to solve"
+msgstr ""
+
+#: src/CronTask.php:109
+msgid "Download carbon emissions from Watttime"
+msgstr ""
+
+#: src/CronTask.php:110
+#: src/DataSource/CarbonIntensity/ElectricityMaps/CronTask.php:91
+#: src/DataSource/CarbonIntensity/Rte/CronTask.php:96
+msgid "Maximum number of entries to download"
+msgstr ""
+
+#: src/CronTask.php:115
+msgid "Compute usage environmental impact for all assets"
+msgstr ""
+
+#: src/CronTask.php:116 src/CronTask.php:121
+msgid "Maximum number of entries to calculate"
+msgstr ""
+
+#: src/CronTask.php:120
+msgid "Compute embodied environmental impact for all assets"
+msgstr ""
+
+#: src/CronTask.php:281
+msgid "No zone to download"
+msgstr ""
+
+#: src/Config.php:137
+msgid "This action cannot be undone. Are you sure?"
+msgstr ""
+
+#: src/AbstractChildDropdown.php:67 src/Dashboard/Grid.php:69
+#: src/Dashboard/Grid.php:134 src/Dashboard/Grid.php:232
+msgid "Carbon"
+msgstr ""
+
+#: src/CarbonEmission.php:53
+msgid "Carbon Emission"
+msgid_plural "Carbon Emissions"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/CarbonEmission.php:126
+msgid "Energy"
+msgstr ""
+
+#: src/CarbonEmission.php:134
+msgid "Emission"
+msgstr ""
+
+#: src/CarbonEmission.php:142
+msgid "Energy quality"
+msgstr ""
+
+#: src/CarbonEmission.php:150
+msgid "Emission quality"
+msgstr ""
+
+#: src/CarbonEmission.php:157 src/AbstractImpact.php:129
+msgid "Date of evaluation"
+msgstr ""
+
+#: src/CarbonEmission.php:164 src/AbstractImpact.php:136
+msgid "Engine"
+msgstr ""
+
+#: src/CarbonEmission.php:171 src/AbstractImpact.php:143
+msgid "Engine version"
+msgstr ""
+
+#: src/CarbonEmission.php:228 src/AbstractImpact.php:254
+msgid "Full reset denied."
 msgstr ""
 
 #: src/Source_Zone.php:75
@@ -453,38 +554,460 @@ msgstr ""
 msgid "End"
 msgstr ""
 
-#: src/Config.php:137
-msgid "This action cannot be undone. Are you sure?"
+#: src/UsageInfo.php:64
+msgid "Usage informations"
 msgstr ""
 
-#: src/UsageImpact.php:42
-msgid "Usage impact"
-msgid_plural "Usage impacts"
+#: src/UsageInfo.php:250
+#, php-format
+msgid "%s More information %s"
+msgstr ""
+
+#: src/CarbonIntensity.php:91
+msgid "Emission date"
+msgstr ""
+
+#: src/CarbonIntensity.php:118
+msgid "Intensity"
+msgstr ""
+
+#: src/Report.php:51
+msgid "Carbon report"
+msgid_plural "Carbon reports"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/AbstractImpact.php:129 src/CarbonEmission.php:157
-msgid "Date of evaluation"
+#: src/Report.php:106
+#, php-format
+msgid ""
+"Demo mode enabled. The data below are not representative of the assets in "
+"the database. %sDisable demo mode%s"
 msgstr ""
 
-#: src/AbstractImpact.php:136 src/CarbonEmission.php:164
-msgid "Engine"
+#: src/Dashboard/Grid.php:74 src/Dashboard/Provider.php:473
+msgid "Handled assets ratio"
 msgstr ""
 
-#: src/AbstractImpact.php:143 src/CarbonEmission.php:171
-msgid "Engine version"
+#: src/Dashboard/Grid.php:83
+msgid "Handled assets count"
 msgstr ""
 
-#: src/AbstractImpact.php:254 src/CarbonEmission.php:228
-msgid "Full reset denied."
+#: src/Dashboard/Grid.php:146
+#, php-format
+msgid "Handled %s"
 msgstr ""
 
-#: src/Impact/Embodied/AbstractEmbodiedImpact.php:115
-msgid "Connection to Boavizta failed."
+#: src/Dashboard/Grid.php:157
+#, php-format
+msgid "Unhandled %s"
 msgstr ""
 
-#: src/Impact/Embodied/AbstractEmbodiedImpact.php:118
-msgid "Embodied impact evaluation falied."
+#: src/Dashboard/Grid.php:243
+#, php-format
+msgid "Unhandled %s ratio"
+msgstr ""
+
+#: src/Dashboard/Grid.php:255
+msgid "Usage carbon emission year to date"
+msgstr ""
+
+#: src/Dashboard/Grid.php:261
+msgid "Monthly carbon emission"
+msgstr ""
+
+#: src/Dashboard/Grid.php:270
+msgid "Usage global warming potential chart"
+msgstr ""
+
+#: src/Dashboard/Grid.php:279 src/Dashboard/Widget.php:91
+#: src/Dashboard/Widget.php:588
+msgid "Biggest monthly averaged carbon emission per model"
+msgstr ""
+
+#: src/Dashboard/Grid.php:336 src/Dashboard/Widget.php:61
+msgid "Environmental impact information video"
+msgstr ""
+
+#: src/Dashboard/Grid.php:341
+msgid "Environmental impact methodology information"
+msgstr ""
+
+#: src/Dashboard/Widget.php:68
+msgid "Methodology information"
+msgstr ""
+
+#: src/Dashboard/Widget.php:77
+msgid "Total Carbon Emission"
+msgstr ""
+
+#: src/Dashboard/Widget.php:84
+msgid "Monthly Carbon Emission"
+msgstr ""
+
+#: src/Dashboard/Widget.php:99
+msgid "Carbon Emission Per month"
+msgstr ""
+
+#: src/Dashboard/Widget.php:106
+msgid "Usage abiotic depletion potential"
+msgstr ""
+
+#: src/Dashboard/Widget.php:114
+msgid "Impact criteria"
+msgstr ""
+
+#: src/Dashboard/Widget.php:126
+msgid "Unhandled Computers"
+msgstr ""
+
+#: src/Dashboard/Widget.php:137
+msgid "Unhandled Monitors"
+msgstr ""
+
+#: src/Dashboard/Widget.php:148
+msgid "Unhandled Network equipments"
+msgstr ""
+
+#: src/Dashboard/Widget.php:159
+msgid "Radar chart"
+msgstr ""
+
+#: src/Dashboard/Widget.php:485 src/Dashboard/Provider.php:994
+msgid "Consumed energy and carbon emission per month"
+msgstr ""
+
+#: src/Dashboard/Widget.php:530 src/Dashboard/Widget.php:545
+#: src/Dashboard/DemoProvider.php:88 src/Dashboard/DemoProvider.php:189
+#: src/Dashboard/Provider.php:1099
+msgid "Carbon emission"
+msgstr ""
+
+#: src/Dashboard/Widget.php:535 src/Dashboard/Widget.php:548
+#: src/Dashboard/DemoProvider.php:106 src/Dashboard/DemoProvider.php:202
+#: src/Dashboard/Provider.php:1115
+msgid "Consumed energy"
+msgstr ""
+
+#: src/Dashboard/Widget.php:730
+#, php-format
+msgid ""
+"Evaluates the usage carbon emission in CO₂ equivalent during the last 2 "
+"months. %s More information %s"
+msgstr ""
+
+#: src/Dashboard/Widget.php:796
+#, php-format
+msgid ""
+"Evaluates the usage carbon emission in CO₂ equivalent during the last 12 "
+"elapsed months. %s More information %s"
+msgstr ""
+
+#: src/Dashboard/Widget.php:838
+msgid "More information"
+msgstr ""
+
+#: src/Dashboard/Widget.php:877
+#, php-format
+msgid ""
+"Evaluates the consumption of non renewable resources in Antimony equivalent. "
+"%s More information %s"
+msgstr ""
+
+#: src/Dashboard/Widget.php:1081
+msgid "Handled percentage"
+msgstr ""
+
+#: src/Dashboard/Dashboard.php:68
+msgid "Carbon dioxyde intensity"
+msgstr ""
+
+#: src/Dashboard/DemoProvider.php:76
+msgid "Usage carbon emission per month"
+msgstr ""
+
+#: src/Dashboard/DemoProvider.php:88 src/Dashboard/DemoProvider.php:189
+#: src/Dashboard/Provider.php:193 src/Dashboard/Provider.php:316
+#: src/Dashboard/Provider.php:1099 src/Dashboard/Provider.php:1101
+msgid "CO₂eq"
+msgstr ""
+
+#: src/Dashboard/DemoProvider.php:242 src/Dashboard/Provider.php:534
+#, php-format
+msgid "plugin carbon - handled %s"
+msgstr ""
+
+#: src/Dashboard/DemoProvider.php:243 src/Dashboard/Provider.php:535
+#, php-format
+msgid "plugin carbon - unhandled %s"
+msgstr ""
+
+#: src/Dashboard/DemoProvider.php:274
+msgid "plugin carbon - handled assets ratio"
+msgstr ""
+
+#: src/Dashboard/DemoProvider.php:297 src/Dashboard/Provider.php:497
+msgid "Handled"
+msgstr ""
+
+#: src/Dashboard/DemoProvider.php:302 src/Dashboard/Provider.php:502
+msgid "Unhandled"
+msgstr ""
+
+#: src/Dashboard/DemoProvider.php:325
+msgid "plugin carbon - Usage carbon emission"
+msgstr ""
+
+#: src/Dashboard/Provider.php:195 src/Dashboard/Provider.php:318
+#: src/Dashboard/Provider.php:1086 src/Toolbox.php:242
+msgid "g"
+msgstr ""
+
+#: src/Dashboard/Provider.php:196 src/Dashboard/Provider.php:319
+#: src/Dashboard/Provider.php:1087 src/Toolbox.php:243
+msgid "Kg"
+msgstr ""
+
+#: src/Dashboard/Provider.php:197 src/Dashboard/Provider.php:320
+#: src/Dashboard/Provider.php:1088 src/Toolbox.php:244
+msgid "t"
+msgstr ""
+
+#: src/Dashboard/Provider.php:198 src/Dashboard/Provider.php:321
+#: src/Dashboard/Provider.php:1089 src/Toolbox.php:245
+msgid "Kt"
+msgstr ""
+
+#: src/Dashboard/Provider.php:199 src/Dashboard/Provider.php:322
+#: src/Dashboard/Provider.php:1090 src/Toolbox.php:246
+msgid "Mt"
+msgstr ""
+
+#: src/Dashboard/Provider.php:200 src/Dashboard/Provider.php:323
+#: src/Dashboard/Provider.php:1091 src/Toolbox.php:247
+msgid "Gt"
+msgstr ""
+
+#: src/Dashboard/Provider.php:201 src/Dashboard/Provider.php:324
+#: src/Dashboard/Provider.php:1092 src/Toolbox.php:248
+msgid "Tt"
+msgstr ""
+
+#: src/Dashboard/Provider.php:202 src/Dashboard/Provider.php:325
+#: src/Dashboard/Provider.php:1093 src/Toolbox.php:249
+msgid "Pt"
+msgstr ""
+
+#: src/Dashboard/Provider.php:203 src/Dashboard/Provider.php:326
+#: src/Dashboard/Provider.php:1094 src/Toolbox.php:250
+msgid "Et"
+msgstr ""
+
+#: src/Dashboard/Provider.php:204 src/Dashboard/Provider.php:327
+#: src/Dashboard/Provider.php:1095 src/Toolbox.php:251
+msgid "Zt"
+msgstr ""
+
+#: src/Dashboard/Provider.php:205 src/Dashboard/Provider.php:328
+#: src/Dashboard/Provider.php:1096 src/Toolbox.php:252
+msgid "Yt"
+msgstr ""
+
+#: src/Dashboard/Provider.php:427
+msgid "handled assets ratio"
+msgstr ""
+
+#: src/Dashboard/Provider.php:507
+msgid "Ignored"
+msgstr ""
+
+#: src/Dashboard/Provider.php:584
+#, php-format
+msgid "plugin carbon - ignored %s"
+msgstr ""
+
+#: src/Dashboard/Provider.php:632
+msgid "plugin carbon - Total usage power consumption"
+msgstr ""
+
+#: src/Dashboard/Provider.php:1105 src/Toolbox.php:293
+msgid "KWh"
+msgstr ""
+
+#: src/Dashboard/Provider.php:1106 src/Toolbox.php:294
+msgid "MWh"
+msgstr ""
+
+#: src/Dashboard/Provider.php:1107 src/Toolbox.php:295
+msgid "GWh"
+msgstr ""
+
+#: src/Dashboard/Provider.php:1108 src/Toolbox.php:296
+msgid "TWh"
+msgstr ""
+
+#: src/Dashboard/Provider.php:1109 src/Toolbox.php:297
+msgid "PWh"
+msgstr ""
+
+#: src/Dashboard/Provider.php:1110 src/Toolbox.php:298
+msgid "EWh"
+msgstr ""
+
+#: src/Dashboard/Provider.php:1111 src/Toolbox.php:299
+msgid "ZWh"
+msgstr ""
+
+#: src/Dashboard/Provider.php:1112 src/Toolbox.php:300
+msgid "YWh"
+msgstr ""
+
+#: src/DataSource/Lca/Boaviztapi/Config.php:108
+msgid "Invalid Boavizta API URL"
+msgstr ""
+
+#: src/DataSource/Lca/Boaviztapi/Config.php:116
+msgid "Connection to Boavizta API established"
+msgstr ""
+
+#: src/DataSource/CarbonIntensity/ElectricityMaps/CronTask.php:56
+#: src/DataSource/CarbonIntensity/Rte/CronTask.php:61
+msgid "Resource diagnosis"
+msgstr ""
+
+#: src/DataSource/CarbonIntensity/ElectricityMaps/CronTask.php:72
+msgid "Collect carbon intensities from Electricity Maps"
+msgstr ""
+
+#: src/DataSource/CarbonIntensity/ElectricityMaps/CronTask.php:90
+msgid "Download carbon emissions from Electricity Maps"
+msgstr ""
+
+#: src/DataSource/CarbonIntensity/Rte/CronTask.php:77
+msgid "Collect carbon intensities from RTE"
+msgstr ""
+
+#: src/DataSource/CarbonIntensity/Rte/CronTask.php:95
+msgid "Download carbon emissions from RTE"
+msgstr ""
+
+#: src/ComputerUsageProfile.php:53
+msgid "Computer usage profile"
+msgid_plural "Computer usage profiles"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/ComputerUsageProfile.php:123
+msgid "Start time is invalid"
+msgstr ""
+
+#: src/ComputerUsageProfile.php:128
+msgid "Stop time is invalid"
+msgstr ""
+
+#: src/Toolbox.php:268
+msgid "W"
+msgstr ""
+
+#: src/Toolbox.php:269
+msgid "KW"
+msgstr ""
+
+#: src/Toolbox.php:270
+msgid "MW"
+msgstr ""
+
+#: src/Toolbox.php:271
+msgid "GW"
+msgstr ""
+
+#: src/Toolbox.php:272
+msgid "TW"
+msgstr ""
+
+#: src/Toolbox.php:273
+msgid "PW"
+msgstr ""
+
+#: src/Toolbox.php:274
+msgid "EW"
+msgstr ""
+
+#: src/Toolbox.php:275
+msgid "ZW"
+msgstr ""
+
+#: src/Toolbox.php:276
+msgid "YW"
+msgstr ""
+
+#: src/Toolbox.php:292
+msgid "Wh"
+msgstr ""
+
+#: src/Toolbox.php:316
+msgid "L"
+msgstr ""
+
+#: src/Toolbox.php:317
+msgid "m³"
+msgstr ""
+
+#: src/Toolbox.php:318
+msgid "dam³"
+msgstr ""
+
+#: src/Toolbox.php:319
+msgid "hm³"
+msgstr ""
+
+#: src/Toolbox.php:320
+msgid "Km³"
+msgstr ""
+
+#: src/Toolbox.php:388
+#, php-format
+msgid "%1$s %2$s"
+msgstr ""
+
+#: src/MonitorType.php:52 src/ComputerType.php:72
+#: src/NetworkEquipmentType.php:52 src/SearchOptions.php:166
+msgid "Power consumption"
+msgstr ""
+
+#: src/ComputerType.php:57
+msgid "Unspecified"
+msgstr ""
+
+#: src/ComputerType.php:59
+msgid "Server"
+msgstr ""
+
+#: src/ComputerType.php:60
+msgid "Laptop"
+msgstr ""
+
+#: src/ComputerType.php:61
+msgid "Tablet"
+msgstr ""
+
+#: src/ComputerType.php:62
+msgid "Smartphone"
+msgstr ""
+
+#: src/Source.php:48
+msgid "Carbon intensity source"
+msgid_plural "Carbon intensity sources"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/SearchOptions.php:189 src/SearchOptions.php:321
+#: src/SearchOptions.php:334 src/SearchOptions.php:347
+msgid "Ignore environmental impact"
+msgstr ""
+
+#: src/SearchOptions.php:246 src/SearchOptions.php:370
+#: src/SearchOptions.php:447
+msgid "Is historizable"
 msgstr ""
 
 #: src/Impact/History/AbstractAsset.php:377
@@ -757,220 +1280,35 @@ msgstr ""
 msgid "Incidence of disease"
 msgstr ""
 
-#: src/CarbonIntensity.php:91
-msgid "Emission date"
+#: src/Impact/Embodied/AbstractEmbodiedImpact.php:115
+msgid "Connection to Boavizta failed."
 msgstr ""
 
-#: src/CarbonIntensity.php:118
-msgid "Intensity"
+#: src/Impact/Embodied/AbstractEmbodiedImpact.php:118
+msgid "Embodied impact evaluation falied."
 msgstr ""
 
-#: src/CronTask.php:103
-msgid "Find the Alpha3 country code (ISO3166)"
+#: src/AbstractModel.php:156
+msgid "Quality"
 msgstr ""
 
-#: src/CronTask.php:104
-msgid "Maximum number of locations to solve"
-msgstr ""
-
-#: src/CronTask.php:109
-msgid "Download carbon emissions from Watttime"
-msgstr ""
-
-#: src/CronTask.php:110
-#: src/DataSource/CarbonIntensity/ElectricityMaps/CronTask.php:91
-#: src/DataSource/CarbonIntensity/Rte/CronTask.php:96
-msgid "Maximum number of entries to download"
-msgstr ""
-
-#: src/CronTask.php:115
-msgid "Compute usage environmental impact for all assets"
-msgstr ""
-
-#: src/CronTask.php:116 src/CronTask.php:121
-msgid "Maximum number of entries to calculate"
-msgstr ""
-
-#: src/CronTask.php:120
-msgid "Compute embodied environmental impact for all assets"
-msgstr ""
-
-#: src/CronTask.php:281
-msgid "No zone to download"
-msgstr ""
-
-#: src/Report.php:51
-msgid "Carbon report"
-msgid_plural "Carbon reports"
+#: src/UsageImpact.php:42
+msgid "Usage impact"
+msgid_plural "Usage impacts"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Report.php:106
+#: src/Command/ExportDashboardCommand.php:71
+msgid "Updating the report dashboard description"
+msgstr ""
+
+#: src/Command/ExportDashboardCommand.php:76
+msgid "Dashboard not found"
+msgstr ""
+
+#: src/Command/ExportDashboardCommand.php:100
 #, php-format
-msgid ""
-"Demo mode enabled. The data below are not representative of the assets in "
-"the database. %sDisable demo mode%s"
-msgstr ""
-
-#: src/Toolbox.php:242 src/Dashboard/Provider.php:195
-#: src/Dashboard/Provider.php:318 src/Dashboard/Provider.php:1086
-msgid "g"
-msgstr ""
-
-#: src/Toolbox.php:243 src/Dashboard/Provider.php:196
-#: src/Dashboard/Provider.php:319 src/Dashboard/Provider.php:1087
-msgid "Kg"
-msgstr ""
-
-#: src/Toolbox.php:244 src/Dashboard/Provider.php:197
-#: src/Dashboard/Provider.php:320 src/Dashboard/Provider.php:1088
-msgid "t"
-msgstr ""
-
-#: src/Toolbox.php:245 src/Dashboard/Provider.php:198
-#: src/Dashboard/Provider.php:321 src/Dashboard/Provider.php:1089
-msgid "Kt"
-msgstr ""
-
-#: src/Toolbox.php:246 src/Dashboard/Provider.php:199
-#: src/Dashboard/Provider.php:322 src/Dashboard/Provider.php:1090
-msgid "Mt"
-msgstr ""
-
-#: src/Toolbox.php:247 src/Dashboard/Provider.php:200
-#: src/Dashboard/Provider.php:323 src/Dashboard/Provider.php:1091
-msgid "Gt"
-msgstr ""
-
-#: src/Toolbox.php:248 src/Dashboard/Provider.php:201
-#: src/Dashboard/Provider.php:324 src/Dashboard/Provider.php:1092
-msgid "Tt"
-msgstr ""
-
-#: src/Toolbox.php:249 src/Dashboard/Provider.php:202
-#: src/Dashboard/Provider.php:325 src/Dashboard/Provider.php:1093
-msgid "Pt"
-msgstr ""
-
-#: src/Toolbox.php:250 src/Dashboard/Provider.php:203
-#: src/Dashboard/Provider.php:326 src/Dashboard/Provider.php:1094
-msgid "Et"
-msgstr ""
-
-#: src/Toolbox.php:251 src/Dashboard/Provider.php:204
-#: src/Dashboard/Provider.php:327 src/Dashboard/Provider.php:1095
-msgid "Zt"
-msgstr ""
-
-#: src/Toolbox.php:252 src/Dashboard/Provider.php:205
-#: src/Dashboard/Provider.php:328 src/Dashboard/Provider.php:1096
-msgid "Yt"
-msgstr ""
-
-#: src/Toolbox.php:268
-msgid "W"
-msgstr ""
-
-#: src/Toolbox.php:269
-msgid "KW"
-msgstr ""
-
-#: src/Toolbox.php:270
-msgid "MW"
-msgstr ""
-
-#: src/Toolbox.php:271
-msgid "GW"
-msgstr ""
-
-#: src/Toolbox.php:272
-msgid "TW"
-msgstr ""
-
-#: src/Toolbox.php:273
-msgid "PW"
-msgstr ""
-
-#: src/Toolbox.php:274
-msgid "EW"
-msgstr ""
-
-#: src/Toolbox.php:275
-msgid "ZW"
-msgstr ""
-
-#: src/Toolbox.php:276
-msgid "YW"
-msgstr ""
-
-#: src/Toolbox.php:292
-msgid "Wh"
-msgstr ""
-
-#: src/Toolbox.php:293 src/Dashboard/Provider.php:1105
-msgid "KWh"
-msgstr ""
-
-#: src/Toolbox.php:294 src/Dashboard/Provider.php:1106
-msgid "MWh"
-msgstr ""
-
-#: src/Toolbox.php:295 src/Dashboard/Provider.php:1107
-msgid "GWh"
-msgstr ""
-
-#: src/Toolbox.php:296 src/Dashboard/Provider.php:1108
-msgid "TWh"
-msgstr ""
-
-#: src/Toolbox.php:297 src/Dashboard/Provider.php:1109
-msgid "PWh"
-msgstr ""
-
-#: src/Toolbox.php:298 src/Dashboard/Provider.php:1110
-msgid "EWh"
-msgstr ""
-
-#: src/Toolbox.php:299 src/Dashboard/Provider.php:1111
-msgid "ZWh"
-msgstr ""
-
-#: src/Toolbox.php:300 src/Dashboard/Provider.php:1112
-msgid "YWh"
-msgstr ""
-
-#: src/Toolbox.php:316
-msgid "L"
-msgstr ""
-
-#: src/Toolbox.php:317
-msgid "m³"
-msgstr ""
-
-#: src/Toolbox.php:318
-msgid "dam³"
-msgstr ""
-
-#: src/Toolbox.php:319
-msgid "hm³"
-msgstr ""
-
-#: src/Toolbox.php:320
-msgid "Km³"
-msgstr ""
-
-#: src/Toolbox.php:388
-#, php-format
-msgid "%1$s %2$s"
-msgstr ""
-
-#: src/NetworkEquipmentType.php:52 src/SearchOptions.php:166
-#: src/ComputerType.php:72 src/MonitorType.php:52
-msgid "Power consumption"
-msgstr ""
-
-#: src/Command/CreateTestInventoryCommand.php:148
-msgid "Creating test inventory"
+msgid "Dashboard description saved to %s"
 msgstr ""
 
 #: src/Command/CollectCarbonIntensityCommand.php:72
@@ -1016,6 +1354,10 @@ msgstr ""
 msgid "Reading data..."
 msgstr ""
 
+#: src/Command/CreateTestInventoryCommand.php:148
+msgid "Creating test inventory"
+msgstr ""
+
 #: src/Command/CreateFakeCarbonIntensityCommand.php:81
 msgid "Creating data zone name"
 msgstr ""
@@ -1024,366 +1366,8 @@ msgstr ""
 msgid "Creating fake data..."
 msgstr ""
 
-#: src/Command/ExportDashboardCommand.php:71
-msgid "Updating the report dashboard description"
-msgstr ""
-
-#: src/Command/ExportDashboardCommand.php:76
-msgid "Dashboard not found"
-msgstr ""
-
-#: src/Command/ExportDashboardCommand.php:100
-#, php-format
-msgid "Dashboard description saved to %s"
-msgstr ""
-
-#: src/UsageInfo.php:64
-msgid "Usage informations"
-msgstr ""
-
-#: src/UsageInfo.php:250
-#, php-format
-msgid "%s More information %s"
-msgstr ""
-
-#: src/CarbonEmission.php:53
-msgid "Carbon Emission"
-msgid_plural "Carbon Emissions"
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/CarbonEmission.php:126
-msgid "Energy"
-msgstr ""
-
-#: src/CarbonEmission.php:134
-msgid "Emission"
-msgstr ""
-
-#: src/CarbonEmission.php:142
-msgid "Energy quality"
-msgstr ""
-
-#: src/CarbonEmission.php:150
-msgid "Emission quality"
-msgstr ""
-
-#: src/Dashboard/Widget.php:61 src/Dashboard/Grid.php:336
-msgid "Environmental impact information video"
-msgstr ""
-
-#: src/Dashboard/Widget.php:68
-msgid "Methodology information"
-msgstr ""
-
-#: src/Dashboard/Widget.php:77
-msgid "Total Carbon Emission"
-msgstr ""
-
-#: src/Dashboard/Widget.php:84
-msgid "Monthly Carbon Emission"
-msgstr ""
-
-#: src/Dashboard/Widget.php:91 src/Dashboard/Widget.php:588
-#: src/Dashboard/Grid.php:279
-msgid "Biggest monthly averaged carbon emission per model"
-msgstr ""
-
-#: src/Dashboard/Widget.php:99
-msgid "Carbon Emission Per month"
-msgstr ""
-
-#: src/Dashboard/Widget.php:106
-msgid "Usage abiotic depletion potential"
-msgstr ""
-
-#: src/Dashboard/Widget.php:114
-msgid "Impact criteria"
-msgstr ""
-
-#: src/Dashboard/Widget.php:126
-msgid "Unhandled Computers"
-msgstr ""
-
-#: src/Dashboard/Widget.php:137
-msgid "Unhandled Monitors"
-msgstr ""
-
-#: src/Dashboard/Widget.php:148
-msgid "Unhandled Network equipments"
-msgstr ""
-
-#: src/Dashboard/Widget.php:159
-msgid "Radar chart"
-msgstr ""
-
-#: src/Dashboard/Widget.php:485 src/Dashboard/Provider.php:994
-msgid "Consumed energy and carbon emission per month"
-msgstr ""
-
-#: src/Dashboard/Widget.php:530 src/Dashboard/Widget.php:545
-#: src/Dashboard/DemoProvider.php:88 src/Dashboard/DemoProvider.php:189
-#: src/Dashboard/Provider.php:1099
-msgid "Carbon emission"
-msgstr ""
-
-#: src/Dashboard/Widget.php:535 src/Dashboard/Widget.php:548
-#: src/Dashboard/DemoProvider.php:106 src/Dashboard/DemoProvider.php:202
-#: src/Dashboard/Provider.php:1115
-msgid "Consumed energy"
-msgstr ""
-
-#: src/Dashboard/Widget.php:730
-#, php-format
-msgid ""
-"Evaluates the usage carbon emission in CO₂ equivalent during the last 2 "
-"months. %s More information %s"
-msgstr ""
-
-#: src/Dashboard/Widget.php:796
-#, php-format
-msgid ""
-"Evaluates the usage carbon emission in CO₂ equivalent during the last 12 "
-"elapsed months. %s More information %s"
-msgstr ""
-
-#: src/Dashboard/Widget.php:838
-msgid "More information"
-msgstr ""
-
-#: src/Dashboard/Widget.php:877
-#, php-format
-msgid ""
-"Evaluates the consumption of non renewable resources in Antimony equivalent. "
-"%s More information %s"
-msgstr ""
-
-#: src/Dashboard/Widget.php:1081
-msgid "Handled percentage"
-msgstr ""
-
-#: src/Dashboard/DemoProvider.php:76
-msgid "Usage carbon emission per month"
-msgstr ""
-
-#: src/Dashboard/DemoProvider.php:88 src/Dashboard/DemoProvider.php:189
-#: src/Dashboard/Provider.php:193 src/Dashboard/Provider.php:316
-#: src/Dashboard/Provider.php:1099 src/Dashboard/Provider.php:1101
-msgid "CO₂eq"
-msgstr ""
-
-#: src/Dashboard/DemoProvider.php:242 src/Dashboard/Provider.php:534
-#, php-format
-msgid "plugin carbon - handled %s"
-msgstr ""
-
-#: src/Dashboard/DemoProvider.php:243 src/Dashboard/Provider.php:535
-#, php-format
-msgid "plugin carbon - unhandled %s"
-msgstr ""
-
-#: src/Dashboard/DemoProvider.php:274
-msgid "plugin carbon - handled assets ratio"
-msgstr ""
-
-#: src/Dashboard/DemoProvider.php:297 src/Dashboard/Provider.php:497
-msgid "Handled"
-msgstr ""
-
-#: src/Dashboard/DemoProvider.php:302 src/Dashboard/Provider.php:502
-msgid "Unhandled"
-msgstr ""
-
-#: src/Dashboard/DemoProvider.php:325
-msgid "plugin carbon - Usage carbon emission"
-msgstr ""
-
-#: src/Dashboard/Grid.php:69 src/Dashboard/Grid.php:134
-#: src/Dashboard/Grid.php:232 src/AbstractChildDropdown.php:67
-msgid "Carbon"
-msgstr ""
-
-#: src/Dashboard/Grid.php:74 src/Dashboard/Provider.php:473
-msgid "Handled assets ratio"
-msgstr ""
-
-#: src/Dashboard/Grid.php:83
-msgid "Handled assets count"
-msgstr ""
-
-#: src/Dashboard/Grid.php:146
-#, php-format
-msgid "Handled %s"
-msgstr ""
-
-#: src/Dashboard/Grid.php:157
-#, php-format
-msgid "Unhandled %s"
-msgstr ""
-
-#: src/Dashboard/Grid.php:243
-#, php-format
-msgid "Unhandled %s ratio"
-msgstr ""
-
-#: src/Dashboard/Grid.php:255
-msgid "Usage carbon emission year to date"
-msgstr ""
-
-#: src/Dashboard/Grid.php:261
-msgid "Monthly carbon emission"
-msgstr ""
-
-#: src/Dashboard/Grid.php:270
-msgid "Usage global warming potential chart"
-msgstr ""
-
-#: src/Dashboard/Grid.php:341
-msgid "Environmental impact methodology information"
-msgstr ""
-
-#: src/Dashboard/Provider.php:427
-msgid "handled assets ratio"
-msgstr ""
-
-#: src/Dashboard/Provider.php:507
-msgid "Ignored"
-msgstr ""
-
-#: src/Dashboard/Provider.php:584
-#, php-format
-msgid "plugin carbon - ignored %s"
-msgstr ""
-
-#: src/Dashboard/Provider.php:632
-msgid "plugin carbon - Total usage power consumption"
-msgstr ""
-
-#: src/Dashboard/Dashboard.php:68
-msgid "Carbon dioxyde intensity"
-msgstr ""
-
-#: src/DataTracking/AbstractTracked.php:78
-msgid "Impact not evaluated"
-msgstr ""
-
-#: src/DataTracking/AbstractTracked.php:79
-msgid "Unspecified quality"
-msgstr ""
-
-#: src/DataTracking/AbstractTracked.php:80
-msgid "Manual data"
-msgstr ""
-
-#: src/DataTracking/AbstractTracked.php:81
-msgid "Estimated data"
-msgstr ""
-
-#: src/DataTracking/AbstractTracked.php:82
-msgid "Downsampled data"
-msgstr ""
-
-#: src/DataTracking/AbstractTracked.php:83
-msgid "Measured data"
-msgstr ""
-
-#: src/AbstractModel.php:156
-msgid "Quality"
-msgstr ""
-
-#: src/DataSource/Lca/Boaviztapi/Config.php:108
-msgid "Invalid Boavizta API URL"
-msgstr ""
-
-#: src/DataSource/Lca/Boaviztapi/Config.php:116
-msgid "Connection to Boavizta API established"
-msgstr ""
-
-#: src/DataSource/CarbonIntensity/ElectricityMaps/CronTask.php:56
-#: src/DataSource/CarbonIntensity/Rte/CronTask.php:61
-msgid "Resource diagnosis"
-msgstr ""
-
-#: src/DataSource/CarbonIntensity/ElectricityMaps/CronTask.php:72
-msgid "Collect carbon intensities from Electricity Maps"
-msgstr ""
-
-#: src/DataSource/CarbonIntensity/ElectricityMaps/CronTask.php:90
-msgid "Download carbon emissions from Electricity Maps"
-msgstr ""
-
-#: src/DataSource/CarbonIntensity/Rte/CronTask.php:77
-msgid "Collect carbon intensities from RTE"
-msgstr ""
-
-#: src/DataSource/CarbonIntensity/Rte/CronTask.php:95
-msgid "Download carbon emissions from RTE"
-msgstr ""
-
-#: src/SearchOptions.php:189 src/SearchOptions.php:321
-#: src/SearchOptions.php:334 src/SearchOptions.php:347
-msgid "Ignore environmental impact"
-msgstr ""
-
-#: src/SearchOptions.php:246 src/SearchOptions.php:370
-#: src/SearchOptions.php:447
-msgid "Is historizable"
-msgstr ""
-
-#: src/ComputerType.php:57
-msgid "Unspecified"
-msgstr ""
-
-#: src/ComputerType.php:59
-msgid "Server"
-msgstr ""
-
-#: src/ComputerType.php:60
-msgid "Laptop"
-msgstr ""
-
-#: src/ComputerType.php:61
-msgid "Tablet"
-msgstr ""
-
-#: src/ComputerType.php:62
-msgid "Smartphone"
-msgstr ""
-
-#: src/Source.php:48
-msgid "Carbon intensity source"
-msgid_plural "Carbon intensity sources"
-msgstr[0] ""
-msgstr[1] ""
-
-#: hook.php:98
-msgid ""
-"Please check the logs for more details. Fill an issue in the repository of "
-"the plugin."
-msgstr ""
-
-#: hook.php:309
-msgid "Associate to an usage profile"
-msgstr ""
-
-#: hook.php:310 hook.php:315
-msgid "Delete all calculated environmental impacts"
-msgstr ""
-
-#: hook.php:319 hook.php:324 hook.php:328
-msgid "Update type power consumption"
-msgstr ""
-
-#: hook.php:320
-msgid "Update category"
-msgstr ""
-
-#: hook.php:332
-msgid "Update zone for Boavizta engine"
-msgstr ""
-
-#: hook.php:333
-msgid "Update carbon intensity source and zone"
+#: setup.php:303
+msgid "Environmental Impact"
 msgstr ""
 
 #: ajax/toggleZoneDownload.php:41
@@ -1406,6 +1390,22 @@ msgstr ""
 msgid "Update failed."
 msgstr ""
 
-#: setup.php:303
-msgid "Environmental Impact"
+#: install/install/create_uasge_profiles.php:41
+msgid "Always on"
+msgstr ""
+
+#: install/install/create_uasge_profiles.php:52
+msgid "Office hours"
+msgstr ""
+
+#: install/install/create_automatic_actions.php:52
+msgid "Find the Alpha3 country code (ISO3166) of locations"
+msgstr ""
+
+#: install/install/create_automatic_actions.php:64
+msgid "Compute carbon emissions of computers"
+msgstr ""
+
+#: install/install/create_automatic_actions.php:76
+msgid "Compute embodied impact of assets"
 msgstr ""
