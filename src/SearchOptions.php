@@ -174,9 +174,6 @@ class SearchOptions
                         'jointype' => 'child',
                         'beforejoin' => [
                             'table' => $glpi_item_type_table,
-                            'joinparams' => [
-                                'jointype' => 'child',
-                            ],
                         ],
                     ],
                     'computation' => "COALESCE(TABLE.`power_consumption`, 0)",
@@ -194,9 +191,6 @@ class SearchOptions
                         'jointype' => 'child',
                         'beforejoin' => [
                             'table' => $glpi_item_type_table,
-                            'joinparams' => [
-                                'jointype' => 'child',
-                            ],
                         ],
                     ],
                     'computation' => "COALESCE(TABLE.`is_ignore`, 0)",
