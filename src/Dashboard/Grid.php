@@ -33,16 +33,27 @@
 namespace GlpiPlugin\Carbon\Dashboard;
 
 use Computer;
+use Glpi\Dashboard\Dashboard;
 use Glpi\Dashboard\Filter;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\Impact\Type;
+use Plugin;
 use Session;
 
+/**
+ * @phpstan-import-type DashboardConfigDescription from Dashboard
+ */
 class Grid
 {
-    public static function getDashboardCards(): array
+    /**
+     * Get the description of additional cards
+     *
+     * @param null|array $cards existing types
+     * @return array
+     */
+    public static function getDashboardCards(?array $cards = null): array
     {
-        $cards = [];
+        $cards ??= [];
         // Declare the following cards only if we show / edit the quick report page of the plugin
         $in_carbon_report_page = self::in_carbon_report_page();
 
@@ -332,5 +343,31 @@ class Grid
         ];
 
         return $new_cards;
+    }
+
+    /**
+     * Return default dashboards data.
+     *
+     * @return DashboardConfigDescription
+     */
+    public static function getDefaults(?array $defaults = null): ?array
+    {
+        $cards_path = Plugin::getPhpDir('carbon') . '/install/data/report_dashboard.json';
+        $cards = file_get_contents($cards_path);
+        if ($cards === false) {
+            return $defaults;
+        }
+        $cards = json_decode($cards, true);
+        if ($cards === null) {
+            return $defaults;
+        }
+
+        $defaults[] = [
+            'key' => 'plugin_carbon_board',
+            'name' => __('Environmental impact', 'carbon'),
+            'context' => 'mini_core',
+            'items' => $cards,
+        ];
+        return $defaults;
     }
 }

@@ -30,24 +30,19 @@
  * -------------------------------------------------------------------------
  */
 
-use Glpi\Exception\Http\NotFoundHttpException;
-use GlpiPlugin\Carbon\NetworkEquipmentType;
-use NetworkEquipmentType as GlpiNetworkEquipmentType;
+namespace GlpiPlugin\Carbon\Impact\Embodied\Internal\Tests;
 
-include(__DIR__ . '/../../../inc/includes.php');
+use Computer as GlpiComputer;
+use ComputerModel as GlpiComputerModel;
+use ComputerType as GlpiComputerType;
+use GlpiPlugin\Carbon\Impact\Embodied\Internal\Computer as InternalComputer;
+use GlpiPlugin\Carbon\Tests\Impact\Embodied\Internal\AbstractEmbodiedImpactTest;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-if (!Plugin::isPluginActive('carbon')) {
-    throw new NotFoundHttpException();
+#[CoversClass(InternalComputer::class)]
+class ComputerTest extends AbstractEmbodiedImpactTest
+{
+    protected static string $itemtype = GlpiComputer::class;
+    protected static string $itemtype_type = GlpiComputerType::class;
+    protected static string $itemtype_model = GlpiComputerModel::class;
 }
-
-Session::checkRight(GlpiNetworkEquipmentType::$rightname, UPDATE);
-
-$item = new NetworkEquipmentType();
-
-if (isset($_POST['update'])) {
-    Session::checkRight(GlpiNetworkEquipmentType::$rightname, UPDATE);
-    $item->update($_POST);
-    Html::back();
-}
-
-Html::back();

@@ -295,7 +295,13 @@ function plugin_carbon_hook_pre_purge_assettype(CommonDBTM $item)
     ]);
 }
 
-function plugin_carbon_MassiveActions($itemtype)
+/**
+ * Massive actions enumeration hook
+ *
+ * @param class-string $itemtype
+ * @return array
+ */
+function plugin_carbon_MassiveActions($itemtype): array
 {
     switch ($itemtype) {
         case GlpiComputer::class:

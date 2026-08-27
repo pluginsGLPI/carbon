@@ -41,6 +41,7 @@ use GlpiPlugin\Carbon\Impact\Type;
 use GlpiPlugin\Carbon\Toolbox;
 use GlpiPlugin\Carbon\UsageImpact;
 use LogicException;
+use Override;
 use RuntimeException;
 use Toolbox as GlpiToolbox;
 
@@ -77,32 +78,13 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
 
     abstract protected function getVersion(): string;
 
-    /**
-     * Get the unit of an impact
-     *
-     * @param int $type
-     * @param bool $short
-     * @return string|null
-     */
-    final public function getUnit(int $type, bool $short = true): ?string
-    {
-        switch ($type) {
-            case Type::IMPACT_GWP:
-                return $short ? 'gCO2eq' : __('grams of carbon dioxyde equivalent', 'carbon');
-            case Type::IMPACT_ADP:
-                return $short ? 'gSbeq' : __('grams of antimony equivalent', 'carbon');
-            case Type::IMPACT_PE:
-                return $short ? 'J' : __('joules', 'carbon');
-        }
-
-        return null;
-    }
-
+    #[Override]
     public function setLimit(int $limit)
     {
         $this->limit = $limit;
     }
 
+    #[Override]
     public function getItemsToEvaluate(string $itemtype, array $crit = []): DBmysqlIterator
     {
         /** @var DBmysql $DB */
@@ -123,6 +105,7 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
         return $iterator;
     }
 
+    #[Override]
     public function evaluateItems(DBmysqlIterator $iterator): int
     {
         /**
@@ -158,6 +141,7 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
         return $count;
     }
 
+    #[Override]
     public function evaluateItem(): bool
     {
         $itemtype = get_class($this->item);

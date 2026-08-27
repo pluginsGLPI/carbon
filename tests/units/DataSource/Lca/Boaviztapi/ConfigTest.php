@@ -50,7 +50,7 @@ class ConfigTest extends DbTestCase
         $this->assertSame($expected, $result);
     }
 
-    public function testGetconfigTemplate()
+    public function test_getConfigTemplate_returns_full_template_when_boaviztapi_url_is_not_set_by_a_constant()
     {
         $context = [
             'current_config' => [
@@ -60,7 +60,7 @@ class ConfigTest extends DbTestCase
         ];
         $this->login('glpi', 'glpi');
         $instance = new Config();
-        putenv(Config::ENV_BOAVIZTAPI_BASE_URL); // Env var unset
+
         $result = $instance->getConfigTemplate();
         $renderer = TemplateRenderer::getInstance();
         if (!$renderer->getEnvironment()->hasExtension(StringLoaderExtension::class)) {
@@ -72,9 +72,25 @@ class ConfigTest extends DbTestCase
         $geocoding = $crawler->filter('input[type="checkbox"][name="geocoding_enabled"]');
         $this->assertEquals(1, $boaviztapi_url->count());
         $this->assertEquals(1, $geocoding->count());
+    }
 
-        putenv(Config::ENV_BOAVIZTAPI_BASE_URL . '=bar');
+    public function test_getConfigTemplate_returns_truncated_template_when_boaviztapi_url_is_set_by_a_constant()
+    {
+        $context = [
+            'current_config' => [
+                'boaviztapi_base_url' => 'foo',
+                'geocoding_enabled'   => true,
+            ],
+        ];
+        $this->login('glpi', 'glpi');
+        $instance = new Config();
+
+        define(Config::ENV_BOAVIZTAPI_BASE_URL, 'bar');
         $result = $instance->getConfigTemplate();
+        $renderer = TemplateRenderer::getInstance();
+        if (!$renderer->getEnvironment()->hasExtension(StringLoaderExtension::class)) {
+            $renderer->getEnvironment()->addExtension(new StringLoaderExtension());
+        }
         $result_html = $renderer->renderFromStringTemplate($result, $context);
         $crawler = new Crawler($result_html);
         $boaviztapi_url = $crawler->filter('input[name="boaviztapi_base_url"]');
@@ -116,21 +132,23 @@ class ConfigTest extends DbTestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testGetPluginConfigurationValue()
+    public function test_getPluginConfigurationValue_returns_data_from_config_when_not_overriden()
     {
         // Test an overridable configuration value, not overriden
         GlpiConfig::setConfigurationValues('plugin:carbon', [
             'boaviztapi_base_url' => 'bar',
         ]);
-        putenv(Config::ENV_BOAVIZTAPI_BASE_URL); // Env var unset
         $result = Config::getConfigurationValue('boaviztapi_base_url');
         $this->assertEquals('bar', $result);
+    }
 
+    public function test_getPluginConfigurationValue_returns_data_from_config_when_overriden()
+    {
         // Test an overridable configuration value, overriden by an env var
         GlpiConfig::setConfigurationValues('plugin:carbon', [
             'boaviztapi_base_url' => 'baz',
         ]);
-        putenv(Config::ENV_BOAVIZTAPI_BASE_URL . '=bar');
+        define(Config::ENV_BOAVIZTAPI_BASE_URL, 'bar');
         $result = Config::getConfigurationValue('boaviztapi_base_url');
         $this->assertEquals('bar', $result);
     }

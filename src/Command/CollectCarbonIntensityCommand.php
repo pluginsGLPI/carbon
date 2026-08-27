@@ -41,6 +41,7 @@ use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientInterface;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
+use Override;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -63,6 +64,7 @@ class CollectCarbonIntensityCommand extends AbstractCommand
     private ?ClientInterface $client = null;
     private array $zones = [];
 
+    #[Override]
     protected function configure()
     {
         $this
@@ -74,6 +76,7 @@ class CollectCarbonIntensityCommand extends AbstractCommand
         ;
     }
 
+    #[Override]
     protected function interact(InputInterface $input, OutputInterface $output)
     {
         // Set data source argument if not provided
@@ -113,6 +116,7 @@ class CollectCarbonIntensityCommand extends AbstractCommand
         }
     }
 
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         if (count($this->zones) > 1 && $input->getArgument('zone') === null) {

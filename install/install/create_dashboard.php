@@ -35,7 +35,6 @@ use Glpi\Dashboard\Item as DashboardItem;
 use Glpi\Dashboard\Right as DashboardRight;
 use Glpi\DBAL\QueryExpression;
 use GlpiPlugin\Carbon\Report;
-use Ramsey\Uuid\Uuid;
 
 /** @var DBmysql $DB */
 global $DB;
@@ -46,7 +45,7 @@ if ($dashboard->getFromDB($dashboard_key) === false) {
     // The dashboard already exists, nothing to create
     $dashboard->add([
         'key'     => $dashboard_key,
-        'name'    => 'Environmental impact',
+        'name'    => __('Environmental impact', 'carbon'),
         'context' => 'mini_core',
     ]);
     if ($dashboard->isNewItem()) {
@@ -61,27 +60,23 @@ if ($dashboard->getFromDB($dashboard_key) === false) {
 $cards_path = Plugin::getPhpDir('carbon') . '/install/data/report_dashboard.json';
 $cards = file_get_contents($cards_path);
 $cards = json_decode($cards, true);
-foreach ($cards as $key => $card) {
+foreach ($cards as $card) {
     $item = new DashboardItem();
-    $x = $card['x'];
-    $y = $card['y'];
-    $w = $card['width'];
-    $h = $card['height'];
     $rows = $item->find([
         'dashboards_dashboards_id' => $dashboard->fields['id'],
-        'card_id' => $key,
+        'card_id' => $card['card_id'],
     ]);
     if (count($rows) > 0) {
         // The card already exists
         continue;
     }
     $item->addForDashboard($dashboard->fields['id'], [[
-        'card_id' => $key,
-        'gridstack_id' => $key . '_' . Uuid::uuid4(),
-        'x'       => $x,
-        'y'       => $y,
-        'width'   => $w,
-        'height'  => $h,
+        'card_id'      => $card['card_id'],
+        'gridstack_id' => $card['gridstack_id'],
+        'x'            => $card['x'],
+        'y'            => $card['y'],
+        'width'        => $card['width'],
+        'height'       => $card['height'],
         'card_options' => $card['card_options'],
     ],
     ]);

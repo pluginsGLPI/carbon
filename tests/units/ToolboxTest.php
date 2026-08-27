@@ -585,4 +585,66 @@ class ToolboxTest extends DbTestCase
         $result = Toolbox::getInfocomLifespanInMonth($infocom);
         $this->assertSame(48, $result);
     }
+
+    public function testGetVolume()
+    {
+        $this->assertEquals('1 L', Toolbox::getVolume(1));
+        $this->assertEquals('989 L', Toolbox::getVolume(989));
+        $this->assertEquals('0.99 m³', Toolbox::getVolume(990));
+        $this->assertEquals('1 m³', Toolbox::getVolume(1000));
+        $this->assertEquals('1 dam³', Toolbox::getVolume(1000 * 1000));
+        $this->assertEquals('1 hm³', Toolbox::getVolume(1000 * 1000 * 1000));
+        $this->assertEquals('1 Km³', Toolbox::getVolume(1000 * 1000 * 1000 * 1000));
+        $this->assertEquals('1000 Km³', Toolbox::getVolume(1000 * 1000 * 1000 * 1000 * 1000));
+    }
+
+    public function testGetWeight()
+    {
+        $this->assertEquals('1 g', Toolbox::getWeight(1));
+        $this->assertEquals('989 g', Toolbox::getWeight(989));
+        $this->assertEquals('0.99 Kg', Toolbox::getWeight(990));
+        $this->assertEquals('1 Kg', Toolbox::getWeight(1000));
+        $this->assertEquals('1 t', Toolbox::getWeight(1000 * 1000));
+        $this->assertEquals('1 Kt', Toolbox::getWeight(1000 * 1000 * 1000));
+        $this->assertEquals('1 Mt', Toolbox::getWeight(1000 * 1000 * 1000 * 1000));
+        $this->assertEquals('1 Gt', Toolbox::getWeight(1000 * 1000 * 1000 * 1000 * 1000));
+        $this->assertEquals('1 Tt', Toolbox::getWeight(1000 * 1000 * 1000 * 1000 * 1000 * 1000));
+        $this->assertEquals('1 Pt', Toolbox::getWeight(1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000));
+        $this->assertEquals('1 Et', Toolbox::getWeight(1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000));
+        $this->assertEquals('1 Zt', Toolbox::getWeight(1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000));
+        $this->assertEquals('1 Yt', Toolbox::getWeight(1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000));
+        $this->assertEquals('1000 Yt', Toolbox::getWeight(1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000));
+    }
+
+    public function testGetPower()
+    {
+        $this->assertEquals('1 W', Toolbox::getPower(1));
+        $this->assertEquals('989 W', Toolbox::getPower(989));
+        $this->assertEquals('0.99 KW', Toolbox::getPower(990));
+        $this->assertEquals('1 KW', Toolbox::getPower(1000));
+        $this->assertEquals('1 MW', Toolbox::getPower(1000 * 1000));
+        $this->assertEquals('1 GW', Toolbox::getPower(1000 * 1000 * 1000));
+        $this->assertEquals('1 TW', Toolbox::getPower(1000 * 1000 * 1000 * 1000));
+        $this->assertEquals('1 PW', Toolbox::getPower(1000 * 1000 * 1000 * 1000 * 1000));
+        $this->assertEquals('1 EW', Toolbox::getPower(1000 * 1000 * 1000 * 1000 * 1000 * 1000));
+        $this->assertEquals('1 ZW', Toolbox::getPower(1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000));
+        $this->assertEquals('1 YW', Toolbox::getPower(1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000));
+        $this->assertEquals('1000 YW', Toolbox::getPower(1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000));
+    }
+
+    public function testGetEnergy()
+    {
+        $this->assertEquals('1 Wh', Toolbox::getEnergy(1));
+        $this->assertEquals('989 Wh', Toolbox::getEnergy(989));
+        $this->assertEquals('0.99 KWh', Toolbox::getEnergy(990));
+        $this->assertEquals('1 KWh', Toolbox::getEnergy(1000));
+        $this->assertEquals('1 MWh', Toolbox::getEnergy(1000 * 1000));
+        $this->assertEquals('1 GWh', Toolbox::getEnergy(1000 * 1000 * 1000));
+        $this->assertEquals('1 TWh', Toolbox::getEnergy(1000 * 1000 * 1000 * 1000));
+        $this->assertEquals('1 PWh', Toolbox::getEnergy(1000 * 1000 * 1000 * 1000 * 1000));
+        $this->assertEquals('1 EWh', Toolbox::getEnergy(1000 * 1000 * 1000 * 1000 * 1000 * 1000));
+        $this->assertEquals('1 ZWh', Toolbox::getEnergy(1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000));
+        $this->assertEquals('1 YWh', Toolbox::getEnergy(1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000));
+        $this->assertEquals('1000 YWh', Toolbox::getEnergy(1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000));
+    }
 }

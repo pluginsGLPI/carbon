@@ -125,6 +125,7 @@ class PluginUpgradeTest extends PluginInstallTest
             'ElectricityMap_zone_setup_complete' => '0',
             'demo'                               => '0',
             'dbversion'                          => PLUGIN_CARBON_SCHEMA_VERSION,
+            'ember_dataset_date'                 => EMBER_DATASET_DATE,
         ];
 
         $config = Config::getConfigurationValues('plugin:' . TEST_PLUGIN_NAME);

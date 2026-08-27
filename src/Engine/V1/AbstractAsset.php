@@ -46,6 +46,7 @@ use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 use LogicException;
+use Override;
 
 abstract class AbstractAsset implements EngineInterface
 {
@@ -125,6 +126,7 @@ abstract class AbstractAsset implements EngineInterface
      * Returns the declared power for an asset
      * @return TrackedInt
      */
+    #[Override]
     public function getPower(): TrackedInt
     {
         /** @var DBmysql $DB */

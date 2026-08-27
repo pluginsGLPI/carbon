@@ -47,9 +47,15 @@ use Toolbox as GlpiToolbox;
 
 class Widget extends GlpiDashboardWidget
 {
-    public static function WidgetTypes(): array
+    /**
+     * Get the description of additional widget types
+     *
+     * @param null|array $types existing types
+     * @return array
+     */
+    public static function WidgetTypes(?array $types = null): array
     {
-        $types = [
+        $types = array_merge($types ?? [], [
             // Informative
             'information_video' => [
                 'label'    => __('Environmental impact information video', 'carbon'),
@@ -111,7 +117,7 @@ class Widget extends GlpiDashboardWidget
                 'width'    => 6,
                 'height'   => 3,
             ],
-        ];
+        ]);
 
         // Data diagnostic
         if (in_array(Computer::class, PLUGIN_CARBON_TYPES)) {

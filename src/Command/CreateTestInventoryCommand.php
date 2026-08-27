@@ -41,6 +41,7 @@ use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\UsageInfo;
 use Location;
+use Override;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -123,6 +124,7 @@ class CreateTestInventoryCommand extends Command
 
     private OutputInterface $output;
 
+    #[Override]
     protected function configure()
     {
         $this
@@ -138,6 +140,7 @@ class CreateTestInventoryCommand extends Command
         );
     }
 
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->output = $output;

@@ -45,6 +45,7 @@ use Html;
 use Infocom;
 use Monitor as GlpiMonitor;
 use NetworkEquipment as GlpiNetworkEquipment;
+use Override;
 use Toolbox as GlpiToolbox;
 
 /**
@@ -57,16 +58,19 @@ class UsageInfo extends CommonDBChild
 
     public static $rightname = 'carbon:report';
 
+    #[Override]
     public static function getTypeName($nb = 0)
     {
         return __('Usage informations', 'Carbon');
     }
 
+    #[Override]
     public static function getIcon()
     {
         return 'fa-solid fa-solar-panel';
     }
 
+    #[Override]
     public function canPurgeItem(): bool
     {
         if ($this->isNewItem()) {
@@ -86,6 +90,7 @@ class UsageInfo extends CommonDBChild
         return $item->canDelete();
     }
 
+    #[Override]
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         $tabName = '';
@@ -105,6 +110,7 @@ class UsageInfo extends CommonDBChild
      * @param int $withtemplate
      * @return void
      */
+    #[Override]
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
         /** @var CommonDBTM $item */
@@ -129,6 +135,7 @@ class UsageInfo extends CommonDBChild
         }
     }
 
+    #[Override]
     public function post_updateItem($history = true)
     {
         parent::post_updateItem($history);
@@ -173,6 +180,7 @@ class UsageInfo extends CommonDBChild
         ]);
     }
 
+    #[Override]
     public function rawSearchOptions()
     {
         $tab = parent::rawSearchOptions();
@@ -260,7 +268,7 @@ class UsageInfo extends CommonDBChild
             $usage_labels[$impact_type] = Type::getUsageImpactLabel($impact_type);
         }
 
-        $usage_imapct_action_url    = $CFG_GLPI['root_doc'] . '/plugins/carbon/front/usageimpact.form.php';
+        $usage_impact_action_url    = $CFG_GLPI['root_doc'] . '/plugins/carbon/front/usageimpact.form.php';
         $embodied_impact_action_url = $CFG_GLPI['root_doc'] . '/plugins/carbon/front/embodiedimpact.form.php';
         TemplateRenderer::getInstance()->display('@carbon/environmentalimpact-item.html.twig', [
             'usage_info'      => $usage_info,
@@ -273,7 +281,7 @@ class UsageInfo extends CommonDBChild
             'embodied_tooltips' => $embodied_tooltips,
             'usage_tooltips' => $usage_tooltips,
             'usage_carbon_emission_graph' => Widget::DisplayGraphUsageCarbonEmissionPerMonth($data),
-            'usage_impact_action_url'    => $usage_imapct_action_url,
+            'usage_impact_action_url'    => $usage_impact_action_url,
             'embodied_impact_action_url' => $embodied_impact_action_url,
         ]);
     }

@@ -39,18 +39,17 @@ use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
 use DBmysql;
 use DbUtils;
-use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\Engine\V1\Computer as EngineComputer;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\Source_Zone;
-use GlpiPlugin\Carbon\UsageImpact;
 use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\Zone;
 use Infocom;
 use Location as GlpiLocation;
+use Override;
 
 class Computer extends AbstractAsset
 {
@@ -58,11 +57,13 @@ class Computer extends AbstractAsset
     protected static string $type_itemtype  = GlpiComputerType::class;
     protected static string $model_itemtype = GlpiComputerModel::class;
 
+    #[Override]
     public static function getEngine(CommonDBTM $item): EngineInterface
     {
         return new EngineComputer($item);
     }
 
+    #[Override]
     public function getEvaluableQuery(array $crit = [], bool $entity_restrict = true): array
     {
         $item_table = self::$itemtype::getTable();
@@ -195,6 +196,7 @@ class Computer extends AbstractAsset
         return $request;
     }
 
+    #[Override]
     public static function getHistorizableDiagnosis(CommonDBTM $item): ?array
     {
         /** @var DBmysql $DB */
@@ -271,20 +273,5 @@ class Computer extends AbstractAsset
         $status['has_decommission_date'] = ($data['decommission_date'] !== null);
 
         return $status;
-    }
-
-    public static function showHistorizableDiagnosis(CommonDBTM $item)
-    {
-        $status = self::getHistorizableDiagnosis($item);
-        $usage_impact = new UsageImpact();
-        $usage_impact->getFromDBByCrit([
-            'itemtype' => $item::getType(),
-            'items_id' => $item->getID(),
-        ]);
-        TemplateRenderer::getInstance()->display('@carbon/history/status-item.html.twig', [
-            'usage_impact' => $usage_impact,
-            'has_status' => ($status !== null),
-            'status' => $status,
-        ]);
     }
 }

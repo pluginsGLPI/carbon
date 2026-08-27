@@ -41,6 +41,7 @@ use GlpiPlugin\Carbon\UsageInfo;
 use Monitor as GlpiMonitor;
 use MonitorModel;
 use MonitorType as GlpiMonitorType;
+use Override;
 
 /**
  * Compute CO2 emission of a computer
@@ -52,6 +53,7 @@ class Monitor extends AbstractSwitchable
     protected static string $model_itemtype = MonitorModel::class;
     protected static string $plugin_type_itemtype = MonitorType::class;
 
+    #[Override]
     public function getUsageProfile(): ?ComputerUsageProfile
     {
         /** @var DBmysql $DB */

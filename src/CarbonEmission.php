@@ -39,17 +39,21 @@ use DateTimeInterface;
 use DBmysql;
 use Entity;
 use Location;
+use Override;
+use Session;
 
 class CarbonEmission extends CommonDBChild
 {
     public static $itemtype = 'itemtype';
     public static $items_id = 'items_id';
 
+    #[Override]
     public static function getTypeName($nb = 0)
     {
         return _n("Carbon Emission", "Carbon Emissions", $nb, 'carbon');
     }
 
+    #[Override]
     public function prepareInputForAdd($input)
     {
         $input = parent::prepareInputForAdd($input);
@@ -59,6 +63,7 @@ class CarbonEmission extends CommonDBChild
         return $input;
     }
 
+    #[Override]
     public function rawSearchOptions()
     {
         $tab = parent::rawSearchOptions();
@@ -207,5 +212,23 @@ class CarbonEmission extends CommonDBChild
         /** @var ?array<float> $row */
         $row = $result->current();
         return $row['total_emissions'] ?? null;
+    }
+
+    /**
+     * Delete all data
+     *
+     * @return bool true on succcess
+     */
+    public function truncate(): bool
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        if (!Session::haveRight(Config::$rightname, READ) || !static::canPurge()) {
+            Session::addMessageAfterRedirect(__('Full reset denied.', 'carbon'), false, ERROR);
+            return false;
+        }
+
+        return $DB->delete(static::getTable(), [1]);
     }
 }

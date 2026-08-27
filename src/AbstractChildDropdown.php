@@ -36,12 +36,14 @@ use CommonDBChild;
 use CommonDBTM;
 use CommonGLPI;
 use Glpi\Application\View\TemplateRenderer;
+use Override;
 use Session;
 
-abstract class AbstractType extends CommonDBChild
+abstract class AbstractChildDropdown extends CommonDBChild
 {
     public static $rightname = 'dropdown';
 
+    #[Override]
     public static function getIcon(): string
     {
         return 'fa-solid fa-solar-panel';
@@ -50,11 +52,13 @@ abstract class AbstractType extends CommonDBChild
     /**
      * @todo fix type name
      */
+    #[Override]
     public static function getTypeName($nb = 0)
     {
         return __('Environmental impact', 'carbon');
     }
 
+    #[Override]
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         $tabName = '';
@@ -67,13 +71,14 @@ abstract class AbstractType extends CommonDBChild
     }
 
     /**
-     * Undocumented function
+     * Select the tab to display
      *
      * @param CommonGLPI $item
      * @param int $tabnum
      * @param int $withtemplate
      * @return void
      */
+    #[Override]
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
         /** @var CommonDBTM $item */

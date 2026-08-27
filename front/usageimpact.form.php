@@ -32,6 +32,7 @@
 
 use Glpi\Event;
 use Glpi\Exception\Http\NotFoundHttpException;
+use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\CommonAsset;
 use GlpiPlugin\Carbon\Impact\History\AbstractAsset;
 use GlpiPlugin\Carbon\Impact\Usage\Engine;
@@ -47,7 +48,6 @@ if (!Plugin::isPluginActive('carbon')) {
 
 Session::checkRight(UsageInfo::$rightname, READ);
 
-
 if (isset($_POST['update'])) {
     $usage_info = new UsageInfo();
     $usage_info->check($_POST['id'], UPDATE);
@@ -61,6 +61,14 @@ if (isset($_POST['update'])) {
         sprintf(__('%s updates an item'), $_SESSION['glpiname'])
     );
     Html::back();
+} elseif (isset($_POST['reset_all'])) {
+    // Rights checks are in the method
+    $usage_impact = new UsageImpact();
+    $usage_impact->truncate();
+
+    $usage_ghg_impact = new CarbonEmission();
+    $usage_ghg_impact->truncate();
+
 } elseif (isset($_POST['reset'])) {
     if (!isset($_POST['itemtype']) || !isset($_POST['items_id'])) {
         Session::addMessageAfterRedirect(__('Missing arguments in request.', 'carbon'), false, ERROR);

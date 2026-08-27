@@ -232,11 +232,10 @@ class Toolbox
     /**
      * Format a weight passing a weight in grams
      *
-     * @param float $weight  Weight in grams
-     *
+     * @param float $v  Weight in grams
      * @return string  formatted weight
      **/
-    public static function getWeight(float $weight): string
+    public static function getWeight(float $v): string
     {
         //TRANS: list of unit (o for octet)
         $units = [
@@ -252,28 +251,17 @@ class Toolbox
             __('Zt', 'carbon'),
             __('Yt', 'carbon'),
         ];
-        $multiple = 990;
-        foreach ($units as $human_readable_unit) {
-            if ($weight < $multiple) {
-                break;
-            }
-            $weight /= 1000;
-        }
-
-        $weight = self::dynamicRound($weight);
-
-        //TRANS: %1$s is a number maybe float or string and %2$s the unit
-        return sprintf(__('%1$s %2$s'), $weight, $human_readable_unit);
+        return self::scaleNumber($v, $units);
     }
 
     /**
      * Format a power passing a power in grams
      *
-     * @param float $p  Power in Watt
+     * @param float $v  Power in Watt
      *
      * @return string  formatted power
      **/
-    public static function getPower(float $p): string
+    public static function getPower(float $v): string
     {
         //TRANS: list of unit (W for watt)
         $units = [
@@ -287,28 +275,17 @@ class Toolbox
             __('ZW', 'carbon'),
             __('YW', 'carbon'),
         ];
-        $multiple = 990;
-        foreach ($units as $human_readable_unit) {
-            if ($p < $multiple) {
-                break;
-            }
-            $p /= 1000;
-        }
-
-        $p = self::dynamicRound($p);
-
-        //TRANS: %1$s is a number maybe float or string and %2$s the unit
-        return sprintf(__('%1$s %2$s'), $p, $human_readable_unit);
+        return self::scaleNumber($v, $units);
     }
 
     /**
      * Format a energy in watt.hour
      *
-     * @param float $p  Energy in watt.hour
+     * @param float $v  Energy in watt.hour
      *
      * @return string  formatted energy
      **/
-    public static function getEnergy(float $p): string
+    public static function getEnergy($v): string
     {
         //TRANS: list of unit (Wh for watt.hour)
         $units = [
@@ -322,18 +299,53 @@ class Toolbox
             __('ZWh', 'carbon'),
             __('YWh', 'carbon'),
         ];
+        return self::scaleNumber($v, $units);
+    }
+
+    /**
+     * Format a volume in L
+     *
+     * @param float $v  Volume in L
+     *
+     * @return string  formatted volume
+     **/
+    public static function getVolume(float $v): string
+    {
+        //TRANS: list of unit
+        $units = [
+            __('L', 'carbon'),
+            __('m³', 'carbon'),
+            __('dam³', 'carbon'),
+            __('hm³', 'carbon'),
+            __('Km³', 'carbon'),
+        ];
+        return self::scaleNumber($v, $units);
+    }
+
+    /**
+     * Format a quantity in a given dimension
+     *
+     * @param float $v  quantity
+     * @param array $units multiple units for a dimension
+     *
+     * @return string  formatted volume
+     **/
+    protected static function scaleNumber(float $v, array $units): string
+    {
         $multiple = 990;
-        foreach ($units as $human_readable_unit) {
-            if ($p < $multiple) {
+        $human_readable_unit = reset($units);
+        foreach ($units as $key => $human_readable_unit) {
+            if (abs($v) >= $multiple && isset($units[$key + 1])) {
+                $v /= 1000;
+            } else {
                 break;
             }
-            $p /= 1000;
         }
 
-        $p = self::dynamicRound($p);
+        $v = self::dynamicRound($v);
 
         //TRANS: %1$s is a number maybe float or string and %2$s the unit
-        return sprintf(__('%1$s %2$s'), $p, $human_readable_unit);
+        return sprintf(__('%1$s %2$s'), $v, $human_readable_unit);
     }
 
     public static function dynamicRound(float $number): float
@@ -364,18 +376,16 @@ class Toolbox
             case 'g':
                 return self::getWeight($value) . $unit[1];
             case 'J':
-                // To be converted into watt.hour
+                // Value is in J, convert it into Wh
                 return self::getEnergy($value / 3600) . $unit[1];
             case 'Wh':
                 return self::getEnergy($value) . $unit[1];
             case 'm³':
-                // Value is in m^3
-                return sprintf(__('%1$s %2$s', 'carbon'), $value * 1000, 'L');
-            case 'mol':
-                break;
+                // Value is in m^3, convert it into L
+                return self::getVolume($value * 1000) . $unit[1];
         }
 
-        return sprintf(__('%1$s %2$s', 'carbon'), $value, implode(' ', $unit));
+        return self::dynamicRound($value) . ' ' . implode(' ', $unit);
     }
 
     /**

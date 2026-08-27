@@ -36,20 +36,23 @@ use Exception;
 use GlpiPlugin\Carbon\Config as PluginConfig;
 use GlpiPlugin\Carbon\DataSource\ConfigInterface;
 use GlpiPlugin\Carbon\DataSource\RestApiClient;
+use Override;
 use Session;
 
 class Config implements ConfigInterface
 {
     public const ENV_BOAVIZTAPI_BASE_URL = 'GLPI_PLUGIN_CARBON_BOAVIZTAPI_BASE_URL';
 
+    #[Override]
     public static function getSecuredConfigs(): array
     {
         return [];
     }
 
+    #[Override]
     public function getConfigTemplate(): string
     {
-        $hide_boaviztapi_base_url = (getenv(self::ENV_BOAVIZTAPI_BASE_URL) !== false);
+        $hide_boaviztapi_base_url = defined(self::ENV_BOAVIZTAPI_BASE_URL) && constant(self::ENV_BOAVIZTAPI_BASE_URL) !== null;
         $commercial_url = 'https://boavizta.org/';
         $twig = <<<TWIG
         {% import "components/form/fields_macros.html.twig" as fields %}
@@ -64,6 +67,10 @@ class Config implements ConfigInterface
 TWIG;
         if (!$hide_boaviztapi_base_url) {
             $twig .= <<<TWIG
+            {{ fields.smallTitle(
+                __('Boavizta does not provide any service. You are responsible for hosting the server. Read the documentation of the plugin.', 'carbon'),
+            ) }}
+
             {{ fields.textField(
                 'boaviztapi_base_url',
                 current_config['boaviztapi_base_url'],
@@ -86,6 +93,7 @@ TWIG;
         return $twig;
     }
 
+    #[Override]
     public function configUpdate(array $input): array
     {
         if (isset($input['boaviztapi_base_url']) && (string) $input['boaviztapi_base_url'] !== '') {
@@ -115,9 +123,9 @@ TWIG;
 
     public static function getConfigurationValue(string $name)
     {
-        if ($name === 'boaviztapi_base_url') {
-            $value = getenv(self::ENV_BOAVIZTAPI_BASE_URL);
-            if ($value !== false) {
+        if ($name === 'boaviztapi_base_url' && defined(self::ENV_BOAVIZTAPI_BASE_URL)) {
+            $value = constant(self::ENV_BOAVIZTAPI_BASE_URL);
+            if ($value !== null) {
                 return $value;
             }
         }

@@ -37,17 +37,6 @@
         <input type="hidden" name="config_context" value="plugin:carbon">
         <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token() }}">
 
-        {# {{ fields.largeTitle(
-            __('Electricity maps', 'carbon'),
-            'fas fa-gears'
-        ) }}
-
-        {{ fields.passwordField(
-            'electricitymap_api_key',
-            current_config['electricitymap_api_key'],
-            __('Key for electricitymap.org API', 'carbon')
-        ) }} #}
-
         {{ fields.largeTitle(
             __('Impact engine', 'carbon'),
             'fas fa-gears'
@@ -73,4 +62,40 @@
             <span>{{ _x('button', 'Save') }}</span>
         </button>
     </form>
+
+    <div style="height: 10em"></div>
+
+    {{ fields.largeTitle(
+        __('Danger zone', 'carbon'),
+        'fas fa-bomb'
+    ) }}
+
+    <div class="border border-danger rounded p-3">
+        <div class="table-responsive">
+            <table class="table table-borderless mb-0">
+                <tbody>
+                    <tr>
+                        <td>{{ __('Reset usage impacts. This will delete all calculated usage impacts for all assets.', 'carbon') }}</td>
+                        <td class="text-end">
+                            {% set reset_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', reset_all: ''}" %}
+                            <a class="btn btn-outline-warning me-2" onclick='{{ usage_impact_action_url|raw }};'>
+                                <i class="ti ti-device-floppy"></i>
+                                <span>{{ _x('button', 'Reset usage impacts') }}</span>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>{{ __('Reset embodied impacts. This will delete all calculated embodied impacts for all assets.', 'carbon') }}</td>
+                        <td class="text-end">
+                            {% set reset_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', reset_all: ''}" %}
+                            <a class="btn btn-outline-warning me-2" onclick='{{ embodied_impact_action_url|raw }};'>
+                                <i class="ti ti-device-floppy"></i>
+                                <span>{{ _x('button', 'Reset embodied impacts') }}</span>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 {% endif %}

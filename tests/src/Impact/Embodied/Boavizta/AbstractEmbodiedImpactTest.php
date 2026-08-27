@@ -30,24 +30,16 @@
  * -------------------------------------------------------------------------
  */
 
-use Glpi\Exception\Http\NotFoundHttpException;
-use GlpiPlugin\Carbon\ComputerModel;
+namespace GlpiPlugin\Carbon\Tests\Impact\Embodied\Boavizta;
 
-include(__DIR__ . '/../../../inc/includes.php');
+use GlpiPlugin\Carbon\Impact\Embodied\AbstractEmbodiedImpact;
+use GlpiPlugin\Carbon\Tests\Impact\Embodied\AbstractCommonEmbodiedImpactTest;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-if (!Plugin::isPluginActive('carbon')) {
-    throw new NotFoundHttpException();
+#[CoversClass(AbstractEmbodiedImpact::class)]
+class AbstractEmbodiedImpactTest extends AbstractCommonEmbodiedImpactTest
+{
+    protected static string $itemtype = '';
+    protected static string $itemtype_type = '';
+    protected static string $itemtype_model = '';
 }
-
-Session::checkRight('config', UPDATE);
-
-$item = new ComputerModel();
-
-if (isset($_POST['update'])) {
-    // Add a new Form
-    Session::checkRight('entity', UPDATE);
-    $item->update($_POST);
-    Html::back();
-}
-
-Html::back();

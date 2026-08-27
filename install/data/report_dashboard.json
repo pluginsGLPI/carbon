@@ -1,5 +1,7 @@
-{
-    "plugin_carbon_report_usage_carbon_emission_ytd": {
+[
+    {
+        "gridstack_id": "plugin_carbon_report_usage_carbon_emission_ytd_1879b1f9-ca39-4a39-87a8-c58e2e71418d",
+        "card_id": "plugin_carbon_report_usage_carbon_emission_ytd",
         "x": 0,
         "y": 0,
         "width": 5,
@@ -12,7 +14,9 @@
             "point_labels": "0"
         }
     },
-    "plugin_carbon_report_usage_carbon_emission_two_last_months": {
+    {
+        "gridstack_id": "plugin_carbon_report_usage_carbon_emission_two_last_months_8aa072d3-5674-4be9-b0f0-ebc22a374593",
+        "card_id": "plugin_carbon_report_usage_carbon_emission_two_last_months",
         "x": 5,
         "y": 0,
         "width": 5,
@@ -25,7 +29,9 @@
             "point_labels": "0"
         }
     },
-    "plugin_carbon_report_information_video": {
+    {
+        "gridstack_id": "plugin_carbon_report_information_video_178e3cad-b679-45a5-95d2-3e8fa23654ab",
+        "card_id": "plugin_carbon_report_information_video",
         "x": 15,
         "y": 3,
         "width": 5,
@@ -38,7 +44,9 @@
             "point_labels": "0"
         }
     },
-    "plugin_carbon_report_methodology_information": {
+    {
+        "gridstack_id": "plugin_carbon_report_methodology_information_1df49777-aaa8-4a8b-bf7f-725ecd0a2e54",
+        "card_id": "plugin_carbon_report_methodology_information",
         "x": 0,
         "y": 12,
         "width": 10,
@@ -51,7 +59,9 @@
             "point_labels": "0"
         }
     },
-    "plugin_carbon_report_biggest_gwp_per_model": {
+    {
+        "gridstack_id": "plugin_carbon_report_biggest_gwp_per_model_56915732-1459-4e22-a6f2-e238224b201b",
+        "card_id": "plugin_carbon_report_biggest_gwp_per_model",
         "x": 0,
         "y": 6,
         "width": 10,
@@ -64,7 +74,9 @@
             "point_labels": "0"
         }
     },
-    "plugin_carbon_report_usage_carbon_emissions_graph": {
+    {
+        "gridstack_id": "plugin_carbon_report_usage_carbon_emissions_graph_1a51df14-6e79-47a2-b0bd-7fdbbce974a2",
+        "card_id": "plugin_carbon_report_usage_carbon_emissions_graph",
         "x": 10,
         "y": 6,
         "width": 10,
@@ -77,7 +89,9 @@
             "point_labels": "0"
         }
     },
-    "plugin_carbon_report_embodied_adp_impact": {
+    {
+        "gridstack_id": "plugin_carbon_report_embodied_adp_impact_59fff680-353f-4911-8a3d-a5d9ec315c44",
+        "card_id": "plugin_carbon_report_embodied_adp_impact",
         "x": 5,
         "y": 3,
         "width": 5,
@@ -90,7 +104,9 @@
             "limit": "7"
         }
     },
-    "plugin_carbon_report_embodied_gwp_impact": {
+    {
+        "gridstack_id": "plugin_carbon_report_embodied_gwp_impact_d906cdee-207d-4f02-994e-6c3fa87b0f7a",
+        "card_id": "plugin_carbon_report_embodied_gwp_impact",
         "x": 10,
         "y": 0,
         "width": 5,
@@ -103,7 +119,9 @@
             "limit": "7"
         }
     },
-    "plugin_carbon_report_embodied_pe_impact": {
+    {
+        "gridstack_id": "plugin_carbon_report_embodied_pe_impact_c0f72389-9685-49ae-9ec1-312019f9af6b",
+        "card_id": "plugin_carbon_report_embodied_pe_impact",
         "x": 0,
         "y": 3,
         "width": 5,
@@ -116,20 +134,9 @@
             "limit": "7"
         }
     },
-    "plugin_carbon_report_usage_adp_impact": {
-        "x": 10,
-        "y": 3,
-        "width": 5,
-        "height": 3,
-        "card_options": {
-            "color": "#fccd3e",
-            "widgettype": "impact_criteria_number",
-            "use_gradient": "0",
-            "point_labels": "0",
-            "limit": "7"
-        }
-    },
-    "plugin_carbon_assets_completeness": {
+    {
+        "gridstack_id": "plugin_carbon_assets_completeness_2390e460-f05b-4319-8ebe-c40813e39c0f",
+        "card_id": "plugin_carbon_assets_completeness",
         "x": 15,
         "y": 0,
         "width": 5,
@@ -141,5 +148,22 @@
             "point_labels": "0",
             "limit": "7"
         }
+    },
+    {
+        "gridstack_id": "plugin_carbon_report_usage_adp_impact_1595fe99-c0bf-4d9c-896c-a887dae91d9d",
+        "card_id": "plugin_carbon_report_usage_adp_impact",
+        "x": 10,
+        "y": 3,
+        "width": 5,
+        "height": 3,
+        "card_options": {
+            "color": "#fccd3e",
+            "widgettype": "impact_criteria_number",
+            "palette": "tab10",
+            "use_gradient": "0",
+            "point_labels": "1",
+            "legend": "1",
+            "limit": "7"
+        }
     }
-}
+]

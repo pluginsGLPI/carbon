@@ -39,7 +39,6 @@ use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
 use DBmysql;
 use DbUtils;
-use Glpi\Application\View\TemplateRenderer;
 use Glpi\Asset\Asset_PeripheralAsset;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
@@ -47,12 +46,12 @@ use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Engine\V1\Monitor as EngineMonitor;
 use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\MonitorType;
-use GlpiPlugin\Carbon\UsageImpact;
 use Infocom;
 use Location as GlpiLocation;
 use Monitor as GlpiMonitor;
 use MonitorModel as GlpiMonitorModel;
 use MonitorType as GlpiMonitorType;
+use Override;
 
 class Monitor extends AbstractAsset
 {
@@ -60,11 +59,13 @@ class Monitor extends AbstractAsset
     protected static string $type_itemtype  = GlpiMonitorType::class;
     protected static string $model_itemtype = GlpiMonitorModel::class;
 
+    #[Override]
     public static function getEngine(CommonDBTM $item): EngineInterface
     {
         return new EngineMonitor($item);
     }
 
+    #[Override]
     public function getEvaluableQuery(array $crit = [], bool $entity_restrict = true): array
     {
         // Monitors must be attached to a computer to be used
@@ -183,6 +184,7 @@ class Monitor extends AbstractAsset
         return $request;
     }
 
+    #[Override]
     public static function getHistorizableDiagnosis(CommonDBTM $item): ?array
     {
         /** @var DBmysql $DB */
@@ -259,19 +261,5 @@ class Monitor extends AbstractAsset
         $status['has_decommission_date'] = ($data['decommission_date'] !== null);
 
         return $status;
-    }
-
-    public static function showHistorizableDiagnosis(CommonDBTM $item)
-    {
-        $status = self::getHistorizableDiagnosis($item);
-        $usage_impact = new UsageImpact();
-        $usage_impact->getFromDBByCrit([
-            'itemtype' => $item::getType(),
-            'items_id' => $item->getID(),
-        ]);
-        TemplateRenderer::getInstance()->display('@carbon/history/status-item.html.twig', [
-            'has_status' => ($status !== null),
-            'status' => $status,
-        ]);
     }
 }

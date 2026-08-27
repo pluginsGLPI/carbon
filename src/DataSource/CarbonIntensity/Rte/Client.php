@@ -45,6 +45,7 @@ use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Toolbox;
 use GlpiPlugin\Carbon\Zone;
+use Override;
 use RuntimeException;
 use Safe\Exceptions\FilesystemException;
 
@@ -92,21 +93,25 @@ class Client extends AbstractClient
         }
     }
 
+    #[Override]
     public function getSourceName(): string
     {
         return 'RTE';
     }
 
+    #[Override]
     public function getDataInterval(): string
     {
         return 'P15M';
     }
 
+    #[Override]
     public function getHardStartDate(): DateTimeImmutable
     {
         return DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '2012-01-01T00:00:00+00:00');
     }
 
+    #[Override]
     public function getMaxIncrementalAge(): DateTimeImmutable
     {
         $recent_limit = new DateTime('15 days ago');
@@ -115,6 +120,7 @@ class Client extends AbstractClient
         return DateTimeImmutable::createFromMutable($recent_limit);
     }
 
+    #[Override]
     public function getSupportedZones(): array
     {
         return [
@@ -122,6 +128,7 @@ class Client extends AbstractClient
         ];
     }
 
+    #[Override]
     public function createZones(): int
     {
         $source = new Source();
@@ -169,6 +176,7 @@ class Client extends AbstractClient
      * @param Source_Zone $source_zone
      * @return array
      */
+    #[Override]
     public function fetchDay(DateTimeImmutable $day, Source_Zone $source_zone): array
     {
         $stop = $day->add(new DateInterval('P1D'));
@@ -230,6 +238,7 @@ class Client extends AbstractClient
      * @param int $dataset
      * @return array
      */
+    #[Override]
     public function fetchRange(DateTimeImmutable $start, DateTimeImmutable $stop, Source_Zone $source_zone, int $dataset = self::DATASET_REALTIME): array
     {
         // Build realtime and consolidated paths
@@ -344,6 +353,7 @@ class Client extends AbstractClient
      * @param int $step
      * @return array
      */
+    #[Override]
     protected function formatOutput(array $response, int $step): array
     {
         $this->step = $this->detectStep($response);

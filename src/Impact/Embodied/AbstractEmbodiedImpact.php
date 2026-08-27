@@ -43,6 +43,7 @@ use GlpiPlugin\Carbon\EmbodiedImpact;
 use GlpiPlugin\Carbon\Impact\Type;
 use GuzzleHttp\Exception\ConnectException;
 use LogicException;
+use Override;
 use RuntimeException;
 use Session;
 
@@ -79,32 +80,13 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
 
     abstract protected function getVersion(): string;
 
-    /**
-     * Get the unit of an impact
-     *
-     * @param int $type
-     * @param bool $short
-     * @return string|null
-     */
-    final public function getUnit(int $type, bool $short = true): ?string
-    {
-        switch ($type) {
-            case Type::IMPACT_GWP:
-                return $short ? 'gCO2eq' : __('grams of carbon dioxyde equivalent', 'carbon');
-            case Type::IMPACT_ADP:
-                return $short ? 'gSbeq' : __('grams of antimony equivalent', 'carbon');
-            case Type::IMPACT_PE:
-                return $short ? 'J' : __('joules', 'carbon');
-        }
-
-        return null;
-    }
-
+    #[Override]
     public function setLimit(int $limit)
     {
         $this->limit = $limit;
     }
 
+    #[Override]
     public static function getItemsToEvaluate(string $itemtype, array $crit = []): DBmysqlIterator
     {
         /** @var DBmysql $DB */
@@ -121,6 +103,7 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         return $iterator;
     }
 
+    #[Override]
     public function evaluateItem(): bool
     {
         $itemtype = get_class($this->item);
@@ -182,6 +165,7 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         return false;
     }
 
+    #[Override]
     public static function getEvaluableQuery(string $itemtype, array $crit = [], bool $entity_restrict = true): array
     {
         $item_table = getTableForItemType($itemtype);

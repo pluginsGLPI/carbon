@@ -303,6 +303,7 @@ class PluginInstallTest extends CommonTestCase
             'demo'                   => '1',
             'geocoding_enabled'      => '0',
             'dbversion'              => PLUGIN_CARBON_SCHEMA_VERSION,
+            'ember_dataset_date'     => EMBER_DATASET_DATE,
         ];
 
         $config = Config::getConfigurationValues('plugin:' . TEST_PLUGIN_NAME);
@@ -955,7 +956,6 @@ class PluginInstallTest extends CommonTestCase
         $this->assertSame($setup_version, $composer['version'] ?? null);
         $this->assertSame($setup_version, $package['version'] ?? null);
         $this->assertSame($setup_version, $package_lock['version'] ?? null);
-
         // Find in packages[] the entry whose name is carbon and check its version is the same as setup_version
         $carbon_package = null;
         foreach ($package_lock['packages'] as $package) {

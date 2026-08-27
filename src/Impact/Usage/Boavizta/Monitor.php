@@ -46,6 +46,7 @@ use GlpiPlugin\Carbon\UsageInfo;
 use Monitor as GlpiMonitor;
 use MonitorModel as GlpiMonitorModel;
 use MonitorType as GlpiMonitorType;
+use Override;
 
 class Monitor extends AbstractAsset
 {
@@ -55,6 +56,7 @@ class Monitor extends AbstractAsset
 
     protected string $endpoint        = 'peripheral/monitor';
 
+    #[Override]
     public function getEvaluableQuery(string $itemtype, array $crit = [], bool $entity_restrict = true): array
     {
         // TODO : build the evaluable query from the computer evaluable query
@@ -108,6 +110,7 @@ class Monitor extends AbstractAsset
         return $request;
     }
 
+    #[Override]
     protected function doEvaluation(CommonDBTM $item): ?array
     {
         // Ask for embodied impact only
@@ -144,6 +147,7 @@ class Monitor extends AbstractAsset
         return $impacts;
     }
 
+    #[Override]
     protected function analyzeHardware(): array
     {
         $configuration = [];

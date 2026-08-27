@@ -42,6 +42,7 @@ use GlpiPlugin\Carbon\Impact\Type;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
+use Override;
 use RuntimeException;
 
 class Client extends AbstractClient
@@ -91,6 +92,7 @@ class Client extends AbstractClient
         }
     }
 
+    #[Override]
     public function getSourceName(): string
     {
         return self::$source_name;
@@ -271,7 +273,7 @@ class Client extends AbstractClient
         return $impacts;
     }
 
-    protected function parseCriteria(string $name, $impact): ?TrackedFloat
+    protected function parseCriteria(string $name, array|string $impact): ?TrackedFloat
     {
         if ($impact === 'not implemented') {
             return null;

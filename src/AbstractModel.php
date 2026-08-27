@@ -32,59 +32,17 @@
 
 namespace GlpiPlugin\Carbon;
 
-use CommonDBChild;
 use CommonDBTM;
 use CommonGLPI;
 use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\DataTracking\TrackedInt;
 use GlpiPlugin\Carbon\Impact\Type;
+use Override;
 use Session;
 
-class AbstractModel extends CommonDBChild
+class AbstractModel extends AbstractChildDropdown
 {
-    public static $rightname = 'dropdown';
-
-    public static function getIcon(): string
-    {
-        return 'fa-solid fa-solar-panel';
-    }
-
-    public static function getTypeName($nb = 0)
-    {
-        return __('Environmental impact', 'carbon');
-    }
-
-    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
-    {
-        $tabName = '';
-        if (!$withtemplate) {
-            if ($item->getType() == static::$itemtype) {
-                return self::createTabEntry(__('Carbon', 'carbon'), 0);
-            }
-        }
-        return $tabName;
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @param CommonGLPI $item
-     * @param int $tabnum
-     * @param int $withtemplate
-     * @return void
-     */
-    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
-    {
-        /** @var CommonDBTM $item */
-        if ($item->getType() !== static::$itemtype) {
-            return;
-        }
-
-        $model = new static();
-        $model->getOrCreate($item);
-        $model->showForItemType($model->getID());
-    }
-
+    #[Override]
     public function prepareInputForUpdate($input)
     {
         $keys = Type::getImpactTypes();
@@ -151,6 +109,7 @@ class AbstractModel extends CommonDBChild
         ]);
     }
 
+    #[Override]
     public function rawSearchOptions()
     {
         $tab = parent::rawSearchOptions();

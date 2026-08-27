@@ -41,7 +41,7 @@ use Migration;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use Plugin;
 
-class migration_to_1_2_0_Test extends DbTestCase
+class migration_to_1_2_0_Test extends CommonTestCase
 {
     public function setUp(): void
     {

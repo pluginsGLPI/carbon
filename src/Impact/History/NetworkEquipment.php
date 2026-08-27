@@ -36,19 +36,18 @@ namespace GlpiPlugin\Carbon\Impact\History;
 use CommonDBTM;
 use DBmysql;
 use DbUtils;
-use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\Engine\V1\EngineInterface;
 use GlpiPlugin\Carbon\Engine\V1\NetworkEquipment as EngineNetworkEquipment;
 use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
 use GlpiPlugin\Carbon\Source_Zone;
-use GlpiPlugin\Carbon\UsageImpact;
 use GlpiPlugin\Carbon\Zone;
 use Infocom;
 use Location as GlpiLocation;
 use NetworkEquipment as GlpiNetworkEquipment;
 use NetworkEquipmentModel as GlpiNetworkEquipmentModel;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
+use Override;
 
 class NetworkEquipment extends AbstractAsset
 {
@@ -56,11 +55,13 @@ class NetworkEquipment extends AbstractAsset
     protected static string $type_itemtype  = GlpiNetworkEquipmentType::class;
     protected static string $model_itemtype = GlpiNetworkEquipmentModel::class;
 
+    #[Override]
     public static function getEngine(CommonDBTM $item): EngineInterface
     {
         return new EngineNetworkEquipment($item);
     }
 
+    #[Override]
     public function getEvaluableQuery(array $crit = [], bool $entity_restrict = true): array
     {
         $item_table = self::$itemtype::getTable();
@@ -170,6 +171,7 @@ class NetworkEquipment extends AbstractAsset
     }
 
 
+    #[Override]
     public static function getHistorizableDiagnosis(CommonDBTM $item): ?array
     {
         /** @var DBmysql $DB */
@@ -241,19 +243,5 @@ class NetworkEquipment extends AbstractAsset
         $status['has_decommission_date'] = ($data['decommission_date'] !== null);
 
         return $status;
-    }
-
-    public static function showHistorizableDiagnosis(CommonDBTM $item)
-    {
-        $status = self::getHistorizableDiagnosis($item);
-        $usage_impact = new UsageImpact();
-        $usage_impact->getFromDBByCrit([
-            'itemtype' => $item::getType(),
-            'items_id' => $item->getID(),
-        ]);
-        TemplateRenderer::getInstance()->display('@carbon/history/status-item.html.twig', [
-            'has_status' => ($status !== null),
-            'status' => $status,
-        ]);
     }
 }

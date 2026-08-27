@@ -33,7 +33,7 @@
 namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta\Tests;
 
 use GlpiPlugin\Carbon\Impact\Embodied\Boavizta\Monitor as BoaviztaMonitor;
-use GlpiPlugin\Carbon\Tests\Impact\Embodied\AbstractEmbodiedImpactTest;
+use GlpiPlugin\Carbon\Tests\Impact\Embodied\Boavizta\AbstractEmbodiedImpactTest;
 use Monitor as GlpiMonitor;
 use MonitorModel as glpiMonitorModel;
 use MonitorType as GlpiMonitorType;

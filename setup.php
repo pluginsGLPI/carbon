@@ -47,16 +47,28 @@ use Location as GlpiLocation;
 use Profile as GlpiProfile;
 
 // Version of the plugin (major.minor.bugfix)
-define('PLUGIN_CARBON_VERSION', '1.2.0');
+define('PLUGIN_CARBON_VERSION', '1.3.1');
 // Schema version of this version (major.minor.bugfix)
-define('PLUGIN_CARBON_SCHEMA_VERSION', '1.2.0');
+define('PLUGIN_CARBON_SCHEMA_VERSION', '1.3.0');
+
+// Version compatibility check -- from GLPI developer documentation
+// > A bug in GLPI prior to 11.0.7 caused plugin routes with method constraints other than GET to never match.
+// > The router context was always evaluated as GET, so any route declared with only POST, PUT, DELETE, PATCH, etc.
+// > would never be found.
+//
+// > This bug was fixed in GLPI 11.0.7. If your plugin needs to support GLPI < 11.0.7, use the following workaround:
+// > include GET alongside the intended methods and check the actual method manually inside the controller.
+//
+// For now, there is no such controller, then compatibility with GLPI 11.0.0 is still OK.
+// Watch it when adding new controllers.
 
 // Minimal GLPI version, inclusive
-define("PLUGIN_CARBON_MIN_GLPI_VERSION", '11.0.0');
+define('PLUGIN_CARBON_MIN_GLPI_VERSION', '11.0.0');
 // Maximum GLPI version, exclusive
-define("PLUGIN_CARBON_MAX_GLPI_VERSION", '12.0.0');
+define('PLUGIN_CARBON_MAX_GLPI_VERSION', '12.0.0');
 
 define('PLUGIN_CARBON_DECIMALS', 3);
+define('EMBER_DATASET_DATE', '2025-07-30');
 
 // Plugin compatible itemtypes
 /**
@@ -106,6 +118,10 @@ function plugin_carbon_setupHooks()
     // add new cards to the dashboard
     $PLUGIN_HOOKS[Hooks::DASHBOARD_CARDS]['carbon'] = [Grid::class, 'getDashboardCards'];
     $PLUGIN_HOOKS[Hooks::DASHBOARD_TYPES]['carbon'] = [Widget::class, 'WidgetTypes'];
+    // @phpstan-ignore-next-line
+    if (version_compare(GLPI_VERSION, '11.0.8', '>')) {
+        $PLUGIN_HOOKS[Hooks::DASHBOARD_DEFAULTS]['carbon'] = [Grid::class, 'getDefaults'];
+    }
 
     if (Session::haveRight('config', UPDATE)) {
         $PLUGIN_HOOKS['config_page']['carbon'] = 'front/config.form.php';

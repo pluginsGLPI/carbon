@@ -32,15 +32,15 @@
 
 namespace GlpiPlugin\Carbon\Tests;
 
-use GlpiPlugin\Carbon\EmbodiedImpact;
+use GlpiPlugin\Carbon\UsageImpact;
 use PHPUnit\Framework\Attributes\CoversClass;
 
-#[CoversClass(EmbodiedImpact::class)]
-class EmbodiedImpactTest extends AbstractImpactTest
+#[CoversClass(UsageImpact::class)]
+class UsageImpactTest extends AbstractImpactTest
 {
     public static function typeProvider(): array
     {
-        return [[EmbodiedImpact::class]];
+        return [[UsageImpact::class]];
     }
 
     public function testNotCalculatedAssetMustBeCalculated()
@@ -51,17 +51,17 @@ class EmbodiedImpactTest extends AbstractImpactTest
             $not_calculated_asset_1 = $this->createItem($itemtype);
             $not_calculated_asset_2 = $this->createItem($itemtype);
             $calculated_asset = $this->createItem($itemtype);
-            $calculated_impact = $this->createItem(EmbodiedImpact::class, [
+            $calculated_impact = $this->createItem(UsageImpact::class, [
                 'itemtype' => $itemtype,
                 'items_id' => $calculated_asset->getID(),
             ]);
 
             // Check that we get all not calculated assets for the given itemtype
-            $iterator = EmbodiedImpact::getItemsToEvaluate($itemtype);
+            $iterator = UsageImpact::getItemsToEvaluate($itemtype);
             $this->assertEquals(2, $iterator->count());
 
             // Check that we can filter not calculated assets by ID
-            $iterator = EmbodiedImpact::getItemsToEvaluate($itemtype, [
+            $iterator = UsageImpact::getItemsToEvaluate($itemtype, [
                 'WHERE' => [
                     'NOT' => [$itemtype::getTableField('id') => $not_calculated_asset_2->getID()],
                 ],

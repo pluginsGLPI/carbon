@@ -39,6 +39,7 @@ use DbUtils;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\DataTracking\TrackedInt;
 use GlpiPlugin\Carbon\Source_Zone;
+use Override;
 
 /**
  * Compute environmental impact of a whole inventory
@@ -153,6 +154,7 @@ class Inventory implements EngineInterface
         return true;
     }
 
+    #[Override]
     public function getPower(): TrackedInt
     {
         $total_power = 0;
@@ -169,6 +171,7 @@ class Inventory implements EngineInterface
         return $power->setValue($total_power);
     }
 
+    #[Override]
     public function getEnergyPerDay(DateTime $day): TrackedFloat
     {
         $total_energy = 0;
@@ -186,6 +189,7 @@ class Inventory implements EngineInterface
         return $energy->setValue($total_energy);
     }
 
+    #[Override]
     public function getCarbonEmissionPerDay(DateTime $day, Source_Zone $source_zone): ?TrackedFloat
     {
         $total_emission = 0;

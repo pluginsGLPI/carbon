@@ -41,6 +41,11 @@ if (!Plugin::isPluginActive('carbon')) {
     die();
 }
 
+if (!Zone::canView()) {
+    http_response_code(403);
+    die();
+}
+
 $source_zone_table = Source_Zone::getTable();
 $zone_table = Zone::getTable();
 $source_id = (int) $_POST['plugin_carbon_sources_id'];

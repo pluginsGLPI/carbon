@@ -44,12 +44,14 @@ use GlpiPlugin\Carbon\Impact\Embodied\Engine as EmbodiedEngine;
 use GlpiPlugin\Carbon\Impact\History\AssetInterface;
 use GlpiPlugin\Carbon\Impact\Usage\Engine as UsageEngine;
 use Location as GlpiLocation;
+use Override;
 use RuntimeException;
 
 class CronTask extends CommonGLPI
 {
     private $getGeocoder = [Location::class, 'getGeocoder'];
 
+    #[Override]
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         // Delegate to the client's crontask class the tab name to return
@@ -65,6 +67,7 @@ class CronTask extends CommonGLPI
         return $client_cron_task->getTabNameForItem($item);
     }
 
+    #[Override]
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
         if ($item instanceof GlpiCronTask) {
