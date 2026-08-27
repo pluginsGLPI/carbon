@@ -20,4 +20,5 @@ Thank you for improving the security of glpi-agent.
 | Version | Supported          |
 | ------- | ------------------ |
 | 1.0.x   | :heavy_check_mark: |
-| 1.2.x   | :heavy_check_mark: |
+| 1.2.x   | :x:                |
+| 1.3.x   | :heavy_check_mark: |
