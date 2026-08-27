@@ -4,6 +4,28 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [1.3.1](https://github.com/pluginsGLPI/carbon/compare/1.3.0...1.3.1) (2026-08-26)
+
+### Bug Fixes
+
+* Prevent missing build assets regression ([9f8c8b](https://github.com/pluginsGLPI/carbon/commit/9f8c8b9ed9dc59becbb4a27f47801df8af122f43))
+* Typo in var name ([1e9b53](https://github.com/pluginsGLPI/carbon/commit/1e9b53bea1e720b305c85b37e7c1716aebe720b4))
+
+##### Search Options
+
+* Bad join type ([a95fb9](https://github.com/pluginsGLPI/carbon/commit/a95fb93857745bf88ef220dc91150351c02c8901))
+
+##### Source Zone
+
+* Better right check before toggling download flag ([391376](https://github.com/pluginsGLPI/carbon/commit/39137612965cf7ce4d130650a93d0f08f399e994))
+
+##### Zone
+
+* Check right before outputting a dropdown ([793138](https://github.com/pluginsGLPI/carbon/commit/793138604aaf55bad645c1795b847f4ffb6508b8))
+
+
+---
+
 ## [1.3.0](https://github.com/pluginsGLPI/carbon/compare/1.2.0...1.3.0) (2026-07-09)
 
 ### Features
