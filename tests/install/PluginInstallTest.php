@@ -966,6 +966,20 @@ class PluginInstallTest extends CommonTestCase
         }
         $this->assertNotNull($carbon_package, "Carbon package not found in package-lock.json");
         $this->assertSame($setup_version, $carbon_package['version'] ?? null, "Version mismatch for carbon package");
+
+        // Check that SECURITY.md mentions the current version as supported
+        $setup_version = preg_replace("#-.*$#", '', $setup_version);
+        $setup_version = preg_replace("#\.[0-9]+$#", '.x', $setup_version);
+        $security_file = $plugin_dir . '/SECURITY.md';
+        // Find a markdown table under the title "Supported Versions"
+        $security_content = file_get_contents($security_file);
+        $matches = [];
+        preg_match('/## Supported Versions\s*\n(.*?)(\n##|\Z)/s', $security_content, $matches);
+        $this->assertNotEmpty($matches, "Supported Versions section not found in SECURITY.md");
+        $supported_versions_table = trim($matches[1]);
+        // Check that the table contains a row with the current version after the section title
+        $this->assertNotEmpty($supported_versions_table, "Supported Versions table is empty in SECURITY.md");
+        $this->assertStringContainsString($setup_version, $supported_versions_table, "Current version '$setup_version' not found in Supported Versions table in SECURITY.md");
     }
 
     #[CoversNothing()]
