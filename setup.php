@@ -119,7 +119,7 @@ function plugin_carbon_setupHooks()
     $PLUGIN_HOOKS[Hooks::DASHBOARD_CARDS]['carbon'] = [Grid::class, 'getDashboardCards'];
     $PLUGIN_HOOKS[Hooks::DASHBOARD_TYPES]['carbon'] = [Widget::class, 'WidgetTypes'];
     // @phpstan-ignore-next-line
-    if (version_compare(GLPI_VERSION, '11.0.8', '>')) {
+    if (version_compare(GLPI_VERSION, '11.0.8', '>=')) {
         $PLUGIN_HOOKS[Hooks::DASHBOARD_DEFAULTS]['carbon'] = [Grid::class, 'getDefaults'];
     }
 
