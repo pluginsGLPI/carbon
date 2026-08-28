@@ -214,7 +214,7 @@ class Location extends CommonDBChild
         switch ($ma->getAction()) {
             case 'MassUpdateBoaviztaZone':
                 foreach ($ids as $id) {
-                    if ($item->getFromDB($id) && self::updateBoaviztaZone($item, $ma->POST['_boavizta_zone'])) {
+                    if ($item->can($id, UPDATE) && $item->getFromDB($id) && self::updateBoaviztaZone($item, $ma->POST['_boavizta_zone'])) {
                         $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
                     } else {
                         $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
@@ -235,7 +235,7 @@ class Location extends CommonDBChild
                     return;
                 }
                 foreach ($ids as $id) {
-                    if ($item->getFromDB($id) && self::updateCarbonIntensitySourceZone($item, $source_zone)) {
+                    if ($item->can($id, UPDATE) && $item->getFromDB($id) && self::updateCarbonIntensitySourceZone($item, $source_zone)) {
                         $ma->itemDone(get_class($item), $id, MassiveAction::ACTION_OK);
                     } else {
                         $ma->itemDone(get_class($item), $id, MassiveAction::ACTION_KO);
