@@ -34,6 +34,7 @@ use Glpi\Exception\Http\AccessDeniedHttpException;
 use Glpi\Exception\Http\NotFoundHttpException;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\Report;
+use Session;
 
 include __DIR__ . '/../../../inc/includes.php';
 
@@ -47,6 +48,7 @@ if (!Report::canView()) {
 }
 
 if (isset($_GET['disable_demo'])) {
+    Session::checkRight('config', UPDATE);
     Config::exitDemoMode();
     Html::back();
 }
