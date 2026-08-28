@@ -109,6 +109,8 @@ class Location extends CommonDBChild
     #[Override]
     public function prepareInputForUpdate($input)
     {
+        $input = parent::prepareInputForUpdate($input);
+
         if (isset($input['plugin_carbon_sources_id']) && isset($input['plugin_carbon_zones_id'])) {
             $source_zone = new Source_Zone();
             $source_zone->getFromDBByCrit([
