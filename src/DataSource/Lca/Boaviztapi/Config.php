@@ -99,13 +99,18 @@ TWIG;
         if (isset($input['boaviztapi_base_url']) && (string) $input['boaviztapi_base_url'] !== '') {
             $old_url = PluginConfig::getPluginConfigurationValue('boaviztapi_base_url');
             if ($old_url != $input['boaviztapi_base_url']) {
+                if (!$this->validateBaseUrl($input['boaviztapi_base_url'])) {
+                    unset($input['boaviztapi_base_url']);
+                    Session::addMessageAfterRedirect(__('Invalid Boavizta API URL', 'carbon'), false, ERROR);
+                    return $input;
+                }
                 $boavizta = new Client(new RestApiClient(), $input['boaviztapi_base_url']);
                 $zones = [];
                 try {
                     $zones = $boavizta->queryZones();
                 } catch (Exception $e) {
                     unset($input['boaviztapi_base_url']);
-                    Session::addMessageAfterRedirect(__('Invalid Boavizta API URL', 'carbon'), false, ERROR);
+                    Session::addMessageAfterRedirect(__('Test of Boavizta API URL failed', 'carbon'), false, ERROR);
                 }
                 if (count($zones) > 0) {
                     // Create the source if it does not exists already
@@ -119,6 +124,27 @@ TWIG;
         }
 
         return $input;
+    }
+
+    /**
+     * Check the given URL matches security requirements
+     * @param string $url
+     * @return bool
+     */
+    protected function validateBaseUrl(string $url): bool
+    {
+        // Check if the URL is valid
+        if (filter_var($url, FILTER_VALIDATE_URL) === false) {
+            return false;
+        }
+
+        // Check if the URL has a valid scheme (http or https)
+        $parsed_url = parse_url($url);
+        if (!isset($parsed_url['scheme']) || !in_array($parsed_url['scheme'], ['http', 'https'])) {
+            return false;
+        }
+
+        return true;
     }
 
     public static function getConfigurationValue(string $name)
