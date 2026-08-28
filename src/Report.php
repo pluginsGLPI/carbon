@@ -99,7 +99,7 @@ class Report extends CommonDBTM
 
         $messages = [];
         if (Config::isDemoMode()) {
-            $exit_demo_url = '/plugins/carbon/front/report.php?disable_demo=1';
+            $exit_demo_url = $CFG_GLPI['root_doc'] . '/plugins/carbon/front/report.php?disable_demo=1';
 
             // TRANS: %s are replaced with an HTML anchor : <a> and </a>
             $message = sprintf(
