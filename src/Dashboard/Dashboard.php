@@ -37,6 +37,12 @@ use ComputerModel;
 class Dashboard
 {
     /**
+     * Key of the dashboard used by the plugin in its reporting page
+     * @var string
+     */
+    public const REPORTING_DASHBOARD_KEY = 'plugin_carbon_board';
+
+    /**
      * Returns total usage carbon emission per computer type.
      *
      * @return array of:
