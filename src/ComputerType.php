@@ -41,8 +41,8 @@ use Override;
 
 class ComputerType extends AbstractChildDropdown
 {
-    public static $itemtype = GlpiComputerType::class;
-    public static $items_id = 'computertypes_id';
+    public static string $itemtype = GlpiComputerType::class;
+    public static string $items_id = 'computertypes_id';
 
     public const CATEGORY_UNDEFINED  = 0;
     public const CATEGORY_DESKTOP    = 1;

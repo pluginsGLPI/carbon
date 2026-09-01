@@ -44,10 +44,10 @@ use Toolbox as GlpiToolbox;
 
 abstract class AbstractImpact extends CommonDBChild
 {
-    public static $itemtype = 'itemtype';
-    public static $items_id = 'items_id';
+    public static string $itemtype = 'itemtype';
+    public static string $items_id = 'items_id';
 
-    public static $rightname = 'carbon:report';
+    public static string $rightname = 'carbon:report';
 
     #[Override]
     public function canEdit($ID): bool

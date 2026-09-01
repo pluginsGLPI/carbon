@@ -46,13 +46,13 @@ use Override;
 
 class Source_Zone extends CommonDBRelation
 {
-    public static $itemtype_1 = Source::class; // Type ref or field name (must start with itemtype)
-    public static $items_id_1 = 'plugin_carbon_sources_id'; // Field name
-    public static $checkItem_1_Rights = self::HAVE_SAME_RIGHT_ON_ITEM;
+    public static ?string $itemtype_1 = Source::class; // Type ref or field name (must start with itemtype)
+    public static ?string $items_id_1 = 'plugin_carbon_sources_id'; // Field name
+    public static int $checkItem_1_Rights = self::HAVE_SAME_RIGHT_ON_ITEM;
 
-    public static $itemtype_2 = Zone::class; // Type ref or field name (must start with itemtype)
-    public static $items_id_2 = 'plugin_carbon_zones_id'; // Field name
-    public static $checkItem_2_Rights = self::HAVE_SAME_RIGHT_ON_ITEM;
+    public static ?string $itemtype_2 = Zone::class; // Type ref or field name (must start with itemtype)
+    public static ?string $items_id_2 = 'plugin_carbon_zones_id'; // Field name
+    public static int $checkItem_2_Rights = self::HAVE_SAME_RIGHT_ON_ITEM;
 
     #[Override]
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)

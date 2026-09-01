@@ -60,7 +60,7 @@ class ExportDashboardCommand extends Command
     }
 
     #[Override]
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         /** @var DBmysql $DB */
         global $DB;

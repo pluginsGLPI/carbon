@@ -36,6 +36,6 @@ use ComputerModel as GlpiComputerModel;
 
 class ComputerModel extends AbstractModel
 {
-    public static $itemtype = GlpiComputerModel::class;
-    public static $items_id = 'computermodels_id';
+    public static string $itemtype = GlpiComputerModel::class;
+    public static string $items_id = 'computermodels_id';
 }
