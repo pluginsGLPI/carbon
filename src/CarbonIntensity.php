@@ -59,7 +59,7 @@ class CarbonIntensity extends CommonDropdown
 {
     private const MIN_HISTORY_LENGTH = '13 months ago';
 
-    public static $rightname = 'carbon:report';
+    public static string $rightname = 'carbon:report';
 
     #[Override]
     public static function getTypeName($nb = 0)

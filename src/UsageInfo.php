@@ -53,10 +53,10 @@ use Toolbox as GlpiToolbox;
  */
 class UsageInfo extends CommonDBChild
 {
-    public static $itemtype = 'itemtype';
-    public static $items_id = 'items_id';
+    public static string $itemtype = 'itemtype';
+    public static string $items_id = 'items_id';
 
-    public static $rightname = 'carbon:report';
+    public static string $rightname = 'carbon:report';
 
     #[Override]
     public static function getTypeName($nb = 0)

@@ -170,7 +170,6 @@ class PluginInstallTest extends CommonTestCase
         $this->checkRegisteredClasses();
     }
 
-    #[CoversNothing()]
     public function testConfigurationExists()
     {
         $config = Config::getConfigurationValues(TEST_PLUGIN_NAME);
@@ -181,7 +180,6 @@ class PluginInstallTest extends CommonTestCase
         return $config;
     }
 
-    #[CoversNothing()]
     private function checkSchema(
         string $version,
         bool $strict = true,

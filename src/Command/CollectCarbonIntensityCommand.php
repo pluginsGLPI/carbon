@@ -117,7 +117,7 @@ class CollectCarbonIntensityCommand extends AbstractCommand
     }
 
     #[Override]
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (count($this->zones) > 1 && $input->getArgument('zone') === null) {
             // Null is not a valid key if there are several zones available for the source
