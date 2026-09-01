@@ -37,7 +37,6 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
-use DBmysql;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\AbstractClient;
 use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
@@ -387,11 +386,8 @@ class Client extends AbstractClient
      */
     protected function shiftToLocalTimezone(array $response): array
     {
-        /** @var DBmysql $DB */
-        global $DB;
-
         $shifted_response = [];
-        $local_timezone = new DateTimeZone($DB->guessTimezone());
+        $local_timezone = new DateTimeZone(date_default_timezone_get());
         array_walk($response, function ($item, $key) use (&$shifted_response, $local_timezone) {
             $shifted_date_object = DateTime::createFromFormat('Y-m-d\TH:i:sP', $item['date_heure'])
                 ->setTimezone($local_timezone);
