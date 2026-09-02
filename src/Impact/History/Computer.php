@@ -165,6 +165,7 @@ class Computer extends AbstractAsset
                 'AND' => [
                     self::$itemtype::getTableField('is_deleted') => 0,
                     self::$itemtype::getTableField('is_template') => 0,
+                    ['NOT' => [ComputerType::getTableField('category') => ComputerType::CATEGORY_CLOUD]],
                     Location::getTableField('plugin_carbon_sources_zones_id') => ['>', 0],
                     'OR' => [
                         [ComputerType::getTableField('is_ignore') => 0],
@@ -259,6 +260,7 @@ class Computer extends AbstractAsset
         $status['has_type_power_consumption'] = (($data['type_power_consumption'] ?? 0) !== 0);
         $status['has_usage_profile'] = !ComputerUsageProfile::isNewID($data['plugin_carbon_computerusageprofiles_id']);
         $status['has_category'] = (($data['category'] ?? 0) !== ComputerType::CATEGORY_UNDEFINED);
+        $status['is__category_not_cloud'] = (($data['category'] ?? 0) !== ComputerType::CATEGORY_CLOUD);
         $status['ci_download_enabled'] = $is_carbon_intensity_download_enabled;
         $status['ci_fallback_available'] = $is_carbon_intensity_fallback_available;
         $status['not_is_ignore'] = (($data['is_ignore'] ?? 0) === 0);

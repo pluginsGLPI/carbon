@@ -102,13 +102,6 @@ class Widget extends GlpiDashboardWidget
                 'width'    => 16,
                 'height'   => 12,
             ],
-            'usage_abiotic_depletion' => [
-                'label'    => __('Usage abiotic depletion potential', 'carbon'),
-                'function' => self::class . '::displayUsageAbioticDepletion',
-                'image'      => '',
-                'width'    => 6,
-                'height'   => 3,
-            ],
 
             'impact_criteria_number' => [
                 'label'    => __('Impact criteria', 'carbon'),

@@ -5,7 +5,6 @@
  * Carbon plugin for GLPI
  *
  * @copyright Copyright (C) 2024-2025 Teclib' and contributors.
- * @copyright Copyright (C) 2024 by the carbon plugin team.
  * @license   https://www.gnu.org/licenses/gpl-3.0.txt GPLv3+
  * @link      https://github.com/pluginsGLPI/carbon
  *
@@ -31,40 +30,28 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta;
+namespace GlpiPlugin\Carbon;
 
-use Monitor as GlpiMonitor;
-use Override;
+use Plugin;
 
-class Monitor extends AbstractAsset
+/**
+ * Establish the functional bridge between Carbon and the plugin CloudInventory
+ */
+class CloudInventoryConnector
 {
-    protected static string $itemtype = GlpiMonitor::class;
-
-    protected string $endpoint        = 'peripheral/monitor';
-
-    #[Override]
-    protected function doEvaluation(): ?array
+    public static function checkPluginAvailability(): void
     {
-        $this->endpoint .= '?' . $this->getCriteriasQueryString();
+        /** @var array $CFG_GLPI */
+        global $CFG_GLPI;
 
-        // Ask for embodied impact only
-        $configuration = $this->analyzeHardware();
-
-        $description = [
-            'configuration' => $configuration,
-            'usage' => self::USAGE_NULL,
-        ];
-        $response = $this->query($description);
-        $impacts = $this->client->parseResponse($response, 'embedded');
-
-        return $impacts;
+        $CFG_GLPI['plugin:carbon']['use_cloudinventory'] = Plugin::isPluginActive('cloudinventory');
     }
 
-    #[Override]
-    protected function analyzeHardware(): array
+    public function pluginAvailable(): bool
     {
-        $configuration = [];
+        /** @var array $CFG_GLPI */
+        global $CFG_GLPI;
 
-        return $configuration;
+        return $CFG_GLPI['plugin:carbon']['use_cloudinventory'] ?? false;
     }
 }
