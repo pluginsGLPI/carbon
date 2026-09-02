@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-17 01:24+0000\n"
+"POT-Creation-Date: 2026-08-28 10:17+0000\n"
 "PO-Revision-Date: 2026-07-09 09:55+0000\n"
 "Last-Translator: Pablo Pierre <pablo.terdulino@gmail.com>, 2026\n"
 "Language-Team: Portuguese (Brazil) (https://app.transifex.com/teclib/teams/28042/pt_BR/)\n"
@@ -265,7 +265,7 @@ msgstr ""
 "modelo de computador é desconhecida"
 
 #: templates/computertype.html.twig src/ComputerType.php:80
-#: src/SearchOptions.php:308
+#: src/SearchOptions.php:302
 msgid "Category"
 msgstr "Categoria"
 
@@ -1051,13 +1051,13 @@ msgstr[0] "Origem de intensidade de carbono"
 msgstr[1] "Origem de intensidade de carbono"
 msgstr[2] "Origens de intensidade de carbono"
 
-#: src/SearchOptions.php:189 src/SearchOptions.php:321
-#: src/SearchOptions.php:334 src/SearchOptions.php:347
+#: src/SearchOptions.php:186 src/SearchOptions.php:315
+#: src/SearchOptions.php:328 src/SearchOptions.php:341
 msgid "Ignore environmental impact"
 msgstr "Ignorar o impacto ambiental"
 
-#: src/SearchOptions.php:246 src/SearchOptions.php:370
-#: src/SearchOptions.php:447
+#: src/SearchOptions.php:240 src/SearchOptions.php:364
+#: src/SearchOptions.php:441
 msgid "Is historizable"
 msgstr "É historizável"
 
