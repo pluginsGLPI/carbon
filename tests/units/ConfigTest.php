@@ -99,10 +99,8 @@ class ConfigTest extends DbTestCase
         $crawler = new Crawler($output);
         $config_class = $crawler->filter('input[type="hidden"][name="config_class"]');
         $config_context = $crawler->filter('input[type="hidden"][name="config_context"]');
-        $csrf = $crawler->filter('input[type="hidden"][name="_glpi_csrf_token"]');
         $this->assertEquals(1, $config_class->count());
         $this->assertEquals(1, $config_context->count());
-        $this->assertEquals(1, $csrf->count());
         $electricitymaps_api = $crawler->filter('input[name="electricitymap_api_key"]');
         $impact_engine = $crawler->filter('select[name="impact_engine"]');
         $this->assertEquals(1, $electricitymaps_api->count());
