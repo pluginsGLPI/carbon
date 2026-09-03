@@ -78,7 +78,12 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
         }
     }
 
-    abstract protected function getVersion(): string;
+    public function getEnginename(): string
+    {
+        return $this->engine;
+    }
+
+    abstract public function getVersion(): string;
 
     #[Override]
     public function setLimit(int $limit)
@@ -221,7 +226,7 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
     /**
      * Do the environmental impact evaluation of an asset
      *
-     * @return ?array
+     * @return ?array<int, null|AbstractTracked>
      */
     abstract protected function doEvaluation(): ?array;
 

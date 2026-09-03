@@ -33,6 +33,7 @@
 namespace GlpiPlugin\Carbon\Impact\Embodied\Internal;
 
 use CommonDBTM;
+use DBmysql;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\Impact\Embodied\AbstractEmbodiedImpact;
 use GlpiPlugin\Carbon\Impact\Type;
@@ -48,8 +49,16 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact
     /** @var string $engine_version Version of the calculation engine */
     protected static string $engine_version = '1';
 
+    protected ?AbstractEmbodiedImpact $external_embodied_impact_engine = null;
+
+    public function __construct(CommonDBTM $item, ?AbstractEmbodiedImpact $external_embodied_impact_engine)
+    {
+        parent::__construct($item);
+        $this->external_embodied_impact_engine = $external_embodied_impact_engine;
+    }
+
     #[Override]
-    protected function getVersion(): string
+    public function getVersion(): string
     {
         return self::$engine_version;
     }
@@ -57,33 +66,49 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact
     #[Override]
     protected function doEvaluation(): array
     {
-        /** @var class-string<CommonDBTM> */
-        $glpi_model_itemtype = static::$itemtype . 'Model';
-        $glpi_model_fk = getForeignKeyFieldForItemType($glpi_model_itemtype);
-        if ($glpi_model_itemtype::isNewID($this->item->fields[$glpi_model_fk])) {
-            return [];
-        }
-
-        /** @var CommonDBTM|false $model */
-        $model = getItemForItemtype('GlpiPlugin\\Carbon\\' . $glpi_model_itemtype);
-        $model->getFromDBByCrit([
-            $glpi_model_fk => $this->item->fields[$glpi_model_fk],
-        ]);
-        if ($model->isNewItem()) {
-            return [];
-        }
+        /** @var DBmysql $DB */
+        global $DB;
 
         $impacts = [];
-        $types = Type::getImpactTypes();
-        foreach ($types as $type) {
-            if (!isset($model->fields[$type]) || empty($model->fields[$type])) {
-                continue;
+
+        $glpi_model_itemtype = static::$itemtype . 'Model';
+        $glpi_model_table = getTableForItemType($glpi_model_itemtype);
+        $glpi_model_fk = getForeignKeyFieldForItemType($glpi_model_itemtype);
+        $model_itemtype = 'GlpiPlugin\\Carbon\\' . $glpi_model_itemtype;
+        $model = getItemForItemtype($model_itemtype);
+        if ($model !== false) {
+            $model_table = getTableForItemtype($model_itemtype);
+            $model->getFromDBByRequest([
+                'INNER JOIN' => [
+                    $glpi_model_table => [
+                        'ON' => [
+                            $glpi_model_table => 'id',
+                            $model_table => $glpi_model_fk,
+                        ],
+                    ],
+                ],
+                'WHERE' => [
+                    $glpi_model_fk => $this->item->fields[$glpi_model_fk],
+                ],
+            ]);
+
+            $types = Type::getImpactTypes();
+
+            foreach ($types as $type) {
+                if (!isset($model->fields[$type]) || empty($model->fields[$type])) {
+                    continue;
+                }
+                $impacts[Type::getImpactId($type)] = new TrackedFloat(
+                    $model->fields[$type],
+                    null,
+                    $model->fields["{$type}_quality"]
+                );
             }
-            $impacts[Type::getImpactId($type)] = new TrackedFloat(
-                $model->fields[$type],
-                null,
-                $model->fields["{$type}_quality"]
-            );
+        }
+        if ($this->external_embodied_impact_engine !== null) {
+            $external_impacts = $this->external_embodied_impact_engine->doEvaluation();
+            $this->engine .= ' + ' . $this->external_embodied_impact_engine->getEngineName() . ' ' . $this->external_embodied_impact_engine->getVersion();
+            $impacts = array_replace($external_impacts, $impacts);
         }
 
         return $impacts;

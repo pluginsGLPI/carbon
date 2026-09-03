@@ -77,7 +77,7 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
     }
 
     #[Override]
-    protected function getVersion(): string
+    public function getVersion(): string
     {
         if (self::$engine_version !== 'unknown') {
             return self::$engine_version;
