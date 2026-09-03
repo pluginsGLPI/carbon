@@ -607,6 +607,10 @@ class PluginInstallTest extends CommonTestCase
         }
     }
 
+    /**
+     * Summary of zones
+     * @var array<string>
+     */
     private $zones = [
         'Afghanistan',
         'Albania',
