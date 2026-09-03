@@ -85,6 +85,69 @@ class Type
         self::IMPACT_EPT    => 'ept',
     ];
 
+    private static array $impact_categorization = [
+        'Acidification' => [
+            'ap',
+        ], 'Climate change' => [
+            'gwp',
+        ], 'Ecotoxicity, freshwater' => [
+            'ctue',
+        ], 'EF-particulate matter' => [
+            'pm',
+        ], 'Eutrophication, freshwater' => [
+            'epf',
+        ], 'Eutrophication, marine' => [
+            'epm',
+        ], 'Eutrophication, terrestrial' => [
+            'ept',
+        ], 'Human toxicity, cancer' => [
+            'ctuh_c',
+        ], 'Human toxicity, non-cancer' => [
+            'ctuh_nc',
+        ], 'Ionising radiation' => [
+            'ir',
+        ], 'Land use' => [
+            'lu',
+        ], 'Ozone depletion' => [
+            'odp',
+        ], 'Photochemical ozone formation' => [
+            'pocp',
+        ], 'Resource depletion, fossils' => [
+            'adpf',
+        ], 'Resource depletion, minerals and metals' => [
+            'adp',
+        ], 'Water use' => [
+            'wu',
+        ],
+    ];
+
+    /**
+     * Impact weight factor
+     * Sum must be equal to 100%
+     * @see https://eplca.jrc.ec.europa.eu/permalink/EF3_1/Normalisation_Weighting_Factors_EF_3.1.xlsx
+     * @see Source: Sala S, Cerutti AK, Pant R. (2018). Development of a weighting approach for Environmental Footprint. European Commission, Joint Research Centre, Publication Office of the European Union, Luxembourg. ISBN 978-92-79-68041-0.
+     *
+     * @var array<string, float>
+     */
+    private static array $category_weight_percentage = [
+        'Acidification' =>	                            6.20,
+        'Climate change' =>	                            21.06,
+        'Ecotoxicity, freshwater' =>	                1.92,
+        'EF-particulate matter' =>	                    8.96,
+        'Eutrophication, freshwater' =>	                2.80,
+        'Eutrophication, marine' =>	                    2.96,
+        'Eutrophication, terrestrial' =>	            3.71,
+        'Human toxicity, cancer' =>	                    2.13,
+        'Human toxicity, non-cancer' =>	                1.84,
+        'Ionising radiation' =>	                        5.01,
+        'Land use' =>	                                7.94,
+        'Ozone depletion' =>	                        6.31,
+        'Photochemical ozone formation' =>	            4.78,
+        'Resource depletion, fossils' =>	            8.32,
+        'Resource depletion, minerals and metals' =>	7.55,
+        'Water use' =>	                                8.51,
+    ];
+
     /**
      * Unit of impact criterias
      *
@@ -401,4 +464,5 @@ class Type
 
         return '';
     }
+
 }
