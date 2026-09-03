@@ -148,6 +148,32 @@ class Config extends GlpiConfig
     }
 
     /**
+     * Set config values : create or update entry
+     *
+     * @param string $context context to get values (default for glpi is core)
+     * @param array  $values  config names to set
+     *
+     * @return void
+     */
+    public static function setConfigurationValues($context, array $values = [])
+    {
+        GlpiConfig::setConfigurationValues($context, $values);
+    }
+
+    /**
+     * Get config value
+     *
+     * @param $context  string   context to get values (default for glpi is core)
+     * @param $name     string   config name
+     *
+     * @return mixed
+     */
+    public static function getConfigurationValue(string $context, string $name)
+    {
+        return GlpiConfig::getConfigurationValue($context, $name);
+    }
+
+    /**
      * Prepare input for configuration update
      *
      * @param array $input
