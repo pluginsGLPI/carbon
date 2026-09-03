@@ -229,6 +229,6 @@ class CarbonEmission extends CommonDBChild
             return false;
         }
 
-        return $DB->delete(static::getTable(), [1]);
+        return $DB->delete(static::getTable(), ['NOT' => ['id' => null]]);
     }
 }
