@@ -35,7 +35,6 @@
     <form name="form" action="{{ "Config"|itemtype_form_path }}" method="POST">
         <input type="hidden" name="config_class" value="GlpiPlugin\Carbon\Config">
         <input type="hidden" name="config_context" value="plugin:carbon">
-        <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token() }}">
 
         {{ fields.largeTitle(
             __('Impact engine', 'carbon'),
@@ -79,7 +78,7 @@
                     <tr>
                         <td>{{ __('Reset usage impacts. This will delete all calculated usage impacts for all assets.', 'carbon') }}</td>
                         <td class="text-end">
-                            {% set reset_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', reset_all: ''}" %}
+                            {% set reset_args = "{reset_all: ''}" %}
                             <a class="btn btn-outline-warning me-2" onclick='{{ usage_impact_action_url|raw }};'>
                                 <i class="ti ti-device-floppy"></i>
                                 <span>{{ _x('button', 'Reset usage impacts') }}</span>
@@ -89,7 +88,7 @@
                     <tr>
                         <td>{{ __('Reset embodied impacts. This will delete all calculated embodied impacts for all assets.', 'carbon') }}</td>
                         <td class="text-end">
-                            {% set reset_args = "{_glpi_csrf_token: '" ~ csrf_token() ~ "', reset_all: ''}" %}
+                            {% set reset_args = "{reset_all: ''}" %}
                             <a class="btn btn-outline-warning me-2" onclick='{{ embodied_impact_action_url|raw }};'>
                                 <i class="ti ti-device-floppy"></i>
                                 <span>{{ _x('button', 'Reset embodied impacts') }}</span>
