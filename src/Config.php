@@ -123,7 +123,6 @@ class Config extends GlpiConfig
 
         $current_config = array_diff_key($current_config, array_flip($secured_config));
         $reset_args = json_encode([
-            '_glpi_csrf_token' => Session::getNewCSRFToken(),
             'reset_all'        => '',
         ]);
         $usage_impact_action_url    = 'submitGetLink("' . $CFG_GLPI['root_doc'] . '/plugins/carbon/front/usageimpact.form.php", ' . $reset_args . ')';
