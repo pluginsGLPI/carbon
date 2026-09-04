@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-17 01:24+0000\n"
+"POT-Creation-Date: 2026-08-28 10:17+0000\n"
 "PO-Revision-Date: 2026-07-09 09:55+0000\n"
 "Last-Translator: Thierry Bugier <tbugier@teclib.com>, 2026\n"
 "Language-Team: English (United Kingdom) (https://app.transifex.com/teclib/teams/28042/en_GB/)\n"
@@ -262,7 +262,7 @@ msgstr ""
 "unknown"
 
 #: templates/computertype.html.twig src/ComputerType.php:80
-#: src/SearchOptions.php:308
+#: src/SearchOptions.php:302
 msgid "Category"
 msgstr "Category"
 
@@ -1039,13 +1039,13 @@ msgid_plural "Carbon intensity sources"
 msgstr[0] "Carbon intensity source"
 msgstr[1] "Carbon intensity sources"
 
-#: src/SearchOptions.php:189 src/SearchOptions.php:321
-#: src/SearchOptions.php:334 src/SearchOptions.php:347
+#: src/SearchOptions.php:186 src/SearchOptions.php:315
+#: src/SearchOptions.php:328 src/SearchOptions.php:341
 msgid "Ignore environmental impact"
 msgstr "Ignore environmental impact"
 
-#: src/SearchOptions.php:246 src/SearchOptions.php:370
-#: src/SearchOptions.php:447
+#: src/SearchOptions.php:240 src/SearchOptions.php:364
+#: src/SearchOptions.php:441
 msgid "Is historizable"
 msgstr "Is historizable"
 
