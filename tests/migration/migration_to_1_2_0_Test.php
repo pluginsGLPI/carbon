@@ -38,7 +38,6 @@ use GlpiPlugin\Carbon\Install;
 use GlpiPlugin\Carbon\Uninstall;
 use Location as GlpiLocation;
 use Migration;
-use PHPUnit\Framework\Attributes\CoversNothing;
 use Plugin;
 
 class migration_to_1_2_0_Test extends CommonTestCase
@@ -60,7 +59,6 @@ class migration_to_1_2_0_Test extends CommonTestCase
         $success = $DB->runFile(realpath($sql_file));
     }
 
-    #[CoversNothing]
     public function testUpdateCountryLocationZoneRelation()
     {
         /** @var DBmysql $DB */
@@ -110,7 +108,6 @@ class migration_to_1_2_0_Test extends CommonTestCase
         $this->assertEquals($expected, $result->current());
     }
 
-    #[CoversNothing]
     public function testUpdateStateLocationZoneRelation()
     {
         /** @var DBmysql $DB */
@@ -159,7 +156,6 @@ class migration_to_1_2_0_Test extends CommonTestCase
         $this->assertEquals($expected, $result->current());
     }
 
-    #[CoversNothing]
     public function testTimeformatInUsageProfile()
     {
         global $DB;
