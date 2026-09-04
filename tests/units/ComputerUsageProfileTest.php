@@ -180,9 +180,7 @@ class ComputerUsageProfileTest extends DbTestCase
     public function testShowMassiveActionsSubForm()
     {
         // Test power consumption update form
-        $massive_action = $this->getMockBuilder(MassiveAction::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $massive_action = $this->createStub(MassiveAction::class);
         $massive_action->method('getAction')->willReturn('MassAssociateItems');
         $massive_action->method('getItems')->willReturn([
             GlpiComputer::class => $this->createItem(GlpiComputer::class),
