@@ -126,7 +126,7 @@ class AbstractClientTest extends DbTestCase
     {
         foreach ($this->sliceDateRangeByMonthProvider() as $data) {
             [$start, $stop, $expected] = $data;
-            $stub = $this->getMockBuilder(AbstractClient::class)->getMock();
+            $stub = $this->createStub(AbstractClient::class);
             $output = $this->callPrivateMethod($stub, 'sliceDateRangeByMonth', $start, $stop);
 
             if (count($expected) === 0) {
@@ -175,7 +175,7 @@ class AbstractClientTest extends DbTestCase
     {
         foreach ($this->sliceDateRangeByDayProvider() as $data) {
             [$start, $stop, $expected] = $data;
-            $stub = $this->getMockBuilder(AbstractClient::class)->getMock();
+            $stub = $this->createStub(AbstractClient::class);
             $output = $this->callPrivateMethod($stub, 'sliceDateRangeByDay', $start, $stop);
 
             if (count($expected) === 0) {

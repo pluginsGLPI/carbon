@@ -42,8 +42,8 @@ use Override;
 
 class Report extends CommonDBTM
 {
-    public static $rightname = 'carbon:report';
-    protected static $notable   = true;
+    public static string $rightname = 'carbon:report';
+    protected static bool $notable   = true;
 
     #[Override]
     public static function getTypeName($nb = 0)

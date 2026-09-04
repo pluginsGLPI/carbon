@@ -124,9 +124,7 @@ class ComputerTypeTest extends AbstractTypeTest
     public function testShowMassiveActionsSubForm()
     {
         // Test power consumption update form
-        $massive_action = $this->getMockBuilder(MassiveAction::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $massive_action = $this->createStub(MassiveAction::class);
         $massive_action->method('getAction')->willReturn('MassUpdatePower');
         $massive_action->method('getItems')->willReturn([
             ComputerType::class => $this->createItem(GlpiComputerType::class),
@@ -153,9 +151,7 @@ class ComputerTypeTest extends AbstractTypeTest
         $this->assertTrue($result);
 
         // Test category update form
-        $massive_action = $this->getMockBuilder(MassiveAction::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $massive_action = $this->createStub(MassiveAction::class);
         $massive_action->method('getAction')->willReturn('MassUpdateCategory');
         $massive_action->method('getItems')->willReturn([
             ComputerType::class => $this->createItem(GlpiComputerType::class),
@@ -181,9 +177,7 @@ class ComputerTypeTest extends AbstractTypeTest
         $this->assertTrue($result);
 
         // Test invalid action
-        $massive_action = $this->getMockBuilder(MassiveAction::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $massive_action = $this->createStub(MassiveAction::class);
         $massive_action->method('getAction')->willReturn('');
         $massive_action->method('getItems')->willReturn([
             ComputerType::class => $this->createItem(GlpiComputerType::class),
@@ -200,9 +194,7 @@ class ComputerTypeTest extends AbstractTypeTest
     public function testProcessMassiveActionForOneItemtype()
     {
         // Test create power consumption
-        $massive_action = $this->getMockBuilder(MassiveAction::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $massive_action = $this->createStub(MassiveAction::class);
         $massive_action->method('getAction')->willReturn('MassUpdatePower');
         $glpi_computer_type = $this->createItem(GlpiComputerType::class);
         $massive_action->POST = [
@@ -222,9 +214,7 @@ class ComputerTypeTest extends AbstractTypeTest
         $this->assertEquals(25, $computer_type->fields['power_consumption']);
 
         // Test update category
-        $massive_action = $this->getMockBuilder(MassiveAction::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $massive_action = $this->createStub(MassiveAction::class);
         $massive_action->method('getAction')->willReturn('MassUpdateCategory');
         $glpi_computer_type = $this->createItem(GlpiComputerType::class);
         $massive_action->POST = [

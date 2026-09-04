@@ -125,7 +125,9 @@ if ($ember_dataset_version === null || EMBER_DATASET_DATE > $ember_dataset_versi
         $progress_bar->setProgress($rows_count);
     }
     $file = null; // close the file
-
+    if (isset($output)) {
+        $output->writeln("");
+    }
     Config::setPluginConfigurationValues(['ember_dataset_date' => EMBER_DATASET_DATE]);
 }
 

@@ -60,8 +60,8 @@ use Override;
 class Location extends CommonDBChild
 {
     // From CommonDBRelation
-    public static $itemtype       = GlpiLocation::class;
-    public static $items_id       = 'locations_id';
+    public static string $itemtype       = GlpiLocation::class;
+    public static string $items_id       = 'locations_id';
 
     #[Override]
     public static function getIcon()

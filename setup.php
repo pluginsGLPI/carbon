@@ -47,9 +47,9 @@ use Location as GlpiLocation;
 use Profile as GlpiProfile;
 
 // Version of the plugin (major.minor.bugfix)
-define('PLUGIN_CARBON_VERSION', '1.3.0-dev');
+define('PLUGIN_CARBON_VERSION', '1.4.0-dev');
 // Schema version of this version (major.minor.bugfix)
-define('PLUGIN_CARBON_SCHEMA_VERSION', '1.3.0');
+define('PLUGIN_CARBON_SCHEMA_VERSION', '1.4.0');
 
 // Version compatibility check -- from GLPI developer documentation
 // > A bug in GLPI prior to 11.0.7 caused plugin routes with method constraints other than GET to never match.
@@ -63,9 +63,9 @@ define('PLUGIN_CARBON_SCHEMA_VERSION', '1.3.0');
 // Watch it when adding new controllers.
 
 // Minimal GLPI version, inclusive
-define('PLUGIN_CARBON_MIN_GLPI_VERSION', '11.0.0');
+define('PLUGIN_CARBON_MIN_GLPI_VERSION', '12.0.0');
 // Maximum GLPI version, exclusive
-define('PLUGIN_CARBON_MAX_GLPI_VERSION', '12.0.0');
+define('PLUGIN_CARBON_MAX_GLPI_VERSION', '13.0.0');
 
 define('PLUGIN_CARBON_DECIMALS', 3);
 define('EMBER_DATASET_DATE', '2025-07-30');
@@ -223,8 +223,9 @@ function plugin_carbon_check_prerequisites()
 
     $prerequisitesSuccess = true;
 
+    // In case GLPI is so old that the modern version checker is not implemented
     /** @phpstan-ignore if.alwaysFalse */
-    if (version_compare(GLPI_VERSION, PLUGIN_CARBON_MIN_GLPI_VERSION, 'lt')) {
+    if (version_compare(GLPI_VERSION, "10.0.0", 'lt')) {
         echo "This plugin requires GLPI >= " . PLUGIN_CARBON_MIN_GLPI_VERSION . " and GLPI < " . PLUGIN_CARBON_MAX_GLPI_VERSION . "<br>";
         $prerequisitesSuccess = false;
     }
@@ -239,22 +240,23 @@ function plugin_carbon_check_prerequisites()
         $prerequisitesSuccess = false;
     }
 
-    if (getenv('CI') === false) {
-        // only when not under test
-        $version_string = $DB->getVersion();
+    // GLPI 12 requires MySQL >= 8.0 or MariaDB >= 10.2, then the check below can be disabled
+    // if (getenv('CI') === false) {
+    //     // only when not under test
+    //     $version_string = $DB->getVersion();
 
-        $server  = preg_match('/-MariaDB/', $version_string) ? 'MariaDB' : 'MySQL';
-        $version = preg_replace('/^((\d+\.?)+).*$/', '$1', $version_string);
-        if ($server === 'MySQL' && version_compare($version, '8.0.0', '<')) {
-            echo 'This plugin requires MySQL >= 8.0 or MariaDB >= 10.2<br>';
-            $prerequisitesSuccess = false;
-        }
+    //     $server  = preg_match('/-MariaDB/', $version_string) ? 'MariaDB' : 'MySQL';
+    //     $version = preg_replace('/^((\d+\.?)+).*$/', '$1', $version_string);
+    //     if ($server === 'MySQL' && version_compare($version, '8.0.0', '<')) {
+    //         echo 'This plugin requires MySQL >= 8.0 or MariaDB >= 10.2<br>';
+    //         $prerequisitesSuccess = false;
+    //     }
 
-        if ($server === 'MariaDB' && version_compare($version, '10.2.0', '<')) {
-            echo 'This plugin requires MySQL >= 8.0 or MariaDB >= 10.2<br>';
-            $prerequisitesSuccess = false;
-        }
-    }
+    //     if ($server === 'MariaDB' && version_compare($version, '10.2.0', '<')) {
+    //         echo 'This plugin requires MySQL >= 8.0 or MariaDB >= 10.2<br>';
+    //         $prerequisitesSuccess = false;
+    //     }
+    // }
 
     return $prerequisitesSuccess;
 }

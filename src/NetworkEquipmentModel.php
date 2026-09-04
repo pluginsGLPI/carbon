@@ -36,6 +36,6 @@ use NetworkEquipmentModel as GlpiNetworkEquipmentModel;
 
 class NetworkEquipmentModel extends AbstractModel
 {
-    public static $itemtype = GlpiNetworkEquipmentModel::class;
-    public static $items_id = 'networkequipmentmodels_id';
+    public static string $itemtype = GlpiNetworkEquipmentModel::class;
+    public static string $items_id = 'networkequipmentmodels_id';
 }

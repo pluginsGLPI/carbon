@@ -209,7 +209,7 @@ class CarbonEmissionTest extends DbTestCase
         $this->assertEquals(1, countElementsInTable($table));
     }
 
-    public function test_truncate_fails_when_user_has_all_required_rights()
+    public function test_truncate_succeeds_when_user_has_all_required_rights()
     {
         /** @var DBmysql $DB */
         global $DB;

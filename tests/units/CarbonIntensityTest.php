@@ -299,9 +299,7 @@ class CarbonIntensityTest extends DbTestCase
     {
         $instance = new CarbonIntensity();
 
-        $data_source = $this->getMockBuilder(AbstractClient::class)
-            ->getMock();
-        $result = $instance->getDownloadStartDate('foo', $data_source);
+        $result = $instance->getDownloadStartDate();
         $expected = (new DateTime('13 months ago'))->setTime(0, 0, 0); // CarbonIntensity::MIN_HISTORY_LENGTH
         $this->assertEquals($expected, $result);
 
@@ -312,7 +310,7 @@ class CarbonIntensityTest extends DbTestCase
             'buy_date' => '2022-02-01',
         ]);
 
-        $result = $instance->getDownloadStartDate('foo', $data_source);
+        $result = $instance->getDownloadStartDate();
         $expected = (new DateTime('2022-02-01'))->setTime(0, 0, 0); // CarbonIntensity::MIN_HISTORY_LENGTH
         $this->assertEquals($expected, $result);
     }
@@ -366,8 +364,7 @@ class CarbonIntensityTest extends DbTestCase
             $zone::getForeignKeyField() => $zone->getID(),
         ]);
 
-        $data_source = $this->getMockBuilder(AbstractClient::class)
-            ->getMock();
+        $data_source = $this->createStub(AbstractClient::class);
         $hours = null;
         $data_source->method('fullDownload')->willReturnCallback(
             function ($zone_name, $gap_start, $gap_end, $carbon_intensity, $limit, $progress_bar) use (&$hours) {
@@ -379,8 +376,7 @@ class CarbonIntensityTest extends DbTestCase
         $data_source->method('getHardStartDate')->willReturn(
             DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '2021-01-01T00:00:00+00:00'),
         );
-        $output = $this->getMockBuilder(Output::class)
-            ->getMock();
+        $output = $this->createStub(Output::class);
         $progress_bar = new ProgressBar($output);
 
         $instance = new CarbonIntensity();
