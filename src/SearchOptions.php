@@ -220,18 +220,22 @@ class SearchOptions
             $fallback_carbon_intensity_subquery = Location::getCarbonIntensityDataSourceRequest([
                 Location::getTableField('id') => new QueryExpression('glpi_plugin_carbon_locations_3d6da7fccf9233a3f1a4e41183391a41.id'),
             ]);
-            $fallback_carbon_intensity_subquery = (new QuerySubQuery($fallback_carbon_intensity_subquery))->getQuery();
-            $computation = "IF(`glpi_computers_id_963cd5e903dddc7ab00a3b70933369df`.`is_deleted` = 0
-            AND `glpi_computers_id_963cd5e903dddc7ab00a3b70933369df`.`is_template` = 0
-            AND `glpi_plugin_carbon_locations_3d6da7fccf9233a3f1a4e41183391a41`.`plugin_carbon_sources_zones_id` > 0
-            AND `glpi_plugin_carbon_computerusageprofiles_09f8403aa14af64cd70f350288a0331b`.`id` > 0"
-            // Do not check if an asset is ignored
-            // . "AND COALESCE(`glpi_plugin_carbon_computertypes_a643ab3ffd70abf99533ed214da87d60`.`is_ignore`, 0) = 0"
-            . " AND (
-                `glpi_plugin_carbon_computertypes_a643ab3ffd70abf99533ed214da87d60`.`power_consumption` > 0
-                OR `glpi_computermodels`.`power_consumption` > 0
-            )
-            AND ($fallback_carbon_intensity_subquery) > 0, 1, 0)";
+            $fallback_carbon_intensity_subquery = (new QuerySubQuery($fallback_carbon_intensity_subquery));
+            $computation = new QueryExpression(
+                "IF(`glpi_computers_id_963cd5e903dddc7ab00a3b70933369df`.`is_deleted` = 0
+                AND `glpi_computers_id_963cd5e903dddc7ab00a3b70933369df`.`is_template` = 0
+                AND `glpi_plugin_carbon_locations_3d6da7fccf9233a3f1a4e41183391a41`.`plugin_carbon_sources_zones_id` > 0
+                AND `glpi_plugin_carbon_computerusageprofiles_09f8403aa14af64cd70f350288a0331b`.`id` > 0"
+                // Do not check if an asset is ignored
+                // . "AND COALESCE(`glpi_plugin_carbon_computertypes_a643ab3ffd70abf99533ed214da87d60`.`is_ignore`, 0) = 0"
+                . " AND (
+                    `glpi_plugin_carbon_computertypes_a643ab3ffd70abf99533ed214da87d60`.`power_consumption` > 0
+                    OR `glpi_computermodels`.`power_consumption` > 0
+                )
+                AND ($fallback_carbon_intensity_subquery) > 0, 1, 0)",
+                null,
+                $fallback_carbon_intensity_subquery->getParams()
+            );
             $sopt[] = [
                 'id'            => SearchOptions::IS_HISTORIZABLE,
                 'table'         => getTableForItemType($itemtype),
