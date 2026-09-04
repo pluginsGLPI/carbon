@@ -116,8 +116,7 @@ class LocationTest extends DbTestCase
         $this->assertEquals('FRA', $location->fields['boavizta_zone']);
 
         // Test the geocoding feature
-        $geocoder = $this->getMockBuilder(Geocoder::class)
-            ->getMock();
+        $geocoder = $this->createStub(Geocoder::class);
         $geocoder->method('geocodeQuery')->willReturn(
             new AddressCollection([
                 new NominatimAddress(
@@ -169,8 +168,7 @@ class LocationTest extends DbTestCase
         $this->assertEquals('FRA', $location->fields['boavizta_zone']);
 
         // Test the geocoding feature
-        $geocoder = $this->getMockBuilder(Geocoder::class)
-            ->getMock();
+        $geocoder = $this->createStub(Geocoder::class);
         $geocoder->method('geocodeQuery')->willReturn(
             new AddressCollection([
                 new NominatimAddress(
