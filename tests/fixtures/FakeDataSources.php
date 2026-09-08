@@ -32,6 +32,8 @@
 
 namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\Foo;
 
+use CommonDBTM;
+use CommonGLPI;
 use GlpiPlugin\Carbon\DataSource\CronTaskInterface;
 
 class CronTask implements CronTaskInterface
@@ -39,11 +41,23 @@ class CronTask implements CronTaskInterface
     public static function enumerateTasks(): array
     {
         return [];
+    }
+
+    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    {
+        return 'Foo';
+    }
+
+    public function showForCronTask(CommonDBTM $item)
+    {
+        return true;
     }
 }
 
 namespace GlpiPlugin\Carbon\DataSource\Lca\Bar;
 
+use CommonDBTM;
+use CommonGLPI;
 use GlpiPlugin\Carbon\DataSource\CronTaskInterface;
 
 class CronTask implements CronTaskInterface
@@ -52,10 +66,22 @@ class CronTask implements CronTaskInterface
     {
         return [];
     }
+
+    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    {
+        return 'Bar';
+    }
+
+    public function showForCronTask(CommonDBTM $item)
+    {
+        return true;
+    }
 }
 
 namespace GlpiPlugin\Carbon\DataSource\Lca\Baz;
 
+use CommonDBTM;
+use CommonGLPI;
 use GlpiPlugin\Carbon\DataSource\CronTaskInterface;
 
 class CronTask implements CronTaskInterface
@@ -63,5 +89,15 @@ class CronTask implements CronTaskInterface
     public static function enumerateTasks(): array
     {
         return [];
+    }
+
+    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    {
+        return 'Baz';
+    }
+
+    public function showForCronTask(CommonDBTM $item)
+    {
+        return true;
     }
 }

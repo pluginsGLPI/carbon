@@ -29,8 +29,10 @@
  *
  * -------------------------------------------------------------------------
  */
-
 use Config as GlpiConfig;
+use Glpi\Exception\Http\AccessDeniedHttpException;
+use Glpi\Exception\Http\BadRequestHttpException;
+use Glpi\Exception\Http\NotFoundHttpException;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 
@@ -38,32 +40,16 @@ include(__DIR__ . '/../../../inc/includes.php');
 
 // Check if plugin is activated...
 if (!Plugin::isPluginActive('carbon')) {
-    echo __('Not found.', 'carbon');
-    http_response_code(404);
-    die();
-}
-
-if (!Source::canView() || ! GlpiConfig::canUpdate()) {
-    // Will die
-    echo __('Access denied.', 'carbon');
-    http_response_code(403);
-    die();
-}
-
-if (!isset($_GET['id'])) {
-    echo __('Bad request.', 'carbon');
-    http_response_code(400);
-    die();
-}
-
-$source_zone = new Source_Zone();
-if (!$source_zone->getFromDB($_GET['id'])) {
-    echo __('Item not found.', 'carbon');
-    http_response_code(403);
-    die();
-}
-if (!$source_zone->toggleZone()) {
-    echo __('Update failed.', 'carbon');
-    http_response_code(500);
-    die();
+    throw new NotFoundHttpException();
+} elseif (!Source::canView() || !GlpiConfig::canUpdate()) {
+    throw new AccessDeniedHttpException();
+} elseif (!isset($_GET['id'])) {
+    throw new BadRequestHttpException();
+} else {
+    $source_zone = new Source_Zone();
+    if (!$source_zone->getFromDB($_GET['id'])) {
+        throw new BadRequestHttpException();
+    } elseif (!$source_zone->toggleZone()) {
+        throw new BadRequestHttpException();
+    }
 }

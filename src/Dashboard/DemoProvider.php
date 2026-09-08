@@ -34,12 +34,12 @@ namespace GlpiPlugin\Carbon\Dashboard;
 
 use Computer;
 use DateInterval;
-use DateTime;
-use DateTimeImmutable;
 use GlpiPlugin\Carbon\Impact\Type;
 use GlpiPlugin\Carbon\Toolbox;
 use Monitor;
 use NetworkEquipment;
+use Safe\DateTime;
+use Safe\DateTimeImmutable;
 use Session;
 
 class DemoProvider

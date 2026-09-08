@@ -75,6 +75,10 @@ if (isset($_POST['update'])) {
     $embodied_impact->check($_POST['id'], PURGE);
 
     $itemtype = $embodied_impact->fields['itemtype'];
+    if (!is_a($itemtype, CommonDBTM::class, true)) {
+        Session::addMessageAfterRedirect(__('Bad arguments.', 'carbon'), false, ERROR);
+        Html::back();
+    }
     $item = new $itemtype();
     $item->getFromDB($embodied_impact->fields['items_id']);
     if (!$item->canUpdateItem()) {
@@ -92,7 +96,7 @@ if (isset($_POST['update'])) {
     }
 
     $itemtype = $_POST['itemtype'];
-    if (!Toolbox::isCommonDBTM($itemtype)) {
+    if (!is_a($itemtype, CommonDBTM::class, true)) {
         Session::addMessageAfterRedirect(__('Bad arguments.', 'carbon'), false, ERROR);
         Html::back();
     }

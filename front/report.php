@@ -30,6 +30,7 @@
  * -------------------------------------------------------------------------
  */
 
+use Config as GlpiConfig;
 use Glpi\Exception\Http\AccessDeniedHttpException;
 use Glpi\Exception\Http\NotFoundHttpException;
 use GlpiPlugin\Carbon\Config;
@@ -48,7 +49,7 @@ if (!Report::canView()) {
 }
 
 if (isset($_GET['disable_demo'])) {
-    Session::checkRight('config', UPDATE);
+    Session::checkRight(GlpiConfig::$rightname, UPDATE);
     Config::exitDemoMode();
     Html::back();
 }

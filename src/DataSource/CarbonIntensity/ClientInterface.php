@@ -32,9 +32,9 @@
 
 namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity;
 
-use DateTimeImmutable;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\Source_Zone;
+use Safe\DateTimeImmutable;
 use Symfony\Component\Console\Helper\ProgressBar;
 
 /**

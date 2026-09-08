@@ -30,6 +30,9 @@
  * -------------------------------------------------------------------------
  */
 
+use function Safe\preg_match;
+use function Safe\scandir;
+
 function update101to110(Migration $migration)
 {
     /** @var DBmysql $DB */

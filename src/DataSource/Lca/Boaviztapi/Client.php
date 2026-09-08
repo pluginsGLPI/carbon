@@ -45,6 +45,8 @@ use GlpiPlugin\Carbon\Zone;
 use Override;
 use RuntimeException;
 
+use function Safe\json_encode;
+
 class Client extends AbstractClient
 {
     private RestApiClientInterface $client;

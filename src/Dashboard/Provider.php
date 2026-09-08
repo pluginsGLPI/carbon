@@ -37,8 +37,6 @@ use Computer as GlpiComputer;
 use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
 use DateInterval;
-use DateTime;
-use DateTimeImmutable;
 use DBmysql;
 use DbUtils;
 use Glpi\Dashboard\Filter;
@@ -55,6 +53,8 @@ use GlpiPlugin\Carbon\Toolbox;
 use GlpiPlugin\Carbon\UsageImpact;
 use GlpiPlugin\Carbon\Zone;
 use RuntimeException;
+use Safe\DateTime;
+use Safe\DateTimeImmutable;
 use Search;
 use Session;
 use Toolbox as GlpiToolbox;
@@ -761,7 +761,7 @@ class Provider
                 $end_date->format('Y-m-d\TH:i:s.v\Z'),
             ],
         ];
-        return self::getUsageCarbonEmission($params);
+        return self::getImpactOfUsageCriteria('gwp', $params, ['itemtype' => PLUGIN_CARBON_TYPES]);
     }
 
     public static function getCarbonIntensity(array $params): array

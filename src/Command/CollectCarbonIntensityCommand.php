@@ -52,6 +52,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 
+use function Safe\define;
+
 // 6 months
 
 define('DATE_MIN', 'P6M');

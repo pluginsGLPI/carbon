@@ -33,8 +33,6 @@
 namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\Rte;
 
 use DateInterval;
-use DateTime;
-use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\AbstractClient;
@@ -46,8 +44,14 @@ use GlpiPlugin\Carbon\Toolbox;
 use GlpiPlugin\Carbon\Zone;
 use Override;
 use RuntimeException;
+use Safe\DateTime;
+use Safe\DateTimeImmutable;
 use Safe\Exceptions\FilesystemException;
 
+use function Safe\file_get_contents;
+use function Safe\file_put_contents;
+use function Safe\json_decode;
+use function Safe\json_encode;
 use function Safe\mkdir;
 
 /**

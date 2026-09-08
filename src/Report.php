@@ -33,12 +33,15 @@
 namespace GlpiPlugin\Carbon;
 
 use CommonDBTM;
-use DateTime;
-use DateTimeImmutable;
 use Glpi\Application\View\TemplateRenderer;
 use Glpi\Dashboard\Grid as DashboardGrid;
 use GlpiPlugin\Carbon\Dashboard\Provider;
 use Override;
+use Safe\DateTime;
+use Safe\DateTimeImmutable;
+
+use function Safe\ob_get_clean;
+use function Safe\ob_start;
 
 class Report extends CommonDBTM
 {
