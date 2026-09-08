@@ -37,7 +37,10 @@ use GlpiPlugin\Carbon\Config as PluginConfig;
 use GlpiPlugin\Carbon\DataSource\ConfigInterface;
 use GlpiPlugin\Carbon\DataSource\RestApiClient;
 use Override;
+use Safe\Exceptions\UrlException;
 use Session;
+
+use function Safe\parse_url;
 
 class Config implements ConfigInterface
 {
@@ -139,7 +142,11 @@ TWIG;
         }
 
         // Check if the URL has a valid scheme (http or https)
-        $parsed_url = parse_url($url);
+        try {
+            $parsed_url = parse_url($url);
+        } catch (UrlException $e) {
+            return false;
+        }
         if (!isset($parsed_url['scheme']) || !in_array($parsed_url['scheme'], ['http', 'https'])) {
             return false;
         }

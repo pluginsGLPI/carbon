@@ -46,6 +46,9 @@ use GlpiPlugin\Carbon\UsageInfo;
 use Location as GlpiLocation;
 use Profile as GlpiProfile;
 
+use function Safe\define;
+use function Safe\preg_match;
+
 // Version of the plugin (major.minor.bugfix)
 define('PLUGIN_CARBON_VERSION', '1.4.0-dev');
 // Schema version of this version (major.minor.bugfix)
@@ -123,7 +126,7 @@ function plugin_carbon_setupHooks()
         $PLUGIN_HOOKS[Hooks::DASHBOARD_DEFAULTS]['carbon'] = [Grid::class, 'getDefaults'];
     }
 
-    if (Session::haveRight('config', UPDATE)) {
+    if (Session::haveRight(GlpiConfig::$rightname, UPDATE)) {
         $PLUGIN_HOOKS['config_page']['carbon'] = 'front/config.form.php';
     }
 

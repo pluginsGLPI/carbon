@@ -33,7 +33,6 @@
 namespace GlpiPlugin\Carbon\Impact\History\Tests;
 
 use CommonDBTM;
-use DateTime;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\Impact\History\NetworkEquipment;
 use GlpiPlugin\Carbon\Location;
@@ -50,6 +49,7 @@ use NetworkEquipment as GlpiNetworkEquipment;
 use NetworkEquipmentModel as GlpiNetworkEquipmentModel;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
 use PHPUnit\Framework\Attributes\CoversClass;
+use Safe\DateTime;
 
 #[CoversClass(NetworkEquipment::class)]
 class NetworkEquipmentTest extends CommonAsset

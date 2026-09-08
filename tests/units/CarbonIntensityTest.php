@@ -33,8 +33,6 @@
 namespace GlpiPlugin\Carbon\Tests;
 
 use Computer;
-use DateTime;
-use DateTimeImmutable;
 use DateTimeInterface;
 use DBmysql;
 use GlpiPlugin\Carbon\CarbonIntensity;
@@ -44,6 +42,8 @@ use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 use Infocom;
 use PHPUnit\Framework\Attributes\CoversClass;
+use Safe\DateTime;
+use Safe\DateTimeImmutable;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\Output;
 

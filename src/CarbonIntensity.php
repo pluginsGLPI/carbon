@@ -34,14 +34,14 @@ namespace GlpiPlugin\Carbon;
 
 use CommonDropdown;
 use DateInterval;
-use DateTime;
-use DateTimeImmutable;
 use DateTimeInterface;
 use DBmysql;
 use Exception;
 use Glpi\DBAL\QueryParam;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientInterface;
 use Override;
+use Safe\DateTime;
+use Safe\DateTimeImmutable;
 use Symfony\Component\Console\Helper\ProgressBar;
 
 /**

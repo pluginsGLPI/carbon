@@ -29,7 +29,6 @@
  *
  * -------------------------------------------------------------------------
  */
-
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\Install;
@@ -38,6 +37,8 @@ use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\StreamOutput;
+
+use function Safe\fopen;
 
 /** @var DBmysql $DB */
 global $DB;

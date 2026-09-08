@@ -34,7 +34,7 @@ use CronTask as GlpiCronTask;
 use GlpiPlugin\Carbon\CronTask;
 use GlpiPlugin\Carbon\DataSource\CronTaskProvider;
 
-$cron_task_classes = CronTaskProvider::getCronTaskTypes();
+$cron_task_classes = CronTaskProvider::getCronTaskTypes(CronTaskProvider::getCronTaskDirectories());
 $automatic_actions = [];
 foreach ($cron_task_classes as $cron_task_class) {
     $automatic_actions = array_merge($automatic_actions, $cron_task_class::enumerateTasks());

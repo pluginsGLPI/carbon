@@ -52,6 +52,8 @@ use Override;
 use Session;
 use Twig\Extension\StringLoaderExtension;
 
+use function Safe\json_encode;
+
 class Config extends GlpiConfig
 {
     /**

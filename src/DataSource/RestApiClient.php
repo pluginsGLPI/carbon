@@ -39,6 +39,8 @@ use GuzzleHttp\Psr7\Request;
 use Override;
 use Toolbox;
 
+use function Safe\json_decode;
+
 class RestApiClient implements RestApiClientInterface
 {
     public const DEFAULT_TIMEOUT = 5;

@@ -39,6 +39,11 @@ use Migration;
 use Plugin;
 use RuntimeException;
 
+use function Safe\ini_set;
+use function Safe\preg_match;
+use function Safe\preg_replace;
+use function Safe\scandir;
+
 class Install
 {
     /**

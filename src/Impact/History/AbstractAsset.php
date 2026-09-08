@@ -35,7 +35,6 @@ namespace GlpiPlugin\Carbon\Impact\History;
 
 use CommonDBTM;
 use DateInterval;
-use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DBmysql;
@@ -50,6 +49,7 @@ use GlpiPlugin\Carbon\Toolbox;
 use GlpiPlugin\Carbon\UsageImpact;
 use LogicException;
 use Override;
+use Safe\DateTime;
 use Session;
 
 abstract class AbstractAsset extends CommonDBTM implements AssetInterface
