@@ -34,8 +34,6 @@ namespace GlpiPlugin\Carbon\Dashboard;
 
 use Computer;
 use DateInterval;
-use DateTime;
-use DateTimeImmutable;
 use Glpi\Application\View\TemplateRenderer;
 use Glpi\Dashboard\Widget as GlpiDashboardWidget;
 use GlpiPlugin\Carbon\Impact\Type;
@@ -43,6 +41,8 @@ use GlpiPlugin\Carbon\Toolbox;
 use Html;
 use Monitor;
 use NetworkEquipment;
+use Safe\DateTime;
+use Safe\DateTimeImmutable;
 use Toolbox as GlpiToolbox;
 
 class Widget extends GlpiDashboardWidget

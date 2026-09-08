@@ -32,17 +32,30 @@
 
 namespace GlpiPlugin\Carbon\DataSource;
 
+use DirectoryIterator;
+
 class CronTaskProvider
 {
-    public static function getCronTaskTypes(): array
+    /**
+     * Get all the cron task types available in the plugin.
+     *
+     * @param array<DirectoryIterator> $subdirs The subdirectories to search for cron tasks.
+     * @return array<string, class-string<CronTaskInterface>> An associative array where the keys are the cron task names and the values are the fully qualified class names of the cron tasks.
+     */
+    public static function getCronTaskTypes(array $subdirs): array
     {
-        $subdirs = ['CarbonIntensity', 'Lca'];
-        $types = [];
+        static $types = [];
+        if (!empty($types)) {
+            return $types;
+        }
         foreach ($subdirs as $subdir) {
-            foreach (glob(__DIR__ . '/' . $subdir . '/*', GLOB_ONLYDIR) as $connector_dir) {
-                $dir = basename($connector_dir);
-                $class_name = 'GlpiPlugin\\Carbon\\DataSource\\' . $subdir . '\\'
-                    . $dir . '\\CronTask';
+            foreach ($subdir as $connector_dir) {
+                if ($connector_dir->isDot() || !$connector_dir->isDir()) {
+                    continue;
+                }
+                $type_dir = basename(dirname($connector_dir->getPathname()));
+                $dir = $connector_dir->getBasename();
+                $class_name = 'GlpiPlugin\\Carbon\\DataSource\\' . $type_dir . '\\' . $dir . '\\CronTask';
                 if (!class_exists($class_name)) {
                     continue;
                 }
@@ -54,5 +67,18 @@ class CronTaskProvider
         }
 
         return $types;
+    }
+
+    /**
+     * Get the directories containing cron tasks.
+     *
+     * @return array<DirectoryIterator> The directories containing cron tasks.
+     */
+    public static function getCronTaskDirectories(): array
+    {
+        return [
+            new DirectoryIterator(__DIR__ . '/CarbonIntensity'),
+            new DirectoryIterator(__DIR__ . '/Lca'),
+        ];
     }
 }

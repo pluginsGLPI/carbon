@@ -133,7 +133,7 @@ class ImportDashboardCommandTest extends DbTestCase
                 $this->fail("Failed to get dashboard item with id {$row['id']}");
             }
             $item_fields = array_filter($item->fields, function ($key) {
-                return !in_array($key, ['id', 'dashboards_dashboards_id']);
+                return !in_array($key, ['id', 'dashboards_dashboards_id', 'date_creation', 'date_mod']);
             }, ARRAY_FILTER_USE_KEY);
             $item_fields['card_options'] = json_decode($item_fields['card_options'], true);
             $found = false;

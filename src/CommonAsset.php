@@ -33,6 +33,7 @@
 namespace GlpiPlugin\Carbon;
 
 use CommonDBTM;
+use GlpiPlugin\Carbon\Impact\History\AbstractAsset;
 use Html;
 use MassiveAction;
 use Override;
@@ -108,6 +109,9 @@ abstract class CommonAsset extends CommonDBTM
     public static function deleteUsageImpact(CommonDBTM $item): bool
     {
         $gwp_impact_class = '\\GlpiPlugin\\Carbon\\Impact\\History\\' . get_class($item);
+        if (!is_a($gwp_impact_class, AbstractAsset::class, true)) {
+            return false;
+        }
         $gwp_impact = new $gwp_impact_class();
         $success = $gwp_impact->resetForItem($item->getID());
 
