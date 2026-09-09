@@ -43,6 +43,7 @@ use Html;
 use InvalidArgumentException;
 use Location as GlpiLocation;
 use Override;
+use Session;
 
 class Source_Zone extends CommonDBRelation
 {
@@ -196,7 +197,12 @@ class Source_Zone extends CommonDBRelation
             // At least 1 entry then add JS to toggle the state of zones
             echo Html::scriptBlock('
                 var plugin_carbon_toggleZone = function (id) {
-                    fetch(CFG_GLPI["root_doc"] + "/plugins/carbon/ajax/toggleZoneDownload.php?id=" + id).then(response => {
+                    fetch(CFG_GLPI["root_doc"] + "/plugins/carbon/ajax/toggleZoneDownload.php?id=" + id, {
+                        method: "POST",
+                        headers: {
+                            "X-Glpi-Csrf-Token": "' . Session::getNewCSRFToken() . '"
+                        }
+                    }).then(response => {
                         if (response.status === 200) {
                             reloadTab();
                         } else {
@@ -295,7 +301,12 @@ class Source_Zone extends CommonDBRelation
             // At least 1 entry then add JS to toggle the state of zones
             echo Html::scriptBlock('
                 var plugin_carbon_toggleZone = function (id) {
-                    fetch(CFG_GLPI["root_doc"] + "/plugins/carbon/ajax/toggleZoneDownload.php?id=" + id).then(response => {
+                    fetch(CFG_GLPI["root_doc"] + "/plugins/carbon/ajax/toggleZoneDownload.php?id=" + id, {
+                        method: "POST",
+                        headers: {
+                            "X-Glpi-Csrf-Token": "' . Session::getNewCSRFToken() . '"
+                        }
+                    }).then(response => {
                         if (response.status === 200) {
                             reloadTab();
                         } else {

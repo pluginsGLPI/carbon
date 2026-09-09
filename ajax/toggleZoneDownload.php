@@ -50,14 +50,14 @@ if (!Source::canView() || ! GlpiConfig::canUpdate()) {
     die();
 }
 
-if (!isset($_GET['id'])) {
+if (!isset($_POST['id'])) {
     echo __('Bad request.', 'carbon');
     http_response_code(400);
     die();
 }
 
 $source_zone = new Source_Zone();
-if (!$source_zone->getFromDB($_GET['id'])) {
+if (!$source_zone->getFromDB($_POST['id'])) {
     echo __('Item not found.', 'carbon');
     http_response_code(403);
     die();
