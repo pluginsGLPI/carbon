@@ -35,6 +35,7 @@ namespace GlpiPlugin\Carbon\DataSource;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Message;
+use GuzzleHttp\Psr7\Request;
 use Override;
 use Toolbox;
 
@@ -73,10 +74,17 @@ class RestApiClient implements RestApiClientInterface
             $request = $this->api_client;
             $response = $request->request($method, $uri, $options);
         } catch (RequestException $e) {
+            $cleaned_request = new Request(
+                $e->getRequest()->getMethod(),
+                $e->getRequest()->getUri(),
+                [],
+                $request->getBody(),
+                $request->getProtocolVersion()
+            );
             $this->last_error = [
                 'title'     => "Plugins API error",
                 'exception' => $e->getMessage(),
-                'request'   => Message::toString($e->getRequest()),
+                'request'   => Message::toString($cleaned_request),
             ];
             if ($e->hasResponse()) {
                 $this->last_error['response'] = Message::toString($e->getResponse());
