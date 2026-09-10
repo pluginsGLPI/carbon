@@ -1,0 +1,25 @@
+<?php
+
+namespace GlpiPlugin\Cloudinventory;
+
+class CloudInstance
+{
+    /** @var array<string,mixed> */
+    public $fields = [];
+
+    /**
+     * @param array<string, mixed> $criteria
+     * @return bool
+     *
+     * @phpstan-impure
+     */
+    public function getFromDBByCrit(array $criteria): bool {}
+
+    public function isNewItem(): bool {}
+}
+
+class Amazon {}
+class Azure {}
+class Google {}
+class Ovh {}
+class Scaleway {}

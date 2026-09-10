@@ -30,41 +30,28 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Carbon\Dashboard;
+namespace GlpiPlugin\Carbon;
 
-use ComputerModel;
+use Plugin;
 
-class Dashboard
+/**
+ * Establish the functional bridge between Carbon and the plugin CloudInventory
+ */
+class CloudInventoryConnector
 {
-    /**
-     * Key of the dashboard used by the plugin in its reporting page
-     * @var string
-     */
-    public const REPORTING_DASHBOARD_KEY = 'plugin_carbon_board';
-
-    /**
-     * Returns total usage carbon emission per computer type.
-     *
-     * @return array of:
-     *  - float  'number': total carbon emission of the type
-     *  - string 'url': url to redirect when clicking on the slice
-     *  - string 'label': name of the computer type
-     */
-    public static function getTotalUsageCarbonEmissionPerType()
+    public static function checkPluginAvailability(): void
     {
-        return Provider::getSumUsageEmissionsPerType();
+        /** @var array $CFG_GLPI */
+        global $CFG_GLPI;
+
+        $CFG_GLPI['plugin:carbon']['use_cloudinventory'] = Plugin::isPluginActive('cloudinventory');
     }
 
-    /**
-     * Returns total power per computer model.
-     *
-     * @return array of:
-     *   - int  'number': total power of the model
-     *   - string 'url': url to redirect when clicking on the slice
-     *   - string 'label': name of the computer model
-     */
-    public static function getTotalPowerPerModel(): array
+    public function pluginAvailable(): bool
     {
-        return Provider::getSumPowerPerModel([ComputerModel::getTableField('power_consumption') => ['>', '0']]);
+        /** @var array $CFG_GLPI */
+        global $CFG_GLPI;
+
+        return $CFG_GLPI['plugin:carbon']['use_cloudinventory'] ?? false;
     }
 }

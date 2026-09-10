@@ -55,6 +55,10 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
     /** @var Client instance of the HTTP client */
     protected ?Client $client = null;
 
+    protected const USAGE_NULL = [
+        'avg_power' => 0,
+    ];
+
     // abstract public static function getEngine(CommonDBTM $item): EngineInterface;
 
     /**

@@ -251,7 +251,7 @@ class CarbonIntensity extends CommonDropdown
             $gap_end = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $gap['end']);
             $count = $data_source->fullDownload($source_zone, $gap_start, $gap_end, $this, $limit, $progress_bar);
             $total_count += $count;
-            if ($total_count >= $limit) {
+            if ($limit > 0 && $total_count >= $limit) {
                 return $total_count;
             }
         }

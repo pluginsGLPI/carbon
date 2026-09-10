@@ -124,10 +124,6 @@ class ConfigTest extends DbTestCase
         /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
-        $CFG_GLPI['plugi:carbon']['lca_datasources'] = [
-            Client::class,
-        ];
-
         $result = (new Config())->configUpdate($input);
         $this->assertEquals($expected, $result);
     }

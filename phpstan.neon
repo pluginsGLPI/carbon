@@ -5,6 +5,7 @@ parameters:
     bootstrapFiles:
         - ../../stubs/glpi_constants.php
         - ../../vendor/autoload.php
+        - stubs/OptionalClass.php.stub
     paths:
         - src
         - front
@@ -17,5 +18,6 @@ parameters:
         - ../../src
     stubFiles:
         - ../../stubs/glpi_constants.php
+        - ./stubs/OptionalClass.php.stub
 rules:
     - GlpiProject\Tools\PHPStan\Rules\GlobalVarTypeRule
