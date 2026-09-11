@@ -71,6 +71,31 @@ class Source_ZoneTest extends DbTestCase
         $this->assertNotEmpty($output);
     }
 
+    public function test_prepareInputForUpdate_toggles_the_download_flag()
+    {
+        $source = $this->createItem(Source::class, [
+            'name' => 'foo',
+        ]);
+        $zone = $this->createItem(Zone::class, [
+            'name' => 'bar',
+        ]);
+        $instance = $this->createItem(Source_Zone::class, [
+            $source::getForeignKeyField() => $source->getID(),
+            $zone::getForeignKeyField() => $zone->getID(),
+            'is_download_enabled' => 0,
+        ]);
+
+        $input = ['_toggle_is_download_enabled' => 1];
+        $output = $instance->prepareInputForUpdate($input);
+        $this->assertEquals(1, $output['is_download_enabled']);
+
+        // Test toggling back to 0
+        $instance->fields['is_download_enabled'] = 1;
+        $input = ['_toggle_is_download_enabled' => 1];
+        $output = $instance->prepareInputForUpdate($input);
+        $this->assertEquals(0, $output['is_download_enabled']);
+    }
+
     public function test_showForZone_shows_nothing_when_user_cannot_view_the_related_zone()
     {
         $source = $this->createItem(Source::class, [
