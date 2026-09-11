@@ -64,6 +64,15 @@ class Source_Zone extends CommonDBRelation
         return self::createTabEntry(Source::getTypeName(), 0);
     }
 
+    public function prepareInputForUpdate($input)
+    {
+        if (isset($input['_toggle_is_download_enabled'])) {
+            $input['is_download_enabled'] = ($this->fields['is_download_enabled'] == 1) ? 0 : 1;
+            unset($input['_toggle_is_download_enabled']);
+        }
+        return parent::prepareInputForUpdate($input);
+    }
+
     #[Override]
     public function rawSearchOptions()
     {
@@ -197,9 +206,7 @@ class Source_Zone extends CommonDBRelation
             // At least 1 entry then add JS to toggle the state of zones
             echo Html::scriptBlock('
                 var plugin_carbon_toggleZone = function (id) {
-                    var csrfToken = "' . Session::getNewCSRFToken() . '";
                     var formData = new FormData();
-                    formData.append("_glpi_csrf_token", csrfToken);
                     formData.append("id", id);
                     fetch(CFG_GLPI["root_doc"] + "/plugins/carbon/ajax/toggleZoneDownload.php", {
                         method: "POST",
@@ -210,7 +217,7 @@ class Source_Zone extends CommonDBRelation
                     }).then(response => {
                         reloadTab();
                     });
-                };
+                }
             ');
         }
     }
@@ -300,9 +307,7 @@ class Source_Zone extends CommonDBRelation
             // At least 1 entry then add JS to toggle the state of zones
             echo Html::scriptBlock('
                 var plugin_carbon_toggleZone = function (id) {
-                    var csrfToken = "' . Session::getNewCSRFToken() . '";
                     var formData = new FormData();
-                    formData.append("_glpi_csrf_token", csrfToken);
                     formData.append("id", id);
                     fetch(CFG_GLPI["root_doc"] + "/plugins/carbon/ajax/toggleZoneDownload.php", {
                         method: "POST",
@@ -313,7 +318,7 @@ class Source_Zone extends CommonDBRelation
                     }).then(response => {
                         reloadTab();
                     });
-                };
+                }
             ');
         }
     }

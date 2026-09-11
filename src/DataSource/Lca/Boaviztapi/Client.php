@@ -277,7 +277,7 @@ class Client extends AbstractClient
         return $impacts;
     }
 
-    protected function parseCriteria(string $name, $impact): ?TrackedFloat
+    protected function parseCriteria(string $name, string|array $impact): ?TrackedFloat
     {
         if ($impact === 'not implemented') {
             return null;
