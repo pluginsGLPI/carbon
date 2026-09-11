@@ -44,16 +44,21 @@ class ComputerTypeTest extends AbstractTypeTest
     protected static string $glpi_type_itemtype = GlpiComputerType::class;
     protected static string $type_itemtype = ComputerType::class;
 
-    public function testGetTabNameForItem()
+    public function test_GetTabNameForItem_returns_empty_string_for_computer()
+    {
+        $glpi_computer_type = $this->createItem(GlpiComputerType::class);
+        $instance = new ComputerType();
+        $result = $instance->getTabNameForItem($glpi_computer_type, 1);
+        $this->assertEquals('', $result);
+    }
+
+    public function test_GetTabNameForItem_returns_tab_name_for_computer_type()
     {
         $glpi_computer_type = $this->createItem(GlpiComputerType::class);
         $instance = new ComputerType();
         $result = $instance->getTabNameForItem($glpi_computer_type);
         $crawler = new Crawler($result);
         $this->assertEquals('Carbon', $crawler->text());
-
-        $result = $instance->getTabNameForItem($glpi_computer_type, 1);
-        $this->assertEquals('', $result);
     }
 
     public function testShowForItemType()
