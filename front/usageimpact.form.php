@@ -92,6 +92,10 @@ if (isset($_POST['update'])) {
     /** @var AbstractAsset $history */
     $gwp_impact = new $gwp_impact_class();
     $itemtype = $gwp_impact->getItemtype();
+    if (!is_a($itemtype, CommonDBTM::class, true)) {
+        Session::addMessageAfterRedirect(__('Bad arguments.', 'carbon'), false, ERROR);
+        Html::back();
+    }
     $item = new $itemtype();
     $item->getFromDB($_POST['items_id']);
     if (!$item->canUpdateItem()) {
@@ -110,7 +114,7 @@ if (isset($_POST['update'])) {
     }
 
     $itemtype = $_POST['itemtype'];
-    if (!Toolbox::isCommonDBTM($itemtype)) {
+    if (!is_a($itemtype, CommonDBTM::class, true)) {
         Session::addMessageAfterRedirect(__('Bad arguments.', 'carbon'), false, ERROR);
         Html::back();
     }

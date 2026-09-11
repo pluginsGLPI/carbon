@@ -34,10 +34,8 @@ namespace GlpiPlugin\Carbon\Impact\History\Tests;
 
 use CommonDBTM;
 use Computer as GlpiComputer;
-use Computer_Item;
 use ComputerModel;
 use ComputerType as GlpiComputerType;
-use DateTime;
 use DBmysql;
 use Glpi\Asset\Asset_PeripheralAsset;
 use GlpiPlugin\Carbon\CarbonEmission;
@@ -57,6 +55,7 @@ use Monitor as GlpiMonitor;
 use MonitorModel as GlpiMonitorModel;
 use MonitorType as GlpiMonitorType;
 use PHPUnit\Framework\Attributes\CoversClass;
+use Safe\DateTime;
 
 #[CoversClass(Monitor::class)]
 class MonitorTest extends CommonAsset

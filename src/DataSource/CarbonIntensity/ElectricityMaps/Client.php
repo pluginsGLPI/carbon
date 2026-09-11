@@ -33,11 +33,8 @@
 namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\ElectricityMaps;
 
 use DateInterval;
-use DateTime;
-use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
-use DBmysql;
 use GLPIKey;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\AbortException;
@@ -50,8 +47,17 @@ use GlpiPlugin\Carbon\Toolbox;
 use GlpiPlugin\Carbon\Zone;
 use Override;
 use RuntimeException;
+use Safe\DateTime;
+use Safe\DateTimeImmutable;
 use Safe\Exceptions\FilesystemException;
 use Symfony\Component\Console\Helper\ProgressBar;
+
+use function Safe\file_get_contents;
+use function Safe\file_put_contents;
+use function Safe\json_decode;
+use function Safe\json_encode;
+use function Safe\mkdir;
+use function Safe\preg_match;
 
 /**
  * Query carbon intensity data from Electricity map
@@ -239,7 +245,7 @@ class Client extends AbstractClient
             if ($response['message'] === 'Invalid auth-token') {
                 throw new AbortException('Invalid auth-token');
             }
-            if (preg_match("#^Zone '[^']*' does not exist.$#", $response['message']) !== false) {
+            if (preg_match("#^Zone '[^']*' does not exist.$#", $response['message']) === 1) {
                 throw new AbortException($response['message']);
             }
             return [];
@@ -249,9 +255,6 @@ class Client extends AbstractClient
         $timezone = new DateTimeZone('UTC');
         foreach ($response['history'] as $record) {
             $datetime = DateTime::createFromFormat('Y-m-d\TH:i:s+', $record['datetime'], $timezone);
-            if (!$datetime instanceof DateTimeInterface) {
-                continue;
-            }
             $data_quality = $this->getDataQuality($record);
             $intensities[] = [
                 'datetime' => $datetime->format('Y-m-d\TH:i:s'),
@@ -412,11 +415,8 @@ class Client extends AbstractClient
      */
     protected function shiftToLocalTimezone(array $response): array
     {
-        /** @var DBmysql $DB */
-        global $DB;
-
         $shifted_response = [];
-        $local_timezone = new DateTimeZone($DB->guessTimezone());
+        $local_timezone = new DateTimeZone(date_default_timezone_get());
         array_walk($response, function ($item, $key) use (&$shifted_response, $local_timezone) {
             $shifted_date_object = DateTime::createFromFormat('Y-m-d\TH:i:s.vp', $item['datetime'])
                 ->setTimezone($local_timezone);

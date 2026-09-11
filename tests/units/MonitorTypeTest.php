@@ -78,9 +78,7 @@ class MonitorTypeTest extends AbstractTypeTest
 
     public function testShowMassiveActionsSubForm()
     {
-        $massive_action = $this->getMockBuilder(MassiveAction::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $massive_action = $this->createStub(MassiveAction::class);
         $massive_action->method('getAction')->willReturn('MassUpdatePower');
         $massive_action->method('getItems')->willReturn([
             MonitorType::class => $this->createItem(GlpiMonitorType::class),
@@ -106,9 +104,7 @@ class MonitorTypeTest extends AbstractTypeTest
         });
         $this->assertTrue($result);
 
-        $massive_action = $this->getMockBuilder(MassiveAction::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $massive_action = $this->createStub(MassiveAction::class);
         $massive_action->method('getAction')->willReturn('');
         $massive_action->method('getItems')->willReturn([
             MonitorType::class => $this->createItem(GlpiMonitorType::class),
@@ -125,9 +121,7 @@ class MonitorTypeTest extends AbstractTypeTest
     public function testProcessMassiveActionForOneItemtype()
     {
         // Test update power consumption
-        $massive_action = $this->getMockBuilder(MassiveAction::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $massive_action = $this->createStub(MassiveAction::class);
         $massive_action->method('getAction')->willReturn('MassUpdatePower');
         $glpi_monitor_type = $this->createItem(GlpiMonitorType::class);
         $massive_action->POST = [

@@ -35,6 +35,9 @@
 
 use Glpi\Dashboard\Item as DashboardItem;
 
+use function Safe\json_decode;
+use function Safe\json_encode;
+
 $new_criteria = [
     'gwppb'   => '(unit g CO2 eq) Biogenic climate change potential',
     'gwppf'   => '(unit g CO2 eq) Fossil climate change potential',

@@ -44,8 +44,8 @@ use Session;
 
 class CarbonEmission extends CommonDBChild
 {
-    public static $itemtype = 'itemtype';
-    public static $items_id = 'items_id';
+    public static string $itemtype = 'itemtype';
+    public static string $items_id = 'items_id';
 
     #[Override]
     public static function getTypeName($nb = 0)
@@ -229,6 +229,6 @@ class CarbonEmission extends CommonDBChild
             return false;
         }
 
-        return $DB->delete(static::getTable(), [1]);
+        return $DB->delete(static::getTable(), ['NOT' => ['id' => null]]);
     }
 }

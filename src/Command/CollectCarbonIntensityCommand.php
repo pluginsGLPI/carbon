@@ -52,6 +52,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 
+use function Safe\define;
+
 // 6 months
 
 define('DATE_MIN', 'P6M');
@@ -117,7 +119,7 @@ class CollectCarbonIntensityCommand extends AbstractCommand
     }
 
     #[Override]
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (count($this->zones) > 1 && $input->getArgument('zone') === null) {
             // Null is not a valid key if there are several zones available for the source

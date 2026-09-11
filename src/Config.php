@@ -52,6 +52,8 @@ use Override;
 use Session;
 use Twig\Extension\StringLoaderExtension;
 
+use function Safe\json_encode;
+
 class Config extends GlpiConfig
 {
     /**
@@ -68,12 +70,18 @@ class Config extends GlpiConfig
     }
 
     #[Override]
+    public static function getIcon(): string
+    {
+        return 'fa-solid fa-solar-panel';
+    }
+
+    #[Override]
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         $tabName = '';
         if (!$withtemplate) {
             if ($item->getType() == GlpiConfig::class) {
-                $tabName = self::getTypeName();
+                $tabName = GlpiConfig::createTabEntry(self::getTypeName(), 0, $item::class, self::getIcon());
             }
         }
         return $tabName;
@@ -123,7 +131,6 @@ class Config extends GlpiConfig
 
         $current_config = array_diff_key($current_config, array_flip($secured_config));
         $reset_args = json_encode([
-            '_glpi_csrf_token' => Session::getNewCSRFToken(),
             'reset_all'        => '',
         ]);
         $usage_impact_action_url    = 'submitGetLink("' . $CFG_GLPI['root_doc'] . '/plugins/carbon/front/usageimpact.form.php", ' . $reset_args . ')';
@@ -146,6 +153,32 @@ class Config extends GlpiConfig
         ]);
 
         return true;
+    }
+
+    /**
+     * Set config values : create or update entry
+     *
+     * @param string $context context to get values (default for glpi is core)
+     * @param array  $values  config names to set
+     *
+     * @return void
+     */
+    public static function setConfigurationValues($context, array $values = [])
+    {
+        GlpiConfig::setConfigurationValues($context, $values);
+    }
+
+    /**
+     * Get config value
+     *
+     * @param $context  string   context to get values (default for glpi is core)
+     * @param $name     string   config name
+     *
+     * @return mixed
+     */
+    public static function getConfigurationValue(string $context, string $name)
+    {
+        return GlpiConfig::getConfigurationValue($context, $name);
     }
 
     /**

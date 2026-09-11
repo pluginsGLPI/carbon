@@ -46,13 +46,13 @@ use Override;
 
 class Source_Zone extends CommonDBRelation
 {
-    public static $itemtype_1 = Source::class; // Type ref or field name (must start with itemtype)
-    public static $items_id_1 = 'plugin_carbon_sources_id'; // Field name
-    public static $checkItem_1_Rights = self::HAVE_SAME_RIGHT_ON_ITEM;
+    public static ?string $itemtype_1 = Source::class; // Type ref or field name (must start with itemtype)
+    public static ?string $items_id_1 = 'plugin_carbon_sources_id'; // Field name
+    public static int $checkItem_1_Rights = self::HAVE_SAME_RIGHT_ON_ITEM;
 
-    public static $itemtype_2 = Zone::class; // Type ref or field name (must start with itemtype)
-    public static $items_id_2 = 'plugin_carbon_zones_id'; // Field name
-    public static $checkItem_2_Rights = self::HAVE_SAME_RIGHT_ON_ITEM;
+    public static ?string $itemtype_2 = Zone::class; // Type ref or field name (must start with itemtype)
+    public static ?string $items_id_2 = 'plugin_carbon_zones_id'; // Field name
+    public static int $checkItem_2_Rights = self::HAVE_SAME_RIGHT_ON_ITEM;
 
     #[Override]
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
@@ -61,6 +61,15 @@ class Source_Zone extends CommonDBRelation
             return self::createTabEntry(Zone::getTypeName(), 0);
         }
         return self::createTabEntry(Source::getTypeName(), 0);
+    }
+
+    public function prepareInputForUpdate($input)
+    {
+        if (isset($input['_toggle_is_download_enabled'])) {
+            $input['is_download_enabled'] = ($this->fields['is_download_enabled'] == 1) ? 0 : 1;
+            unset($input['_toggle_is_download_enabled']);
+        }
+        return parent::prepareInputForUpdate($input);
     }
 
     #[Override]
@@ -196,16 +205,14 @@ class Source_Zone extends CommonDBRelation
             // At least 1 entry then add JS to toggle the state of zones
             echo Html::scriptBlock('
                 var plugin_carbon_toggleZone = function (id) {
-                    fetch(CFG_GLPI["root_doc"] + "/plugins/carbon/ajax/toggleZoneDownload.php?id=" + id).then(response => {
-                        if (response.status === 200) {
-                            reloadTab();
-                        } else {
-                            response.text().then(function (text) {
-                                glpi_toast_error(text)
-                            });
-                        }
+                    debugger;
+                    var url = CFG_GLPI["root_doc"] + "/plugins/carbon/front/source_zone.form.php?id=" + id;
+                    submitGetLink(url, {
+                        "update": "",
+                        "id": id,
+                        "_toggle_is_download_enabled": 1,
                     });
-                };
+                }
             ');
         }
     }
@@ -295,16 +302,14 @@ class Source_Zone extends CommonDBRelation
             // At least 1 entry then add JS to toggle the state of zones
             echo Html::scriptBlock('
                 var plugin_carbon_toggleZone = function (id) {
-                    fetch(CFG_GLPI["root_doc"] + "/plugins/carbon/ajax/toggleZoneDownload.php?id=" + id).then(response => {
-                        if (response.status === 200) {
-                            reloadTab();
-                        } else {
-                            response.text().then(function (text) {
-                                glpi_toast_error(text)
-                            });
-                        }
+                    debugger;
+                    var url = CFG_GLPI["root_doc"] + "/plugins/carbon/front/source_zone.form.php?id=" + id;
+                    submitGetLink(url, {
+                        "update": "",
+                        "id": id,
+                        "_toggle_is_download_enabled": 1,
                     });
-                };
+                }
             ');
         }
     }

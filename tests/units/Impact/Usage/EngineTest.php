@@ -54,8 +54,7 @@ class EngineTest extends DbTestCase
         $version_response = [
             '1.3.11',
         ];
-        $client_stub = $this->getMockBuilder(RestApiClient::class)
-            ->getMock();
+        $client_stub = $this->createStub(RestApiClient::class);
         $client_stub->method('request')->willReturn($version_response);
 
         $item = $this->createItem(GlpiComputer::class);

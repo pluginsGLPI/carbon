@@ -33,7 +33,6 @@
 namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\Rte;
 
 use DateTime;
-use DateTimeImmutable;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
 use GlpiPlugin\Carbon\Source;
@@ -41,6 +40,7 @@ use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Tests\DbTestCase;
 use GlpiPlugin\Carbon\Zone;
 use PHPUnit\Framework\Attributes\CoversClass;
+use Safe\DateTimeImmutable;
 
 #[CoversClass(Client::class)]
 class ClientTest extends DbTestCase

@@ -36,6 +36,8 @@ use GlpiPlugin\Carbon\DataSource\ConfigInterface;
 use GlpiPlugin\Carbon\DataSource\RestApiClient;
 use InvalidArgumentException;
 
+use function Safe\glob;
+
 class ClientFactory
 {
     /**
@@ -144,6 +146,9 @@ class ClientFactory
 
         $class_name = array_search($name, $names);
         $rest_api_client = new RestApiClient([]);
+        if (!is_a($class_name, AbstractClient::class, true)) {
+            throw new InvalidArgumentException("Class $class_name is not a subclass of AbstractClient");
+        }
         return new $class_name($rest_api_client);
     }
 }

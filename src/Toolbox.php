@@ -33,8 +33,6 @@
 namespace GlpiPlugin\Carbon;
 
 use DateInterval;
-use DateTime;
-use DateTimeImmutable;
 use DateTimeInterface;
 use DBmysql;
 use Glpi\Dashboard\Dashboard as GlpiDashboard;
@@ -45,6 +43,9 @@ use Infocom;
 use InvalidArgumentException;
 use Location;
 use Mexitek\PHPColors\Color;
+use Safe\DateTime;
+use Safe\DateTimeImmutable;
+use Safe\Exceptions\DatetimeException;
 use Toolbox as GlpiToolbox;
 
 class Toolbox
@@ -107,10 +108,15 @@ class Toolbox
         if ($oldest_date === null) {
             return null;
         }
-        if (($output = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $oldest_date)) === false) {
-            // Infocom dates are date (without time)
-            $output = DateTimeImmutable::createFromFormat('Y-m-d', $oldest_date);
-            $output = $output->setTime(0, 0, 0, 0);
+        try {
+            $output = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $oldest_date);
+        } catch (DatetimeException $e) {
+            try {
+                $output = DateTimeImmutable::createFromFormat('Y-m-d', $oldest_date);
+                $output = $output->setTime(0, 0, 0, 0);
+            } catch (DatetimeException $e) {
+                throw $e;
+            }
         }
 
         return $output;
@@ -165,10 +171,15 @@ class Toolbox
         if ($latest_date === null) {
             return null;
         }
-        if (($output = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $latest_date)) === false) {
-            // Infocom dates are date (without time)
-            $output = DateTimeImmutable::createFromFormat('Y-m-d', $latest_date);
-            $output = $output->setTime(23, 59, 59, 0);
+        try {
+            $output = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $latest_date);
+        } catch (DatetimeException $e) {
+            try {
+                $output = DateTimeImmutable::createFromFormat('Y-m-d', $latest_date);
+                $output = $output->setTime(23, 59, 59, 0);
+            } catch (DatetimeException $e) {
+                throw $e;
+            }
         }
 
         return $output;
@@ -562,6 +573,10 @@ class Toolbox
         if ($stop === null) {
             // Assume stop date is yesterday at midnight
             $stop = new DateTime('yesterday midnight');
+        }
+        if ($start > $stop) {
+            // Fix start so that it does not exeeds stop
+            $start = clone $stop;
         }
         $sql_interval = self::dateIntervalToMySQLInterval($interval);
 

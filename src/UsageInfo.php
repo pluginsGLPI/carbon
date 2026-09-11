@@ -36,7 +36,6 @@ use CommonDBChild;
 use CommonDBTM;
 use CommonGLPI;
 use Computer as GlpiComputer;
-use DateTime;
 use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Carbon\Dashboard\Provider;
 use GlpiPlugin\Carbon\Dashboard\Widget;
@@ -46,17 +45,17 @@ use Infocom;
 use Monitor as GlpiMonitor;
 use NetworkEquipment as GlpiNetworkEquipment;
 use Override;
-use Toolbox as GlpiToolbox;
+use Safe\DateTime;
 
 /**
  * Relation between a computer and a usage profile
  */
 class UsageInfo extends CommonDBChild
 {
-    public static $itemtype = 'itemtype';
-    public static $items_id = 'items_id';
+    public static string $itemtype = 'itemtype';
+    public static string $items_id = 'items_id';
 
-    public static $rightname = 'carbon:report';
+    public static string $rightname = 'carbon:report';
 
     #[Override]
     public static function getTypeName($nb = 0)
@@ -161,7 +160,7 @@ class UsageInfo extends CommonDBChild
         ];
         $this->initForm($this->getID(), $options);
         $asset_itemtype = $this->fields['itemtype'];
-        if (!GlpiToolbox::isCommonDBTM($asset_itemtype)) {
+        if (!is_a($asset_itemtype, CommonDBTM::class, true)) {
             return;
         }
         $asset = new $asset_itemtype();
