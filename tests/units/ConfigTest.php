@@ -56,14 +56,20 @@ class ConfigTest extends DbTestCase
         $this->assertEquals('Environmental Impact', $result);
     }
 
-    public function testGetTabNameForItem()
+    public function test_GetTabNameForItem_returns_empty_string_for_computer()
     {
         $instance = new Config();
         $result = $instance->getTabNameForItem(new GlpiComputer());
         $this->assertEquals('', $result);
 
+    }
+
+    public function test_GetTabNameForItem_returns_tab_name_for_config()
+    {
+        $instance = new Config();
         $result = $instance->getTabNameForItem(new GlpiConfig());
-        $this->assertEquals('Environmental Impact', $result);
+        $crawler = new Crawler($result);
+        $this->assertEquals('Environmental Impact', $crawler->text());
     }
 
     public function testDisplayTabContentForItem()
