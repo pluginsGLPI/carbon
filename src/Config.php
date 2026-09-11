@@ -70,12 +70,18 @@ class Config extends GlpiConfig
     }
 
     #[Override]
+    public static function getIcon(): string
+    {
+        return 'fa-solid fa-solar-panel';
+    }
+
+    #[Override]
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         $tabName = '';
         if (!$withtemplate) {
             if ($item->getType() == GlpiConfig::class) {
-                $tabName = self::getTypeName();
+                $tabName = GlpiConfig::createTabEntry(self::getTypeName(), 0, $item::class, self::getIcon());
             }
         }
         return $tabName;
