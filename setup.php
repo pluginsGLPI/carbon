@@ -32,6 +32,7 @@
 
 use Config as GlpiConfig;
 use CronTask as GlpiCronTask;
+use Glpi\Config\ProxyExclusion;
 use Glpi\Plugin\Hooks;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\CronTask;
@@ -105,6 +106,11 @@ function plugin_init_carbon()
     plugin_carbon_registerClasses();
 
     $CFG_GLPI['javascript']['tools'][strtolower(Report::class)] = ['dashboard'];
+    $proxy_exclusions = $CFG_GLPI['possible_proxy_exclusions'];
+    $proxy_exclusions->addExclusion(new ProxyExclusion(
+        Config::class,
+        plugin_carbon_getFriendlyName(),
+    ));
 }
 
 function plugin_carbon_setupHooks()
