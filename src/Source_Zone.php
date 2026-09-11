@@ -63,6 +63,15 @@ class Source_Zone extends CommonDBRelation
         return self::createTabEntry(Source::getTypeName(), 0);
     }
 
+    public function prepareInputForUpdate($input)
+    {
+        if (isset($input['_toggle_is_download_enabled'])) {
+            $input['is_download_enabled'] = ($this->fields['is_download_enabled'] == 1) ? 0 : 1;
+            unset($input['_toggle_is_download_enabled']);
+        }
+        return parent::prepareInputForUpdate($input);
+    }
+
     #[Override]
     public function rawSearchOptions()
     {
@@ -196,16 +205,14 @@ class Source_Zone extends CommonDBRelation
             // At least 1 entry then add JS to toggle the state of zones
             echo Html::scriptBlock('
                 var plugin_carbon_toggleZone = function (id) {
-                    fetch(CFG_GLPI["root_doc"] + "/plugins/carbon/ajax/toggleZoneDownload.php?id=" + id).then(response => {
-                        if (response.status === 200) {
-                            reloadTab();
-                        } else {
-                            response.text().then(function (text) {
-                                glpi_toast_error(text)
-                            });
-                        }
+                    debugger;
+                    var url = CFG_GLPI["root_doc"] + "/plugins/carbon/front/source_zone.form.php?id=" + id;
+                    submitGetLink(url, {
+                        "update": "",
+                        "id": id,
+                        "_toggle_is_download_enabled": 1,
                     });
-                };
+                }
             ');
         }
     }
@@ -295,16 +302,14 @@ class Source_Zone extends CommonDBRelation
             // At least 1 entry then add JS to toggle the state of zones
             echo Html::scriptBlock('
                 var plugin_carbon_toggleZone = function (id) {
-                    fetch(CFG_GLPI["root_doc"] + "/plugins/carbon/ajax/toggleZoneDownload.php?id=" + id).then(response => {
-                        if (response.status === 200) {
-                            reloadTab();
-                        } else {
-                            response.text().then(function (text) {
-                                glpi_toast_error(text)
-                            });
-                        }
+                    debugger;
+                    var url = CFG_GLPI["root_doc"] + "/plugins/carbon/front/source_zone.form.php?id=" + id;
+                    submitGetLink(url, {
+                        "update": "",
+                        "id": id,
+                        "_toggle_is_download_enabled": 1,
                     });
-                };
+                }
             ');
         }
     }

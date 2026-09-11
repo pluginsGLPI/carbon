@@ -34,8 +34,6 @@ namespace GlpiPlugin\Carbon\DataSource;
 
 use Glpi\Toolbox\HttpClient;
 use GlpiPlugin\Carbon\Config;
-use GuzzleHttp\Psr7\Message;
-use GuzzleHttp\Psr7\Request;
 use Override;
 use RuntimeException;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;

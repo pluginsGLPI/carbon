@@ -574,6 +574,10 @@ class Toolbox
             // Assume stop date is yesterday at midnight
             $stop = new DateTime('yesterday midnight');
         }
+        if ($start > $stop) {
+            // Fix start so that it does not exeeds stop
+            $start = clone $stop;
+        }
         $sql_interval = self::dateIntervalToMySQLInterval($interval);
 
         $start_string = $start->format('Y-m-d H:i:s');
