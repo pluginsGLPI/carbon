@@ -39,6 +39,7 @@ use CronTask as GlpiCronTask;
 use Geocoder\Exception\QuotaExceeded;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientFactory;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientInterface;
+use GlpiPlugin\Carbon\DataSource\CronTaskInterface;
 use GlpiPlugin\Carbon\DataSource\CronTaskProvider;
 use GlpiPlugin\Carbon\Impact\Embodied\Engine as EmbodiedEngine;
 use GlpiPlugin\Carbon\Impact\History\AssetInterface;
@@ -60,7 +61,10 @@ class CronTask extends CommonGLPI
         if (!$item instanceof GlpiCronTask) {
             return '';
         }
-        if (!in_array($item->fields['itemtype'], CronTaskProvider::getCronTaskTypes())) {
+        if (!in_array($item->fields['itemtype'], CronTaskProvider::getCronTaskTypes(CronTaskProvider::getCronTaskDirectories()))) {
+            return '';
+        }
+        if (!is_a($item->fields['itemtype'], CronTaskInterface::class, true)) {
             return '';
         }
         $client_cron_task = new $item->fields['itemtype']();
@@ -81,7 +85,10 @@ class CronTask extends CommonGLPI
     public function showForCronTask(CommonDBTM $item)
     {
         $itemtype = $item->fields['itemtype'];
-        if (!in_array($itemtype, CronTaskProvider::getCronTaskTypes())) {
+        if (!in_array($itemtype, CronTaskProvider::getCronTaskTypes(CronTaskProvider::getCronTaskDirectories()))) {
+            return;
+        }
+        if (!is_a($itemtype, CronTaskInterface::class, true)) {
             return;
         }
         $crontask = new $itemtype();
@@ -151,7 +158,9 @@ class CronTask extends CommonGLPI
         // Calculate GWP
         $count = 0;
         foreach ($usage_impacts as $usage_impact_type) {
-            /** @var AssetInterface $usage_impact */
+            if (!is_a($usage_impact_type, AssetInterface::class, true)) {
+                continue;
+            }
             $usage_impact = new $usage_impact_type();
             $usage_impact->setLimit($limit_per_type);
             $count = $usage_impact->evaluateItems($usage_impact->getItemsToEvaluate());

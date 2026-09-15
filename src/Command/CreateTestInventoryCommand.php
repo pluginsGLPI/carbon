@@ -40,6 +40,7 @@ use Entity;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\UsageInfo;
+use InvalidArgumentException;
 use Location;
 use Override;
 use Symfony\Component\Console\Command\Command;
@@ -141,7 +142,7 @@ class CreateTestInventoryCommand extends Command
     }
 
     #[Override]
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->output = $output;
 
@@ -161,6 +162,9 @@ class CreateTestInventoryCommand extends Command
 
     private function createItemIfNotExist(string $item_type, array $crit, ?array $input = null): CommonDBTM
     {
+        if (!is_a($item_type, CommonDBTM::class, true)) {
+            throw new InvalidArgumentException("Item type $item_type is not a subclass of CommonDBTM");
+        }
         $item = new $item_type();
 
         $ret = $item->getFromDBByCrit($crit);

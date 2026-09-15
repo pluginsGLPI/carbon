@@ -37,8 +37,13 @@ use Glpi\Dashboard\Dashboard;
 use Glpi\Dashboard\Filter;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\Impact\Type;
+use JsonException;
 use Plugin;
+use Safe\Exceptions\FilesystemException;
 use Session;
+
+use function Safe\file_get_contents;
+use function Safe\json_decode;
 
 /**
  * @phpstan-import-type DashboardConfigDescription from Dashboard
@@ -353,12 +358,14 @@ class Grid
     public static function getDefaults(?array $defaults = null): ?array
     {
         $cards_path = Plugin::getPhpDir('carbon') . '/install/data/report_dashboard.json';
-        $cards = file_get_contents($cards_path);
-        if ($cards === false) {
+        try {
+            $cards = file_get_contents($cards_path);
+        } catch (FilesystemException $e) {
             return $defaults;
         }
-        $cards = json_decode($cards, true);
-        if ($cards === null) {
+        try {
+            $cards = json_decode($cards, true);
+        } catch (JsonException $e) {
             return $defaults;
         }
 

@@ -39,6 +39,7 @@ use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\CronTask;
 use GlpiPlugin\Carbon\DataSource\AbstractCronTask as DatasourceAbstractCronTask;
 use GlpiPlugin\Carbon\DataSource\CronTaskInterface;
+use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Toolbox;
 use GlpiPlugin\Carbon\Zone;
@@ -86,12 +87,18 @@ abstract class AbstractCronTask extends DatasourceAbstractCronTask implements Cr
         {% import "components/form/fields_macros.html.twig" as fields %}
         {{ fields.largeTitle(__('Gaps in carbon intensity time series', 'carbon')) }}
         <div>{{ __('Only zones with download enabled are displayed.', 'carbon') }}</div>
+        <div><a href="{{ url_to_zones }}">{{ __('You may view and enable them here.', 'carbon') }}</a></div>
         <div>&nbsp;</div>
 TWIG;
-        echo $renderer->renderFromStringTemplate($template);
-        $oldest_asset_date = (new Toolbox())->getOldestAssetDate();
         $client = ClientFactory::create(static::$client_name);
         $source_name = $client->getSourceName();
+        $source = new Source();
+        $source->getFromDBByCrit(['name' => $source_name]);
+        $source_url = $source->getLinkURL();
+        echo $renderer->renderFromStringTemplate($template, [
+            'url_to_zones' => $source_url,
+        ]);
+        $oldest_asset_date = (new Toolbox())->getOldestAssetDate();
         foreach ($client->getSupportedZones() as $zone_name) {
             $source_zone = new Source_Zone();
             if (!$source_zone->getFromDbBySourceAndZone($source_name, $zone_name)) {

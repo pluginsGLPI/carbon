@@ -67,7 +67,6 @@ use NetworkEquipment;
 use NetworkEquipmentModel;
 use NetworkEquipmentType;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Depends;
 use Plugin;
 use Profile;
@@ -170,7 +169,6 @@ class PluginInstallTest extends CommonTestCase
         $this->checkRegisteredClasses();
     }
 
-    #[CoversNothing()]
     public function testConfigurationExists()
     {
         $config = Config::getConfigurationValues(TEST_PLUGIN_NAME);
@@ -181,7 +179,6 @@ class PluginInstallTest extends CommonTestCase
         return $config;
     }
 
-    #[CoversNothing()]
     private function checkSchema(
         string $version,
         bool $strict = true,
@@ -610,6 +607,10 @@ class PluginInstallTest extends CommonTestCase
         }
     }
 
+    /**
+     * Summary of zones
+     * @var array<string>
+     */
     private $zones = [
         'Afghanistan',
         'Albania',
@@ -939,7 +940,6 @@ class PluginInstallTest extends CommonTestCase
         $this->assertEquals($expected, $result);
     }
 
-    #[CoversNothing()]
     #[Depends('testInstallPlugin')]
     public function test_version_is_consistent_across_files()
     {
@@ -982,7 +982,6 @@ class PluginInstallTest extends CommonTestCase
         $this->assertStringContainsString($setup_version, $supported_versions_table, "Current version '$setup_version' not found in Supported Versions table in SECURITY.md");
     }
 
-    #[CoversNothing()]
     #[Depends('testInstallPlugin')]
     public function test_tagged_version_is_declared_in_plugin_xml()
     {

@@ -38,6 +38,8 @@ use GlpiPlugin\Carbon\Impact\Embodied\AbstractEmbodiedImpact;
 use Override;
 use RuntimeException;
 
+use function Safe\json_encode;
+
 abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInterface
 {
     /** @var string $engine Name of the calculation engine */

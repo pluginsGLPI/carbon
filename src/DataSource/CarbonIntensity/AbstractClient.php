@@ -34,8 +34,6 @@ namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity;
 
 use Config as GlpiConfig;
 use DateInterval;
-use DateTime;
-use DateTimeImmutable;
 use DateTimeZone;
 use DBmysql;
 use Generator;
@@ -45,6 +43,8 @@ use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Toolbox;
 use GlpiPlugin\Carbon\Zone;
 use Override;
+use Safe\DateTime;
+use Safe\DateTimeImmutable;
 use Symfony\Component\Console\Helper\ProgressBar;
 
 abstract class AbstractClient implements ClientInterface
