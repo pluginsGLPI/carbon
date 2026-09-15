@@ -377,7 +377,9 @@ class Client extends AbstractClient
         }
 
         $downloaded_year_month = $start->format('Y-m');
-        if (count($full_response) > 0 && $downloaded_year_month < date('Y-m')) {
+        if (count($full_response) > 0 && $downloaded_year_month < date('Y-m') && date('j') > 1) {
+            // Cache only if the month being processed is older than the month of now
+            // and we are at least the 2nd day of the current month (to handle +14 hours overlap)
             $json = json_encode($full_response);
             file_put_contents($cache_file, $json);
         }

@@ -52,9 +52,7 @@ class Monitor extends AbstractAsset
 
         $description = [
             'configuration' => $configuration,
-            'usage' => [
-                'avg_power' => 0,
-            ],
+            'usage' => self::USAGE_NULL,
         ];
         $response = $this->query($description);
         $impacts = $this->client->parseResponse($response, 'embedded');
