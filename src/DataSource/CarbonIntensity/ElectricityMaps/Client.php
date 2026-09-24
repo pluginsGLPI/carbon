@@ -334,7 +334,7 @@ class Client extends AbstractClient
         while ($current_date < $request_stop) {
             $stop = clone $current_date;
             $stop->add($step);
-            // For some reason, passing the parameters as a query stringthrough Guzzle
+            // For some reason, passing the parameters as a query string through Guzzle
             // Makes the request malformed from the point of view of Electricitymaps
             // Workarounded by building here the query string
             // $params = [
