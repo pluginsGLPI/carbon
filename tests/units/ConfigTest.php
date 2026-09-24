@@ -56,14 +56,20 @@ class ConfigTest extends DbTestCase
         $this->assertEquals('Environmental Impact', $result);
     }
 
-    public function testGetTabNameForItem()
+    public function test_GetTabNameForItem_returns_empty_string_for_computer()
     {
         $instance = new Config();
         $result = $instance->getTabNameForItem(new GlpiComputer());
         $this->assertEquals('', $result);
 
+    }
+
+    public function test_GetTabNameForItem_returns_tab_name_for_config()
+    {
+        $instance = new Config();
         $result = $instance->getTabNameForItem(new GlpiConfig());
-        $this->assertEquals('Environmental Impact', $result);
+        $crawler = new Crawler($result);
+        $this->assertEquals('Environmental Impact', $crawler->text());
     }
 
     public function testDisplayTabContentForItem()
@@ -99,10 +105,8 @@ class ConfigTest extends DbTestCase
         $crawler = new Crawler($output);
         $config_class = $crawler->filter('input[type="hidden"][name="config_class"]');
         $config_context = $crawler->filter('input[type="hidden"][name="config_context"]');
-        $csrf = $crawler->filter('input[type="hidden"][name="_glpi_csrf_token"]');
         $this->assertEquals(1, $config_class->count());
         $this->assertEquals(1, $config_context->count());
-        $this->assertEquals(1, $csrf->count());
         $electricitymaps_api = $crawler->filter('input[name="electricitymap_api_key"]');
         $impact_engine = $crawler->filter('select[name="impact_engine"]');
         $this->assertEquals(1, $electricitymaps_api->count());

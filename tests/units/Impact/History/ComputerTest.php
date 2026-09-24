@@ -36,7 +36,7 @@ use CommonDBTM;
 use Computer as GlpiComputer;
 use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
-use DateTime;
+use DBmysql;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerModel;
 use GlpiPlugin\Carbon\ComputerType;
@@ -51,6 +51,7 @@ use GlpiPlugin\Carbon\Zone;
 use Infocom;
 use Location as GlpiLocation;
 use PHPUnit\Framework\Attributes\CoversClass;
+use Safe\DateTime;
 
 #[CoversClass(Computer::class)]
 class ComputerTest extends CommonAsset
@@ -153,7 +154,7 @@ class ComputerTest extends CommonAsset
         }
 
         $this->login('glpi', 'glpi');
-        $entities_id = $this->isolateInEntity('glpi', 'glpi');
+        $entities_id = $this->isolateInEntity();
 
         $model_power = 55;
         $glpi_location = $this->createItem(GlpiLocation::class, [

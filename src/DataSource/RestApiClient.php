@@ -32,12 +32,16 @@
 
 namespace GlpiPlugin\Carbon\DataSource;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Psr7\Message;
-use GuzzleHttp\Psr7\Request;
+use Glpi\Toolbox\HttpClient;
+use GlpiPlugin\Carbon\Config;
 use Override;
+use RuntimeException;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Toolbox;
+
+use function Safe\json_decode;
 
 class RestApiClient implements RestApiClientInterface
 {
@@ -47,54 +51,52 @@ class RestApiClient implements RestApiClientInterface
     ];
     public const DEFAULT_HTTP_VERSION = '2.0';
 
-    protected $api_client = null;
-    protected $last_error = '';
+    protected ?HttpClient $api_client = null;
+    protected array $last_error = [];
 
     public function __construct(array $params = [])
     {
         $local_params = [
-            'timeout'         => self::DEFAULT_TIMEOUT,
-            'connect_timeout' => self::DEFAULT_TIMEOUT,
-            'headers'         => self::DEFAULT_HEADERS,
-            'version'         => self::DEFAULT_HTTP_VERSION,
-            'http_errors'     => false,
-            'debug'           => false, // ($_SESSION['glpi_use_mode'] == Session::DEBUG_MODE),
-            // This is insecure and not recommanded, but...
-            // 'verify'          => false,
+            'timeout'              => self::DEFAULT_TIMEOUT,
+            'max_connect_duration' => self::DEFAULT_TIMEOUT,
+            'headers'              => self::DEFAULT_HEADERS,
+            'http_version'         => self::DEFAULT_HTTP_VERSION,
         ];
 
         // array_merge_recursive() is used because it merges headers
-        $this->api_client = new Client(array_merge_recursive($local_params, $params));
+        $this->api_client = new HttpClient(Config::class, array_merge_recursive($local_params, $params));
     }
 
     #[Override]
     public function request(string $method = 'GET', string $uri = '', array $options = [])
     {
+        $request = $this->api_client;
         try {
-            $request = $this->api_client;
             $response = $request->request($method, $uri, $options);
-        } catch (RequestException $e) {
-            $cleaned_request = new Request(
-                $e->getRequest()->getMethod(),
-                $e->getRequest()->getUri(),
-                [],
-                $request->getBody(),
-                $request->getProtocolVersion()
-            );
+        } catch (RedirectionExceptionInterface|ClientExceptionInterface|ServerExceptionInterface $e) {
+            // Exception related to HTTP
             $this->last_error = [
                 'title'     => "Plugins API error",
                 'exception' => $e->getMessage(),
-                'request'   => Message::toString($cleaned_request),
+                'request'   => $method . ' ' . $uri,
             ];
-            if ($e->hasResponse()) {
-                $this->last_error['response'] = Message::toString($e->getResponse());
-            }
+            $this->last_error['response'] = $e->getResponse()->getContent(false);
+
+            Toolbox::logDebug($this->last_error);
+
+            return false;
+        } catch (RuntimeException $e) {
+            // Other exceptions
+            $this->last_error = [
+                'title'     => "Plugins API error",
+                'exception' => $e->getMessage(),
+            ];
 
             Toolbox::logDebug($this->last_error);
 
             return false;
         }
 
-        return json_decode($response->getBody(), true);
+        return json_decode($response->getContent(), true);
     }
 }

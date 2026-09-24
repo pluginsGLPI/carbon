@@ -41,7 +41,7 @@ use Session;
 
 abstract class AbstractChildDropdown extends CommonDBChild
 {
-    public static $rightname = 'dropdown';
+    public static string $rightname = 'dropdown';
 
     #[Override]
     public static function getIcon(): string

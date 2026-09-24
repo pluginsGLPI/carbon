@@ -3,13 +3,7 @@
         "php": ">=8.2.0",
         "geocoder-php/google-maps-provider": "^4.7",
         "geocoder-php/nominatim-provider": "^5.7",
-        "league/iso3166": "^4.3",
-        "php-http/message": "^1.16",
-        "php-http/message-factory": "^1.1"
-    },
-    "require-dev": {
-        "glpi-project/tools": "^0.8.1",
-        "marcocesarato/php-conventional-changelog": "^1.17"
+        "league/iso3166": "^4.3"
     },
     "config": {
         "optimize-autoloader": true,
@@ -35,5 +29,5 @@
         "license-headers": "vendor/bin/licence-headers-check --ansi --no-interaction",
         "build-schema": "tools/build-db-schema.php carbon | plantuml -p -tpng > docs/db-schema.png"
     },
-    "version": "1.3.0-dev"
+    "version": "1.4.0-dev"
 }

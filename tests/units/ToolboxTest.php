@@ -34,8 +34,6 @@ namespace GlpiPlugin\Carbon\Tests;
 
 use Computer as GlpiComputer;
 use DateInterval;
-use DateTime;
-use DateTimeImmutable;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
@@ -44,6 +42,8 @@ use GlpiPlugin\Carbon\Zone;
 use Infocom;
 use Location;
 use PHPUnit\Framework\Attributes\CoversClass;
+use Safe\DateTime;
+use Safe\DateTimeImmutable;
 
 #[CoversClass(Toolbox::class)]
 class ToolboxTest extends DbTestCase

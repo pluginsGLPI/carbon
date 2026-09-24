@@ -13,12 +13,14 @@ Once the report will be handled, and if the issue is not yet fixed (or in progre
 we'll add it to the GitHub security tab, and add you as observer. Meanwhile,
 you will reserve a CVE for the issue.
 
-Thank you for improving the security of glpi-agent.
+Thank you for improving the security of the plugin Carbon.
 
 ## Supported Versions
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 1.0.x   | :heavy_check_mark: |
+| 1.0.x   | :x:                |
 | 1.2.x   | :x:                |
 | 1.3.x   | :heavy_check_mark: |
+| 1.3.x   | :heavy_check_mark: |
+| 1.4.x   | :heavy_check_mark: |
