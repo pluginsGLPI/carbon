@@ -3,9 +3,7 @@
         "php": ">=8.2.0",
         "geocoder-php/google-maps-provider": "^4.7",
         "geocoder-php/nominatim-provider": "^5.7",
-        "league/iso3166": "^4.3",
-        "php-http/message": "^1.16",
-        "php-http/message-factory": "^1.1"
+        "league/iso3166": "^4.3"
     },
     "require-dev": {
         "marcocesarato/php-conventional-changelog": "^1.17"
