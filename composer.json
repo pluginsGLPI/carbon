@@ -5,9 +5,6 @@
         "geocoder-php/nominatim-provider": "^5.7",
         "league/iso3166": "^4.3"
     },
-    "require-dev": {
-        "marcocesarato/php-conventional-changelog": "^1.17"
-    },
     "config": {
         "optimize-autoloader": true,
         "platform": {
