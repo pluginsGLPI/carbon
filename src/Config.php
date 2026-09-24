@@ -144,6 +144,7 @@ class Config extends GlpiConfig
         $confirm_message = __('This action cannot be undone. Are you sure?', 'carbon');
         $renderer->display('@carbon/config.html.twig', [
             'can_edit'                   => $canedit,
+            'context'                    => self::CONFIG_CONTEXT,
             'current_config'             => $current_config,
             'impact_engines'             => Engine::getAvailableBackends(),
             'include_configs'            => $include_configs,
