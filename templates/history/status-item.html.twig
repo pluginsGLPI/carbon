@@ -134,6 +134,8 @@
                             {% set field = nok_field %}
                             {% if status.has_model %}
                                 {% set field = ok_field %}
+                            {% elseif status.has_type is defined and status.has_type %}
+                                {% set field = warning_field %}
                             {% endif %}
                             {{ fields.field('', field, __('The asset has a model', 'carbon')) }}
                         {% endif %}
@@ -153,10 +155,8 @@
 
                         {% if status.has_type is defined %}
                             {% set field = nok_field %}
-                            {% if status.has_model is defined %}
-                                {% if status.has_model %}
-                                    {% set field = warning_field %}
-                                {% endif %}
+                            {% if status.has_model is defined and status.has_model%}
+                                {% set field = warning_field %}
                             {% endif %}
                             {% if status.has_type %}
                                 {% set field = ok_field %}
