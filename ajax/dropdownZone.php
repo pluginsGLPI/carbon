@@ -34,8 +34,6 @@ use Glpi\Exception\Http\NotFoundHttpException;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 
-include(__DIR__ . '/../../../inc/includes.php');
-
 // Check if plugin is activated...
 if (!Plugin::isPluginActive('carbon')) {
     throw new NotFoundHttpException();
