@@ -39,7 +39,6 @@ use Glpi\Security\Attribute\SecurityStrategy;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
-use Session;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -50,7 +49,8 @@ class AjaxController extends AbstractController
     #[Route(
         path: 'ajax/dropdownZone.php',
         name: 'ajax dropdownZone',
-        methods: ['GET', 'POST'])]
+        methods: ['GET', 'POST']
+    )]
     public function showDropdownBySourceCondition(Request $request): Response
     {
         // if method is GET, then throw an exception, workaround bug in GLPI up to 11.0.7
@@ -76,7 +76,8 @@ class AjaxController extends AbstractController
     #[Route(
         path: 'ajax/toggleZoneDownload.php',
         name: 'ajax toggle zone download flag',
-        methods: ['GET', 'POST'])]
+        methods: ['GET', 'POST']
+    )]
     public function toggleZoneDownload(Request $request): Response
     {
         // if method is GET, then throw an exception, workaround bug in GLPI up to 11.0.7
@@ -97,7 +98,7 @@ class AjaxController extends AbstractController
             return new Response(__('Item not found.', 'carbon'), 403);
         }
         if (!$source_zone->toggleZone()) {
-            return new Response( __('Update failed.', 'carbon'), 500);
+            return new Response(__('Update failed.', 'carbon'), 500);
         }
 
         return new Response();
