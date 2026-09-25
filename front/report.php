@@ -37,8 +37,6 @@ use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\Report;
 use Session;
 
-include __DIR__ . '/../../../inc/includes.php';
-
 // Check if plugin is activated
 if (!Plugin::isPluginActive('carbon')) {
     throw new NotFoundHttpException();
