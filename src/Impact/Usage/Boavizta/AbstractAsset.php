@@ -45,6 +45,8 @@ use Infocom;
 use Override;
 use RuntimeException;
 
+use function Safe\json_encode;
+
 abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterface
 {
     protected static string $itemtype = '';

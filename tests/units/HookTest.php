@@ -103,7 +103,7 @@ class HookTest extends DbTestCase
             'computertypes_id' => $computer_type->getID(),
         ]);
 
-        $computer_type->delete($computer_type->fields, 1);
+        $computer_type->delete($computer_type->fields, true);
         $count = (new DbUtils())->countElementsInTable($carbon_computer_type::getTable(), [
             'computertypes_id' => $computer_type->getID(),
         ]);

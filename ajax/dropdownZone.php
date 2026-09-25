@@ -29,21 +29,16 @@
  *
  * -------------------------------------------------------------------------
  */
-
+use Glpi\Exception\Http\AccessDeniedHttpException;
+use Glpi\Exception\Http\NotFoundHttpException;
 use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 
-include(__DIR__ . '/../../../inc/includes.php');
-
 // Check if plugin is activated...
 if (!Plugin::isPluginActive('carbon')) {
-    http_response_code(404);
-    die();
-}
-
-if (!Zone::canView()) {
-    http_response_code(403);
-    die();
+    throw new NotFoundHttpException();
+} elseif (!Zone::canView()) {
+    throw new AccessDeniedHttpException();
 }
 
 $source_zone_table = Source_Zone::getTable();

@@ -32,7 +32,14 @@
 
 namespace GlpiPlugin\Carbon\DataSource;
 
+use CommonDBTM;
+use CommonGLPI;
+
 interface CronTaskInterface
 {
     public static function enumerateTasks(): array;
+
+    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0);
+
+    public function showForCronTask(CommonDBTM $item);
 }

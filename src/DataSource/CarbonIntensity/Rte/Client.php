@@ -33,11 +33,8 @@
 namespace GlpiPlugin\Carbon\DataSource\CarbonIntensity\Rte;
 
 use DateInterval;
-use DateTime;
-use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
-use DBmysql;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\AbstractClient;
 use GlpiPlugin\Carbon\DataSource\RestApiClientInterface;
 use GlpiPlugin\Carbon\DataTracking\AbstractTracked;
@@ -47,8 +44,14 @@ use GlpiPlugin\Carbon\Toolbox;
 use GlpiPlugin\Carbon\Zone;
 use Override;
 use RuntimeException;
+use Safe\DateTime;
+use Safe\DateTimeImmutable;
 use Safe\Exceptions\FilesystemException;
 
+use function Safe\file_get_contents;
+use function Safe\file_put_contents;
+use function Safe\json_decode;
+use function Safe\json_encode;
 use function Safe\mkdir;
 
 /**
@@ -336,8 +339,9 @@ class Client extends AbstractClient
             }
         } else {
             $downloaded_year_month = $start->format('Y-m');
-            if ($downloaded_year_month < date('Y-m')) {
+            if (count($response) > 0 && $downloaded_year_month < date('Y-m') && date('j') > 1) {
                 // Cache only if the month being processed is older than the month of now
+                // and we are at least the 2nd day of the current month (to handle +14 hours overlap)
                 $json = json_encode($response);
                 file_put_contents($cache_file, $json);
             }
@@ -387,11 +391,8 @@ class Client extends AbstractClient
      */
     protected function shiftToLocalTimezone(array $response): array
     {
-        /** @var DBmysql $DB */
-        global $DB;
-
         $shifted_response = [];
-        $local_timezone = new DateTimeZone($DB->guessTimezone());
+        $local_timezone = new DateTimeZone(date_default_timezone_get());
         array_walk($response, function ($item, $key) use (&$shifted_response, $local_timezone) {
             $shifted_date_object = DateTime::createFromFormat('Y-m-d\TH:i:sP', $item['date_heure'])
                 ->setTimezone($local_timezone);

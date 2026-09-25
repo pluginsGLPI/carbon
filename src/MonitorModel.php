@@ -36,6 +36,6 @@ use MonitorModel as GlpiMonitorModel;
 
 class MonitorModel extends AbstractModel
 {
-    public static $itemtype = GlpiMonitorModel::class;
-    public static $items_id = 'monitormodels_id';
+    public static string $itemtype = GlpiMonitorModel::class;
+    public static string $items_id = 'monitormodels_id';
 }

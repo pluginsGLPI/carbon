@@ -40,8 +40,8 @@ use Override;
 
 class NetworkEquipmentType extends AbstractChildDropdown
 {
-    public static $itemtype = GlpiNetworkEquipmentType::class;
-    public static $items_id = 'networkequipmenttypes_id';
+    public static string $itemtype = GlpiNetworkEquipmentType::class;
+    public static string $items_id = 'networkequipmenttypes_id';
 
     #[Override]
     public static function showMassiveActionsSubForm(MassiveAction $ma)
