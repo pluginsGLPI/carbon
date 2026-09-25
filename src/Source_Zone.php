@@ -43,6 +43,7 @@ use Html;
 use InvalidArgumentException;
 use Location as GlpiLocation;
 use Override;
+use Session;
 
 class Source_Zone extends CommonDBRelation
 {
@@ -196,14 +197,18 @@ class Source_Zone extends CommonDBRelation
             // At least 1 entry then add JS to toggle the state of zones
             echo Html::scriptBlock('
                 var plugin_carbon_toggleZone = function (id) {
-                    fetch(CFG_GLPI["root_doc"] + "/plugins/carbon/ajax/toggleZoneDownload.php?id=" + id).then(response => {
-                        if (response.status === 200) {
-                            reloadTab();
-                        } else {
-                            response.text().then(function (text) {
-                                glpi_toast_error(text)
-                            });
-                        }
+                    var csrfToken = "' . Session::getNewCSRFToken() . '";
+                    var formData = new FormData();
+                    formData.append("_glpi_csrf_token", csrfToken);
+                    formData.append("id", id);
+                    fetch(CFG_GLPI["root_doc"] + "/plugins/carbon/ajax/toggleZoneDownload.php", {
+                        method: "POST",
+                        headers: {
+                            "X-Glpi-Csrf-Token": csrfToken
+                        },
+                        body: formData,
+                    }).then(response => {
+                        reloadTab();
                     });
                 };
             ');
@@ -295,14 +300,18 @@ class Source_Zone extends CommonDBRelation
             // At least 1 entry then add JS to toggle the state of zones
             echo Html::scriptBlock('
                 var plugin_carbon_toggleZone = function (id) {
-                    fetch(CFG_GLPI["root_doc"] + "/plugins/carbon/ajax/toggleZoneDownload.php?id=" + id).then(response => {
-                        if (response.status === 200) {
-                            reloadTab();
-                        } else {
-                            response.text().then(function (text) {
-                                glpi_toast_error(text)
-                            });
-                        }
+                    var csrfToken = "' . Session::getNewCSRFToken() . '";
+                    var formData = new FormData();
+                    formData.append("_glpi_csrf_token", csrfToken);
+                    formData.append("id", id);
+                    fetch(CFG_GLPI["root_doc"] + "/plugins/carbon/ajax/toggleZoneDownload.php", {
+                        method: "POST",
+                        headers: {
+                            "X-Glpi-Csrf-Token": csrfToken
+                        },
+                        body: formData,
+                    }).then(response => {
+                        reloadTab();
                     });
                 };
             ');
