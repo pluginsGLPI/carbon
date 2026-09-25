@@ -237,38 +237,28 @@ function plugin_carbon_check_prerequisites()
 
     // In case GLPI is so old that the modern version checker is not implemented
     /** @phpstan-ignore if.alwaysFalse */
+    $output = [];
     if (version_compare(GLPI_VERSION, "10.0.0", 'lt')) {
-        echo "This plugin requires GLPI >= " . PLUGIN_CARBON_MIN_GLPI_VERSION . " and GLPI < " . PLUGIN_CARBON_MAX_GLPI_VERSION . "<br>";
+        $output[] = "This plugin requires GLPI >= " . PLUGIN_CARBON_MIN_GLPI_VERSION . " and GLPI < " . PLUGIN_CARBON_MAX_GLPI_VERSION;
         $prerequisitesSuccess = false;
     }
 
     if (!is_readable(__DIR__ . '/vendor/autoload.php') || !is_file(__DIR__ . '/vendor/autoload.php')) {
-        echo "Run composer install --no-dev in the plugin directory<br>";
+        $output[] = "Run composer install --no-dev in the plugin directory.";
+        $prerequisitesSuccess = false;
+    }
+
+    if (!is_readable(__DIR__ . '/public/lib/carbon.css') || !is_file(__DIR__ . '/public/lib/carbon.css')) {
+        $output[] = "Run npm install in the plugin directory.";
         $prerequisitesSuccess = false;
     }
 
     if ($DB->use_timezones !== true) {
-        echo "Enable timezones support<br>";
+        $output[] = "Enable timezones support";
         $prerequisitesSuccess = false;
     }
 
-    // GLPI 12 requires MySQL >= 8.0 or MariaDB >= 10.2, then the check below can be disabled
-    // if (getenv('CI') === false) {
-    //     // only when not under test
-    //     $version_string = $DB->getVersion();
-
-    //     $server  = preg_match('/-MariaDB/', $version_string) ? 'MariaDB' : 'MySQL';
-    //     $version = preg_replace('/^((\d+\.?)+).*$/', '$1', $version_string);
-    //     if ($server === 'MySQL' && version_compare($version, '8.0.0', '<')) {
-    //         echo 'This plugin requires MySQL >= 8.0 or MariaDB >= 10.2<br>';
-    //         $prerequisitesSuccess = false;
-    //     }
-
-    //     if ($server === 'MariaDB' && version_compare($version, '10.2.0', '<')) {
-    //         echo 'This plugin requires MySQL >= 8.0 or MariaDB >= 10.2<br>';
-    //         $prerequisitesSuccess = false;
-    //     }
-    // }
+    echo implode(' ', $output);
 
     return $prerequisitesSuccess;
 }
