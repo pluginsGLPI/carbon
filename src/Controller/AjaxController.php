@@ -65,7 +65,7 @@ class AjaxController extends AbstractController
         $source_id = (int) $_POST['plugin_carbon_sources_id'];
         $html = Zone::dropdown([
             'display' => false,
-            'rand' => (int) $_POST['dom_id'],
+            'rand' => (int) $request->request->get('dom_id'),
             'condition' => Zone::getRestrictBySourceCondition($source_id),
             'specific_tags' => ($source_id === 0 ? ['disabled' => 'disabled'] : []),
         ]);
@@ -94,7 +94,7 @@ class AjaxController extends AbstractController
         }
 
         $source_zone = new Source_Zone();
-        if (!$source_zone->getFromDB($_POST['id'])) {
+        if (!$source_zone->getFromDB($request->request->get('id'))) {
             return new Response(__('Item not found.', 'carbon'), 403);
         }
         if (!$source_zone->toggleZone()) {
