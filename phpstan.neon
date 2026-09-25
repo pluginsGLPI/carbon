@@ -8,7 +8,6 @@ parameters:
     paths:
         - src
         - front
-        - ajax
         - install
         - hook.php
         - setup.php
