@@ -200,7 +200,7 @@ function plugin_carbon_registerClasses()
  *
  * @return array
  */
-function plugin_version_carbon()
+function plugin_version_carbon(): array
 {
     $requirements = [
         'name'           => 'Carbon',
@@ -228,7 +228,7 @@ function plugin_version_carbon()
  *
  * @return bool
  */
-function plugin_carbon_check_prerequisites()
+function plugin_carbon_check_prerequisites(): bool
 {
     /** @var DBmysql $DB */
     global $DB;
