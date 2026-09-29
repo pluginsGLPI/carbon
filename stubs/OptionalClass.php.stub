@@ -23,3 +23,4 @@ class Azure {}
 class Google {}
 class Ovh {}
 class Scaleway {}
+class CloudInventoryConnector {}
