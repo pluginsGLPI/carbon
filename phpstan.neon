@@ -10,6 +10,7 @@ parameters:
     bootstrapFiles:
         - ../../stubs/glpi_constants.php
         - ../../vendor/autoload.php
+        - stubs/OptionalClass.php.stub
         - setup.php
     paths:
         - src
@@ -22,3 +23,4 @@ parameters:
         - ../../src
     stubFiles:
         - ../../stubs/glpi_constants.php
+        - stubs/OptionalClass.php.stub
