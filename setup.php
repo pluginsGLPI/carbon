@@ -236,8 +236,8 @@ function plugin_carbon_check_prerequisites(): bool
     $prerequisitesSuccess = true;
 
     // In case GLPI is so old that the modern version checker is not implemented
-    /** @phpstan-ignore if.alwaysFalse */
     $output = [];
+    /** @phpstan-ignore if.alwaysFalse */
     if (version_compare(GLPI_VERSION, "10.0.0", 'lt')) {
         $output[] = "This plugin requires GLPI >= " . PLUGIN_CARBON_MIN_GLPI_VERSION . " and GLPI < " . PLUGIN_CARBON_MAX_GLPI_VERSION;
         $prerequisitesSuccess = false;
