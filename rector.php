@@ -40,7 +40,6 @@ require_once __DIR__ . '/../../src/Plugin.php';
 
 return RectorConfig::configure()
     ->withPaths([
-        __DIR__ . '/ajax',
         __DIR__ . '/front',
         __DIR__ . '/install',
         __DIR__ . '/public',
