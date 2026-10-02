@@ -6,6 +6,7 @@
         "league/iso3166": "^4.3"
     },
     "config": {
+        "autoloader-suffix": "PluginCarbon",
         "optimize-autoloader": true,
         "platform": {
             "php": "8.2.0"
