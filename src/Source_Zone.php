@@ -210,9 +210,6 @@ class Source_Zone extends CommonDBRelation
                     formData.append("id", id);
                     fetch(CFG_GLPI["root_doc"] + "/plugins/carbon/ajax/toggleZoneDownload.php", {
                         method: "POST",
-                        headers: {
-                            "X-Glpi-Csrf-Token": csrfToken
-                        },
                         body: formData,
                     }).then(response => {
                         reloadTab();
@@ -311,9 +308,6 @@ class Source_Zone extends CommonDBRelation
                     formData.append("id", id);
                     fetch(CFG_GLPI["root_doc"] + "/plugins/carbon/ajax/toggleZoneDownload.php", {
                         method: "POST",
-                        headers: {
-                            "X-Glpi-Csrf-Token": csrfToken
-                        },
                         body: formData,
                     }).then(response => {
                         reloadTab();
