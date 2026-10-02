@@ -46,28 +46,4 @@ class EmbodiedImpact extends AbstractImpact
     {
         return _n("Embodied impact", "Embodied impacts", $nb, 'carbon');
     }
-
-    // /**
-    //  * Calculate the embodied impact of assets
-    //  *
-    //  * @param class-string $lca_type
-    //  * @param int $limit
-    //  * @return int
-    //  */
-    // public function calculateImpact(string $lca_type, int $limit = 0): int
-    // {
-    //     $crit = [];
-    //     if ($limit > 0) {
-    //         $crit['LIMIT'] = $limit;
-    //     }
-    //     $iterator = self::getItemsToEvaluate($lca_type::getItemtype(), $crit);
-    //     $count = 0;
-    //     foreach ($iterator as $item) {
-    //         $lca = new $lca_type($item['id']);
-    //         $lca::calculate($item);
-    //         $count++;
-    //     }
-
-    //     return $iterator->count();
-    // }
 }
