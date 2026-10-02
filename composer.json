@@ -11,6 +11,7 @@
         "glpi-project/tools": "^0.8.1"
     },
     "config": {
+        "autoloader-suffix": "PluginCarbon",
         "optimize-autoloader": true,
         "platform": {
             "php": "8.2.0"
