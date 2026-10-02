@@ -213,7 +213,7 @@ class Source_Zone extends CommonDBRelation
                     }).then(response => {
                         reloadTab();
                     });
-                }
+                };
             ');
         }
     }
@@ -311,7 +311,7 @@ class Source_Zone extends CommonDBRelation
                     }).then(response => {
                         reloadTab();
                     });
-                }
+                };
             ');
         }
     }
