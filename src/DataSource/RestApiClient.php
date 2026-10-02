@@ -84,7 +84,7 @@ class RestApiClient implements RestApiClientInterface
 
             Toolbox::logDebug($this->last_error);
 
-            return false;
+            throw $e;
         } catch (RuntimeException $e) {
             // Other exceptions
             $this->last_error = [
@@ -94,7 +94,7 @@ class RestApiClient implements RestApiClientInterface
 
             Toolbox::logDebug($this->last_error);
 
-            return false;
+            throw $e;
         }
 
         return json_decode($response->getContent(), true);

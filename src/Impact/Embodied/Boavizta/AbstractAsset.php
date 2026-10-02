@@ -89,12 +89,7 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
             return self::$engine_version;
         }
 
-        try {
-            $response = $this->client->get('utils/version');
-        } catch (RuntimeException $e) {
-            trigger_error($e->getMessage(), E_USER_WARNING);
-            throw $e;
-        }
+        $response = $this->client->get('utils/version');
         if (!isset($response[0]) || !is_string($response[0])) {
             trigger_error(sprintf(
                 'Invalid response from Boavizta API: %s',

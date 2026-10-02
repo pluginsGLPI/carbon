@@ -106,7 +106,7 @@ class Client extends AbstractClient
         $options['headers'] = [
             'Accept'       => 'application/json',
         ];
-        $options['allow_redirects'] = false;
+        $options['max_redirects'] = 0;
         $response = $this->client->request('POST', $this->base_url . '/v1/' . $endpoint, $options);
         if (!$response) {
             return [];
@@ -120,7 +120,7 @@ class Client extends AbstractClient
         $options['headers'] = [
             'Accept'       => 'application/json',
         ];
-        $options['allow_redirects'] = false;
+        $options['max_redirects'] = 0;
         $response = $this->client->request('GET', $this->base_url . '/v1/' . $endpoint, $options);
         if (!$response) {
             return [];
