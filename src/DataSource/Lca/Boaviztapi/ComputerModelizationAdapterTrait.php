@@ -33,20 +33,14 @@
 namespace GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi;
 
 use CommonDBTM;
-use DBmysql;
-use ComputerModel as GlpiComputerModel;
-use DeviceHardDrive;
 use Computer as GlpiComputer;
-use DeviceHardDriveType;
+use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
+use DBmysql;
+use DeviceHardDrive;
+use DeviceHardDriveType;
 use DeviceProcessor;
 use GlpiPlugin\Carbon\CloudInventoryConnector;
-use InterfaceType;
-use Item_DeviceHardDrive;
-use Item_DeviceMemory;
-use Item_DeviceProcessor;
-use Item_Devices;
-use Manufacturer;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Cloudinventory\Amazon;
 use GlpiPlugin\Cloudinventory\Azure;
@@ -54,11 +48,17 @@ use GlpiPlugin\Cloudinventory\CloudInstance;
 use GlpiPlugin\Cloudinventory\Google;
 use GlpiPlugin\Cloudinventory\Ovh;
 use GlpiPlugin\Cloudinventory\Scaleway;
+use InterfaceType;
+use Item_DeviceHardDrive;
+use Item_DeviceMemory;
+use Item_DeviceProcessor;
+use Item_Devices;
+use Manufacturer;
 use UnhandledMatchError;
 
 trait ComputerModelizationAdapterTrait
 {
-     protected const USAGE_NULL = [
+    protected const USAGE_NULL = [
         'avg_power' => 0,
     ];
 
