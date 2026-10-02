@@ -141,10 +141,13 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
         $fallback_source_zone = null;
         $iterator = null;
 
+        $total_seconds = (int) $length->format('%S');
+        $expected_count = (int) ceil($total_seconds / 3600);
+
         // Try to read real time carbon intensities
         if ($source->fields['fallback_level'] === 0) {
             $iterator = $this->requestCarbonIntensitiesPerDay($start_time, $length, $source_zone);
-            if ($iterator->count() === 0) {
+            if ($iterator->count() < $expected_count) {
                 // Need to fallback to an alternate source
                 $fallback_source_zone = new Source_Zone();
                 if (!$fallback_source_zone->getFallbackFromDB($source_zone)) {
@@ -156,8 +159,6 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
             $fallback_source_zone = $source_zone;
         }
 
-        $total_seconds = (int) $length->format('%S');
-        $expected_count = (int) ceil($total_seconds / 3600);
 
         // Try a fallback source
         if ($fallback_source_zone !== null) {

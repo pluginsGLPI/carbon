@@ -1116,8 +1116,6 @@ class Provider
         $data['series'][1]['data'] = $scaled['serie'];
         $data['series'][1]['unit'] = $scaled['unit']; // Not supported by apex charts
 
-        // $data = self::getCarbonEmissionPerMonth($params['args'], $crit);
-
         $data['date_interval'] = [
             $start_date->format($date_format),
             $end_date->format($date_format),

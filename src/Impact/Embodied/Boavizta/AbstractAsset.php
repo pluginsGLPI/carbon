@@ -34,6 +34,7 @@
 namespace GlpiPlugin\Carbon\Impact\Embodied\Boavizta;
 
 use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\Client;
+use GlpiPlugin\Carbon\Impact\Common\Boavizta\AbstractAssetTrait;
 use GlpiPlugin\Carbon\Impact\Embodied\AbstractEmbodiedImpact;
 use Override;
 use RuntimeException;
@@ -42,6 +43,8 @@ use function Safe\json_encode;
 
 abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInterface
 {
+    use AbstractAssetTrait;
+
     /** @var string $engine Name of the calculation engine */
     protected string $engine = 'Boavizta';
 
@@ -57,9 +60,9 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
     /** @var Client instance of the HTTP client */
     protected ?Client $client = null;
 
-    protected const USAGE_NULL = [
-        'avg_power' => 0,
-    ];
+    // protected const USAGE_NULL = [
+    //     'avg_power' => 0,
+    // ];
 
     // abstract public static function getEngine(CommonDBTM $item): EngineInterface;
 
@@ -112,23 +115,23 @@ abstract class AbstractAsset extends AbstractEmbodiedImpact implements AssetInte
         return 'criteria=' . implode('&criteria=', $impact_criteria);
     }
 
-    /**
-     * Send a HTTP query
-     *
-     * @param array $description
-     * @return array
-     */
-    protected function query(array $description): array
-    {
-        try {
-            $response = $this->client->post($this->endpoint, [
-                'json' => $description,
-            ]);
-        } catch (RuntimeException $e) {
-            trigger_error($e->getMessage(), E_USER_WARNING);
-            throw $e;
-        }
+    // /**
+    //  * Send a HTTP query
+    //  *
+    //  * @param array $description
+    //  * @return array
+    //  */
+    // protected function query(array $description): array
+    // {
+    //     try {
+    //         $response = $this->client->post($this->endpoint, [
+    //             'json' => $description,
+    //         ]);
+    //     } catch (RuntimeException $e) {
+    //         trigger_error($e->getMessage(), E_USER_WARNING);
+    //         throw $e;
+    //     }
 
-        return $response;
-    }
+    //     return $response;
+    // }
 }
