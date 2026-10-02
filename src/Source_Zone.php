@@ -43,7 +43,6 @@ use Html;
 use InvalidArgumentException;
 use Location as GlpiLocation;
 use Override;
-use Session;
 
 class Source_Zone extends CommonDBRelation
 {

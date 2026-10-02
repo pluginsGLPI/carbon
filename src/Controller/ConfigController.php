@@ -46,7 +46,8 @@ final class ConfigController extends AbstractController
     #[Route(
         path: 'front/config.form.php',
         name: 'idmefv2_config',
-        methods: ['GET', 'POST'])]
+        methods: ['GET', 'POST']
+    )]
     public function alert(Request $request): Response
     {
         throw new RedirectException('../../../front/config.form.php?forcetab=GlpiPlugin%5CCarbon%5CConfig$1');
