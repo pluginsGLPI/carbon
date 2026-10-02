@@ -41,20 +41,25 @@
   <div class="col-12 col-xxl-12 flex-column">
     <div class="d-flex flex-row flex-wrap flex-xl-nowrap">
       <div class="row flex-row align-items-start flex-grow-1 col-12 col-sm-6 mb-2">
+        <table class="small table card-table table-hover table-striped"><tbody>
         {% for criteria, label in usage_labels %}
           {% if usage_impact.fields[criteria] ?? null is not null %}
-            <div class="col-xxl-7">
-              {{ label }}
-            </div>
-            <div class="col-xxl-5">
-              <span id="usage_{{ criteria }}_tip">
-                {{ usage_impact.getHumanReadableImpact(criteria)|raw }}
-                {# <i class="fa-solid fa-circle-info"></i> #}
-              </span>
-              {{ usage_tooltips[criteria]|raw }}
-            </div>
+            <tr>
+              <td><div class="col-xxl-7">
+                <div class="col-xxl-7">
+                  {{ label }}
+                </div></td>
+                <td><div class="col-xxl-5">
+                  <span id="usage_{{ criteria }}_tip">
+                    {{ usage_impact.getHumanReadableImpact(criteria)|raw }}
+                    {# <i class="fa-solid fa-circle-info"></i> #}
+                  </span>
+                  {{ usage_tooltips[criteria]|raw }}
+              </div></td>
+            </tr>
           {% endif %}
         {% endfor %}
+        </tbody></table>
       </div>
     </div>
   </div>
@@ -83,20 +88,24 @@
   <div class="col-12 col-xxl-12 flex-column">
     <div class="d-flex flex-row flex-wrap flex-xl-nowrap">
       <div class="row flex-row align-items-start flex-grow-1 col-12 col-sm-6 mb-2">
+        <table class="small table card-table table-hover table-striped"><tbody>
         {% for criteria, label in embodied_labels %}
           {% if embodied_impact.fields[criteria] ?? null is not null %}
-            <div class="col-xxl-7">
-              {{ label }}
-            </div>
-            <div class="col-xxl-5">
-              <span id="embodied_{{ criteria }}_tip">
-                {{ embodied_impact.getHumanReadableImpact(criteria)|raw }}
-                {# <i class="fa-solid fa-circle-info"></i> #}
-              </span>
-              {{ embodied_tooltips[criteria]|raw }}
-            </div>
+            <tr>
+              <td><div class="col-xxl-7">
+                {{ label }}
+              </div></td>
+              <td><div class="col-xxl-5">
+                <span id="embodied_{{ criteria }}_tip">
+                  {{ embodied_impact.getHumanReadableImpact(criteria)|raw }}
+                  {# <i class="fa-solid fa-circle-info"></i> #}
+                </span>
+                {{ embodied_tooltips[criteria]|raw }}
+              </div></td>
+            </tr>
           {% endif %}
         {% endfor %}
+        </tbody></table>
       </div>
     </div>
   </div>
