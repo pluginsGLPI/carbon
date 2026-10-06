@@ -40,8 +40,8 @@ use Override;
 
 class MonitorType extends AbstractChildDropdown
 {
-    public static $itemtype = GlpiMonitorType::class;
-    public static $items_id = 'monitortypes_id';
+    public static string $itemtype = GlpiMonitorType::class;
+    public static string $items_id = 'monitortypes_id';
 
     #[Override]
     public static function showMassiveActionsSubForm(MassiveAction $ma)

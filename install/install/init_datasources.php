@@ -29,7 +29,6 @@
  *
  * -------------------------------------------------------------------------
  */
-
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\Install;
@@ -38,6 +37,8 @@ use GlpiPlugin\Carbon\Source_Zone;
 use GlpiPlugin\Carbon\Zone;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\StreamOutput;
+
+use function Safe\fopen;
 
 /** @var DBmysql $DB */
 global $DB;
@@ -125,7 +126,9 @@ if ($ember_dataset_version === null || EMBER_DATASET_DATE > $ember_dataset_versi
         $progress_bar->setProgress($rows_count);
     }
     $file = null; // close the file
-
+    if (isset($output)) {
+        $output->writeln("");
+    }
     Config::setPluginConfigurationValues(['ember_dataset_date' => EMBER_DATASET_DATE]);
 }
 

@@ -36,7 +36,7 @@ use CommonDBTM;
 use Computer as GlpiComputer;
 use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
-use DateTime;
+use DBmysql;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerModel;
 use GlpiPlugin\Carbon\ComputerType;
@@ -51,6 +51,7 @@ use GlpiPlugin\Carbon\Zone;
 use Infocom;
 use Location as GlpiLocation;
 use PHPUnit\Framework\Attributes\CoversClass;
+use Safe\DateTime;
 
 #[CoversClass(Computer::class)]
 class ComputerTest extends CommonAsset
@@ -153,7 +154,7 @@ class ComputerTest extends CommonAsset
         }
 
         $this->login('glpi', 'glpi');
-        $entities_id = $this->isolateInEntity('glpi', 'glpi');
+        $entities_id = $this->isolateInEntity();
 
         $model_power = 55;
         $glpi_location = $this->createItem(GlpiLocation::class, [
@@ -290,6 +291,7 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => true,
             'has_location'                => true,
             'has_category'                => true,
+            'is__category_not_cloud'      => true,
             'has_carbon_intensity_zone'   => true,
             'has_model'                   => true,
             'has_model_power_consumption' => true,
@@ -328,6 +330,7 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => true,
             'has_location'                => true,
             'has_category'                => true,
+            'is__category_not_cloud'      => true,
             'has_carbon_intensity_zone'   => true,
             'has_model'                   => true,
             'has_model_power_consumption' => true,
@@ -366,6 +369,7 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => true,
             'has_location'                => true,
             'has_category'                => true,
+            'is__category_not_cloud'      => true,
             'has_carbon_intensity_zone'   => true,
             'has_model'                   => true,
             'has_model_power_consumption' => true,
@@ -404,6 +408,7 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => false,
             'has_location'                => true,
             'has_category'                => true,
+            'is__category_not_cloud'      => true,
             'has_carbon_intensity_zone'   => true,
             'has_model'                   => true,
             'has_model_power_consumption' => true,
@@ -442,6 +447,7 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => true,
             'has_location'                => false,
             'has_category'                => true,
+            'is__category_not_cloud'      => true,
             'has_carbon_intensity_zone'   => false, // No location cascades this requirement to be not met
             'has_model'                   => true,
             'has_model_power_consumption' => true,
@@ -480,6 +486,7 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => true,
             'has_location'                => true,
             'has_category'                => false,
+            'is__category_not_cloud'      => true,
             'has_carbon_intensity_zone'   => true,
             'has_model'                   => true,
             'has_model_power_consumption' => true,
@@ -518,6 +525,7 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => true,
             'has_location'                => true,
             'has_category'                => true,
+            'is__category_not_cloud'      => true,
             'has_carbon_intensity_zone'   => false,
             'has_model'                   => true,
             'has_model_power_consumption' => true,
@@ -556,6 +564,7 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => true,
             'has_location'                => true,
             'has_category'                => true,
+            'is__category_not_cloud'      => true,
             'has_carbon_intensity_zone'   => true,
             'has_model'                   => false,
             'has_model_power_consumption' => false,
@@ -594,6 +603,7 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => true,
             'has_location'                => true,
             'has_category'                => true,
+            'is__category_not_cloud'      => true,
             'has_carbon_intensity_zone'   => true,
             'has_model'                   => true,
             'has_model_power_consumption' => false,
@@ -632,6 +642,7 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => true,
             'has_location'                => true,
             'has_category'                => false,
+            'is__category_not_cloud'      => true,
             'has_carbon_intensity_zone'   => true,
             'has_model'                   => true,
             'has_model_power_consumption' => true,
@@ -670,6 +681,7 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => true,
             'has_location'                => true,
             'has_category'                => true,
+            'is__category_not_cloud'      => true,
             'has_carbon_intensity_zone'   => true,
             'has_model'                   => true,
             'has_model_power_consumption' => true,
@@ -708,6 +720,7 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => true,
             'has_location'                => true,
             'has_category'                => true,
+            'is__category_not_cloud'      => true,
             'has_carbon_intensity_zone'   => true,
             'has_model'                   => true,
             'has_model_power_consumption' => true,
@@ -746,6 +759,7 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => true,
             'has_location'                => true,
             'has_category'                => true,
+            'is__category_not_cloud'      => true,
             'has_carbon_intensity_zone'   => true,
             'has_model'                   => true,
             'has_model_power_consumption' => true,
@@ -786,6 +800,7 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => true,
             'has_location'                => true,
             'has_category'                => true,
+            'is__category_not_cloud'      => true,
             'has_carbon_intensity_zone'   => true,
             'has_model'                   => true,
             'has_model_power_consumption' => true,
@@ -824,6 +839,7 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => true,
             'has_location'                => true,
             'has_category'                => true,
+            'is__category_not_cloud'      => true,
             'has_carbon_intensity_zone'   => true,
             'has_model'                   => true,
             'has_model_power_consumption' => true,
@@ -863,6 +879,7 @@ class ComputerTest extends CommonAsset
             'has_usage_profile'           => true,
             'has_location'                => true,
             'has_category'                => true,
+            'is__category_not_cloud'      => true,
             'has_carbon_intensity_zone'   => true,
             'has_model'                   => true,
             'has_model_power_consumption' => true,
@@ -873,6 +890,46 @@ class ComputerTest extends CommonAsset
             'ci_fallback_available'       => true,
             'not_is_ignore'               => true,
             'has_decommission_date'       => false,
+        ];
+        $result = $history->getHistorizableDiagnosis($glpi_computer);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_getHistorizableDiagnosis_when_computer_has_cloud_category()
+    {
+        $history = new Computer();
+
+        [
+            $glpi_computer,
+            $glpi_location,
+            $location,
+            $source_zone,
+            $glpi_computer_model,
+            $glpi_computer_type,
+            $computer_type,
+            $infocom,
+            $usage_profile,
+            $zone,
+        ] = $this->getHistorizableComputer();
+        $this->updateItem($computer_type, ['category' => ComputerType::CATEGORY_CLOUD]);
+
+        $expected = [
+            'is_deleted'                  => true,
+            'is_template'                 => true,
+            'has_usage_profile'           => true,
+            'has_location'                => true,
+            'has_category'                => true,
+            'is__category_not_cloud'      => false,
+            'has_carbon_intensity_zone'   => true,
+            'has_model'                   => true,
+            'has_model_power_consumption' => true,
+            'has_type'                    => true,
+            'has_type_power_consumption'  => true,
+            'has_inventory_entry_date'    => true,
+            'ci_download_enabled'         => true,
+            'ci_fallback_available'       => true,
+            'not_is_ignore'               => true,
+            'has_decommission_date'       => true,
         ];
         $result = $history->getHistorizableDiagnosis($glpi_computer);
         $this->assertEquals($expected, $result);
@@ -932,6 +989,7 @@ class ComputerTest extends CommonAsset
             'has_type_power_consumption'  => true,
             'has_usage_profile'           => true,
             'has_category'                => false,
+            'is__category_not_cloud'      => true,
             'has_inventory_entry_date'    => true,
             'ci_download_enabled'         => true,
             'ci_fallback_available'       => true,

@@ -38,6 +38,7 @@ use DBmysql;
 use DbUtils;
 use Glpi\DBAL\QueryExpression;
 use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\Client;
+use GlpiPlugin\Carbon\Impact\Common\Boavizta\AbstractAssetTrait;
 use GlpiPlugin\Carbon\Impact\Usage\AbstractUsageImpact;
 use GlpiPlugin\Carbon\Location;
 use GlpiPlugin\Carbon\UsageImpact;
@@ -45,17 +46,18 @@ use Infocom;
 use Override;
 use RuntimeException;
 
+use function Safe\json_encode;
+
 abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterface
 {
+    use AbstractAssetTrait;
+
     protected static string $itemtype = '';
     protected static string $type_itemtype  = '';
     protected static string $model_itemtype = '';
 
     /** @var string $engine Name of the calculation engine */
     protected string $engine = 'Boavizta';
-
-    /** @var string $engine_version Version of the calculation engine */
-    // protected static string $engine_version = 'unknown';
 
     /** @var string Endpoint to query for the itemtype, to be filled in child class */
     protected string $endpoint       = '';
@@ -65,8 +67,6 @@ abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterfa
 
     /** @var Client instance of the HTTP client */
     protected ?Client $client = null;
-
-    // abstract public static function getEngine(CommonDBTM $item): EngineInterface;
 
     /**
      * Analyze the hardware of the asset to prepare the request to the backend
@@ -130,19 +130,25 @@ abstract class AbstractAsset extends AbstractUsageImpact implements AssetInterfa
         return 'criteria=' . implode('&criteria=', $impact_criteria);
     }
 
-    protected function query($description): array
-    {
-        try {
-            $response = $this->client->post($this->endpoint, [
-                'json' => $description,
-            ]);
-        } catch (RuntimeException $e) {
-            trigger_error($e->getMessage(), E_USER_WARNING);
-            throw $e;
-        }
+    // /**
+    //  * Send a HTTP query
+    //  *
+    //  * @param array $description
+    //  * @return array
+    //  */
+    // protected function query(array $description): array
+    // {
+    //     try {
+    //         $response = $this->client->post($this->endpoint, [
+    //             'json' => $description,
+    //         ]);
+    //     } catch (RuntimeException $e) {
+    //         trigger_error($e->getMessage(), E_USER_WARNING);
+    //         throw $e;
+    //     }
 
-        return $response;
-    }
+    //     return $response;
+    // }
 
     #[Override]
     public function getEvaluableQuery(string $itemtype, array $crit = [], bool $entity_restrict = true): array

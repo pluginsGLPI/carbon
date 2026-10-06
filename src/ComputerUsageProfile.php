@@ -40,7 +40,10 @@ use Glpi\Application\View\TemplateRenderer;
 use Html;
 use MassiveAction;
 use Override;
+use Safe\Exceptions\PcreException;
 use Session;
+
+use function Safe\preg_match;
 
 /**
  * Usage profile of a computer
@@ -141,7 +144,11 @@ class ComputerUsageProfile extends CommonDropdown
     protected function isValidTime(string $time): bool
     {
         $time_pattern = '/^(([01]\d|2[0-3]):[0-5]\d)|(24:00)$/';
-        $found = preg_match($time_pattern, $time, $matches);
+        try {
+            $found = preg_match($time_pattern, $time, $matches);
+        } catch (PcreException $e) {
+            return false;
+        }
         return ($found === 1);
     }
 

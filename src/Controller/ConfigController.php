@@ -30,24 +30,26 @@
  * -------------------------------------------------------------------------
  */
 
-use Glpi\Exception\Http\NotFoundHttpException;
-use GlpiPlugin\Carbon\Location;
-use Location as GlpiLocation;
+namespace GlpiPlugin\Carbon\Controller;
 
-include(__DIR__ . "/../../../inc/includes.php");
+use Glpi\Controller\AbstractController;
+use Glpi\Exception\RedirectException;
+use Glpi\Http\Firewall;
+use Glpi\Security\Attribute\SecurityStrategy;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
-if (!Plugin::isPluginActive('carbon')) {
-    throw new NotFoundHttpException();
+final class ConfigController extends AbstractController
+{
+    #[SecurityStrategy(Firewall::STRATEGY_AUTHENTICATED)]
+    #[Route(
+        path: 'front/config.form.php',
+        name: 'idmefv2_config',
+        methods: ['GET', 'POST']
+    )]
+    public function alert(Request $request): Response
+    {
+        throw new RedirectException('../../../front/config.form.php?forcetab=GlpiPlugin%5CCarbon%5CConfig$1');
+    }
 }
-
-Session::checkRight(GlpiLocation::$rightname, UPDATE);
-
-$item = new Location();
-
-if (isset($_POST['update'])) {
-    Session::checkRight(GlpiLocation::$rightname, UPDATE);
-    $item->update($_POST);
-    Html::back();
-}
-
-Html::back();

@@ -37,7 +37,6 @@ use CommonDBTM;
 use Computer as GlpiComputer;
 use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
-use DBmysql;
 use GlpiPlugin\Carbon\ComputerType;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\DataSource\Lca\Boaviztapi\ComputerModelizationAdapterTrait;
@@ -91,7 +90,11 @@ class Computer extends AbstractAsset
     protected function doEvaluation(CommonDBTM $item): ?array
     {
         $type = $this->getType($item);
-        $this->endpoint = $this->getEndpoint($type);
+
+        $response = null;
+        $this->chooseEvaluationMode($type);
+
+        // select all impact types
         $this->endpoint .= '?' . $this->getCriteriasQueryString();
 
         // Find boavizta zone code
@@ -99,77 +102,18 @@ class Computer extends AbstractAsset
         if ($zone_code === null) {
             return null;
         }
-        $average_power = $this->getAveragePower($item->getID());
-        // Ask for usage impact only
-        $configuration = $this->analyzeHardware();
-        if (count($configuration) === 0) {
-            return null;
-        }
-        $lifespan = (new UsageInfo())->getLifespanInHours($item);
-        if ($lifespan === null) {
-            return null;
-        }
-        $use_ratio = $this->getUseRatio();
         $time_workload = $this->getWorkloadRepartition();
 
-        $description = [
-            'configuration' => $configuration,
-            'usage' => [
-                'usage_location' => $zone_code,
-                'hours_lifetime' => $lifespan,
-                'avg_power'      => $average_power,
-                'use_time_ratio' => $use_ratio,
-                'time_workload'  => $time_workload,
-            ],
+        $this->description['usage'] = [
+            'usage_location' => $zone_code,
+            'time_workload'  => $time_workload,
         ];
-        $response = $this->query($description);
-        $impacts = $this->client->parseResponse($response, 'use');
 
+        // Query Boaviztapi
+        $response = $this->query($this->description);
+
+        $impacts = $this->client->parseResponse($response, 'embedded');
         return $impacts;
-    }
-
-    /**
-     * Get the type of the computer
-     * @param CommonDBTM $item
-     * @return int The type of the computer
-     */
-    protected function getType(CommonDBTM $item): int
-    {
-        /** @var DBmysql $DB */
-        global $DB;
-
-        $computer_table = GlpiComputer::getTable();
-        $computer_type_table = ComputerType::getTable();
-        $glpi_computer_type_table = GlpiComputerType::getTable();
-        $result = $DB->request([
-            'SELECT'     => ComputerType::getTableField('category'),
-            'FROM'       => $computer_type_table,
-            'INNER JOIN' => [
-                $glpi_computer_type_table => [
-                    'FKEY' => [
-                        $computer_type_table => 'computertypes_id',
-                        $glpi_computer_type_table => 'id',
-                    ],
-                ],
-                $computer_table => [
-                    'FKEY' => [
-                        $glpi_computer_type_table => 'id',
-                        $computer_table           => 'computertypes_id',
-                    ],
-                ],
-            ],
-            'WHERE' => [
-                GlpiComputer::getTableField('id') => $item->getID(),
-            ],
-        ]);
-        $row_count = $result->count();
-        if ($row_count === 0) {
-            return ComputerType::CATEGORY_UNDEFINED;
-        } elseif ($result->count() > 1) {
-            trigger_error(sprintf('SQL query shall return 1 row, got %d', $row_count), WARNING);
-        }
-
-        return $result->current()['category'];
     }
 
     /**

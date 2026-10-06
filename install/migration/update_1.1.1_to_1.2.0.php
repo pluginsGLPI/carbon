@@ -29,6 +29,8 @@
  *
  * -------------------------------------------------------------------------
  */
+use function Safe\preg_match;
+use function Safe\scandir;
 
 function update111to120(Migration $migration)
 {

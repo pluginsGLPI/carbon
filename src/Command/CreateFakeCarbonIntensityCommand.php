@@ -33,12 +33,12 @@
 namespace GlpiPlugin\Carbon\Command;
 
 use DateInterval;
-use DateTime;
 use DateTimeZone;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Zone;
 use Override;
+use Safe\DateTime;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
@@ -63,7 +63,7 @@ class CreateFakeCarbonIntensityCommand extends Command
     }
 
     #[Override]
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->output = $output;
 

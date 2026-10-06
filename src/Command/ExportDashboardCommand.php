@@ -38,9 +38,14 @@ use Glpi\Dashboard\Dashboard;
 use Glpi\Dashboard\Item;
 use Override;
 use Plugin;
+use Safe\Exceptions\FilesystemException;
+use Safe\Exceptions\JsonException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+
+use function Safe\file_put_contents;
+use function Safe\json_encode;
 
 class ExportDashboardCommand extends Command
 {
@@ -60,7 +65,7 @@ class ExportDashboardCommand extends Command
     }
 
     #[Override]
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         /** @var DBmysql $DB */
         global $DB;
@@ -93,10 +98,16 @@ class ExportDashboardCommand extends Command
             $this->dashboard_description[] = $row;
         }
 
-        file_put_contents(
-            $this->output_path,
-            json_encode($this->dashboard_description, JSON_PRETTY_PRINT)
-        );
+        try {
+            file_put_contents(
+                $this->output_path,
+                json_encode($this->dashboard_description, JSON_PRETTY_PRINT)
+            );
+        } catch (FilesystemException|JsonException $e) {
+            $message = __('Error while saving dashboard description', 'carbon');
+            $this->output->writeln("<error>$message</error>");
+            return Command::FAILURE;
+        }
         $message = sprintf(__('Dashboard description saved to %s', 'carbon'), $this->output_path);
         $this->output->writeln("<info>$message</info>");
 

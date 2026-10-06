@@ -93,10 +93,6 @@ class LocationTest extends DbTestCase
     }
 
     /**
-     * #CoversMethod GlpiPlugin\Carbon\Location::onGlpiLocationAdd
-     * #CoversMethod GlpiPlugin\Carbon\Location::setBoaviztaZone
-     * #CoversMethod plugin_carbon_locationAdd
-     *
      * @return void
      */
     public function testOnGlpiLocationAdd()
@@ -120,8 +116,7 @@ class LocationTest extends DbTestCase
         $this->assertEquals('FRA', $location->fields['boavizta_zone']);
 
         // Test the geocoding feature
-        $geocoder = $this->getMockBuilder(Geocoder::class)
-            ->getMock();
+        $geocoder = $this->createStub(Geocoder::class);
         $geocoder->method('geocodeQuery')->willReturn(
             new AddressCollection([
                 new NominatimAddress(
@@ -150,10 +145,6 @@ class LocationTest extends DbTestCase
     }
 
     /**
-     * #CoversMethod GlpiPlugin\Carbon\Location::onGlpiLocationPreUpdate
-     * #CoversMethod GlpiPlugin\Carbon\Location::setBoaviztaZone
-     * #CoversMethod plugin_carbon_locationPreUpdate
-     *
      * @return void
      */
     public function testOnGlpiLocationPreUpdate()
@@ -177,8 +168,7 @@ class LocationTest extends DbTestCase
         $this->assertEquals('FRA', $location->fields['boavizta_zone']);
 
         // Test the geocoding feature
-        $geocoder = $this->getMockBuilder(Geocoder::class)
-            ->getMock();
+        $geocoder = $this->createStub(Geocoder::class);
         $geocoder->method('geocodeQuery')->willReturn(
             new AddressCollection([
                 new NominatimAddress(
@@ -208,9 +198,6 @@ class LocationTest extends DbTestCase
     }
 
     /**
-     * #CoversMethod GlpiPlugin\Carbon\Location::onGlpiLocationPrePurge
-     * #CoversMethod plugin_carbon_locationPrePurge
-     *
      * @return void
      */
     public function testOnGlpiLocationPrePurge()
@@ -234,8 +221,6 @@ class LocationTest extends DbTestCase
     }
 
     /**
-     * #CoversMethod GlpiPlugin\Carbon\Location::getIncompleteLocations
-     *
      * @return void
      */
     public function testGetIncompleteLocations()
@@ -258,8 +243,6 @@ class LocationTest extends DbTestCase
     }
 
     /**
-     * #CoversMethod GlpiPlugin\Carbon\Location::getCountryCode
-     *
      * @return void
      */
     public function testGetCountryCode()
@@ -301,8 +284,6 @@ class LocationTest extends DbTestCase
     }
 
     /**
-     * #CoversMethod GlpiPlugin\Carbon\Location::enableCarbonIntensityDownload
-     *
      * @return void
      */
     public function testEnableCarbonIntensityDownload()

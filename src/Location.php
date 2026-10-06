@@ -60,8 +60,8 @@ use Override;
 class Location extends CommonDBChild
 {
     // From CommonDBRelation
-    public static $itemtype       = GlpiLocation::class;
-    public static $items_id       = 'locations_id';
+    public static string $itemtype       = GlpiLocation::class;
+    public static string $items_id       = 'locations_id';
 
     #[Override]
     public static function getIcon()
@@ -109,6 +109,8 @@ class Location extends CommonDBChild
     #[Override]
     public function prepareInputForUpdate($input)
     {
+        $input = parent::prepareInputForUpdate($input);
+
         if (isset($input['plugin_carbon_sources_id']) && isset($input['plugin_carbon_zones_id'])) {
             $source_zone = new Source_Zone();
             $source_zone->getFromDBByCrit([
@@ -122,7 +124,7 @@ class Location extends CommonDBChild
             }
         }
 
-        if (($input['plugin_carbon_sources_id'] ?? 0) == 0) {
+        if (isset($input['plugin_carbon_sources_id']) && $input['plugin_carbon_sources_id'] == 0) {
             $input['plugin_carbon_sources_zones_id'] = 0;
         }
 
@@ -214,7 +216,7 @@ class Location extends CommonDBChild
         switch ($ma->getAction()) {
             case 'MassUpdateBoaviztaZone':
                 foreach ($ids as $id) {
-                    if ($item->getFromDB($id) && self::updateBoaviztaZone($item, $ma->POST['_boavizta_zone'])) {
+                    if ($item->can($id, UPDATE) && $item->getFromDB($id) && self::updateBoaviztaZone($item, $ma->POST['_boavizta_zone'])) {
                         $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
                     } else {
                         $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
@@ -235,7 +237,7 @@ class Location extends CommonDBChild
                     return;
                 }
                 foreach ($ids as $id) {
-                    if ($item->getFromDB($id) && self::updateCarbonIntensitySourceZone($item, $source_zone)) {
+                    if ($item->can($id, UPDATE) && $item->getFromDB($id) && self::updateCarbonIntensitySourceZone($item, $source_zone)) {
                         $ma->itemDone(get_class($item), $id, MassiveAction::ACTION_OK);
                     } else {
                         $ma->itemDone(get_class($item), $id, MassiveAction::ACTION_KO);

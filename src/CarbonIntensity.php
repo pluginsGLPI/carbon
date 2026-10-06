@@ -34,14 +34,14 @@ namespace GlpiPlugin\Carbon;
 
 use CommonDropdown;
 use DateInterval;
-use DateTime;
-use DateTimeImmutable;
 use DateTimeInterface;
 use DBmysql;
 use Exception;
 use Glpi\DBAL\QueryParam;
 use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientInterface;
 use Override;
+use Safe\DateTime;
+use Safe\DateTimeImmutable;
 use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
@@ -59,7 +59,7 @@ class CarbonIntensity extends CommonDropdown
 {
     private const MIN_HISTORY_LENGTH = '13 months ago';
 
-    public static $rightname = 'carbon:report';
+    public static string $rightname = 'carbon:report';
 
     #[Override]
     public static function getTypeName($nb = 0)
@@ -251,7 +251,7 @@ class CarbonIntensity extends CommonDropdown
             $gap_end = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $gap['end']);
             $count = $data_source->fullDownload($source_zone, $gap_start, $gap_end, $this, $limit, $progress_bar);
             $total_count += $count;
-            if ($total_count >= $limit) {
+            if ($limit > 0 && $total_count >= $limit) {
                 return $total_count;
             }
         }

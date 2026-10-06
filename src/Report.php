@@ -33,17 +33,20 @@
 namespace GlpiPlugin\Carbon;
 
 use CommonDBTM;
-use DateTime;
-use DateTimeImmutable;
 use Glpi\Application\View\TemplateRenderer;
 use Glpi\Dashboard\Grid as DashboardGrid;
 use GlpiPlugin\Carbon\Dashboard\Provider;
 use Override;
+use Safe\DateTime;
+use Safe\DateTimeImmutable;
+
+use function Safe\ob_get_clean;
+use function Safe\ob_start;
 
 class Report extends CommonDBTM
 {
-    public static $rightname = 'carbon:report';
-    protected static $notable   = true;
+    public static string $rightname = 'carbon:report';
+    protected static bool $notable   = true;
 
     #[Override]
     public static function getTypeName($nb = 0)
@@ -99,7 +102,7 @@ class Report extends CommonDBTM
 
         $messages = [];
         if (Config::isDemoMode()) {
-            $exit_demo_url = '/plugins/carbon/front/report.php?disable_demo=1';
+            $exit_demo_url = $CFG_GLPI['root_doc'] . '/plugins/carbon/front/report.php?disable_demo=1';
 
             // TRANS: %s are replaced with an HTML anchor : <a> and </a>
             $message = sprintf(

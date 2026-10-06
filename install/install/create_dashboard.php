@@ -29,12 +29,14 @@
  *
  * -------------------------------------------------------------------------
  */
-
 use Glpi\Dashboard\Dashboard;
 use Glpi\Dashboard\Item as DashboardItem;
 use Glpi\Dashboard\Right as DashboardRight;
 use Glpi\DBAL\QueryExpression;
 use GlpiPlugin\Carbon\Report;
+
+use function Safe\file_get_contents;
+use function Safe\json_decode;
 
 /** @var DBmysql $DB */
 global $DB;
