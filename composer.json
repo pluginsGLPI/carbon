@@ -1,4 +1,5 @@
 {
+    "version": "1.4.1-dev",
     "require": {
         "php": ">=8.2.0",
         "geocoder-php/google-maps-provider": "^4.7",
@@ -29,6 +30,5 @@
         "js-lint": "node_modules/.bin/eslint --color .",
         "license-headers": "vendor/bin/licence-headers-check --ansi --no-interaction",
         "build-schema": "tools/build-db-schema.php carbon | plantuml -p -tpng > docs/db-schema.png"
-    },
-    "version": "1.4.0"
+    }
 }
