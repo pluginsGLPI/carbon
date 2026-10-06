@@ -211,7 +211,7 @@ class SearchOptions
                     'beforejoin' => [
                         'table'    => UsageInfo::getTable(),
                         'joinparams' => [
-                            'jointype' => 'child',
+                            'jointype' => 'itemtype_item',
                         ],
                     ],
                 ],
