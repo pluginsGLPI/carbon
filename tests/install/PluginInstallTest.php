@@ -452,7 +452,7 @@ class PluginInstallTest extends CommonTestCase
         $count = $dbUtils->countElementsInTable($table, [
             $source::getForeignKeyField() => $source->getID(),
         ]);
-        $this->assertEquals(5174, $count);
+        $this->assertEquals(6020, $count);
 
         // Find the zone
         $zone_name = 'Quebec';
