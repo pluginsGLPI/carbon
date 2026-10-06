@@ -10,10 +10,10 @@
       </short>
       <long>
          <en>
-Carbon is a plugin that aims to assess the environmental impact of your IT infrastructure. It uses external data sources to collect carbon intensity of electricity and environmental impact of each supported asset. It supports up to 20 impact criteria.
+Carbon is a plugin that aims to assess the environmental impact of your IT infrastructure. It uses external data sources to collect carbon intensity of electricity and environmental impact of each supported asset. It supports up to 20 impact criteria. This plugin was developed as part of the IEN (Environmental Impact of Digital Technology) research project led by the SystemX Institute of Technological Research.
          </en>
          <fr>
-Carbon est un plugin permettant d'évaluer l'impact environnemental de votre infrastructure informatique. Il utilise des sources de données exernes pour collecter l'intensité carbone de l'électricity et l'impact environnemental des équipements pris en charge. Il gère jusqu'à 20 critères d'impact.
+Carbon est un plugin permettant d'évaluer l'impact environnemental de votre infrastructure informatique. Il utilise des sources de données exernes pour collecter l'intensité carbone de l'électricity et l'impact environnemental des équipements pris en charge. Il gère jusqu'à 20 critères d'impact. Ce plugin a été développé dans le cadre du projet de recherche IEN (Impact Envrionnemental du Numérique) mené par l'Institut de Recherche Technologique SystemX.
          </fr>
       </long>
    </description>
