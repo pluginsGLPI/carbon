@@ -182,13 +182,17 @@ function plugin_carbon_registerClasses()
     Plugin::registerClass(CronTask::class, ['addtabon' => GlpiCronTask::class]);
 
     foreach (PLUGIN_CARBON_TYPES as $itemtype) {
+        /** @var class-string<CommonDBTM> $core_type_class */
         $core_type_class = $itemtype . 'Type';
+        /** @var class-string<CommonDBTM> $item_type_class */
         $item_type_class = 'GlpiPlugin\\Carbon\\' . $core_type_class;
         Plugin::registerClass($item_type_class, ['addtabon' => $core_type_class]);
 
         Plugin::registerClass(UsageInfo::class, ['addtabon' => $itemtype]);
 
+        /** @var class-string<CommonDBTM> $core_model_class */
         $core_model_class = $itemtype . 'Model';
+        /** @var class-string<CommonDBTM> $item_model_class */
         $item_model_class = 'GlpiPlugin\\Carbon\\' . $core_model_class;
         Plugin::registerClass($item_model_class, ['addtabon' => $core_model_class]);
     }
