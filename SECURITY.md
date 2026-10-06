@@ -22,5 +22,4 @@ Thank you for improving the security of the plugin Carbon.
 | 1.0.x   | :x:                |
 | 1.2.x   | :x:                |
 | 1.3.x   | :heavy_check_mark: |
-| 1.3.x   | :heavy_check_mark: |
 | 1.4.x   | :heavy_check_mark: |

@@ -1,8 +1,115 @@
-<!--- BEGIN HEADER -->
+<!-- BEGIN HEADER -->
 # Changelog
 
 All notable changes to this project will be documented in this file.
-<!--- END HEADER -->
+<!-- END HEADER -->
+
+## [1.4.0](https://github.com/pluginsglpi/carbon/compare/1.3.1...1.4.0) (2026-10-06)
+
+### Features
+
+* Disable useless DB version check ([fad6f6](https://github.com/pluginsglpi/carbon/commit/fad6f6dd98d6133d8d61275e743594d4d243748b))
+* Drop deprecated CSRF token ([0d768a](https://github.com/pluginsglpi/carbon/commit/0d768a1b3cb91481f283578bbc6ff2ea14fbc6f5))
+* Glpi 12 compatibility ([387761](https://github.com/pluginsglpi/carbon/commit/3877615778f7a6d46c4a664133b741643df01606), [129377](https://github.com/pluginsglpi/carbon/commit/129377f7b4587b7b31343d9062370e407b149110))
+
+##### Config
+
+* Compatibility with GLPI 12 ([ab4394](https://github.com/pluginsglpi/carbon/commit/ab4394e36f77c29cbad1f30b423f64687964e1a5))
+
+##### Dashboard
+
+* Import dashboard command ([e5a623](https://github.com/pluginsglpi/carbon/commit/e5a623092070dc9207720c66b68a2bd09d23d1f2))
+
+##### Data Source/ Rest Api Client
+
+* Use GLPI HTTP client instead of Guzzle ([a75b89](https://github.com/pluginsglpi/carbon/commit/a75b8983714f8e9e35e4af37217843b56167da11))
+
+##### Datasource/ Abstract Crontask
+
+* Give link to enable zones ([0e8494](https://github.com/pluginsglpi/carbon/commit/0e849433882bbd5e9b9c60c819c96b2ead2025a4))
+
+##### Impact\ Embodied\ Boavizta
+
+* Support for cloud servers ([e4345e](https://github.com/pluginsglpi/carbon/commit/e4345ef7159423ec42f91f7fe2d2d14868b6b262))
+
+##### Impact\ Usage\ Boavizta\ Computer
+
+* Hanle upsage impact for cloud computers ([e6809e](https://github.com/pluginsglpi/carbon/commit/e6809e34258c2e500af366cf98ce3b0113f1af6f))
+
+### Bug Fixes
+
+* More clear error notification ([ec9170](https://github.com/pluginsglpi/carbon/commit/ec917000242e1e2f4dc2c23248c5557b8f78eb3f))
+* Prevent logging HTTP headers on error ([2cb3f6](https://github.com/pluginsglpi/carbon/commit/2cb3f6fe72727b0fdf6cbf1dc6f7d9416d9f50d1))
+* Prevent missing build assets regression ([c8cd08](https://github.com/pluginsglpi/carbon/commit/c8cd08395e1bbd114ddbb2f3c529a0681e6430b7), [9f8c8b](https://github.com/pluginsglpi/carbon/commit/9f8c8b9ed9dc59becbb4a27f47801df8af122f43))
+* Truncate table with bad WHERE clause ([a88954](https://github.com/pluginsglpi/carbon/commit/a88954996aca9581b7884ca9e167ed5ab6638d43))
+* Type hint function output ([0592d2](https://github.com/pluginsglpi/carbon/commit/0592d228cb8c5549f824a33df3f202673253c582))
+* Typo in var name ([1e9b53](https://github.com/pluginsglpi/carbon/commit/1e9b53bea1e720b305c85b37e7c1716aebe720b4), [41d2e4](https://github.com/pluginsglpi/carbon/commit/41d2e40089e1444813cf25adf3a8bc059df2cf83))
+* Various fixes ([2c8448](https://github.com/pluginsglpi/carbon/commit/2c844865585acf740249e5e5c72b53659634c534))
+
+##### Carbon Intensity
+
+* Limit downloads only if the limit is set ([3313df](https://github.com/pluginsglpi/carbon/commit/3313df6af20d6f88c05b16b2441289ba0ceba6d2))
+
+##### Config
+
+* Improve config page layout ([81c561](https://github.com/pluginsglpi/carbon/commit/81c5618740f02ad6066530f40246c565a52e36e9))
+* Set icon ([888c61](https://github.com/pluginsglpi/carbon/commit/888c6113251f4a17cac151445d90c4c94b95ef6b))
+
+##### Data Source\ Carbon Intensity
+
+* Cache only if the extended range end is in the pastwithout this constraint, a download occurring when the +14 hours is in the future leadds to a truncated cache, as some data is not kown ([53bd5e](https://github.com/pluginsglpi/carbon/commit/53bd5e16eee1db01cec6062cd47f29edce5a8d2c))
+
+##### Datasource\ Lca\ Boaviztapi\ Client
+
+* Method type hinting ([533074](https://github.com/pluginsglpi/carbon/commit/5330746ae9d1ef9e8d90571cdd3439f5fcb74224))
+
+##### Impact\ Common Boavizta\ Abstract Asset Trait
+
+* Add missing file ([98485d](https://github.com/pluginsglpi/carbon/commit/98485dffbfed5d906faf6c0d1c91cb2bd4a9632f))
+
+##### Impact\ History\ Computer
+
+* More accurate status ([733431](https://github.com/pluginsglpi/carbon/commit/733431a329656ae08c234cee5297dbdabf935375))
+
+##### Impact\ Type
+
+* Missing unit for CTUe, fix missing space ([3c474b](https://github.com/pluginsglpi/carbon/commit/3c474b9019dec15687a50cbf68cdf62df111b4fb))
+* Set unit for pm impact criteria ([89df35](https://github.com/pluginsglpi/carbon/commit/89df356ed3c7ccbb09e7497e0884e86380c68a48))
+
+##### Install
+
+* Newline after completing fallback data installation ([c8cf0a](https://github.com/pluginsglpi/carbon/commit/c8cf0a88bf0a876f030014a21bcc94a7523158f2))
+
+##### Lca/ Boaviztapi/ Config
+
+* Tighten security ([6a8de3](https://github.com/pluginsglpi/carbon/commit/6a8de30a81b7ceb644af390dbc53f980c959a3ee))
+
+##### Location
+
+* Call parent implementation of prepareInpurForUpdate ([6a47f5](https://github.com/pluginsglpi/carbon/commit/6a47f5d5165327684cc2a0c6e74344ff868fd869))
+* Fail to massively update locations ([838cae](https://github.com/pluginsglpi/carbon/commit/838caef5e1d0bd1b2454e074c2e71a62c05d0c49))
+
+##### Search Options
+
+* Use subquery object instead of raw SQL ([edba8d](https://github.com/pluginsglpi/carbon/commit/edba8d2aa000eb72896921ab61f23e045b397dc2))
+
+##### Seeach Options
+
+* Bad join type ([63ba84](https://github.com/pluginsglpi/carbon/commit/63ba848f5c615f89a8dd0f2650321a269d9ee157), [a95fb9](https://github.com/pluginsglpi/carbon/commit/a95fb93857745bf88ef220dc91150351c02c8901))
+
+##### Source Zone
+
+* Better right check before toggling download flag ([391376](https://github.com/pluginsglpi/carbon/commit/39137612965cf7ce4d130650a93d0f08f399e994), [d6624a](https://github.com/pluginsglpi/carbon/commit/d6624aae2737661c6ae3b01f6c787b69af5da389))
+* Broken download toggle ([7245d8](https://github.com/pluginsglpi/carbon/commit/7245d850f3a0f486998cd4b02f682fa010cbf8c7))
+* Remove dead code ([b5b497](https://github.com/pluginsglpi/carbon/commit/b5b497b6364ca13b865d2c523de2792d793372a7))
+
+##### Zone
+
+* Check right before outputting a dropdown ([793138](https://github.com/pluginsglpi/carbon/commit/793138604aaf55bad645c1795b847f4ffb6508b8), [ba415f](https://github.com/pluginsglpi/carbon/commit/ba415f2137e37e79f862f8c2ef5f1acdc3cf7b50))
+* Remove deprecated include ([1d7e53](https://github.com/pluginsglpi/carbon/commit/1d7e53499898a8b78065d6514bfceb1d8e7b6278))
+
+
+---
 
 ## [1.3.1](https://github.com/pluginsGLPI/carbon/compare/1.3.0...1.3.1) (2026-08-26)
 
