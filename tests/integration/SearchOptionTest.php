@@ -34,8 +34,11 @@ namespace GlpiPlugin\Carbon\Tests;
 
 use CommonDBTM;
 use CommonGLPI;
+use DBConnection;
 use DBmysql;
 use DbUtils;
+use Glpi\Search\Provider\SQLProvider;
+use Glpi\Search\SearchEngine;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\CarbonIntensity;
 use GlpiPlugin\Carbon\ComputerModel;
@@ -46,6 +49,7 @@ use GlpiPlugin\Carbon\MonitorModel;
 use GlpiPlugin\Carbon\MonitorType;
 use GlpiPlugin\Carbon\NetworkEquipmentModel;
 use GlpiPlugin\Carbon\NetworkEquipmentType;
+use GlpiPlugin\Carbon\SearchOptions;
 use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\Zone;
 use PHPUnit\Framework\Attributes\CoversMethod;
@@ -191,6 +195,52 @@ class SearchOptionTest extends CommonTestCase
                 }
                 $search_option = $instance->getSearchOptionByField('field', $key);
                 $this->assertTrue(!empty($search_option), "No search option for field $key in class $class_name");
+            }
+        }
+    }
+
+    public function testSearchOptionForCoreClasses()
+    {
+        $this->login('glpi', 'glpi');
+        $core_classes = [
+            'Computer' => [
+                SearchOptions::POWER_CONSUMPTION => 0,
+                SearchOptions::IS_IGNORED => 0,
+                SearchOptions::USAGE_PROFILE => 1,
+            ],
+            'Monitor' => [
+                SearchOptions::POWER_CONSUMPTION => 0,
+                SearchOptions::IS_IGNORED => 0,
+            ],
+            'NetworkEquipment' => [
+                SearchOptions::POWER_CONSUMPTION => 0,
+                SearchOptions::IS_IGNORED => 0,
+            ],
+        ];
+        foreach ($core_classes as $class => $options) {
+            foreach ($options as $so_id => $value) {
+                $params = [
+                    'reset' => 'reset',
+                    'criteria' => [
+                        [
+                            'field' => $so_id,
+                            'searchtype' => 'equals',
+                            'value' => $value,
+                        ],
+                    ],
+                ];
+                $data = SearchEngine::prepareDataForSearch($class, $params);
+                SQLProvider::constructSQL($data);
+                $sql = $data['sql']['search'];
+                $DBread = DBConnection::getReadConnection();
+                $DBread->doQuery("SET SESSION group_concat_max_len = 8194304;");
+                // May throw an exception if the generated SQL query is invalid
+                try {
+                    $result = $DBread->doQuery($data['sql']['search']);
+                } catch (\Exception $e) {
+                    $this->fail("SQL query failed for class $class with search option $so_id: " . $e->getMessage());
+                }
+                $this->assertTrue(true); // Mark the test as passed if no exception was thrown
             }
         }
     }
