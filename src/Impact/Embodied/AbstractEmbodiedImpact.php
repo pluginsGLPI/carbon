@@ -113,9 +113,11 @@ abstract class AbstractEmbodiedImpact implements EmbodiedImpactInterface
             $impacts = $this->doEvaluation();
         } catch (ConnectException $e) {
             Session::addMessageAfterRedirect(__('Connection to Boavizta failed.', 'carbon'), false, ERROR);
+            Session::addMessageAfterRedirect($e->getMessage(), false, ERROR);
             return false;
         } catch (RuntimeException $e) {
             Session::addMessageAfterRedirect(__('Embodied impact evaluation falied.', 'carbon'), false, ERROR);
+            Session::addMessageAfterRedirect($e->getMessage(), false, ERROR);
             return false;
         }
 

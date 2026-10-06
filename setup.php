@@ -32,7 +32,9 @@
 
 use Config as GlpiConfig;
 use CronTask as GlpiCronTask;
+use Glpi\Config\ProxyExclusion;
 use Glpi\Plugin\Hooks;
+use GlpiPlugin\Carbon\CloudInventoryConnector;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\CronTask;
 use GlpiPlugin\Carbon\Dashboard\Grid;
@@ -46,10 +48,13 @@ use GlpiPlugin\Carbon\UsageInfo;
 use Location as GlpiLocation;
 use Profile as GlpiProfile;
 
+use function Safe\define;
+use function Safe\preg_match;
+
 // Version of the plugin (major.minor.bugfix)
-define('PLUGIN_CARBON_VERSION', '1.3.1');
+define('PLUGIN_CARBON_VERSION', '1.4.0');
 // Schema version of this version (major.minor.bugfix)
-define('PLUGIN_CARBON_SCHEMA_VERSION', '1.3.0');
+define('PLUGIN_CARBON_SCHEMA_VERSION', '1.4.0');
 
 // Version compatibility check -- from GLPI developer documentation
 // > A bug in GLPI prior to 11.0.7 caused plugin routes with method constraints other than GET to never match.
@@ -63,12 +68,12 @@ define('PLUGIN_CARBON_SCHEMA_VERSION', '1.3.0');
 // Watch it when adding new controllers.
 
 // Minimal GLPI version, inclusive
-define('PLUGIN_CARBON_MIN_GLPI_VERSION', '11.0.0');
+define('PLUGIN_CARBON_MIN_GLPI_VERSION', '12.0.0');
 // Maximum GLPI version, exclusive
-define('PLUGIN_CARBON_MAX_GLPI_VERSION', '12.0.0');
+define('PLUGIN_CARBON_MAX_GLPI_VERSION', '13.0.0');
 
 define('PLUGIN_CARBON_DECIMALS', 3);
-define('EMBER_DATASET_DATE', '2025-07-30');
+define('EMBER_DATASET_DATE', '2026-06-30');
 
 // Plugin compatible itemtypes
 /**
@@ -102,6 +107,11 @@ function plugin_init_carbon()
     plugin_carbon_registerClasses();
 
     $CFG_GLPI['javascript']['tools'][strtolower(Report::class)] = ['dashboard'];
+    $proxy_exclusions = $CFG_GLPI['possible_proxy_exclusions'];
+    $proxy_exclusions->addExclusion(new ProxyExclusion(
+        Config::class,
+        plugin_carbon_getFriendlyName(),
+    ));
 }
 
 function plugin_carbon_setupHooks()
@@ -115,15 +125,17 @@ function plugin_carbon_setupHooks()
         LcaClientFactory::getSecuredConfigs()
     );
 
+    $PLUGIN_HOOKS[Hooks::POST_INIT]['carbon'] = [CloudInventoryConnector::class, 'checkPluginAvailability'];
+
     // add new cards to the dashboard
     $PLUGIN_HOOKS[Hooks::DASHBOARD_CARDS]['carbon'] = [Grid::class, 'getDashboardCards'];
     $PLUGIN_HOOKS[Hooks::DASHBOARD_TYPES]['carbon'] = [Widget::class, 'WidgetTypes'];
     // @phpstan-ignore-next-line
-    if (version_compare(GLPI_VERSION, '11.0.8', '>')) {
+    if (version_compare(GLPI_VERSION, '11.0.8', '>=')) {
         $PLUGIN_HOOKS[Hooks::DASHBOARD_DEFAULTS]['carbon'] = [Grid::class, 'getDefaults'];
     }
 
-    if (Session::haveRight('config', UPDATE)) {
+    if (Session::haveRight(GlpiConfig::$rightname, UPDATE)) {
         $PLUGIN_HOOKS['config_page']['carbon'] = 'front/config.form.php';
     }
 
@@ -170,13 +182,17 @@ function plugin_carbon_registerClasses()
     Plugin::registerClass(CronTask::class, ['addtabon' => GlpiCronTask::class]);
 
     foreach (PLUGIN_CARBON_TYPES as $itemtype) {
+        /** @var class-string<CommonDBTM> $core_type_class */
         $core_type_class = $itemtype . 'Type';
+        /** @var class-string<CommonDBTM> $item_type_class */
         $item_type_class = 'GlpiPlugin\\Carbon\\' . $core_type_class;
         Plugin::registerClass($item_type_class, ['addtabon' => $core_type_class]);
 
         Plugin::registerClass(UsageInfo::class, ['addtabon' => $itemtype]);
 
+        /** @var class-string<CommonDBTM> $core_model_class */
         $core_model_class = $itemtype . 'Model';
+        /** @var class-string<CommonDBTM> $item_model_class */
         $item_model_class = 'GlpiPlugin\\Carbon\\' . $core_model_class;
         Plugin::registerClass($item_model_class, ['addtabon' => $core_model_class]);
     }
@@ -188,7 +204,7 @@ function plugin_carbon_registerClasses()
  *
  * @return array
  */
-function plugin_version_carbon()
+function plugin_version_carbon(): array
 {
     $requirements = [
         'name'           => 'Carbon',
@@ -216,45 +232,37 @@ function plugin_version_carbon()
  *
  * @return bool
  */
-function plugin_carbon_check_prerequisites()
+function plugin_carbon_check_prerequisites(): bool
 {
     /** @var DBmysql $DB */
     global $DB;
 
     $prerequisitesSuccess = true;
 
+    // In case GLPI is so old that the modern version checker is not implemented
+    $output = [];
     /** @phpstan-ignore if.alwaysFalse */
-    if (version_compare(GLPI_VERSION, PLUGIN_CARBON_MIN_GLPI_VERSION, 'lt')) {
-        echo "This plugin requires GLPI >= " . PLUGIN_CARBON_MIN_GLPI_VERSION . " and GLPI < " . PLUGIN_CARBON_MAX_GLPI_VERSION . "<br>";
+    if (version_compare(GLPI_VERSION, "10.0.0", 'lt')) {
+        $output[] = "This plugin requires GLPI >= " . PLUGIN_CARBON_MIN_GLPI_VERSION . " and GLPI < " . PLUGIN_CARBON_MAX_GLPI_VERSION;
         $prerequisitesSuccess = false;
     }
 
     if (!is_readable(__DIR__ . '/vendor/autoload.php') || !is_file(__DIR__ . '/vendor/autoload.php')) {
-        echo "Run composer install --no-dev in the plugin directory<br>";
+        $output[] = "Run composer install --no-dev in the plugin directory.";
+        $prerequisitesSuccess = false;
+    }
+
+    if (!is_readable(__DIR__ . '/public/lib/carbon.css') || !is_file(__DIR__ . '/public/lib/carbon.css')) {
+        $output[] = "Run npm install in the plugin directory.";
         $prerequisitesSuccess = false;
     }
 
     if ($DB->use_timezones !== true) {
-        echo "Enable timezones support<br>";
+        $output[] = "Enable timezones support";
         $prerequisitesSuccess = false;
     }
 
-    if (getenv('CI') === false) {
-        // only when not under test
-        $version_string = $DB->getVersion();
-
-        $server  = preg_match('/-MariaDB/', $version_string) ? 'MariaDB' : 'MySQL';
-        $version = preg_replace('/^((\d+\.?)+).*$/', '$1', $version_string);
-        if ($server === 'MySQL' && version_compare($version, '8.0.0', '<')) {
-            echo 'This plugin requires MySQL >= 8.0 or MariaDB >= 10.2<br>';
-            $prerequisitesSuccess = false;
-        }
-
-        if ($server === 'MariaDB' && version_compare($version, '10.2.0', '<')) {
-            echo 'This plugin requires MySQL >= 8.0 or MariaDB >= 10.2<br>';
-            $prerequisitesSuccess = false;
-        }
-    }
+    echo implode(' ', $output);
 
     return $prerequisitesSuccess;
 }

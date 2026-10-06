@@ -43,6 +43,7 @@ use GlpiPlugin\Carbon\UsageImpact;
 use LogicException;
 use Override;
 use RuntimeException;
+use Session;
 use Toolbox as GlpiToolbox;
 
 abstract class AbstractUsageImpact implements UsageImpactInterface
@@ -150,6 +151,7 @@ abstract class AbstractUsageImpact implements UsageImpactInterface
             $this->getVersion();
             $impacts = $this->doEvaluation($this->item);
         } catch (RuntimeException $e) {
+            Session::addMessageAfterRedirect(__(sprintf('Evaluation failed: %s', $e->getMessage()), 'carbon'), false, ERROR);
             return false;
         }
 

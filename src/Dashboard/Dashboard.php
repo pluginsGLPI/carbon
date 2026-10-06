@@ -37,6 +37,12 @@ use ComputerModel;
 class Dashboard
 {
     /**
+     * Key of the dashboard used by the plugin in its reporting page
+     * @var string
+     */
+    public const REPORTING_DASHBOARD_KEY = 'plugin_carbon_board';
+
+    /**
      * Returns total usage carbon emission per computer type.
      *
      * @return array of:
@@ -60,23 +66,5 @@ class Dashboard
     public static function getTotalPowerPerModel(): array
     {
         return Provider::getSumPowerPerModel([ComputerModel::getTableField('power_consumption') => ['>', '0']]);
-    }
-
-    public static function cardCarbonintensityProvider(array $params = [])
-    {
-        $default_params = [
-            'label' => __('Carbon dioxyde intensity', 'carbon'),
-            'icon'  => "fas fa-computer",
-            'color' => '#ea9999',
-        ];
-        $params = array_merge($default_params, $params);
-
-        $data = Provider::getCarbonIntensity($params);
-
-        return [
-            'data'  => $data,
-            'label' => $params['label'],
-            'icon'  => $params['icon'],
-        ];
     }
 }

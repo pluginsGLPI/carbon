@@ -60,6 +60,9 @@ use NetworkEquipmentType as GlpiNetworkEquipmentType;
 use Profile as GlpiProfile;
 use Toolbox as GlpiToolbox;
 
+use function Safe\ob_end_clean;
+use function Safe\ob_start;
+
 /**
  * Plugin install process
  * supported arguments for upgrade process
@@ -289,6 +292,9 @@ function plugin_carbon_hook_pre_purge_assettype(CommonDBTM $item)
     }
 
     $carbon_type_itemtype = 'GlpiPlugin\\Carbon\\' . $itemtype;
+    if (!is_a($carbon_type_itemtype, CommonDBTM::class, true)) {
+        return;
+    }
     $carbon_type = new $carbon_type_itemtype();
     $carbon_type->deleteByCriteria([
         $item->getForeignKeyField() => $item->getID(),

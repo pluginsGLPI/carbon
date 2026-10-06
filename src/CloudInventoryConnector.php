@@ -30,27 +30,28 @@
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Carbon\Source_Zone;
-use GlpiPlugin\Carbon\Zone;
+namespace GlpiPlugin\Carbon;
 
-include(__DIR__ . '/../../../inc/includes.php');
+use Plugin;
 
-// Check if plugin is activated...
-if (!Plugin::isPluginActive('carbon')) {
-    http_response_code(404);
-    die();
+/**
+ * Establish the functional bridge between Carbon and the plugin CloudInventory
+ */
+class CloudInventoryConnector
+{
+    public static function checkPluginAvailability(): void
+    {
+        /** @var array $CFG_GLPI */
+        global $CFG_GLPI;
+
+        $CFG_GLPI['plugin:carbon']['use_cloudinventory'] = Plugin::isPluginActive('cloudinventory');
+    }
+
+    public function pluginAvailable(): bool
+    {
+        /** @var array $CFG_GLPI */
+        global $CFG_GLPI;
+
+        return $CFG_GLPI['plugin:carbon']['use_cloudinventory'] ?? false;
+    }
 }
-
-if (!Zone::canView()) {
-    http_response_code(403);
-    die();
-}
-
-$source_zone_table = Source_Zone::getTable();
-$zone_table = Zone::getTable();
-$source_id = (int) $_POST['plugin_carbon_sources_id'];
-Zone::dropdown([
-    'rand' => (int) $_POST['dom_id'],
-    'condition' => Zone::getRestrictBySourceCondition($source_id),
-    'specific_tags' => ($source_id === 0 ? ['disabled' => 'disabled'] : []),
-]);

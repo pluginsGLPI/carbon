@@ -67,7 +67,6 @@ use NetworkEquipment;
 use NetworkEquipmentModel;
 use NetworkEquipmentType;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Depends;
 use Plugin;
 use Profile;
@@ -170,7 +169,6 @@ class PluginInstallTest extends CommonTestCase
         $this->checkRegisteredClasses();
     }
 
-    #[CoversNothing()]
     public function testConfigurationExists()
     {
         $config = Config::getConfigurationValues(TEST_PLUGIN_NAME);
@@ -181,7 +179,6 @@ class PluginInstallTest extends CommonTestCase
         return $config;
     }
 
-    #[CoversNothing()]
     private function checkSchema(
         string $version,
         bool $strict = true,
@@ -455,7 +452,7 @@ class PluginInstallTest extends CommonTestCase
         $count = $dbUtils->countElementsInTable($table, [
             $source::getForeignKeyField() => $source->getID(),
         ]);
-        $this->assertEquals(5174, $count);
+        $this->assertEquals(6020, $count);
 
         // Find the zone
         $zone_name = 'Quebec';
@@ -610,6 +607,10 @@ class PluginInstallTest extends CommonTestCase
         }
     }
 
+    /**
+     * Summary of zones
+     * @var array<string>
+     */
     private $zones = [
         'Afghanistan',
         'Albania',
@@ -939,7 +940,6 @@ class PluginInstallTest extends CommonTestCase
         $this->assertEquals($expected, $result);
     }
 
-    #[CoversNothing()]
     #[Depends('testInstallPlugin')]
     public function test_version_is_consistent_across_files()
     {
@@ -966,9 +966,22 @@ class PluginInstallTest extends CommonTestCase
         }
         $this->assertNotNull($carbon_package, "Carbon package not found in package-lock.json");
         $this->assertSame($setup_version, $carbon_package['version'] ?? null, "Version mismatch for carbon package");
+
+        // Check that SECURITY.md mentions the current version as supported
+        $setup_version = preg_replace("#-.*$#", '', $setup_version);
+        $setup_version = preg_replace("#\.[0-9]+$#", '.x', $setup_version);
+        $security_file = $plugin_dir . '/SECURITY.md';
+        // Find a markdown table under the title "Supported Versions"
+        $security_content = file_get_contents($security_file);
+        $matches = [];
+        preg_match('/## Supported Versions\s*\n(.*?)(\n##|\Z)/s', $security_content, $matches);
+        $this->assertNotEmpty($matches, "Supported Versions section not found in SECURITY.md");
+        $supported_versions_table = trim($matches[1]);
+        // Check that the table contains a row with the current version after the section title
+        $this->assertNotEmpty($supported_versions_table, "Supported Versions table is empty in SECURITY.md");
+        $this->assertStringContainsString($setup_version, $supported_versions_table, "Current version '$setup_version' not found in Supported Versions table in SECURITY.md");
     }
 
-    #[CoversNothing()]
     #[Depends('testInstallPlugin')]
     public function test_tagged_version_is_declared_in_plugin_xml()
     {

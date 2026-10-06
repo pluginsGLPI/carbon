@@ -86,6 +86,36 @@ class Type
     ];
 
     /**
+     * Unit of impact criterias
+     *
+     * @var array
+     */
+    private static array $impact_units = [
+        'gwp'    => ['g', 'CO₂ eq'],
+        'adp'    => ['g', 'SB eq'],
+        'pe'     => ['J', ''],
+        'gwppb'  => ['g', 'CO₂ eq'],
+        'gwppf'  => ['g', 'CO₂ eq'],
+        'gwpplu' => ['g', 'CO₂ eq'],
+        'ir'     => ['g', 'U235 eq'],
+        'lu'     => null,
+        'odp'    => ['g', 'CFC-11 eq'],
+        'pm'     => null,
+        'pocp'   => ['g', 'NMVOC eq'],
+        'wu'     => ['m³', ''],
+        'mips'   => ['g', ''],
+        'adpe'   => ['g', 'SB eq'],
+        'adpf'   => ['J', ''],
+        'ap'     => ['mol', 'H+ eq'],
+        'ctue'   => null,
+        // 'ctuh_c' => [null, 'CTUh'],
+        // 'ctuh_nc' => [null, 'CTUh'],
+        'epf'    => ['g', 'P eq'],
+        'epm'    => ['g', 'N eq'],
+        'ept'    => ['mol', 'N eq'],
+    ];
+
+    /**
      * get an array of impact types
      *
      * @return array<int, string>
@@ -114,32 +144,7 @@ class Type
      **/
     public static function getImpactUnit(string $type): array
     {
-        $impact_units = [
-            'gwp'    => ['g', 'CO₂ eq'],
-            'adp'    => ['g', 'SB eq'],
-            'pe'     => ['J', ''],
-            'gwppb'  => ['g', 'CO₂ eq'],
-            'gwppf'  => ['g', 'CO₂ eq'],
-            'gwpplu' => ['g', 'CO₂ eq'],
-            'ir'     => ['g', 'U235 eq'],
-            'lu'     => null,
-            'odp'    => ['g', 'CFC-11 eq'],
-            'pm'     => [null, __('Disease incidence', 'carbon')],
-            'pocp'   => ['g', 'NMVOC eq'],
-            'wu'     => ['m³', ''],
-            'mips'   => ['g', ''],
-            'adpe'   => ['g', 'SB eq'],
-            'adpf'   => ['J', ''],
-            'ap'     => ['mol', 'H+ eq'],
-            'ctue'   => ['', 'CTUe'],
-            // 'ctuh_c' => [null, 'CTUh'],
-            // 'ctuh_nc' => [null, 'CTUh'],
-            'epf'    => ['g', 'P eq'],
-            'epm'    => ['g', 'N eq'],
-            'ept'    => ['mol', 'N eq'],
-        ];
-
-        return $impact_units[$type] ?? ['', ''];
+        return self::$impact_units[$type] ?? ['', ''];
     }
 
     /**
