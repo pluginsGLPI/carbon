@@ -6,6 +6,7 @@ on:
       - "main"
       - "develop"
       - "support/*"
+      - "12.0/bugfixes"
     tags:
        - "*"
   pull_request:
