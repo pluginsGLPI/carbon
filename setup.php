@@ -52,7 +52,7 @@ use function Safe\define;
 use function Safe\preg_match;
 
 // Version of the plugin (major.minor.bugfix)
-define('PLUGIN_CARBON_VERSION', '1.4.0');
+define('PLUGIN_CARBON_VERSION', '1.4.1-dev');
 // Schema version of this version (major.minor.bugfix)
 define('PLUGIN_CARBON_SCHEMA_VERSION', '1.4.0');
 
