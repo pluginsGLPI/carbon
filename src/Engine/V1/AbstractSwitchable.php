@@ -150,24 +150,20 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
             if ($iterator->count() < $expected_count) {
                 // Need to fallback to an alternate source
                 $fallback_source_zone = new Source_Zone();
-                if (!$fallback_source_zone->getFallbackFromDB($source_zone)) {
-                    $fallback_source_zone = null;
+                if ($fallback_source_zone->getFallbackFromDB($source_zone)) {
+                    $row = array_fill(0, $expected_count, $this->getFallbackCarbonIntensity($start_time, $fallback_source_zone));
+                    $iterator = new ArrayObject($row);
+                    $iterator = $iterator->getIterator();
                 }
             }
         } else {
             // The source is already a fallback (exapmple: Quebec does has any realtime source)
-            $fallback_source_zone = $source_zone;
-        }
-
-
-        // Try a fallback source
-        if ($fallback_source_zone !== null) {
-            $row = array_fill(0, $expected_count, $this->getFallbackCarbonIntensity($start_time, $fallback_source_zone));
+            $row = array_fill(0, $expected_count, $this->getFallbackCarbonIntensity($start_time, $source_zone));
             $iterator = new ArrayObject($row);
             $iterator = $iterator->getIterator();
         }
 
-        $count = $iterator ? $iterator->count() : 0;
+        $count = $iterator->count();
         if ($count != $expected_count) {
             trigger_error(sprintf(
                 "required count of carbon intensity %d samples not met. Got %d samples for date %s",

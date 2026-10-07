@@ -75,8 +75,7 @@ abstract class AbstractPermanent extends AbstractAsset implements EngineInterfac
         $start_time->setTime(0, 0, 0, 0);
         $length = new DateInterval('PT' . 86400 . 'S'); // 24h = 86400 seconds
         $source = Source::getById($source_zone->fields['plugin_carbon_sources_id']);
-        $fallback_source_zone = null;
-        $iterator = null;
+        $expected_count = 24;
 
         // Try to read real time carbon intensities
         if ($source->fields['fallback_level'] === 0) {
@@ -84,25 +83,20 @@ abstract class AbstractPermanent extends AbstractAsset implements EngineInterfac
             if ($iterator->count() === 0) {
                 // Need to fallback to an alternate source
                 $fallback_source_zone = new Source_Zone();
-                if (!$fallback_source_zone->getFallbackFromDB($source_zone)) {
-                    $fallback_source_zone = null;
+                if ($fallback_source_zone->getFallbackFromDB($source_zone)) {
+                    $row = array_fill(0, $expected_count, $this->getFallbackCarbonIntensity($start_time, $fallback_source_zone));
+                    $iterator = new ArrayObject($row);
+                    $iterator = $iterator->getIterator();
                 }
             }
         } else {
             // The source is already a fallback (exapmple: Quebec does has any realtime source)
-            $fallback_source_zone = $source_zone;
-        }
-
-        $expected_count = 24;
-
-        // Try a fallback source
-        if ($fallback_source_zone !== null) {
-            $row = array_fill(0, $expected_count, $this->getFallbackCarbonIntensity($start_time, $fallback_source_zone));
+            $row = array_fill(0, $expected_count, $this->getFallbackCarbonIntensity($start_time, $source_zone));
             $iterator = new ArrayObject($row);
             $iterator = $iterator->getIterator();
         }
 
-        $count = $iterator ? $iterator->count() : 0;
+        $count = $iterator->count();
         if ($count != $expected_count) {
             trigger_error(sprintf(
                 'required count of carbon intensity %d samples not met. Got %d samples for date %s',
