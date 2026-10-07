@@ -51,26 +51,39 @@
         border: 1px solid {{ fg_hover_border }};
     }
 
-    #{{ id }} .apexcharts-title-text {
-        fill: {{ fg_color }};
+    #{{ id }} .card-body {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
     }
 
-    .theme-dark #{{ id }} .apexcharts-title-text {
-        fill: {{ dark_fg_color }};
+    #{{ id }}_carbon_emission_per_model_chart {
+        flex: 1 1 auto;
+        min-height: 0;
+        width: 100%;
     }
 </style>
 <div class="card" id="{{ id }}">
-    <div id="carbonEmissionPerModelChart" class="card-body card-max-height">
-    <div class="h1 mb-3" id="carbonEmissionPerModel"></div>
-    <div class="chart-lg"></div>
+    <div class="card-body">
+        <div id="{{ id }}_carbon_emission_per_model_chart" class="chart-lg"></div>
     </div>
 </div>
 
 {% block scripts %}
-<script>
-	$(document).ready(function () {
-      var carbonEmissionPerModelChart = new ApexCharts(document.querySelector("#carbonEmissionPerModelChart .chart-lg"), {{ data|json_encode(constant('JSON_PRETTY_PRINT'))|raw }});
-      carbonEmissionPerModelChart.render();
-   });
+<script type="module">
+  (async () => {
+    const chartElement = document.getElementById('{{ id }}_carbon_emission_per_model_chart');
+    const carbonEmissionPerModelChart = echarts.init(chartElement);
+    carbonEmissionPerModelChart.setOption({{ data|json_encode|raw }});
+    carbonEmissionPerModelChart.on('click', (params) => {
+      const dataUrl = _.get(params, 'data.url', '');
+      if (dataUrl.length > 0) {
+        window.location.href = dataUrl;
+      }
+    });
+
+    const chartResizeObserver = new ResizeObserver(() => carbonEmissionPerModelChart.resize());
+    chartResizeObserver.observe(chartElement);
+  })();
 </script>
 {% endblock %}

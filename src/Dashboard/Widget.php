@@ -179,77 +179,68 @@ class Widget extends GlpiDashboardWidget
         $fg_hover_color  = GlpiToolbox::getFgColor($p['color'], 15);
         $fb_hover_border = GlpiToolbox::getFgColor($p['color'], 30);
 
-        $apex_data = [
-            'chart' => [
-                'type' => 'line',
-                'height' => 350,
-            ],
+        $data = $p['data'];
+        $energy = array_column($data['series'][1]['data'], 'y');
+        $energy_min = count($energy) > 0 ? 0.8 * min($energy) : 0;
+        $echarts_data = [
             'title' => [
                 'text' => $p['label'],
-            ],
-            'colors' => ['#BBDA50', '#A00'],
-            'plotOptions' => [
-                'bar' => [
-                    'horizontal' => false,
-                    'columnWidth' => '55%',
-                    'endingShape' => 'rounded',
+                'textStyle' => [
+                    'color' => $fg_color,
                 ],
             ],
-            'dataLabels' => [
-                'enabled' => false,
-                'enabledOnSeries' => [0, 1],
-                'style' => [
-                    'colors' => ['#145161', '#800'],
-                ],
+            'color' => ['#BBDA50', '#A00'],
+            'tooltip' => [
+                'trigger' => 'axis',
             ],
-            'labels' => [],
-            'stroke' => [
-                'width' => [0, 4],
-                'curve' => 'smooth',
+            'legend' => [
+                'data' => array_column($data['series'], 'name'),
+            ],
+            'grid' => [
+                'containLabel' => true,
+            ],
+            'xAxis' => [
+                'type' => 'category',
+                'data' => $data['labels'],
+            ],
+            'yAxis' => [
+                [
+                    'type' => 'value',
+                    'position' => 'left',
+                    'name' => $data['series'][0]['name'],
+                    'nameLocation' => 'middle',
+                    'nameRotate' => 90,
+                    'nameGap' => 40,
+                    'splitLine' => ['show' => false],
+                ],
+                [
+                    'type' => 'value',
+                    'position' => 'right',
+                    'name' => $data['series'][1]['name'],
+                    'nameLocation' => 'middle',
+                    'nameRotate' => 90,
+                    'nameGap' => 40,
+                    'min' => $energy_min,
+                    'splitLine' => ['show' => false],
+                ],
             ],
             'series' => [
                 [
-                    'name' =>  __('Carbon emission', 'carbon'),
+                    'name' => $data['series'][0]['name'],
                     'type' => 'bar',
-                    'data' => [],
+                    'yAxisIndex' => 0,
+                    'data' => array_column($data['series'][0]['data'], 'y'),
                 ],
                 [
-                    'name' => __('Consumed energy', 'carbon'),
+                    'name' => $data['series'][1]['name'],
                     'type' => 'line',
-                    'data' => [],
+                    'yAxisIndex' => 1,
+                    'smooth' => true,
+                    'symbolSize' => 6,
+                    'data' => $energy,
                 ],
-            ],
-            'xaxis' => [
-                'categories' => [],
-            ],
-            'yaxis' => [
-                [
-                    'title' => ['text' => __('Carbon emission', 'carbon')],
-                ], [
-                    'opposite' => true,
-                    'title' => ['text' => __('Consumed energy', 'carbon')],
-                ],
-            ],
-            'markers' => [
-                'size' => [3, 3],
-            ],
-            'tooltip' => [
-                'enabled' => true,
             ],
         ];
-        $data = $p['data'];
-        foreach ($data['series'] as $key => $serie) {
-            $apex_data['series'][$key]['name'] = $serie['name'];
-            $apex_data['series'][$key]['data'] = $serie['data'];
-        }
-        $apex_data['labels'] = $data['labels'];
-        $apex_data['xaxis']['categories'] = $data['labels'];
-
-        $apex_data['yaxis'][1]['min'] = 0;
-        $energy = array_column($apex_data['series'][1]['data'], 'y');
-        if (count($energy) > 0) {
-            $apex_data['yaxis'][1]['min'] = 0.8 * min($energy);
-        }
 
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/graph-carbon-emission-per-month.html.twig', [
             'id' => $p['id'],
@@ -259,7 +250,7 @@ class Widget extends GlpiDashboardWidget
             'dark_bg_color'   => $dark_bg_color,
             'fg_hover_color' => $fg_hover_color,
             'fg_hover_border' => $fb_hover_border,
-            'data' => $apex_data,
+            'data' => $echarts_data,
         ]);
     }
 
@@ -276,59 +267,81 @@ class Widget extends GlpiDashboardWidget
         ];
         $p = array_merge($default, $params);
         $fg_color = GlpiToolbox::getFgColor($p['color']);
-        $dark_fg_color = GlpiToolbox::getFgColor($p['color'], 40);
+        $data = $p['data'];
+        $source_values = $data['series'] ?? [];
+        $source_labels = $data['labels'] ?? [];
+        $source_urls = $data['url'] ?? [];
+        $limit = min($params['limit'] ?? count($source_values), count($source_values));
+        $labels = array_slice($source_labels, 0, $limit);
+        $values = array_slice($source_values, 0, $limit);
+        $urls = array_slice($source_urls, 0, $limit);
+        $series_data = [];
+        foreach ($values as $index => $value) {
+            $series_data[] = [
+                'name' => $labels[$index],
+                'value' => $value,
+                'url' => $urls[$index],
+            ];
+        }
+        $series_data[] = [
+            'name' => '',
+            'value' => array_sum($values),
+            'itemStyle' => ['color' => 'transparent'],
+            'tooltip' => ['show' => false],
+            'label' => ['show' => false],
+        ];
 
-        $apex_data = [
-            'colors' => ['#146151', '#FEEC5C', '#BBDA50', '#F78343', '#97989C'],
-            'chart' => [
-                'type' => 'donut',
-            ],
+        $echarts_data = [
             'title' => [
                 'text' => $p['label'],
-            ],
-            'plotOptions' => [
-                'pie' => [
-                    'startAngle' => -90,
-                    'endAngle' => 90,
-                    'offsetY' => 10,
+                'textStyle' => [
+                    'color' => $fg_color,
                 ],
             ],
-            'grid' => [
-                'padding' => [
-                    'bottom' => -80,
+            'color' => ['#146151', '#FEEC5C', '#BBDA50', '#F78343', '#97989C'],
+            'tooltip' => [
+                'trigger' => 'item',
+                'appendToBody' => true,
+            ],
+            'legend' => [
+                'show' => true,
+                'type' => 'scroll',
+                'orient' => 'vertical',
+                'data' => $labels,
+                // 'left' => '68%',
+                // 'top' => '50%',
+                'right'  => '5%',
+                'top'    => '25%',
+                'textStyle' => [
+                    'color' => $fg_color,
                 ],
             ],
-            'responsive' => [[
-                'breakpoint' => 480,
-                'options' => [
-                    'chart' => [
-                        'width' => 200,
+            'series' => [
+                [
+                    'type' => 'pie',
+                    'radius' => ['40%', '70%'],
+                    // 'center' => ['32%', '68%'],
+                    'center' => ['25%', '68%'],
+                    'startAngle' => 180,
+                    'avoidLabelOverlap' => true,
+                    'data' => $series_data,
+                    'label' => [
+                        'show' => false,
                     ],
-                    'legend' => [
-                        'position' => 'bottom',
+                    'labelLine' => [
+                        'show' => false,
                     ],
                 ],
             ],
-            ],
-            'subtitle' => [
-                'style' => [],
-            ],
-            'series' => [],
-            'labels' => [],
         ];
-        $apex_data = array_merge($apex_data, $p['data']);
-        $limit = min($params['limit'], count($p['data']));
-        $apex_data['series'] = array_slice($apex_data['series'], 0, $limit);
-        $apex_data['labels'] = array_slice($apex_data['labels'], 0, $limit);
 
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/graph-carbon-emission-per-model.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
             'fg_color' => $fg_color,
-            'dark_fg_color' => $dark_fg_color,
             'fg_hover_color'  => GlpiToolbox::getFgColor($p['color'], 15),
             'fg_hover_border' => GlpiToolbox::getFgColor($p['color'], 30),
-            'data' => $apex_data,
+            'data' => $echarts_data,
         ]);
     }
 

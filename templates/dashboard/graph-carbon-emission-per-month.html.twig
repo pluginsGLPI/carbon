@@ -51,32 +51,42 @@
         border: 1px solid {{ fg_hover_border }};
     }
 
-    #{{ id }} .apexcharts-title-text {
-        fill: {{ fg_color }};
+    #{{ id }} .card-body {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
     }
 
-    .theme-dark #{{ id }} .apexcharts-title-text {
-        fill: {{ dark_fg_color }};
+    #{{ id }}_carbon_emission_chart {
+        flex: 1 1 auto;
+        min-height: 0;
+        width: 100%;
     }
   </style>
 <div class="card" id="{{ id }}">
   <div class="card-body">
       <div class="h1 mb-3" id="carbonEmissionPerMonth"></div>
-      <div id="carbonEmissionPerMonthChart" class="chart-lg"></div>
+      <div id="{{ id }}_carbon_emission_chart" class="chart-lg"></div>
   </div>
 </div>
 
 {% block scripts %}
-<script>
-  $(document).ready(function () {
-    var currentUrl = window.location.href;
-
-    if (currentUrl.includes('dashboard')) {
+<script type="module">
+  (async () => {
+    if (window.location.href.includes('dashboard')) {
       document.getElementById('cardBodyBorder1').classList.add('border', 'border-2');
     }
 
-    var carbonEmissionPerMonthChart = new ApexCharts(document.querySelector("#carbonEmissionPerMonthChart"), {{ data|json_encode(constant('JSON_PRETTY_PRINT'))|raw }});
-    carbonEmissionPerMonthChart.render();
-  });
+    const chartElement = document.getElementById('{{ id }}_carbon_emission_chart');
+    const carbonEmissionPerMonthChart = echarts.init(chartElement);
+    const chartOptions = {{ data|json_encode(constant('JSON_PRETTY_PRINT'))|raw }};
+    chartOptions.yAxis[1].axisLabel = {
+      formatter: (value) => Number(Number(value).toPrecision(4)).toString()
+    };
+    carbonEmissionPerMonthChart.setOption(chartOptions);
+
+    const chartResizeObserver = new ResizeObserver(() => carbonEmissionPerMonthChart.resize());
+    chartResizeObserver.observe(chartElement);
+  })();
 </script>
 {% endblock %}
