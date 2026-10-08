@@ -148,7 +148,7 @@ class Widget extends GlpiDashboardWidget
         }
 
         $types += [
-            'apex_radar' => [
+            'radar' => [
                 'label'    => __('Radar chart', 'carbon'),
                 'function' => self::class . '::HandledRatioRadar',
                 'image'    => '',
