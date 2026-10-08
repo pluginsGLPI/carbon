@@ -760,83 +760,71 @@ class Widget extends GlpiDashboardWidget
         $p = array_merge($default, $params);
         $p['cache_key'] ??= $p['rand'];
 
-        $nodata   = isset($p['data']['nodata']) && $p['data']['nodata'];
-
         $fg_color      = GlpiToolbox::getFgColor($p['color']);
         $dark_bg_color = GlpiToolbox::getFgColor($p['color'], 80);
-        $dark_fg_color = GlpiToolbox::getFgColor($p['color'], 40);
 
         $chart_id = GlpiToolbox::slugify("chart_{$p['cache_key']}");
 
         $class = "radar";
         $class .= count($p['filters']) > 0 ? " filter-" . implode(' filter-', $p['filters']) : "";
 
-        $series = [
-            [
-                'name' => __('Handled percentage', 'carbon'),
-                'data' => [],
-            ],
-        ];
-
-        $categories = [];
+        $indicators = [];
+        $values = [];
         foreach ($p['data'] as $itemtype_data) {
-            $categories[] = $itemtype_data['label'];
-            $series[0]['data'][] = $itemtype_data['number'];
-        }
-
-        $nb_series = count($series);
-        $palette_style = "";
-        if ($p['use_gradient']) {
-            $palette_style = self::getGradientPalette(
-                $p['color'],
-                $nb_series,
-                false
-            );
-        }
-
-        $no_data_html = "";
-        if ($nodata) {
-            $no_data_html = "<span class='empty-card no-data'>
-               <div>" . __('No data found') . "</div>
-            <span>";
+            $indicators[] = [
+                'name' => $itemtype_data['label'],
+                'max'  => 100,
+            ];
+            $values[] = (float) $itemtype_data['number'];
         }
 
         $data = [
-            'series' => $series,
-            'chart' => [
-                'width'  => '100%',
-                'height' => '95%',
-                'redrawOnParentResize' => true,
-                'type'   => 'radar',
-                'toolbar' => [
+            'color' => [$fg_color],
+            'title' => [
+                'text' => $p['label'],
+                'textStyle' => [
+                    'color' => $fg_color,
+                ],
+            ],
+            'tooltip' => [
+                'trigger' => 'item',
+            ],
+            'radar' => [
+                'indicator' => $indicators,
+                'shape' => 'polygon',
+                'radius' => '65%',
+                'center' => ['50%', '55%'],
+                'axisName' => [
+                    'color' => $fg_color,
+                ],
+                'axisLine' => [
+                    'lineStyle' => [
+                        'color' => $fg_color,
+                    ],
+                ],
+                'splitLine' => [
+                    'lineStyle' => [
+                        'color' => $fg_color,
+                    ],
+                ],
+                'splitArea' => [
                     'show' => false,
                 ],
             ],
-            'yaxis' => [
-                'stepSize' => 20,
-            ],
-            'xaxis' => [
-                'categories' => $categories,
-            ],
-            'title' => [
-                'text' => $p['label'],
-            ],
-            'dataLabels' => [
-                //     'style' => [
-                //         'colors' => [$fg_color],
-                //     ]
-                'background' => [
-                    'enabled' => true,
-                    'foreColor' => $fg_color,
+            'series' => [
+                [
+                    'type' => 'radar',
+                    'areaStyle' => [
+                        'opacity' => 0.2,
+                    ],
+                    'data' => [
+                        [
+                            'name' => __('Handled percentage', 'carbon'),
+                            'value' => $values,
+                        ],
+                    ],
                 ],
             ],
-            'colors' => [
-                $fg_color,
-            ],
-            // 'legend' => [
-            //     'show' => true,
-            //     'showForSingleSeries' => true,
-            // ],
         ];
 
         $output = TemplateRenderer::getInstance()->render('@carbon/dashboard/apex_radar.html.twig', [
@@ -844,11 +832,13 @@ class Widget extends GlpiDashboardWidget
             'class'    => $class,
             'color' => $p['color'],
             'fg_color' => $fg_color,
-            'dark_fg_color' => $dark_fg_color,
+            'fg_hover_color' => GlpiToolbox::getFgColor($p['color'], 15),
+            'fg_hover_border' => GlpiToolbox::getFgColor($p['color'], 30),
+            'dark_fg_color' => GlpiToolbox::getFgColor($p['color'], 40),
             'dark_bg_color' => $dark_bg_color,
-            'palette_style' => $palette_style,
             'label' => $p['label'],
             'data' => $data,
+            'icon' => $p['icon'],
         ]);
 
         return $output;
