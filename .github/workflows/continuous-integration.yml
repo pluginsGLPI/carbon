@@ -49,7 +49,7 @@ jobs:
         run: "npm install"
       - name: "Check generated assets are present"
         run: |
-          for file in public/lib/apexcharts.js public/lib/carbon.js public/lib/carbon.css; do
+          for file in public/lib/carbon.js public/lib/carbon.css; do
             if [ ! -s "$file" ]; then
               echo "::error::Missing or empty build asset: $file"
               exit 1

@@ -530,10 +530,8 @@ class PluginInstallTest extends CommonTestCase
         $plugin_dir = dirname(__DIR__, 2);
         $this->assertTrue(file_exists($plugin_dir . 'lib/carbon.css'));
         $this->assertTrue(file_exists($plugin_dir . 'lib/carbon.js'));
-        $this->assertTrue(file_exists($plugin_dir . 'lib/apexcharts.js'));
 
         $this->assertTrue(in_array('lib/carbon.css', $PLUGIN_HOOKS[Hooks::ADD_CSS]['carbon']));
-        $this->assertTrue(in_array('lib/apexcharts.js', $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon']));
     }
 
     #[Depends('testInstallPlugin')]
