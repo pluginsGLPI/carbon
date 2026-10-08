@@ -31,6 +31,7 @@
  */
 
 use Glpi\Dashboard\Item as DashboardItem;
+
 use function Safe\json_decode;
 use function Safe\json_encode;
 

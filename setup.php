@@ -108,10 +108,10 @@ function plugin_init_carbon()
 
     $CFG_GLPI['javascript']['tools'][strtolower(Report::class)] = ['dashboard'];
     foreach (PLUGIN_CARBON_TYPES as $itemtype) {
-       $form_url = $itemtype::getFormURL();
-       if (strpos($_SERVER['REQUEST_URI'] ?? '', $form_url) !== false) {
+        $form_url = $itemtype::getFormURL();
+        if (strpos($_SERVER['REQUEST_URI'] ?? '', $form_url) !== false) {
             continue;
-       }
+        }
         if (($_SESSION['glpi_tabs'][strtolower($itemtype)] ?? '') == 'GlpiPlugin\Carbon\UsageInfo$1') {
             Html::requireJs('charts');
         }
