@@ -71,7 +71,7 @@
 </div>
 
 {% block scripts %}
-<script type="module">
+<script>
   (async () => {
     const chartElement = document.getElementById('{{ id }}_carbon_emission_per_model_chart');
     const carbonEmissionPerModelChart = echarts.init(chartElement);
