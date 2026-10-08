@@ -148,328 +148,17 @@ class Widget extends GlpiDashboardWidget
         }
 
         $types += [
-            'apex_radar' => [
+            'radar' => [
                 'label'    => __('Radar chart', 'carbon'),
-                'function' => self::class . '::apexRadar',
+                'function' => self::class . '::HandledRatioRadar',
                 'image'    => '',
                 'width'    => 4,
                 'height'   => 4,
             ],
         ];
-        // 'graphpertype' => [
-        //     'label'    => __('Carbon Emission Per Type', 'carbon'),
-        //     'function' => self::class . '::DisplayGraphCarbonEmissionPerType',
-        //     'image'      => '',
-        //     'limit'    => true,
-        //     'width'    => 12,
-        //     'height'   => 10,
-        // ],
-        // 'totalcarbonemission' => [
-        //     'label'    => __('Total Carbon Emission', 'carbon'),
-        //     'function' => self::class . '::DisplayTotalCarbonEmission',
-        //     'image'      => '',
-        //     'width'    => 5,
-        //     'height'   => 4,
-        // ],
-        // 'apex_lines' => [
-        //     'label'    => __('Multiple lines', 'carbon'),
-        //     'function' => self::class . '::multipleLines',
-        //     'image'    => $CFG_GLPI['root_doc'] . '/pics/charts/line.png',
-        //     'width'    => 5,
-        //     'height'   => 4,
-        // ]
-        // 'apex_pie' => [
-        //     'label'    => __('Pie', 'carbon'),
-        //     'function' => self::class . '::apex_pie',
-        //     'image'    => $CFG_GLPI['root_doc'] . '/pics/charts/line.png',
-        //     'width'    => 5,
-        //     'height'   => 4,
-        // ],
 
         return $types;
     }
-
-    /**
-     * Display a widget with a multiple line chart (with multiple series)
-     * @see self::getLinesGraph for params
-     *
-     * @return string html
-     */
-    // public static function multipleLines(array $params = []): string
-    // {
-    //     return self::getLinesGraph(
-    //         array_merge($params, [
-    //             'legend'   => true,
-    //             'multiple' => true,
-    //         ]),
-    //         $params['data']['labels'],
-    //         $params['data']['series']
-    //     );
-    // }
-
-    // /**
-    //  * Display a widget with a lines chart
-    //  *
-    //  * @param array $params contains these keys:
-    //  * - array  'data': represents the lines to display
-    //  *    - string 'url': url to redirect when clicking on the line
-    //  *    - string 'label': title of the line
-    //  *    - int     'number': number of the line
-    //  * - string 'label': global title of the widget
-    //  * - string 'alt': tooltip
-    //  * - string 'color': hex color of the widget
-    //  * - string 'icon': font awesome class to display an icon side of the label
-    //  * - string 'id': unique dom identifier
-    //  * - bool   'area': do we want an area chart
-    //  * - bool   'legend': do we display a legend for the graph
-    //  * - bool   'use_gradient': gradient or generic palette
-    //  * - bool   'point_labels': display labels (for values) directly on graph
-    //  * - int    'limit': the number of lines
-    //  * - array  'filters': array of filter's id to apply classes on widget html
-    //  * @param array $labels title of the lines (if a single array is given, we have a single line graph)
-    //  * @param array $series values of the line (if a single array is given, we have a single line graph)
-    //  *
-    //  * @return string html of the widget
-    //  */
-    // private static function getLinesGraph(
-    //     array $params = [],
-    //     array $labels = [],
-    //     array $series = []
-    // ): string {
-    //     $defaults = [
-    //         'data'         => [],
-    //         'label'        => '',
-    //         'alt'          => '',
-    //         'color'        => '',
-    //         'icon'         => '',
-    //         'area'         => false,
-    //         'legend'       => false,
-    //         'multiple'     => false,
-    //         'use_gradient' => false,
-    //         'point_labels' => false,
-    //         'limit'        => 99999,
-    //         'filters'      => [],
-    //         'rand'         => mt_rand(),
-    //     ];
-
-    //     $p = array_merge($defaults, $params);
-    //     $p['cache_key'] = $p['cache_key'] ?? $p['rand'];
-
-    //     $nb_series = count($series);
-    //     $nb_labels = min($p['limit'], count($labels));
-    //     array_splice($labels, 0, -$nb_labels);
-    //     if ($p['multiple']) {
-    //         foreach ($series as &$serie) {
-    //             if (isset($serie['data'])) {
-    //                 array_splice($serie['data'], 0, -$nb_labels);
-    //             }
-    //         }
-    //         unset($serie);
-    //     } else {
-    //         array_splice($series[0], 0, -$nb_labels);
-    //     }
-
-    //     // Chart title
-    //     $chart_title = $p['label'];
-
-    //     // Line or area ?
-    //     $chart_type = $p['area'] ? 'area' : 'line';
-
-    //     // legend
-    //     $show_legend = $p['legend'] ? true : false;
-
-    //     // Series and y axis
-    //     $yaxis = [];
-    //     $stroke = [];
-    //     foreach ($series as $key => $serie) {
-    //         $yaxis[$key] = [
-    //             'title' => [
-    //                 'text' => $serie['name'],
-    //             ],
-    //             'opposite' => ($key % 2 > 0),
-    //         ];
-    //         $stroke['width'][] = (($serie['type'] ?? 'line') == 'line') ? 4 : 0;
-    //     }
-
-    //     $fg_color        = GlpiToolbox::getFgColor($p['color']);
-    //     $line_color      = GlpiToolbox::getFgColor($p['color'], 10);
-    //     $dark_bg_color   = GlpiToolbox::getFgColor($p['color'], 80);
-    //     $dark_fg_color   = GlpiToolbox::getFgColor($p['color'], 40);
-    //     $dark_line_color = GlpiToolbox::getFgColor($p['color'], 90);
-
-    //     $chart_id        = "chart-{$p['cache_key']}";
-
-    //     $palette_style = "";
-    //     if (!$p['multiple'] || $p['use_gradient']) {
-    //         $palette_style = self::getGradientPalette($p['color'], $nb_series);
-    //     }
-
-    //     $chart_id = 'chart_' . $p['cache_key'];
-    //     $class = "line";
-    //     $class .= $p['area'] ? " area" : "";
-    //     $class .= $p['multiple'] ? " multiple" : "";
-    //     $class .= count($p['filters']) > 0 ? " filter-" . implode(' filter-', $p['filters']) : "";
-    //     $categories  = json_encode($labels);
-    //     $series      = json_encode($series);
-    //     $yaxis       = json_encode($yaxis);
-    //     $stroke      = json_encode($stroke);
-    //     $class       = count($p['filters']) > 0 ? " filter-" . implode(' filter-', $p['filters']) : "";
-
-    //     return TemplateRenderer::getInstance()->render('@carbon/dashboard/multiple-lines.html.twig', [
-    //         'class'       => $class,
-    //         'chart_id'    => $chart_id,
-    //         'chart_type'  => $chart_type,
-    //         'chart_title' => $chart_title,
-    //         'show_legend' => $show_legend,
-    //         'series'      => $series,
-    //         'categories'  => $categories,
-    //         'yaxis'       => $yaxis,
-    //         'icon'        => $p['icon'],
-    //         'label_class' => $p['label'],
-    //         'color'       => $p['color'],
-    //         'palette_style' => $palette_style,
-    //         'fg_color'    => $fg_color,
-    //         'line_color'  => $line_color,
-    //         'dark_bg_color' => $dark_bg_color,
-    //         'dark_fg_color' => $dark_fg_color,
-    //         'dark_line_color' => $dark_line_color,
-    //         'stroke'          => $stroke,
-    //     ]);
-    // }
-
-    // /**
-    //  * Display a widget with a pie chart
-    //  *
-    //  * @param array $params contains these keys:
-    //  * - array  'data': represents the slices to display
-    //  *    - int    'number': number of the slice
-    //  *    - string 'url': url to redirect when clicking on the slice
-    //  *    - string 'label': title of the slice
-    //  * - string 'label': global title of the widget
-    //  * - string 'alt': tooltip
-    //  * - string 'color': hex color of the widget
-    //  * - string 'icon': font awesome class to display an icon side of the label
-    //  * - string 'id': unique dom identifier
-    //  * - bool   'use_gradient': gradient or generic palette
-    //  * - int    'limit': the number of slices
-    //  * - bool 'donut': do we want a "holed" pie
-    //  * - bool 'gauge': do we want an half pie
-    //  * - array  'filters': array of filter's id to apply classes on widget html
-    //  *
-    //  * @return string html of the widget
-    //  */
-    // public static function pie(
-    //     array $params = []
-    // ): string {
-    //     $default = [
-    //         'type'         => 'pie',
-    //         'data'         => [],
-    //         'label'        => '',
-    //         'alt'          => '',
-    //         'color'        => '',
-    //         'icon'         => '',
-    //         'donut'        => false,
-    //         'half'         => false,
-    //         'legend'       => false,
-    //         'use_gradient' => false,
-    //         'limit'        => 99999,
-    //         'filters'      => [],
-    //         'rand'         => mt_rand(),
-    //     ];
-    //     $p = array_merge($default, $params);
-    //     $p['cache_key'] = $p['cache_key'] ?? $p['rand'];
-
-    //     $chart_id = "chart-{$p['cache_key']}";
-
-    //     $nb_slices = min($p['limit'], count($p['series']));
-    //     array_splice($p['series'], $nb_slices);
-    //     array_splice($p['labels'], $nb_slices);
-    //     $nb_series = min($p['limit'], count($p['series']));
-
-    //     $options = ['pie' => [
-    //         'startAngle' => 0,
-    //         'endAngle'   => 360,
-    //         'offsetY'    => 0,
-    //     ]
-    //     ];
-    //     if ($p['donut']) {
-    //         $p['type'] = 'donut';
-    //     }
-    //     if ($p['half']) {
-    //         $options['pie'] = [
-    //             'startAngle' => -90,
-    //             'endAngle'   => 90,
-    //             'offsetY'    => 10,
-    //         ];
-    //     }
-
-    //     $nodata   = isset($p['data']['nodata']) && $p['data']['nodata'];
-
-    //     $fg_color      = GlpiToolbox::getFgColor($p['color']);
-    //     $dark_bg_color = GlpiToolbox::getFgColor($p['color'], 80);
-    //     $dark_fg_color = GlpiToolbox::getFgColor($p['color'], 40);
-
-    //     $palette_style = "";
-    //     if ($p['use_gradient']) {
-    //         $palette_style = self::getGradientPalette(
-    //             $p['color'],
-    //             $nb_series
-    //         );
-    //     }
-
-    //     // Chart title
-    //     $chart_title = $p['label'];
-
-    //     // legend
-    //     $show_legend = $p['legend'] ? true : false;
-
-    //     return TemplateRenderer::getInstance()->render('@carbon/dashboard/pie.html.twig', [
-    //         'no_data'       => $nodata ? 'true' : 'false',
-    //         'chart_type'    => $p['type'],
-    //         'plot_options'  => json_encode($options),
-    //         'chart_id'      => $chart_id,
-    //         'icon'          => $p['icon'],
-    //         'label_class'   => $p['label'],
-    //         'color'         => $p['color'],
-    //         'chart_title'   => $chart_title,
-    //         'show_legend'   => $show_legend,
-    //         'palette_style' => $palette_style,
-    //         'fg_color'      => $fg_color,
-    //         'dark_bg_color' => $dark_bg_color,
-    //         'dark_fg_color' => $dark_fg_color,
-    //         'series'        => json_encode($p['series']),
-    //         'labels'        => json_encode($p['labels']),
-    //     ]);
-    // }
-
-    // public static function donut(
-    //     array $params = [],
-    //     array $labels = [],
-    //     array $series = []
-    // ): string {
-    //     return self::pie(
-    //         array_merge($params, ['donut' => true]),
-    //         $labels,
-    //         $series
-    //     );
-    // }
-
-    // public static function halfDonut(
-    //     array $params = [],
-    //     array $labels = [],
-    //     array $series = []
-    // ): string {
-    //     return self::pie(
-    //         array_merge($params, ['donut' => true, 'half' => true]),
-    //         $labels,
-    //         $series
-    //     );
-    // }
-
-    // public static function displayGraphCarbonEmissionPerType(array $params = []): string
-    // {
-    //     return self::halfDonut($params);
-    // }
 
     public static function displayGraphUsageCarbonEmissionPerMonth(array $params = []): string
     {
@@ -490,77 +179,68 @@ class Widget extends GlpiDashboardWidget
         $fg_hover_color  = GlpiToolbox::getFgColor($p['color'], 15);
         $fb_hover_border = GlpiToolbox::getFgColor($p['color'], 30);
 
-        $apex_data = [
-            'chart' => [
-                'type' => 'line',
-                'height' => 350,
-            ],
+        $data = $p['data'];
+        $energy = array_column($data['series'][1]['data'], 'y');
+        $energy_min = count($energy) > 0 ? 0.8 * min($energy) : 0;
+        $echarts_data = [
             'title' => [
                 'text' => $p['label'],
-            ],
-            'colors' => ['#BBDA50', '#A00'],
-            'plotOptions' => [
-                'bar' => [
-                    'horizontal' => false,
-                    'columnWidth' => '55%',
-                    'endingShape' => 'rounded',
+                'textStyle' => [
+                    'color' => $fg_color,
                 ],
             ],
-            'dataLabels' => [
-                'enabled' => false,
-                'enabledOnSeries' => [0, 1],
-                'style' => [
-                    'colors' => ['#145161', '#800'],
-                ],
+            'color' => ['#BBDA50', '#A00'],
+            'tooltip' => [
+                'trigger' => 'axis',
             ],
-            'labels' => [],
-            'stroke' => [
-                'width' => [0, 4],
-                'curve' => 'smooth',
+            'legend' => [
+                'data' => array_column($data['series'], 'name'),
+            ],
+            'grid' => [
+                'containLabel' => true,
+            ],
+            'xAxis' => [
+                'type' => 'category',
+                'data' => $data['labels'],
+            ],
+            'yAxis' => [
+                [
+                    'type' => 'value',
+                    'position' => 'left',
+                    'name' => $data['series'][0]['name'],
+                    'nameLocation' => 'middle',
+                    'nameRotate' => 90,
+                    'nameGap' => 40,
+                    'splitLine' => ['show' => false],
+                ],
+                [
+                    'type' => 'value',
+                    'position' => 'right',
+                    'name' => $data['series'][1]['name'],
+                    'nameLocation' => 'middle',
+                    'nameRotate' => 90,
+                    'nameGap' => 40,
+                    'min' => $energy_min,
+                    'splitLine' => ['show' => false],
+                ],
             ],
             'series' => [
                 [
-                    'name' =>  __('Carbon emission', 'carbon'),
+                    'name' => $data['series'][0]['name'],
                     'type' => 'bar',
-                    'data' => [],
+                    'yAxisIndex' => 0,
+                    'data' => array_column($data['series'][0]['data'], 'y'),
                 ],
                 [
-                    'name' => __('Consumed energy', 'carbon'),
+                    'name' => $data['series'][1]['name'],
                     'type' => 'line',
-                    'data' => [],
+                    'yAxisIndex' => 1,
+                    'smooth' => true,
+                    'symbolSize' => 6,
+                    'data' => $energy,
                 ],
-            ],
-            'xaxis' => [
-                'categories' => [],
-            ],
-            'yaxis' => [
-                [
-                    'title' => ['text' => __('Carbon emission', 'carbon')],
-                ], [
-                    'opposite' => true,
-                    'title' => ['text' => __('Consumed energy', 'carbon')],
-                ],
-            ],
-            'markers' => [
-                'size' => [3, 3],
-            ],
-            'tooltip' => [
-                'enabled' => true,
             ],
         ];
-        $data = $p['data'];
-        foreach ($data['series'] as $key => $serie) {
-            $apex_data['series'][$key]['name'] = $serie['name'];
-            $apex_data['series'][$key]['data'] = $serie['data'];
-        }
-        $apex_data['labels'] = $data['labels'];
-        $apex_data['xaxis']['categories'] = $data['labels'];
-
-        $apex_data['yaxis'][1]['min'] = 0;
-        $energy = array_column($apex_data['series'][1]['data'], 'y');
-        if (count($energy) > 0) {
-            $apex_data['yaxis'][1]['min'] = 0.8 * min($energy);
-        }
 
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/graph-carbon-emission-per-month.html.twig', [
             'id' => $p['id'],
@@ -570,7 +250,7 @@ class Widget extends GlpiDashboardWidget
             'dark_bg_color'   => $dark_bg_color,
             'fg_hover_color' => $fg_hover_color,
             'fg_hover_border' => $fb_hover_border,
-            'data' => $apex_data,
+            'data' => $echarts_data,
         ]);
     }
 
@@ -587,59 +267,81 @@ class Widget extends GlpiDashboardWidget
         ];
         $p = array_merge($default, $params);
         $fg_color = GlpiToolbox::getFgColor($p['color']);
-        $dark_fg_color = GlpiToolbox::getFgColor($p['color'], 40);
+        $data = $p['data'];
+        $source_values = $data['series'] ?? [];
+        $source_labels = $data['labels'] ?? [];
+        $source_urls = $data['url'] ?? [];
+        $limit = min($params['limit'] ?? count($source_values), count($source_values));
+        $labels = array_slice($source_labels, 0, $limit);
+        $values = array_slice($source_values, 0, $limit);
+        $urls = array_slice($source_urls, 0, $limit);
+        $series_data = [];
+        foreach ($values as $index => $value) {
+            $series_data[] = [
+                'name' => $labels[$index],
+                'value' => $value,
+                'url' => $urls[$index],
+            ];
+        }
+        $series_data[] = [
+            'name' => '',
+            'value' => array_sum($values),
+            'itemStyle' => ['color' => 'transparent'],
+            'tooltip' => ['show' => false],
+            'label' => ['show' => false],
+        ];
 
-        $apex_data = [
-            'colors' => ['#146151', '#FEEC5C', '#BBDA50', '#F78343', '#97989C'],
-            'chart' => [
-                'type' => 'donut',
-            ],
+        $echarts_data = [
             'title' => [
                 'text' => $p['label'],
-            ],
-            'plotOptions' => [
-                'pie' => [
-                    'startAngle' => -90,
-                    'endAngle' => 90,
-                    'offsetY' => 10,
+                'textStyle' => [
+                    'color' => $fg_color,
                 ],
             ],
-            'grid' => [
-                'padding' => [
-                    'bottom' => -80,
+            'color' => ['#146151', '#FEEC5C', '#BBDA50', '#F78343', '#97989C'],
+            'tooltip' => [
+                'trigger' => 'item',
+                'appendToBody' => true,
+            ],
+            'legend' => [
+                'show' => true,
+                'type' => 'scroll',
+                'orient' => 'vertical',
+                'data' => $labels,
+                // 'left' => '68%',
+                // 'top' => '50%',
+                'right'  => '5%',
+                'top'    => '25%',
+                'textStyle' => [
+                    'color' => $fg_color,
                 ],
             ],
-            'responsive' => [[
-                'breakpoint' => 480,
-                'options' => [
-                    'chart' => [
-                        'width' => 200,
+            'series' => [
+                [
+                    'type' => 'pie',
+                    'radius' => ['40%', '70%'],
+                    // 'center' => ['32%', '68%'],
+                    'center' => ['25%', '68%'],
+                    'startAngle' => 180,
+                    'avoidLabelOverlap' => true,
+                    'data' => $series_data,
+                    'label' => [
+                        'show' => false,
                     ],
-                    'legend' => [
-                        'position' => 'bottom',
+                    'labelLine' => [
+                        'show' => false,
                     ],
                 ],
             ],
-            ],
-            'subtitle' => [
-                'style' => [],
-            ],
-            'series' => [],
-            'labels' => [],
         ];
-        $apex_data = array_merge($apex_data, $p['data']);
-        $limit = min($params['limit'], count($p['data']));
-        $apex_data['series'] = array_slice($apex_data['series'], 0, $limit);
-        $apex_data['labels'] = array_slice($apex_data['labels'], 0, $limit);
 
         return TemplateRenderer::getInstance()->render('@carbon/dashboard/graph-carbon-emission-per-model.html.twig', [
             'id' => $p['id'],
             'color' => $p['color'],
             'fg_color' => $fg_color,
-            'dark_fg_color' => $dark_fg_color,
             'fg_hover_color'  => GlpiToolbox::getFgColor($p['color'], 15),
             'fg_hover_border' => GlpiToolbox::getFgColor($p['color'], 30),
-            'data' => $apex_data,
+            'data' => $echarts_data,
         ]);
     }
 
@@ -1040,7 +742,7 @@ class Widget extends GlpiDashboardWidget
      * @param array $params
      * @return string
      */
-    public static function apexRadar(array $params = []): string
+    public static function HandledRatioRadar(array $params = []): string
     {
         $default = [
             'data'         => [],
@@ -1058,83 +760,71 @@ class Widget extends GlpiDashboardWidget
         $p = array_merge($default, $params);
         $p['cache_key'] ??= $p['rand'];
 
-        $nodata   = isset($p['data']['nodata']) && $p['data']['nodata'];
-
         $fg_color      = GlpiToolbox::getFgColor($p['color']);
         $dark_bg_color = GlpiToolbox::getFgColor($p['color'], 80);
-        $dark_fg_color = GlpiToolbox::getFgColor($p['color'], 40);
 
         $chart_id = GlpiToolbox::slugify("chart_{$p['cache_key']}");
 
         $class = "radar";
         $class .= count($p['filters']) > 0 ? " filter-" . implode(' filter-', $p['filters']) : "";
 
-        $series = [
-            [
-                'name' => __('Handled percentage', 'carbon'),
-                'data' => [],
-            ],
-        ];
-
-        $categories = [];
+        $indicators = [];
+        $values = [];
         foreach ($p['data'] as $itemtype_data) {
-            $categories[] = $itemtype_data['label'];
-            $series[0]['data'][] = $itemtype_data['number'];
-        }
-
-        $nb_series = count($series);
-        $palette_style = "";
-        if ($p['use_gradient']) {
-            $palette_style = self::getGradientPalette(
-                $p['color'],
-                $nb_series,
-                false
-            );
-        }
-
-        $no_data_html = "";
-        if ($nodata) {
-            $no_data_html = "<span class='empty-card no-data'>
-               <div>" . __('No data found') . "</div>
-            <span>";
+            $indicators[] = [
+                'name' => $itemtype_data['label'],
+                'max'  => 100,
+            ];
+            $values[] = (float) $itemtype_data['number'];
         }
 
         $data = [
-            'series' => $series,
-            'chart' => [
-                'width'  => '100%',
-                'height' => '95%',
-                'redrawOnParentResize' => true,
-                'type'   => 'radar',
-                'toolbar' => [
+            'color' => [$fg_color],
+            'title' => [
+                'text' => $p['label'],
+                'textStyle' => [
+                    'color' => $fg_color,
+                ],
+            ],
+            'tooltip' => [
+                'trigger' => 'item',
+            ],
+            'radar' => [
+                'indicator' => $indicators,
+                'shape' => 'polygon',
+                'radius' => '65%',
+                'center' => ['50%', '55%'],
+                'axisName' => [
+                    'color' => $fg_color,
+                ],
+                'axisLine' => [
+                    'lineStyle' => [
+                        'color' => $fg_color,
+                    ],
+                ],
+                'splitLine' => [
+                    'lineStyle' => [
+                        'color' => $fg_color,
+                    ],
+                ],
+                'splitArea' => [
                     'show' => false,
                 ],
             ],
-            'yaxis' => [
-                'stepSize' => 20,
-            ],
-            'xaxis' => [
-                'categories' => $categories,
-            ],
-            'title' => [
-                'text' => $p['label'],
-            ],
-            'dataLabels' => [
-                //     'style' => [
-                //         'colors' => [$fg_color],
-                //     ]
-                'background' => [
-                    'enabled' => true,
-                    'foreColor' => $fg_color,
+            'series' => [
+                [
+                    'type' => 'radar',
+                    'areaStyle' => [
+                        'opacity' => 0.2,
+                    ],
+                    'data' => [
+                        [
+                            'name' => __('Handled percentage', 'carbon'),
+                            'value' => $values,
+                        ],
+                    ],
                 ],
             ],
-            'colors' => [
-                $fg_color,
-            ],
-            // 'legend' => [
-            //     'show' => true,
-            //     'showForSingleSeries' => true,
-            // ],
         ];
 
         $output = TemplateRenderer::getInstance()->render('@carbon/dashboard/apex_radar.html.twig', [
@@ -1142,11 +832,13 @@ class Widget extends GlpiDashboardWidget
             'class'    => $class,
             'color' => $p['color'],
             'fg_color' => $fg_color,
-            'dark_fg_color' => $dark_fg_color,
+            'fg_hover_color' => GlpiToolbox::getFgColor($p['color'], 15),
+            'fg_hover_border' => GlpiToolbox::getFgColor($p['color'], 30),
+            'dark_fg_color' => GlpiToolbox::getFgColor($p['color'], 40),
             'dark_bg_color' => $dark_bg_color,
-            'palette_style' => $palette_style,
             'label' => $p['label'],
             'data' => $data,
+            'icon' => $p['icon'],
         ]);
 
         return $output;
