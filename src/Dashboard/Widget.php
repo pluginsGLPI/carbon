@@ -150,7 +150,7 @@ class Widget extends GlpiDashboardWidget
         $types += [
             'apex_radar' => [
                 'label'    => __('Radar chart', 'carbon'),
-                'function' => self::class . '::apexRadar',
+                'function' => self::class . '::HandledRatioRadar',
                 'image'    => '',
                 'width'    => 4,
                 'height'   => 4,
@@ -742,7 +742,7 @@ class Widget extends GlpiDashboardWidget
      * @param array $params
      * @return string
      */
-    public static function apexRadar(array $params = []): string
+    public static function HandledRatioRadar(array $params = []): string
     {
         $default = [
             'data'         => [],
