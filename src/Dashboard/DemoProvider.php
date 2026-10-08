@@ -485,4 +485,37 @@ class DemoProvider
             'doc_url' => Type::getCriteriaInfoLink($impact_type),
         ];
     }
+
+    public static function getHandledAssetsRatio(array $params = [])
+    {
+        $default_params = [
+            'label' => __('handled assets ratio', 'carbon'),
+            'icon'  => '',
+        ];
+        $params = array_merge($default_params, $params);
+
+        $data = [];
+
+        $data[] = [
+            'number' => 83,
+            'url'    => '',
+            'label'  => Computer::getTypeName(Session::getPluralNumber()),
+        ];
+        $data[] = [
+            'number' => 71,
+            'url'    => '',
+            'label'  => Monitor::getTypeName(Session::getPluralNumber()),
+        ];
+        $data[] = [
+            'number' => 90,
+            'url'    => '',
+            'label'  => NetworkEquipment::getTypeName(Session::getPluralNumber()),
+        ];
+
+        return [
+            'data' => $data,
+            'label' => $params['label'],
+            'icon'  => $params['icon'],
+        ];
+    }
 }
