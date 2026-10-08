@@ -1,3 +1,5 @@
+<?php
+
 /**
  * -------------------------------------------------------------------------
  * Carbon plugin for GLPI
@@ -28,5 +30,28 @@
  * -------------------------------------------------------------------------
  */
 
-import ApexCharts from "apexcharts";
-window.ApexCharts = ApexCharts;
+use Glpi\Dashboard\Item as DashboardItem;
+
+use function Safe\json_decode;
+use function Safe\json_encode;
+
+/** @var DBmysql $DB */
+/** @var Migration $migration */
+
+$dashboard_item = new DashboardItem();
+$rows = $dashboard_item->find([
+    'card_id' => 'plugin_carbon_assets_completeness_ratio',
+]);
+
+foreach ($rows as $row) {
+    $card_options = json_decode($row['card_options'], true);
+    if (!is_array($card_options) || ($card_options['widgettype'] ?? null) !== 'apex_radar') {
+        continue;
+    }
+
+    $card_options['widgettype'] = 'radar';
+    $dashboard_item->update([
+        'id' => $row['id'],
+        'card_options' => json_encode($card_options),
+    ]);
+}

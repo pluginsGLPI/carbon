@@ -199,7 +199,7 @@ class UsageInfoTest extends DbTestCase
             UsageInfo::showCharts($item);
             $output = ob_get_clean();
             $crawler = new Crawler($output);
-            $monthlyCarbonEmissionChart = $crawler->filter('#carbonEmissionPerMonthChart');
+            $monthlyCarbonEmissionChart = $crawler->filter('[id$="_carbon_emission_chart"]');
             $this->assertEquals(1, $monthlyCarbonEmissionChart->count());
             $this->assertTrue($this->testEmbodiedGwp($crawler));
             $this->assertTrue($this->testEmbodiedAdp($crawler));
@@ -215,7 +215,7 @@ class UsageInfoTest extends DbTestCase
             UsageInfo::showCharts($item);
             $output = ob_get_clean();
             $crawler = new Crawler($output);
-            $monthlyCarbonEmissionChart = $crawler->filter('#carbonEmissionPerMonthChart');
+            $monthlyCarbonEmissionChart = $crawler->filter('[id$="_carbon_emission_chart"]');
             $this->assertEquals(1, $monthlyCarbonEmissionChart->count());
             $this->assertFalse($this->testEmbodiedGwp($crawler));
             $this->assertFalse($this->testEmbodiedAdp($crawler));
@@ -238,7 +238,7 @@ class UsageInfoTest extends DbTestCase
             UsageInfo::showCharts($item);
             $output = ob_get_clean();
             $crawler = new Crawler($output);
-            $monthlyCarbonEmissionChart = $crawler->filter('#carbonEmissionPerMonthChart');
+            $monthlyCarbonEmissionChart = $crawler->filter('[id$="_carbon_emission_chart"]');
             $this->assertEquals(1, $monthlyCarbonEmissionChart->count());
             $this->assertFalse($this->testEmbodiedGwp($crawler));
             $this->assertFalse($this->testEmbodiedAdp($crawler));
