@@ -29,6 +29,9 @@
  # -------------------------------------------------------------------------
  #}
 
+{% extends "layout/page_skeleton.html.twig" %}
+
+{% block content %}
 <div class="page plugin_carbon_quick_report">
     <!-- Header with background image -->
     <header class="page-header header-height illustration container-fluid">
@@ -55,3 +58,4 @@
       <img src="{{ footer_pic_url }}" class="py-1 illustration-footer" alt="GLPI Carbon footer" />
   </footer>
 </div>
+{% endblock content %}
