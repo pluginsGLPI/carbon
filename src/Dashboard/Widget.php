@@ -827,7 +827,7 @@ class Widget extends GlpiDashboardWidget
             ],
         ];
 
-        $output = TemplateRenderer::getInstance()->render('@carbon/dashboard/apex_radar.html.twig', [
+        $output = TemplateRenderer::getInstance()->render('@carbon/dashboard/radar.html.twig', [
             'chart_id' => $chart_id,
             'class'    => $class,
             'color' => $p['color'],
