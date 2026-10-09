@@ -88,10 +88,8 @@ class ReportTest extends DbTestCase
     {
         $this->login('glpi', 'glpi');
         $_SERVER['REQUEST_URI'] = '/ajax/dashboard.php';
-        ob_start();
-        Report::showInstantReport();
-        $output = ob_get_clean();
-        $crawler = new Crawler($output);
+        $html = Report::showInstantReport();
+        $crawler = new Crawler($html);
         $this->assertCount(1, $crawler->filter('div.plugin_carbon_quick_report'));
         $this->assertCount(1, $crawler->filter('div.dashboard.mini'));
     }

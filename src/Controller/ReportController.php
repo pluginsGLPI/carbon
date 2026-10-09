@@ -30,35 +30,43 @@
  * -------------------------------------------------------------------------
  */
 
+namespace GlpiPlugin\Carbon\Controller;
+
 use Config as GlpiConfig;
+use Glpi\Controller\AbstractController;
 use Glpi\Exception\Http\AccessDeniedHttpException;
-use Glpi\Exception\Http\NotFoundHttpException;
+use Glpi\Http\Firewall;
+use Glpi\Http\RedirectResponse;
+use Glpi\Security\Attribute\SecurityStrategy;
 use GlpiPlugin\Carbon\Config;
 use GlpiPlugin\Carbon\Report;
+use Html;
 use Session;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
-// Check if plugin is activated
-if (!Plugin::isPluginActive('carbon')) {
-    throw new NotFoundHttpException();
+final class ReportController extends AbstractController
+{
+    #[SecurityStrategy(Firewall::STRATEGY_AUTHENTICATED)]
+    #[Route(
+        path: 'front/report.php',
+        name: 'carbon_report',
+        methods: ['GET']
+    )]
+    public function __invoke(Request $request): Response
+    {
+        if (!Report::canView()) {
+            throw new AccessDeniedHttpException();
+        }
+
+        if ($request->query->has('disable_demo')) {
+            Session::checkRight(GlpiConfig::$rightname, UPDATE);
+            Config::exitDemoMode();
+
+            return new RedirectResponse(Html::getBackUrl());
+        }
+
+        return new Response(Report::showInstantReport());
+    }
 }
-
-if (!Report::canView()) {
-    throw new AccessDeniedHttpException();
-}
-
-if (isset($_GET['disable_demo'])) {
-    Session::checkRight(GlpiConfig::$rightname, UPDATE);
-    Config::exitDemoMode();
-    Html::back();
-}
-
-Html::header(
-    __('GLPI Carbon', 'carbon'),
-    '',
-    'tools',
-    Report::getType()
-);
-
-Report::showInstantReport();
-
-Html::footer();
