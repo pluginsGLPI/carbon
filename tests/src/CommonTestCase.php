@@ -535,17 +535,13 @@ class CommonTestCase extends TestCase
      *
      * @param mixed     $instance   Class instance
      * @param string    $methodName Method to call
-     * @param mixed     ...$arg     Method arguments
+     * @param mixed     ...$args    Method arguments
      *
      * @return mixed
      */
     protected function callPrivateMethod($instance, string $methodName, mixed ...$args)
     {
         $method = new ReflectionMethod($instance, $methodName);
-        if (version_compare(PHP_VERSION, '8.1.0') < 0) {
-            $method->setAccessible(true);
-        }
-
         return $method->invoke($instance, ...$args);
     }
 }

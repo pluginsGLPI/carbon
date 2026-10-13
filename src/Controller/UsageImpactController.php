@@ -36,6 +36,7 @@ use CommonDBTM;
 use Exception;
 use Glpi\Controller\AbstractController;
 use Glpi\Event;
+use Glpi\Exception\Http\BadRequestHttpException;
 use Glpi\Http\Firewall;
 use Glpi\Http\RedirectResponse;
 use Glpi\Security\Attribute\SecurityStrategy;
@@ -57,15 +58,11 @@ class UsageImpactController extends AbstractController
     #[Route(
         path: 'front/usageimpact.form.php',
         name: 'usageimpact',
-        methods: ['GET', 'POST']
+        methods: ['POST']
     )]
     public function handle(Request $request): Response
     {
         Session::checkRight(UsageInfo::$rightname, READ);
-
-        if ($request->isMethod('GET')) {
-            return new Response('', 403);
-        }
 
         switch (true) {
             case $request->request->has('update'):
@@ -77,7 +74,7 @@ class UsageImpactController extends AbstractController
             case $request->request->has('calculate'):
                 return $this->calculate($request);
             default:
-                throw new Exception('Method not allowed', 405);
+                throw new BadRequestHttpException();
         }
     }
 

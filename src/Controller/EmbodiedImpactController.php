@@ -36,6 +36,7 @@ use CommonDBTM;
 use Exception;
 use Glpi\Controller\AbstractController;
 use Glpi\Event;
+use Glpi\Exception\Http\BadRequestHttpException;
 use Glpi\Http\Firewall;
 use Glpi\Http\RedirectResponse;
 use Glpi\Security\Attribute\SecurityStrategy;
@@ -53,16 +54,11 @@ class EmbodiedImpactController extends AbstractController
     #[Route(
         path: 'front/embodiedimpact.form.php',
         name: 'embodiedimpact',
-        methods: ['GET', 'POST']
+        methods: ['POST']
     )]
     public function handle(Request $request): Response
     {
         Session::checkRight(EmbodiedImpact::$rightname, READ);
-
-        // if method is GET, then throw an exception, workaround bug in GLPI up to 11.0.7
-        if ($request->isMethod('GET')) {
-            return new Response('', 403);
-        }
 
         switch (true) {
             case $request->request->has('update'):
@@ -74,7 +70,7 @@ class EmbodiedImpactController extends AbstractController
             case $request->request->has('calculate'):
                 return $this->calculate($request);
             default:
-                throw new Exception('Method not allowed');
+                throw new BadRequestHttpException();
         }
     }
 
