@@ -105,6 +105,8 @@ class UsageImpactController extends AbstractController
         $usage_ghg_impact_truncated = $usage_ghg_impact->truncate();
         if (!$usage_impact_truncated || !$usage_ghg_impact_truncated) {
             Session::addMessageAfterRedirect(__('Reset failed.', 'carbon'), false, ERROR);
+        } else {
+            Session::addMessageAfterRedirect(__('All usage impact data has been reset.', 'carbon'), false, INFO);
         }
 
         return new RedirectResponse(Html::getBackUrl());
