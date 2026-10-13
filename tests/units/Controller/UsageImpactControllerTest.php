@@ -32,6 +32,7 @@
 
 namespace GlpiPlugin\Carbon\Tests\Controller;
 
+use Computer;
 use Glpi\Exception\Http\AccessDeniedHttpException;
 use Glpi\Exception\Http\BadRequestHttpException;
 use Glpi\Http\RedirectResponse;
@@ -56,6 +57,11 @@ final class UsageImpactControllerTest extends DbTestCase
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertSame(Html::getBackUrl(), $response->getTargetUrl());
+        $this->assertSame(
+            [__('All usage impact data has been reset.', 'carbon')],
+            $_SESSION['MESSAGE_AFTER_REDIRECT'][INFO]
+        );
+        $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
     }
 
     public function test_handle_rejects_unknown_action(): void
@@ -87,6 +93,20 @@ final class UsageImpactControllerTest extends DbTestCase
         (new UsageImpactController())->handle(Request::create('/', 'POST', $parameters));
     }
 
+    public function test_reset_all_denies_users_without_purge_right(): void
+    {
+        $this->login('glpi', 'glpi');
+        $_SESSION['glpiactiveprofile'][UsageInfo::$rightname] = READ;
+
+        $response = (new UsageImpactController())->handle(
+            Request::create('/', 'POST', ['reset_all' => '1'])
+        );
+
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        $this->assertCount(1, $_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR]);
+        $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
+    }
+
     public function test_reset_returns_redirect_when_arguments_are_missing(): void
     {
         $this->login('glpi', 'glpi');
@@ -98,7 +118,24 @@ final class UsageImpactControllerTest extends DbTestCase
         );
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertNotEmpty($_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR] ?? []);
+        $this->assertCount(1, $_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR]);
+        $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
+    }
+
+    public function test_reset_denies_users_without_purge_right(): void
+    {
+        $this->login('glpi', 'glpi');
+        $_SESSION['glpiactiveprofile'][UsageInfo::$rightname] = READ;
+
+        $request = Request::create('/', 'POST', [
+            'itemtype' => Computer::class,
+            'items_id' => '1',
+        ]);
+
+        $response = $this->callPrivateMethod(new UsageImpactController(), 'reset', $request);
+
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        $this->assertCount(1, $_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR]);
         $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
     }
 
@@ -113,7 +150,7 @@ final class UsageImpactControllerTest extends DbTestCase
         );
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertNotEmpty($_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR] ?? []);
+        $this->assertCount(1, $_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR]);
         $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
     }
 
@@ -129,7 +166,7 @@ final class UsageImpactControllerTest extends DbTestCase
         $response = $this->callPrivateMethod(new UsageImpactController(), 'reset', $request);
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertNotEmpty($_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR] ?? []);
+        $this->assertCount(1, $_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR]);
         $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
     }
 }

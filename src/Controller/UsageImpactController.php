@@ -101,6 +101,10 @@ class UsageImpactController extends AbstractController
     {
         $usage_impact = new UsageImpact();
         $usage_ghg_impact = new CarbonEmission();
+        if (!UsageImpact::canPurge() || !CarbonEmission::canPurge()) {
+            Session::addMessageAfterRedirect(__('Reset denied.', 'carbon'), false, ERROR);
+            return new RedirectResponse(Html::getBackUrl());
+        }
         $usage_impact_truncated = $usage_impact->truncate();
         $usage_ghg_impact_truncated = $usage_ghg_impact->truncate();
         if (!$usage_impact_truncated || !$usage_ghg_impact_truncated) {
@@ -121,6 +125,11 @@ class UsageImpactController extends AbstractController
 
         $itemtype = $request->request->getString('itemtype');
         $items_id = $request->request->getInt('items_id');
+
+        if (!UsageImpact::canPurge()) {
+            Session::addMessageAfterRedirect(__('Reset denied.', 'carbon'), false, ERROR);
+            return new RedirectResponse(Html::getBackUrl());
+        }
 
         $usage_impact = new UsageImpact();
         $usage_impact->getFromDBByCrit([

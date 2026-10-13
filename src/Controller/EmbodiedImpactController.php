@@ -96,6 +96,10 @@ class EmbodiedImpactController extends AbstractController
     private function resetAll(): Response
     {
         $embodied_impact = new EmbodiedImpact();
+        if (!EmbodiedImpact::canPurge()) {
+            Session::addMessageAfterRedirect(__('Reset denied.', 'carbon'), false, ERROR);
+            return new RedirectResponse(Html::getBackUrl());
+        }
         if ($embodied_impact->truncate()) {
             Session::addMessageAfterRedirect(__('All embodied impact data has been reset.', 'carbon'), false, INFO);
         } else {

@@ -56,6 +56,11 @@ final class EmbodiedImpactControllerTest extends DbTestCase
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertSame(Html::getBackUrl(), $response->getTargetUrl());
+        $this->assertSame(
+            [__('All embodied impact data has been reset.', 'carbon')],
+            $_SESSION['MESSAGE_AFTER_REDIRECT'][INFO]
+        );
+        $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
     }
 
     public function test_handle_rejects_unknown_action(): void
@@ -87,6 +92,20 @@ final class EmbodiedImpactControllerTest extends DbTestCase
         (new EmbodiedImpactController())->handle(Request::create('/', 'POST', $parameters));
     }
 
+    public function test_reset_all_denies_users_without_purge_right(): void
+    {
+        $this->login('glpi', 'glpi');
+        $_SESSION['glpiactiveprofile'][EmbodiedImpact::$rightname] = READ;
+
+        $response = (new EmbodiedImpactController())->handle(
+            Request::create('/', 'POST', ['reset_all' => '1'])
+        );
+
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        $this->assertCount(1, $_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR]);
+        $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
+    }
+
     public function test_reset_returns_redirect_when_arguments_are_missing(): void
     {
         $this->login('glpi', 'glpi');
@@ -98,7 +117,23 @@ final class EmbodiedImpactControllerTest extends DbTestCase
         );
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertNotEmpty($_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR] ?? []);
+        $this->assertCount(1, $_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR]);
+        $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
+    }
+
+    public function test_reset_denies_users_without_purge_right(): void
+    {
+        $this->login('glpi', 'glpi');
+        $_SESSION['glpiactiveprofile'][EmbodiedImpact::$rightname] = READ;
+
+        $request = Request::create('/', 'POST', [
+            'id' => '1',
+        ]);
+
+        $response = $this->callPrivateMethod(new EmbodiedImpactController(), 'reset', $request);
+
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        $this->assertCount(1, $_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR]);
         $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
     }
 
@@ -113,7 +148,7 @@ final class EmbodiedImpactControllerTest extends DbTestCase
         );
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertNotEmpty($_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR] ?? []);
+        $this->assertCount(1, $_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR]);
         $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
     }
 
@@ -129,7 +164,7 @@ final class EmbodiedImpactControllerTest extends DbTestCase
         $response = $this->callPrivateMethod(new EmbodiedImpactController(), 'calculate', $request);
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertNotEmpty($_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR] ?? []);
+        $this->assertCount(1, $_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR]);
         $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
     }
 }
