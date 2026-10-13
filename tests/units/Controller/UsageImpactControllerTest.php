@@ -32,7 +32,6 @@
 
 namespace GlpiPlugin\Carbon\Tests\Controller;
 
-use Exception;
 use Glpi\Exception\Http\AccessDeniedHttpException;
 use Glpi\Exception\Http\BadRequestHttpException;
 use Glpi\Http\RedirectResponse;

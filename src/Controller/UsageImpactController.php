@@ -33,7 +33,6 @@
 namespace GlpiPlugin\Carbon\Controller;
 
 use CommonDBTM;
-use Exception;
 use Glpi\Controller\AbstractController;
 use Glpi\Event;
 use Glpi\Exception\Http\BadRequestHttpException;
