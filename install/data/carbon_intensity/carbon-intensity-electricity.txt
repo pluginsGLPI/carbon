@@ -1,2 +1,4 @@
 Data source:
 https://ourworldindata.org/grapher/carbon-intensity-electricity
+
+download archive: https://ourworldindata.org/grapher/carbon-intensity-electricity.zip?v=1&csvType=full&useColumnShortNames=false
