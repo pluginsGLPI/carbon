@@ -85,6 +85,7 @@ if ($ember_dataset_version === null || EMBER_DATASET_DATE > $ember_dataset_versi
         $progress_bar = new ProgressBar($output, $rows_count);
     }
     $line_number = 0;
+    $cache_zones = [];
     while (($line = $file->fgetcsv(',', '"', '\\')) !== false) {
         $line_number++;
         if ($progress_bar) {
@@ -104,7 +105,12 @@ if ($ember_dataset_version === null || EMBER_DATASET_DATE > $ember_dataset_versi
             continue;
         }
 
-        $zone_id = Install::getOrCreateZone($entity, $source_id);
+        if (!isset($cache_zones[$code])) {
+            $zone_id = Install::getOrCreateZone($entity, $source_id);
+            $cache_zones[$code] = $zone_id;
+        } else {
+            $zone_id = $cache_zones[$code];
+        }
         Install::linkSourceZone($source_id, $zone_id, $code);
 
         // Insert into the database
