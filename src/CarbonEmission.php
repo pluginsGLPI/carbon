@@ -40,7 +40,6 @@ use DBmysql;
 use Entity;
 use Location;
 use Override;
-use Session;
 
 class CarbonEmission extends CommonDBChild
 {
@@ -223,11 +222,6 @@ class CarbonEmission extends CommonDBChild
     {
         /** @var DBmysql $DB */
         global $DB;
-
-        if (!Session::haveRight(Config::$rightname, READ) || !static::canPurge()) {
-            Session::addMessageAfterRedirect(__('Full reset denied.', 'carbon'), false, ERROR);
-            return false;
-        }
 
         return $DB->delete(static::getTable(), ['NOT' => ['id' => null]]);
     }

@@ -49,15 +49,10 @@ class AjaxController extends AbstractController
     #[Route(
         path: 'ajax/dropdownZone.php',
         name: 'ajax dropdownZone',
-        methods: ['GET', 'POST']
+        methods: ['POST']
     )]
     public function showDropdownBySourceCondition(Request $request): Response
     {
-        // if method is GET, then throw an exception, workaround bug in GLPI up to 11.0.7
-        if ($request->isMethod('GET')) {
-            return new Response('', 403);
-        }
-
         if (!Zone::canView()) {
             return new Response('', 403);
         }
@@ -76,15 +71,10 @@ class AjaxController extends AbstractController
     #[Route(
         path: 'ajax/toggleZoneDownload.php',
         name: 'ajax toggle zone download flag',
-        methods: ['GET', 'POST']
+        methods: ['POST']
     )]
     public function toggleZoneDownload(Request $request): Response
     {
-        // if method is GET, then throw an exception, workaround bug in GLPI up to 11.0.7
-        if ($request->isMethod('GET')) {
-            return new Response('', 403);
-        }
-
         if (!Source::canView() || ! GlpiConfig::canUpdate()) {
             return new Response(__('Access denied.', 'carbon'), 403);
         }

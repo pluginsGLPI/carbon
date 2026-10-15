@@ -30,35 +30,32 @@
  * -------------------------------------------------------------------------
  */
 
-use Config as GlpiConfig;
-use Glpi\Exception\Http\AccessDeniedHttpException;
-use Glpi\Exception\Http\NotFoundHttpException;
-use GlpiPlugin\Carbon\Config;
-use GlpiPlugin\Carbon\Report;
-use Session;
+namespace GlpiPlugin\Carbon\Tests\Controller;
 
-// Check if plugin is activated
-if (!Plugin::isPluginActive('carbon')) {
-    throw new NotFoundHttpException();
+use Glpi\Exception\RedirectException;
+use Glpi\Http\Firewall;
+use Glpi\Security\Attribute\SecurityStrategy;
+use GlpiPlugin\Carbon\Controller\ConfigController;
+use GlpiPlugin\Carbon\Tests\DbTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use ReflectionMethod;
+use Symfony\Component\HttpFoundation\Request;
+
+#[CoversClass(ConfigController::class)]
+final class ConfigControllerTest extends DbTestCase
+{
+    public function test_alert_redirects_to_carbon_configuration_tab(): void
+    {
+        $this->expectException(RedirectException::class);
+
+        (new ConfigController())->alert(Request::create('/front/config.form.php', 'GET'));
+    }
+
+    public function test_alert_requires_authenticated_user(): void
+    {
+        $method = new ReflectionMethod(ConfigController::class, 'alert');
+        $security_attribute = $method->getAttributes(SecurityStrategy::class)[0]->newInstance();
+
+        $this->assertSame(Firewall::STRATEGY_AUTHENTICATED, $security_attribute->strategy);
+    }
 }
-
-if (!Report::canView()) {
-    throw new AccessDeniedHttpException();
-}
-
-if (isset($_GET['disable_demo'])) {
-    Session::checkRight(GlpiConfig::$rightname, UPDATE);
-    Config::exitDemoMode();
-    Html::back();
-}
-
-Html::header(
-    __('GLPI Carbon', 'carbon'),
-    '',
-    'tools',
-    Report::getType()
-);
-
-Report::showInstantReport();
-
-Html::footer();

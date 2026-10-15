@@ -14,7 +14,6 @@ parameters:
         - setup.php
     paths:
         - src
-        - front
         - install
         - hook.php
         - setup.php

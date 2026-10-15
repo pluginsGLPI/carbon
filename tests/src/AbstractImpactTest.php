@@ -33,7 +33,6 @@
 namespace GlpiPlugin\Carbon\Tests;
 
 use Computer;
-use DBmysql;
 use GlpiPlugin\Carbon\AbstractImpact;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -58,52 +57,5 @@ abstract class AbstractImpactTest extends DbTestCase
         ]);
         $result = $instance->canEdit($instance->getID());
         $this->assertFalse($result);
-    }
-
-    #[DataProvider('typeProvider')]
-    public function test_truncate_fails_when_not_logged_in(string $tested_type)
-    {
-        /** @var DBmysql $DB */
-        global $DB;
-
-        $table = getTableForItemType($tested_type);
-        $this->assertTrue($DB->insert($table, []));
-
-        $instance = new $tested_type();
-        $success = $instance->truncate();
-        $this->assertFalse($success);
-        $this->assertEquals(1, countElementsInTable($table));
-    }
-
-    #[DataProvider('typeProvider')]
-    public function test_truncate_fails_when_user_has_all_required_rights(string $tested_type)
-    {
-        /** @var DBmysql $DB */
-        global $DB;
-
-        $this->login('glpi', 'glpi');
-        $table = getTableForItemType($tested_type);
-        $this->assertTrue($DB->insert($table, []));
-
-        $instance = new $tested_type();
-        $success = $instance->truncate();
-        $this->assertTrue($success);
-        $this->assertEquals(0, countElementsInTable($table));
-    }
-
-    #[DataProvider('typeProvider')]
-    public function test_truncate_fails_when_user_has_not_required_rights(string $tested_type)
-    {
-        /** @var DBmysql $DB */
-        global $DB;
-
-        $this->login('tech', 'tech');
-        $table = getTableForItemType($tested_type);
-        $this->assertTrue($DB->insert($table, []));
-
-        $instance = new $tested_type();
-        $success = $instance->truncate();
-        $this->assertFalse($success);
-        $this->assertEquals(1, countElementsInTable($table));
     }
 }

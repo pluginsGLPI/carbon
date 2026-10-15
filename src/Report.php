@@ -90,7 +90,7 @@ class Report extends CommonDBTM
         return array_intersect_key($values, [READ => true, UPDATE => true, PURGE => true]);
     }
 
-    public static function showInstantReport(): void
+    public static function showInstantReport(): string
     {
         /** @var array $CFG_GLPI */
         global $CFG_GLPI;
@@ -117,7 +117,9 @@ class Report extends CommonDBTM
 
         $header_pic_url = $CFG_GLPI['root_doc'] . '/plugins/carbon/images/illustration_bridge.png';
         $footer_pic_url = $CFG_GLPI['root_doc'] . '/plugins/carbon/images/illustration-footer.png';
-        TemplateRenderer::getInstance()->display('@carbon/quick-report.html.twig', [
+        return TemplateRenderer::getInstance()->render('@carbon/quick-report.html.twig', [
+            'title' => __('GLPI Carbon', 'carbon'),
+            'menu' => ['tools', self::class],
             'dashboard' => $dashboard_html,
             'messages'  => $messages,
             'header_pic_url' => $header_pic_url,

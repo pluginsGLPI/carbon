@@ -39,7 +39,6 @@ use DBmysqlIterator;
 use GlpiPlugin\Carbon\Impact\Type;
 use LogicException;
 use Override;
-use Session;
 use Toolbox as GlpiToolbox;
 
 abstract class AbstractImpact extends CommonDBChild
@@ -249,11 +248,6 @@ abstract class AbstractImpact extends CommonDBChild
     {
         /** @var DBmysql $DB */
         global $DB;
-
-        if (!Session::haveRight(Config::$rightname, READ) || !static::canPurge()) {
-            Session::addMessageAfterRedirect(__('Full reset denied.', 'carbon'), false, ERROR);
-            return false;
-        }
 
         return $DB->delete(static::getTable(), ['NOT' => ['id' => null]]);
     }
