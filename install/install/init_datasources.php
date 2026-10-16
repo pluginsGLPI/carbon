@@ -106,12 +106,10 @@ if ($ember_dataset_version === null || EMBER_DATASET_DATE > $ember_dataset_versi
         }
 
         if (!isset($cache_zones[$code])) {
-            $zone_id = Install::getOrCreateZone($entity, $source_id);
-            $cache_zones[$code] = $zone_id;
-        } else {
-            $zone_id = $cache_zones[$code];
+            $cache_zones[$code] = Install::getOrCreateZone($entity, $source_id);
+            Install::linkSourceZone($source_id, $cache_zones[$code], $code);
         }
-        Install::linkSourceZone($source_id, $zone_id, $code);
+        $zone_id = $cache_zones[$code];
 
         // Insert into the database
         try {
