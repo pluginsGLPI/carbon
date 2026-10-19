@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 03:45+0000\n"
+"POT-Creation-Date: 2026-10-19 03:51+0000\n"
 "PO-Revision-Date: 2026-10-06 08:40+0000\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2026\n"
 "Language-Team: Turkish (Turkey) (https://app.transifex.com/teclib/teams/28042/tr_TR/)\n"
@@ -875,7 +875,7 @@ msgstr "Sıfırlama reddedildi."
 
 #: src/Controller/EmbodiedImpactController.php:104
 msgid "All embodied impact data has been reset."
-msgstr ""
+msgstr "Tüm birleştirilmiş etki değerlendirmesi verileri sıfırlandı."
 
 #: src/Controller/EmbodiedImpactController.php:106
 #: src/Controller/EmbodiedImpactController.php:137
@@ -907,7 +907,7 @@ msgstr "Bu varlık için bir hesaplayıcısı bulunamadı."
 
 #: src/Controller/UsageImpactController.php:113
 msgid "All usage impact data has been reset."
-msgstr ""
+msgstr "Tüm kullanım etki değerlendirmesi verileri sıfırlandı."
 
 #: src/Controller/UsageImpactController.php:191
 msgid "Missing data prevents historization of this asset."

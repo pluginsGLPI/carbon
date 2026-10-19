@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 03:45+0000\n"
+"POT-Creation-Date: 2026-10-19 03:51+0000\n"
 "PO-Revision-Date: 2026-10-06 08:40+0000\n"
 "Last-Translator: Edwin Elias Alvarez <elias986@yahoo.com>, 2026\n"
 "Language-Team: Spanish (Mexico) (https://app.transifex.com/teclib/teams/28042/es_MX/)\n"
@@ -895,7 +895,7 @@ msgstr "Restablecimiento denegado."
 
 #: src/Controller/EmbodiedImpactController.php:104
 msgid "All embodied impact data has been reset."
-msgstr ""
+msgstr "Todos los datos de impacto incorporado se han restablecido."
 
 #: src/Controller/EmbodiedImpactController.php:106
 #: src/Controller/EmbodiedImpactController.php:137
@@ -927,7 +927,7 @@ msgstr "No se pudo encontrar el motor de cálculo para este activo."
 
 #: src/Controller/UsageImpactController.php:113
 msgid "All usage impact data has been reset."
-msgstr ""
+msgstr "Todos los datos sobre el impacto del uso se han restablecido."
 
 #: src/Controller/UsageImpactController.php:191
 msgid "Missing data prevents historization of this asset."
