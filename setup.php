@@ -196,6 +196,7 @@ function plugin_version_carbon()
         'author'         => '<a href="http://www.teclib.com">Teclib\'</a>',
         'license'        => 'GPLv3',
         'homepage'       => '',
+        'csp_compliant'  => true,
         'requirements'   => [
             'glpi' => [
                 'min' => PLUGIN_CARBON_MIN_GLPI_VERSION,

@@ -211,6 +211,11 @@ class Source_Zone extends CommonDBRelation
                         reloadTab();
                     });
                 };
+                document.querySelectorAll("[data-carbon-toggle-zone]").forEach(function (button) {
+                    button.addEventListener("click", function () {
+                        plugin_carbon_toggleZone(button.dataset.carbonToggleZone);
+                    });
+                });
             ');
         }
     }
@@ -314,6 +319,11 @@ class Source_Zone extends CommonDBRelation
                         reloadTab();
                     });
                 };
+                document.querySelectorAll("[data-carbon-toggle-zone]").forEach(function (button) {
+                    button.addEventListener("click", function () {
+                        plugin_carbon_toggleZone(button.dataset.carbonToggleZone);
+                    });
+                });
             ');
         }
     }
@@ -428,7 +438,7 @@ class Source_Zone extends CommonDBRelation
     protected static function getToggleLink(int $zone_id, ?string $state): string
     {
         $state = $state == 0 ? __('No') : __('Yes');
-        $link = '<a href="javascript:void(0)" onclick="plugin_carbon_toggleZone(' . $zone_id . ')" title="' . __('Enable / Disable', 'carbon') . '">' . $state . '</a>';
+        $link = '<button type="button" class="btn-as-link" data-carbon-toggle-zone="' . $zone_id . '" title="' . __('Enable / Disable', 'carbon') . '">' . $state . '</button>';
         return $link;
     }
 
