@@ -116,7 +116,7 @@
   </div>
   <div>
     {% if not embodied_impact.isNewItem() %}
-      {% set reset_args = "{reset: '', id: '" ~ embodied_impact.getID() ~ "'}" %}
+      {% set reset_args = "{reset: '', itemtype: '" ~ asset.getType() ~ "', items_id: '" ~ asset.getID() ~ "'}" %}
       <a class="btn btn-outline-warning me-2" onclick="submitGetLink('{{ embodied_impact_action_url }}', {{ reset_args }})"><i class="ti ti-trash"></i><span>{{ __('Reset data', 'carbon') }}</span></a>
     {% endif %}
     {% set calculate_args = "{calculate: '', itemtype: '" ~ asset.getType() ~ "', items_id: '" ~ asset.getID() ~ "'}" %}

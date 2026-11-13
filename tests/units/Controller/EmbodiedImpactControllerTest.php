@@ -32,6 +32,7 @@
 
 namespace GlpiPlugin\Carbon\Tests\Controller;
 
+use Computer as GlpiComputer;
 use Glpi\Exception\Http\AccessDeniedHttpException;
 use Glpi\Exception\Http\BadRequestHttpException;
 use Glpi\Http\RedirectResponse;
@@ -127,13 +128,59 @@ final class EmbodiedImpactControllerTest extends DbTestCase
         $_SESSION['glpiactiveprofile'][EmbodiedImpact::$rightname] = READ;
 
         $request = Request::create('/', 'POST', [
-            'id' => '1',
+            'itemtype' => GlpiComputer::class,
+            'items_id' => '1',
         ]);
 
         $response = $this->callPrivateMethod(new EmbodiedImpactController(), 'reset', $request);
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertCount(1, $_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR]);
+        $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
+    }
+
+    public function test_reset_denies_invalid_request(): void
+    {
+        $this->login('glpi', 'glpi');
+
+        $request = Request::create('/', 'POST', [
+            'items_id' => '1',
+        ]);
+
+        $response = $this->callPrivateMethod(new EmbodiedImpactController(), 'reset', $request);
+
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        $this->assertCount(1, $_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR]);
+        $this->assertEquals('Missing arguments in the request.', $this->getSessionMessage());
+        $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
+
+        $request = Request::create('/', 'POST', [
+            'itemtype' => GlpiComputer::class,
+        ]);
+
+        $response = $this->callPrivateMethod(new EmbodiedImpactController(), 'reset', $request);
+
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        $this->assertCount(1, $_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR]);
+        $this->assertEquals('Missing arguments in the request.', $this->getSessionMessage());
+        $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
+    }
+
+
+    public function test_reset_denies_unknown_asset_Type(): void
+    {
+        $this->login('glpi', 'glpi');
+
+        $request = Request::create('/', 'POST', [
+            'itemtype' => 'InvalidAsset',
+            'items_id' => '1',
+        ]);
+
+        $response = $this->callPrivateMethod(new EmbodiedImpactController(), 'reset', $request);
+
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        $this->assertCount(1, $_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR]);
+        $this->assertEquals('Bad arguments.', $this->getSessionMessage());
         $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
     }
 
