@@ -45,7 +45,6 @@ use GlpiPlugin\Carbon\DataSource\CarbonIntensity\ClientFactory as CarbonIntensit
 use GlpiPlugin\Carbon\DataSource\Lca\ClientFactory as LcaClientFactory;
 use GlpiPlugin\Carbon\Impact\Embodied\Engine;
 use GuzzleHttp\Client;
-use Html;
 use Monitor as GlpiMonitor;
 use NetworkEquipment as GlpiNetworkEquipment;
 use Override;
@@ -132,8 +131,8 @@ class Config extends GlpiConfig
             '_glpi_csrf_token' => Session::getNewCSRFToken(),
             'reset_all'        => '',
         ]);
-        $usage_impact_action_url    = 'submitGetLink("' . $CFG_GLPI['root_doc'] . '/plugins/carbon/front/usageimpact.form.php", ' . $reset_args . ')';
-        $embodied_impact_action_url = 'submitGetLink("' . $CFG_GLPI['root_doc'] . '/plugins/carbon/front/embodiedimpact.form.php", ' . $reset_args . ')';
+        $usage_impact_action_url    = $CFG_GLPI['root_doc'] . '/plugins/carbon/front/usageimpact.form.php';
+        $embodied_impact_action_url = $CFG_GLPI['root_doc'] . '/plugins/carbon/front/embodiedimpact.form.php';
 
         $renderer = TemplateRenderer::getInstance();
         $environment = $renderer->getEnvironment();
@@ -147,8 +146,10 @@ class Config extends GlpiConfig
             'impact_engines'             => Engine::getAvailableBackends(),
             'include_configs'            => $include_configs,
             'action'                     => (isset($options['plugin_config']) ? Config::getFormURL() : GlpiConfig::getFormURL()),
-            'usage_impact_action_url'    => Html::getConfirmationOnActionScript($confirm_message, $usage_impact_action_url),
-            'embodied_impact_action_url' => Html::getConfirmationOnActionScript($confirm_message, $embodied_impact_action_url),
+            'confirm_message'            => $confirm_message,
+            'reset_args'                 => $reset_args,
+            'usage_impact_action_url'    => $usage_impact_action_url,
+            'embodied_impact_action_url' => $embodied_impact_action_url,
         ]);
 
         return true;
