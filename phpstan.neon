@@ -1,20 +1,25 @@
+includes:
+    - ../../vendor/glpi-project/phpstan-glpi/extension.neon
+    - ../../vendor/phpstan/phpstan-deprecation-rules/rules.neon
+    - ../../vendor/thecodingmachine/phpstan-safe-rule/phpstan-safe-rule.neon
+    - phpstan-baseline.neon
+
 parameters:
-    parallel:
-        maximumNumberOfProcesses: 2
     level: 5
-    bootstrapFiles:
-        - ../../stubs/glpi_constants.php
-        - ../../vendor/autoload.php
     paths:
-        - src
         - front
         - install
+        - src
+        - tests
+        - tools
         - hook.php
         - setup.php
     scanDirectories:
-        - ../../inc
         - ../../src
-    stubFiles:
+        - ../../tests
+    bootstrapFiles:
         - ../../stubs/glpi_constants.php
-rules:
-    - GlpiProject\Tools\PHPStan\Rules\GlobalVarTypeRule
+        - ../../vendor/autoload.php
+    treatPhpDocTypesAsCertain: false
+    # Ignores on GLPI_VERSION comparisons only match on some GLPI versions
+    reportUnmatchedIgnoredErrors: false
