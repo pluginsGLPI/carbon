@@ -7,8 +7,8 @@
         "php-http/message": "^1.16",
         "php-http/message-factory": "^1.1"
     },
-    "require-dev": {
-        "glpi-project/tools": "^0.8.1"
+    "provide": {
+        "psr/http-message": "*"
     },
     "config": {
         "autoloader-suffix": "PluginCarbon",
@@ -32,7 +32,7 @@
         "php-lint": "../../vendor/bin/parallel-lint --colors --exclude vendor .; ../../vendor/bin/phpstan --memory-limit=256M; ../../vendor/bin/rector process --dry-run --ansi",
         "css-lint": "node_modules/.bin/stylelint --color --formatter verbose '**/*.css' '**/*.scss'",
         "js-lint": "node_modules/.bin/eslint --color .",
-        "license-headers": "vendor/bin/licence-headers-check --ansi --no-interaction",
+        "license-headers": "../../bin/console tools:licence_headers_check --ansi --no-interaction --plugin=carbon",
         "build-schema": "tools/build-db-schema.php carbon | plantuml -p -tpng > docs/db-schema.png"
     },
     "version": "1.3.1"
