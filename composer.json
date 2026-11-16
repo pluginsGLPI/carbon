@@ -18,8 +18,7 @@
         },
         "sort-packages": true,
         "allow-plugins": {
-            "php-http/discovery": false,
-            "phpstan/extension-installer": true
+            "php-http/discovery": false
         }
     },
     "autoload-dev": {

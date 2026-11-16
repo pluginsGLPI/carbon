@@ -1,0 +1,1666 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Instantiating an object from an unrestricted dynamic string is forbidden \(see https\://github\.com/glpi\-project/phpstan\-glpi\?tab\=readme\-ov\-file\#forbiddynamicinstantiationrule\)\.$#'
+			identifier: glpi.forbidDynamicInstantiation
+			count: 2
+			path: front/embodiedimpact.form.php
+
+		-
+			message: '#^Instantiating an object from an unrestricted dynamic string is forbidden \(see https\://github\.com/glpi\-project/phpstan\-glpi\?tab\=readme\-ov\-file\#forbiddynamicinstantiationrule\)\.$#'
+			identifier: glpi.forbidDynamicInstantiation
+			count: 2
+			path: front/usageimpact.form.php
+
+		-
+			message: '#^Function ob_end_clean is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_end_clean;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: hook.php
+
+		-
+			message: '#^Function ob_start is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_start;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: hook.php
+
+		-
+			message: '#^Instantiating an object from an unrestricted dynamic string is forbidden \(see https\://github\.com/glpi\-project/phpstan\-glpi\?tab\=readme\-ov\-file\#forbiddynamicinstantiationrule\)\.$#'
+			identifier: glpi.forbidDynamicInstantiation
+			count: 1
+			path: hook.php
+
+		-
+			message: '#^Function ini_set is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ini_set;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: install/Install.php
+
+		-
+			message: '#^Function preg_match is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\preg_match;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 4
+			path: install/Install.php
+
+		-
+			message: '#^Function preg_replace is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\preg_replace;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: install/Install.php
+
+		-
+			message: '#^Function scandir is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\scandir;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 2
+			path: install/Install.php
+
+		-
+			message: '#^Function file_get_contents is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\file_get_contents;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: install/install/create_dashboard.php
+
+		-
+			message: '#^Function json_decode is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\json_decode;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: install/install/create_dashboard.php
+
+		-
+			message: '#^Function fopen is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\fopen;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: install/install/init_datasources.php
+
+		-
+			message: '#^Function preg_match is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\preg_match;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: install/migration/update_1.0.0_to_1.0.1.php
+
+		-
+			message: '#^Function scandir is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\scandir;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: install/migration/update_1.0.0_to_1.0.1.php
+
+		-
+			message: '#^Function preg_match is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\preg_match;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: install/migration/update_1.0.1_to_1.1.0.php
+
+		-
+			message: '#^Function scandir is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\scandir;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: install/migration/update_1.0.1_to_1.1.0.php
+
+		-
+			message: '#^Function preg_match is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\preg_match;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: install/migration/update_1.1.1_to_1.2.0.php
+
+		-
+			message: '#^Function scandir is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\scandir;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: install/migration/update_1.1.1_to_1.2.0.php
+
+		-
+			message: '#^Function json_decode is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\json_decode;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 4
+			path: install/migration/update_1.1.1_to_1.2.0/09_add_impact_criterias.php
+
+		-
+			message: '#^Function json_encode is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\json_encode;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 4
+			path: install/migration/update_1.1.1_to_1.2.0/09_add_impact_criterias.php
+
+		-
+			message: '#^Function preg_match is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\preg_match;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: install/migration/update_x.x.x_to_y.y.y.php
+
+		-
+			message: '#^Function scandir is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\scandir;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: install/migration/update_x.x.x_to_y.y.y.php
+
+		-
+			message: '#^Function define is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\define;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 7
+			path: setup.php
+
+		-
+			message: '#^Function preg_match is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\preg_match;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 3
+			path: setup.php
+
+		-
+			message: '#^Function preg_replace is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\preg_replace;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: setup.php
+
+		-
+			message: '#^Class DateTime is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTime;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 1
+			path: src/CarbonIntensity.php
+
+		-
+			message: '#^Function define is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\define;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: src/Command/CollectCarbonIntensityCommand.php
+
+		-
+			message: '#^Class DateTime is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTime;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 2
+			path: src/Command/CreateFakeCarbonIntensityCommand.php
+
+		-
+			message: '#^Instantiating an object from an unrestricted dynamic string is forbidden \(see https\://github\.com/glpi\-project/phpstan\-glpi\?tab\=readme\-ov\-file\#forbiddynamicinstantiationrule\)\.$#'
+			identifier: glpi.forbidDynamicInstantiation
+			count: 1
+			path: src/Command/CreateTestInventoryCommand.php
+
+		-
+			message: '#^Function file_put_contents is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\file_put_contents;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: src/Command/ExportDashboardCommand.php
+
+		-
+			message: '#^Function json_encode is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\json_encode;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: src/Command/ExportDashboardCommand.php
+
+		-
+			message: '#^Instantiating an object from an unrestricted dynamic string is forbidden \(see https\://github\.com/glpi\-project/phpstan\-glpi\?tab\=readme\-ov\-file\#forbiddynamicinstantiationrule\)\.$#'
+			identifier: glpi.forbidDynamicInstantiation
+			count: 2
+			path: src/CommonAsset.php
+
+		-
+			message: '#^Function preg_match is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\preg_match;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: src/ComputerUsageProfile.php
+
+		-
+			message: '#^Function json_encode is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\json_encode;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: src/Config.php
+
+		-
+			message: '#^Instantiating an object from an unrestricted dynamic string is forbidden \(see https\://github\.com/glpi\-project/phpstan\-glpi\?tab\=readme\-ov\-file\#forbiddynamicinstantiationrule\)\.$#'
+			identifier: glpi.forbidDynamicInstantiation
+			count: 4
+			path: src/Config.php
+
+		-
+			message: '#^Instantiating an object from an unrestricted dynamic string is forbidden \(see https\://github\.com/glpi\-project/phpstan\-glpi\?tab\=readme\-ov\-file\#forbiddynamicinstantiationrule\)\.$#'
+			identifier: glpi.forbidDynamicInstantiation
+			count: 3
+			path: src/CronTask.php
+
+		-
+			message: '#^Class DateTime is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTime;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 1
+			path: src/Dashboard/DemoProvider.php
+
+		-
+			message: '#^Class DateTimeImmutable is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTimeImmutable;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 1
+			path: src/Dashboard/DemoProvider.php
+
+		-
+			message: '#^Function file_get_contents is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\file_get_contents;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: src/Dashboard/Grid.php
+
+		-
+			message: '#^Function json_decode is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\json_decode;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: src/Dashboard/Grid.php
+
+		-
+			message: '''
+				#^Call to deprecated method getUsageCarbonEmission\(\) of class GlpiPlugin\\Carbon\\Dashboard\\Provider\:
+				1\.2\.0$#
+			'''
+			identifier: staticMethod.deprecated
+			count: 1
+			path: src/Dashboard/Provider.php
+
+		-
+			message: '#^Class DateTime is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTime;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 2
+			path: src/Dashboard/Provider.php
+
+		-
+			message: '#^Class DateTimeImmutable is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTimeImmutable;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 2
+			path: src/Dashboard/Provider.php
+
+		-
+			message: '#^Class DateTime is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTime;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 1
+			path: src/Dashboard/Widget.php
+
+		-
+			message: '#^Class DateTimeImmutable is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTimeImmutable;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 1
+			path: src/Dashboard/Widget.php
+
+		-
+			message: '#^Class DateTimeImmutable is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTimeImmutable;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 1
+			path: src/DataSource/CarbonIntensity/AbstractClient.php
+
+		-
+			message: '#^Function glob is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\glob;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 2
+			path: src/DataSource/CarbonIntensity/ClientFactory.php
+
+		-
+			message: '#^Instantiating an object from an unrestricted dynamic string is forbidden \(see https\://github\.com/glpi\-project/phpstan\-glpi\?tab\=readme\-ov\-file\#forbiddynamicinstantiationrule\)\.$#'
+			identifier: glpi.forbidDynamicInstantiation
+			count: 4
+			path: src/DataSource/CarbonIntensity/ClientFactory.php
+
+		-
+			message: '#^Class DateTime is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTime;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 3
+			path: src/DataSource/CarbonIntensity/ElectricityMaps/Client.php
+
+		-
+			message: '#^Class DateTimeImmutable is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTimeImmutable;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 1
+			path: src/DataSource/CarbonIntensity/ElectricityMaps/Client.php
+
+		-
+			message: '#^Function file_get_contents is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\file_get_contents;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: src/DataSource/CarbonIntensity/ElectricityMaps/Client.php
+
+		-
+			message: '#^Function file_put_contents is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\file_put_contents;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: src/DataSource/CarbonIntensity/ElectricityMaps/Client.php
+
+		-
+			message: '#^Function json_decode is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\json_decode;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: src/DataSource/CarbonIntensity/ElectricityMaps/Client.php
+
+		-
+			message: '#^Function json_encode is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\json_encode;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: src/DataSource/CarbonIntensity/ElectricityMaps/Client.php
+
+		-
+			message: '#^Function mkdir is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\mkdir;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: src/DataSource/CarbonIntensity/ElectricityMaps/Client.php
+
+		-
+			message: '#^Function preg_match is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\preg_match;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: src/DataSource/CarbonIntensity/ElectricityMaps/Client.php
+
+		-
+			message: '#^Class DateTime is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTime;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 2
+			path: src/DataSource/CarbonIntensity/Rte/Client.php
+
+		-
+			message: '#^Function file_get_contents is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\file_get_contents;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: src/DataSource/CarbonIntensity/Rte/Client.php
+
+		-
+			message: '#^Function file_put_contents is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\file_put_contents;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: src/DataSource/CarbonIntensity/Rte/Client.php
+
+		-
+			message: '#^Function json_decode is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\json_decode;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: src/DataSource/CarbonIntensity/Rte/Client.php
+
+		-
+			message: '#^Function json_encode is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\json_encode;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: src/DataSource/CarbonIntensity/Rte/Client.php
+
+		-
+			message: '#^Function glob is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\glob;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: src/DataSource/CronTaskProvider.php
+
+		-
+			message: '#^Function json_encode is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\json_encode;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: src/DataSource/Lca/Boaviztapi/Client.php
+
+		-
+			message: '#^Function parse_url is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\parse_url;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: src/DataSource/Lca/Boaviztapi/Config.php
+
+		-
+			message: '#^Function glob is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\glob;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 2
+			path: src/DataSource/Lca/ClientFactory.php
+
+		-
+			message: '#^Instantiating an object from an unrestricted dynamic string is forbidden \(see https\://github\.com/glpi\-project/phpstan\-glpi\?tab\=readme\-ov\-file\#forbiddynamicinstantiationrule\)\.$#'
+			identifier: glpi.forbidDynamicInstantiation
+			count: 4
+			path: src/DataSource/Lca/ClientFactory.php
+
+		-
+			message: '#^Function json_decode is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\json_decode;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: src/DataSource/RestApiClient.php
+
+		-
+			message: '#^Instantiating an object from an unrestricted dynamic string is forbidden \(see https\://github\.com/glpi\-project/phpstan\-glpi\?tab\=readme\-ov\-file\#forbiddynamicinstantiationrule\)\.$#'
+			identifier: glpi.forbidDynamicInstantiation
+			count: 1
+			path: src/EmbodiedImpact.php
+
+		-
+			message: '#^Instantiating an object from an unrestricted dynamic string is forbidden \(see https\://github\.com/glpi\-project/phpstan\-glpi\?tab\=readme\-ov\-file\#forbiddynamicinstantiationrule\)\.$#'
+			identifier: glpi.forbidDynamicInstantiation
+			count: 1
+			path: src/Engine/V1/Inventory.php
+
+		-
+			message: '#^Function json_encode is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\json_encode;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: src/Impact/Embodied/Boavizta/AbstractAsset.php
+
+		-
+			message: '#^Instantiating an object from an unrestricted dynamic string is forbidden \(see https\://github\.com/glpi\-project/phpstan\-glpi\?tab\=readme\-ov\-file\#forbiddynamicinstantiationrule\)\.$#'
+			identifier: glpi.forbidDynamicInstantiation
+			count: 2
+			path: src/Impact/Embodied/Engine.php
+
+		-
+			message: '#^Class DateTime is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTime;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 1
+			path: src/Impact/History/AbstractAsset.php
+
+		-
+			message: '#^Function json_encode is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\json_encode;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: src/Impact/Usage/Boavizta/AbstractAsset.php
+
+		-
+			message: '#^Class DateTimeImmutable is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTimeImmutable;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 2
+			path: src/Report.php
+
+		-
+			message: '#^Function ob_get_clean is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_get_clean;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: src/Report.php
+
+		-
+			message: '#^Function ob_start is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_start;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: src/Report.php
+
+		-
+			message: '#^Class DateTime is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTime;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 4
+			path: src/Toolbox.php
+
+		-
+			message: '#^Class DateTime is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTime;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 2
+			path: src/UsageInfo.php
+
+		-
+			message: '#^Instantiating an object from an unrestricted dynamic string is forbidden \(see https\://github\.com/glpi\-project/phpstan\-glpi\?tab\=readme\-ov\-file\#forbiddynamicinstantiationrule\)\.$#'
+			identifier: glpi.forbidDynamicInstantiation
+			count: 1
+			path: src/UsageInfo.php
+
+		-
+			message: '#^Function define is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\define;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 7
+			path: tests/bootstrap.php
+
+		-
+			message: '#^Function ini_set is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ini_set;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/bootstrap.php
+
+		-
+			message: '#^Function spl_autoload_register is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\spl_autoload_register;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/bootstrap.php
+
+		-
+			message: '#^Parameter \#1 \$callback of function spl_autoload_register expects \(callable\(string\)\: void\)\|null, Closure\(mixed\)\: bool given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/bootstrap.php
+
+		-
+			message: '#^You should not use the `exit` function\. It prevents the execution of post\-request/post\-command routines\.$#'
+			identifier: glpi.forbidExit
+			count: 2
+			path: tests/bootstrap.php
+
+		-
+			message: '#^Function exec is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\exec;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 4
+			path: tests/install/PluginInstallTest.php
+
+		-
+			message: '#^Function fclose is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\fclose;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/install/PluginInstallTest.php
+
+		-
+			message: '#^Function file_get_contents is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\file_get_contents;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 5
+			path: tests/install/PluginInstallTest.php
+
+		-
+			message: '#^Function fopen is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\fopen;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/install/PluginInstallTest.php
+
+		-
+			message: '#^Function json_decode is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\json_decode;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 5
+			path: tests/install/PluginInstallTest.php
+
+		-
+			message: '#^Function ob_get_clean is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_get_clean;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/install/PluginInstallTest.php
+
+		-
+			message: '#^Function ob_start is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_start;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/install/PluginInstallTest.php
+
+		-
+			message: '#^Function preg_match is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\preg_match;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/install/PluginInstallTest.php
+
+		-
+			message: '#^Function preg_replace is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\preg_replace;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 2
+			path: tests/install/PluginInstallTest.php
+
+		-
+			message: '#^Function simplexml_load_file is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\simplexml_load_file;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/install/PluginInstallTest.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 6
+			path: tests/install/PluginInstallTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/integration/SearchOptionTest.php
+
+		-
+			message: '#^Function class_parents is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\class_parents;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/integration/SearchOptionTest.php
+
+		-
+			message: '#^Instantiating an object from an unrestricted dynamic string is forbidden \(see https\://github\.com/glpi\-project/phpstan\-glpi\?tab\=readme\-ov\-file\#forbiddynamicinstantiationrule\)\.$#'
+			identifier: glpi.forbidDynamicInstantiation
+			count: 1
+			path: tests/integration/SearchOptionTest.php
+
+		-
+			message: '#^Function realpath is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\realpath;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/migration/migration_to_1_2_0_Test.php
+
+		-
+			message: '#^Instantiating an object from an unrestricted dynamic string is forbidden \(see https\://github\.com/glpi\-project/phpstan\-glpi\?tab\=readme\-ov\-file\#forbiddynamicinstantiationrule\)\.$#'
+			identifier: glpi.forbidDynamicInstantiation
+			count: 3
+			path: tests/src/AbstractImpactTest.php
+
+		-
+			message: '#^Access to property \$fields on an unknown class GlpiPlugin\\Carbon\\Tests\\T\.$#'
+			identifier: class.notFound
+			count: 1
+			path: tests/src/AbstractModelTest.php
+
+		-
+			message: '#^Call to an undefined static method GlpiPlugin\\Carbon\\Tests\\T\:\:getTypeName\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 2
+			path: tests/src/AbstractModelTest.php
+
+		-
+			message: '#^Call to method displayTabContentForItem\(\) on an unknown class GlpiPlugin\\Carbon\\Tests\\T\.$#'
+			identifier: class.notFound
+			count: 1
+			path: tests/src/AbstractModelTest.php
+
+		-
+			message: '#^Call to method getFromDBByCrit\(\) on an unknown class GlpiPlugin\\Carbon\\Tests\\T\.$#'
+			identifier: class.notFound
+			count: 2
+			path: tests/src/AbstractModelTest.php
+
+		-
+			message: '#^Call to method isNewItem\(\) on an unknown class GlpiPlugin\\Carbon\\Tests\\T\.$#'
+			identifier: class.notFound
+			count: 2
+			path: tests/src/AbstractModelTest.php
+
+		-
+			message: '#^Class GlpiPlugin\\Carbon\\AbstractType not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: tests/src/AbstractModelTest.php
+
+		-
+			message: '#^Function ob_end_clean is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_end_clean;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/src/AbstractModelTest.php
+
+		-
+			message: '#^Function ob_get_clean is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_get_clean;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/src/AbstractModelTest.php
+
+		-
+			message: '#^Function ob_start is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_start;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 2
+			path: tests/src/AbstractModelTest.php
+
+		-
+			message: '#^Instantiating an object from an unrestricted dynamic string is forbidden \(see https\://github\.com/glpi\-project/phpstan\-glpi\?tab\=readme\-ov\-file\#forbiddynamicinstantiationrule\)\.$#'
+			identifier: glpi.forbidDynamicInstantiation
+			count: 1
+			path: tests/src/AbstractModelTest.php
+
+		-
+			message: '#^PHPDoc tag @var for variable \$model contains unknown class GlpiPlugin\\Carbon\\Tests\\T\.$#'
+			identifier: class.notFound
+			count: 1
+			path: tests/src/AbstractModelTest.php
+
+		-
+			message: '#^PHPDoc tag @var with type GlpiPlugin\\Carbon\\Tests\\T is not subtype of native type CommonDBTM\.$#'
+			identifier: varTag.nativeType
+			count: 1
+			path: tests/src/AbstractModelTest.php
+
+		-
+			message: '#^Parameter \#1 \$itemtype of method GlpiPlugin\\Carbon\\Tests\\CommonTestCase\:\:createItem\(\) expects class\-string\<CommonDBTM\>, class\-string\<GlpiPlugin\\Carbon\\Tests\\T\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/src/AbstractModelTest.php
+
+		-
+			message: '#^Property GlpiPlugin\\Carbon\\Tests\\AbstractModelTest\:\:\$model_itemtype has unknown class GlpiPlugin\\Carbon\\Tests\\T as its type\.$#'
+			identifier: class.notFound
+			count: 1
+			path: tests/src/AbstractModelTest.php
+
+		-
+			message: '#^Access to property \$fields on an unknown class GlpiPlugin\\Carbon\\Tests\\T\.$#'
+			identifier: class.notFound
+			count: 1
+			path: tests/src/AbstractTypeTest.php
+
+		-
+			message: '#^Call to an undefined static method GlpiPlugin\\Carbon\\Tests\\T\:\:getTypeName\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 2
+			path: tests/src/AbstractTypeTest.php
+
+		-
+			message: '#^Call to method displayTabContentForItem\(\) on an unknown class GlpiPlugin\\Carbon\\Tests\\T\.$#'
+			identifier: class.notFound
+			count: 1
+			path: tests/src/AbstractTypeTest.php
+
+		-
+			message: '#^Call to method getFromDBByCrit\(\) on an unknown class GlpiPlugin\\Carbon\\Tests\\T\.$#'
+			identifier: class.notFound
+			count: 2
+			path: tests/src/AbstractTypeTest.php
+
+		-
+			message: '#^Call to method isNewItem\(\) on an unknown class GlpiPlugin\\Carbon\\Tests\\T\.$#'
+			identifier: class.notFound
+			count: 2
+			path: tests/src/AbstractTypeTest.php
+
+		-
+			message: '#^Call to method showForItemType\(\) on an unknown class GlpiPlugin\\Carbon\\Tests\\T\.$#'
+			identifier: class.notFound
+			count: 1
+			path: tests/src/AbstractTypeTest.php
+
+		-
+			message: '#^Function ob_end_clean is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_end_clean;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/src/AbstractTypeTest.php
+
+		-
+			message: '#^Function ob_get_clean is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_get_clean;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/src/AbstractTypeTest.php
+
+		-
+			message: '#^Function ob_start is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_start;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 2
+			path: tests/src/AbstractTypeTest.php
+
+		-
+			message: '#^Instantiating an object from an unrestricted dynamic string is forbidden \(see https\://github\.com/glpi\-project/phpstan\-glpi\?tab\=readme\-ov\-file\#forbiddynamicinstantiationrule\)\.$#'
+			identifier: glpi.forbidDynamicInstantiation
+			count: 1
+			path: tests/src/AbstractTypeTest.php
+
+		-
+			message: '#^PHPDoc tag @var for variable \$type contains unknown class GlpiPlugin\\Carbon\\Tests\\T\.$#'
+			identifier: class.notFound
+			count: 1
+			path: tests/src/AbstractTypeTest.php
+
+		-
+			message: '#^PHPDoc tag @var with type GlpiPlugin\\Carbon\\Tests\\T is not subtype of native type CommonDBTM\.$#'
+			identifier: varTag.nativeType
+			count: 1
+			path: tests/src/AbstractTypeTest.php
+
+		-
+			message: '#^Parameter \#1 \$itemtype of method GlpiPlugin\\Carbon\\Tests\\CommonTestCase\:\:createItem\(\) expects class\-string\<CommonDBTM\>, class\-string\<GlpiPlugin\\Carbon\\Tests\\T\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/src/AbstractTypeTest.php
+
+		-
+			message: '#^Property GlpiPlugin\\Carbon\\Tests\\AbstractTypeTest\:\:\$type_itemtype has unknown class GlpiPlugin\\Carbon\\Tests\\T as its type\.$#'
+			identifier: class.notFound
+			count: 1
+			path: tests/src/AbstractTypeTest.php
+
+		-
+			message: '#^Call to an undefined method DateTimeInterface\:\:add\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: tests/src/CommonTestCase.php
+
+		-
+			message: '#^Call to an undefined method DateTimeInterface\:\:sub\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: tests/src/CommonTestCase.php
+
+		-
+			message: '#^Class Computer_Item not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: tests/src/CommonTestCase.php
+
+		-
+			message: '#^Function file_get_contents is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\file_get_contents;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/src/CommonTestCase.php
+
+		-
+			message: '#^Function file_put_contents is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\file_put_contents;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 2
+			path: tests/src/CommonTestCase.php
+
+		-
+			message: '#^Instantiating an object from an unrestricted dynamic string is forbidden \(see https\://github\.com/glpi\-project/phpstan\-glpi\?tab\=readme\-ov\-file\#forbiddynamicinstantiationrule\)\.$#'
+			identifier: glpi.forbidDynamicInstantiation
+			count: 2
+			path: tests/src/CommonTestCase.php
+
+		-
+			message: '#^PHPDoc tag @param references unknown parameter\: \$arg$#'
+			identifier: parameter.notFound
+			count: 1
+			path: tests/src/CommonTestCase.php
+
+		-
+			message: '#^Parameter \#1 \$mode of static method Toolbox\:\:setDebugMode\(\) expects 0\|1\|2\|null, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/src/CommonTestCase.php
+
+		-
+			message: '#^Function opendir is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\opendir;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/src/DbTestCase.php
+
+		-
+			message: '#^Function preg_match is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\preg_match;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/src/DbTestCase.php
+
+		-
+			message: '#^Function preg_replace is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\preg_replace;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/src/DbTestCase.php
+
+		-
+			message: '#^Function rmdir is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\rmdir;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/src/DbTestCase.php
+
+		-
+			message: '#^Function unlink is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\unlink;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/src/DbTestCase.php
+
+		-
+			message: '#^PHPDoc tag @param references unknown parameter\: \$dir$#'
+			identifier: parameter.notFound
+			count: 1
+			path: tests/src/DbTestCase.php
+
+		-
+			message: '#^Instantiating an object from an unrestricted dynamic string is forbidden \(see https\://github\.com/glpi\-project/phpstan\-glpi\?tab\=readme\-ov\-file\#forbiddynamicinstantiationrule\)\.$#'
+			identifier: glpi.forbidDynamicInstantiation
+			count: 5
+			path: tests/src/Engine/V1/EngineTestCase.php
+
+		-
+			message: '#^Function fgetcsv is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\fgetcsv;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/src/GlobalFixture.php
+
+		-
+			message: '#^Function fopen is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\fopen;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/src/GlobalFixture.php
+
+		-
+			message: '#^Function fwrite is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\fwrite;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 4
+			path: tests/src/GlobalFixture.php
+
+		-
+			message: '#^You should not use the `exit` function\. It prevents the execution of post\-request/post\-command routines\.$#'
+			identifier: glpi.forbidExit
+			count: 2
+			path: tests/src/GlobalFixture.php
+
+		-
+			message: '#^Instantiating an object from an unrestricted dynamic string is forbidden \(see https\://github\.com/glpi\-project/phpstan\-glpi\?tab\=readme\-ov\-file\#forbiddynamicinstantiationrule\)\.$#'
+			identifier: glpi.forbidDynamicInstantiation
+			count: 1
+			path: tests/src/Impact/History/CommonAsset.php
+
+		-
+			message: '#^Instantiating an object from an unrestricted dynamic string is forbidden \(see https\://github\.com/glpi\-project/phpstan\-glpi\?tab\=readme\-ov\-file\#forbiddynamicinstantiationrule\)\.$#'
+			identifier: glpi.forbidDynamicInstantiation
+			count: 10
+			path: tests/src/Impact/Usage/Boavizta/AbstractAsset.php
+
+		-
+			message: '#^Static property GlpiPlugin\\Carbon\\Tests\\Impact\\Usage\\Boavizta\\AbstractAsset\:\:\$itemtype \(class\-string\<CommonDBTM\>\) does not accept default value of type string\.$#'
+			identifier: property.defaultValue
+			count: 1
+			path: tests/src/Impact/Usage/Boavizta/AbstractAsset.php
+
+		-
+			message: '#^Static property GlpiPlugin\\Carbon\\Tests\\Impact\\Usage\\Boavizta\\AbstractAsset\:\:\$itemtype_model \(class\-string\<CommonDBTM\>\) does not accept default value of type string\.$#'
+			identifier: property.defaultValue
+			count: 1
+			path: tests/src/Impact/Usage/Boavizta/AbstractAsset.php
+
+		-
+			message: '#^Static property GlpiPlugin\\Carbon\\Tests\\Impact\\Usage\\Boavizta\\AbstractAsset\:\:\$itemtype_type \(class\-string\<CommonDBTM\>\) does not accept default value of type string\.$#'
+			identifier: property.defaultValue
+			count: 1
+			path: tests/src/Impact/Usage/Boavizta/AbstractAsset.php
+
+		-
+			message: '#^Function json_encode is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\json_encode;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/uninstall/PluginUninstallTest.php
+
+		-
+			message: '#^Function ob_get_clean is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_get_clean;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/uninstall/PluginUninstallTest.php
+
+		-
+			message: '#^Function ob_start is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_start;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/uninstall/PluginUninstallTest.php
+
+		-
+			message: '#^Class DateTime is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTime;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 3
+			path: tests/units/CarbonEmissionTest.php
+
+		-
+			message: '#^Class DateTime is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTime;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 8
+			path: tests/units/CarbonIntensityTest.php
+
+		-
+			message: '#^Function preg_replace is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\preg_replace;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/units/CarbonIntensityTest.php
+
+		-
+			message: '#^Method GlpiPlugin\\Carbon\\CarbonIntensity\:\:getDownloadStartDate\(\) invoked with 2 parameters, 0 required\.$#'
+			identifier: arguments.count
+			count: 2
+			path: tests/units/CarbonIntensityTest.php
+
+		-
+			message: '#^Right side of \|\| is always false\.$#'
+			identifier: booleanOr.rightAlwaysFalse
+			count: 1
+			path: tests/units/CarbonIntensityTest.php
+
+		-
+			message: '#^Function file_get_contents is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\file_get_contents;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/units/Command/ImportDashboardCommandTest.php
+
+		-
+			message: '#^Function json_decode is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\json_decode;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 2
+			path: tests/units/Command/ImportDashboardCommandTest.php
+
+		-
+			message: '#^Function ob_get_clean is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_get_clean;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/units/CommonAssetTest.php
+
+		-
+			message: '#^Function ob_start is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_start;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/units/CommonAssetTest.php
+
+		-
+			message: '#^Property GlpiPlugin\\Carbon\\Tests\\ComputerModelTest\:\:\$model_itemtype has unknown class GlpiPlugin\\Carbon\\Tests\\T as its type\.$#'
+			identifier: class.notFound
+			count: 1
+			path: tests/units/ComputerModelTest.php
+
+		-
+			message: '#^Static property GlpiPlugin\\Carbon\\Tests\\ComputerModelTest\:\:\$model_itemtype \(class\-string\<GlpiPlugin\\Carbon\\Tests\\T\>\) does not accept default value of type string\.$#'
+			identifier: property.defaultValue
+			count: 1
+			path: tests/units/ComputerModelTest.php
+
+		-
+			message: '#^Call to method showForItemType\(\) on an unknown class GlpiPlugin\\Carbon\\Tests\\T\.$#'
+			identifier: class.notFound
+			count: 1
+			path: tests/units/ComputerTypeTest.php
+
+		-
+			message: '#^Function ob_get_clean is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_get_clean;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 4
+			path: tests/units/ComputerTypeTest.php
+
+		-
+			message: '#^Function ob_start is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_start;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 4
+			path: tests/units/ComputerTypeTest.php
+
+		-
+			message: '#^Method PHPUnit\\Framework\\Assert\:\:stringStartsWith\(\) invoked with 2 parameters, 1 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: tests/units/ComputerTypeTest.php
+
+		-
+			message: '#^PHPDoc tag @var for variable \$type contains unknown class GlpiPlugin\\Carbon\\Tests\\T\.$#'
+			identifier: class.notFound
+			count: 1
+			path: tests/units/ComputerTypeTest.php
+
+		-
+			message: '#^PHPDoc tag @var with type GlpiPlugin\\Carbon\\Tests\\T is not subtype of native type CommonDBTM\.$#'
+			identifier: varTag.nativeType
+			count: 1
+			path: tests/units/ComputerTypeTest.php
+
+		-
+			message: '#^Parameter \#1 \$itemtype of method GlpiPlugin\\Carbon\\Tests\\CommonTestCase\:\:createItem\(\) expects class\-string\<CommonDBTM\>, class\-string\<GlpiPlugin\\Carbon\\Tests\\T\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/units/ComputerTypeTest.php
+
+		-
+			message: '#^Parameter \#2 \$case of method PHPUnit\\Framework\\Assert\:\:stringContains\(\) expects bool, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/units/ComputerTypeTest.php
+
+		-
+			message: '#^Parameter \#3 \$values of static method GlpiPlugin\\Carbon\\ComputerType\:\:getSpecificValueToSelect\(\) expects array\<string, mixed\>\|string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/units/ComputerTypeTest.php
+
+		-
+			message: '#^Property GlpiPlugin\\Carbon\\Tests\\ComputerTypeTest\:\:\$type_itemtype has unknown class GlpiPlugin\\Carbon\\Tests\\T as its type\.$#'
+			identifier: class.notFound
+			count: 1
+			path: tests/units/ComputerTypeTest.php
+
+		-
+			message: '#^Static property GlpiPlugin\\Carbon\\Tests\\ComputerTypeTest\:\:\$type_itemtype \(class\-string\<GlpiPlugin\\Carbon\\Tests\\T\>\) does not accept default value of type string\.$#'
+			identifier: property.defaultValue
+			count: 1
+			path: tests/units/ComputerTypeTest.php
+
+		-
+			message: '#^Function ob_get_clean is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_get_clean;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 2
+			path: tests/units/ComputerUsageProfileTest.php
+
+		-
+			message: '#^Function ob_start is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_start;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 2
+			path: tests/units/ComputerUsageProfileTest.php
+
+		-
+			message: '#^Function ob_get_clean is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_get_clean;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 4
+			path: tests/units/ConfigTest.php
+
+		-
+			message: '#^Function ob_start is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_start;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 4
+			path: tests/units/ConfigTest.php
+
+		-
+			message: '#^Class DateTime is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTime;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 5
+			path: tests/units/Dashboard/ProviderTest.php
+
+		-
+			message: '#^Method GlpiPlugin\\Carbon\\Tests\\CommonTestCase\:\:isolateInEntity\(\) invoked with 2 parameters, 0 required\.$#'
+			identifier: arguments.count
+			count: 4
+			path: tests/units/Dashboard/ProviderTest.php
+
+		-
+			message: '#^Class DateTimeImmutable is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTimeImmutable;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 41
+			path: tests/units/DataSource/CarbonIntensity/AbstractClientTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertIsArray\(\) with array will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/units/DataSource/CarbonIntensity/ElectricityMaps/ClientTest.php
+
+		-
+			message: '#^Class DateTimeImmutable is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTimeImmutable;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 1
+			path: tests/units/DataSource/CarbonIntensity/ElectricityMaps/ClientTest.php
+
+		-
+			message: '#^Function file_get_contents is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\file_get_contents;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 2
+			path: tests/units/DataSource/CarbonIntensity/ElectricityMaps/ClientTest.php
+
+		-
+			message: '#^Function json_decode is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\json_decode;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 2
+			path: tests/units/DataSource/CarbonIntensity/ElectricityMaps/ClientTest.php
+
+		-
+			message: '#^PHPDoc tag @var with type GlpiPlugin\\Carbon\\DataSource\\RestApiClientInterface is not subtype of native type PHPUnit\\Framework\\MockObject\\Stub\.$#'
+			identifier: varTag.nativeType
+			count: 2
+			path: tests/units/DataSource/CarbonIntensity/ElectricityMaps/ClientTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertIsArray\(\) with array will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 2
+			path: tests/units/DataSource/CarbonIntensity/Rte/ClientTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertIsArray\(\) with array\<mixed\> will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/units/DataSource/CarbonIntensity/Rte/ClientTest.php
+
+		-
+			message: '#^Class DateTime is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTime;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 2
+			path: tests/units/DataSource/CarbonIntensity/Rte/ClientTest.php
+
+		-
+			message: '#^Class DateTimeImmutable is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTimeImmutable;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 5
+			path: tests/units/DataSource/CarbonIntensity/Rte/ClientTest.php
+
+		-
+			message: '#^Function file_get_contents is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\file_get_contents;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/units/DataSource/CarbonIntensity/Rte/ClientTest.php
+
+		-
+			message: '#^Function json_decode is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\json_decode;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/units/DataSource/CarbonIntensity/Rte/ClientTest.php
+
+		-
+			message: '#^PHPDoc tag @var with type GlpiPlugin\\Carbon\\DataSource\\RestApiClientInterface is not subtype of native type PHPUnit\\Framework\\MockObject\\Stub\.$#'
+			identifier: varTag.nativeType
+			count: 1
+			path: tests/units/DataSource/CarbonIntensity/Rte/ClientTest.php
+
+		-
+			message: '#^Function define is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\define;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 2
+			path: tests/units/DataSource/Lca/Boaviztapi/ConfigTest.php
+
+		-
+			message: '#^Class DateTime is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTime;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 2
+			path: tests/units/Engine/V1/ComputerTest.php
+
+		-
+			message: '#^Method GlpiPlugin\\Carbon\\Tests\\CommonTestCase\:\:isolateInEntity\(\) invoked with 2 parameters, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: tests/units/Engine/V1/InventoryTest.php
+
+		-
+			message: '#^Class Computer_Item not found\.$#'
+			identifier: class.notFound
+			count: 4
+			path: tests/units/Engine/V1/MonitorTest.php
+
+		-
+			message: '#^Class DateTime is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTime;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 2
+			path: tests/units/Engine/V1/MonitorTest.php
+
+		-
+			message: '#^Instantiating an object from an unrestricted dynamic string is forbidden \(see https\://github\.com/glpi\-project/phpstan\-glpi\?tab\=readme\-ov\-file\#forbiddynamicinstantiationrule\)\.$#'
+			identifier: glpi.forbidDynamicInstantiation
+			count: 2
+			path: tests/units/Engine/V1/MonitorTest.php
+
+		-
+			message: '#^Parameter \#1 \$itemtype of method GlpiPlugin\\Carbon\\Tests\\CommonTestCase\:\:createItem\(\) expects class\-string\<CommonDBTM\>, string given\.$#'
+			identifier: argument.type
+			count: 4
+			path: tests/units/Engine/V1/MonitorTest.php
+
+		-
+			message: '#^Class DateTime is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTime;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 1
+			path: tests/units/Engine/V1/NetworkEquipmentTest.php
+
+		-
+			message: '#^Instantiating an object from an unrestricted dynamic string is forbidden \(see https\://github\.com/glpi\-project/phpstan\-glpi\?tab\=readme\-ov\-file\#forbiddynamicinstantiationrule\)\.$#'
+			identifier: glpi.forbidDynamicInstantiation
+			count: 2
+			path: tests/units/Engine/V1/NetworkEquipmentTest.php
+
+		-
+			message: '#^Parameter \#2 \$force of method CommonDBTM\:\:delete\(\) expects bool, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/units/HookTest.php
+
+		-
+			message: '#^Call to method getVersion\(\) on an unknown class GlpiPlugin\\Carbon\\Impact\\History\\Tests\\DBmysql\.$#'
+			identifier: class.notFound
+			count: 1
+			path: tests/units/Impact/History/ComputerTest.php
+
+		-
+			message: '#^Class DateTime is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTime;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 2
+			path: tests/units/Impact/History/ComputerTest.php
+
+		-
+			message: '#^Function preg_replace is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\preg_replace;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/units/Impact/History/ComputerTest.php
+
+		-
+			message: '#^Method GlpiPlugin\\Carbon\\Tests\\CommonTestCase\:\:isolateInEntity\(\) invoked with 2 parameters, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: tests/units/Impact/History/ComputerTest.php
+
+		-
+			message: '#^PHPDoc tag @var for variable \$DB contains unknown class GlpiPlugin\\Carbon\\Impact\\History\\Tests\\DBmysql\.$#'
+			identifier: class.notFound
+			count: 1
+			path: tests/units/Impact/History/ComputerTest.php
+
+		-
+			message: '#^Right side of \|\| is always false\.$#'
+			identifier: booleanOr.rightAlwaysFalse
+			count: 1
+			path: tests/units/Impact/History/ComputerTest.php
+
+		-
+			message: '#^Class DateTime is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTime;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 2
+			path: tests/units/Impact/History/MonitorTest.php
+
+		-
+			message: '#^Function preg_replace is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\preg_replace;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/units/Impact/History/MonitorTest.php
+
+		-
+			message: '#^Method GlpiPlugin\\Carbon\\Tests\\CommonTestCase\:\:isolateInEntity\(\) invoked with 2 parameters, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: tests/units/Impact/History/MonitorTest.php
+
+		-
+			message: '#^Right side of \|\| is always false\.$#'
+			identifier: booleanOr.rightAlwaysFalse
+			count: 1
+			path: tests/units/Impact/History/MonitorTest.php
+
+		-
+			message: '#^Call to method getVersion\(\) on an unknown class GlpiPlugin\\Carbon\\Impact\\History\\Tests\\DBmysql\.$#'
+			identifier: class.notFound
+			count: 1
+			path: tests/units/Impact/History/NetworkEquipmentTest.php
+
+		-
+			message: '#^Class DateTime is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTime;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 2
+			path: tests/units/Impact/History/NetworkEquipmentTest.php
+
+		-
+			message: '#^Function preg_replace is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\preg_replace;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/units/Impact/History/NetworkEquipmentTest.php
+
+		-
+			message: '#^Instantiating an object from an unrestricted dynamic string is forbidden \(see https\://github\.com/glpi\-project/phpstan\-glpi\?tab\=readme\-ov\-file\#forbiddynamicinstantiationrule\)\.$#'
+			identifier: glpi.forbidDynamicInstantiation
+			count: 1
+			path: tests/units/Impact/History/NetworkEquipmentTest.php
+
+		-
+			message: '#^Method GlpiPlugin\\Carbon\\Tests\\CommonTestCase\:\:isolateInEntity\(\) invoked with 2 parameters, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: tests/units/Impact/History/NetworkEquipmentTest.php
+
+		-
+			message: '#^PHPDoc tag @var for variable \$DB contains unknown class GlpiPlugin\\Carbon\\Impact\\History\\Tests\\DBmysql\.$#'
+			identifier: class.notFound
+			count: 1
+			path: tests/units/Impact/History/NetworkEquipmentTest.php
+
+		-
+			message: '#^Right side of \|\| is always false\.$#'
+			identifier: booleanOr.rightAlwaysFalse
+			count: 1
+			path: tests/units/Impact/History/NetworkEquipmentTest.php
+
+		-
+			message: '#^Call to method request\(\) on an unknown class GlpiPlugin\\Carbon\\Impact\\Usage\\Boavizta\\Tests\\DBmysql\.$#'
+			identifier: class.notFound
+			count: 3
+			path: tests/units/Impact/Usage/Boavizta/ComputerTest.php
+
+		-
+			message: '#^Instantiating an object from an unrestricted dynamic string is forbidden \(see https\://github\.com/glpi\-project/phpstan\-glpi\?tab\=readme\-ov\-file\#forbiddynamicinstantiationrule\)\.$#'
+			identifier: glpi.forbidDynamicInstantiation
+			count: 3
+			path: tests/units/Impact/Usage/Boavizta/ComputerTest.php
+
+		-
+			message: '#^PHPDoc tag @var for variable \$DB contains unknown class GlpiPlugin\\Carbon\\Impact\\Usage\\Boavizta\\Tests\\DBmysql\.$#'
+			identifier: class.notFound
+			count: 3
+			path: tests/units/Impact/Usage/Boavizta/ComputerTest.php
+
+		-
+			message: '#^Call to method request\(\) on an unknown class GlpiPlugin\\Carbon\\Impact\\Usage\\Boavizta\\Tests\\DBmysql\.$#'
+			identifier: class.notFound
+			count: 2
+			path: tests/units/Impact/Usage/Boavizta/MonitorTest.php
+
+		-
+			message: '#^Instantiating an object from an unrestricted dynamic string is forbidden \(see https\://github\.com/glpi\-project/phpstan\-glpi\?tab\=readme\-ov\-file\#forbiddynamicinstantiationrule\)\.$#'
+			identifier: glpi.forbidDynamicInstantiation
+			count: 2
+			path: tests/units/Impact/Usage/Boavizta/MonitorTest.php
+
+		-
+			message: '#^PHPDoc tag @var for variable \$DB contains unknown class GlpiPlugin\\Carbon\\Impact\\Usage\\Boavizta\\Tests\\DBmysql\.$#'
+			identifier: class.notFound
+			count: 2
+			path: tests/units/Impact/Usage/Boavizta/MonitorTest.php
+
+		-
+			message: '#^Static method GlpiPlugin\\Carbon\\Impact\\Usage\\Engine\:\:getEngineFromItemtype\(\) invoked with 2 parameters, 1 required\.$#'
+			identifier: arguments.count
+			count: 3
+			path: tests/units/Impact/Usage/EngineTest.php
+
+		-
+			message: '#^Class DateTime is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTime;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 6
+			path: tests/units/LocationTest.php
+
+		-
+			message: '#^Class GlpiPlugin\\Carbon\\Tests\\GlpiComputer not found\.$#'
+			identifier: class.notFound
+			count: 4
+			path: tests/units/LocationTest.php
+
+		-
+			message: '#^Parameter \#1 \$itemtype of method GlpiPlugin\\Carbon\\Tests\\CommonTestCase\:\:createItem\(\) expects class\-string\<CommonDBTM\>, string given\.$#'
+			identifier: argument.type
+			count: 4
+			path: tests/units/LocationTest.php
+
+		-
+			message: '#^Property GlpiPlugin\\Carbon\\Tests\\MonitorModelTest\:\:\$model_itemtype has unknown class GlpiPlugin\\Carbon\\Tests\\T as its type\.$#'
+			identifier: class.notFound
+			count: 1
+			path: tests/units/MonitorModelTest.php
+
+		-
+			message: '#^Static property GlpiPlugin\\Carbon\\Tests\\MonitorModelTest\:\:\$model_itemtype \(class\-string\<GlpiPlugin\\Carbon\\Tests\\T\>\) does not accept default value of type string\.$#'
+			identifier: property.defaultValue
+			count: 1
+			path: tests/units/MonitorModelTest.php
+
+		-
+			message: '#^Function ob_get_clean is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_get_clean;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 2
+			path: tests/units/MonitorTypeTest.php
+
+		-
+			message: '#^Function ob_start is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_start;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 2
+			path: tests/units/MonitorTypeTest.php
+
+		-
+			message: '#^Property GlpiPlugin\\Carbon\\Tests\\MonitorTypeTest\:\:\$type_itemtype has unknown class GlpiPlugin\\Carbon\\Tests\\T as its type\.$#'
+			identifier: class.notFound
+			count: 1
+			path: tests/units/MonitorTypeTest.php
+
+		-
+			message: '#^Static property GlpiPlugin\\Carbon\\Tests\\MonitorTypeTest\:\:\$type_itemtype \(class\-string\<GlpiPlugin\\Carbon\\Tests\\T\>\) does not accept default value of type string\.$#'
+			identifier: property.defaultValue
+			count: 1
+			path: tests/units/MonitorTypeTest.php
+
+		-
+			message: '#^Property GlpiPlugin\\Carbon\\Tests\\NetworkEquipmentModelTest\:\:\$model_itemtype has unknown class GlpiPlugin\\Carbon\\Tests\\T as its type\.$#'
+			identifier: class.notFound
+			count: 1
+			path: tests/units/NetworkEquipmentModelTest.php
+
+		-
+			message: '#^Static property GlpiPlugin\\Carbon\\Tests\\NetworkEquipmentModelTest\:\:\$model_itemtype \(class\-string\<GlpiPlugin\\Carbon\\Tests\\T\>\) does not accept default value of type string\.$#'
+			identifier: property.defaultValue
+			count: 1
+			path: tests/units/NetworkEquipmentModelTest.php
+
+		-
+			message: '#^Function ob_get_clean is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_get_clean;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 2
+			path: tests/units/NetworkEquipmentTypeTest.php
+
+		-
+			message: '#^Function ob_start is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_start;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 2
+			path: tests/units/NetworkEquipmentTypeTest.php
+
+		-
+			message: '#^Property GlpiPlugin\\Carbon\\Tests\\NetworkEquipmentTypeTest\:\:\$type_itemtype has unknown class GlpiPlugin\\Carbon\\Tests\\T as its type\.$#'
+			identifier: class.notFound
+			count: 1
+			path: tests/units/NetworkEquipmentTypeTest.php
+
+		-
+			message: '#^Static property GlpiPlugin\\Carbon\\Tests\\NetworkEquipmentTypeTest\:\:\$type_itemtype \(class\-string\<GlpiPlugin\\Carbon\\Tests\\T\>\) does not accept default value of type string\.$#'
+			identifier: property.defaultValue
+			count: 1
+			path: tests/units/NetworkEquipmentTypeTest.php
+
+		-
+			message: '#^Function ob_get_clean is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_get_clean;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/units/ProfileTest.php
+
+		-
+			message: '#^Function ob_start is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_start;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/units/ProfileTest.php
+
+		-
+			message: '#^Function ob_get_clean is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_get_clean;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/units/ReportTest.php
+
+		-
+			message: '#^Function ob_start is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_start;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/units/ReportTest.php
+
+		-
+			message: '#^Function ob_get_clean is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_get_clean;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 2
+			path: tests/units/SourceTest.php
+
+		-
+			message: '#^Function ob_start is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_start;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 2
+			path: tests/units/SourceTest.php
+
+		-
+			message: '#^Method PHPUnit\\Framework\\TestCase\:\:count\(\) invoked with 2 parameters, 0 required\.$#'
+			identifier: arguments.count
+			count: 2
+			path: tests/units/SourceTest.php
+
+		-
+			message: '#^Function ob_get_clean is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_get_clean;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 4
+			path: tests/units/Source_ZoneTest.php
+
+		-
+			message: '#^Function ob_start is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_start;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 4
+			path: tests/units/Source_ZoneTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertIsArray\(\) with array will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 3
+			path: tests/units/ToolboxTest.php
+
+		-
+			message: '#^Class DateTime is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTime;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 22
+			path: tests/units/ToolboxTest.php
+
+		-
+			message: '#^Class DateTimeImmutable is unsafe to use\. Its methods can return FALSE instead of throwing an exception\. Please add ''use Safe\\DateTimeImmutable;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.class
+			count: 2
+			path: tests/units/ToolboxTest.php
+
+		-
+			message: '#^Parameter \#1 \$year of method DateTime\:\:setDate\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/units/ToolboxTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertFalse\(\) with false will always evaluate to false\.$#'
+			identifier: method.impossibleType
+			count: 4
+			path: tests/units/UsageInfoTest.php
+
+		-
+			message: '#^Function ob_get_clean is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_get_clean;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 6
+			path: tests/units/UsageInfoTest.php
+
+		-
+			message: '#^Function ob_start is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_start;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 6
+			path: tests/units/UsageInfoTest.php
+
+		-
+			message: '#^Method PHPUnit\\Framework\\TestCase\:\:count\(\) invoked with 2 parameters, 0 required\.$#'
+			identifier: arguments.count
+			count: 2
+			path: tests/units/ZoneTest.php
+
+		-
+			message: '#^Function file_put_contents is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\file_put_contents;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 2
+			path: tests/upgrade/PluginUpgradeTest.php
+
+		-
+			message: '#^Function filesize is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\filesize;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/upgrade/PluginUpgradeTest.php
+
+		-
+			message: '#^Function fopen is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\fopen;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/upgrade/PluginUpgradeTest.php
+
+		-
+			message: '#^Function fread is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\fread;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/upgrade/PluginUpgradeTest.php
+
+		-
+			message: '#^Function json_encode is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\json_encode;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/upgrade/PluginUpgradeTest.php
+
+		-
+			message: '#^Function ob_get_clean is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_get_clean;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/upgrade/PluginUpgradeTest.php
+
+		-
+			message: '#^Function ob_start is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ob_start;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/upgrade/PluginUpgradeTest.php
+
+		-
+			message: '#^Function preg_split is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\preg_split;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: tests/upgrade/PluginUpgradeTest.php
+
+		-
+			message: '#^Function realpath is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\realpath;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 2
+			path: tests/upgrade/PluginUpgradeTest.php
+
+		-
+			message: '#^Method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) invoked with 3 parameters, 1\-2 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: tests/upgrade/PluginUpgradeTest.php
+
+		-
+			message: '#^You should not use the `exit` function\. It prevents the execution of post\-request/post\-command routines\.$#'
+			identifier: glpi.forbidExit
+			count: 1
+			path: tools/GraphViz.php
+
+		-
+			message: '#^You should not use the `exit` function\. It prevents the execution of post\-request/post\-command routines\.$#'
+			identifier: glpi.forbidExit
+			count: 1
+			path: tools/Mermaid.php
+
+		-
+			message: '#^You should not use the `exit` function\. It prevents the execution of post\-request/post\-command routines\.$#'
+			identifier: glpi.forbidExit
+			count: 1
+			path: tools/PlantUml.php
+
+		-
+			message: '#^Function preg_match is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\preg_match;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
+			identifier: theCodingMachineSafe.function
+			count: 3
+			path: tools/build-db-schema.php
+
+		-
+			message: '#^You should not use the `exit` function\. It prevents the execution of post\-request/post\-command routines\.$#'
+			identifier: glpi.forbidExit
+			count: 3
+			path: tools/build-db-schema.php
