@@ -39,6 +39,7 @@ use Glpi\Exception\Http\BadRequestHttpException;
 use Glpi\Http\Firewall;
 use Glpi\Http\RedirectResponse;
 use Glpi\Security\Attribute\SecurityStrategy;
+use GlpiPlugin\Carbon\CommonAsset;
 use GlpiPlugin\Carbon\EmbodiedImpact;
 use GlpiPlugin\Carbon\Impact\Embodied\Engine;
 use Html;
@@ -111,8 +112,16 @@ class EmbodiedImpactController extends AbstractController
 
     private function reset(Request $request): Response
     {
-        if (!$request->request->has('id')) {
-            Session::addMessageAfterRedirect(__('Missing arguments in request.', 'carbon'), false, ERROR);
+        if (!$request->request->has('itemtype') || !$request->request->has('items_id')) {
+            Session::addMessageAfterRedirect(__('Missing arguments in the request.', 'carbon'), false, ERROR);
+            return new RedirectResponse(Html::getBackUrl());
+        }
+
+        $itemtype = $request->request->getString('itemtype');
+        $items_id = $request->request->getInt('items_id');
+
+        if (!is_a($itemtype, CommonDBTM::class, true)) {
+            Session::addMessageAfterRedirect(__('Bad arguments.', 'carbon'), false, ERROR);
             return new RedirectResponse(Html::getBackUrl());
         }
 
@@ -122,18 +131,18 @@ class EmbodiedImpactController extends AbstractController
         }
 
         $embodied_impact = new EmbodiedImpact();
-        $embodied_impact->check($request->request->getInt('id'), PURGE);
-
-        $itemtype = $embodied_impact->fields['itemtype'];
-        if (!is_a($itemtype, CommonDBTM::class, true)) {
-            Session::addMessageAfterRedirect(__('Bad arguments.', 'carbon'), false, ERROR);
-            return new RedirectResponse(Html::getBackUrl());
+        $embodied_impact->getFromDBByCrit([
+            'itemtype' => $itemtype,
+            'items_id' => $items_id,
+        ]);
+        if (!$embodied_impact->isNewItem()) {
+            $embodied_impact->check($embodied_impact->getID(), PURGE);
         }
 
         $item = new $itemtype();
-        $item->check((int) $embodied_impact->fields['items_id'], UPDATE);
+        $item->check($items_id, UPDATE);
 
-        if (!$embodied_impact->delete($embodied_impact->fields)) {
+        if (!CommonAsset::deleteEmbodiedImpact($item)) {
             Session::addMessageAfterRedirect(__('Reset failed.', 'carbon'), false, ERROR);
         }
 

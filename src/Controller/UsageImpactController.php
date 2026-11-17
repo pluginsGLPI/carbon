@@ -119,12 +119,17 @@ class UsageImpactController extends AbstractController
     private function reset(Request $request): Response
     {
         if (!$request->request->has('itemtype') || !$request->request->has('items_id')) {
-            Session::addMessageAfterRedirect(__('Missing arguments in request.', 'carbon'), false, ERROR);
+            Session::addMessageAfterRedirect(__('Missing arguments in the request.', 'carbon'), false, ERROR);
             return new RedirectResponse(Html::getBackUrl());
         }
 
         $itemtype = $request->request->getString('itemtype');
         $items_id = $request->request->getInt('items_id');
+
+        if (!is_a($itemtype, CommonDBTM::class, true)) {
+            Session::addMessageAfterRedirect(__('Bad arguments.', 'carbon'), false, ERROR);
+            return new RedirectResponse(Html::getBackUrl());
+        }
 
         if (!UsageImpact::canPurge()) {
             Session::addMessageAfterRedirect(__('Reset denied.', 'carbon'), false, ERROR);

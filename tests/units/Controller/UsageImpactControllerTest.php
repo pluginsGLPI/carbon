@@ -104,6 +104,7 @@ final class UsageImpactControllerTest extends DbTestCase
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertCount(1, $_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR]);
+        $this->assertEquals('Reset denied.', $this->getSessionMessage());
         $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
     }
 
@@ -119,6 +120,7 @@ final class UsageImpactControllerTest extends DbTestCase
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertCount(1, $_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR]);
+        $this->assertEquals('Missing arguments in the request.', $this->getSessionMessage());
         $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
     }
 
@@ -136,6 +138,7 @@ final class UsageImpactControllerTest extends DbTestCase
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertCount(1, $_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR]);
+        $this->assertEquals('Reset denied.', $this->getSessionMessage());
         $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
     }
 
@@ -151,6 +154,7 @@ final class UsageImpactControllerTest extends DbTestCase
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertCount(1, $_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR]);
+        $this->assertEquals('Missing arguments in request.', $this->getSessionMessage());
         $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
     }
 
@@ -167,6 +171,7 @@ final class UsageImpactControllerTest extends DbTestCase
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertCount(1, $_SESSION['MESSAGE_AFTER_REDIRECT'][ERROR]);
+        $this->assertEquals('Bad arguments.', $this->getSessionMessage());
         $_SESSION['MESSAGE_AFTER_REDIRECT'] = [];
     }
 }
