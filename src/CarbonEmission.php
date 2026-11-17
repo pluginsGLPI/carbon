@@ -46,6 +46,8 @@ class CarbonEmission extends CommonDBChild
     public static string $itemtype = 'itemtype';
     public static string $items_id = 'items_id';
 
+    public static bool $logs_for_parent    = false;
+
     #[Override]
     public static function getTypeName($nb = 0)
     {
