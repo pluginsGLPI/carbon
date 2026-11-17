@@ -175,7 +175,7 @@ class MonitorTest extends CommonAsset
         }
 
         $this->login('glpi', 'glpi');
-        $entities_id = $this->isolateInEntity('glpi', 'glpi');
+        $entities_id = $this->isolateInEntity();
 
         $model_power = 55;
         $glpi_location = $this->createItem(GlpiLocation::class, [
