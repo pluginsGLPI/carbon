@@ -34,6 +34,7 @@ namespace GlpiPlugin\Carbon\Impact\History\Tests;
 
 use CommonDBTM;
 use DBmysql;
+use DbUtils;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\Impact\History\NetworkEquipment;
 use GlpiPlugin\Carbon\Location;
@@ -46,6 +47,7 @@ use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\Zone;
 use Infocom;
 use Location as GlpiLocation;
+use Log;
 use NetworkEquipment as GlpiNetworkEquipment;
 use NetworkEquipmentModel as GlpiNetworkEquipmentModel;
 use NetworkEquipmentType as GlpiNetworkEquipmentType;
@@ -187,6 +189,16 @@ class NetworkEquipmentTest extends CommonAsset
         $history = new NetworkEquipment();
         $start_date = '2024-02-01 00:00:00';
         $end_date =   '2024-02-08 00:00:00';
+
+
+        $previous_logs_count = (new DbUtils())->countElementsInTable(
+            getTableForItemType(Log::class),
+            [
+                'itemtype' => $asset->getType(),
+                'items_id' => $asset->getID(),
+            ]
+        );
+
         $count = $history->evaluateItem(
             $asset->getID(),
             new DateTime($start_date),
@@ -195,6 +207,16 @@ class NetworkEquipmentTest extends CommonAsset
 
         // Days interval is [$start_date, $end_date[
         $this->assertEquals(7, $count);
+
+        $new_logs_count = (new DbUtils())->countElementsInTable(
+            getTableForItemType(Log::class),
+            [
+                'itemtype' => $asset->getType(),
+                'items_id' => $asset->getID(),
+            ]
+        );
+
+        $this->assertEquals($previous_logs_count, $new_logs_count);
 
         $carbon_emission = new CarbonEmission();
         $emissions = $carbon_emission->find([
