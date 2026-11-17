@@ -33,6 +33,7 @@
 namespace GlpiPlugin\Carbon\Impact\History\Tests;
 
 use CommonDBTM;
+use DBmysql;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\Impact\History\NetworkEquipment;
 use GlpiPlugin\Carbon\Location;
@@ -148,7 +149,7 @@ class NetworkEquipmentTest extends CommonAsset
         }
 
         $this->login('glpi', 'glpi');
-        $entities_id = $this->isolateInEntity('glpi', 'glpi');
+        $entities_id = $this->isolateInEntity();
 
         $model_power = 100;
         $glpi_location = $this->createItem(GlpiLocation::class, [

@@ -218,7 +218,7 @@ class ProviderTest extends DbTestCase
 
     public function testGetSumUsageEmissionsPerModel()
     {
-        $entities_id = $this->isolateInEntity('glpi', 'glpi');
+        $entities_id = $this->isolateInEntity();
 
         $source = $this->createItem(Source::class);
         $zone = $this->createItem(Zone::class);
@@ -319,7 +319,7 @@ class ProviderTest extends DbTestCase
 
     public function testGetSumEmissionsPerType()
     {
-        $entities_id = $this->isolateInEntity('glpi', 'glpi');
+        $entities_id = $this->isolateInEntity();
 
         $source = $this->createItem(Source::class);
         $zone = $this->createItem(Zone::class);
@@ -412,7 +412,7 @@ class ProviderTest extends DbTestCase
 
     public function testGetSumPowerPerModel()
     {
-        $entities_id = $this->isolateInEntity('glpi', 'glpi');
+        $entities_id = $this->isolateInEntity();
 
         $country = $this->getUniqueString();
         $usage_profile = [
@@ -601,7 +601,7 @@ class ProviderTest extends DbTestCase
         // For a given itemtype, we first test an item which shall be not ignored
         // Then we test an item which shall be ignored
 
-        $entities_id = $this->isolateInEntity('glpi', 'glpi');
+        $entities_id = $this->isolateInEntity();
 
         // Test with a computer which must be taken into account
         $source = $this->createItem(Source::class);
