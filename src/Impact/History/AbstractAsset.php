@@ -77,6 +77,13 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
     protected string $engine_version = PLUGIN_CARBON_VERSION;
 
     /**
+     * Source zone of the asset being evaluated, read once for all its days (null when it has none)
+     */
+    private ?Source_Zone $source_zone = null;
+
+    private bool $source_zone_loaded = false;
+
+    /**
      * Get request in Query builder format to find evaluable items
      *
      * @param array $crit
@@ -184,13 +191,16 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
         if ($resume_date === null) {
             return 0;
         }
-        $start_date = max($start_date, $resume_date);
+        // Days are stored at midnight: a start date with a time would make the first day look missing on every run
+        $start_date = DateTime::createFromInterface(max($start_date, $resume_date))->setTime(0, 0, 0, 0);
 
         // Determine the last date to compute
         $last_available_date = $this->getStopDate($id);
         $end_date ??= $last_available_date ?? (new DateTime('now'))->sub(new DateInterval(self::$date_end_shift));
 
         $engine = static::getEngine($item);
+        $this->source_zone = null;
+        $this->source_zone_loaded = false;
 
         $count = 0;
         $carbon_emission = new CarbonEmission();
@@ -242,9 +252,17 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
      */
     protected function evaluateItemPerDay(CommonDBTM $item, EngineInterface $engine, DateTimeInterface $day): bool
     {
+        /** @var DBmysql $DB */
+        global $DB;
+
         $energy = $engine->getEnergyPerDay($day);
-        $source_zone = new Source_Zone();
-        if (!$source_zone->getFromDbByItem($item)) {
+        if (!$this->source_zone_loaded) {
+            $source_zone = new Source_Zone();
+            $this->source_zone = $source_zone->getFromDbByItem($item) ? $source_zone : null;
+            $this->source_zone_loaded = true;
+        }
+        $source_zone = $this->source_zone;
+        if ($source_zone === null) {
             return false;
         }
         // $zone = new Zone();
@@ -261,10 +279,10 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
             }
         }
 
-        $entry = new CarbonEmission();
         $type_fk = static::$type_itemtype::getForeignKeyField();
         $model_fk = static::$model_itemtype::getForeignKeyField();
-        $id = $entry->add([
+        // Direct insert: CommonDBTM::add() would reload the asset and reread the row for every computed day
+        return $DB->insert(CarbonEmission::getTable(), [
             'itemtype'          => $item->getType(),
             'items_id'          => $item->getID(),
             'engine'            => $this->engine,
@@ -278,9 +296,8 @@ abstract class AbstractAsset extends CommonDBTM implements AssetInterface
             'energy_quality'    => $energy->getLowestSource(),
             'emission_per_day'  => $emission->getValue(),
             'emission_quality'  => $emission->getLowestSource(),
+            'date_mod'          => $_SESSION['glpi_currenttime'],
         ]);
-
-        return !$this->isNewID($id);
     }
 
     /**

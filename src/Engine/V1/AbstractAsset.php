@@ -57,6 +57,18 @@ abstract class AbstractAsset implements EngineInterface
 
     protected CommonDBTM $item;
 
+    /**
+     * Power of the asset, read once: an engine instance evaluates one asset over many days
+     */
+    private ?TrackedInt $power = null;
+
+    /**
+     * Carbon intensity sources already read, by id
+     *
+     * @var array<int, Source|false>
+     */
+    private array $sources = [];
+
     public function __construct(CommonDBTM $item)
     {
         $types = [
@@ -126,8 +138,24 @@ abstract class AbstractAsset implements EngineInterface
      * Returns the declared power for an asset
      * @return TrackedInt
      */
+    /**
+     * Get a carbon intensity source, read once per engine instance
+     *
+     * @param int $id
+     * @return Source|false
+     */
+    protected function getSource(int $id)
+    {
+        return $this->sources[$id] ??= Source::getById($id);
+    }
+
     #[Override]
     public function getPower(): TrackedInt
+    {
+        return $this->power ??= $this->readPower();
+    }
+
+    private function readPower(): TrackedInt
     {
         /** @var DBmysql $DB */
         global $DB;

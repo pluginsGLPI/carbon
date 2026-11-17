@@ -40,12 +40,27 @@ use DateTimeInterface;
 use GlpiPlugin\Carbon\ComputerUsageProfile;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
 use GlpiPlugin\Carbon\DataTracking\TrackedInt;
-use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use Override;
 
 abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInterface
 {
+    private ?ComputerUsageProfile $usage_profile = null;
+
+    private bool $usage_profile_loaded = false;
+
+    /**
+     * Usage profile of the asset, read once: an engine instance evaluates one asset over many days
+     */
+    private function getLoadedUsageProfile(): ?ComputerUsageProfile
+    {
+        if (!$this->usage_profile_loaded) {
+            $this->usage_profile = $this->getUsageProfile();
+            $this->usage_profile_loaded = true;
+        }
+
+        return $this->usage_profile;
+    }
     /**
      * Tells if the asset is expected to run in the specified date and usage profile
      *
@@ -71,7 +86,7 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
     #[Override]
     public function getEnergyPerDay(DateTimeInterface $day): TrackedFloat
     {
-        $usage_profile = $this->getUsageProfile();
+        $usage_profile = $this->getLoadedUsageProfile();
 
         if ($usage_profile === null || !self::isUsageDay($usage_profile, $day)) {
             return new TrackedFloat(0, null, TrackedFloat::DATA_QUALITY_MANUAL);
@@ -99,7 +114,7 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
     #[Override]
     public function getCarbonEmissionPerDay(DateTimeInterface $day, Source_Zone $source_zone): ?TrackedFloat
     {
-        $usage_profile = $this->getUsageProfile();
+        $usage_profile = $this->getLoadedUsageProfile();
 
         if ($usage_profile === null || !self::isUsageDay($usage_profile, $day)) {
             return new TrackedFloat(0, null, TrackedFloat::DATA_QUALITY_MANUAL);
@@ -137,7 +152,7 @@ abstract class AbstractSwitchable extends AbstractAsset implements SwitchableInt
             return new TrackedFloat(0);
         }
 
-        $source = Source::getById($source_zone->fields['plugin_carbon_sources_id']);
+        $source = $this->getSource((int) $source_zone->fields['plugin_carbon_sources_id']);
         $fallback_source_zone = null;
         $iterator = null;
 

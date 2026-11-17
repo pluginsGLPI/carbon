@@ -93,10 +93,6 @@ function plugin_init_carbon()
     /** @var array $CFG_GLPI */
     global $CFG_GLPI;
 
-    if (!Plugin::isPluginActive('carbon')) {
-        return;
-    }
-
     require_once(__DIR__ . '/vendor/autoload.php');
     plugin_carbon_setupHooks();
     plugin_carbon_registerClasses();
@@ -151,8 +147,26 @@ function plugin_carbon_setupHooks()
     $PLUGIN_HOOKS[Hooks::PRE_ITEM_UPDATE]['carbon'][GlpiProfile::class] = 'plugin_carbon_profileUpdate';
     $PLUGIN_HOOKS[Hooks::PRE_ITEM_ADD]['carbon'][GlpiProfile::class] = 'plugin_carbon_profileAdd';
 
-    $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][] = 'lib/apexcharts.js';
-    $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][] = 'lib/carbon.js';
+    // Charts are drawn on the asset forms, the report and the dashboards (plugin cards may be added to any of them)
+    $chart_pages = [
+        '/front/computer.form.php',
+        '/front/monitor.form.php',
+        '/front/networkequipment.form.php',
+        '/plugins/carbon/',
+        '/front/central.php',
+        '/front/dashboard_assets.php',
+        '/front/dashboard_helpdesk.php',
+        '/front/ticket.php',
+        '/front/helpdesk.public.php',
+    ];
+    $request_uri = $_SERVER['REQUEST_URI'] ?? '';
+    foreach ($chart_pages as $chart_page) {
+        if (str_contains($request_uri, $chart_page)) {
+            $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][] = 'lib/apexcharts.js';
+            $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['carbon'][] = 'lib/carbon.js';
+            break;
+        }
+    }
 
     // Import CSS
     $PLUGIN_HOOKS[Hooks::ADD_CSS]['carbon'][] = 'lib/carbon.css';

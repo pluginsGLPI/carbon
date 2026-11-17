@@ -499,8 +499,12 @@ class Location extends CommonDBChild
             ],
         ]);
 
-        $result = $DB->request($request);
-        return ($result->current()['count'] > 0);
+        // One matching row is enough
+        unset($request['COUNT']);
+        $request['SELECT'] = [Location::getTableField('id')];
+        $request['LIMIT'] = 1;
+
+        return count($DB->request($request)) > 0;
     }
 
     /**

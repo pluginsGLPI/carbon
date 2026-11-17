@@ -220,6 +220,10 @@ class SearchOptions
             $fallback_carbon_intensity_subquery = Location::getCarbonIntensityDataSourceRequest([
                 Location::getTableField('id') => new QueryExpression('glpi_plugin_carbon_locations_3d6da7fccf9233a3f1a4e41183391a41.id'),
             ]);
+            // Evaluated for each displayed asset: stop at the first matching row instead of counting all of them
+            unset($fallback_carbon_intensity_subquery['COUNT']);
+            $fallback_carbon_intensity_subquery['SELECT'] = [Location::getTableField('id')];
+            $fallback_carbon_intensity_subquery['LIMIT'] = 1;
             $fallback_carbon_intensity_subquery = (new QuerySubQuery($fallback_carbon_intensity_subquery))->getQuery();
             $computation = "IF(`glpi_computers_id_963cd5e903dddc7ab00a3b70933369df`.`is_deleted` = 0
             AND `glpi_computers_id_963cd5e903dddc7ab00a3b70933369df`.`is_template` = 0
@@ -231,7 +235,7 @@ class SearchOptions
                 `glpi_plugin_carbon_computertypes_a643ab3ffd70abf99533ed214da87d60`.`power_consumption` > 0
                 OR `glpi_computermodels`.`power_consumption` > 0
             )
-            AND ($fallback_carbon_intensity_subquery) > 0, 1, 0)";
+            AND EXISTS ($fallback_carbon_intensity_subquery), 1, 0)";
             $sopt[] = [
                 'id'            => SearchOptions::IS_HISTORIZABLE,
                 'table'         => getTableForItemType($itemtype),
