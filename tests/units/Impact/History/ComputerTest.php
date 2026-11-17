@@ -270,7 +270,7 @@ class ComputerTest extends CommonAsset
     public function testEvaluateItemTwiceWhenHistoryStartsAtNonMidnightTime()
     {
         $this->login('glpi', 'glpi');
-        $this->isolateInEntity('glpi', 'glpi');
+        $this->isolateInEntity();
 
         $glpi_location = $this->createItem(GlpiLocation::class, [
             'state' => 'Quebec',
@@ -323,11 +323,11 @@ class ComputerTest extends CommonAsset
         ]);
 
         $end_date = '2024-02-08 00:00:00';
-        $count = (new Computer())->evaluateItem($asset->getID(), null, new DateTime($end_date));
+        $count = (new Computer())->evaluateItem($asset->getID(), null, new \Safe\DateTime($end_date));
         $this->assertEquals(7, $count);
 
         // The second run finds nothing to compute, instead of the first day again
-        $count = (new Computer())->evaluateItem($asset->getID(), null, new DateTime($end_date));
+        $count = (new Computer())->evaluateItem($asset->getID(), null, new \Safe\DateTime($end_date));
         $this->assertEquals(0, $count);
 
         $emissions = (new CarbonEmission())->find([
