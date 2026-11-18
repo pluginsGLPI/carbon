@@ -135,10 +135,6 @@ abstract class AbstractAsset implements EngineInterface
     }
 
     /**
-     * Returns the declared power for an asset
-     * @return TrackedInt
-     */
-    /**
      * Get a carbon intensity source, read once per engine instance
      *
      * @param int $id
@@ -149,6 +145,10 @@ abstract class AbstractAsset implements EngineInterface
         return $this->sources[$id] ??= Source::getById($id);
     }
 
+    /**
+     * Returns the declared power for an asset
+     * @return TrackedInt
+     */
     #[Override]
     public function getPower(): TrackedInt
     {

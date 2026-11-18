@@ -157,7 +157,7 @@ function plugin_carbon_setupHooks()
         '/front/dashboard_assets.php',
         '/front/dashboard_helpdesk.php',
         '/front/ticket.php',
-        '/front/helpdesk.public.php',
+        '/Helpdesk',
     ];
     $request_uri = $_SERVER['REQUEST_URI'] ?? '';
     foreach ($chart_pages as $chart_page) {

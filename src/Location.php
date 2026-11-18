@@ -398,6 +398,7 @@ class Location extends CommonDBChild
 
     /**
      * Get request to find carbon intensity sources
+     * One matching row is enough: the request selects a single location id
      *
      * @param array $crit Criterias
      * @return array
@@ -412,7 +413,7 @@ class Location extends CommonDBChild
         $source_fk = Source::getForeignKeyField();
         $zone_fk = Zone::getForeignKeyField();
         $request = [
-            'COUNT' => 'count',
+            'SELECT' => [Location::getTableField('id')],
             'FROM' => $location_table,
             'INNER JOIN' => [
                 $source_zone_table => [
@@ -468,6 +469,7 @@ class Location extends CommonDBChild
                 ],
             ],
             'WHERE' => $crit,
+            'LIMIT' => 1,
         ];
 
         return $request;
@@ -498,11 +500,6 @@ class Location extends CommonDBChild
                 Source::getTableField('fallback_level') => ['>', 0],
             ],
         ]);
-
-        // One matching row is enough
-        unset($request['COUNT']);
-        $request['SELECT'] = [Location::getTableField('id')];
-        $request['LIMIT'] = 1;
 
         return count($DB->request($request)) > 0;
     }
