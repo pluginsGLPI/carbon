@@ -47,6 +47,9 @@ class CarbonEmission extends CommonDBChild
     public static $itemtype = 'itemtype';
     public static $items_id = 'items_id';
 
+    // One row per asset and per day is computed: do not write it in the history of the asset
+    public static $logs_for_parent = false;
+
     #[Override]
     public static function getTypeName($nb = 0)
     {

@@ -4,6 +4,12 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [Unreleased]
+
+### Bug Fixes
+
+* History computation no longer stops on a duplicate row for assets entered at a non-midnight time, no longer writes a line in the asset history for every computed day, and reads the asset data once per asset; the "is historizable" search option tests the existence of carbon intensity data instead of counting it; chart scripts are loaded only on the pages that can display them
+
 ## [1.3.1](https://github.com/pluginsGLPI/carbon/compare/1.3.0...1.3.1) (2026-08-26)
 
 ### Bug Fixes

@@ -37,6 +37,7 @@ use Computer as GlpiComputer;
 use ComputerModel as GlpiComputerModel;
 use ComputerType as GlpiComputerType;
 use DateTime;
+use DbUtils;
 use GlpiPlugin\Carbon\CarbonEmission;
 use GlpiPlugin\Carbon\ComputerModel;
 use GlpiPlugin\Carbon\ComputerType;
@@ -50,6 +51,7 @@ use GlpiPlugin\Carbon\UsageInfo;
 use GlpiPlugin\Carbon\Zone;
 use Infocom;
 use Location as GlpiLocation;
+use Log;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(Computer::class)]
@@ -209,6 +211,14 @@ class ComputerTest extends CommonAsset
         $start_date = '2024-02-01 00:00:00';
         $end_date =   '2024-02-08 00:00:00';
 
+        $previous_logs_count = (new DbUtils())->countElementsInTable(
+            getTableForItemType(Log::class),
+            [
+                'itemtype' => $asset->getType(),
+                'items_id' => $asset->getID(),
+            ]
+        );
+
         $count = $history->evaluateItem(
             $asset->getID(),
             new DateTime($start_date),
@@ -217,6 +227,16 @@ class ComputerTest extends CommonAsset
 
         // Days interval is [$start_date, $end_date[
         $this->assertEquals(7, $count);
+
+        $new_logs_count = (new DbUtils())->countElementsInTable(
+            getTableForItemType(Log::class),
+            [
+                'itemtype' => $asset->getType(),
+                'items_id' => $asset->getID(),
+            ]
+        );
+
+        $this->assertEquals($previous_logs_count, $new_logs_count);
 
         $carbon_emission = new CarbonEmission();
         $emissions = $carbon_emission->find([
@@ -265,6 +285,77 @@ class ComputerTest extends CommonAsset
             $emission = array_intersect_key($emission, $expected_row);
             $this->assertEquals($expected_row, $emission);
         }
+    }
+
+    public function testEvaluateItemTwiceWhenHistoryStartsAtNonMidnightTime()
+    {
+        $this->login('glpi', 'glpi');
+        $this->isolateInEntity();
+
+        $glpi_location = $this->createItem(GlpiLocation::class, [
+            'state' => 'Quebec',
+        ]);
+        $source = new Source(); // This source exists after a fresh install
+        $source->getFromDBByCrit([
+            'name' => 'Hydro Quebec',
+        ]);
+        $zone = new Zone(); // This zone exists after a fresh install
+        $zone->getFromDBByCrit([
+            'name' => 'Quebec',
+        ]);
+        $source_zone = new Source_Zone(); // the relation source / zone also exists after a fresh install
+        $source_zone->getFromDBByCrit([
+            $source::getForeignKeyField() => $source->getID(),
+            $zone::getForeignKeyField() => $zone->getID(),
+        ]);
+        $this->createItem(Location::class, [
+            'locations_id' => $glpi_location->getID(),
+            'plugin_carbon_sources_zones_id' => $source_zone->getID(),
+        ]);
+        $glpi_model = $this->createItem(GlpiComputerModel::class, ['power_consumption' => 55]);
+        $glpi_type = $this->createItem(GlpiComputerType::class);
+        $this->createItem(ComputerType::class, [
+            GlpiComputerType::getForeignKeyField() => $glpi_type->getID(),
+        ]);
+        // No infocom date: the history starts at the creation date, which is not at midnight
+        $asset = $this->createItem(GlpiComputer::class, [
+            'computertypes_id'  => $glpi_type->getID(),
+            'computermodels_id' => $glpi_model->getID(),
+            'locations_id'      => $glpi_location->getID(),
+            'date_creation'     => '2024-02-01 10:00:00',
+            'date_mod'          => null,
+        ]);
+        $usage_profile = $this->createItem(ComputerUsageProfile::class, [
+            'time_start'   => '09:00',
+            'time_stop'    => '18:00',
+            'day_1'        => '1',
+            'day_2'        => '1',
+            'day_3'        => '1',
+            'day_4'        => '1',
+            'day_5'        => '1',
+            'day_6'        => '0',
+            'day_7'        => '0',
+        ]);
+        $this->createItem(UsageInfo::class, [
+            $usage_profile->getForeignKeyField() => $usage_profile->getID(),
+            'itemtype' => $asset->getType(),
+            'items_id' => $asset->getID(),
+        ]);
+
+        $end_date = '2024-02-08 00:00:00';
+        $count = (new Computer())->evaluateItem($asset->getID(), null, new \Safe\DateTime($end_date));
+        $this->assertEquals(7, $count);
+
+        // The second run finds nothing to compute, instead of the first day again
+        $count = (new Computer())->evaluateItem($asset->getID(), null, new \Safe\DateTime($end_date));
+        $this->assertEquals(0, $count);
+
+        $emissions = (new CarbonEmission())->find([
+            'itemtype' => $asset->getType(),
+            'items_id' => $asset->getID(),
+        ], ['date ASC']);
+        $this->assertCount(7, $emissions);
+        $this->assertEquals('2024-02-01 00:00:00', reset($emissions)['date']);
     }
 
     public function test_getHistorizableDiagnosis_when_computer_is_historizable()
