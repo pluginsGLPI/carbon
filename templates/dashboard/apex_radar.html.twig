@@ -82,5 +82,5 @@
 </div>
 
 {% block scripts %}
-{{ call('Html::script', ['/plugins/carbon/lib/carbon-dashboard.js', {}, false])|raw }}
+{{ call('Html::script', ['/plugins/carbon/lib/carbon-dashboard.js', {'version': constant('PLUGIN_CARBON_VERSION')}, false])|raw }}
 {% endblock %}
