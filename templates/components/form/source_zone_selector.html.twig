@@ -47,20 +47,6 @@
         order: 'fallback_level'
     }) }}
 
-<script type="text/javascript">
-    $(function() {
-        $('select[name="plugin_carbon_sources_id"]').on("change", function () {
-            var zone_dom_id = $('select[name="plugin_carbon_zones_id"]').prop('id').replace(/\D+/g,'');
-            $('select[name="plugin_carbon_zones_id"]').closest('.btn-group').load(
-                '{{ config('root_doc') }}/plugins/carbon/ajax/dropdownZone.php', {
-                    plugin_carbon_sources_id: document.querySelector('select[name="plugin_carbon_sources_id"]').value,
-                    dom_id: zone_dom_id
-                }
-            );
-        })
-    })
-</script>
-
 {{ fields.dropdownField('GlpiPlugin\\Carbon\\Zone',
     'plugin_carbon_zones_id',
     zone_id,

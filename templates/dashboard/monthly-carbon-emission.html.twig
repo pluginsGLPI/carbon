@@ -104,7 +104,7 @@
             <div class="col">
                 <div class="label">{{ __('Monthly usage carbon emission', 'carbon') }}</div>
                 <div class="label">{{ last_month }}</div>
-                <div class="my-3 number">{{ last_month_emissions }}</div>
+                <div class="my-3 number" data-carbon-fit-text>{{ last_month_emissions }}</div>
                 <div class="label">{{ __('Compared to %s', 'carbon')|format(penultimate_month) }}</div>
                 {% if variation > 0 %}
                     <p class="m-0 variation-up" id="monthlyComparison">↑ {{ percentage_change }}%</p>
@@ -120,14 +120,5 @@
         </div>
     </div>
 </div>
-<script>
-(function () {
-    observer = new ResizeObserver(entries => {
-        for (const entry of entries) {
-            $(entry.target).fitText(0.7);
-        }
-    })
-    observer.observe(document.querySelector('#{{ id }} .number'));
-})();
-</script>
+{{ call('Html::script', ['/plugins/carbon/lib/carbon-dashboard.js', {}, false])|raw }}
 {{ tooltip_html|raw }}

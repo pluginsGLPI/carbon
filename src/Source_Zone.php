@@ -192,32 +192,6 @@ class Source_Zone extends CommonDBRelation
             ],
             'automatic_actions_url' => CronTask::getSearchURL(),
         ]);
-
-        if (count($entries) !== 0) {
-            // At least 1 entry then add JS to toggle the state of zones
-            echo Html::scriptBlock('
-                var plugin_carbon_toggleZone = function (id) {
-                    var csrfToken = "' . Session::getNewCSRFToken() . '";
-                    var formData = new FormData();
-                    formData.append("_glpi_csrf_token", csrfToken);
-                    formData.append("id", id);
-                    fetch(CFG_GLPI["root_doc"] + "/plugins/carbon/ajax/toggleZoneDownload.php", {
-                        method: "POST",
-                        headers: {
-                            "X-Glpi-Csrf-Token": csrfToken
-                        },
-                        body: formData,
-                    }).then(response => {
-                        reloadTab();
-                    });
-                };
-                document.querySelectorAll("[data-carbon-toggle-zone]").forEach(function (button) {
-                    button.addEventListener("click", function () {
-                        plugin_carbon_toggleZone(button.dataset.carbonToggleZone);
-                    });
-                });
-            ');
-        }
     }
 
     public static function showForZone(CommonDBTM $item)
@@ -300,32 +274,6 @@ class Source_Zone extends CommonDBRelation
                 'container'     => 'mass' . static::class . mt_rand(),
             ],
         ]);
-
-        if (count($entries) !== 0) {
-            // At least 1 entry then add JS to toggle the state of zones
-            echo Html::scriptBlock('
-                var plugin_carbon_toggleZone = function (id) {
-                    var csrfToken = "' . Session::getNewCSRFToken() . '";
-                    var formData = new FormData();
-                    formData.append("_glpi_csrf_token", csrfToken);
-                    formData.append("id", id);
-                    fetch(CFG_GLPI["root_doc"] + "/plugins/carbon/ajax/toggleZoneDownload.php", {
-                        method: "POST",
-                        headers: {
-                            "X-Glpi-Csrf-Token": csrfToken
-                        },
-                        body: formData,
-                    }).then(response => {
-                        reloadTab();
-                    });
-                };
-                document.querySelectorAll("[data-carbon-toggle-zone]").forEach(function (button) {
-                    button.addEventListener("click", function () {
-                        plugin_carbon_toggleZone(button.dataset.carbonToggleZone);
-                    });
-                });
-            ');
-        }
     }
 
     /**
@@ -438,7 +386,7 @@ class Source_Zone extends CommonDBRelation
     protected static function getToggleLink(int $zone_id, ?string $state): string
     {
         $state = $state == 0 ? __('No') : __('Yes');
-        $link = '<button type="button" class="btn-as-link" data-carbon-toggle-zone="' . $zone_id . '" title="' . __('Enable / Disable', 'carbon') . '">' . $state . '</button>';
+        $link = '<a href="#" role="button" data-carbon-toggle-zone="' . $zone_id . '" data-carbon-csrf-token="' . Session::getNewCSRFToken() . '" title="' . __('Enable / Disable', 'carbon') . '">' . $state . '</a>';
         return $link;
     }
 

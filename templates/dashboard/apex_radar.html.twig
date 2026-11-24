@@ -74,7 +74,7 @@
     {{ palette_style }}
 </style>
 <div style="height: 100%">
-    <div class="card g-chart {{ class }}" id="{{ chart_id }}">
+    <div class="card g-chart {{ class }}" id="{{ chart_id }}" data-carbon-chart="{{ data|json_encode }}" data-carbon-highlight-card="cardBodyBorder1">
         <div class="chart ct-chart">{{ no_data_html }}</div>
         {# <span class="main-label">{{ label }}</span> #}
         <i class="main-icon {{ icon }}"></i>
@@ -82,16 +82,5 @@
 </div>
 
 {% block scripts %}
-<script>
-  $(document).ready(function () {
-    var currentUrl = window.location.href;
-
-    if (currentUrl.includes('dashboard')) {
-      document.getElementById('cardBodyBorder1').classList.add('border', 'border-2');
-    }
-
-    var chart = new ApexCharts(document.querySelector("#{{ chart_id }} "), {{ data|json_encode(constant('JSON_PRETTY_PRINT'))|raw }});
-    chart.render();
-  });
-</script>
+{{ call('Html::script', ['/plugins/carbon/lib/carbon-dashboard.js', {}, false])|raw }}
 {% endblock %}

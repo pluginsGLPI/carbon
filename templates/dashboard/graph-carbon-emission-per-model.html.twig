@@ -62,15 +62,10 @@
 <div class="card" id="{{ id }}">
     <div id="carbonEmissionPerModelChart" class="card-body card-max-height">
     <div class="h1 mb-3" id="carbonEmissionPerModel"></div>
-    <div class="chart-lg"></div>
+    <div class="chart-lg" data-carbon-chart="{{ data|json_encode }}"></div>
     </div>
 </div>
 
 {% block scripts %}
-<script>
-	$(document).ready(function () {
-      var carbonEmissionPerModelChart = new ApexCharts(document.querySelector("#carbonEmissionPerModelChart .chart-lg"), {{ data|json_encode(constant('JSON_PRETTY_PRINT'))|raw }});
-      carbonEmissionPerModelChart.render();
-   });
-</script>
+{{ call('Html::script', ['/plugins/carbon/lib/carbon-dashboard.js', {}, false])|raw }}
 {% endblock %}
