@@ -45,9 +45,6 @@ use Session;
 use function Safe\file_get_contents;
 use function Safe\json_decode;
 
-/**
- * @phpstan-import-type DashboardConfigDescription from Dashboard
- */
 class Grid
 {
     /**
@@ -353,7 +350,7 @@ class Grid
     /**
      * Return default dashboards data.
      *
-     * @return DashboardConfigDescription
+     * @return null|array
      */
     public static function getDefaults(?array $defaults = null): ?array
     {

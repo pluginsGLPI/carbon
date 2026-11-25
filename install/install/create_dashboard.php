@@ -33,6 +33,7 @@ use Glpi\Dashboard\Dashboard;
 use Glpi\Dashboard\Item as DashboardItem;
 use Glpi\Dashboard\Right as DashboardRight;
 use Glpi\DBAL\QueryExpression;
+use Glpi\DBAL\QueryParam;
 use GlpiPlugin\Carbon\Report;
 
 use function Safe\file_get_contents;
@@ -62,6 +63,20 @@ if ($dashboard->getFromDB($dashboard_key) === false) {
 $cards_path = Plugin::getPhpDir('carbon') . '/install/data/report_dashboard.json';
 $cards = file_get_contents($cards_path);
 $cards = json_decode($cards, true);
+$query_items = $DB->buildInsert(
+    getTableForItemType(DashboardItem::class),
+    [
+        'dashboards_dashboards_id' => new QueryParam(),
+        'gridstack_id' => new QueryParam(),
+        'card_id'      => new QueryParam(),
+        'x'            => new QueryParam(),
+        'y'            => new QueryParam(),
+        'width'        => new QueryParam(),
+        'height'       => new QueryParam(),
+        'card_options' => new QueryParam(),
+    ]
+);
+$stmt = $DB->prepare($query_items);
 foreach ($cards as $card) {
     $item = new DashboardItem();
     $rows = $item->find([
@@ -72,16 +87,20 @@ foreach ($cards as $card) {
         // The card already exists
         continue;
     }
-    $item->addForDashboard($dashboard->fields['id'], [[
-        'card_id'      => $card['card_id'],
-        'gridstack_id' => $card['gridstack_id'],
-        'x'            => $card['x'],
-        'y'            => $card['y'],
-        'width'        => $card['width'],
-        'height'       => $card['height'],
-        'card_options' => $card['card_options'],
-    ],
-    ]);
+    $DB->executeStatement(
+        $stmt,
+        [
+            $dashboard->fields['id'],
+            $card['gridstack_id'],
+            $card['card_id'],
+            $card['x'],
+            $card['y'],
+            $card['width'],
+            $card['height'],
+            $card['card_options'],
+        ],
+        ['i', 's', 's', 'i', 'i', 'i', 'i', 's']
+    );
 }
 
 // Configure rights
