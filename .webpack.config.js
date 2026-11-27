@@ -92,6 +92,11 @@ copyPatterns.push({
 });
 
 copyPatterns.push({
+    from: path.resolve(__dirname, 'js/carbon-dashboard.js'),
+    to: path.resolve(__dirname, 'public/lib/carbon-dashboard.js')
+});
+
+copyPatterns.push({
     from: path.resolve(__dirname, 'css/carbon.css'),
     to: path.resolve(__dirname, 'public/lib/carbon.css')
 });

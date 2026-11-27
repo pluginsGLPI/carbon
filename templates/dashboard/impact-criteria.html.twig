@@ -82,7 +82,7 @@
             <div class="col">
                 <div class="label">{{ label }}</div>
             </div>
-            <div class="my-3 number text-center">{{ number|raw }}</div>
+            <div class="my-3 number text-center" data-carbon-fit-text>{{ number|raw }}</div>
             <div class="info-tooltip">
                 <span id="{{ id }}_tip">
                     <i class="fa-solid fa-circle-info"></i>
@@ -91,14 +91,5 @@
         </div>
     </div>
 </div>
-<script>
-    (function () {
-        observer = new ResizeObserver(entries => {
-            for (const entry of entries) {
-                $(entry.target).fitText(0.7);
-            }
-        })
-        observer.observe(document.querySelector('#{{ id }} .number'));
-    })();
-</script>
+{{ call('Html::script', ['/plugins/carbon/lib/carbon-dashboard.js', {'version': constant('PLUGIN_CARBON_VERSION')}, false])|raw }}
 {{ tooltip_html|raw }}

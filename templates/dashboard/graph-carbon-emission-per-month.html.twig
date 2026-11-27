@@ -62,21 +62,10 @@
 <div class="card" id="{{ id }}">
   <div class="card-body">
       <div class="h1 mb-3" id="carbonEmissionPerMonth"></div>
-      <div id="carbonEmissionPerMonthChart" class="chart-lg"></div>
+      <div id="carbonEmissionPerMonthChart" class="chart-lg" data-carbon-chart="{{ data|json_encode }}" data-carbon-highlight-card="cardBodyBorder1"></div>
   </div>
 </div>
 
 {% block scripts %}
-<script>
-  $(document).ready(function () {
-    var currentUrl = window.location.href;
-
-    if (currentUrl.includes('dashboard')) {
-      document.getElementById('cardBodyBorder1').classList.add('border', 'border-2');
-    }
-
-    var carbonEmissionPerMonthChart = new ApexCharts(document.querySelector("#carbonEmissionPerMonthChart"), {{ data|json_encode(constant('JSON_PRETTY_PRINT'))|raw }});
-    carbonEmissionPerMonthChart.render();
-  });
-</script>
+{{ call('Html::script', ['/plugins/carbon/lib/carbon-dashboard.js', {'version': constant('PLUGIN_CARBON_VERSION')}, false])|raw }}
 {% endblock %}
