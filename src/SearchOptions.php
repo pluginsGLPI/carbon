@@ -231,7 +231,7 @@ class SearchOptions
                 `glpi_plugin_carbon_computertypes_a643ab3ffd70abf99533ed214da87d60`.`power_consumption` > 0
                 OR `glpi_computermodels`.`power_consumption` > 0
             )
-            AND ($fallback_carbon_intensity_subquery) > 0, 1, 0)";
+            AND EXISTS ($fallback_carbon_intensity_subquery), 1, 0)";
             $sopt[] = [
                 'id'            => SearchOptions::IS_HISTORIZABLE,
                 'table'         => getTableForItemType($itemtype),

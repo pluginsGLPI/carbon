@@ -37,7 +37,6 @@ use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
 use GlpiPlugin\Carbon\DataTracking\TrackedFloat;
-use GlpiPlugin\Carbon\Source;
 use GlpiPlugin\Carbon\Source_Zone;
 use Override;
 
@@ -74,7 +73,7 @@ abstract class AbstractPermanent extends AbstractAsset implements EngineInterfac
         $start_time = clone $day;
         $start_time->setTime(0, 0, 0, 0);
         $length = new DateInterval('PT' . 86400 . 'S'); // 24h = 86400 seconds
-        $source = Source::getById($source_zone->fields['plugin_carbon_sources_id']);
+        $source = $this->getSource((int) $source_zone->fields['plugin_carbon_sources_id']);
         $fallback_source_zone = null;
         $iterator = null;
 
